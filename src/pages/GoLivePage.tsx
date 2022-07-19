@@ -10,16 +10,22 @@ import BasicsComponent from '../components/BasicsComponent'
 import TokenComponent from '../components/TokenComponent'
 import SettingsComponent from '../components/SettingsComponent'
 import { LineWobble } from '@uiball/loaders'
-
+import { useAppSelector } from 'state/hooks'
 const GoLivePage = () => {
   const {provider} = useWeb3React();
   const [deployedGovernor,setdeployedGovernor] = useState<string>("");
   const [isLoading,setisLoading] = useState(false);
+  const title = useAppSelector((state) => state.proposal.title);
+  const purpose = useAppSelector((state) => state.proposal.purpose);
+  const deployedTokenAddress = useAppSelector((state) => state.proposal.deployedTokenAddress);
+  const longDesc = useAppSelector((state) => state.proposal.longDesc);
+  const shortDesc = useAppSelector((state) => state.proposal.shortDesc);
+  
 
   const DeployDAO = async () =>{
     const factory = await factoryCall(provider);
     setisLoading(true);
-    const creatingGovernor = await factory.createGovernor("MyGov","0x3c5bAF552449858dfa69E9dAa8b44A1a26ee2873","MyGovernor","testing","teeesting","testing..");
+    const creatingGovernor = await factory.createGovernor(title,deployedTokenAddress,title,purpose,longDesc,shortDesc);
     await creatingGovernor.wait();
     const governorAddress = await factory.deployedGovernorAddress();
     setisLoading(false)

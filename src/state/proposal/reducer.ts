@@ -3,8 +3,11 @@ import { createSlice, nanoid } from '@reduxjs/toolkit'
 export interface ProposalState {
   readonly title: string
   readonly purpose: string
+  readonly tokenTitle: string
+  readonly tokenSymbol: string
   readonly supply: number
   readonly shortDesc: string
+  readonly deployedTokenAddress: string,
   readonly longDesc: string
   readonly explain: string
   readonly holder: string
@@ -13,8 +16,11 @@ export interface ProposalState {
 const initialState: ProposalState = {
   title: "",
   purpose: "",
+  tokenTitle: "",
+  tokenSymbol: "",
   supply: 0,
   shortDesc: "",
+  deployedTokenAddress: "",
   longDesc: "",
   explain: "",
   holder: "",
@@ -30,8 +36,17 @@ const proposalSlice = createSlice({
     updatePurpose(state, action) {
       state.purpose = action.payload
     },
+    updatetokenTitle(state, action) {
+      state.tokenTitle = action.payload
+    },
+    updatetokenSymbol(state, action) {
+      state.tokenSymbol = action.payload
+    },
     updateSupply(state, action) {
       state.supply = action.payload
+    },
+    updatedeployedTokenAddress(state, action) {
+      state.deployedTokenAddress = action.payload
     },
     updateShortDesc(state, action) {
       state.shortDesc = action.payload
@@ -48,5 +63,5 @@ const proposalSlice = createSlice({
   },
 })
 
-export const { updateTitle, updatePurpose, updateSupply, updateShortDesc, updateLongDesc, updateExplain, updateHolder } = proposalSlice.actions
+export const { updateTitle, updatePurpose,updatetokenSymbol,updatetokenTitle, updateSupply, updatedeployedTokenAddress, updateShortDesc, updateLongDesc, updateExplain, updateHolder } = proposalSlice.actions
 export default proposalSlice.reducer

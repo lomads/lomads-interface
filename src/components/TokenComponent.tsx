@@ -1,9 +1,13 @@
 import React,{useState} from 'react'
+import { useAppDispatch } from 'state/hooks'
+import { updatetokenTitle, updatetokenSymbol,updateHolder } from 'state/proposal/reducer'
+import { useAppSelector } from 'state/hooks'
 
 const TokenComponent = () => {
-    const [Name, setName] = useState("");
-    const [Symbol, setSymbol] = useState("");
-    const [Holder, setHolder] = useState("");
+    const dispatch = useAppDispatch()
+    const tokenTitle = useAppSelector((state) => state.proposal.tokenTitle)
+    const tokenSymbol = useAppSelector((state) => state.proposal.tokenSymbol)
+    const holder = useAppSelector((state) => state.proposal.holder)
   return (
     <div className={"TitleBar"} style={{paddingBottom:60}}>
     <div className={"tokentitleTile"} style={{width:750}}>
@@ -13,8 +17,8 @@ const TokenComponent = () => {
             Token Name
         </div>
     </div>
-        <input className={"inputField"} type="title" name="title" value={Name} style={{height:40, width:250}}
-               autoFocus placeholder="Enter Token Name" onChange={(e)=>{setName(e.target.value)}} />
+        <input className={"inputField"} type="title" name="title" value={tokenTitle} style={{height:40, width:250}}
+               autoFocus placeholder="Enter Token Name" onChange={(e) => { dispatch(updatetokenTitle(e.target.value)) }} />
     </div>
     {/* second */}
     <div style={{marginLeft:"20px"}}>
@@ -23,8 +27,8 @@ const TokenComponent = () => {
             Symbol
         </div>
     </div>
-        <input className={"inputField"} type="title" name="title" value={Symbol} style={{height:40, width:150}}
-               placeholder="Symbol" onChange={(e)=>{setSymbol(e.target.value)}} />
+        <input className={"inputField"} type="title" name="title" value={tokenSymbol} style={{height:40, width:150}}
+               placeholder="Symbol" onChange={(e) => { dispatch(updatetokenSymbol(e.target.value)) }}/>
     </div>
     {/* third */}
     <div style={{marginLeft:"20px"}}>
@@ -33,8 +37,8 @@ const TokenComponent = () => {
             Holder
         </div>
     </div>
-        <input className={"inputField"} type="title" name="title" value={Holder} style={{height:40, width:260}}
-               placeholder="Enter Holder Address" onChange={(e)=>{setHolder(e.target.value)}} />
+        <input className={"inputField"} type="title" name="title" value={holder} style={{height:40, width:260}}
+               placeholder="Enter Holder Address" onChange={(e) => { dispatch(updateHolder(e.target.value)) }}/>
     </div>
     </div>
 </div>
