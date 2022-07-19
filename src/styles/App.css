@@ -1,0 +1,172 @@
+.App {
+  text-align: center;
+  /*background: linear-gradient(169.22deg, #FDF7F7 12.19%, #EFEFEF 92%, #DD6149 92%);*/
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+.link {
+  color: aliceblue;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.SideNav-style {
+  position: absolute;
+  left: 0%;
+  right: 66.09%;
+  top: 0%;
+  bottom: -5.86%;
+
+  background: linear-gradient(178.31deg, #C94B32 0.74%, rgba(152, 66, 54, 0.746875) 63.87%);
+}
+
+.App-login {
+  position: absolute;
+  right: 7.5%;
+  top: 2%;
+  height: 40px;
+  width: 115px;
+
+  background: #FFFFFF;
+  /*box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);*/
+  /*border-radius: 5px;*/
+  border-width: 0px;
+  /*border-color: #C94B32;*/
+  /*align-content: inherit;*/
+  /*color: #C94B32;*/
+}
+
+.App-logout {
+  position: absolute;
+  /*left: 85%;*/
+  /*right: 2%;*/
+  /*top: 2%;*/
+  /*bottom: 90%;*/
+  right: 6.5%;
+  top: 4%;
+  height: 40px;
+  width: 115px;
+
+  background: #FFFFFF;
+  box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+  border-radius: 5px;
+  border-width: 0px;
+  border-color: #C94B32;
+  align-content: inherit;
+  color: #C94B32;
+}
+
+.page-button {
+  /*right: 28%;*/
+  /*top: 4%;*/
+  height: 40px;
+  width: 120px;
+  margin-left: 600px;
+
+  background: #C94B32;
+  box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+  border-radius: 5px;
+  border-width: 0px;
+  border-color: #FFFFFF;
+  align-content: inherit;
+  color: #FFFFFF;
+}
+
+.page-header-text {
+  width: 200px;
+  height: 50px;
+
+  font-family: 'Insignia';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 80px;
+  line-height: 20px;
+  /* identical to box height, or 25% */
+
+  color: rgba(118, 128, 141, 0.1);
+}
+
+.treasury-text {
+  width: 280px;
+  height: 43px;
+  left: 157px;
+  top: 161px;
+
+  /* Big-Titles */
+
+  font-family: 'Insignia';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 35px;
+  line-height: 35px;
+  /* or 100% */
+
+  /* Light3 */
+
+  color: rgba(118, 128, 141, 0.5);
+  opacity: 0.5;
+}
+
+.accountInfo {
+  position: absolute;
+  right: 16%;
+  top: 4%;
+  width: 120px;
+  height: 30px;
+  align-content: center;
+  background: #FFFFFF;
+  /* Color-drop */
+  align-items: center;
+  text-align: center;
+  box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+  border-radius: 30px;
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 18px;
+  padding: 5px 5px 5px 25px;
+  display: flex;
+  letter-spacing: -0.011em;
+  color: #919191;
+}
+
+.react-sweet-progress-line-inner {
+  position: static;
+  min-height: 10px;
+  border-radius: 100px;
+  transition: width 0.3s ease; }

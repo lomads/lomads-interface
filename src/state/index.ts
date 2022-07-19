@@ -6,6 +6,7 @@ import user from './user/reducer'
 import connection from './connection/reducer'
 import transactions from './transactions/reducer'
 import lists from './lists/reducer'
+import proposal from './proposal/reducer'
 import multicall from "state/multicall";
 
 
@@ -17,6 +18,7 @@ const store = configureStore({
     user,
     connection,
     transactions,
+    proposal,
     lists,
     multicall: multicall.reducer
   },

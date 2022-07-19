@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import {BrowserRouter} from "react-router-dom";
 import { Provider } from 'react-redux';
 import App from 'pages/App';
 import Web3Provider from 'components/Web3Provider';
@@ -10,6 +11,7 @@ import { MulticallUpdater } from "state/multicall";
 import TransactionUpdater from 'state/transactions/updater';
 import ThemeProvider, { ThemedGlobalStyle } from './theme';
 import { LanguageProvider } from './i18n'
+import { ChakraProvider } from '@chakra-ui/react'
 
 
 const root = ReactDOM.createRoot(
@@ -25,7 +27,11 @@ root.render(
             <TransactionUpdater />
             <ThemeProvider>
               <ThemedGlobalStyle />
-              <App />
+                <BrowserRouter>
+                   <ChakraProvider>
+                     <App />
+                   </ChakraProvider>
+                </BrowserRouter>
             </ThemeProvider>
           </BlockNumberProvider>
         </Web3Provider>

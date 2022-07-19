@@ -1,49 +1,24 @@
-import React, { Suspense } from 'react'
-import styled from 'styled-components/macro'
+import React from 'react'
+import { Routes, Route } from "react-router-dom";
+import StartDAO from './StartDAO';
+import SidebarPage from './SidebarPage';
 import Header from 'components/Header'
-import Loader from 'components/Loader'
-import Polling from 'components/Header/Polling'
-
-const AppWrapper = styled.div`
-  display: flex;
-  flex-flow: column;
-  align-items: flex-start;
-`
-
-const BodyWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  padding: 120px 16px 0px 16px;
-  align-items: center;
-  flex: 1;
-  z-index: 1;
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    padding: 4rem 8px 16px 8px;
-  `};
-`
-
-const HeaderWrapper = styled.div`
-  ${({ theme }) => theme.flexRowNoWrap}
-  width: 100%;
-  justify-content: space-between;
-  position: fixed;
-  top: 0;
-  z-index: 2;
-`
+import { Context } from '../constants/context';
 
 export default function App() {
   return (
-    <AppWrapper>
-      <HeaderWrapper>
-        <Header />
-      </HeaderWrapper>
-      <BodyWrapper>
-        <Polling />
-        <Suspense fallback={<Loader />}>
-          <h1>Hello web3!</h1>
-        </Suspense>
-      </BodyWrapper>
-    </AppWrapper>
+    <Context.Provider value={{ title: '' }}>
+      <Header />
+      <div style={{ margin: 0 }}>
+        <Routes>
+          <Route path='/' element={<StartDAO />} />
+          <Route path='/basics' element={<SidebarPage page="Basics" />} />
+          <Route path='/settings' element={<SidebarPage page="Settings" />} />
+          <Route path='/token' element={<SidebarPage page="Token" />} />
+          <Route path='/golive' element={<SidebarPage page="Go Live" />} />
+          <Route path='/sidepage' element={<SidebarPage page="Basics" />} />
+        </Routes>
+      </div>
+    </Context.Provider >
   )
 }
