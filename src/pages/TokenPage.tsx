@@ -7,14 +7,13 @@ import '../styles/Sidebar.css'
 import { useWeb3React } from "@web3-react/core";
 import { useNavigate } from 'react-router-dom'
 import { factoryCall } from 'connection/DaoFactoryCall'
-import { ethers } from 'ethers'
-import { ABI } from 'abis/DaoFactory'
+import { LineWobble } from '@uiball/loaders'
 const TokenPage = () => {
     const {provider} = useWeb3React();
     const navigate = useNavigate();
-
+    const [isLoading,setisLoading] = useState(false);
     const [title, setTitle] = useState<string>("");
-    const [purpose, setPurpose] = useState<string>("");
+    const [symbol, setsymbol] = useState<string>("");
     const [explain, setExplain] = useState<string>("");
     const [supply, setSupply] = useState<number>();
     const [holder, setHolder] = useState<string>("");
@@ -26,6 +25,19 @@ const TokenPage = () => {
         // Add code here to upload file to server
         // ...
     }
+
+    const createToken = async () =>{
+        const factory = await factoryCall(provider);
+        setisLoading(true);
+        if(title.length>=3 && symbol.length>=2){
+           const creatingToken =  await factory.createToken(title,symbol,supply,explain);
+           await creatingToken.wait();
+            const tokenAddress  = await factory.deployedTokenAddress();
+            setisLoading(false);
+            setDeployed(tokenAddress);
+        }
+    }
+
 
     const handleClick = () =>{
         navigate("/golive");
@@ -72,8 +84,8 @@ const TokenPage = () => {
                         <div className={"tokenpageDescription"}>
                            A one owrd symbol signifying your project token. This symbol will be used in block explorers and token wallets.
                       </div>
-                        <input className={"inputField"} type="title" name="title" value={purpose} style={{height:40, width:240}}
-                               placeholder="Enter your Token Symbol" onChange={(e)=>{setPurpose(e.target.value)}} />
+                        <input className={"inputField"} type="title" name="title" value={symbol} style={{height:40, width:240}}
+                               placeholder="Enter your Token Symbol" onChange={(e)=>{setsymbol(e.target.value)}} />
                     </div>
                     </div>
                     
@@ -120,6 +132,20 @@ const TokenPage = () => {
                 </div>
                 <input className={"inputField"} type="holder" name="holder" value={holder} style={{height:50}}
                        autoFocus placeholder="0x3429…" onChange={(e)=>{setHolder(e.target.value)}} />
+
+               <div>
+                <div className={"subItemHeader"}>
+                        <div>
+                            Deployed Token Address
+                        </div>
+                    </div>
+                    <div className={"fieldDesc"}>
+                        Depolyed Contract address of Token.
+                    </div>
+                </div>
+                <input className={"inputField"} type="holder" name="deployedToken" value={deployed} style={{height:50}}
+                       autoFocus placeholder="0x9ddk..." onChange={(e)=>{setDeployed(e.target.value)}}/>
+                       
                 <div className={"pageItemHeader"}>
                     Icon image
                     <div className={"fieldDesc"}>
@@ -136,12 +162,23 @@ const TokenPage = () => {
                         <p>File size: {file.size} bytes</p>
                         {file && <ImageThumb image={file} />} */}
                     </div>
+                    {
+                   isLoading ? (
+                   <div>
+                    <div className={"subItemHeader"} style={{paddingBottom:20}}>
+                        Hold on we are deploying your Token
+                    </div>
+                   <LineWobble size={750} color="#C94B32" />
+                </div>):(null)
+                }
                 </div>
-                <div>Deployed:{deployed}</div>
                 <div>
-                    <button id="nextButtonToken" className={"nextButton"} onClick={handleClick}>
+                    {deployed.length>=30 ? (<button id="nextButtonToken" className={"nextButton"} onClick={handleClick}>
                         NEXT STEP
-                    </button>
+                    </button>): (<button id="nextButtonToken" className={"nextButton"} onClick={createToken}>
+                        Create Token
+                    </button>)} 
+                   
                 </div>
             </div>
   )
