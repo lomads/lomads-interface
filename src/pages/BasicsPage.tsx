@@ -12,15 +12,17 @@ import '../styles/Dashboard.css'
 import '../styles/Modal.css'
 import '../styles/Sidebar.css'
 import { imageType, tagType } from '../types';
+import { useAppDispatch } from 'state/hooks'
+import { updateTitle, updatePurpose, updateShortDesc, updateLongDesc } from 'state/proposal/reducer'
+import { useAppSelector } from 'state/hooks'
 
-
-const BasicsPage = (props:any) => {
-    const { data, setData } = props;
+const BasicsPage = () => {
+    const dispatch = useAppDispatch()
+    const title = useAppSelector((state) => state.proposal.title)
+    const purpose = useAppSelector((state) => state.proposal.purpose)
+    const shortDesc = useAppSelector((state) => state.proposal.shortDesc)
+    const longDesc = useAppSelector((state) => state.proposal.longDesc)
     const navigate = useNavigate();
-    const [title, setTitle] = useState<string>(data.title);
-    const [purpose, setPurpose] = useState<string>(data.purpose);
-    const [shortDesc, setShortDesc] = useState<string>(data.shortDesc);
-    const [longDesc, setLongDesc] = useState<string>(data.longDesc);
     const [file, setFile] = useState<string>("");
 
     function handleUpload(event: any) {
@@ -30,7 +32,6 @@ const BasicsPage = (props:any) => {
         // ...
     }
     const handleClick = () => {
-        setData({ title, purpose, shortDesc, longDesc });
         navigate("/settings")
     }
 
@@ -68,7 +69,7 @@ const BasicsPage = (props:any) => {
                         </div>
                     </div>
                     <input className={"inputField"} name="title" value={title} style={{ height: 40, width: 340 }}
-                        autoFocus placeholder="Name your DAO" onChange={(e) => { setTitle(e.target.value) }} />
+                        autoFocus placeholder="Name your DAO" onChange={(e) => { dispatch(updateTitle(e.target.value)) }} />
                 </div>
                 <div className={"titleTile"} style={{ width: 280 }}>
                     <div className={"tileItemHeader"}>
@@ -82,19 +83,19 @@ const BasicsPage = (props:any) => {
                         </div>
                     </div>
                     <input className={"inputField"} name="title" value={purpose} style={{ height: 40, width: 240 }}
-                        placeholder="Choose Purpose" onChange={(e) => { setPurpose(e.target.value) }} />
+                        placeholder="Choose Purpose" onChange={(e) => { dispatch(updatePurpose(e.target.value)) }} />
                 </div>
             </div>
             <div className={"pageItemHeader"}>
                 Short description
             </div>
             <textarea className={"shorttextField"} name="shortDesc" value={shortDesc}
-                placeholder="In a few words" onChange={(e) => { setShortDesc(e.target.value) }}></textarea>
+                placeholder="In a few words" onChange={(e) => { dispatch(updateShortDesc(e.target.value)) }}></textarea>
             <div className={"pageItemHeader"}>
                 Long description
             </div>
             <textarea className={"textField"} name="longDesc" value={longDesc} style={{ height: 150 }}
-                placeholder="Explain in detail" onChange={(e) => { setLongDesc(e.target.value) }} />
+                placeholder="Explain in detail" onChange={(e) => { dispatch(updateLongDesc(e.target.value)) }} />
             <div className={"pageItemHeader"}>
                 Cover image
                 <div className={"fieldDesc"}>

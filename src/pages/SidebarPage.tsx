@@ -7,25 +7,18 @@ import GoLivePage from './GoLivePage'
 import { sidebarPropType } from '../types'
 
 const SidebarPage = (props: sidebarPropType) => {
-  const [data, setData] = useState({
-    title: "",
-    purpose: "",
-    supply: 0,
-    shortDesc: "",
-    longDesc: ""
-  });
-
+  
   const renderPage = () => {
     if (props.page === "Basics") {
       return (
         <div>
-          <BasicsPage data={data} setData={setData} />
+          <BasicsPage/>
         </div>
       );
     } else if (props.page === "Token") {
       return (
         <div>
-          <TokenPage data={data} setData={setData} />
+          <TokenPage/>
         </div>
       );
     }
@@ -38,7 +31,7 @@ const SidebarPage = (props: sidebarPropType) => {
     } else if (props.page === "Go Live") {
       return (
         <div>
-          <GoLivePage />
+          <GoLivePage/>
         </div>
       );
     }
