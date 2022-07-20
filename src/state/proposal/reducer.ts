@@ -11,6 +11,7 @@ export interface ProposalState {
   readonly longDesc: string
   readonly explain: string
   readonly holder: string
+  readonly deployedGovernorAddress: string,
 }
 
 const initialState: ProposalState = {
@@ -24,6 +25,7 @@ const initialState: ProposalState = {
   longDesc: "",
   explain: "",
   holder: "",
+  deployedGovernorAddress: "",
 }
 
 const proposalSlice = createSlice({
@@ -60,8 +62,11 @@ const proposalSlice = createSlice({
     updateHolder(state, action) {
       state.holder = action.payload
     },
+    updatedeployedGovernorAddress(state, action) {
+      state.deployedGovernorAddress = action.payload
+    },
   },
 })
 
-export const { updateTitle, updatePurpose,updatetokenSymbol,updatetokenTitle, updateSupply, updatedeployedTokenAddress, updateShortDesc, updateLongDesc, updateExplain, updateHolder } = proposalSlice.actions
+export const { updateTitle, updatePurpose,updatetokenSymbol,updatetokenTitle, updateSupply, updatedeployedTokenAddress, updateShortDesc, updateLongDesc, updateExplain, updateHolder, updatedeployedGovernorAddress } = proposalSlice.actions
 export default proposalSlice.reducer

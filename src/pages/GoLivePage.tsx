@@ -13,7 +13,7 @@ import { LineWobble } from '@uiball/loaders'
 import { useAppSelector } from 'state/hooks'
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from 'state/hooks'
-import { updateGovernorAddress, updateTokenAddress } from 'state/proposal copy/reducer'
+import { updatedeployedGovernorAddress} from '../state/proposal/reducer'
 
 const GoLivePage = () => {
   const navigate = useNavigate();
@@ -38,7 +38,7 @@ const GoLivePage = () => {
     const governorAddress = await factory.deployedGovernorAddress();
     setisLoading(false)
 
-    dispatch(updateGovernorAddress(governorAddress))
+    dispatch(updatedeployedGovernorAddress(governorAddress))
     navigate("/dashboard");
     setdeployedGovernor(governorAddress);
   }
@@ -88,7 +88,7 @@ const GoLivePage = () => {
         deployedGovernor.length >= 32 ? (
           <div className={"subItemHeader"}>
             <div>
-              Deployed Token Address: {deployedGovernor}
+              Deployed Governor Address: {deployedGovernor}
             </div>
           </div>
         ) : (null)

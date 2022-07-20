@@ -38,7 +38,7 @@ const TokenPage = () => {
         const factory = await factoryCall(provider);
         setisLoading(true);
         if(tokenTitle.length>=3 && tokenSymbol.length>=2){
-           const creatingToken =  await factory.createToken(tokenTitle,tokenSymbol,supply,explain);
+           const creatingToken =  await factory.createToken(tokenTitle,tokenSymbol,supply,holder,explain);
            await creatingToken.wait();
             const tokenAddress  = await factory.deployedTokenAddress();
             dispatch(updatedeployedTokenAddress(tokenAddress));

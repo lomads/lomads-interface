@@ -1,6 +1,26 @@
 import React, { useState } from 'react'
+import { useWeb3React } from "@web3-react/core";
+import { useAppSelector } from 'state/hooks'
+import { tokenCall } from 'connection/DaoTokenCall'
+import { LeapFrog } from '@uiball/loaders'
+
 const MintTokenComponent = () => {
-    const [template, setTemplate] = useState("");
+    const {provider} = useWeb3React();
+    const [isLoading,setisLoading] = useState(false)
+    const [message,setMessage] = useState("");
+
+    const tokenAddress = useAppSelector((state) => state.proposal.deployedTokenAddress)
+    const tokenSupply = useAppSelector((state) => state.proposal.supply)
+    const holder = useAppSelector((state)=> state.proposal.holder)
+
+    const mintToken = async () =>{
+        setisLoading(true);
+      const token = await tokenCall(provider,tokenAddress); 
+      const mintToken = await token.mint(holder,tokenSupply)
+      await mintToken.wait()
+      setMessage("Token have been minted successfully")
+      setisLoading(false)
+    }
     return (
         <div className={"TitleBar"} style={{ paddingBottom: 60 }}>
             <div className={"tokentitleTile"} style={{ width: 750 }}>
@@ -11,11 +31,19 @@ const MintTokenComponent = () => {
                         </div>
                     </div>
                     <div style={{display: 'flex'}}>
-                        <input className={"inputField"} type="title" name="title" value={template} style={{ height: 40, width: 340 }}
-                            autoFocus placeholder="Enter Amount" onChange={(e) => { setTemplate(e.target.value) }} />
-                        <button id="buttonDeploy" className={"nextButton"}  style={{ background: '#C94B32', position: 'relative', left: '10px' }}>
+                        <input className={"inputField"} type="title" name="title" value={tokenSupply} style={{ height: 40, width: 340 }}
+                            autoFocus placeholder="Enter Amount" />
+                        <button id="buttonDeploy" className={"nextButton"}  style={{ background: '#C94B32', position: 'relative', left: '10px' }} onClick={mintToken}>
                             Mint
                         </button>
+                        <div style={{marginLeft:20}}>
+                        {
+                            isLoading ? <LeapFrog size={35} color="#C94B32"/> : null
+                        }
+                        </div>
+                    </div>
+                    <div className={"message"} style={{ width: "486px" }}>
+                        {message}
                     </div>
                 </div>
                 {/* second */}

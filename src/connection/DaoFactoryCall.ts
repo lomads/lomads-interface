@@ -6,7 +6,7 @@ import { ABI } from "abis/DaoFactory";
 
 
 export const factoryCall= async (provider: any) =>{
-    const factoryAddress = "0xc06d055a7250Ccb0C6a513fCce3B8332Ce735846";
+    const factoryAddress = "0x5D1372253dfF791eB50800108D99C1DdBa489603";
     const signer = provider?.getSigner();
     const factory = new ethers.Contract(factoryAddress,ABI,signer);
     return factory;

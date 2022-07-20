@@ -73,6 +73,11 @@ export const ABI:Array<object> = [
         "type": "uint256"
       },
       {
+        "internalType": "address",
+        "name": "_holder",
+        "type": "address"
+      },
+      {
         "internalType": "string",
         "name": "_shortdesc",
         "type": "string"
