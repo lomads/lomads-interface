@@ -11,9 +11,13 @@ const AnimatedDialogOverlay = animated(DialogOverlay)
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const StyledDialogOverlay = styled(AnimatedDialogOverlay)`
   &[data-reach-dialog-overlay] {
-    z-index: 2;
+    z-index: 10000;
+    top: 0px;
     background-color: transparent;
     overflow: hidden;
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
 
     display: flex;
     align-items: center;
@@ -47,13 +51,13 @@ const StyledDialogContent = styled(({ minHeight, maxHeight, mobile, isOpen, ...r
 
     max-width: 420px;
     ${({ maxHeight }) =>
-      maxHeight &&
-      css`
+    maxHeight &&
+    css`
         max-height: ${maxHeight}vh;
       `}
     ${({ minHeight }) =>
-      minHeight &&
-      css`
+    minHeight &&
+    css`
         min-height: ${minHeight}vh;
       `}
     display: flex;
@@ -64,15 +68,14 @@ const StyledDialogContent = styled(({ minHeight, maxHeight, mobile, isOpen, ...r
     `}
     ${({ theme, mobile }) => theme.mediaWidth.upToSmall`
       width:  85vw;
-      ${
-        mobile &&
-        css`
+      ${mobile &&
+    css`
           width: 100vw;
           border-radius: 20px;
           border-bottom-left-radius: 0;
           border-bottom-right-radius: 0;
         `
-      }
+    }
     `}
   }
 `
@@ -115,36 +118,38 @@ export default function Modal({
 
   return (
     <>
-      {fadeTransition.map(
-        // @ts-ignore
-        ({ item, key, props }) =>
-          item && (
-            <StyledDialogOverlay
-              key={key}
-              style={props}
-              onDismiss={onDismiss}
-              initialFocusRef={initialFocusRef}
-              unstable_lockFocusAcrossFrames={false}
-            >
-              <StyledDialogContent
-                {...(isMobile
-                  ? {
+      <div style={{ position: 'absolute', width: '10vw', height: '10vh' }}>
+        {fadeTransition.map(
+          // @ts-ignore
+          ({ item, key, props }) =>
+            item && (
+              <StyledDialogOverlay
+                key={key}
+                style={props}
+                onDismiss={onDismiss}
+                initialFocusRef={initialFocusRef}
+                unstable_lockFocusAcrossFrames={false}
+              >
+                <StyledDialogContent
+                  {...(isMobile
+                    ? {
                       ...bind(),
                       style: { transform: y.interpolate((y) => `translateY(${(y as number) > 0 ? y : 0}px)`) },
                     }
-                  : {})}
-                aria-label="dialog content"
-                minHeight={minHeight}
-                maxHeight={maxHeight}
-                mobile={isMobile}
-              >
-                {/* prevents the automatic focusing of inputs on mobile by the reach dialog */}
-                {!initialFocusRef && isMobile ? <div tabIndex={1} /> : null}
-                {children}
-              </StyledDialogContent>
-            </StyledDialogOverlay>
-          )
-      )}
+                    : {})}
+                  aria-label="dialog content"
+                  minHeight={minHeight}
+                  maxHeight={maxHeight}
+                  mobile={isMobile}
+                >
+                  {/* prevents the automatic focusing of inputs on mobile by the reach dialog */}
+                  {!initialFocusRef && isMobile ? <div tabIndex={1} /> : null}
+                  {children}
+                </StyledDialogContent>
+              </StyledDialogOverlay>
+            )
+        )}
+      </div>
     </>
   )
 }
