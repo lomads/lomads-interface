@@ -1,4 +1,4 @@
-import React,{useState} from 'react'
+import React, { useState } from 'react'
 import '../styles/App.css'
 import '../styles/CreateDao.css'
 import '../styles/Dashboard.css'
@@ -11,84 +11,94 @@ import TokenComponent from '../components/TokenComponent'
 import SettingsComponent from '../components/SettingsComponent'
 import { LineWobble } from '@uiball/loaders'
 import { useAppSelector } from 'state/hooks'
+import { useNavigate } from 'react-router-dom';
+import { useAppDispatch } from 'state/hooks'
+import { updateGovernorAddress, updateTokenAddress } from 'state/proposal copy/reducer'
+
 const GoLivePage = () => {
-  const {provider} = useWeb3React();
-  const [deployedGovernor,setdeployedGovernor] = useState<string>("");
-  const [isLoading,setisLoading] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch()
+  const { provider } = useWeb3React();
+  const [deployedGovernor, setdeployedGovernor] = useState<string>("");
+  const [isLoading, setisLoading] = useState(false);
   const title = useAppSelector((state) => state.proposal.title);
   const purpose = useAppSelector((state) => state.proposal.purpose);
   const deployedTokenAddress = useAppSelector((state) => state.proposal.deployedTokenAddress);
   const longDesc = useAppSelector((state) => state.proposal.longDesc);
   const shortDesc = useAppSelector((state) => state.proposal.shortDesc);
-  
 
-  const DeployDAO = async () =>{
+
+  const DeployDAO = async () => {
+    // navigate("/dashboard");
+
     const factory = await factoryCall(provider);
     setisLoading(true);
-    const creatingGovernor = await factory.createGovernor(title,deployedTokenAddress,title,purpose,longDesc,shortDesc);
+    const creatingGovernor = await factory.createGovernor(title, deployedTokenAddress, title, purpose, longDesc, shortDesc);
     await creatingGovernor.wait();
     const governorAddress = await factory.deployedGovernorAddress();
     setisLoading(false)
+
+    dispatch(updateGovernorAddress(governorAddress))
+    navigate("/dashboard");
     setdeployedGovernor(governorAddress);
-
-
   }
-  return (
-    <div className={"something"} style={{paddingLeft:480, paddingTop:100,paddingBottom:100}}>
-                <div className={"pageTitle"}>
-                    Go live
-                </div>
-                <div className={"pageDescription"} style={{width:"486px"}}>
-                    Take your crowdfund public by completing the final checklist, cross-checking the values, and ensuring there aren’t any mis-spellings.
-                </div>
-                <div>
-                   <div className={"gotitle"}>
-                     Basics
-                   </div>
-                   <div>
-                    <BasicsComponent/>
-                   </div>
-                </div>
-                <div>
-                   <div className={"gotitle"}>
-                     Settings
-                   </div>
-                   <div>
-                    <SettingsComponent/>
-                   </div>
-                </div>
-                <div>
-                   <div className={"gotitle"}>
-                     Token
-                   </div>
-                   <div>
-                    <TokenComponent/>
-                   </div>
-                   {
-                   isLoading ? (
-                   <div>
-                    <div className={"subItemHeader"} style={{paddingBottom:20}}>
-                        Hold on we are deploying your Governor
-                    </div>
-                   <LineWobble size={750} color="#C94B32" />
-                </div>):(null)
-                }
-                </div>
-                {
-                  deployedGovernor.length>=32 ? (
-                    <div className={"subItemHeader"}>
-                            <div>
-                                Deployed Token Address: {deployedGovernor}
-                            </div>
-                        </div> 
-                        ) : (null)
-                }
 
-                <div>
-                    <button id="buttonDeploy" className={"nextButton"} onClick={DeployDAO}>
-                        DEPLOY
-                    </button>
-                </div>
+  return (
+    <div className={"something"} style={{ paddingLeft: 480, paddingTop: 100, paddingBottom: 100 }}>
+      <div className={"pageTitle"}>
+        Go live
+      </div>
+      <div className={"pageDescription"} style={{ width: "486px" }}>
+        Take your crowdfund public by completing the final checklist, cross-checking the values, and ensuring there aren’t any mis-spellings.
+      </div>
+      <div>
+        <div className={"gotitle"}>
+          Basics
+        </div>
+        <div>
+          <BasicsComponent />
+        </div>
+      </div>
+      <div>
+        <div className={"gotitle"}>
+          Settings
+        </div>
+        <div>
+          <SettingsComponent />
+        </div>
+      </div>
+      <div>
+        <div className={"gotitle"}>
+          Token
+        </div>
+        <div>
+          <TokenComponent />
+        </div>
+        {
+          isLoading ? (
+            <div>
+              <div className={"subItemHeader"} style={{ paddingBottom: 20 }}>
+                Hold on we are deploying your Governor
+              </div>
+              <LineWobble size={750} color="#C94B32" />
+            </div>) : (null)
+        }
+      </div>
+      {
+        deployedGovernor.length >= 32 ? (
+          <div className={"subItemHeader"}>
+            <div>
+              Deployed Token Address: {deployedGovernor}
+            </div>
+          </div>
+        ) : (null)
+      }
+
+      <div>
+        <button id="buttonDeploy" className={"nextButton"} onClick={DeployDAO}>
+          DEPLOY
+        </button>
+      </div>
     </div>
   )
 }

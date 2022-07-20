@@ -4,21 +4,22 @@ import BasicsPage from './BasicsPage'
 import SettingsPage from './SettingsPage'
 import TokenPage from './TokenPage'
 import GoLivePage from './GoLivePage'
+import Dashboard from './Dashboard'
 import { sidebarPropType } from '../types'
 
 const SidebarPage = (props: sidebarPropType) => {
-  
+
   const renderPage = () => {
     if (props.page === "Basics") {
       return (
         <div>
-          <BasicsPage/>
+          <BasicsPage />
         </div>
       );
     } else if (props.page === "Token") {
       return (
         <div>
-          <TokenPage/>
+          <TokenPage />
         </div>
       );
     }
@@ -31,7 +32,13 @@ const SidebarPage = (props: sidebarPropType) => {
     } else if (props.page === "Go Live") {
       return (
         <div>
-          <GoLivePage/>
+          <GoLivePage />
+        </div>
+      );
+    } else if (props.page === "Dashboard") {
+      return (
+        <div>
+          <Dashboard />
         </div>
       );
     }

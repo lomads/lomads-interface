@@ -16,6 +16,7 @@ export default function App() {
           <Route path='/settings' element={<SidebarPage page="Settings" />} />
           <Route path='/token' element={<SidebarPage page="Token" />} />
           <Route path='/golive' element={<SidebarPage page="Go Live" />} />
+          <Route path='/dashboard' element={<SidebarPage page="Dashboard" />} />
           <Route path='/sidepage' element={<SidebarPage page="Basics" />} />
         </Routes>
       </div>
