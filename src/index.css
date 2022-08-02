@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .pageSubItemHeader {
+        font-family: 'Open Sans';
+        font-style: normal;
+        letter-spacing: -0.011em;
+        color: ;
+      }
+}
