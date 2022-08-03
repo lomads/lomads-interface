@@ -79,13 +79,20 @@ const GoLivePage = () => {
   }
 
   const createToken = async () => {
-    // const ipfs = await getIPFSInstance();
-    // const orbitdb = await getOrbitInstance(ipfs);
-    // const db = await getDB(orbitdb);
-    // await setValue(db, 'aa', 'aa');
-    // const value = await getValue(db, 'aa');
-    // console.log(value);
-    // return;
+    const ipfs = await getIPFSInstance();
+    console.log("IPFS is ", ipfs);
+
+    const orbitdb = await getOrbitInstance(ipfs);
+    console.log("Orbit DB is ", orbitdb);
+    
+    const db = await getDB(orbitdb);
+    console.log("DB is ", db);
+
+
+    await setValue(db, 'aa', 'aa');
+    const value = await getValue(db, 'aa');
+    console.log(value);
+    return;
 
     const factory = await factoryCall(provider);
     setisLoading(true);

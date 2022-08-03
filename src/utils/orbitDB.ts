@@ -2,11 +2,14 @@ import { create } from 'ipfs';
 const OrbitDB = require("orbit-db");
 
 // optional settings for the ipfs instance
-const ipfsOptions = {
-  EXPERIMENTAL: {
-    pubsub: true
-  }
-}
+// const ipfsOptions = {
+//   EXPERIMENTAL: {
+//     pubsub: true
+//   }
+// }
+
+const ipfsOptions = { repo : './ipfs', }
+
 
 // Create IPFS instance with optional config
 const getIPFSInstance = async () => {
