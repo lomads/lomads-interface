@@ -10,12 +10,10 @@ import '../styles/App.css'
 import '../styles/CreateDao.css'
 import '../styles/Dashboard.css'
 import '../styles/Modal.css'
-import '../styles/Sidebar.css'
-
 
 const LoginPage = () => {
     const navigate = useNavigate();
-    const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
+    const [web3auth,setWeb3auth] = useState<Web3Auth | null>(null)
     const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null);
     const clientId = "BJywQytxS6QAqZSwyDUmNQT490GiyjZNbCHOIggKPEHJXBkIQb2HS3RbV8pQsEcsJ9WySXFVi9MFwMG7T9v7Ux8";
   
@@ -35,7 +33,12 @@ const LoginPage = () => {
   
         const web3auth = new Web3Auth({
           clientId,
-          chainConfig: polygonMumbaiConfig
+          chainConfig: polygonMumbaiConfig,
+          uiConfig: {
+            theme: "light",
+            appLogo: "https://user-images.githubusercontent.com/87822922/182828442-99abd9eb-ca46-43d6-89fc-07833a907dc0.svg",
+            loginMethodsOrder: ["google","facebook","discord","github","twitter"]
+          }
         });
   
         setWeb3auth(web3auth);
@@ -62,36 +65,31 @@ const LoginPage = () => {
       setProvider(web3authProvider);
     };
   
-    const getUserInfo = async () => {
-      if (!web3auth) {
-        console.log("web3auth not initialized yet");
-        return;
-      }
-      const user = await web3auth.getUserInfo();
-      console.log(web3auth.provider)
-      console.log(user);
-    };
+    // const getUserInfo = async () => {
+    //   if (!web3auth) {
+    //     console.log("web3auth not initialized yet");
+    //     return;
+    //   }
+    //   const user = await web3auth.getUserInfo();
+    //   console.log(web3auth.provider)
+    //   console.log(user);
+    // };
   
-    const logout = async () => {
-      if (!web3auth) {
-        console.log("web3auth not initialized yet");
-        return;
-      }
-      await web3auth.logout();
-      setProvider(null);
-    };
-    const unloggedInView = (
-        <button onClick={login} className="card">
-          Login
-        </button>
-      );
+    // const logout = async () => {
+    //   if (!web3auth) {
+    //     console.log("web3auth not initialized yet");
+    //     return;
+    //   }
+    //   await web3auth.logout();
+    //   setProvider(null);
+    // };
    
-    const moralisLogin=()=>{
+    const nextLogin=()=>{
         navigate('/createdao');
     }
+    
   return (
-        <div>
-            {!provider ? unloggedInView : (<div className={"createDaoLogin"}>
+            <div className={"createDaoLogin"}>
             <div className="logo">
                 <img src={createDao} alt=""/>
             </div>
@@ -103,17 +101,16 @@ const LoginPage = () => {
             </div>  
             <div className={"body"}>
                 {/*onClick={() => loginWeb3auth("metamask")}*/}
-                <button className="modalLoginButton" onClick={moralisLogin}>
+                <button className="modalLoginButton" onClick={nextLogin}>
                    <img src={metamask2} style={{padding:40}} alt="MetaMask"/>
                 </button>
-                <button className="modalLoginButton" onClick={moralisLogin}>
+                <button className="modalLoginButton" onClick={nextLogin}>
                    <img src={walletconnect} style={{padding:40}} alt="MetaMask"/>
                 </button>
                 <div className={"loginWithoutWallet"}>
-                   <a style={{textDecorationLine: "underline"}} href="/">login without crypto wallet </a>
+                   <button className='font-sans text-sm text-text_color' onClick={login}>login without crypto wallet </button>
                 </div>
             </div>
-        </div>)}
         </div>
   )
 }

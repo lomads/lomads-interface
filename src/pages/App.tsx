@@ -22,7 +22,7 @@ export default function App() {
           <Route path='/token' element={<SidebarPage page="Token" />} />
           <Route path='/golive' element={<SidebarPage page="Go Live" />} />
           <Route path='/dashboard' element={<SidebarPage page="Dashboard" />} />
-          <Route path='/sidepage' element={[<Header/>,<SidebarPage page="Basics" />]} />
+          <Route path='/sidepage' element={<SidebarPage page='Basics'/>} />
           <Route path='/tag' element={<MyTag/>}/>
         </Routes>
       </div>

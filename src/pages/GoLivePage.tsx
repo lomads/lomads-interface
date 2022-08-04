@@ -13,7 +13,6 @@ import { LineWobble } from '@uiball/loaders'
 import { useAppSelector } from 'state/hooks'
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from 'state/hooks'
-import { updatedeployedGovernorAddress,updatedeployedTokenAddress} from '../state/proposal/reducer'
 import {
   Modal,
   ModalOverlay,
@@ -24,11 +23,13 @@ import {
   useDisclosure,
   Button
 } from '@chakra-ui/react'
+import { updatedeployedGovernorAddress, updatedeployedTokenAddress } from '../state/proposal/reducer'
+import Header from 'components/Header';
 
 const GoLivePage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch()
-  const { provider,connector } = useWeb3React();
+  const { provider, connector } = useWeb3React();
   const [deployedGovernor, setdeployedGovernor] = useState<string>("");
   const [isLoading, setisLoading] = useState(false);
   const title = useAppSelector((state) => state.proposal.title);
@@ -45,34 +46,35 @@ const GoLivePage = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-const addToken = async () =>{
-const tokenAddress = deployedTokenAddress;
-const tokenSymbol = deployedTokenSymbol;
-const tokenDecimals = 18;
-const tokenImage = 'https://user-images.githubusercontent.com/87822922/182279388-17db0814-b7f4-4b74-b79a-fdbda12c696b.png';
 
-try {
-  const wasAdded = connector.provider?.request({
-    method: 'wallet_watchAsset',
-    params: {
-      type: 'ERC20', 
-      options: {
-        address: tokenAddress, 
-        symbol: tokenSymbol, 
-        decimals: tokenDecimals, 
-        image: tokenImage, 
-      },
-    },
-  });
+  const addToken = async () => {
+    const tokenAddress = deployedTokenAddress;
+    const tokenSymbol = deployedTokenSymbol;
+    const tokenDecimals = 18;
+    const tokenImage = 'https://user-images.githubusercontent.com/87822922/182279388-17db0814-b7f4-4b74-b79a-fdbda12c696b.png';
 
-  if (wasAdded) {
-    console.log('Thanks for your interest!');
-  } else {
-    console.log('Your loss!');
-  }
-} catch (error) {
-  console.log(error);
-}
+    try {
+      const wasAdded = connector.provider?.request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20',
+          options: {
+            address: tokenAddress,
+            symbol: tokenSymbol,
+            decimals: tokenDecimals,
+            image: tokenImage,
+          },
+        },
+      });
+
+      if (wasAdded) {
+        console.log('Thanks for your interest!');
+      } else {
+        console.log('Your loss!');
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   const DeployDAO = async () => {
@@ -89,22 +91,22 @@ try {
     setdeployedGovernor(governorAddress);
   }
 
-  const createToken = async () =>{
-    onClose()
-    if(tokenTitle.length>=2 && tokenSymbol.length>=2){
+  const createToken = async () => {
     const factory = await factoryCall(provider);
     setisLoading(true);
-    const creatingToken =  await factory.createToken(tokenTitle,tokenSymbol,supply,holder,explain);
+    const creatingToken = await factory.createToken(tokenTitle, tokenSymbol, supply, holder, explain);
     await creatingToken.wait();
-    const tokenAddress  = await factory.deployedTokenAddress();
+    const tokenAddress = await factory.deployedTokenAddress();
     dispatch(updatedeployedTokenAddress(tokenAddress));
     await DeployDAO()
-    }
-}
+  }
 
   return (
     <>
-    <div className={"something"} style={{ paddingLeft: 480, paddingTop: 100, paddingBottom: 100,height:1600,width:"100%" }}>
+    <div className='absolute top-0 right-0'>
+        <Header/>
+    </div>
+    <div className={"something"} style={{ paddingLeft: 480, paddingTop: 100, paddingBottom: 100, height: 1600, width: "100%" }}>
       <div className={"pageTitle"}>
         Go live
       </div>
@@ -112,13 +114,13 @@ try {
         Take your crowdfund public by completing the final checklist, cross-checking the values, and ensuring there aren’t any mis-spellings.
       </div>
       <div>
-        <BasicsComponent/>
+        <BasicsComponent />
       </div>
       <div>
-          <SettingsComponent />
+        <SettingsComponent />
       </div>
       <div>
-          <TokenComponent />
+        <TokenComponent />
         {
           isLoading ? (
             <div>
@@ -170,6 +172,7 @@ try {
       </Modal>
     </>
   )
-}
+
+  }
 
 export default GoLivePage

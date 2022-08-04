@@ -15,6 +15,7 @@ import { updateTitle, updatePurpose, updateShortDesc, updateLongDesc } from 'sta
 import { useAppSelector } from 'state/hooks'
 import CommunityTag from './CommunityTag';
 import KeywordTag from './KeywordTag';
+import Header from 'components/Header';
 
 const BasicsPage = () => {
     const dispatch = useAppDispatch()
@@ -41,6 +42,10 @@ const BasicsPage = () => {
 
 
     return (
+        <>
+        <div className='absolute top-0 right-0'>
+            <Header/>
+        </div>
         <div className={"something"} style={{ paddingLeft: 480, paddingTop: 100, paddingBottom: 100,height:1600 }}>
             <div className={"pageTitle"}>
                 Basics
@@ -131,6 +136,7 @@ const BasicsPage = () => {
                 </button>
             </div>
         </div>
+        </>
     )
 }
 

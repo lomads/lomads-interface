@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAppDispatch } from 'state/hooks'
 import { updatetokenTitle,updatetokenSymbol, updateExplain, updateSupply, updateHolder } from 'state/proposal/reducer'
 import { useAppSelector } from 'state/hooks'
+import Header from 'components/Header';
 
 
 const TokenPage = () => {
@@ -30,6 +31,10 @@ const TokenPage = () => {
         navigate("/golive");
     }
     return (
+       <>
+       <div className='absolute top-0 right-0'>
+        <Header/>
+       </div>
         <div className={"something"} style={{ paddingLeft: 480, paddingTop: 100, paddingBottom: 100,height:1600 }}>
             <div className={"pageTitle"}>
                 Token
@@ -143,6 +148,7 @@ const TokenPage = () => {
                 </div>
                 </div>
             
+       </>
     )
 }
 

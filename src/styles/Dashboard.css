@@ -140,7 +140,7 @@
   width: 100%;
   display: flex;
   letter-spacing: -0.011em;
-  align-items: end;
+  align-items: flex-end;
   color: #76808D;
   padding-top: 25px;
   padding-bottom: 10px;
@@ -170,7 +170,7 @@
   line-height: 15px;
   width: 50%;
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   letter-spacing: -0.011em;
   color: rgba(118, 128, 141, 0.5);
 }

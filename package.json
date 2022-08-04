@@ -49,8 +49,10 @@
     "@web3auth/web3auth": "^1.1.4",
     "ethers": "^5.6.9",
     "fortmatic": "^2.4.0",
-    "framer-motion": "^6.5.1",
+    "framer-motion": "^6.5.0",
     "ms.macro": "^2.0.0",
+    "next-tick": "^1.1.0",
+    "path-browserify": "^1.0.1",
     "polished": "^4.2.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -63,6 +65,7 @@
     "react-scripts": "5.0.1",
     "react-spring": "^8.0.27",
     "react-use-gesture": "^9.1.3",
+    "readable-stream": "^4.1.0",
     "rebass": "^4.0.7",
     "redux-localstorage-simple": "^2.5.1",
     "styled-components": "^5.3.5",
@@ -72,12 +75,13 @@
     "web-vitals": "^2.1.0"
   },
   "scripts": {
+    "preinstall": "npx npm-force-resolutions",
     "contracts:compile:abi": "typechain --target ethers-v5 --out-dir src/abis/types \"./src/abis/**/*.json\"",
     "contracts:compile:v3": "typechain --target ethers-v5 --out-dir src/types/v3 \"./node_modules/@uniswap/**/artifacts/contracts/**/*[!dbg].json\"",
     "contracts:compile": "yarn contracts:compile:abi && yarn contracts:compile:v3",
     "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
-    "test": "react-app-rewired test",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -108,9 +112,17 @@
     "postcss": "^8.4.14",
     "process": "^0.11.10",
     "react-app-rewired": "^2.2.1",
+    "react-error-overlay": "^6.0.11",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
     "tailwindcss": "^3.1.7",
     "url": "^0.11.0"
+  },
+  "browser": {
+    "crypto": false
+  },
+  "resolutions": {
+    "//": "See https://github.com/facebook/create-react-app/issues/11773",
+    "react-error-overlay": "6.0.11"
   }
 }
