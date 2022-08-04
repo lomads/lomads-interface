@@ -1,55 +1,97 @@
-import React,{useState} from 'react'
+import React,{useState,useEffect} from 'react'
 // import {useMoralis} from "react-moralis";
 import { useNavigate } from 'react-router-dom';
 import createDao from "../assets/svg/createDao.svg";
 import metamask2 from "../assets/svg/metamask2.svg";
 import walletconnect from "../assets/svg/walletconnect.svg";
+import { Web3Auth } from "@web3auth/web3auth";
+import { CHAIN_NAMESPACES, SafeEventEmitterProvider } from "@web3auth/base";
 import '../styles/App.css'
 import '../styles/CreateDao.css'
 import '../styles/Dashboard.css'
 import '../styles/Modal.css'
 import '../styles/Sidebar.css'
 
+
 const LoginPage = () => {
     const navigate = useNavigate();
-    // const { authenticate, isAuthenticated, isAuthenticating, user, account, chainId, logout } = useMoralis();
-    const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
-    // const moralisLogin = async () => {
-    //     console.log("in login");
-    //     if (!isAuthenticated) {
-    //         console.log("authenticate");
-    //         await authenticate({signingMessage: "Log into Lomads Dapp to create a DAO" })
-    //             .then(function (user) {
-    //                 console.log("logged in user:", user);
-    //                 console.log(user.get("ethAddress"));
-    //                 console.log(account);
-    //                 setIsUserLoggedIn(true);
-    //                 navigate("/dao");
-    //             })
-    //             .catch(function (error) {
-    //                 console.log(error);
-    //             });
-    //     } else {
-    //         setIsUserLoggedIn(true);
-    //         navigate("/dao");
-    //         console.log("already authenticated");
-    //     }
-    // }
-
-    // const moralisLogout = async () => {
-    //     await logout();
-    //     setIsUserLoggedIn(false);
-    //     console.log("logged out");
-    // }
+    const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
+    const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null);
+    const clientId = "BJywQytxS6QAqZSwyDUmNQT490GiyjZNbCHOIggKPEHJXBkIQb2HS3RbV8pQsEcsJ9WySXFVi9MFwMG7T9v7Ux8";
+  
+    useEffect(() => {
+      const init = async () => {
+        try {
+          const polygonMumbaiConfig = {
+            chainNamespace: CHAIN_NAMESPACES.EIP155,
+            rpcTarget: "https://polygon-mumbai.g.alchemy.com/v2/adPYBBOeggH5WxfoGnMLGRwAVV2_0Kl9",
+            blockExplorer: "https://mumbai.polygonscan.com",
+            chainId: "0x13881",
+            displayName: "Polygon Mumbai Testnet",
+            ticker: "matic",
+            tickerName: "matic",
+          };
+      
+  
+        const web3auth = new Web3Auth({
+          clientId,
+          chainConfig: polygonMumbaiConfig
+        });
+  
+        setWeb3auth(web3auth);
+  
+        await web3auth.initModal();
+          if (web3auth.provider) {
+            console.log(web3auth.provider)
+            setProvider(web3auth.provider);
+          };
+        } catch (error) {
+          console.error(error);
+        }
+      };
+  
+      init();
+    }, []);
+  
+    const login = async () => {
+      if (!web3auth) {
+        console.log("web3auth not initialized yet");
+        return;
+      }
+      const web3authProvider = await web3auth.connect();
+      setProvider(web3authProvider);
+    };
+  
+    const getUserInfo = async () => {
+      if (!web3auth) {
+        console.log("web3auth not initialized yet");
+        return;
+      }
+      const user = await web3auth.getUserInfo();
+      console.log(web3auth.provider)
+      console.log(user);
+    };
+  
+    const logout = async () => {
+      if (!web3auth) {
+        console.log("web3auth not initialized yet");
+        return;
+      }
+      await web3auth.logout();
+      setProvider(null);
+    };
+    const unloggedInView = (
+        <button onClick={login} className="card">
+          Login
+        </button>
+      );
+   
     const moralisLogin=()=>{
-        setIsUserLoggedIn(true);
         navigate('/createdao');
     }
-    const moralisLogout=()=>{
-        setIsUserLoggedIn(false);
-    }
   return (
-        <div className={"createDaoLogin"}>
+        <div>
+            {!provider ? unloggedInView : (<div className={"createDaoLogin"}>
             <div className="logo">
                 <img src={createDao} alt=""/>
             </div>
@@ -68,9 +110,10 @@ const LoginPage = () => {
                    <img src={walletconnect} style={{padding:40}} alt="MetaMask"/>
                 </button>
                 <div className={"loginWithoutWallet"}>
-                   <a onClick={moralisLogout} style={{textDecorationLine: "underline"}} href="/">login without crypto wallet </a>
+                   <a style={{textDecorationLine: "underline"}} href="/">login without crypto wallet </a>
                 </div>
             </div>
+        </div>)}
         </div>
   )
 }

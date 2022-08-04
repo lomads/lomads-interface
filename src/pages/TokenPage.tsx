@@ -4,20 +4,15 @@ import '../styles/CreateDao.css'
 import '../styles/Dashboard.css'
 import '../styles/Modal.css'
 import '../styles/Sidebar.css'
-import { useWeb3React } from "@web3-react/core";
 import { useNavigate } from 'react-router-dom'
-import { factoryCall } from 'connection/DaoFactoryCall'
 import { useAppDispatch } from 'state/hooks'
-import { updatetokenTitle,updatetokenSymbol, updatedeployedTokenAddress, updateExplain, updateSupply, updateHolder } from 'state/proposal/reducer'
+import { updatetokenTitle,updatetokenSymbol, updateExplain, updateSupply, updateHolder } from 'state/proposal/reducer'
 import { useAppSelector } from 'state/hooks'
-import { LineWobble } from '@uiball/loaders'
 
 
 const TokenPage = () => {
     const dispatch = useAppDispatch()
-    const { provider,connector } = useWeb3React();
     const navigate = useNavigate();
-    const [isLoading,setisLoading] = useState(false);
     const tokenTitle = useAppSelector((state) => state.proposal.tokenTitle)
     const tokenSymbol = useAppSelector((state) => state.proposal.tokenSymbol)
     const explain = useAppSelector((state) => state.proposal.explain)
@@ -140,22 +135,11 @@ const TokenPage = () => {
                         <p>File size: {file.size} bytes</p>
                         {file && <ImageThumb image={file} />} */}
                     </div>
-                    {
-                   isLoading ? (
-                   <div>
-                    <div className={"subItemHeader"} style={{paddingBottom:20}}>
-                        Hold on we are deploying your Token
-                    </div>
-                   <LineWobble size={750} color="#C94B32" />
-                </div>):(null)
-                }
                 </div>
                 <div>
                     <button id="nextButtonToken" className={"nextButton"} onClick={handleClick}>
                         NEXT STEP
                     </button>
-                   
-
                 </div>
                 </div>
             

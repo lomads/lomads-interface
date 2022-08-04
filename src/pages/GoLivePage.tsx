@@ -14,6 +14,16 @@ import { useAppSelector } from 'state/hooks'
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from 'state/hooks'
 import { updatedeployedGovernorAddress,updatedeployedTokenAddress} from '../state/proposal/reducer'
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  useDisclosure,
+  Button
+} from '@chakra-ui/react'
 
 const GoLivePage = () => {
   const navigate = useNavigate();
@@ -32,6 +42,8 @@ const GoLivePage = () => {
   const explain = useAppSelector((state) => state.proposal.explain)
   const supply = useAppSelector((state) => state.proposal.supply)
   const holder = useAppSelector((state) => state.proposal.holder)
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
 const addToken = async () =>{
 const tokenAddress = deployedTokenAddress;
@@ -78,6 +90,8 @@ try {
   }
 
   const createToken = async () =>{
+    onClose()
+    if(tokenTitle.length>=2 && tokenSymbol.length>=2){
     const factory = await factoryCall(provider);
     setisLoading(true);
     const creatingToken =  await factory.createToken(tokenTitle,tokenSymbol,supply,holder,explain);
@@ -85,9 +99,11 @@ try {
     const tokenAddress  = await factory.deployedTokenAddress();
     dispatch(updatedeployedTokenAddress(tokenAddress));
     await DeployDAO()
+    }
 }
 
   return (
+    <>
     <div className={"something"} style={{ paddingLeft: 480, paddingTop: 100, paddingBottom: 100,height:1600,width:"100%" }}>
       <div className={"pageTitle"}>
         Go live
@@ -124,11 +140,35 @@ try {
       }
 
       <div>
-        <button id="buttonDeploy" className={"nextButton"} onClick={createToken}>
+        <button id="buttonDeploy" className={"nextButton"} onClick={onOpen}>
           DEPLOY
         </button>
       </div>
     </div>
+    <Modal
+        isCentered
+        onClose={onClose}
+        isOpen={isOpen}
+        motionPreset='slideInBottom'
+        size="md"
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader color="#C94B32">Final Check</ModalHeader>
+          <ModalBody className={"pageDescription"}>
+            Ensure All values above are correct before proceeding. These values cannot be changed after deploying. However, you can keep editing the story text after the crowdfund is deployed. The Mirror protocol takes a 2.5% on amount raised during the crowdfund. 
+          </ModalBody>
+          <ModalFooter >
+            <div className='flex flex-row justify-between items-center w-full'>
+            <Button colorScheme='blue' mr={3} onClick={onClose} width="180px" variant="outline" color="#C94B32">
+              Close
+            </Button>
+            <Button variant='solid' colorScheme="#C94B32" bg="#C94B32" onClick={createToken} width="180px"  color="#FFFFFF">Deploy</Button>
+            </div>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
   )
 }
 

@@ -1,13 +1,6 @@
 import React,{useState} from 'react'
 import { Link } from 'react-router-dom'
 import SelectTemplate from '../components/sub/SelectTemplate'
-import {
-    Slider,
-    SliderTrack,
-    SliderFilledTrack,
-    SliderThumb,
-    Box
-  } from '@chakra-ui/react'
 import '../styles/App.css'
 import '../styles/CreateDao.css'
 import '../styles/Dashboard.css'

@@ -6,6 +6,7 @@ import StartDAO from './StartDAO';
 import SidebarPage from './SidebarPage';
 import Header from 'components/Header'
 import { Context } from '../constants/context';
+import MyTag from './CommunityTag';
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
           <Route path='/golive' element={<SidebarPage page="Go Live" />} />
           <Route path='/dashboard' element={<SidebarPage page="Dashboard" />} />
           <Route path='/sidepage' element={[<Header/>,<SidebarPage page="Basics" />]} />
+          <Route path='/tag' element={<MyTag/>}/>
         </Routes>
       </div>
     </Context.Provider >

@@ -225,6 +225,7 @@
   font-style: normal;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-weight: 700;
   font-size: 16px;
   line-height: 18px;
@@ -253,7 +254,7 @@
 }
 
 .titleBar {
-  z-index: 9999;
+  z-index: 1000;
   display: flex;
   position: relative;
   right: 120px;
@@ -316,6 +317,7 @@
   border-width: 0px;
 }
 .shorttextField {
+  margin-top: 10px;
   width: 500px;
   height: 90px;
   resize: none;
@@ -539,6 +541,7 @@
   font-style: normal;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-weight: 700;
   font-size: 16px;
   line-height: 18px;

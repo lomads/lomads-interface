@@ -24,34 +24,34 @@ function SliderThumbWithTooltip() {
         onMouseLeave={() => setShowTooltip(false)}
       >
         <SliderMark value={10} mt='1' ml='-2.5' fontSize='sm'>
-          10%
+          10
         </SliderMark>
         <SliderMark value={20} mt='1' ml='-2.5' fontSize='sm'>
-          20%
+          20
         </SliderMark>
         <SliderMark value={30} mt='1' ml='-2.5' fontSize='sm'>
-          30%
+          30
         </SliderMark>
         <SliderMark value={40} mt='1' ml='-2.5' fontSize='sm'>
-          40%
+          40
         </SliderMark>
         <SliderMark value={50} mt='1' ml='-2.5' fontSize='sm'>
-          50%
+          50
         </SliderMark>
         <SliderMark value={60} mt='1' ml='-2.5' fontSize='sm'>
-          60%
+          60
         </SliderMark>
         <SliderMark value={70} mt='1' ml='-2.5' fontSize='sm'>
-          70%
+          70
         </SliderMark>
         <SliderMark value={80} mt='1' ml='-2.5' fontSize='sm'>
-          80%
+          80
         </SliderMark>
         <SliderMark value={90} mt='1' ml='-2.5' fontSize='sm'>
-          90%
+          90
         </SliderMark>
         <SliderMark value={100} mt='1' ml='-2.5' fontSize='sm'>
-          100%
+          100
         </SliderMark>
         <SliderTrack bg='red.100'>
           <SliderFilledTrack bg='#C94B32'/>
@@ -62,7 +62,7 @@ function SliderThumbWithTooltip() {
           color='white'
           placement='top'
           isOpen={showTooltip}
-          label={`${sliderValue}%`}
+          label={`${sliderValue}`}
         >
         <SliderThumb/>
         </Tooltip>
