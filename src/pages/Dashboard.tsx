@@ -17,7 +17,7 @@ const Dashboard = () => {
  
 
   return (
-    <div className={"something"} style={{ paddingLeft: 480, paddingTop: 100, paddingBottom: 100 }}>
+    <div className={"something"} style={{ paddingLeft: 480, paddingTop: 100, paddingBottom: 100,height:1600 }}>
       <div className={"pageTitle"}>
         Dashboard Page
       </div>

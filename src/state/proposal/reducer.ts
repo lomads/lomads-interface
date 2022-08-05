@@ -12,6 +12,8 @@ export interface ProposalState {
   readonly explain: string
   readonly holder: string
   readonly deployedGovernorAddress: string,
+  readonly Web3AuthAddress: string,
+  readonly Web3AuthAddressPvtKey: string
 }
 
 const initialState: ProposalState = {
@@ -26,6 +28,8 @@ const initialState: ProposalState = {
   explain: "",
   holder: "",
   deployedGovernorAddress: "",
+  Web3AuthAddress: "",
+  Web3AuthAddressPvtKey: "",
 }
 
 const proposalSlice = createSlice({
@@ -65,8 +69,14 @@ const proposalSlice = createSlice({
     updatedeployedGovernorAddress(state, action) {
       state.deployedGovernorAddress = action.payload
     },
+    updateWeb3AuthAddress(state,action) {
+      state.Web3AuthAddress = action.payload
+    },
+    updateWeb3AuthAddressPvtKey(state,action) {
+      state.Web3AuthAddressPvtKey = action.payload
+    }
   },
 })
 
-export const { updateTitle, updatePurpose,updatetokenSymbol,updatetokenTitle, updateSupply, updatedeployedTokenAddress, updateShortDesc, updateLongDesc, updateExplain, updateHolder, updatedeployedGovernorAddress } = proposalSlice.actions
+export const { updateTitle, updatePurpose,updatetokenSymbol,updatetokenTitle, updateSupply, updatedeployedTokenAddress, updateShortDesc, updateLongDesc, updateExplain, updateHolder, updatedeployedGovernorAddress,updateWeb3AuthAddress,updateWeb3AuthAddressPvtKey } = proposalSlice.actions
 export default proposalSlice.reducer

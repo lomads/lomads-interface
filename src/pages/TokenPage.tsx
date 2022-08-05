@@ -9,6 +9,7 @@ import { useAppDispatch } from 'state/hooks'
 import { updatetokenTitle,updatetokenSymbol, updateExplain, updateSupply, updateHolder } from 'state/proposal/reducer'
 import { useAppSelector } from 'state/hooks'
 import Header from 'components/Header';
+import Navbar from 'components/Web3AuthNavbar/Navbar'
 
 
 const TokenPage = () => {
@@ -19,6 +20,7 @@ const TokenPage = () => {
     const explain = useAppSelector((state) => state.proposal.explain)
     const supply = useAppSelector((state) => state.proposal.supply)
     const holder = useAppSelector((state) => state.proposal.holder)
+    const web3authAddress  = useAppSelector((state) => state.proposal.Web3AuthAddress)
 
     const [file, setFile] = useState<string>("");
     function handleUpload(event: any) {
@@ -30,10 +32,11 @@ const TokenPage = () => {
     const handleClick = () =>{
         navigate("/golive");
     }
+    const showHeader =  web3authAddress.length>=30 ? <Navbar/> : <Header/>;
     return (
        <>
        <div className='absolute top-0 right-0'>
-        <Header/>
+        {showHeader}
        </div>
         <div className={"something"} style={{ paddingLeft: 480, paddingTop: 100, paddingBottom: 100,height:1600 }}>
             <div className={"pageTitle"}>

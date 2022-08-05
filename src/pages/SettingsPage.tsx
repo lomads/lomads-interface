@@ -10,15 +10,18 @@ import ChangeComponent from '../components/sub/ChangeComponent'
 import SliderThumbWithTooltip from 'components/sub/SupportSlider'
 import ApprovalSliderThumbWithTooltip from 'components/sub/ApprovalSlider'
 import Header from 'components/Header';
+import Navbar from 'components/Web3AuthNavbar/Navbar'
+import { useAppSelector } from 'state/hooks'
 
 const SettingsPage = () => {
-
+    const web3authAddress  = useAppSelector((state) => state.proposal.Web3AuthAddress)
     const [SupportValue,setSupportValue] = useState<number>(0)
     const [ApprovalValue,setApprovalValue] = useState<number>(0)
+    const showHeader =  web3authAddress.length>=30 ? <Navbar/> : <Header/>;
   return (
     <>
     <div className='absolute top-0 right-0'>
-        <Header/>
+        {showHeader}
     </div>
     <div className={"something"} style={{paddingLeft:480, paddingTop:100,paddingBottom:100,height:1600}}>
                 <div className={"pageTitle"}>
