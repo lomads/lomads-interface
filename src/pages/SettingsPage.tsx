@@ -1,35 +1,28 @@
-import React from 'react'
+import React,{useState} from 'react'
 import { Link } from 'react-router-dom'
 import SelectTemplate from '../components/sub/SelectTemplate'
-import {
-    Slider,
-    SliderTrack,
-    SliderFilledTrack,
-    SliderThumb,
-    Box
-  } from '@chakra-ui/react'
 import '../styles/App.css'
 import '../styles/CreateDao.css'
 import '../styles/Dashboard.css'
 import '../styles/Modal.css'
 import '../styles/Sidebar.css'
 import ChangeComponent from '../components/sub/ChangeComponent'
-import {sliderType} from '../types/index'
+import SliderThumbWithTooltip from 'components/sub/SupportSlider'
+import ApprovalSliderThumbWithTooltip from 'components/sub/ApprovalSlider'
+import Header from 'components/Header';
+import Navbar from 'components/Web3AuthNavbar/Navbar'
+import { useAppSelector } from 'state/hooks'
 
 const SettingsPage = () => {
-    const Sliders = (props: sliderType) =>{
-        return(
-            <Slider aria-label='slider-ex-4' defaultValue={props.value}>
-                    <SliderTrack bg='#f5f5f5'>
-                      <SliderFilledTrack bg='#C94B32' />
-                    </SliderTrack>
-                    <SliderThumb boxSize={5}>
-                      <Box color='#f5f5f5'/>
-                    </SliderThumb>
-                  </Slider>
-        )
-    }
+    const web3authAddress  = useAppSelector((state) => state.proposal.Web3AuthAddress)
+    const [SupportValue,setSupportValue] = useState<number>(0)
+    const [ApprovalValue,setApprovalValue] = useState<number>(0)
+    const showHeader =  web3authAddress.length>=30 ? <Navbar/> : <Header/>;
   return (
+    <>
+    <div className='absolute top-0 right-0'>
+        {showHeader}
+    </div>
     <div className={"something"} style={{paddingLeft:480, paddingTop:100,paddingBottom:100,height:1600}}>
                 <div className={"pageTitle"}>
                     Settings
@@ -71,18 +64,18 @@ const SettingsPage = () => {
                     <div className={"fieldDesc"}>
                         Choose your voting application settings.
                     </div>
-                    <div style={{width:"486px"}}>
+                    <div style={{width:"500px"}}>
                     <div className={"pageSubItemHeader"}>
                         Support
                     </div>
-                    <Sliders value={60}/>
+                    <SliderThumbWithTooltip/>
                     </div>
 
                     <div style={{width:"486px"}}>
                     <div className={"pageSubItemHeader"}>
                         Minimum Approval
                     </div>
-                    <Sliders value={30}/>
+                    <ApprovalSliderThumbWithTooltip/>
                     </div>
                     <div className={"pageSubItemHeader"}>
                         Vote Duration
@@ -98,6 +91,7 @@ const SettingsPage = () => {
                     </button>
                 </div>
             </div>
+    </>
   )
 }
 

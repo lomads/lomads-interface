@@ -8,7 +8,7 @@ import '../styles/Sidebar.css'
 
 const LandingPage = () => {
   return (
-    <div>
+    <div style={{backgroundColor:'white'}}>
         <button  id="buyToken" className={"page-button"} style={{width:140, marginLeft:250, position:"absolute", top:30,right:80}}>
             <Link to="/login" className='link'>Create DAO</Link>
         </button>

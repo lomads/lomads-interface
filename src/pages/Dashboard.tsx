@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import '../styles/App.css'
 import '../styles/CreateDao.css'
 import '../styles/Dashboard.css'
@@ -11,13 +11,12 @@ import { useAppSelector } from 'state/hooks'
 import { tokenCall } from 'connection/DaoTokenCall'
 
 const Dashboard = () => {
-  const {provider} = useWeb3React();
   const tokenAddress = useAppSelector((state) => state.proposal.deployedTokenAddress)
   const governorAddress = useAppSelector((state) => state.proposal.deployedGovernorAddress);
  
 
   return (
-    <div className={"something"} style={{ paddingLeft: 480, paddingTop: 100, paddingBottom: 100 }}>
+    <div className={"something"} style={{ paddingLeft: 480, paddingTop: 100, paddingBottom: 100,height:1600 }}>
       <div className={"pageTitle"}>
         Dashboard Page
       </div>

@@ -1,4 +1,4 @@
-import React,{useState} from 'react'
+import React from 'react'
 // import {useMoralis} from "react-moralis";
 import { useNavigate } from 'react-router-dom';
 import createDao from "../assets/svg/createDao.svg";
@@ -8,48 +8,31 @@ import '../styles/App.css'
 import '../styles/CreateDao.css'
 import '../styles/Dashboard.css'
 import '../styles/Modal.css'
-import '../styles/Sidebar.css'
+import { Web3AuthPropType } from 'types';
+import Header from 'components/Header';
 
-const LoginPage = () => {
-    const navigate = useNavigate();
-    // const { authenticate, isAuthenticated, isAuthenticating, user, account, chainId, logout } = useMoralis();
-    const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
-    // const moralisLogin = async () => {
-    //     console.log("in login");
-    //     if (!isAuthenticated) {
-    //         console.log("authenticate");
-    //         await authenticate({signingMessage: "Log into Lomads Dapp to create a DAO" })
-    //             .then(function (user) {
-    //                 console.log("logged in user:", user);
-    //                 console.log(user.get("ethAddress"));
-    //                 console.log(account);
-    //                 setIsUserLoggedIn(true);
-    //                 navigate("/dao");
-    //             })
-    //             .catch(function (error) {
-    //                 console.log(error);
-    //             });
-    //     } else {
-    //         setIsUserLoggedIn(true);
-    //         navigate("/dao");
-    //         console.log("already authenticated");
+const LoginPage = (props: Web3AuthPropType) => {
+    const navigate = useNavigate()
+  
+    const nextLogin=()=>{
+        navigate('/createdao');
+    }
+    // const showHeader = () => {
+    //     if(web3authAddress.length>=30){
+    //         return <Navbar/>
+    //     }else{
+    //         return <Header/>
     //     }
     // }
-
-    // const moralisLogout = async () => {
-    //     await logout();
-    //     setIsUserLoggedIn(false);
-    //     console.log("logged out");
-    // }
-    const moralisLogin=()=>{
-        setIsUserLoggedIn(true);
-        navigate('/dao');
-    }
-    const moralisLogout=()=>{
-        setIsUserLoggedIn(false);
-    }
+    // useEffect(()=>{
+    //     showHeader()
+    // })
   return (
-        <div className={"createDaoLogin"}>
+           <>
+           <div className='absolute top-0 right-0'>
+              <Header/>
+          </div>
+            <div className={"createDaoLogin"}>
             <div className="logo">
                 <img src={createDao} alt=""/>
             </div>
@@ -61,17 +44,18 @@ const LoginPage = () => {
             </div>  
             <div className={"body"}>
                 {/*onClick={() => loginWeb3auth("metamask")}*/}
-                <button className="modalLoginButton" onClick={moralisLogin}>
+                <button className="modalLoginButton" onClick={nextLogin}>
                    <img src={metamask2} style={{padding:40}} alt="MetaMask"/>
                 </button>
-                <button className="modalLoginButton" onClick={moralisLogin}>
+                <button className="modalLoginButton" onClick={nextLogin}>
                    <img src={walletconnect} style={{padding:40}} alt="MetaMask"/>
                 </button>
                 <div className={"loginWithoutWallet"}>
-                   <a onClick={moralisLogout} style={{textDecorationLine: "underline"}} href="/">login without crypto wallet </a>
+                   <button className='font-sans text-sm text-text_color' onClick={props.login}>login without crypto wallet </button>
                 </div>
             </div>
         </div>
+           </>
   )
 }
 

@@ -15,8 +15,9 @@ const MintTokenComponent = () => {
 
     const mintToken = async () =>{
         setisLoading(true);
+        const supply = tokenSupply
       const token = await tokenCall(provider,tokenAddress); 
-      const mintToken = await token.mint(holder,tokenSupply)
+      const mintToken = await token.mint(holder,supply)
       await mintToken.wait()
       setMessage("Token have been minted successfully")
       setisLoading(false)
@@ -30,10 +31,10 @@ const MintTokenComponent = () => {
                             Mint token
                         </div>
                     </div>
-                    <div style={{display: 'flex'}}>
+                    <div className='flex flex-row justify-start items-center'>
                         <input className={"inputField"} type="title" name="title" value={tokenSupply} style={{ height: 40, width: 340 }}
                             autoFocus placeholder="Enter Amount" />
-                        <button id="buttonDeploy" className={"nextButton"}  style={{ background: '#C94B32', position: 'relative', left: '10px' }} onClick={mintToken}>
+                        <button id="buttonDeploy" className={"nextButton"}  style={{ background: '#C94B32', position: 'relative', left: '10px',marginBottom:"40px" }} onClick={mintToken}>
                             Mint
                         </button>
                         <div style={{marginLeft:20}}>

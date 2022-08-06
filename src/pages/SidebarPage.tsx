@@ -49,7 +49,9 @@ const SidebarPage = (props: sidebarPropType) => {
   return (
     <div style={{ display: "flex" }}>
       <CreateDaoSidebar />
+      <div className='combine'>
       {renderPage()}
+      </div>
     </div>
   )
 }

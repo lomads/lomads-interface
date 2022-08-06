@@ -20,7 +20,6 @@ import { ButtonSecondary } from '../Button'
 import StatusIcon from '../Identicon/StatusIcon'
 import { AutoRow } from '../Row'
 import Transaction from './Transaction'
-
 const HeaderRow = styled.div`
   ${({ theme }) => theme.flexRowNoWrap};
   padding: 1rem 1rem;
@@ -188,6 +187,7 @@ function renderTransactions(transactions: string[]) {
     </TransactionListWrapper>
   )
 }
+
 
 interface AccountDetailsProps {
   toggleWalletModal: () => void

@@ -1,4 +1,7 @@
+import Header from 'components/Header';
+import Navbar from 'components/Web3AuthNavbar/Navbar';
 import React from 'react'
+import { useAppSelector } from 'state/hooks';
 import {StepBlock} from '../components/sub/StepBlock';
 import {StepBlockOptional} from '../components/sub/StepBlockOptional';
 import '../styles/App.css'
@@ -8,7 +11,13 @@ import '../styles/Modal.css'
 import '../styles/Sidebar.css'
 
 const StartDAO = () => {
+    const web3authAddress  = useAppSelector((state) => state.proposal.Web3AuthAddress)
+    const showHeader =  web3authAddress.length>=30 ? <Navbar/> : <Header/>;
   return (
+                <>
+                <div className='absolute top-0 right-0'>
+                  {showHeader}
+                </div>
                 <div className={"createDaoLogin"}>
                     <div>
                     <div className={"welcomeText2"} style={{paddingTop:100}}>
@@ -24,6 +33,7 @@ const StartDAO = () => {
                         <StepBlock blockTitle={"Go live!"} onClickGoToStep="/golive" blockDescription={"Take your DAO public by completing the final checklist, cross-checking the values, and ensuring there aren’t any mis-spellings."}/>
                     </div>
                 </div>
+                </>
   )
 }
 

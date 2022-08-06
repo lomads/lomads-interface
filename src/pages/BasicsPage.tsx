@@ -1,10 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState,SyntheticEvent, useCallback, } from 'react'
 import { useNavigate } from 'react-router-dom';
-import {
-    HStack,
-    Tag,
-    TagLabel,
-    TagCloseButton,
+import { 
+    Input
 } from '@chakra-ui/react'
 import '../styles/App.css'
 import '../styles/CreateDao.css'
@@ -15,6 +12,10 @@ import { imageType, tagType } from '../types';
 import { useAppDispatch } from 'state/hooks'
 import { updateTitle, updatePurpose, updateShortDesc, updateLongDesc } from 'state/proposal/reducer'
 import { useAppSelector } from 'state/hooks'
+import CommunityTag from './CommunityTag';
+import KeywordTag from './KeywordTag';
+import Header from 'components/Header';
+import Navbar from 'components/Web3AuthNavbar/Navbar';
 
 const BasicsPage = () => {
     const dispatch = useAppDispatch()
@@ -24,6 +25,7 @@ const BasicsPage = () => {
     const longDesc = useAppSelector((state) => state.proposal.longDesc)
     const navigate = useNavigate();
     const [file, setFile] = useState<string>("");
+    const web3authAddress  = useAppSelector((state) => state.proposal.Web3AuthAddress)
 
     function handleUpload(event: any) {
         setFile(event.target.files[0]);
@@ -38,18 +40,13 @@ const BasicsPage = () => {
     const ImageThumb: React.FC<imageType> = ({ image }) => {
         return <img src={URL.createObjectURL(image)} alt={image.name} width="700" height={"500"} />;
     };
-
-    const Tags = (props: tagType) => {
-        return (
-            <Tag size={'lg'} key={'lg'} borderRadius='full' variant='solid' colorScheme='#e7cfcb;'>
-                <TagLabel textColor='#76808d'>{props.title}</TagLabel>
-                <TagCloseButton textColor='#76808d' />
-            </Tag>
-        );
-    }
-
+    const showHeader =  web3authAddress.length>=30 ? <Navbar/> : <Header/>;
     return (
-        <div className={"something"} style={{ paddingLeft: 480, paddingTop: 100, paddingBottom: 100 }}>
+        <>
+        <div className='absolute top-0 right-0'>
+            {showHeader}
+        </div>
+        <div className={"something"} style={{ paddingLeft: 480, paddingTop: 100, paddingBottom: 100,height:1600 }}>
             <div className={"pageTitle"}>
                 Basics
             </div>
@@ -86,8 +83,15 @@ const BasicsPage = () => {
                         placeholder="Choose Purpose" onChange={(e) => { dispatch(updatePurpose(e.target.value)) }} />
                 </div>
             </div>
-            <div className={"pageItemHeader"}>
-                Short description
+            <div className={"subItemHeader"}>
+                <div>
+                    Short description
+                </div>
+                <div className={"rect2"}>
+                    <div className={"reqText"}>
+                        Required
+                    </div>
+                </div>
             </div>
             <textarea className={"shorttextField"} name="shortDesc" value={shortDesc}
                 placeholder="In a few words" onChange={(e) => { dispatch(updateShortDesc(e.target.value)) }}></textarea>
@@ -116,20 +120,14 @@ const BasicsPage = () => {
             </div>
             <div className={"pageItemHeader"}>
                 Tags
-                <div style={{ marginTop: "10px" }}>
-                    <HStack spacing={4}>
-                        <Tags title="Tag 1" />
-                        <Tags title="Tag 2" />
-                    </HStack>
+                <div className='mt-3 w-72'>
+               <KeywordTag/>
                 </div>
             </div>
             <div className={"pageItemHeader"}>
                 Community links
-                <div style={{ marginTop: "10px" }}>
-                    <HStack spacing={4}>
-                        <Tags title="www.lomads.com" />
-                        <Tags title="www.bitcoin.com" />
-                    </HStack>
+                <div className='mt-3 w-72'>
+                <CommunityTag/>
                 </div>
             </div>
             <div>
@@ -138,6 +136,7 @@ const BasicsPage = () => {
                 </button>
             </div>
         </div>
+        </>
     )
 }
 

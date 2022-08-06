@@ -1,4 +1,5 @@
 import React from 'react';
+import './index.css'
 import ReactDOM from 'react-dom/client';
 import {BrowserRouter} from "react-router-dom";
 import { Provider } from 'react-redux';
@@ -12,6 +13,7 @@ import TransactionUpdater from 'state/transactions/updater';
 import ThemeProvider, { ThemedGlobalStyle } from './theme';
 import { LanguageProvider } from './i18n'
 import { ChakraProvider } from '@chakra-ui/react'
+import './polyfill'
 
 
 const root = ReactDOM.createRoot(
