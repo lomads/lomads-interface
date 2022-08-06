@@ -45,7 +45,6 @@ const GoLivePage = () => {
   const supply = useAppSelector((state) => state.proposal.supply)
   const holder = useAppSelector((state) => state.proposal.holder)
   const web3authAddress  = useAppSelector((state) => state.proposal.Web3AuthAddress)
-  const Web3AuthAddressPvtKey = useAppSelector((state) => state.proposal.Web3AuthAddressPvtKey)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 

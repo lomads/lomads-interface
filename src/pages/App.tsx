@@ -4,12 +4,9 @@ import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 import StartDAO from './StartDAO';
 import SidebarPage from './SidebarPage';
-import Header from 'components/Header'
 import { Context } from '../constants/context';
-import MyTag from './CommunityTag';
 import { Web3Auth } from "@web3auth/web3auth";
 import { CHAIN_NAMESPACES, SafeEventEmitterProvider } from "@web3auth/base";
-import Navbar from 'components/Web3AuthNavbar/Navbar';
 import { ethers } from 'ethers';
 import { useAppSelector } from 'state/hooks'
 import { useAppDispatch } from 'state/hooks'
@@ -21,7 +18,6 @@ export default function App() {
   const dispatch = useAppDispatch()
   const [web3auth,setWeb3auth] = useState<Web3Auth | null>(null)
     const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null);
-    const web3authAddress = useAppSelector((state) => state.proposal.Web3AuthAddress)
     useEffect(() => {
       const init = async () => {
         try {

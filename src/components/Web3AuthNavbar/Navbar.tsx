@@ -1,10 +1,7 @@
-import { login } from 'connection/web3auth';
-import { ethers } from 'ethers'
-import React,{useState,useEffect} from 'react'
+import React from 'react'
 import { useAppSelector } from 'state/hooks';
 import { Web3AuthPropType } from 'types'
 import { useNativeCurrencyBalances } from 'state/connection/hooks'
-import { CHAIN_INFO } from 'constants/chainInfo'
 
 const Navbar = (props: Web3AuthPropType) => {
     

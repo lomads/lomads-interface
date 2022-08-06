@@ -1,4 +1,4 @@
-import React,{useEffect} from 'react'
+import React from 'react'
 // import {useMoralis} from "react-moralis";
 import { useNavigate } from 'react-router-dom';
 import createDao from "../assets/svg/createDao.svg";
@@ -9,12 +9,9 @@ import '../styles/CreateDao.css'
 import '../styles/Dashboard.css'
 import '../styles/Modal.css'
 import { Web3AuthPropType } from 'types';
-import Navbar from 'components/Web3AuthNavbar/Navbar';
 import Header from 'components/Header';
-import { useAppSelector } from 'state/hooks';
 
 const LoginPage = (props: Web3AuthPropType) => {
-    const web3authAddress  = useAppSelector((state) => state.proposal.Web3AuthAddress)
     const navigate = useNavigate()
   
     const nextLogin=()=>{
