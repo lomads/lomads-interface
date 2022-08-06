@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import '../styles/App.css'
 import '../styles/CreateDao.css'
 import '../styles/Dashboard.css'
@@ -13,8 +13,7 @@ import { LineWobble } from '@uiball/loaders'
 import { useAppSelector } from 'state/hooks'
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from 'state/hooks'
-import { updatedeployedGovernorAddress } from '../state/proposal/reducer'
-import { getDatabase, insertProposal } from 'utils/database'
+import { updatedeployedGovernorAddress} from '../state/proposal/reducer'
 
 const GoLivePage = () => {
   const navigate = useNavigate();
@@ -27,13 +26,6 @@ const GoLivePage = () => {
   const deployedTokenAddress = useAppSelector((state) => state.proposal.deployedTokenAddress);
   const longDesc = useAppSelector((state) => state.proposal.longDesc);
   const shortDesc = useAppSelector((state) => state.proposal.shortDesc);
-
-  useEffect(() => {
-    (async () => {
-      const aviondb = await getDatabase();
-      await insertProposal(aviondb)
-    })();
-  }, []);
 
 
   const DeployDAO = async () => {

@@ -12,7 +12,6 @@ import TransactionUpdater from 'state/transactions/updater';
 import ThemeProvider, { ThemedGlobalStyle } from './theme';
 import { LanguageProvider } from './i18n'
 import { ChakraProvider } from '@chakra-ui/react'
-import './polyfill'
 
 
 const root = ReactDOM.createRoot(
