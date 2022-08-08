@@ -20,6 +20,8 @@ import { ButtonSecondary } from '../Button'
 import StatusIcon from '../Identicon/StatusIcon'
 import { AutoRow } from '../Row'
 import Transaction from './Transaction'
+import { useMoralis } from "react-moralis";
+
 const HeaderRow = styled.div`
   ${({ theme }) => theme.flexRowNoWrap};
   padding: 1rem 1rem;
@@ -128,7 +130,7 @@ const AccountControl = styled.div`
   }
 `
 
-const AddressLink = styled(ExternalLink)<{ hasENS: boolean; isENS: boolean }>`
+const AddressLink = styled(ExternalLink) <{ hasENS: boolean; isENS: boolean }>`
   font-size: 0.825rem;
   color: ${({ theme }) => theme.text3};
   margin-left: 1rem;
@@ -213,6 +215,7 @@ export default function AccountDetails({
   const isMetaMask = !!window.ethereum?.isMetaMask
   const isCoinbaseWallet = !!window.ethereum?.isCoinbaseWallet
   const isInjectedMobileBrowser = (isMetaMask || isCoinbaseWallet) && isMobile
+  const {logout } = useMoralis();
 
   function formatConnectorName() {
     const { ethereum } = window
@@ -235,6 +238,26 @@ export default function AccountDetails({
     if (chainId) dispatch(clearAllTransactions({ chainId }))
   }, [dispatch, chainId])
 
+  const disconnect = async () => {
+    console.log("Midas disconnect", openOptions);
+    if (connector.deactivate) {
+      connector.deactivate()
+
+      // Coinbase Wallet SDK does not emit a disconnect event to the provider,
+      // which is what web3-react uses to reset state. As a workaround we manually
+      // reset state.
+      if (connector === coinbaseWalletConnection.connector) {
+        connector.resetState()
+      }
+    } else {
+      connector.resetState()
+    }
+
+    dispatch(updateSelectedWallet({ wallet: undefined }))
+    openOptions()
+    await logout();
+  }
+
   return (
     <>
       <UpperSection>
@@ -254,23 +277,7 @@ export default function AccountDetails({
                     <>
                       <WalletAction
                         style={{ fontSize: '.825rem', fontWeight: 400, marginRight: '8px' }}
-                        onClick={() => {
-                          if (connector.deactivate) {
-                            connector.deactivate()
-
-                            // Coinbase Wallet SDK does not emit a disconnect event to the provider,
-                            // which is what web3-react uses to reset state. As a workaround we manually
-                            // reset state.
-                            if (connector === coinbaseWalletConnection.connector) {
-                              connector.resetState()
-                            }
-                          } else {
-                            connector.resetState()
-                          }
-
-                          dispatch(updateSelectedWallet({ wallet: undefined }))
-                          openOptions()
-                        }}
+                        onClick={disconnect}
                       >
                         <Trans>Disconnect</Trans>
                       </WalletAction>

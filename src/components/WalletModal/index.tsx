@@ -24,6 +24,7 @@ import { LightCard } from '../Card'
 import Modal from '../Modal'
 import Option from './Option'
 import PendingView from './PendingView'
+import { useMoralis } from "react-moralis";
 
 const CloseIcon = styled.div`
   position: absolute;
@@ -134,11 +135,36 @@ export default function WalletModal({
   const openOptions = useCallback(() => {
     setWalletView(WALLET_VIEWS.OPTIONS)
   }, [setWalletView])
+  const { authenticate, isAuthenticated, isAuthenticating, user, logout } = useMoralis();
 
+  const loginMoralis = async () => {
+    if (!isAuthenticated) {
+
+      await authenticate({ signingMessage: "Log in using Moralis" })
+        .then(function (user) {
+          console.log("logged in user:", user);
+          console.log(user!.get("ethAddress"));
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
+  }
+  useEffect(() => {
+    if (isAuthenticated) {
+      // add your logic here
+      console.log("Midas authenticated", isAuthenticated)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
+  
   useEffect(() => {
     if (walletModalOpen) {
+      console.log("Midas account", account)
       setWalletView(account ? WALLET_VIEWS.ACCOUNT : WALLET_VIEWS.OPTIONS)
+      
     }
+    loginMoralis();
   }, [walletModalOpen, setWalletView, account])
 
   useEffect(() => {

@@ -50,6 +50,7 @@
     "ethers": "^5.6.9",
     "fortmatic": "^2.4.0",
     "framer-motion": "^6.5.0",
+    "moralis": "^1.11.0",
     "moralis-v1": "^1.11.0",
     "ms.macro": "^2.0.0",
     "next-tick": "^1.1.0",
