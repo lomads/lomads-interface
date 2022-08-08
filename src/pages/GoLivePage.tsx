@@ -80,6 +80,7 @@ const GoLivePage = () => {
   }
 
   const DeployDAO = async () => {
+    console.log("MIDAS deployDAO")
     // navigate("/dashboard");
 
     const factory = await factoryCall(provider);
@@ -93,6 +94,7 @@ const GoLivePage = () => {
     setdeployedGovernor(governorAddress);
   }
   const createToken = async () => {
+    console.log("MIDAS createToken");
     const factory = await factoryCall(provider);
     setisLoading(true);
     onClose()
@@ -106,6 +108,7 @@ const GoLivePage = () => {
   const showHeader =  web3authAddress.length>=30 ? <Navbar/> : <Header/>;
 
   const web3authTokenDeploy = async () =>{
+    console.log("MIDAS web3authTokenDeploy")
     const factory = getweb3authProvider();
     onClose()
     const TokenAddress = await factory.createToken("Token","TKN","1000000","0x076Ea62aF4D940d36E13cFd6B4ce7c0197c55D7d","test")
@@ -115,6 +118,7 @@ const GoLivePage = () => {
 
   }
 
+  console.log("Midas web3AduthAddress", web3authAddress.length);
   const web3authDeploy = web3authAddress.length >= 30 ? web3authTokenDeploy : createToken
 
   return (
