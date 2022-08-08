@@ -2,6 +2,7 @@ import Header from 'components/Header';
 import Navbar from 'components/Web3AuthNavbar/Navbar';
 import React from 'react'
 import { useAppSelector } from 'state/hooks';
+import { Web3AuthPropType } from 'types';
 import {StepBlock} from '../components/sub/StepBlock';
 import {StepBlockOptional} from '../components/sub/StepBlockOptional';
 import '../styles/App.css'
@@ -10,9 +11,9 @@ import '../styles/Dashboard.css'
 import '../styles/Modal.css'
 import '../styles/Sidebar.css'
 
-const StartDAO = () => {
+const StartDAO = (props: Web3AuthPropType) => {
     const web3authAddress  = useAppSelector((state) => state.proposal.Web3AuthAddress)
-    const showHeader =  web3authAddress.length>=30 ? <Navbar/> : <Header/>;
+    const showHeader =  web3authAddress !== null ? <Navbar web3Provider={props.web3Provider}/> : <Header/>;
   return (
                 <>
                 <div className='absolute top-0 right-0'>

@@ -14,7 +14,7 @@ const SendTokenComponent = () => {
 
     const transferToken = async () =>{
     setisLoading(true);
-      const token = await tokenCall(provider,tokenAddress); 
+      const token = await tokenCall(provider,tokenAddress as string); 
       if(recipient.length>=30 && parseInt(amount)>=1){
         const transferToken = await token.transfer(recipient,amount);
         await transferToken.wait()

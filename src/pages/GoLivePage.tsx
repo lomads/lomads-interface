@@ -26,8 +26,9 @@ import {
 import { updatedeployedGovernorAddress, updatedeployedTokenAddress } from '../state/proposal/reducer'
 import Header from 'components/Header';
 import Navbar from 'components/Web3AuthNavbar/Navbar'
+import { Web3AuthPropType } from 'types'
 
-const GoLivePage = () => {
+const GoLivePage = (props: Web3AuthPropType) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch()
   const { provider, connector } = useWeb3React();
@@ -49,7 +50,7 @@ const GoLivePage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
 
-  const addToken = async () => {
+  const addToken = async (deployedTokenAddress:string) => {
     const tokenAddress = deployedTokenAddress;
     const tokenSymbol = deployedTokenSymbol;
     const tokenDecimals = 18;
@@ -79,14 +80,14 @@ const GoLivePage = () => {
     }
   }
 
-  const DeployDAO = async () => {
-    // navigate("/dashboard");
-
+  const DeployDAO = async (deployedTokenAddress:string) => {
+    console.log("DEploying GOv")
+    console.log(deployedTokenAddress)
     const factory = await factoryCall(provider);
-    const creatingGovernor = deployedTokenAddress.length >=32 && await factory.createGovernor(title, deployedTokenAddress, title, purpose, longDesc, shortDesc);
+    const creatingGovernor = deployedTokenAddress !== null && await factory.createGovernor(title, deployedTokenAddress, title, purpose, longDesc, shortDesc);
     await creatingGovernor.wait();
     const governorAddress = await factory.deployedGovernorAddress();
-    await addToken();
+    await addToken(deployedTokenAddress);
     setisLoading(false)
     dispatch(updatedeployedGovernorAddress(governorAddress))
     navigate("/dashboard");
@@ -100,22 +101,19 @@ const GoLivePage = () => {
     await creatingToken.wait();
     const tokenAddress = await factory.deployedTokenAddress();
     dispatch(updatedeployedTokenAddress(tokenAddress));
-    deployedTokenAddress.length>= 32 && await DeployDAO();
+    // await DeployDAO()
+    if(tokenAddress) {
+      console.log("token address is:",tokenAddress)
+      dispatch(updatedeployedTokenAddress(tokenAddress))
+      DeployDAO(tokenAddress)
+    }
     
   }
-  const showHeader =  web3authAddress.length>=30 ? <Navbar/> : <Header/>;
+  const showHeader =  web3authAddress !== null ? <Navbar web3Provider={props.web3Provider}/> : <Header/>;
 
-  const web3authTokenDeploy = async () =>{
-    const factory = getweb3authProvider();
-    onClose()
-    const TokenAddress = await factory.createToken("Token","TKN","1000000","0x076Ea62aF4D940d36E13cFd6B4ce7c0197c55D7d","test")
-    console.log(TokenAddress)
-    console.log("Token deployed successfully")
+ 
 
-
-  }
-
-  const web3authDeploy = web3authAddress.length >= 30 ? web3authTokenDeploy : createToken
+  // const web3authDeploy = web3authAddress !== null ? web3authTokenDeploy : createToken
 
   return (
     <>
@@ -181,7 +179,7 @@ const GoLivePage = () => {
             <Button colorScheme='blue' mr={3} onClick={onClose} width="180px" variant="outline" color="#C94B32">
               Close
             </Button>
-            <Button variant='solid' colorScheme="#C94B32" bg="#C94B32" onClick={web3authDeploy} width="180px"  color="#FFFFFF">Deploy</Button>
+            <Button variant='solid' colorScheme="#C94B32" bg="#C94B32" onClick={createToken} width="180px"  color="#FFFFFF">Deploy</Button>
             </div>
           </ModalFooter>
         </ModalContent>

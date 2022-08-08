@@ -11,6 +11,7 @@ import { ethers } from 'ethers';
 import { useAppDispatch } from 'state/hooks'
 import { updateWeb3AuthAddress,updateWeb3AuthAddressPvtKey } from 'state/proposal/reducer';
 import { setWeb3authProvider } from 'connection/DaoFactoryCall';
+import Navbar from 'components/Web3AuthNavbar/Navbar';
 
 
 export default function App() {
@@ -95,8 +96,6 @@ export default function App() {
       await web3auth.logout();
       setProvider(null);
     };
-  
-  // const showHeader =  web3authAddress.length>=30 ? <Navbar web3Provider={provider} login={login}/> : <Header/>;
   return (
     <Context.Provider value={{ title: '' }}>
       {/* <Header /> */}
@@ -104,13 +103,13 @@ export default function App() {
         <Routes>
           <Route path='/' element={<LandingPage/>}/>
           <Route path='/login' element={[<LoginPage web3auth = {web3auth} login = {login} logout={logout} web3Provider = {provider}/>]}/>
-          <Route path='/createdao' element={[<StartDAO />]} />
-          <Route path='/basics' element={<SidebarPage page="Basics" />} />
-          <Route path='/settings' element={<SidebarPage page="Settings" />} />
-          <Route path='/token' element={<SidebarPage page="Token" />} />
-          <Route path='/golive' element={<SidebarPage page="Go Live" />} />
+          <Route path='/createdao' element={[<StartDAO web3Provider={provider}/>]} />
+          <Route path='/basics' element={<SidebarPage page="Basics" web3Provider={provider}/>} />
+          <Route path='/settings' element={<SidebarPage page="Settings" web3Provider={provider} />} />
+          <Route path='/token' element={<SidebarPage page="Token" web3Provider={provider}/>} />
+          <Route path='/golive' element={<SidebarPage page="Go Live" web3Provider={provider}/>} />
           <Route path='/dashboard' element={<SidebarPage page="Dashboard" />} />
-          <Route path='/sidepage' element={<SidebarPage page='Basics'/>} />
+          <Route path='/sidepage' element={<SidebarPage page='Basics' web3Provider={provider}/>} />
         </Routes>
       </div>
     </Context.Provider >

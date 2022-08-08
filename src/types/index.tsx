@@ -19,9 +19,9 @@ export interface ChangeComponentType{
     property: string,
 }
 export interface sidebarPropType{
-    page: string,
+    page?: string,
 }
-export interface Web3AuthPropType {
+export interface Web3AuthPropType extends sidebarPropType {
     web3auth?: Web3Auth | null,
     login?: ()=> void,
     logout?: () => void,

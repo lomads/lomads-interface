@@ -7,13 +7,13 @@ export interface ProposalState {
   readonly tokenSymbol: string
   readonly supply: number
   readonly shortDesc: string
-  readonly deployedTokenAddress: string,
+  readonly deployedTokenAddress: string | null,
   readonly longDesc: string
   readonly explain: string
   readonly holder: string
-  readonly deployedGovernorAddress: string,
-  readonly Web3AuthAddress: string,
-  readonly Web3AuthAddressPvtKey: string
+  readonly deployedGovernorAddress: string | null,
+  readonly Web3AuthAddress: string | null,
+  readonly Web3AuthAddressPvtKey: string | null
 }
 
 const initialState: ProposalState = {
@@ -23,13 +23,13 @@ const initialState: ProposalState = {
   tokenSymbol: "",
   supply: 0,
   shortDesc: "",
-  deployedTokenAddress: "",
+  deployedTokenAddress: null,
   longDesc: "",
   explain: "",
   holder: "",
-  deployedGovernorAddress: "",
-  Web3AuthAddress: "",
-  Web3AuthAddressPvtKey: "",
+  deployedGovernorAddress: null,
+  Web3AuthAddress: null,
+  Web3AuthAddressPvtKey: null,
 }
 
 const proposalSlice = createSlice({
