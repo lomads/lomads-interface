@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useEffect, useState } from 'react'
 import '../styles/App.css'
 import '../styles/CreateDao.css'
 import '../styles/Dashboard.css'
@@ -10,9 +10,8 @@ import BasicsComponent from '../components/BasicsComponent'
 import TokenComponent from '../components/TokenComponent'
 import SettingsComponent from '../components/SettingsComponent'
 import { LineWobble } from '@uiball/loaders'
-import { useAppSelector } from 'state/hooks'
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from 'state/hooks'
+import { useAppDispatch, useAppSelector } from 'state/hooks'
 import {
   Modal,
   ModalOverlay,
@@ -46,9 +45,9 @@ const GoLivePage = () => {
   const supply = useAppSelector((state) => state.proposal.supply)
   const holder = useAppSelector((state) => state.proposal.holder)
   const web3authAddress = useAppSelector((state) => state.proposal.Web3AuthAddress)
-
+  const coverImgPath = useAppSelector((state) => state.proposal.coverImgPath)
+  const { save } = useNewMoralisObject("DAOInfo");
   const { isOpen, onOpen, onClose } = useDisclosure()
-
 
   const addToken = async () => {
     const tokenAddress = deployedTokenAddress;
@@ -81,8 +80,6 @@ const GoLivePage = () => {
   }
 
   const DeployDAO = async () => {
-    console.log("MIDAS deployDAO")
-
     const factory = await factoryCall(provider);
     const creatingGovernor = deployedTokenAddress.length >= 32 && await factory.createGovernor(title, deployedTokenAddress, title, purpose, longDesc, shortDesc);
     await creatingGovernor.wait();
@@ -94,32 +91,28 @@ const GoLivePage = () => {
     setdeployedGovernor(governorAddress);
   }
   const createToken = async () => {
-    console.log("MIDAS createToken");
     const factory = await factoryCall(provider);
     setisLoading(true);
     onClose()
     const creatingToken = await factory.createToken(tokenTitle, tokenSymbol, supply, holder, explain);
-    // await creatingToken.wait();
-    // const tokenAddress = await factory.deployedTokenAddress();
-    // dispatch(updatedeployedTokenAddress(tokenAddress));
+    console.log("Midas createToken",  creatingToken)
+    await creatingToken.wait();
+    const tokenAddress = await factory.deployedTokenAddress();
+    dispatch(updatedeployedTokenAddress(tokenAddress));
     deployedTokenAddress.length >= 32 && await DeployDAO();
-
   }
+
   const showHeader = web3authAddress.length >= 30 ? <Navbar /> : <Header />;
 
   const web3authTokenDeploy = async () => {
     const factory = getweb3authProvider();
     onClose()
-    // const TokenAddress = await factory.createToken("Token","TKN","1000000","0x076Ea62aF4D940d36E13cFd6B4ce7c0197c55D7d","test")
-    console.log("Midas deployedTokenAddress", deployedTokenAddress, deployedTokenSymbol, deploywebToken, deployedGovernor)
-    saveObject();
-    navigate("/dashboard");
-    console.log("Midas Token deployed successfully")
-
-
+    const TokenAddress = await factory.createToken("Token","TKN","1000000","0x076Ea62aF4D940d36E13cFd6B4ce7c0197c55D7d","test")
   }
-
-  const { save } = useNewMoralisObject("DAOInfo");
+  
+  const deployTest = () => {
+    saveObject();
+  }
 
   const saveObject = async () => {
     const data = {
@@ -127,14 +120,14 @@ const GoLivePage = () => {
       purpose: purpose,
       shortDesc: shortDesc,
       longDesc: longDesc,
-      coverImg: "sdfsadfasdf",
-      tags: "asdfsdf",
-      communityLinks: "qweqwe",
+      coverImg: coverImgPath,
+      tags: "test",
+      communityLinks: "test",
       settingTemp: "Midas",
       tokenName: tokenTitle,
       tokenSymbol: tokenSymbol,
       explain: explain,
-      supply: supply,
+      supply: supply.toString(),
       holder: holder,
       iconImg: "iconImg"
     };
@@ -143,6 +136,7 @@ const GoLivePage = () => {
       onSuccess: (daoinfo) => {
         // Execute any logic that should take place after the object is saved.
         console.log("New object created with objectId: " + daoinfo.id);
+        navigate("/dashboard");
       },
       onError: (error) => {
         // Execute any logic that should take place if the save fails.
@@ -151,8 +145,7 @@ const GoLivePage = () => {
       },
     });
   };
-
-  console.log("Midas web3AduthAddress", web3authAddress);
+  console.log("Midasweb3AuthAddress", web3authAddress)
   const web3authDeploy = web3authAddress.length >= 30 ? web3authTokenDeploy : createToken
 
   return (
@@ -219,7 +212,8 @@ const GoLivePage = () => {
               <Button colorScheme='blue' mr={3} onClick={onClose} width="180px" variant="outline" color="#C94B32">
                 Close
               </Button>
-              <Button variant='solid' colorScheme="#C94B32" bg="#C94B32" onClick={web3authDeploy} width="180px" color="#FFFFFF">Deploy</Button>
+              {/* <Button variant='solid' colorScheme="#C94B32" bg="#C94B32" onClick={web3authDeploy} width="180px" color="#FFFFFF">Deploy</Button> */}
+              <Button variant='solid' colorScheme="#C94B32" bg="#C94B32" onClick={deployTest} width="180px" color="#FFFFFF">Deploy</Button>
             </div>
           </ModalFooter>
         </ModalContent>

@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { isObjectBindingPattern } from 'typescript'
 
 export interface ProposalState {
   readonly title: string
@@ -14,6 +15,7 @@ export interface ProposalState {
   readonly deployedGovernorAddress: string,
   readonly Web3AuthAddress: string,
   readonly Web3AuthAddressPvtKey: string
+  readonly coverImgPath: string
 }
 
 const initialState: ProposalState = {
@@ -30,6 +32,7 @@ const initialState: ProposalState = {
   deployedGovernorAddress: "",
   Web3AuthAddress: "",
   Web3AuthAddressPvtKey: "",
+  coverImgPath: "",
 }
 
 const proposalSlice = createSlice({
@@ -74,9 +77,12 @@ const proposalSlice = createSlice({
     },
     updateWeb3AuthAddressPvtKey(state,action) {
       state.Web3AuthAddressPvtKey = action.payload
+    },
+    updateCoverImgPath(state, action) {
+      state.coverImgPath = action.payload
     }
   },
 })
 
-export const { updateTitle, updatePurpose,updatetokenSymbol,updatetokenTitle, updateSupply, updatedeployedTokenAddress, updateShortDesc, updateLongDesc, updateExplain, updateHolder, updatedeployedGovernorAddress,updateWeb3AuthAddress,updateWeb3AuthAddressPvtKey } = proposalSlice.actions
+export const { updateTitle, updatePurpose,updatetokenSymbol,updatetokenTitle, updateSupply, updatedeployedTokenAddress, updateShortDesc, updateLongDesc, updateExplain, updateHolder, updatedeployedGovernorAddress,updateWeb3AuthAddress,updateWeb3AuthAddressPvtKey, updateCoverImgPath } = proposalSlice.actions
 export default proposalSlice.reducer

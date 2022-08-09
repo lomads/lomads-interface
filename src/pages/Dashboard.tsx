@@ -9,7 +9,7 @@ import SendTokenComponent from '../components/SendTokenComponent'
 import { useWeb3React } from "@web3-react/core";
 import { useAppSelector } from 'state/hooks'
 import { tokenCall } from 'connection/DaoTokenCall'
-import { useMoralisQuery, useMoralis} from "react-moralis"
+import { useMoralisQuery, useMoralis } from "react-moralis"
 import { useAppDispatch } from 'state/hooks'
 import { updatedeployedGovernorAddress, updatedeployedTokenAddress } from '../state/proposal/reducer'
 
@@ -18,26 +18,41 @@ const Dashboard = () => {
   const tokenAddress = useAppSelector((state) => state.proposal.deployedTokenAddress)
   const governorAddress = useAppSelector((state) => state.proposal.deployedGovernorAddress);
   const { Moralis } = useMoralis();
-  const [histories, setHistories] = useState();
+  const [histories, setHistories] = useState<object>([]);
+  const [title, setTitle] = useState("")
+  const [purpose, setPurpose] = useState("")
+  const [shortDesc, setShortDesc] = useState("")
+  const [longDesc, setLongDesc] = useState("")
+  const [coverImg, setCoverImg] = useState("")
+  const [tokenName, setTokenName] = useState("")
+  const [tokenSymbol, setTokenSymbol] = useState("")
+  const [explain, setExplain] = useState("")
+  const [supply, setSupply] = useState("")
+  const [holder, setHolder] = useState("")
 
   useEffect(() => {
     getHistories();
   }, [])
- 
+
   async function getHistories() {
     const daoinfo = Moralis.Object.extend("DAOInfo");
     const query = new Moralis.Query(daoinfo);
     const results = await query.find({ useMasterKey: true });
-    for (let i = 0; i < results.length; i++) {
-      const object = results[i];
-      console.log(object.id + " - " + object.get("title"));
-    }
-    dispatch(updatedeployedGovernorAddress(results[results.length-1].get("title")))
-    dispatch(updatedeployedTokenAddress(results[results.length-1].get("purpose")))
+    setHistories(results);
+    setTitle(results[results.length - 1].get("title"));
+    setPurpose(results[results.length - 1].get("purpose"));
+    setShortDesc(results[results.length - 1].get("shortDesc"));
+    setLongDesc(results[results.length - 1].get("longDesc"));
+    setCoverImg(results[results.length - 1].get("coverImg"));
+    setTokenName(results[results.length - 1].get("TokenName"));
+    setTokenSymbol(results[results.length - 1].get("TokenSymbol"));
+    setExplain(results[results.length - 1].get("explain"));
+    setSupply(results[results.length - 1].get("supply"));
+    setHolder(results[results.length - 1].get("holder"));
   }
-  
+
   return (
-    <div className={"something"} style={{ paddingLeft: 480, paddingTop: 100, paddingBottom: 100,height:1600 }}>
+    <div className={"something"} style={{ paddingLeft: 480, paddingTop: 100, paddingBottom: 100, height: 1600 }}>
       <div className={"pageTitle"}>
         Dashboard Page
       </div>
@@ -62,6 +77,46 @@ const Dashboard = () => {
         </div>
         <div>
           <SendTokenComponent />
+        </div>
+      </div>
+      <div>
+        <div className={"gotitle"}>
+          Deployed DAO Info from Moralis
+        </div>
+        <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
+          DAO title : {title}
+        </div>
+        <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
+          DAO purpose : {purpose}
+        </div>
+        <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
+          DAO shortDesc : {shortDesc}
+        </div>
+        <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
+          DAO longDesc : {longDesc}
+        </div>
+        <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
+          DAO coverImg : {coverImg}
+          <img
+            alt={`Uploaded coverImg`}
+            src={"https://ipfs.infura.io/ipfs/" + coverImg}
+            style={{ maxWidth: "400px", margin: "15px" }}
+          />
+        </div>
+        <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
+          DAO tokenName : {tokenName}
+        </div>
+        <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
+          DAO tokenSymbol : {tokenSymbol}
+        </div>
+        <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
+          DAO explain : {explain}
+        </div>
+        <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
+          DAO supply : {supply}
+        </div>
+        <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
+          DAO holder : {holder}
         </div>
       </div>
     </div>
