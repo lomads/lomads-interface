@@ -8,7 +8,7 @@ export interface ProposalState {
   readonly tokenSymbol: string
   readonly supply: number
   readonly shortDesc: string
-  readonly deployedTokenAddress: string,
+  readonly deployedTokenAddress: string | null,
   readonly longDesc: string
   readonly explain: string
   readonly holder: string
@@ -25,7 +25,7 @@ const initialState: ProposalState = {
   tokenSymbol: "",
   supply: 0,
   shortDesc: "",
-  deployedTokenAddress: "",
+  deployedTokenAddress: null,
   longDesc: "",
   explain: "",
   holder: "",

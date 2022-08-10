@@ -12,12 +12,13 @@ import ApprovalSliderThumbWithTooltip from 'components/sub/ApprovalSlider'
 import Header from 'components/Header';
 import Navbar from 'components/Web3AuthNavbar/Navbar'
 import { useAppSelector } from 'state/hooks'
+import { Web3AuthPropType } from 'types'
 
-const SettingsPage = () => {
+const SettingsPage = (props: Web3AuthPropType) => {
     const web3authAddress  = useAppSelector((state) => state.proposal.Web3AuthAddress)
     const [SupportValue,setSupportValue] = useState<number>(0)
     const [ApprovalValue,setApprovalValue] = useState<number>(0)
-    const showHeader =  web3authAddress.length>=30 ? <Navbar/> : <Header/>;
+    const showHeader =  web3authAddress !==null ? <Navbar web3Provider={props.web3Provider}/> : <Header/>;
   return (
     <>
     <div className='absolute top-0 right-0'>

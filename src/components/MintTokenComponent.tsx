@@ -16,7 +16,7 @@ const MintTokenComponent = () => {
     const mintToken = async () =>{
         setisLoading(true);
         const supply = tokenSupply
-      const token = await tokenCall(provider,tokenAddress); 
+      const token = await tokenCall(provider,tokenAddress as string); 
       const mintToken = await token.mint(holder,supply)
       await mintToken.wait()
       setMessage("Token have been minted successfully")

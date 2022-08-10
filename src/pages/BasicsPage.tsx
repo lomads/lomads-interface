@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState,SyntheticEvent, useCallback, } from 'react'
 import { useNavigate } from 'react-router-dom';
-import {
+import { 
     Input
 } from '@chakra-ui/react'
 import '../styles/App.css'
@@ -8,7 +8,7 @@ import '../styles/CreateDao.css'
 import '../styles/Dashboard.css'
 import '../styles/Modal.css'
 import '../styles/Sidebar.css'
-import { imageType, tagType } from '../types';
+import { imageType, tagType, Web3AuthPropType } from '../types';
 import { useAppDispatch } from 'state/hooks'
 import { updateTitle, updatePurpose, updateShortDesc, updateLongDesc, updateCoverImgPath } from 'state/proposal/reducer'
 import { useAppSelector } from 'state/hooks'
@@ -16,9 +16,9 @@ import CommunityTag from './CommunityTag';
 import KeywordTag from './KeywordTag';
 import Header from 'components/Header';
 import Navbar from 'components/Web3AuthNavbar/Navbar';
-import { fileUpload } from'../utils/ipfs'
+import { fileUpload } from '../utils/ipfs'
 
-const BasicsPage = () => {
+const BasicsPage = (props: Web3AuthPropType) => {
     const dispatch = useAppDispatch()
     const title = useAppSelector((state) => state.proposal.title)
     const purpose = useAppSelector((state) => state.proposal.purpose)
@@ -46,7 +46,7 @@ const BasicsPage = () => {
     const ImageThumb: React.FC<imageType> = ({ image }) => {
         return <img src={URL.createObjectURL(image)} alt={image.name} width="300" height={"300"} />;
     };
-    const showHeader = web3authAddress.length >= 30 ? <Navbar /> : <Header />;
+    const showHeader =  web3authAddress !== null ? <Navbar web3Provider={props.web3Provider}/> : <Header/>;
     return (
         <>
             <div className='absolute top-0 right-0'>

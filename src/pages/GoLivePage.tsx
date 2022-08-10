@@ -5,7 +5,7 @@ import '../styles/Dashboard.css'
 import '../styles/Modal.css'
 import '../styles/Sidebar.css'
 import { useWeb3React } from "@web3-react/core";
-import { deploywebToken, factoryCall, getweb3authProvider } from 'connection/DaoFactoryCall'
+import { factoryCall, getweb3authProvider } from 'connection/DaoFactoryCall'
 import BasicsComponent from '../components/BasicsComponent'
 import TokenComponent from '../components/TokenComponent'
 import SettingsComponent from '../components/SettingsComponent'
@@ -26,8 +26,9 @@ import { updatedeployedGovernorAddress, updatedeployedTokenAddress } from '../st
 import Header from 'components/Header';
 import Navbar from 'components/Web3AuthNavbar/Navbar'
 import { useNewMoralisObject } from "react-moralis";
+import { Web3AuthPropType } from 'types'
 
-const GoLivePage = () => {
+const GoLivePage = (props: Web3AuthPropType) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch()
   const { provider, connector } = useWeb3React();
@@ -49,7 +50,8 @@ const GoLivePage = () => {
   const { save } = useNewMoralisObject("DAOInfo");
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const addToken = async () => {
+
+  const addToken = async (deployedTokenAddress: string) => {
     const tokenAddress = deployedTokenAddress;
     const tokenSymbol = deployedTokenSymbol;
     const tokenDecimals = 18;
@@ -79,12 +81,14 @@ const GoLivePage = () => {
     }
   }
 
-  const DeployDAO = async () => {
+  const DeployDAO = async (deployedTokenAddress: string) => {
+    console.log("DEploying GOv")
+    console.log(deployedTokenAddress)
     const factory = await factoryCall(provider);
-    const creatingGovernor = deployedTokenAddress.length >= 32 && await factory.createGovernor(title, deployedTokenAddress, title, purpose, longDesc, shortDesc);
+    const creatingGovernor = deployedTokenAddress !== null && await factory.createGovernor(title, deployedTokenAddress, title, purpose, longDesc, shortDesc);
     await creatingGovernor.wait();
     const governorAddress = await factory.deployedGovernorAddress();
-    await addToken();
+    await addToken(deployedTokenAddress);
     setisLoading(false)
     dispatch(updatedeployedGovernorAddress(governorAddress))
     navigate("/dashboard");
@@ -95,21 +99,21 @@ const GoLivePage = () => {
     setisLoading(true);
     onClose()
     const creatingToken = await factory.createToken(tokenTitle, tokenSymbol, supply, holder, explain);
-    console.log("Midas createToken",  creatingToken)
     await creatingToken.wait();
     const tokenAddress = await factory.deployedTokenAddress();
     dispatch(updatedeployedTokenAddress(tokenAddress));
-    deployedTokenAddress.length >= 32 && await DeployDAO();
+    // await DeployDAO()
+    if (tokenAddress) {
+      console.log("token address is:", tokenAddress)
+      dispatch(updatedeployedTokenAddress(tokenAddress))
+      DeployDAO(tokenAddress)
+    }
+
   }
 
-  const showHeader = web3authAddress.length >= 30 ? <Navbar /> : <Header />;
+  const showHeader = web3authAddress !== null ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
 
-  const web3authTokenDeploy = async () => {
-    const factory = getweb3authProvider();
-    onClose()
-    const TokenAddress = await factory.createToken("Token","TKN","1000000","0x076Ea62aF4D940d36E13cFd6B4ce7c0197c55D7d","test")
-  }
-  
+
   const deployTest = () => {
     saveObject();
   }
@@ -131,96 +135,79 @@ const GoLivePage = () => {
       holder: holder,
       iconImg: "iconImg"
     };
+  }
 
-    save(data, {
-      onSuccess: (daoinfo) => {
-        // Execute any logic that should take place after the object is saved.
-        console.log("New object created with objectId: " + daoinfo.id);
-        navigate("/dashboard");
-      },
-      onError: (error) => {
-        // Execute any logic that should take place if the save fails.
-        // error is a Moralis.Error with an error code and message.
-        console.log("Failed to create new object, with error code: " + error.message);
-      },
-    });
-  };
-  console.log("Midasweb3AuthAddress", web3authAddress)
-  const web3authDeploy = web3authAddress.length >= 30 ? web3authTokenDeploy : createToken
-
-  return (
-    <>
-      <div className='absolute top-0 right-0'>
-        {showHeader}
-      </div>
-      <div className={"something"} style={{ paddingLeft: 480, paddingTop: 100, paddingBottom: 100, height: 1600, width: "100%" }}>
-        <div className={"pageTitle"}>
-          Go live
+    return (
+      <>
+        <div className='absolute top-0 right-0'>
+          {showHeader}
         </div>
-        <div className={"pageDescription"} style={{ width: "486px" }}>
-          Take your crowdfund public by completing the final checklist, cross-checking the values, and ensuring there aren’t any mis-spellings.
-        </div>
-        <div>
-          <BasicsComponent />
-        </div>
-        <div>
-          <SettingsComponent />
-        </div>
-        <div>
-          <TokenComponent />
+        <div className={"something"} style={{ paddingLeft: 480, paddingTop: 100, paddingBottom: 100, height: 1600, width: "100%" }}>
+          <div className={"pageTitle"}>
+            Go live
+          </div>
+          <div className={"pageDescription"} style={{ width: "486px" }}>
+            Take your crowdfund public by completing the final checklist, cross-checking the values, and ensuring there aren’t any mis-spellings.
+          </div>
+          <div>
+            <BasicsComponent />
+          </div>
+          <div>
+            <SettingsComponent />
+          </div>
+          <div>
+            <TokenComponent />
+            {
+              isLoading ? (
+                <div>
+                  <div className={"subItemHeader"} style={{ paddingBottom: 20 }}>
+                    Hold on we are deploying your Governor and Token
+                  </div>
+                  <LineWobble size={750} color="#C94B32" />
+                </div>) : (null)
+            }
+          </div>
           {
-            isLoading ? (
-              <div>
-                <div className={"subItemHeader"} style={{ paddingBottom: 20 }}>
-                  Hold on we are deploying your Governor and Token
+            deployedGovernor.length >= 32 ? (
+              <div className={"subItemHeader"}>
+                <div>
+                  Deployed Governor Address: {deployedGovernor}
                 </div>
-                <LineWobble size={750} color="#C94B32" />
-              </div>) : (null)
-          }
-        </div>
-        {
-          deployedGovernor.length >= 32 ? (
-            <div className={"subItemHeader"}>
-              <div>
-                Deployed Governor Address: {deployedGovernor}
               </div>
-            </div>
-          ) : (null)
-        }
+            ) : (null)
+          }
 
-        <div>
-          <button id="buttonDeploy" className={"nextButton"} onClick={onOpen}>
-            DEPLOY
-          </button>
+          <div>
+            <button id="buttonDeploy" className={"nextButton"} onClick={onOpen}>
+              DEPLOY
+            </button>
+          </div>
         </div>
-      </div>
-      <Modal
-        isCentered
-        onClose={onClose}
-        isOpen={isOpen}
-        motionPreset='slideInBottom'
-        size="md"
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader color="#C94B32">Final Check</ModalHeader>
-          <ModalBody className={"pageDescription"}>
-            Ensure All values above are correct before proceeding. These values cannot be changed after deploying. However, you can keep editing the story text after the crowdfund is deployed. The Mirror protocol takes a 2.5% on amount raised during the crowdfund.
-          </ModalBody>
-          <ModalFooter >
-            <div className='flex flex-row justify-between items-center w-full'>
-              <Button colorScheme='blue' mr={3} onClick={onClose} width="180px" variant="outline" color="#C94B32">
-                Close
-              </Button>
-              {/* <Button variant='solid' colorScheme="#C94B32" bg="#C94B32" onClick={web3authDeploy} width="180px" color="#FFFFFF">Deploy</Button> */}
-              <Button variant='solid' colorScheme="#C94B32" bg="#C94B32" onClick={deployTest} width="180px" color="#FFFFFF">Deploy</Button>
-            </div>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </>
-  )
-
+        <Modal
+          isCentered
+          onClose={onClose}
+          isOpen={isOpen}
+          motionPreset='slideInBottom'
+          size="md"
+        >
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader color="#C94B32">Final Check</ModalHeader>
+            <ModalBody className={"pageDescription"}>
+              Ensure All values above are correct before proceeding. These values cannot be changed after deploying. However, you can keep editing the story text after the crowdfund is deployed. The Mirror protocol takes a 2.5% on amount raised during the crowdfund.
+            </ModalBody>
+            <ModalFooter >
+              <div className='flex flex-row justify-between items-center w-full'>
+                <Button colorScheme='blue' mr={3} onClick={onClose} width="180px" variant="outline" color="#C94B32">
+                  Close
+                </Button>
+                <Button variant='solid' colorScheme="#C94B32" bg="#C94B32" onClick={createToken} width="180px" color="#FFFFFF">Deploy</Button>
+              </div>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </>
+    )
 }
 
 export default GoLivePage

@@ -5,34 +5,34 @@ import SettingsPage from './SettingsPage'
 import TokenPage from './TokenPage'
 import GoLivePage from './GoLivePage'
 import Dashboard from './Dashboard'
-import { sidebarPropType } from '../types'
+import { sidebarPropType, Web3AuthPropType } from '../types'
 
-const SidebarPage = (props: sidebarPropType) => {
+const SidebarPage = (props: Web3AuthPropType) => {
 
   const renderPage = () => {
     if (props.page === "Basics") {
       return (
         <div>
-          <BasicsPage />
+          <BasicsPage web3Provider={props.web3Provider}/>
         </div>
       );
     } else if (props.page === "Token") {
       return (
         <div>
-          <TokenPage />
+          <TokenPage web3Provider={props.web3Provider}/>
         </div>
       );
     }
     else if (props.page === "Settings") {
       return (
         <div>
-          <SettingsPage />
+          <SettingsPage web3Provider={props.web3Provider}/>
         </div>
       );
     } else if (props.page === "Go Live") {
       return (
         <div>
-          <GoLivePage />
+          <GoLivePage web3Provider={props.web3Provider}/>
         </div>
       );
     } else if (props.page === "Dashboard") {
@@ -48,7 +48,7 @@ const SidebarPage = (props: sidebarPropType) => {
   }
   return (
     <div style={{ display: "flex" }}>
-      <CreateDaoSidebar />
+      <CreateDaoSidebar  />
       <div className='combine'>
       {renderPage()}
       </div>
