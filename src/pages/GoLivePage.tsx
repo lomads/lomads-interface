@@ -90,8 +90,9 @@ const GoLivePage = (props: Web3AuthPropType) => {
     const governorAddress = await factory.deployedGovernorAddress();
     await addToken(deployedTokenAddress);
     setisLoading(false)
+    saveObject();
     dispatch(updatedeployedGovernorAddress(governorAddress))
-    navigate("/dashboard");
+    // navigate("/dashboard");
     setdeployedGovernor(governorAddress);
   }
   const createToken = async () => {
@@ -113,11 +114,6 @@ const GoLivePage = (props: Web3AuthPropType) => {
 
   const showHeader = web3authAddress !== null ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
 
-
-  const deployTest = () => {
-    saveObject();
-  }
-
   const saveObject = async () => {
     const data = {
       title: title,
@@ -135,6 +131,18 @@ const GoLivePage = (props: Web3AuthPropType) => {
       holder: holder,
       iconImg: "iconImg"
     };
+    save(data, {
+      onSuccess: (daoinfo) => {
+        // Execute any logic that should take place after the object is saved.
+        console.log("New object created with objectId: " + daoinfo.id);
+        navigate("/dashboard");
+      },
+      onError: (error) => {
+        // Execute any logic that should take place if the save fails.
+        // error is a Moralis.Error with an error code and message.
+        console.log("Failed to create new object, with error code: " + error.message);
+      },
+    });
   }
 
     return (
