@@ -67,7 +67,7 @@ export default function App() {
       }
     };
 
-    init();
+    // init();
   }, []);
 
   const login = async () => {

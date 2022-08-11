@@ -17,16 +17,7 @@ const LoginPage = (props: Web3AuthPropType) => {
     const nextLogin=()=>{
         navigate('/createdao');
     }
-    // const showHeader = () => {
-    //     if(web3authAddress.length>=30){
-    //         return <Navbar/>
-    //     }else{
-    //         return <Header/>
-    //     }
-    // }
-    // useEffect(()=>{
-    //     showHeader()
-    // })
+   
   return (
            <>
            <div className='absolute top-0 right-0'>
@@ -48,7 +39,7 @@ const LoginPage = (props: Web3AuthPropType) => {
                    <img src={metamask2} style={{padding:40}} alt="MetaMask"/>
                 </button>
                 <button className="modalLoginButton" onClick={nextLogin}>
-                   <img src={walletconnect} style={{padding:40}} alt="MetaMask"/>
+                   <img src={walletconnect} style={{padding:40}} alt="WalletConnet"/>
                 </button>
                 <div className={"loginWithoutWallet"}>
                    <button className='font-sans text-sm text-text_color' onClick={props.login}>login without crypto wallet </button>
