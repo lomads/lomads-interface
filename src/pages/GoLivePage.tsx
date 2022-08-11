@@ -113,7 +113,7 @@ const GoLivePage = (props: Web3AuthPropType) => {
 
   }
 
-  const showHeader = web3authAddress !== null ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
+  const showHeader = !!web3authAddress ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
 
   const saveObject = async () => {
     const data = {

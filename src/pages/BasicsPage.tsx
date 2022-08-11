@@ -24,7 +24,6 @@ const BasicsPage = (props: Web3AuthPropType) => {
     const purpose = useAppSelector((state) => state.proposal.purpose)
     const shortDesc = useAppSelector((state) => state.proposal.shortDesc)
     const longDesc = useAppSelector((state) => state.proposal.longDesc)
-    const coverImgPath = useAppSelector((state) => state.proposal.coverImgPath)
     const [file, setFile] = useState<string>(""); 
     const web3authAddress = useAppSelector((state) => state.proposal.Web3AuthAddress)
     const navigate = useNavigate();
@@ -46,7 +45,7 @@ const BasicsPage = (props: Web3AuthPropType) => {
     const ImageThumb: React.FC<imageType> = ({ image }) => {
         return <img src={URL.createObjectURL(image)} alt={image.name} width="300" height={"300"} />;
     };
-    const showHeader =  web3authAddress !== null ? <Navbar web3Provider={props.web3Provider}/> : <Header/>;
+    const showHeader = !!web3authAddress ? <Navbar web3Provider={props.web3Provider}/> : <Header/>;
     return (
         <>
             <div className='absolute top-0 right-0'>

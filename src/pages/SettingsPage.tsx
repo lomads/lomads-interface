@@ -1,4 +1,4 @@
-import React,{useState} from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import SelectTemplate from '../components/sub/SelectTemplate'
 import '../styles/App.css'
@@ -15,16 +15,16 @@ import { useAppSelector } from 'state/hooks'
 import { Web3AuthPropType } from 'types'
 
 const SettingsPage = (props: Web3AuthPropType) => {
-    const web3authAddress  = useAppSelector((state) => state.proposal.Web3AuthAddress)
-    const [SupportValue,setSupportValue] = useState<number>(0)
-    const [ApprovalValue,setApprovalValue] = useState<number>(0)
-    const showHeader =  web3authAddress !==null ? <Navbar web3Provider={props.web3Provider}/> : <Header/>;
-  return (
-    <>
-    <div className='absolute top-0 right-0'>
-        {showHeader}
-    </div>
-    <div className={"something"} style={{paddingLeft:480, paddingTop:100,paddingBottom:100,height:1600}}>
+    const web3authAddress = useAppSelector((state) => state.proposal.Web3AuthAddress)
+    const [SupportValue, setSupportValue] = useState<number>(0)
+    const [ApprovalValue, setApprovalValue] = useState<number>(0)
+    const showHeader = !!web3authAddress ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
+    return (
+        <>
+            <div className='absolute top-0 right-0'>
+                {showHeader}
+            </div>
+            <div className={"something"} style={{ paddingLeft: 480, paddingTop: 100, paddingBottom: 100, height: 1600 }}>
                 <div className={"pageTitle"}>
                     Settings
                 </div>
@@ -32,7 +32,7 @@ const SettingsPage = (props: Web3AuthPropType) => {
                     Choose your template and more
                 </div>
                 <div>
-                <div className={"subItemHeader"}>
+                    <div className={"subItemHeader"}>
                         <div>
                             Select a Template
                         </div>
@@ -45,14 +45,14 @@ const SettingsPage = (props: Web3AuthPropType) => {
                     <div className={"fieldDesc"}>
                         Create your organisation with our pre-configured templates.
                     </div>
-                    <div style={{display:"flex",position:"relative",right:120,zIndex: 9999}}>
-                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1"/>
-                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1"/>
-                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1"/>
+                    <div style={{ display: "flex", position: "relative", right: 120, zIndex: 9999 }}>
+                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1" />
+                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1" />
+                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1" />
                     </div>
                 </div>
                 <div>
-                <div className={"subItemHeader"}>
+                    <div className={"subItemHeader"}>
                         <div>
                             Voting
                         </div>
@@ -65,25 +65,25 @@ const SettingsPage = (props: Web3AuthPropType) => {
                     <div className={"fieldDesc"}>
                         Choose your voting application settings.
                     </div>
-                    <div style={{width:"500px"}}>
-                    <div className={"pageSubItemHeader"}>
-                        Support
-                    </div>
-                    <SliderThumbWithTooltip/>
+                    <div style={{ width: "500px" }}>
+                        <div className={"pageSubItemHeader"}>
+                            Support
+                        </div>
+                        <SliderThumbWithTooltip />
                     </div>
 
-                    <div style={{width:"486px"}}>
-                    <div className={"pageSubItemHeader"}>
-                        Minimum Approval
-                    </div>
-                    <ApprovalSliderThumbWithTooltip/>
+                    <div style={{ width: "486px" }}>
+                        <div className={"pageSubItemHeader"}>
+                            Minimum Approval
+                        </div>
+                        <ApprovalSliderThumbWithTooltip />
                     </div>
                     <div className={"pageSubItemHeader"}>
                         Vote Duration
                     </div>
-                    <div style={{display:"flex"}}>
-                        <ChangeComponent property="Days"/>
-                        <ChangeComponent property="Hours"/>
+                    <div style={{ display: "flex" }}>
+                        <ChangeComponent property="Days" />
+                        <ChangeComponent property="Hours" />
                     </div>
                 </div>
                 <div>
@@ -92,8 +92,8 @@ const SettingsPage = (props: Web3AuthPropType) => {
                     </button>
                 </div>
             </div>
-    </>
-  )
+        </>
+    )
 }
 
 export default SettingsPage

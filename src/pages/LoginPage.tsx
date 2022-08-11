@@ -1,5 +1,3 @@
-import React from 'react'
-// import {useMoralis} from "react-moralis";
 import { useNavigate } from 'react-router-dom';
 import createDao from "../assets/svg/createDao.svg";
 import metamask2 from "../assets/svg/metamask2.svg";
@@ -9,12 +7,20 @@ import '../styles/CreateDao.css'
 import '../styles/Dashboard.css'
 import '../styles/Modal.css'
 import { Web3AuthPropType } from 'types';
+import { useWeb3React } from '@web3-react/core'
+import { Connector } from '@web3-react/types'
 import Header from 'components/Header';
 
 const LoginPage = (props: Web3AuthPropType) => {
     const navigate = useNavigate()
-  
-    const nextLogin=()=>{
+    const { connector, account } = useWeb3React()
+    const nextLogin = async (walletType: string)=>{
+        console.log("midas type", walletType)
+        if(walletType == "MetaMask") {
+            await connector.activate()
+        } else {
+            console.log("midas wallet connect")
+        }
         navigate('/createdao');
     }
    
@@ -35,11 +41,11 @@ const LoginPage = (props: Web3AuthPropType) => {
             </div>  
             <div className={"body"}>
                 {/*onClick={() => loginWeb3auth("metamask")}*/}
-                <button className="modalLoginButton" onClick={nextLogin}>
+                <button className="modalLoginButton" onClick={()=>nextLogin("MetaMask")}>
                    <img src={metamask2} style={{padding:40}} alt="MetaMask"/>
                 </button>
-                <button className="modalLoginButton" onClick={nextLogin}>
-                   <img src={walletconnect} style={{padding:40}} alt="WalletConnet"/>
+                <button className="modalLoginButton" onClick={() => nextLogin("WalletConnect")}>
+                   <img src={walletconnect} style={{padding:40}} alt="WalletConnect"/>
                 </button>
                 <div className={"loginWithoutWallet"}>
                    <button className='font-sans text-sm text-text_color' onClick={props.login}>login without crypto wallet </button>
