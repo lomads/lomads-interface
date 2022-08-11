@@ -135,7 +135,7 @@ export default function WalletModal({
   const openOptions = useCallback(() => {
     setWalletView(WALLET_VIEWS.OPTIONS)
   }, [setWalletView])
-  const { authenticate, isAuthenticated, isAuthenticating, user, logout } = useMoralis();
+  const { authenticate, isAuthenticated } = useMoralis();
 
   const loginMoralis = async () => {
     if (!isAuthenticated) {
@@ -160,11 +160,12 @@ export default function WalletModal({
   
   useEffect(() => {
     if (walletModalOpen) {
-      console.log("Midas account", account)
       setWalletView(account ? WALLET_VIEWS.ACCOUNT : WALLET_VIEWS.OPTIONS)
-      
     }
-    loginMoralis();
+    if(account) {
+      console.log("Midas account", account)
+      loginMoralis();
+    }
   }, [walletModalOpen, setWalletView, account])
 
   useEffect(() => {

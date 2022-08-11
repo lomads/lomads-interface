@@ -47,6 +47,7 @@ const GoLivePage = (props: Web3AuthPropType) => {
   const holder = useAppSelector((state) => state.proposal.holder)
   const web3authAddress = useAppSelector((state) => state.proposal.Web3AuthAddress)
   const coverImgPath = useAppSelector((state) => state.proposal.coverImgPath)
+  const iconImgPath = useAppSelector((state) => state.proposal.iconImgPath)
   const { save } = useNewMoralisObject("DAOInfo");
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -129,7 +130,7 @@ const GoLivePage = (props: Web3AuthPropType) => {
       explain: explain,
       supply: supply.toString(),
       holder: holder,
-      iconImg: "iconImg"
+      iconImg: iconImgPath || "iconImag"
     };
     save(data, {
       onSuccess: (daoinfo) => {

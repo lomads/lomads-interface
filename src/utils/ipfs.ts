@@ -1,5 +1,5 @@
 
-import { create, CID, IPFSHTTPClient } from "ipfs-http-client";
+import { create, IPFSHTTPClient } from "ipfs-http-client";
 
 let ipfs: IPFSHTTPClient | undefined;
 try {
@@ -14,7 +14,6 @@ try {
 export const fileUpload = async (coverImg: any) => {
   return new Promise(async(resolve, reject)=> {
     const result = await (ipfs as IPFSHTTPClient).add(coverImg);
-    console.log("Midas fileUploaad", result)
     resolve(result);    
 });
 }

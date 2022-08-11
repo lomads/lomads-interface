@@ -6,11 +6,12 @@ import '../styles/Modal.css'
 import '../styles/Sidebar.css'
 import { useNavigate } from 'react-router-dom'
 import { useAppDispatch } from 'state/hooks'
-import { updatetokenTitle,updatetokenSymbol, updateExplain, updateSupply, updateHolder } from 'state/proposal/reducer'
+import { updatetokenTitle,updatetokenSymbol, updateExplain, updateSupply, updateHolder, updateIconImgPath } from 'state/proposal/reducer'
 import { useAppSelector } from 'state/hooks'
 import Header from 'components/Header';
 import Navbar from 'components/Web3AuthNavbar/Navbar'
 import { Web3AuthPropType } from 'types'
+import { fileUpload } from '../utils/ipfs'
 
 const TokenPage = (props: Web3AuthPropType) => {
     const dispatch = useAppDispatch()
@@ -21,13 +22,17 @@ const TokenPage = (props: Web3AuthPropType) => {
     const supply = useAppSelector((state) => state.proposal.supply)
     const holder = useAppSelector((state) => state.proposal.holder)
     const web3authAddress  = useAppSelector((state) => state.proposal.Web3AuthAddress)
-
     const [file, setFile] = useState<string>("");
-    function handleUpload(event: any) {
-        setFile(event.target.files[0]);
 
-        // Add code here to upload file to server
-        // ...
+    async function handleUpload(event: any) {
+        const files = event.target.files;
+        if (!files || files.length === 0) {
+            return alert("No files selected");
+        }
+        setFile(files[0]);
+        const result: any = await fileUpload(files[0]);
+        dispatch(updateIconImgPath(result?.path.toString()));
+       
     }
     const handleClick = () =>{
         navigate("/golive");

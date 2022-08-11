@@ -9,7 +9,7 @@ import SendTokenComponent from '../components/SendTokenComponent'
 import { useWeb3React } from "@web3-react/core";
 import { useAppSelector } from 'state/hooks'
 import { tokenCall } from 'connection/DaoTokenCall'
-import { useMoralisQuery, useMoralis } from "react-moralis"
+import { useMoralis } from "react-moralis"
 import { useAppDispatch } from 'state/hooks'
 import { updatedeployedGovernorAddress, updatedeployedTokenAddress } from '../state/proposal/reducer'
 
@@ -24,11 +24,15 @@ const Dashboard = () => {
   const [shortDesc, setShortDesc] = useState("")
   const [longDesc, setLongDesc] = useState("")
   const [coverImg, setCoverImg] = useState("")
+  const [tags, setTags] = useState("")
+  const [communityLinks, setCommunityLinks] = useState("")
+  const [settingTemp, setSettingTemp] = useState("")
   const [tokenName, setTokenName] = useState("")
   const [tokenSymbol, setTokenSymbol] = useState("")
   const [explain, setExplain] = useState("")
   const [supply, setSupply] = useState("")
   const [holder, setHolder] = useState("")
+  const [iconImg, setIconImg] = useState("")
 
   useEffect(() => {
     getHistories();
@@ -38,17 +42,22 @@ const Dashboard = () => {
     const daoinfo = Moralis.Object.extend("DAOInfo");
     const query = new Moralis.Query(daoinfo);
     const results = await query.find({ useMasterKey: true });
+    const lastIndex = results.length - 1; 
     setHistories(results);
-    setTitle(results[results.length - 1].get("title"));
-    setPurpose(results[results.length - 1].get("purpose"));
-    setShortDesc(results[results.length - 1].get("shortDesc"));
-    setLongDesc(results[results.length - 1].get("longDesc"));
-    setCoverImg(results[results.length - 1].get("coverImg"));
-    setTokenName(results[results.length - 1].get("TokenName"));
-    setTokenSymbol(results[results.length - 1].get("TokenSymbol"));
-    setExplain(results[results.length - 1].get("explain"));
-    setSupply(results[results.length - 1].get("supply"));
-    setHolder(results[results.length - 1].get("holder"));
+    setTitle(results[lastIndex].get("title"));
+    setPurpose(results[lastIndex].get("purpose"));
+    setShortDesc(results[lastIndex].get("shortDesc"));
+    setLongDesc(results[lastIndex].get("longDesc"));
+    setCoverImg(results[lastIndex].get("coverImg"));
+    setTags(results[lastIndex].get("tags"))
+    setCommunityLinks(results[lastIndex].get("communityLinks"))
+    setSettingTemp(results[lastIndex].get("settingTemp"))
+    setTokenName(results[lastIndex].get("tokenName"));
+    setTokenSymbol(results[lastIndex].get("tokenSymbol"));
+    setExplain(results[lastIndex].get("explain"));
+    setSupply(results[lastIndex].get("supply"));
+    setHolder(results[lastIndex].get("holder"));
+    setIconImg(results[lastIndex].get("iconImg"));
   }
 
   return (
@@ -104,6 +113,15 @@ const Dashboard = () => {
           />
         </div>
         <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
+          DAO tags : {tags}
+        </div>
+        <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
+          DAO communityLinks : {communityLinks}
+        </div>
+        <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
+          DAO settingTemp : {settingTemp}
+        </div>
+        <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
           DAO tokenName : {tokenName}
         </div>
         <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
@@ -117,6 +135,14 @@ const Dashboard = () => {
         </div>
         <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
           DAO holder : {holder}
+        </div>
+        <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
+          DAO iconImg : {iconImg}
+          <img
+            alt={`Uploaded iconImg`}
+            src={"https://ipfs.infura.io/ipfs/" + iconImg}
+            style={{ maxWidth: "400px", margin: "15px" }}
+          />
         </div>
       </div>
     </div>
