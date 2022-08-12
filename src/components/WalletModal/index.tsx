@@ -24,6 +24,7 @@ import { LightCard } from '../Card'
 import Modal from '../Modal'
 import Option from './Option'
 import PendingView from './PendingView'
+import { useNavigate } from 'react-router-dom';
 
 const CloseIcon = styled.div`
   position: absolute;
@@ -119,6 +120,7 @@ export default function WalletModal({
   ENSName?: string
 }) {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const { connector, account } = useWeb3React()
 
   const [walletView, setWalletView] = useState(WALLET_VIEWS.ACCOUNT)
@@ -138,6 +140,15 @@ export default function WalletModal({
   useEffect(() => {
     if (walletModalOpen) {
       setWalletView(account ? WALLET_VIEWS.ACCOUNT : WALLET_VIEWS.OPTIONS)
+      if(account) {
+        navigate('/createdao');
+      } 
+      // else {
+      //   toggleWalletModal();
+      //   navigate('/login')
+      // }
+    } else if( !account) {
+      navigate('/login')
     }
   }, [walletModalOpen, setWalletView, account])
 

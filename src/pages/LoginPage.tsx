@@ -8,7 +8,6 @@ import '../styles/CreateDao.css'
 import '../styles/Dashboard.css'
 import '../styles/Modal.css'
 import { Web3AuthPropType } from 'types';
-import { useWeb3React } from '@web3-react/core'
 import { Connector } from '@web3-react/types'
 import Header from 'components/Header';
 import { updateSelectedWallet } from 'state/user/reducer'
@@ -32,22 +31,23 @@ const LoginPage = (props: Web3AuthPropType) => {
     const selectedWallet = useAppSelector((state) => state.user.selectedWallet);
     const [pendingConnector, setPendingConnector] = useState<Connector | undefined>()
 
-    const nextLogin = useCallback(
-        async (connector: Connector) => {
-            const connectionType = getConnection(connector).type
-            try {
+    const nextLogin = async (connector: Connector) => {
+        console.log("Midas connector", connector);
+        const connectionType = getConnection(connector).type
+        console.log("Midas connection type", connectionType)
+        try {
+            if (connectionType === ConnectionType.INJECTED || connectionType === ConnectionType.WALLET_CONNECT) {
                 setPendingConnector(connector)
                 setWalletView(WALLET_VIEWS.PENDING)
                 dispatch(updateConnectionError({ connectionType, error: undefined }))
                 await connector.activate()
                 dispatch(updateSelectedWallet({ wallet: connectionType }))
-            } catch (error: any) {
-                console.debug(`web3-react connection error: ${error}`)
-                dispatch(updateConnectionError({ connectionType, error: error.message }))
             }
-        },
-        [dispatch, toggleWalletModal]
-    )
+        } catch (error: any) {
+            console.debug(`web3-react connection error: ${error}`)
+            dispatch(updateConnectionError({ connectionType, error: error.message }))
+        }
+    }
 
     useEffect(() => {
         if (selectedWallet) {

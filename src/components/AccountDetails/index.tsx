@@ -239,10 +239,8 @@ export default function AccountDetails({
   }, [dispatch, chainId])
 
   const disconnect = async () => {
-    console.log("Midas disconnect", openOptions);
     if (connector.deactivate) {
       connector.deactivate()
-
       // Coinbase Wallet SDK does not emit a disconnect event to the provider,
       // which is what web3-react uses to reset state. As a workaround we manually
       // reset state.
