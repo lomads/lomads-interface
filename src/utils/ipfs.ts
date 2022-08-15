@@ -2,9 +2,17 @@
 import { create, IPFSHTTPClient } from "ipfs-http-client";
 
 let ipfs: IPFSHTTPClient | undefined;
+
+const projectId = process.env.REACT_APP_IPFS_ID;
+const projectSecret = process.env.REACT_APP_IPFS_KEY;
+
 try {
+  const hash = btoa(projectId + ':' + projectSecret);
   ipfs = create({
     url: "https://ipfs.infura.io:5001/api/v0",
+    headers: {
+      authorization: 'Basic ' + hash
+    }
   });
 } catch (error) {
   console.error("IPFS error ", error);
