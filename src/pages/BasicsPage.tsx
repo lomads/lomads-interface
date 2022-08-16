@@ -29,6 +29,7 @@ const BasicsPage = (props: Web3AuthPropType) => {
     const navigate = useNavigate();
 
     async function handleUpload(event: any) {
+        console.log('Handle upload.....')
         const files = event.target.files;
         if (!files || files.length === 0) {
             return alert("No files selected");

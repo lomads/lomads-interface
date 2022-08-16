@@ -81,7 +81,6 @@
     "web-vitals": "^2.1.0"
   },
   "scripts": {
-    "preinstall": "npx npm-force-resolutions",
     "contracts:compile:abi": "typechain --target ethers-v5 --out-dir src/abis/types \"./src/abis/**/*.json\"",
     "contracts:compile:v3": "typechain --target ethers-v5 --out-dir src/types/v3 \"./node_modules/@uniswap/**/artifacts/contracts/**/*[!dbg].json\"",
     "contracts:compile": "yarn contracts:compile:abi && yarn contracts:compile:v3",
