@@ -132,22 +132,15 @@ export default function WalletModal({
 
   const walletModalOpen = useModalIsOpen(ApplicationModal.WALLET)
   const toggleWalletModal = useToggleWalletModal()
-
+  
   const openOptions = useCallback(() => {
     setWalletView(WALLET_VIEWS.OPTIONS)
   }, [setWalletView])
-
+  
   useEffect(() => {
     if (walletModalOpen) {
       setWalletView(account ? WALLET_VIEWS.ACCOUNT : WALLET_VIEWS.OPTIONS)
-      if(account) {
-        navigate('/createdao');
-      } 
-      // else {
-      //   toggleWalletModal();
-      //   navigate('/login')
-      // }
-    } else if( !account) {
+    } else if( !walletModalOpen && walletView == "options") {
       navigate('/login')
     }
   }, [walletModalOpen, setWalletView, account])

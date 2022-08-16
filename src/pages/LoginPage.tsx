@@ -32,17 +32,13 @@ const LoginPage = (props: Web3AuthPropType) => {
     const [pendingConnector, setPendingConnector] = useState<Connector | undefined>()
 
     const nextLogin = async (connector: Connector) => {
-        console.log("Midas connector", connector);
         const connectionType = getConnection(connector).type
-        console.log("Midas connection type", connectionType)
         try {
-            if (connectionType === ConnectionType.INJECTED || connectionType === ConnectionType.WALLET_CONNECT) {
-                setPendingConnector(connector)
-                setWalletView(WALLET_VIEWS.PENDING)
-                dispatch(updateConnectionError({ connectionType, error: undefined }))
-                await connector.activate()
-                dispatch(updateSelectedWallet({ wallet: connectionType }))
-            }
+            setPendingConnector(connector)
+            setWalletView(WALLET_VIEWS.PENDING)
+            dispatch(updateConnectionError({ connectionType, error: undefined }))
+            await connector.activate()
+            dispatch(updateSelectedWallet({ wallet: connectionType }))
         } catch (error: any) {
             console.debug(`web3-react connection error: ${error}`)
             dispatch(updateConnectionError({ connectionType, error: error.message }))

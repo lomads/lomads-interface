@@ -44,9 +44,7 @@ export default function App() {
         });
 
         setWeb3auth(web3auth);
-
         await web3auth.initModal();
-        console.log("Midas web3auth provider", web3auth)
         if (web3auth.provider) {
           const provider = new ethers.providers.Web3Provider(web3auth.provider as any)
           const signer = provider.getSigner();
