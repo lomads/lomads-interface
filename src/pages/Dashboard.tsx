@@ -66,7 +66,7 @@ const Dashboard = () => {
   useEffect(() => {
     const init = async () => {
       if(!!coverImg) {
-        const result: any = await fetchFile("coverImg");
+        const result: any = await fetchFile(coverImg);
         setCoverImg64(result);
       }
 

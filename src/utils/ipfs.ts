@@ -31,7 +31,8 @@ export const fileUpload = async (coverImg: any) => {
 
 export const fetchFile = async (cid: string) => {
   return new Promise(async(resolve, reject)=> {
-    if(ipfs) {      
+    if(ipfs) {
+      
       let content: any[] = [];
       for await (const chunk of ipfs.cat(cid)) {
         content = [...content, ...chunk];
