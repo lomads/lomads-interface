@@ -36,7 +36,7 @@ const BasicsPage = (props: Web3AuthPropType) => {
         }
         setFile(files[0]);
         const result: any = await fileUpload(files[0]);
-        dispatch(updateCoverImgPath(JSON.stringify(result)));
+        dispatch(updateCoverImgPath(result));
     }
 
     const handleClick = () => {

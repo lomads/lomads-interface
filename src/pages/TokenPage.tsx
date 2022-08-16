@@ -31,7 +31,7 @@ const TokenPage = (props: Web3AuthPropType) => {
         }
         setFile(files[0]);
         const result: any = await fileUpload(files[0]);
-        dispatch(updateIconImgPath(result?.path.toString()));
+        dispatch(updateIconImgPath(result));
 
     }
     const handleClick = () => {
