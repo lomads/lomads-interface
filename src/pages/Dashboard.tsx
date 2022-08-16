@@ -12,6 +12,7 @@ import { tokenCall } from 'connection/DaoTokenCall'
 import { useMoralis } from "react-moralis"
 import { useAppDispatch } from 'state/hooks'
 import { updatedeployedGovernorAddress, updatedeployedTokenAddress } from '../state/proposal/reducer'
+import {  fetchFile } from '../utils/ipfs';
 
 const Dashboard = () => {
   const dispatch = useAppDispatch()
@@ -59,6 +60,15 @@ const Dashboard = () => {
     setHolder(results[lastIndex].get("holder"));
     setIconImg(results[lastIndex].get("iconImg"));
   }
+
+  useEffect(() => {
+    const init = async () => {
+      if(!!coverImg) {
+        const result: any = await fetchFile(coverImg);
+      }
+    }
+    init();
+  }, [coverImg, iconImg]);
 
   return (
     <div className={"something"} style={{ paddingLeft: 480, paddingTop: 100, paddingBottom: 100, height: 1600 }}>
