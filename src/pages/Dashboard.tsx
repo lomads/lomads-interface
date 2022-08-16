@@ -34,6 +34,8 @@ const Dashboard = () => {
   const [supply, setSupply] = useState("")
   const [holder, setHolder] = useState("")
   const [iconImg, setIconImg] = useState("")
+  const [coverImg64, setCoverImg64] = useState("");
+  const [iconImg64, setIconImg64] = useState("");
 
   useEffect(() => {
     getHistories();
@@ -64,7 +66,13 @@ const Dashboard = () => {
   useEffect(() => {
     const init = async () => {
       if(!!coverImg) {
-        // const result: any = await fetchFile(coverImg);
+        const result: any = await fetchFile(coverImg);
+        setCoverImg64(result);
+      }
+
+      if(!!iconImg) {
+        const result: any = await fetchFile(iconImg);
+        setIconImg64(result);
       }
     }
     init();
@@ -118,7 +126,7 @@ const Dashboard = () => {
           DAO coverImg : {coverImg}
           <img
             alt={`Uploaded coverImg`}
-            src={"https://ipfs.infura.io/ipfs/" + coverImg}
+            src={"data:image/jpeg;base64," + coverImg64}
             style={{ maxWidth: "400px", margin: "15px" }}
           />
         </div>
@@ -150,7 +158,7 @@ const Dashboard = () => {
           DAO iconImg : {iconImg}
           <img
             alt={`Uploaded iconImg`}
-            src={"https://ipfs.infura.io/ipfs/" + iconImg}
+            src={"data:image/jpeg;base64," + iconImg64}
             style={{ maxWidth: "400px", margin: "15px" }}
           />
         </div>
