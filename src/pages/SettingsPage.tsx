@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Icon, Tooltip } from '@chakra-ui/react'
 import SelectTemplate from '../components/sub/SelectTemplate'
 import '../styles/App.css'
 import '../styles/CreateDao.css'
@@ -68,6 +69,9 @@ const SettingsPage = (props: Web3AuthPropType) => {
                     <div style={{ width: "500px" }}>
                         <div className={"pageSubItemHeader"}>
                             Support
+                            <Tooltip hasArrow label="Support" placement="top">
+                                <Icon color='gray' w={19} h={19} ml={5} name='question' />
+                            </Tooltip>
                         </div>
                         <SliderThumbWithTooltip />
                     </div>
@@ -75,11 +79,17 @@ const SettingsPage = (props: Web3AuthPropType) => {
                     <div style={{ width: "486px" }}>
                         <div className={"pageSubItemHeader"}>
                             Minimum Approval
+                            <Tooltip hasArrow label="Minimum Approval" placement="top">
+                                <Icon color='gray' w={19} h={19} ml={5} name='question' />
+                            </Tooltip>
                         </div>
                         <ApprovalSliderThumbWithTooltip />
                     </div>
                     <div className={"pageSubItemHeader"}>
                         Vote Duration
+                        <Tooltip hasArrow label="vote Duration" placement="top">
+                            <Icon color='gray' w={19} h={19} ml={5} name='question' />
+                        </Tooltip>
                     </div>
                     <div style={{ display: "flex" }}>
                         <ChangeComponent property="Days" />
