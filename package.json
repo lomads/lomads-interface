@@ -63,6 +63,7 @@
     "react-dom": "^18.2.0",
     "react-feather": "^2.0.10",
     "react-icons": "^4.4.0",
+    "react-loader-spinner": "^5.1.7-beta.1",
     "react-moralis": "^1.4.0",
     "react-popper": "^2.3.0",
     "react-pro-sidebar": "^0.7.1",

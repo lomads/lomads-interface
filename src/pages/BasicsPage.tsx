@@ -1,8 +1,9 @@
-import React, { useState,SyntheticEvent, useCallback, } from 'react'
+import React, { useState, SyntheticEvent, useCallback, } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { 
+import {
     Input
 } from '@chakra-ui/react'
+import {Oval} from 'react-loader-spinner'
 import '../styles/App.css'
 import '../styles/CreateDao.css'
 import '../styles/Dashboard.css'
@@ -24,7 +25,8 @@ const BasicsPage = (props: Web3AuthPropType) => {
     const purpose = useAppSelector((state) => state.proposal.purpose)
     const shortDesc = useAppSelector((state) => state.proposal.shortDesc)
     const longDesc = useAppSelector((state) => state.proposal.longDesc)
-    const [file, setFile] = useState<string>(""); 
+    const [file, setFile] = useState(null);
+    const [loading, setLoading] = useState(false);
     const web3authAddress = useAppSelector((state) => state.proposal.Web3AuthAddress)
     const navigate = useNavigate();
 
@@ -35,7 +37,9 @@ const BasicsPage = (props: Web3AuthPropType) => {
             return alert("No files selected");
         }
         setFile(files[0]);
+        setLoading(true);
         const result: any = await fileUpload(files[0]);
+        setLoading(false);
         dispatch(updateCoverImgPath(result));
     }
 
@@ -46,7 +50,7 @@ const BasicsPage = (props: Web3AuthPropType) => {
     const ImageThumb: React.FC<imageType> = ({ image }) => {
         return <img src={URL.createObjectURL(image)} alt={image.name} width="300" height={"300"} />;
     };
-    const showHeader = !!web3authAddress ? <Navbar web3Provider={props.web3Provider}/> : <Header/>;
+    const showHeader = !!web3authAddress ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
     return (
         <>
             <div className='absolute top-0 right-0'>
@@ -113,15 +117,25 @@ const BasicsPage = (props: Web3AuthPropType) => {
                         , and will be surfaced at the top of your entry and as the preview card across social media platforms. Images must be 2:1 ratio. Suggested dimensions 3000x1500.
                     </div>
                     <div id="upload-box">
-                        <div id="upload-file">
+                        {loading && <Oval
+                            height={80}
+                            width={80}
+                            color="#4fa94d"
+                            wrapperStyle={{}}
+                            wrapperClass=""
+                            visible={true}
+                            ariaLabel='oval-loading'
+                            secondaryColor="#4fa94d"
+                            strokeWidth={2}
+                            strokeWidthSecondary={2}
+
+                        />}
+                        {!loading && !file && <div id="upload-file">
                             <button>
                                 <input type="file" style={{ opacity: "0", position: "relative", zIndex: 2 }} onChange={handleUpload} />
                             </button>
-                        </div>
-                        {/* <p>Filename: {file.name}</p>
-                        <p>File type: {file.type}</p>
-                        <p>File size: {file.size} bytes</p> */}
-                        {/* {file && <ImageThumb image={file} />} */}
+                        </div>}
+                        {!loading && file && <ImageThumb image={file} />}
                     </div>
                 </div>
                 <div className={"pageItemHeader"}>
