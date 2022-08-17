@@ -43,6 +43,11 @@ const BasicsPage = (props: Web3AuthPropType) => {
         dispatch(updateCoverImgPath(result));
     }
 
+    function handleRemoveCover() {
+        setFile(null);
+        dispatch(updateCoverImgPath(''));
+    }
+
     const handleClick = () => {
         navigate("/settings")
     }
@@ -117,6 +122,7 @@ const BasicsPage = (props: Web3AuthPropType) => {
                         , and will be surfaced at the top of your entry and as the preview card across social media platforms. Images must be 2:1 ratio. Suggested dimensions 3000x1500.
                     </div>
                     <div id="upload-box">
+                        {!loading && file && <div id="upload-remove" onClick={handleRemoveCover}/>}
                         {loading && <Oval
                             height={80}
                             width={80}
