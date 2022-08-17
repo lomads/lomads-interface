@@ -367,10 +367,10 @@
 }
 #upload-remove {
   position: absolute;
-  top: 0px;
-  right: 0px;
-  height: 40px;
-  width: 40px;
+  top: 5px;
+  right: 5px;
+  height: 30px;
+  width: 30px;
   background-image: url('../assets/svg/close.svg');
   background-size: contain;
   background-repeat: no-repeat;

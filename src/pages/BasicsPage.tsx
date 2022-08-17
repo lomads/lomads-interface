@@ -53,7 +53,7 @@ const BasicsPage = (props: Web3AuthPropType) => {
     }
 
     const ImageThumb: React.FC<imageType> = ({ image }) => {
-        return <img src={URL.createObjectURL(image)} alt={image.name} width="300" height={"300"} />;
+        return <img src={URL.createObjectURL(image)} alt={image.name} width="300" height={"300"} style={{maxWidth: '100%', maxHeight: '100%', width: 'auto', height: '100%' }}/>;
     };
     const showHeader = !!web3authAddress ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
     return (
