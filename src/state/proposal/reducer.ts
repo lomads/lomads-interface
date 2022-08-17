@@ -17,6 +17,8 @@ export interface ProposalState {
   readonly Web3AuthAddressPvtKey: string
   readonly coverImgPath: string
   readonly iconImgPath: string
+  readonly tags: Array<string>|([])
+  readonly communityTags: Array<string>|([])
 }
 
 const initialState: ProposalState = {
@@ -34,7 +36,9 @@ const initialState: ProposalState = {
   Web3AuthAddress: "",
   Web3AuthAddressPvtKey: "",
   coverImgPath: "",
-  iconImgPath: ""
+  iconImgPath: "",
+  tags:[],
+  communityTags:[],
 }
 
 const proposalSlice = createSlice({
@@ -85,9 +89,15 @@ const proposalSlice = createSlice({
     },
     updateIconImgPath(state, action) {
       state.iconImgPath = action.payload
+    },
+    updateTags(state, action) {
+      state.tags = action.payload
+    },
+    updateCommunityTags(state, action) {
+      state.communityTags = action.payload
     }
   },
 })
 
-export const { updateTitle, updatePurpose,updatetokenSymbol,updatetokenTitle, updateSupply, updatedeployedTokenAddress, updateShortDesc, updateLongDesc, updateExplain, updateHolder, updatedeployedGovernorAddress,updateWeb3AuthAddress,updateWeb3AuthAddressPvtKey, updateCoverImgPath, updateIconImgPath } = proposalSlice.actions
+export const { updateTitle, updatePurpose,updatetokenSymbol,updatetokenTitle, updateSupply, updatedeployedTokenAddress, updateShortDesc, updateLongDesc, updateExplain, updateHolder, updatedeployedGovernorAddress,updateWeb3AuthAddress,updateWeb3AuthAddressPvtKey, updateCoverImgPath, updateIconImgPath, updateTags, updateCommunityTags } = proposalSlice.actions
 export default proposalSlice.reducer

@@ -1,18 +1,20 @@
 import { SyntheticEvent, useCallback, useState } from 'react'
 
-import { Container} from '@chakra-ui/react'
+import { Container } from '@chakra-ui/react'
 
 import ChakraTagInput from '../components/ChakraTagInput'
+import { updateTags } from 'state/proposal/reducer'
+import { useAppSelector, useAppDispatch } from 'state/hooks'
 
 export default function KeywordTag() {
-  const [tags, setTags] = useState<Array<string>>([])
+  const dispatch = useAppDispatch()
+  const tags = useAppSelector((state) => state.proposal.tags)
   const handleTagsChange = useCallback((event: SyntheticEvent, tags: string[]) => {
-    setTags(tags)
+    dispatch(updateTags(tags))
   }, [])
   return (
-      <Container>
-        <ChakraTagInput tags={tags} onTagsChange={handleTagsChange} />
-      </Container>
-     
+    <Container>
+      <ChakraTagInput tags={tags} onTagsChange={handleTagsChange} />
+    </Container>
   )
 }

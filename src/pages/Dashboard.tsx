@@ -25,8 +25,8 @@ const Dashboard = () => {
   const [shortDesc, setShortDesc] = useState("")
   const [longDesc, setLongDesc] = useState("")
   const [coverImg, setCoverImg] = useState("")
-  const [tags, setTags] = useState("")
-  const [communityLinks, setCommunityLinks] = useState("")
+  const [tags, setTags] = useState<Array<string>>([])
+  const [communityLinks, setCommunityLinks] = useState<Array<string>>([])
   const [settingTemp, setSettingTemp] = useState("")
   const [tokenName, setTokenName] = useState("")
   const [tokenSymbol, setTokenSymbol] = useState("")
@@ -53,7 +53,7 @@ const Dashboard = () => {
     setLongDesc(results[lastIndex].get("longDesc"));
     setCoverImg(results[lastIndex].get("coverImg"));
     setTags(results[lastIndex].get("tags"))
-    setCommunityLinks(results[lastIndex].get("communityLinks"))
+    setCommunityLinks(results[lastIndex].get("communityTags"))
     setSettingTemp(results[lastIndex].get("settingTemp"))
     setTokenName(results[lastIndex].get("tokenName"));
     setTokenSymbol(results[lastIndex].get("tokenSymbol"));

@@ -40,6 +40,8 @@ const GoLivePage = (props: Web3AuthPropType) => {
   const deployedTokenSymbol = useAppSelector((state) => state.proposal.tokenSymbol)
   const longDesc = useAppSelector((state) => state.proposal.longDesc);
   const shortDesc = useAppSelector((state) => state.proposal.shortDesc);
+  const tags = useAppSelector((state) => state.proposal.tags)
+  const communityTags = useAppSelector((state) => state.proposal.communityTags)
   const tokenTitle = useAppSelector((state) => state.proposal.tokenTitle)
   const tokenSymbol = useAppSelector((state) => state.proposal.tokenSymbol)
   const explain = useAppSelector((state) => state.proposal.explain)
@@ -93,44 +95,44 @@ const GoLivePage = (props: Web3AuthPropType) => {
     setisLoading(false)
     saveObject();
     dispatch(updatedeployedGovernorAddress(governorAddress))
-    // navigate("/dashboard");
     setdeployedGovernor(governorAddress);
   }
   const createToken = async () => {
-    const factory = await factoryCall(provider);
-    setisLoading(true);
-    onClose()
-    const creatingToken = await factory.createToken(tokenTitle, tokenSymbol, supply, holder, explain);
-    await creatingToken.wait();
-    const tokenAddress = await factory.deployedTokenAddress();
-    dispatch(updatedeployedTokenAddress(tokenAddress));
-    // await DeployDAO()
-    if (tokenAddress) {
-      console.log("token address is:", tokenAddress)
-      dispatch(updatedeployedTokenAddress(tokenAddress))
-      DeployDAO(tokenAddress)
-    }
+    saveObject();
+    // const factory = await factoryCall(provider);
+    // setisLoading(true);
+    // onClose()
+    // const creatingToken = await factory.createToken(tokenTitle, tokenSymbol, supply, holder, explain);
+    // await creatingToken.wait();
+    // const tokenAddress = await factory.deployedTokenAddress();
+    // dispatch(updatedeployedTokenAddress(tokenAddress));
+    // if (tokenAddress) {
+    //   console.log("token address is:", tokenAddress)
+    //   dispatch(updatedeployedTokenAddress(tokenAddress))
+    //   DeployDAO(tokenAddress)
+    // }
 
   }
 
   const showHeader = !!web3authAddress ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
 
   const saveObject = async () => {
+    console.log("Midas tags save", tags)
     const data = {
       title: title,
       purpose: purpose,
       shortDesc: shortDesc,
       longDesc: longDesc,
       coverImg: coverImgPath,
-      tags: "test",
-      communityLinks: "test",
+      tags: tags,
+      communityTags: communityTags,
       settingTemp: "Midas",
       tokenName: tokenTitle,
       tokenSymbol: tokenSymbol,
       explain: explain,
       supply: supply.toString(),
       holder: holder,
-      iconImg: iconImgPath || "iconImag"
+      iconImg: iconImgPath,
     };
     save(data, {
       onSuccess: (daoinfo) => {
