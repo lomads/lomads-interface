@@ -1,7 +1,12 @@
 import React, { useState, SyntheticEvent, useCallback, } from 'react'
 import { useNavigate } from 'react-router-dom';
 import {
-    Input
+    Input,
+    Textarea, 
+    FormControl,
+    FormLabel,
+    FormErrorMessage,
+    FormHelperText,
 } from '@chakra-ui/react'
 import {Oval} from 'react-loader-spinner'
 import '../styles/App.css'
@@ -80,8 +85,24 @@ const BasicsPage = (props: Web3AuthPropType) => {
                                 </div>
                             </div>
                         </div>
-                        <input className={"inputField"} name="title" value={title} style={{ height: 40, width: 340 }}
-                            autoFocus placeholder="Name your DAO" onChange={(e) => { dispatch(updateTitle(e.target.value)) }} />
+                        <FormControl isInvalid={title === ''}>
+                            <Input
+                                className={"inputField"}
+                                style={{ height: 40, width: 340 }}
+                                name="title"
+                                value={title}
+                                placeholder="Name your DAO"
+                                autoFocus
+                                onChange={(e) => { dispatch(updateTitle(e.target.value)) }}
+                            />
+                            {title === '' &&
+                                <FormErrorMessage 
+                                    style={{marginTop: 0, fontSize: "x-small"}}
+                                >
+                                    * DAO title is required.
+                                </FormErrorMessage>
+                            }
+                        </FormControl>
                     </div>
                     <div className={"titleTile"} style={{ width: 280 }}>
                         <div className={"tileItemHeader"}>
@@ -94,8 +115,23 @@ const BasicsPage = (props: Web3AuthPropType) => {
                                 </div>
                             </div>
                         </div>
-                        <input className={"inputField"} name="title" value={purpose} style={{ height: 40, width: 240 }}
-                            placeholder="Choose Purpose" onChange={(e) => { dispatch(updatePurpose(e.target.value)) }} />
+                        <FormControl isInvalid={purpose === ''}>
+                            <Input
+                                className={"inputField"}
+                                style={{ height: 40, width: 240 }}
+                                name="purpose"
+                                value={purpose}
+                                placeholder="Choose Purpose"
+                                onChange={(e) => { dispatch(updatePurpose(e.target.value)) }}
+                            />
+                            {purpose === '' &&
+                                <FormErrorMessage 
+                                    style={{marginTop: 0, fontSize: "x-small"}}
+                                >
+                                    * DAO purpose is required.
+                                </FormErrorMessage>
+                            }
+                        </FormControl>
                     </div>
                 </div>
                 <div className={"subItemHeader"}>
@@ -108,8 +144,23 @@ const BasicsPage = (props: Web3AuthPropType) => {
                         </div>
                     </div>
                 </div>
-                <textarea className={"shorttextField"} name="shortDesc" value={shortDesc}
-                    placeholder="In a few words" onChange={(e) => { dispatch(updateShortDesc(e.target.value)) }}></textarea>
+                <FormControl isInvalid={shortDesc === ''}>
+                    <Textarea 
+                        className={"shorttextField"}
+                        style={{width: "500px", background: "#f5f5f5"}}
+                        name="shortDesc"
+                        value={shortDesc}
+                        placeholder="In a few words"
+                        onChange={(e) => { dispatch(updateShortDesc(e.target.value)) }}
+                    />
+                    {shortDesc === '' &&
+                        <FormErrorMessage 
+                            style={{marginTop: 0, fontSize: "x-small"}}
+                        >
+                            * DAO short description is required.
+                        </FormErrorMessage>
+                    }
+                </FormControl>
                 <div className={"pageItemHeader"}>
                     Long description
                 </div>

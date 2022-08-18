@@ -24,6 +24,7 @@ export interface tagType{
 
 export interface ChangeComponentType{
     property: string,
+    value: number,
     page?: string,
     vote?: string
 }

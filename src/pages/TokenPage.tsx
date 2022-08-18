@@ -6,6 +6,13 @@ import '../styles/Modal.css'
 import '../styles/Sidebar.css'
 import { useNavigate } from 'react-router-dom'
 import {Oval} from 'react-loader-spinner'
+import {
+    Input,
+    FormControl,
+    FormLabel,
+    FormErrorMessage,
+    FormHelperText,
+} from '@chakra-ui/react'
 import { useAppDispatch } from 'state/hooks'
 import { updatetokenTitle, updatetokenSymbol, updateExplain, updateSupply, updateHolder, updateIconImgPath } from 'state/proposal/reducer'
 import { useAppSelector } from 'state/hooks'
@@ -79,8 +86,24 @@ const TokenPage = (props: Web3AuthPropType) => {
                             <div className={"tokenpageDescription"}>
                                 A Short but descriptive name for your project token. This name will be used in block explorers and token wallets.
                             </div>
-                            <input className={"inputField"} type="title" name="title" value={tokenTitle} style={{ height: 40, width: 340 }}
-                                autoFocus placeholder="Name your Token Name" onChange={(e) => { dispatch(updatetokenTitle(e.target.value)) }} />
+                            <FormControl isInvalid={tokenTitle === ''}>
+                                <Input
+                                    className={"inputField"}
+                                    style={{ height: 40, width: 340 }}
+                                    name="title"
+                                    value={tokenTitle}
+                                    placeholder="Name your Token Name"
+                                    autoFocus
+                                    onChange={(e) => { dispatch(updatetokenTitle(e.target.value)) }}
+                                />
+                                {tokenTitle === '' &&
+                                    <FormErrorMessage 
+                                        style={{marginTop: 0, fontSize: "x-small"}}
+                                    >
+                                        * Token title is required.
+                                    </FormErrorMessage>
+                                }
+                            </FormControl>
                         </div>
                         {/* second */}
                         <div style={{ marginLeft: "20px" }}>
@@ -97,8 +120,23 @@ const TokenPage = (props: Web3AuthPropType) => {
                             <div className={"tokenpageDescription"}>
                                 A one owrd symbol signifying your project token. This symbol will be used in block explorers and token wallets.
                             </div>
-                            <input className={"inputField"} type="title" name="title" value={tokenSymbol} style={{ height: 40, width: 240 }}
-                                placeholder="Enter your Token Symbol" onChange={(e) => { dispatch(updatetokenSymbol(e.target.value)) }} />
+                            <FormControl isInvalid={tokenSymbol === ''}>
+                                <Input
+                                    className={"inputField"}
+                                    style={{ height: 40, width: 240 }}
+                                    name="title"
+                                    value={tokenSymbol}
+                                    placeholder="Enter your Token Symbol"
+                                    onChange={(e) => { dispatch(updatetokenSymbol(e.target.value)) }}
+                                />
+                                {tokenSymbol === '' &&
+                                    <FormErrorMessage 
+                                        style={{marginTop: 0, fontSize: "x-small"}}
+                                    >
+                                        * Token symbol is required.
+                                    </FormErrorMessage>
+                                }
+                            </FormControl>
                         </div>
                     </div>
 
@@ -126,8 +164,24 @@ const TokenPage = (props: Web3AuthPropType) => {
                         Define the initial token supply.
                     </div>
                 </div>
-                <input className={"inputField"} type="number" name="supply" value={supply} style={{ height: 50 }}
-                    autoFocus placeholder="100,000,000" onChange={(e) => { dispatch(updateSupply(e.target.value)) }} />
+                <FormControl isInvalid={!supply}>
+                    <Input
+                        className={"inputField"}
+                        style={{ height: 50, width: 500 }}
+                        name="supply"
+                        type="number"
+                        value={supply}
+                        placeholder="100,000,000"
+                        onChange={(e) => { dispatch(updateSupply(e.target.value)) }}
+                    />
+                    {!supply &&
+                        <FormErrorMessage 
+                            style={{marginTop: 0, fontSize: "x-small"}}
+                        >
+                            * Total supply is required.
+                        </FormErrorMessage>
+                    }
+                </FormControl>
                 <div>
                     <div className={"subItemHeader"}>
                         <div>
@@ -143,8 +197,23 @@ const TokenPage = (props: Web3AuthPropType) => {
                         Enter the address that controls the token. This should probably be a multi-sig. Make sure to enter the Ethereum address, not the ENS name.
                     </div>
                 </div>
-                <input className={"inputField"} type="holder" name="holder" value={holder} style={{ height: 50 }}
-                    autoFocus placeholder="0x3429…" onChange={(e) => { dispatch(updateHolder(e.target.value)) }} />
+                <FormControl isInvalid={holder === ''}>
+                    <Input
+                        className={"inputField"}
+                        style={{ height: 50, width: 500 }}
+                        name="holder"
+                        value={holder}
+                        placeholder="0x3429…"
+                        onChange={(e) => { dispatch(updateHolder(e.target.value)) }}
+                    />
+                    {holder === '' &&
+                        <FormErrorMessage 
+                            style={{marginTop: 0, fontSize: "x-small"}}
+                        >
+                            * Holder address is required.
+                        </FormErrorMessage>
+                    }
+                </FormControl>
                 <div className={"pageItemHeader"}>
                     Icon image
                     <div className={"fieldDesc"}>

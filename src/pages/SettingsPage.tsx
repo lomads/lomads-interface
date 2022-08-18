@@ -93,8 +93,8 @@ const SettingsPage = (props: Web3AuthPropType) => {
                         </Tooltip>
                     </div>
                     <div style={{ display: "flex" }}>
-                        <ChangeComponent property="Days" />
-                        <ChangeComponent property="Hours" />
+                        <ChangeComponent property="Days" value={0}/>
+                        <ChangeComponent property="Hours" value={0}/>
                     </div>
                 </div>
                 <div>

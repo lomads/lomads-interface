@@ -33,9 +33,9 @@ const SettingsComponent = () => {
                         Vote Settings
                     </div>
                 </div>
-                <ChangeComponent property="Support" page="golive"/>
-                <ChangeComponent property="Min Approuval" page="golive" />
-                <ChangeComponent property="Vote duration" page="golive" vote="vote"/>
+                <ChangeComponent property="Support" page="golive" value={5}/>
+                <ChangeComponent property="Min Approuval" page="golive" value={5}/>
+                <ChangeComponent property="Vote duration" page="golive" vote="vote" value={0}/>
             </div>
         </div>
     </div>
