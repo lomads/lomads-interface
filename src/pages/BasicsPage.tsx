@@ -115,7 +115,7 @@ const BasicsPage = (props: Web3AuthPropType) => {
                                 </div>
                             </div>
                         </div>
-                        <FormControl isInvalid={purpose === ''}>
+                        <FormControl isInvalid={title !== '' && purpose === ''}>
                             <Input
                                 className={"inputField"}
                                 style={{ height: 40, width: 240 }}
@@ -124,7 +124,7 @@ const BasicsPage = (props: Web3AuthPropType) => {
                                 placeholder="Choose Purpose"
                                 onChange={(e) => { dispatch(updatePurpose(e.target.value)) }}
                             />
-                            {purpose === '' &&
+                            {title !== '' && purpose === '' &&
                                 <FormErrorMessage 
                                     style={{marginTop: 0, fontSize: "x-small"}}
                                 >
@@ -144,7 +144,7 @@ const BasicsPage = (props: Web3AuthPropType) => {
                         </div>
                     </div>
                 </div>
-                <FormControl isInvalid={shortDesc === ''}>
+                <FormControl isInvalid={title !== '' && purpose !== '' && shortDesc === ''}>
                     <Textarea 
                         className={"shorttextField"}
                         style={{width: "500px", background: "#f5f5f5"}}
@@ -153,7 +153,7 @@ const BasicsPage = (props: Web3AuthPropType) => {
                         placeholder="In a few words"
                         onChange={(e) => { dispatch(updateShortDesc(e.target.value)) }}
                     />
-                    {shortDesc === '' &&
+                    {title !== '' && purpose !== '' && shortDesc === '' &&
                         <FormErrorMessage 
                             style={{marginTop: 0, fontSize: "x-small"}}
                         >

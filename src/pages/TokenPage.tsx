@@ -120,7 +120,7 @@ const TokenPage = (props: Web3AuthPropType) => {
                             <div className={"tokenpageDescription"}>
                                 A one owrd symbol signifying your project token. This symbol will be used in block explorers and token wallets.
                             </div>
-                            <FormControl isInvalid={tokenSymbol === ''}>
+                            <FormControl isInvalid={tokenTitle !== '' && tokenSymbol === ''}>
                                 <Input
                                     className={"inputField"}
                                     style={{ height: 40, width: 240 }}
@@ -129,7 +129,7 @@ const TokenPage = (props: Web3AuthPropType) => {
                                     placeholder="Enter your Token Symbol"
                                     onChange={(e) => { dispatch(updatetokenSymbol(e.target.value)) }}
                                 />
-                                {tokenSymbol === '' &&
+                                {tokenTitle !== '' && tokenSymbol === '' &&
                                     <FormErrorMessage 
                                         style={{marginTop: 0, fontSize: "x-small"}}
                                     >
@@ -164,7 +164,7 @@ const TokenPage = (props: Web3AuthPropType) => {
                         Define the initial token supply.
                     </div>
                 </div>
-                <FormControl isInvalid={!supply}>
+                <FormControl isInvalid={tokenTitle !== '' && tokenSymbol !== '' && !supply}>
                     <Input
                         className={"inputField"}
                         style={{ height: 50, width: 500 }}
@@ -174,7 +174,7 @@ const TokenPage = (props: Web3AuthPropType) => {
                         placeholder="100,000,000"
                         onChange={(e) => { dispatch(updateSupply(e.target.value)) }}
                     />
-                    {!supply &&
+                    {tokenTitle !== '' && tokenSymbol !== '' && !supply &&
                         <FormErrorMessage 
                             style={{marginTop: 0, fontSize: "x-small"}}
                         >
@@ -197,7 +197,7 @@ const TokenPage = (props: Web3AuthPropType) => {
                         Enter the address that controls the token. This should probably be a multi-sig. Make sure to enter the Ethereum address, not the ENS name.
                     </div>
                 </div>
-                <FormControl isInvalid={holder === ''}>
+                <FormControl isInvalid={tokenTitle !== '' && tokenSymbol !== '' && !!supply && holder === ''}>
                     <Input
                         className={"inputField"}
                         style={{ height: 50, width: 500 }}
@@ -206,7 +206,7 @@ const TokenPage = (props: Web3AuthPropType) => {
                         placeholder="0x3429…"
                         onChange={(e) => { dispatch(updateHolder(e.target.value)) }}
                     />
-                    {holder === '' &&
+                    {tokenTitle !== '' && tokenSymbol !== '' && !!supply && holder === '' &&
                         <FormErrorMessage 
                             style={{marginTop: 0, fontSize: "x-small"}}
                         >
