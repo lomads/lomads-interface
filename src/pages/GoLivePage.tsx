@@ -98,20 +98,18 @@ const GoLivePage = (props: Web3AuthPropType) => {
     setdeployedGovernor(governorAddress);
   }
   const createToken = async () => {
-    saveObject();
-    // const factory = await factoryCall(provider);
-    // setisLoading(true);
-    // onClose()
-    // const creatingToken = await factory.createToken(tokenTitle, tokenSymbol, supply, holder, explain);
-    // await creatingToken.wait();
-    // const tokenAddress = await factory.deployedTokenAddress();
-    // dispatch(updatedeployedTokenAddress(tokenAddress));
-    // if (tokenAddress) {
-    //   console.log("token address is:", tokenAddress)
-    //   dispatch(updatedeployedTokenAddress(tokenAddress))
-    //   DeployDAO(tokenAddress)
-    // }
-
+    const factory = await factoryCall(provider);
+    setisLoading(true);
+    onClose()
+    const creatingToken = await factory.createToken(tokenTitle, tokenSymbol, supply, holder, explain);
+    await creatingToken.wait();
+    const tokenAddress = await factory.deployedTokenAddress();
+    dispatch(updatedeployedTokenAddress(tokenAddress));
+    if (tokenAddress) {
+      console.log("token address is:", tokenAddress)
+      dispatch(updatedeployedTokenAddress(tokenAddress))
+      DeployDAO(tokenAddress)
+    }
   }
 
   const showHeader = !!web3authAddress ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
