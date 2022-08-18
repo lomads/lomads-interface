@@ -40,13 +40,12 @@ function getRpcUrls(chainId: SupportedChainId): [string] {
 export function isChainAllowed(connector: Connector, chainId: number) {
   switch (connector) {
     case fortmaticConnection.connector:
-      return chainId === SupportedChainId.MAINNET
     case injectedConnection.connector:
     case coinbaseWalletConnection.connector:
     case walletConnectConnection.connector:
     case networkConnection.connector:
     case gnosisSafeConnection.connector:
-      return ALL_SUPPORTED_CHAIN_IDS.includes(chainId)
+      return chainId === SupportedChainId.MAINNET
     default:
       return false
   }
