@@ -24,6 +24,8 @@ export interface tagType{
 
 export interface ChangeComponentType{
     property: string,
+    page?: string,
+    vote?: string
 }
 export interface sidebarPropType{
     page?: string,

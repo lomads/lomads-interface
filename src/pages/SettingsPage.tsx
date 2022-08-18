@@ -48,9 +48,9 @@ const SettingsPage = (props: Web3AuthPropType) => {
                         Create your organisation with our pre-configured templates.
                     </div>
                     <div style={{ display: "flex", position: "relative", right: 120, zIndex: 9999 }} >
-                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1" iconColor={selectedTemplate === 0 ? 'red' : 'white'} onClick={() => setSelectedTemplate(0)}/>
-                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1" iconColor={selectedTemplate === 1 ? 'red' : 'white'} onClick={() => setSelectedTemplate(1)}/>
-                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1" iconColor={selectedTemplate === 2 ? 'red' : 'white'} onClick={() => setSelectedTemplate(2)}/>
+                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1" iconColor={selectedTemplate === 0 ? '#C94B32' : 'white'} onClick={() => setSelectedTemplate(0)}/>
+                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1" iconColor={selectedTemplate === 1 ? '#C94B32' : 'white'} onClick={() => setSelectedTemplate(1)}/>
+                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1" iconColor={selectedTemplate === 2 ? '#C94B32' : 'white'} onClick={() => setSelectedTemplate(2)}/>
                     </div>
                 </div>
                 <div>

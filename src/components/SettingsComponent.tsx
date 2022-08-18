@@ -1,5 +1,7 @@
 import React,{useState} from 'react'
 import { TiPencil } from 'react-icons/ti';
+import ChangeComponent from './sub/ChangeComponent'
+
 const SettingsComponent = () => {
     const [template,setTemplate] = useState("");
     const [disabledButton,setDisabledButton] = useState<boolean>(true)
@@ -10,7 +12,7 @@ const SettingsComponent = () => {
           Settings
         </div>
         <div>
-            <TiPencil size={25} style={{marginRight:30,color:"#B84E24",cursor:"pointer"}} onClick={()=>{setDisabledButton(!disabledButton)}}/>
+            <TiPencil size={25} style={{marginRight:150,color:"#B84E24",cursor:"pointer"}} onClick={()=>{setDisabledButton(!disabledButton)}}/>
         </div>
     </div>
     <div className={"TitleBar"} style={{paddingBottom:60}}>
@@ -21,10 +23,20 @@ const SettingsComponent = () => {
                         Select template
                     </div>
                 </div>
-                    <input className={`${disabledButton ? "focusInputField" : "noInputField"}`} type="title" name="title" value={template} style={{height:40, width:340}}
-                               autoFocus placeholder="Enter Title" onChange={(e)=>{setTemplate(e.target.value)}} disabled={disabledButton} />
+                <input className={`${disabledButton ? "focusInputField" : "noInputField"}`} type="title" name="title" value={template} style={{height:40, width:300, marginTop: 20}}
+                            autoFocus placeholder="Enter Title" onChange={(e)=>{setTemplate(e.target.value)}} disabled={disabledButton} />
+            </div>
+            {/* second */}
+            <div style={{ marginLeft: "20px" }}>
+                <div className={"tileItemHeader"}>
+                    <div>
+                        Vote Settings
+                    </div>
                 </div>
-                    {/* second */}
+                <ChangeComponent property="Support" page="golive"/>
+                <ChangeComponent property="Min Approuval" page="golive" />
+                <ChangeComponent property="Vote duration" page="golive" vote="vote"/>
+            </div>
         </div>
     </div>
     </>

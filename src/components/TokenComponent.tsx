@@ -16,7 +16,7 @@ const TokenComponent = () => {
       Token
     </div>
     <div>
-        <TiPencil size={25} style={{marginRight:30,color:"#B84E24",cursor:"pointer"}} onClick={()=>{setDisabledButton(!disabledButton)}}/>
+        <TiPencil size={25} style={{marginRight:150,color:"#B84E24",cursor:"pointer"}} onClick={()=>{setDisabledButton(!disabledButton)}}/>
     </div>
 </div>
     <div className={"TitleBar"} style={{paddingBottom:60}}>

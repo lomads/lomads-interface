@@ -22,14 +22,14 @@ const BasicsComponent = (props: any) => {
         </div>
         </div>
         <div className={"titleBar"} style={{ paddingBottom: 60,width:"100%" }}>
-            <div className={"tokentitleTile"} style={{ width: 750 }}>
+            <div className={"tokentitleTile"} style={{ width: 870 }}>
                 <div>
                     <div className={"tileItemHeader"}>
                         <div>
                             Title
                         </div>
                     </div>
-                    <input className={`${disabledButton ? "focusInputField" : "noInputField"}`} type="title" name="title" value={title} style={{ height: 40, width: 340 }}
+                    <input className={`${disabledButton ? "focusInputField" : "noInputField"}`} type="title" name="title" value={title} style={{ height: 40, width: 400 }}
                         autoFocus placeholder="Enter Title" onChange={(e) => { dispatch(updateTitle(e.target.value)) }} disabled={disabledButton} />
                 </div>
                 {/* second */}
@@ -39,7 +39,7 @@ const BasicsComponent = (props: any) => {
                             Purpose
                         </div>
                     </div>
-                    <input className={`${disabledButton ? "focusInputField" : "noInputField"}`} type="title" name="title" value={purpose} style={{ height: 40, width: 340 }}
+                    <input className={`${disabledButton ? "focusInputField" : "noInputField"}`} type="title" name="title" value={purpose} style={{ height: 40, width: 400 }}
                         placeholder="Enter Purpose" onChange={(e) => { dispatch(updatePurpose(e.target.value)) }} disabled={disabledButton} />
                 </div>
             </div>
