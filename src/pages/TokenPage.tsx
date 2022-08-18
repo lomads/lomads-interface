@@ -5,12 +5,13 @@ import '../styles/Dashboard.css'
 import '../styles/Modal.css'
 import '../styles/Sidebar.css'
 import { useNavigate } from 'react-router-dom'
+import {Oval} from 'react-loader-spinner'
 import { useAppDispatch } from 'state/hooks'
 import { updatetokenTitle, updatetokenSymbol, updateExplain, updateSupply, updateHolder, updateIconImgPath } from 'state/proposal/reducer'
 import { useAppSelector } from 'state/hooks'
 import Header from 'components/Header';
 import Navbar from 'components/Web3AuthNavbar/Navbar'
-import { Web3AuthPropType } from 'types'
+import { imageType, Web3AuthPropType } from 'types'
 import { fileUpload } from '../utils/ipfs'
 
 const TokenPage = (props: Web3AuthPropType) => {
@@ -22,21 +23,33 @@ const TokenPage = (props: Web3AuthPropType) => {
     const supply = useAppSelector((state) => state.proposal.supply)
     const holder = useAppSelector((state) => state.proposal.holder)
     const web3authAddress = useAppSelector((state) => state.proposal.Web3AuthAddress)
-    const [file, setFile] = useState<string>("");
+    const [file, setFile] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     async function handleUpload(event: any) {
+        console.log('Handle upload.....')
         const files = event.target.files;
         if (!files || files.length === 0) {
             return alert("No files selected");
         }
         setFile(files[0]);
+        setLoading(true);
         const result: any = await fileUpload(files[0]);
+        setLoading(false);
         dispatch(updateIconImgPath(result));
-
     }
+
+    function handleRemoveCover() {
+        setFile(null);
+        dispatch(updateIconImgPath(''));
+    }
+
     const handleClick = () => {
         navigate("/golive");
     }
+    const ImageThumb: React.FC<imageType> = ({ image }) => {
+        return <img src={URL.createObjectURL(image)} alt={image.name} width="300" height={"300"} style={{maxWidth: '100%', maxHeight: '100%', width: 'auto', height: '100%' }}/>;
+    };
     const showHeader = !!web3authAddress ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
     return (
         <>
@@ -138,11 +151,26 @@ const TokenPage = (props: Web3AuthPropType) => {
                         Brand your token by uploading an icon image.
                     </div>
                     <div id="upload-box">
-                        <div id="upload-file">
+                        {!loading && file && <div id="upload-remove" onClick={handleRemoveCover}/>}
+                        {loading && <Oval
+                            height={80}
+                            width={80}
+                            color="#4fa94d"
+                            wrapperStyle={{}}
+                            wrapperClass=""
+                            visible={true}
+                            ariaLabel='oval-loading'
+                            secondaryColor="#4fa94d"
+                            strokeWidth={2}
+                            strokeWidthSecondary={2}
+
+                        />}
+                        {!loading && !file && <div id="upload-file">
                             <button>
                                 <input type="file" style={{ opacity: "0", position: "relative", zIndex: 2 }} onChange={handleUpload} />
                             </button>
-                        </div>
+                        </div>}
+                        {!loading && file && <ImageThumb image={file} />}
                         {/* <p>Filename: {file.name}</p>
                         <p>File type: {file.type}</p>
                         <p>File size: {file.size} bytes</p>
