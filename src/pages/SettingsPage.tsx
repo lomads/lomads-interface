@@ -19,6 +19,7 @@ const SettingsPage = (props: Web3AuthPropType) => {
     const web3authAddress = useAppSelector((state) => state.proposal.Web3AuthAddress)
     const [SupportValue, setSupportValue] = useState<number>(0)
     const [ApprovalValue, setApprovalValue] = useState<number>(0)
+    const [selectedTemplate, setSelectedTemplate] = useState(-1)
     const showHeader = !!web3authAddress ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
     return (
         <>
@@ -46,10 +47,10 @@ const SettingsPage = (props: Web3AuthPropType) => {
                     <div className={"fieldDesc"}>
                         Create your organisation with our pre-configured templates.
                     </div>
-                    <div style={{ display: "flex", position: "relative", right: 120, zIndex: 9999 }}>
-                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1" />
-                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1" />
-                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1" />
+                    <div style={{ display: "flex", position: "relative", right: 120, zIndex: 9999 }} >
+                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1" iconColor={selectedTemplate === 0 ? 'red' : 'white'} onClick={() => setSelectedTemplate(0)}/>
+                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1" iconColor={selectedTemplate === 1 ? 'red' : 'white'} onClick={() => setSelectedTemplate(1)}/>
+                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1" iconColor={selectedTemplate === 2 ? 'red' : 'white'} onClick={() => setSelectedTemplate(2)}/>
                     </div>
                 </div>
                 <div>

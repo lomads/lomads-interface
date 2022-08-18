@@ -5,6 +5,13 @@ export interface blockType{
     blockTitle: string,
     blockDescription: string,
 }
+export interface templateType{
+    onClickGoToStep?: string,
+    blockTitle: string,
+    blockDescription: string,
+    iconColor: string,
+    onClick: () => void
+}
 export type imageType = any;
 
 export interface sliderType{
