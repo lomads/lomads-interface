@@ -132,12 +132,6 @@ export default function Header() {
     nativeCurrency: { symbol: nativeCurrencySymbol },
   } = CHAIN_INFO[!chainId || !chainAllowed ? SupportedChainId.MAINNET : chainId]
 
-  useEffect(() => {
-    if (!chainAllowed) {
-      switchChain(connector, 1)
-    }
-  }, [chainId])
-
   return (
     <HeaderFrame showBackground={scrollY > 45}>
       <Title href=".">

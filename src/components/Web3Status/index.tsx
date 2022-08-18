@@ -7,7 +7,7 @@ import { useMemo } from 'react'
 import { Activity } from 'react-feather'
 import { useAppSelector } from 'state/hooks'
 import styled, { css } from 'styled-components/macro'
-import { isChainAllowed } from 'utils/switchChain'
+import { isChainAllowed, switchChain } from 'utils/switchChain'
 
 import { useHasSocks } from 'hooks/useSocksBalance'
 import { useToggleWalletModal } from 'state/application/hooks'
@@ -145,7 +145,7 @@ function Web3StatusInner() {
     return null
   } else if (!chainAllowed) {
     return (
-      <Web3StatusError onClick={toggleWalletModal}>
+      <Web3StatusError onClick={() => switchChain(connector, 1)}>
         <NetworkIcon />
         <Text>
           <Trans>Wrong Network</Trans>

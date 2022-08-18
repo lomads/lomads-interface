@@ -39,6 +39,12 @@ export const ALL_SUPPORTED_CHAIN_IDS: SupportedChainId[] = Object.values(Support
   (id) => typeof id === 'number'
 ) as SupportedChainId[]
 
+export const SUPPORTED_CHAIN_IDS: SupportedChainId[] = [
+  SupportedChainId.MAINNET,
+  SupportedChainId.POLYGON_MUMBAI,
+  SupportedChainId.GOERLI,
+]
+
 export const SUPPORTED_GAS_ESTIMATE_CHAIN_IDS = [
   SupportedChainId.MAINNET,
   SupportedChainId.POLYGON,
