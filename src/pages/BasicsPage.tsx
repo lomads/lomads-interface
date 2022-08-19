@@ -17,7 +17,7 @@ import '../styles/Modal.css'
 import '../styles/Sidebar.css'
 import { imageType, tagType, Web3AuthPropType } from '../types';
 import { useAppDispatch } from 'state/hooks'
-import { updateTitle, updatePurpose, updateShortDesc, updateLongDesc, updateCoverImgPath } from 'state/proposal/reducer'
+import { updateTitle, updatePurpose, updateShortDesc, updateLongDesc, updateCoverImgPath, updateStepNumber } from 'state/proposal/reducer'
 import { useAppSelector } from 'state/hooks'
 import CommunityTag from './CommunityTag';
 import KeywordTag from './KeywordTag';
@@ -36,6 +36,10 @@ const BasicsPage = (props: Web3AuthPropType) => {
     const web3authAddress = useAppSelector((state) => state.proposal.Web3AuthAddress)
     const navigate = useNavigate();
     const [errors, setErrors] = useState<any>({});
+
+    useEffect(() => {
+        dispatch(updateStepNumber(2))
+    }, [])
 
     useEffect(() => {
         if (!_.isEmpty(errors)) {
@@ -86,6 +90,7 @@ const BasicsPage = (props: Web3AuthPropType) => {
         }
 
         if (_.isEmpty(terrors)) {
+            dispatch(updateStepNumber(3))
             navigate("/settings")
         } else {
             setErrors(terrors);

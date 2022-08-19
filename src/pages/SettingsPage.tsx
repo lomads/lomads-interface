@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom'
 import { Icon, Tooltip } from '@chakra-ui/react'
 import SelectTemplate from '../components/sub/SelectTemplate'
@@ -15,9 +16,11 @@ import Navbar from 'components/Web3AuthNavbar/Navbar'
 import { useAppSelector, useAppDispatch } from 'state/hooks'
 import { Web3AuthPropType } from 'types'
 import { updateTemplate} from 'state/proposal/reducer'
+import { updateStepNumber } from 'state/proposal/reducer'
 
 const SettingsPage = (props: Web3AuthPropType) => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const web3authAddress = useAppSelector((state) => state.proposal.Web3AuthAddress)
     const template = useAppSelector((state) => state.proposal.template)
     const voteDurDay = useAppSelector((state) => state.proposal.voteDurDay)
@@ -29,6 +32,15 @@ const SettingsPage = (props: Web3AuthPropType) => {
         setSelectedTemplate(val);
         dispatch(updateTemplate(val))
     }
+
+    const handleClick = () => {
+        dispatch(updateStepNumber(4))
+        navigate("/token")
+    }
+
+    useEffect(() => {
+        dispatch(updateStepNumber(3))
+    }, [])
 
     return (
         <>
@@ -107,8 +119,8 @@ const SettingsPage = (props: Web3AuthPropType) => {
                     </div>
                 </div>
                 <div>
-                    <button id="nextButtonSettings" className={"nextButton"}>
-                        <Link to="/token" className='link'>NEXT STEP</Link>
+                    <button id="nextButtonSettings" className={"nextButton"} onClick={handleClick}>
+                        NEXT STEP
                     </button>
                 </div>
             </div>

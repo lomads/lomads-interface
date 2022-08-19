@@ -25,6 +25,7 @@ export interface ProposalState {
   readonly minApproval: number
   readonly voteDurDay: number
   readonly voteDurHour: number
+  readonly stepNumber: number
 }
 
 const initialState: ProposalState = {
@@ -50,6 +51,7 @@ const initialState: ProposalState = {
   minApproval: 0,
   voteDurDay: 0,
   voteDurHour: 0,
+  stepNumber: 0
 }
 
 const proposalSlice = createSlice({
@@ -121,9 +123,12 @@ const proposalSlice = createSlice({
     },
     updateVoteDurHour(state, action) {
       state.voteDurHour = action.payload
+    },
+    updateStepNumber(state, action) {
+      state.stepNumber = action.payload
     }
   },
 })
 
-export const { updateTitle, updatePurpose,updatetokenSymbol,updatetokenTitle, updateSupply, updatedeployedTokenAddress, updateShortDesc, updateLongDesc, updateExplain, updateHolder, updatedeployedGovernorAddress,updateWeb3AuthAddress,updateWeb3AuthAddressPvtKey, updateCoverImgPath, updateIconImgPath, updateTags, updateCommunityTags, updateTemplate, updateMinApproval, updateSupport, updateVoteDurDay, updateVoteDurHour } = proposalSlice.actions
+export const { updateTitle, updatePurpose,updatetokenSymbol,updatetokenTitle, updateSupply, updatedeployedTokenAddress, updateShortDesc, updateLongDesc, updateExplain, updateHolder, updatedeployedGovernorAddress,updateWeb3AuthAddress,updateWeb3AuthAddressPvtKey, updateCoverImgPath, updateIconImgPath, updateTags, updateCommunityTags, updateTemplate, updateMinApproval, updateSupport, updateVoteDurDay, updateVoteDurHour, updateStepNumber } = proposalSlice.actions
 export default proposalSlice.reducer

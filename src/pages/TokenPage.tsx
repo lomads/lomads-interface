@@ -15,7 +15,7 @@ import {
     FormHelperText,
 } from '@chakra-ui/react'
 import { useAppDispatch } from 'state/hooks'
-import { updatetokenTitle, updatetokenSymbol, updateExplain, updateSupply, updateHolder, updateIconImgPath } from 'state/proposal/reducer'
+import { updatetokenTitle, updatetokenSymbol, updateExplain, updateSupply, updateHolder, updateIconImgPath, updateStepNumber } from 'state/proposal/reducer'
 import { useAppSelector } from 'state/hooks'
 import Header from 'components/Header';
 import Navbar from 'components/Web3AuthNavbar/Navbar'
@@ -55,6 +55,10 @@ const TokenPage = (props: Web3AuthPropType) => {
     const [errors, setErrors] = useState<any>({});
 
     useEffect(() => {
+        dispatch(updateStepNumber(4))
+    }, [])
+
+    useEffect(() => {
         if (!_.isEmpty(errors)) {
             const id = Object.keys(errors)[0];
             const element = document.getElementById(id);
@@ -88,6 +92,7 @@ const TokenPage = (props: Web3AuthPropType) => {
             terrors.holder = '* Holder address is required.'
         }
         if (_.isEmpty(terrors)) {
+            dispatch(updateStepNumber(5))
             navigate("/golive");
         } else {
             setErrors(terrors);
