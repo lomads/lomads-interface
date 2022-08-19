@@ -1,11 +1,12 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import _ from 'lodash'
 import '../styles/App.css'
 import '../styles/CreateDao.css'
 import '../styles/Dashboard.css'
 import '../styles/Modal.css'
 import '../styles/Sidebar.css'
 import { useNavigate } from 'react-router-dom'
-import {Oval} from 'react-loader-spinner'
+import { Oval } from 'react-loader-spinner'
 import {
     Input,
     FormControl,
@@ -51,11 +52,50 @@ const TokenPage = (props: Web3AuthPropType) => {
         dispatch(updateIconImgPath(''));
     }
 
+    const [errors, setErrors] = useState<any>({});
+
+    useEffect(() => {
+        if (!_.isEmpty(errors)) {
+            const id = Object.keys(errors)[0];
+            const element = document.getElementById(id);
+            if (element) {
+                element.focus();
+                const rect = element.getBoundingClientRect();
+                window.scrollTo({
+                    top: window.scrollY + rect.y - 100,
+                    behavior: 'auto',
+                });
+            }
+        }
+    }, [errors]);
+
     const handleClick = () => {
-        navigate("/golive");
+        let terrors: any = {};
+
+        if (!tokenTitle) {
+            terrors.tokenTitle = '* Token title is required.';
+        }
+
+        if (!tokenSymbol) {
+            terrors.tokenSymbol = '* Token symbol is required.';
+        }
+
+        if (!supply) {
+            terrors.supply = '* Total supply is required.';
+        }
+
+        if (!holder) {
+            terrors.holder = '* Holder address is required.'
+        }
+        if (_.isEmpty(terrors)) {
+            navigate("/golive");
+        } else {
+            setErrors(terrors);
+        }
     }
+
     const ImageThumb: React.FC<imageType> = ({ image }) => {
-        return <img src={URL.createObjectURL(image)} alt={image.name} width="300" height={"300"} style={{maxWidth: '100%', maxHeight: '100%', width: 'auto', height: '100%' }}/>;
+        return <img src={URL.createObjectURL(image)} alt={image.name} width="300" height={"300"} style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: '100%' }} />;
     };
     const showHeader = !!web3authAddress ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
     return (
@@ -86,8 +126,9 @@ const TokenPage = (props: Web3AuthPropType) => {
                             <div className={"tokenpageDescription"}>
                                 A Short but descriptive name for your project token. This name will be used in block explorers and token wallets.
                             </div>
-                            <FormControl isInvalid={tokenTitle === ''}>
+                            <FormControl isInvalid={!tokenTitle && errors.tokenTitle}>
                                 <Input
+                                    id='tokenTitle'
                                     className={"inputField"}
                                     style={{ height: 40, width: 340 }}
                                     name="title"
@@ -96,11 +137,11 @@ const TokenPage = (props: Web3AuthPropType) => {
                                     autoFocus
                                     onChange={(e) => { dispatch(updatetokenTitle(e.target.value)) }}
                                 />
-                                {tokenTitle === '' &&
-                                    <FormErrorMessage 
-                                        style={{marginTop: 0, fontSize: "x-small"}}
+                                {!tokenTitle && errors.tokenTitle &&
+                                    <FormErrorMessage
+                                        style={{ marginTop: 0, fontSize: "x-small" }}
                                     >
-                                        * Token title is required.
+                                        {errors.tokenTitle}
                                     </FormErrorMessage>
                                 }
                             </FormControl>
@@ -120,8 +161,9 @@ const TokenPage = (props: Web3AuthPropType) => {
                             <div className={"tokenpageDescription"}>
                                 A one owrd symbol signifying your project token. This symbol will be used in block explorers and token wallets.
                             </div>
-                            <FormControl isInvalid={tokenTitle !== '' && tokenSymbol === ''}>
+                            <FormControl isInvalid={!tokenSymbol && errors.tokenSymbol}>
                                 <Input
+                                    id='tokenSymbol'
                                     className={"inputField"}
                                     style={{ height: 40, width: 240 }}
                                     name="title"
@@ -129,11 +171,11 @@ const TokenPage = (props: Web3AuthPropType) => {
                                     placeholder="Enter your Token Symbol"
                                     onChange={(e) => { dispatch(updatetokenSymbol(e.target.value)) }}
                                 />
-                                {tokenTitle !== '' && tokenSymbol === '' &&
-                                    <FormErrorMessage 
-                                        style={{marginTop: 0, fontSize: "x-small"}}
+                                {!tokenSymbol && errors.tokenSymbol &&
+                                    <FormErrorMessage
+                                        style={{ marginTop: 0, fontSize: "x-small" }}
                                     >
-                                        * Token symbol is required.
+                                        {errors.tokenSymbol}
                                     </FormErrorMessage>
                                 }
                             </FormControl>
@@ -164,8 +206,9 @@ const TokenPage = (props: Web3AuthPropType) => {
                         Define the initial token supply.
                     </div>
                 </div>
-                <FormControl isInvalid={tokenTitle !== '' && tokenSymbol !== '' && !supply}>
+                <FormControl isInvalid={!supply && errors.supply}>
                     <Input
+                        id='supply'
                         className={"inputField"}
                         style={{ height: 50, width: 500 }}
                         name="supply"
@@ -174,11 +217,11 @@ const TokenPage = (props: Web3AuthPropType) => {
                         placeholder="100,000,000"
                         onChange={(e) => { dispatch(updateSupply(e.target.value)) }}
                     />
-                    {tokenTitle !== '' && tokenSymbol !== '' && !supply &&
-                        <FormErrorMessage 
-                            style={{marginTop: 0, fontSize: "x-small"}}
+                    {!supply && errors.supply &&
+                        <FormErrorMessage
+                            style={{ marginTop: 0, fontSize: "x-small" }}
                         >
-                            * Total supply is required.
+                            {errors.supply}
                         </FormErrorMessage>
                     }
                 </FormControl>
@@ -197,8 +240,9 @@ const TokenPage = (props: Web3AuthPropType) => {
                         Enter the address that controls the token. This should probably be a multi-sig. Make sure to enter the Ethereum address, not the ENS name.
                     </div>
                 </div>
-                <FormControl isInvalid={tokenTitle !== '' && tokenSymbol !== '' && !!supply && holder === ''}>
+                <FormControl isInvalid={!holder && errors.holder}>
                     <Input
+                        id='holder'
                         className={"inputField"}
                         style={{ height: 50, width: 500 }}
                         name="holder"
@@ -206,11 +250,11 @@ const TokenPage = (props: Web3AuthPropType) => {
                         placeholder="0x3429…"
                         onChange={(e) => { dispatch(updateHolder(e.target.value)) }}
                     />
-                    {tokenTitle !== '' && tokenSymbol !== '' && !!supply && holder === '' &&
-                        <FormErrorMessage 
-                            style={{marginTop: 0, fontSize: "x-small"}}
+                    {!holder && errors.holder &&
+                        <FormErrorMessage
+                            style={{ marginTop: 0, fontSize: "x-small" }}
                         >
-                            * Holder address is required.
+                            {errors.holder}
                         </FormErrorMessage>
                     }
                 </FormControl>
@@ -220,7 +264,7 @@ const TokenPage = (props: Web3AuthPropType) => {
                         Brand your token by uploading an icon image.
                     </div>
                     <div id="upload-box">
-                        {!loading && file && <div id="upload-remove" onClick={handleRemoveCover}/>}
+                        {!loading && file && <div id="upload-remove" onClick={handleRemoveCover} />}
                         {loading && <Oval
                             height={80}
                             width={80}
@@ -232,7 +276,6 @@ const TokenPage = (props: Web3AuthPropType) => {
                             secondaryColor="#4fa94d"
                             strokeWidth={2}
                             strokeWidthSecondary={2}
-
                         />}
                         {!loading && !file && <div id="upload-file">
                             <button>
@@ -240,10 +283,6 @@ const TokenPage = (props: Web3AuthPropType) => {
                             </button>
                         </div>}
                         {!loading && file && <ImageThumb image={file} />}
-                        {/* <p>Filename: {file.name}</p>
-                        <p>File type: {file.type}</p>
-                        <p>File size: {file.size} bytes</p>
-                        {file && <ImageThumb image={file} />} */}
                     </div>
                 </div>
                 <div>

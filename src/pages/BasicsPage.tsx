@@ -1,14 +1,15 @@
-import React, { useState, SyntheticEvent, useCallback, } from 'react'
+import React, { useState, SyntheticEvent, useCallback, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
+import _ from 'lodash';
 import {
     Input,
-    Textarea, 
+    Textarea,
     FormControl,
     FormLabel,
     FormErrorMessage,
     FormHelperText,
 } from '@chakra-ui/react'
-import {Oval} from 'react-loader-spinner'
+import { Oval } from 'react-loader-spinner'
 import '../styles/App.css'
 import '../styles/CreateDao.css'
 import '../styles/Dashboard.css'
@@ -34,6 +35,22 @@ const BasicsPage = (props: Web3AuthPropType) => {
     const [loading, setLoading] = useState(false);
     const web3authAddress = useAppSelector((state) => state.proposal.Web3AuthAddress)
     const navigate = useNavigate();
+    const [errors, setErrors] = useState<any>({});
+
+    useEffect(() => {
+        if (!_.isEmpty(errors)) {
+            const id = Object.keys(errors)[0];
+            const element = document.getElementById(id);
+            if (element) {
+                element.focus();
+                const rect = element.getBoundingClientRect();
+                window.scrollTo({
+                    top: window.scrollY + rect.y - 60,
+                    behavior: 'auto',
+                });
+            }
+        }
+    }, [errors]);
 
     async function handleUpload(event: any) {
         console.log('Handle upload.....')
@@ -54,15 +71,29 @@ const BasicsPage = (props: Web3AuthPropType) => {
     }
 
     const handleClick = () => {
-        if ( title === '' || purpose === '' || shortDesc === '') {
-            
-        } else {
+        let terrors: any = {};
+
+        if (!title) {
+            terrors.title = '* DAO title is required.';
+        }
+
+        if (!purpose) {
+            terrors.purpose = '* DAO purpose is required.';
+        }
+
+        if (!shortDesc) {
+            terrors.shortDesc = '* DAO short description is required.';
+        }
+
+        if (_.isEmpty(terrors)) {
             navigate("/settings")
+        } else {
+            setErrors(terrors);
         }
     }
 
     const ImageThumb: React.FC<imageType> = ({ image }) => {
-        return <img src={URL.createObjectURL(image)} alt={image.name} width="300" height={"300"} style={{maxWidth: '100%', maxHeight: '100%', width: 'auto', height: '100%' }}/>;
+        return <img src={URL.createObjectURL(image)} alt={image.name} width="300" height={"300"} style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: '100%' }} />;
     };
     const showHeader = !!web3authAddress ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
     return (
@@ -89,21 +120,22 @@ const BasicsPage = (props: Web3AuthPropType) => {
                                 </div>
                             </div>
                         </div>
-                        <FormControl isInvalid={title === ''}>
+                        <FormControl isInvalid={!title && errors.title}>
                             <Input
+                                id="title"
                                 className={"inputField"}
                                 style={{ height: 40, width: 340 }}
                                 name="title"
                                 value={title}
                                 placeholder="Name your DAO"
-                                autoFocus
+                                autoFocus={!title}
                                 onChange={(e) => { dispatch(updateTitle(e.target.value)) }}
                             />
-                            {title === '' &&
-                                <FormErrorMessage 
-                                    style={{marginTop: 0, fontSize: "x-small"}}
+                            {!title && errors.title &&
+                                <FormErrorMessage
+                                    style={{ marginTop: 0, fontSize: "x-small" }}
                                 >
-                                    * DAO title is required.
+                                    {errors.title}
                                 </FormErrorMessage>
                             }
                         </FormControl>
@@ -119,20 +151,22 @@ const BasicsPage = (props: Web3AuthPropType) => {
                                 </div>
                             </div>
                         </div>
-                        <FormControl isInvalid={title !== '' && purpose === ''}>
+                        <FormControl isInvalid={!purpose && errors.purpose}>
                             <Input
+                                id="purpose"
                                 className={"inputField"}
                                 style={{ height: 40, width: 240 }}
                                 name="purpose"
                                 value={purpose}
                                 placeholder="Choose Purpose"
+                                autoFocus={!!title && !purpose}
                                 onChange={(e) => { dispatch(updatePurpose(e.target.value)) }}
                             />
-                            {title !== '' && purpose === '' &&
-                                <FormErrorMessage 
-                                    style={{marginTop: 0, fontSize: "x-small"}}
+                            {!purpose && errors.purpose &&
+                                <FormErrorMessage
+                                    style={{ marginTop: 0, fontSize: "x-small" }}
                                 >
-                                    * DAO purpose is required.
+                                    {errors.purpose}
                                 </FormErrorMessage>
                             }
                         </FormControl>
@@ -148,20 +182,22 @@ const BasicsPage = (props: Web3AuthPropType) => {
                         </div>
                     </div>
                 </div>
-                <FormControl isInvalid={title !== '' && purpose !== '' && shortDesc === ''}>
-                    <Textarea 
+                <FormControl isInvalid={!shortDesc && errors.shortDesc}>
+                    <Textarea
+                        id="shortDesc"
                         className={"shorttextField"}
-                        style={{width: "500px", background: "#f5f5f5"}}
+                        style={{ width: "500px", background: "#f5f5f5" }}
                         name="shortDesc"
                         value={shortDesc}
                         placeholder="In a few words"
+                        autoFocus={!!title && !!purpose && !shortDesc}
                         onChange={(e) => { dispatch(updateShortDesc(e.target.value)) }}
                     />
-                    {title !== '' && purpose !== '' && shortDesc === '' &&
-                        <FormErrorMessage 
-                            style={{marginTop: 0, fontSize: "x-small"}}
+                    {!shortDesc && errors.shortDesc &&
+                        <FormErrorMessage
+                            style={{ marginTop: 0, fontSize: "x-small" }}
                         >
-                            * DAO short description is required.
+                            {errors.shortDesc}
                         </FormErrorMessage>
                     }
                 </FormControl>
@@ -177,7 +213,7 @@ const BasicsPage = (props: Web3AuthPropType) => {
                         , and will be surfaced at the top of your entry and as the preview card across social media platforms. Images must be 2:1 ratio. Suggested dimensions 3000x1500.
                     </div>
                     <div id="upload-box">
-                        {!loading && file && <div id="upload-remove" onClick={handleRemoveCover}/>}
+                        {!loading && file && <div id="upload-remove" onClick={handleRemoveCover} />}
                         {loading && <Oval
                             height={80}
                             width={80}
