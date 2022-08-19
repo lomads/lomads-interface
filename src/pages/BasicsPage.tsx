@@ -54,7 +54,11 @@ const BasicsPage = (props: Web3AuthPropType) => {
     }
 
     const handleClick = () => {
-        navigate("/settings")
+        if ( title === '' || purpose === '' || shortDesc === '') {
+            
+        } else {
+            navigate("/settings")
+        }
     }
 
     const ImageThumb: React.FC<imageType> = ({ image }) => {

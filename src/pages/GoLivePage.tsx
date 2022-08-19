@@ -47,6 +47,11 @@ const GoLivePage = (props: Web3AuthPropType) => {
   const explain = useAppSelector((state) => state.proposal.explain)
   const supply = useAppSelector((state) => state.proposal.supply)
   const holder = useAppSelector((state) => state.proposal.holder)
+  const template = useAppSelector((state) => state.proposal.template)
+  const support = useAppSelector((state) => state.proposal.support)
+  const minApproval = useAppSelector((state) => state.proposal.minApproval)
+  const voteDurDay = useAppSelector((state) => state.proposal.voteDurDay)
+  const voteDurHour = useAppSelector((state) => state.proposal.voteDurHour)
   const web3authAddress = useAppSelector((state) => state.proposal.Web3AuthAddress)
   const coverImgPath = useAppSelector((state) => state.proposal.coverImgPath)
   const iconImgPath = useAppSelector((state) => state.proposal.iconImgPath)
@@ -98,18 +103,19 @@ const GoLivePage = (props: Web3AuthPropType) => {
     setdeployedGovernor(governorAddress);
   }
   const createToken = async () => {
-    const factory = await factoryCall(provider);
-    setisLoading(true);
-    onClose()
-    const creatingToken = await factory.createToken(tokenTitle, tokenSymbol, supply, holder, explain);
-    await creatingToken.wait();
-    const tokenAddress = await factory.deployedTokenAddress();
-    dispatch(updatedeployedTokenAddress(tokenAddress));
-    if (tokenAddress) {
-      console.log("token address is:", tokenAddress)
-      dispatch(updatedeployedTokenAddress(tokenAddress))
-      DeployDAO(tokenAddress)
-    }
+    saveObject();
+    // const factory = await factoryCall(provider);
+    // setisLoading(true);
+    // onClose()
+    // const creatingToken = await factory.createToken(tokenTitle, tokenSymbol, supply, holder, explain);
+    // await creatingToken.wait();
+    // const tokenAddress = await factory.deployedTokenAddress();
+    // dispatch(updatedeployedTokenAddress(tokenAddress));
+    // if (tokenAddress) {
+    //   console.log("token address is:", tokenAddress)
+    //   dispatch(updatedeployedTokenAddress(tokenAddress))
+    //   DeployDAO(tokenAddress)
+    // }
   }
 
   const showHeader = !!web3authAddress ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
@@ -124,7 +130,11 @@ const GoLivePage = (props: Web3AuthPropType) => {
       coverImg: coverImgPath,
       tags: tags,
       communityTags: communityTags,
-      settingTemp: "Midas",
+      settingTemp: template.toString(),
+      voteDurDay: voteDurDay,
+      voteDurHour: voteDurHour,
+      support: support,
+      minApproval: minApproval,
       tokenName: tokenTitle,
       tokenSymbol: tokenSymbol,
       explain: explain,

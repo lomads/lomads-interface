@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import {useState} from 'react'
 import {
     NumberInput,
     NumberInputField,
@@ -9,10 +9,34 @@ import {
 
 import rightArrow from "../../assets/svg/rightArrow.svg";
 import { ChangeComponentType } from '../../types';
+import { useAppSelector, useAppDispatch } from 'state/hooks'
+import { updateVoteDurDay, updateVoteDurHour, updateSupport, updateMinApproval} from 'state/proposal/reducer'
 
 const ChangeComponent = (props: ChangeComponentType) => {
+    const dispatch = useAppDispatch();
+    const [value1, setValue1] = useState(props.value1);
+    const [value2, setValue2] = useState(props.value2)
 
-    const [value, setValue] = useState(props.value);
+    const handleChange1 = (val: string) => {
+        setValue1(parseInt(val))
+        if(props.property === "Support") {
+            dispatch(updateSupport(parseInt(val)))
+        } else if(props.property == "Min Approval") {
+            dispatch(updateMinApproval(parseInt(val)))
+        } else {
+            if(props.vote){
+                dispatch(updateVoteDurDay(parseInt(val)))
+            } else {
+                dispatch(updateVoteDurHour(parseInt(val)))
+            }
+        }
+    }
+
+    const handleChange2 = (val: string) => {
+        setValue2(parseInt(val))
+        dispatch(updateVoteDurHour(parseInt(val)))
+    }
+
     return (
         <>
         <div className='changebutton' style={{minWidth: props.page ? 350: 0}}>
@@ -25,10 +49,10 @@ const ChangeComponent = (props: ChangeComponentType) => {
                     height="100%" 
                     width={100} 
                     min={0} 
-                    value={value}
-                    onChange={(val) => setValue(parseInt(val))}
+                    value={value1}
+                    onChange={(val) => handleChange1(val) }
                 >
-                    <NumberInputField height="100%" borderRadius={0}/>
+                    <NumberInputField height="100%" borderRadius={5}/>
                     <NumberInputStepper style={{background: "white", borderColor: "white"}}>
                         <NumberIncrementStepper>
                             <div>
@@ -48,10 +72,10 @@ const ChangeComponent = (props: ChangeComponentType) => {
                         height="100%" 
                         width={100} 
                         min={0} 
-                        value={value}
-                        onChange={(val) => setValue(parseInt(val))}
+                        value={value2}
+                        onChange={(val) => handleChange2(val)}
                     >
-                        <NumberInputField height="100%" borderRadius={0}/>
+                        <NumberInputField height="100%" borderRadius={5}/>
                         <NumberInputStepper style={{background: "white"}}>
                             <NumberIncrementStepper>
                                 <div>

@@ -36,6 +36,10 @@ const Dashboard = () => {
   const [iconImg, setIconImg] = useState("")
   const [coverImg64, setCoverImg64] = useState("");
   const [iconImg64, setIconImg64] = useState("");
+  const [support, setSupport] = useState("")
+  const [voteDurDay, setVoteDurDate] = useState("")
+  const [voteDurHour, setVoteDurHour] = useState("")
+  const [minApproval, setMinApproval] = useState("")
 
   useEffect(() => {
     getHistories();
@@ -61,6 +65,10 @@ const Dashboard = () => {
     setSupply(results[lastIndex].get("supply"));
     setHolder(results[lastIndex].get("holder"));
     setIconImg(results[lastIndex].get("iconImg"));
+    setVoteDurDate(results[lastIndex].get("voteDurDay"))
+    setVoteDurHour(results[lastIndex].get("voteDurHour"))
+    setMinApproval(results[lastIndex].get("minApproval"))
+    setSupport(results[lastIndex].get("support"))
   }
 
   useEffect(() => {
@@ -138,6 +146,18 @@ const Dashboard = () => {
         </div>
         <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
           DAO settingTemp : {settingTemp}
+        </div>
+        <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
+          DAO support : {support}
+        </div>
+        <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
+          DAO minApproval : {minApproval}
+        </div>
+        <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
+          DAO voteDurDay : {voteDurDay}
+        </div>
+        <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
+          DAO voteDurHour : {voteDurHour}
         </div>
         <div className={"tileItemHeader"} style={{ paddingTop: 0 }}>
           DAO tokenName : {tokenName}

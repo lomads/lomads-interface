@@ -479,7 +479,7 @@
   width: fit-content;
   align-items: center;
   background: #FFFFFF;
-  border: 0px solid transparent;
+  border: 1px solid transparent;
   margin-top: 20px;
   box-shadow: 3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18);
   border-radius: 5px;

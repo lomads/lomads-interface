@@ -1,9 +1,17 @@
 import React,{useState} from 'react'
 import { TiPencil } from 'react-icons/ti';
 import ChangeComponent from './sub/ChangeComponent'
+import { useAppSelector, useAppDispatch } from 'state/hooks'
+import { updateTemplate } from 'state/proposal/reducer';
 
 const SettingsComponent = () => {
-    const [template,setTemplate] = useState("");
+    const dispatch = useAppDispatch()
+    const template = useAppSelector((state) => state.proposal.template)
+    const support = useAppSelector((state) => state.proposal.support)
+    const minApproval = useAppSelector((state) => state.proposal.minApproval)
+    const voteDurDay = useAppSelector((state) => state.proposal.voteDurDay)
+    const voteDurHour = useAppSelector((state) => state.proposal.voteDurHour)
+    // const [template,setTemplate] = useState("");
     const [disabledButton,setDisabledButton] = useState<boolean>(true)
   return (
     <>
@@ -24,7 +32,7 @@ const SettingsComponent = () => {
                     </div>
                 </div>
                 <input className={`${disabledButton ? "focusInputField" : "noInputField"}`} type="title" name="title" value={template} style={{height:40, width:300, marginTop: 20}}
-                            autoFocus placeholder="Enter Title" onChange={(e)=>{setTemplate(e.target.value)}} disabled={disabledButton} />
+                            autoFocus placeholder="Enter Title" onChange={(e)=>{dispatch(updateTemplate(e.target.value))}} disabled={disabledButton} />
             </div>
             {/* second */}
             <div style={{ marginLeft: "20px" }}>
@@ -33,9 +41,9 @@ const SettingsComponent = () => {
                         Vote Settings
                     </div>
                 </div>
-                <ChangeComponent property="Support" page="golive" value={5}/>
-                <ChangeComponent property="Min Approuval" page="golive" value={5}/>
-                <ChangeComponent property="Vote duration" page="golive" vote="vote" value={0}/>
+                <ChangeComponent property="Support" page="golive" value1={support}/>
+                <ChangeComponent property="Min Approval" page="golive" value1={minApproval}/>
+                <ChangeComponent property="Vote duration" page="golive" vote="vote" value1={voteDurDay} value2={voteDurHour}/>
             </div>
         </div>
     </div>

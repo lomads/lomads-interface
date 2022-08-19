@@ -1,9 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { saturate } from 'polished'
 import { isObjectBindingPattern } from 'typescript'
 
 export interface ProposalState {
   readonly title: string
   readonly purpose: string
+  readonly template: string
   readonly tokenTitle: string
   readonly tokenSymbol: string
   readonly supply: number
@@ -19,11 +21,16 @@ export interface ProposalState {
   readonly iconImgPath: string
   readonly tags: Array<string>|([])
   readonly communityTags: Array<string>|([])
+  readonly support: number
+  readonly minApproval: number
+  readonly voteDurDay: number
+  readonly voteDurHour: number
 }
 
 const initialState: ProposalState = {
   title: "",
   purpose: "",
+  template: "",
   tokenTitle: "",
   tokenSymbol: "",
   supply: 0,
@@ -39,6 +46,10 @@ const initialState: ProposalState = {
   iconImgPath: "",
   tags:[],
   communityTags:[],
+  support: 0,
+  minApproval: 0,
+  voteDurDay: 0,
+  voteDurHour: 0,
 }
 
 const proposalSlice = createSlice({
@@ -50,6 +61,9 @@ const proposalSlice = createSlice({
     },
     updatePurpose(state, action) {
       state.purpose = action.payload
+    },
+    updateTemplate(state, action) {
+      state.template = action.payload
     },
     updatetokenTitle(state, action) {
       state.tokenTitle = action.payload
@@ -95,9 +109,21 @@ const proposalSlice = createSlice({
     },
     updateCommunityTags(state, action) {
       state.communityTags = action.payload
+    },
+    updateSupport(state, action) {
+      state.support = action.payload
+    },
+    updateMinApproval(state, action) {
+      state.minApproval = action.payload
+    },
+    updateVoteDurDay(state, action) {
+      state.voteDurDay = action.payload
+    },
+    updateVoteDurHour(state, action) {
+      state.voteDurHour = action.payload
     }
   },
 })
 
-export const { updateTitle, updatePurpose,updatetokenSymbol,updatetokenTitle, updateSupply, updatedeployedTokenAddress, updateShortDesc, updateLongDesc, updateExplain, updateHolder, updatedeployedGovernorAddress,updateWeb3AuthAddress,updateWeb3AuthAddressPvtKey, updateCoverImgPath, updateIconImgPath, updateTags, updateCommunityTags } = proposalSlice.actions
+export const { updateTitle, updatePurpose,updatetokenSymbol,updatetokenTitle, updateSupply, updatedeployedTokenAddress, updateShortDesc, updateLongDesc, updateExplain, updateHolder, updatedeployedGovernorAddress,updateWeb3AuthAddress,updateWeb3AuthAddressPvtKey, updateCoverImgPath, updateIconImgPath, updateTags, updateCommunityTags, updateTemplate, updateMinApproval, updateSupport, updateVoteDurDay, updateVoteDurHour } = proposalSlice.actions
 export default proposalSlice.reducer

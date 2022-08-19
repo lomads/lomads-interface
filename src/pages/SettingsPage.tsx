@@ -12,15 +12,24 @@ import SliderThumbWithTooltip from 'components/sub/SupportSlider'
 import ApprovalSliderThumbWithTooltip from 'components/sub/ApprovalSlider'
 import Header from 'components/Header';
 import Navbar from 'components/Web3AuthNavbar/Navbar'
-import { useAppSelector } from 'state/hooks'
+import { useAppSelector, useAppDispatch } from 'state/hooks'
 import { Web3AuthPropType } from 'types'
+import { updateTemplate} from 'state/proposal/reducer'
 
 const SettingsPage = (props: Web3AuthPropType) => {
+    const dispatch = useAppDispatch();
     const web3authAddress = useAppSelector((state) => state.proposal.Web3AuthAddress)
-    const [SupportValue, setSupportValue] = useState<number>(0)
-    const [ApprovalValue, setApprovalValue] = useState<number>(0)
+    const template = useAppSelector((state) => state.proposal.template)
+    const voteDurDay = useAppSelector((state) => state.proposal.voteDurDay)
+    const voteDurHour = useAppSelector((state) => state.proposal.voteDurHour)
     const [selectedTemplate, setSelectedTemplate] = useState(-1)
     const showHeader = !!web3authAddress ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
+
+    const handleTemplateSelect = (val: number) => {
+        setSelectedTemplate(val);
+        dispatch(updateTemplate(val))
+    }
+
     return (
         <>
             <div className='absolute top-0 right-0'>
@@ -48,9 +57,9 @@ const SettingsPage = (props: Web3AuthPropType) => {
                         Create your organisation with our pre-configured templates.
                     </div>
                     <div style={{ display: "flex", position: "relative", right: 120, zIndex: 9999 }} >
-                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1" iconColor={selectedTemplate === 0 ? '#C94B32' : 'white'} onClick={() => setSelectedTemplate(0)}/>
-                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1" iconColor={selectedTemplate === 1 ? '#C94B32' : 'white'} onClick={() => setSelectedTemplate(1)}/>
-                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1" iconColor={selectedTemplate === 2 ? '#C94B32' : 'white'} onClick={() => setSelectedTemplate(2)}/>
+                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1" iconColor={selectedTemplate === 0 ? '#C94B32' : 'white'} onClick={() => handleTemplateSelect(0)}/>
+                        <SelectTemplate blockTitle="template 2" blockDescription="description of block 2" iconColor={selectedTemplate === 1 ? '#C94B32' : 'white'} onClick={() => handleTemplateSelect(1)}/>
+                        <SelectTemplate blockTitle="template 3" blockDescription="description of block 3" iconColor={selectedTemplate === 2 ? '#C94B32' : 'white'} onClick={() => handleTemplateSelect(2)}/>
                     </div>
                 </div>
                 <div>
@@ -93,8 +102,8 @@ const SettingsPage = (props: Web3AuthPropType) => {
                         </Tooltip>
                     </div>
                     <div style={{ display: "flex" }}>
-                        <ChangeComponent property="Days" value={0}/>
-                        <ChangeComponent property="Hours" value={0}/>
+                        <ChangeComponent property="Days" value1={voteDurDay}/>
+                        <ChangeComponent property="Hours" value1={voteDurHour}/>
                     </div>
                 </div>
                 <div>
