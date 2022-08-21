@@ -108,7 +108,7 @@ export default function App() {
           <Route path='/settings' element={<SidebarPage page="Settings" web3Provider={provider} />} />
           <Route path='/token' element={<SidebarPage page="Token" web3Provider={provider} />} />
           <Route path='/golive' element={<SidebarPage page="Go Live" web3Provider={provider} />} />
-          <Route path='/dashboard' element={<SidebarPage page="Dashboard" />} />
+          <Route path='/dao/:deployedAddress' element={<SidebarPage page="Dao" />} />
           <Route path='/sidepage' element={<SidebarPage page='Basics' web3Provider={provider} />} />
         </Routes>
       </div>

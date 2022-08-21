@@ -10,7 +10,7 @@ import BasicsComponent from '../components/BasicsComponent'
 import TokenComponent from '../components/TokenComponent'
 import SettingsComponent from '../components/SettingsComponent'
 import { LineWobble } from '@uiball/loaders'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'state/hooks'
 import {
   Modal,
@@ -27,10 +27,13 @@ import Header from 'components/Header';
 import Navbar from 'components/Web3AuthNavbar/Navbar'
 import { useNewMoralisObject } from "react-moralis";
 import { Web3AuthPropType } from 'types'
-import { updateStepNumber } from 'state/proposal/reducer'
+import useStepRouter from 'hooks/useStepRouter'
 
 const GoLivePage = (props: Web3AuthPropType) => {
-  const navigate = useNavigate();
+  useStepRouter(5);
+
+  const navigate = useNavigate()
+  const params = useParams()
   const dispatch = useAppDispatch()
   const { provider, connector } = useWeb3React();
   const [deployedGovernor, setdeployedGovernor] = useState<string>("");
@@ -114,6 +117,7 @@ const GoLivePage = (props: Web3AuthPropType) => {
       console.log("token address is:", tokenAddress)
       dispatch(updatedeployedTokenAddress(tokenAddress))
       DeployDAO(tokenAddress)
+      localStorage.removeItem('maxStep');
     }
   }
 
@@ -145,7 +149,7 @@ const GoLivePage = (props: Web3AuthPropType) => {
       onSuccess: (daoinfo) => {
         // Execute any logic that should take place after the object is saved.
         console.log("New object created with objectId: " + daoinfo.id);
-        navigate("/dashboard");
+        navigate(`/dao/${deployedTokenAddress}`);
       },
       onError: (error) => {
         // Execute any logic that should take place if the save fails.
@@ -155,9 +159,6 @@ const GoLivePage = (props: Web3AuthPropType) => {
     });
   }
 
-  useEffect(() => {
-    dispatch(updateStepNumber(5))
-  }, [])
 
 
   return (

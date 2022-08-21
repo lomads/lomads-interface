@@ -17,8 +17,11 @@ import { useAppSelector, useAppDispatch } from 'state/hooks'
 import { Web3AuthPropType } from 'types'
 import { updateTemplate} from 'state/proposal/reducer'
 import { updateStepNumber } from 'state/proposal/reducer'
+import useStepRouter from 'hooks/useStepRouter';
 
 const SettingsPage = (props: Web3AuthPropType) => {
+    useStepRouter(3);
+    
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const web3authAddress = useAppSelector((state) => state.proposal.Web3AuthAddress)
@@ -37,10 +40,6 @@ const SettingsPage = (props: Web3AuthPropType) => {
         dispatch(updateStepNumber(4))
         navigate("/token")
     }
-
-    useEffect(() => {
-        dispatch(updateStepNumber(3))
-    }, [])
 
     return (
         <>

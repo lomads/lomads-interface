@@ -21,8 +21,11 @@ import Header from 'components/Header';
 import Navbar from 'components/Web3AuthNavbar/Navbar'
 import { imageType, Web3AuthPropType } from 'types'
 import { fileUpload } from '../utils/ipfs'
+import useStepRouter from 'hooks/useStepRouter'
 
 const TokenPage = (props: Web3AuthPropType) => {
+    useStepRouter(4);
+
     const dispatch = useAppDispatch()
     const navigate = useNavigate();
     const tokenTitle = useAppSelector((state) => state.proposal.tokenTitle)
@@ -53,10 +56,6 @@ const TokenPage = (props: Web3AuthPropType) => {
     }
 
     const [errors, setErrors] = useState<any>({});
-
-    useEffect(() => {
-        dispatch(updateStepNumber(4))
-    }, [])
 
     useEffect(() => {
         if (!_.isEmpty(errors)) {

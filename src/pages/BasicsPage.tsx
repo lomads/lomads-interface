@@ -24,8 +24,11 @@ import KeywordTag from './KeywordTag';
 import Header from 'components/Header';
 import Navbar from 'components/Web3AuthNavbar/Navbar';
 import { fileUpload } from '../utils/ipfs'
+import useStepRouter from 'hooks/useStepRouter';
 
 const BasicsPage = (props: Web3AuthPropType) => {
+    useStepRouter(2);
+    
     const dispatch = useAppDispatch()
     const title = useAppSelector((state) => state.proposal.title)
     const purpose = useAppSelector((state) => state.proposal.purpose)
@@ -36,10 +39,6 @@ const BasicsPage = (props: Web3AuthPropType) => {
     const web3authAddress = useAppSelector((state) => state.proposal.Web3AuthAddress)
     const navigate = useNavigate();
     const [errors, setErrors] = useState<any>({});
-
-    useEffect(() => {
-        dispatch(updateStepNumber(2))
-    }, [])
 
     useEffect(() => {
         if (!_.isEmpty(errors)) {
