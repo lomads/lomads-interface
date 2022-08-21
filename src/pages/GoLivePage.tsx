@@ -5,12 +5,12 @@ import '../styles/Dashboard.css'
 import '../styles/Modal.css'
 import '../styles/Sidebar.css'
 import { useWeb3React } from "@web3-react/core";
-import { factoryCall, getweb3authProvider } from 'connection/DaoFactoryCall'
+import { factoryCall } from 'connection/DaoFactoryCall'
 import BasicsComponent from '../components/BasicsComponent'
 import TokenComponent from '../components/TokenComponent'
 import SettingsComponent from '../components/SettingsComponent'
 import { LineWobble } from '@uiball/loaders'
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'state/hooks'
 import {
   Modal,
@@ -28,12 +28,14 @@ import Navbar from 'components/Web3AuthNavbar/Navbar'
 import { useNewMoralisObject } from "react-moralis";
 import { Web3AuthPropType } from 'types'
 import useStepRouter from 'hooks/useStepRouter'
+import { useTransactionAdder } from 'state/transactions/hooks'
+import { useDAOContract } from 'hooks/useContract';
+import { TransactionInfo } from 'state/transactions/types'
 
 const GoLivePage = (props: Web3AuthPropType) => {
   useStepRouter(5);
 
   const navigate = useNavigate()
-  const params = useParams()
   const dispatch = useAppDispatch()
   const { provider, connector } = useWeb3React();
   const [deployedGovernor, setdeployedGovernor] = useState<string>("");
@@ -61,6 +63,8 @@ const GoLivePage = (props: Web3AuthPropType) => {
   const iconImgPath = useAppSelector((state) => state.proposal.iconImgPath)
   const { save } = useNewMoralisObject("DAOInfo");
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const addTransaction = useTransactionAdder();
+  const factory = useDAOContract()
 
   const addToken = async (deployedTokenAddress: string) => {
     const tokenAddress = deployedTokenAddress;
@@ -95,10 +99,9 @@ const GoLivePage = (props: Web3AuthPropType) => {
   const DeployDAO = async (deployedTokenAddress: string) => {
     console.log("DEploying GOv")
     console.log(deployedTokenAddress)
-    const factory = await factoryCall(provider);
-    const creatingGovernor = deployedTokenAddress !== null && await factory.createGovernor(title, deployedTokenAddress, title, purpose, longDesc, shortDesc);
+    const creatingGovernor = factory && deployedTokenAddress !== null && await factory.createGovernor(title, deployedTokenAddress, title, purpose, longDesc, shortDesc);
     await creatingGovernor.wait();
-    const governorAddress = await factory.deployedGovernorAddress();
+    const governorAddress = await factory?.deployedGovernorAddress();
     await addToken(deployedTokenAddress);
     setisLoading(false)
     saveObject();
@@ -106,25 +109,26 @@ const GoLivePage = (props: Web3AuthPropType) => {
     setdeployedGovernor(governorAddress);
   }
   const createToken = async () => {
-    const factory = await factoryCall(provider);
-    setisLoading(true);
-    onClose()
-    const creatingToken = await factory.createToken(tokenTitle, tokenSymbol, supply, holder, explain);
-    await creatingToken.wait();
-    const tokenAddress = await factory.deployedTokenAddress();
-    dispatch(updatedeployedTokenAddress(tokenAddress));
-    if (tokenAddress) {
-      console.log("token address is:", tokenAddress)
-      dispatch(updatedeployedTokenAddress(tokenAddress))
-      DeployDAO(tokenAddress)
-      localStorage.removeItem('maxStep');
+    if (factory) {
+      setisLoading(true);
+      onClose()
+      const creatingToken = await factory.createToken(tokenTitle, tokenSymbol, supply, holder, explain);
+      const transactionInfo = await creatingToken.wait();
+      addTransaction(creatingToken, transactionInfo)
+      const tokenAddress = await factory.deployedTokenAddress();
+      dispatch(updatedeployedTokenAddress(tokenAddress));
+      if (tokenAddress) {
+        console.log("token address is:", tokenAddress)
+        dispatch(updatedeployedTokenAddress(tokenAddress))
+        DeployDAO(tokenAddress)
+        localStorage.removeItem('maxStep');
+      }
     }
   }
 
   const showHeader = !!web3authAddress ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
 
   const saveObject = async () => {
-    console.log("Midas tags save", tags)
     const data = {
       title: title,
       purpose: purpose,
@@ -158,8 +162,6 @@ const GoLivePage = (props: Web3AuthPropType) => {
       },
     });
   }
-
-
 
   return (
     <>
