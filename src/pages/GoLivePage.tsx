@@ -133,7 +133,7 @@ const GoLivePage = (props: Web3AuthPropType) => {
       coverImg: coverImgPath,
       tags: tags,
       communityTags: communityTags,
-      settingTemp: template.toString(),
+      settingTemp: template,
       voteDurDay: voteDurDay,
       voteDurHour: voteDurHour,
       support: support,

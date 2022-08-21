@@ -15,7 +15,7 @@ import Header from 'components/Header';
 import Navbar from 'components/Web3AuthNavbar/Navbar'
 import { useAppSelector, useAppDispatch } from 'state/hooks'
 import { Web3AuthPropType } from 'types'
-import { updateTemplate} from 'state/proposal/reducer'
+import { updateTemplate, updateTemplateVal} from 'state/proposal/reducer'
 import { updateStepNumber } from 'state/proposal/reducer'
 import useStepRouter from 'hooks/useStepRouter';
 
@@ -26,14 +26,25 @@ const SettingsPage = (props: Web3AuthPropType) => {
     const navigate = useNavigate();
     const web3authAddress = useAppSelector((state) => state.proposal.Web3AuthAddress)
     const template = useAppSelector((state) => state.proposal.template)
+    const templateVal = useAppSelector((state) => state.proposal.templateVal)
     const voteDurDay = useAppSelector((state) => state.proposal.voteDurDay)
     const voteDurHour = useAppSelector((state) => state.proposal.voteDurHour)
-    const [selectedTemplate, setSelectedTemplate] = useState(-1)
     const showHeader = !!web3authAddress ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
 
+    const TEMPLATE = [
+        "template 1",
+        "template 2",
+        "template 3"
+    ]
+
     const handleTemplateSelect = (val: number) => {
-        setSelectedTemplate(val);
-        dispatch(updateTemplate(val))
+        if(val === templateVal) {
+            dispatch(updateTemplateVal(-1))
+            dispatch(updateTemplate(''))
+        } else {
+            dispatch(updateTemplateVal(val))
+            dispatch(updateTemplate(TEMPLATE[val]))
+        }
     }
 
     const handleClick = () => {
@@ -68,9 +79,9 @@ const SettingsPage = (props: Web3AuthPropType) => {
                         Create your organisation with our pre-configured templates.
                     </div>
                     <div style={{ display: "flex", position: "relative", right: 120, zIndex: 9999 }} >
-                        <SelectTemplate blockTitle="template 1" blockDescription="description of block 1" iconColor={selectedTemplate === 0 ? '#C94B32' : 'white'} onClick={() => handleTemplateSelect(0)}/>
-                        <SelectTemplate blockTitle="template 2" blockDescription="description of block 2" iconColor={selectedTemplate === 1 ? '#C94B32' : 'white'} onClick={() => handleTemplateSelect(1)}/>
-                        <SelectTemplate blockTitle="template 3" blockDescription="description of block 3" iconColor={selectedTemplate === 2 ? '#C94B32' : 'white'} onClick={() => handleTemplateSelect(2)}/>
+                        <SelectTemplate blockTitle={TEMPLATE[0]} blockDescription="description of block 1" iconColor={templateVal === 0 ? '#C94B32' : 'white'} onClick={() => handleTemplateSelect(0)}/>
+                        <SelectTemplate blockTitle={TEMPLATE[1]} blockDescription="description of block 2" iconColor={templateVal === 1 ? '#C94B32' : 'white'} onClick={() => handleTemplateSelect(1)}/>
+                        <SelectTemplate blockTitle={TEMPLATE[2]} blockDescription="description of block 3" iconColor={templateVal === 2 ? '#C94B32' : 'white'} onClick={() => handleTemplateSelect(2)}/>
                     </div>
                 </div>
                 <div>

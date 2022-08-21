@@ -6,6 +6,7 @@ export interface ProposalState {
   readonly title: string
   readonly purpose: string
   readonly template: string
+  readonly templateVal: number
   readonly tokenTitle: string
   readonly tokenSymbol: string
   readonly supply: number
@@ -32,6 +33,7 @@ const initialState: ProposalState = {
   title: "",
   purpose: "",
   template: "",
+  templateVal: -1,
   tokenTitle: "",
   tokenSymbol: "",
   supply: 0,
@@ -133,9 +135,12 @@ const proposalSlice = createSlice({
       }
 
       state.stepNumber = action.payload
+    },
+    updateTemplateVal(state, action) {
+      state.templateVal = action.payload
     }
   },
 })
 
-export const { updateTitle, updatePurpose,updatetokenSymbol,updatetokenTitle, updateSupply, updatedeployedTokenAddress, updateShortDesc, updateLongDesc, updateExplain, updateHolder, updatedeployedGovernorAddress,updateWeb3AuthAddress,updateWeb3AuthAddressPvtKey, updateCoverImgPath, updateIconImgPath, updateTags, updateCommunityTags, updateTemplate, updateMinApproval, updateSupport, updateVoteDurDay, updateVoteDurHour, updateStepNumber } = proposalSlice.actions
+export const { updateTitle, updatePurpose,updatetokenSymbol,updatetokenTitle, updateSupply, updatedeployedTokenAddress, updateShortDesc, updateLongDesc, updateExplain, updateHolder, updatedeployedGovernorAddress,updateWeb3AuthAddress,updateWeb3AuthAddressPvtKey, updateCoverImgPath, updateIconImgPath, updateTags, updateCommunityTags, updateTemplate, updateMinApproval, updateSupport, updateVoteDurDay, updateVoteDurHour, updateStepNumber, updateTemplateVal } = proposalSlice.actions
 export default proposalSlice.reducer
