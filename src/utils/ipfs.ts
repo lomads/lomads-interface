@@ -21,18 +21,17 @@ try {
 
 export const fileUpload = async (coverImg: any) => {
   return new Promise(async(resolve, reject)=> {
-    console.log('Trying to upload file to IPFS');
-    console.log(ipfs?.stats);
-    const result = await (ipfs as IPFSHTTPClient).add(coverImg);
-    // fetchFile(cid);
-    resolve(result.path);
+  
+    if(ipfs) {
+      const result = await ipfs.add(coverImg);
+      resolve(result.path);
+    }
   });
 }
 
-export const fetchFile = async (cid: string) => {
+export const fetchFile = async (cid: string | CID) => {
   return new Promise(async(resolve, reject)=> {
     if(ipfs) {
-      
       let content: any[] = [];
       for await (const chunk of ipfs.cat(cid)) {
         content = [...content, ...chunk];
