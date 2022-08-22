@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import { useState } from 'react'
 import {
     NumberInput,
     NumberInputField,
@@ -10,7 +10,7 @@ import {
 import rightArrow from "../../assets/svg/rightArrow.svg";
 import { ChangeComponentType } from '../../types';
 import { useAppSelector, useAppDispatch } from 'state/hooks'
-import { updateVoteDurDay, updateVoteDurHour, updateSupport, updateMinApproval} from 'state/proposal/reducer'
+import { updateVoteDurDay, updateVoteDurHour, updateSupport, updateMinApproval } from 'state/proposal/reducer'
 
 const ChangeComponent = (props: ChangeComponentType) => {
     const dispatch = useAppDispatch();
@@ -19,16 +19,12 @@ const ChangeComponent = (props: ChangeComponentType) => {
 
     const handleChange1 = (val: string) => {
         setValue1(parseInt(val))
-        if(props.property === "Support") {
-            dispatch(updateSupport(parseInt(val)))
-        } else if(props.property == "Min Approval") {
-            dispatch(updateMinApproval(parseInt(val)))
-        } else {
-            if(props.vote){
-                dispatch(updateVoteDurDay(parseInt(val)))
-            } else {
-                dispatch(updateVoteDurHour(parseInt(val)))
-            }
+        switch (props.property) {
+            case "Support": dispatch(updateSupport(parseInt(val))); break;
+            case "Min Approval": dispatch(updateMinApproval(parseInt(val))); break;
+            case "Days":
+            case "Vote Duration": dispatch(updateVoteDurDay(parseInt(val))); break;
+            case "Hours": dispatch(updateVoteDurHour(parseInt(val))); break;
         }
     }
 
@@ -39,59 +35,59 @@ const ChangeComponent = (props: ChangeComponentType) => {
 
     return (
         <>
-        <div className='changebutton' style={{minWidth: props.page ? 350: 0}}>
-            <div className='property'>
-                {props.property}
-            </div>
-            <div className='flex 0 0' style={{height: "60px"}}>
-                <NumberInput 
-                    variant='filled' 
-                    height="100%" 
-                    width={100} 
-                    min={0} 
-                    value={value1}
-                    onChange={(val) => handleChange1(val) }
-                >
-                    <NumberInputField height="100%" borderRadius={5}/>
-                    <NumberInputStepper style={{background: "white", borderColor: "white"}}>
-                        <NumberIncrementStepper>
-                            <div>
-                                <img src={rightArrow} alt="" className='rightarrowup'/>
-                            </div>
-                        </NumberIncrementStepper>
-                        <NumberDecrementStepper>
-                            <div>
-                                <img src={rightArrow} alt="" className='rightarrowdown'/>
-                            </div>
-                        </NumberDecrementStepper>
-                    </NumberInputStepper>
-                </NumberInput>
-                {props.vote && 
-                    <NumberInput 
-                        variant='filled' 
-                        height="100%" 
-                        width={100} 
-                        min={0} 
-                        value={value2}
-                        onChange={(val) => handleChange2(val)}
+            <div className='changebutton' style={{ minWidth: props.page ? 350 : 0 }}>
+                <div className='property'>
+                    {props.property}
+                </div>
+                <div className='flex 0 0' style={{ height: "60px" }}>
+                    <NumberInput
+                        variant='filled'
+                        height="100%"
+                        width={100}
+                        min={0}
+                        value={value1}
+                        onChange={(val) => handleChange1(val)}
                     >
-                        <NumberInputField height="100%" borderRadius={5}/>
-                        <NumberInputStepper style={{background: "white"}}>
+                        <NumberInputField height="100%" borderRadius={5} />
+                        <NumberInputStepper style={{ background: "white", borderColor: "white" }}>
                             <NumberIncrementStepper>
                                 <div>
-                                    <img src={rightArrow} alt="" className='rightarrowup'/>
+                                    <img src={rightArrow} alt="" className='rightarrowup' />
                                 </div>
                             </NumberIncrementStepper>
                             <NumberDecrementStepper>
                                 <div>
-                                    <img src={rightArrow} alt="" className='rightarrowdown'/>
+                                    <img src={rightArrow} alt="" className='rightarrowdown' />
                                 </div>
                             </NumberDecrementStepper>
                         </NumberInputStepper>
                     </NumberInput>
-                }
+                    {props.vote &&
+                        <NumberInput
+                            variant='filled'
+                            height="100%"
+                            width={100}
+                            min={0}
+                            value={value2}
+                            onChange={(val) => handleChange2(val)}
+                        >
+                            <NumberInputField height="100%" borderRadius={5} />
+                            <NumberInputStepper style={{ background: "white" }}>
+                                <NumberIncrementStepper>
+                                    <div>
+                                        <img src={rightArrow} alt="" className='rightarrowup' />
+                                    </div>
+                                </NumberIncrementStepper>
+                                <NumberDecrementStepper>
+                                    <div>
+                                        <img src={rightArrow} alt="" className='rightarrowdown' />
+                                    </div>
+                                </NumberDecrementStepper>
+                            </NumberInputStepper>
+                        </NumberInput>
+                    }
+                </div>
             </div>
-        </div>
         </>
     )
 }

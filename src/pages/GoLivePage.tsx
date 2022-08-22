@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react'
+import { LineWobble } from '@uiball/loaders'
+import { useNavigate } from 'react-router-dom';
+import { useWeb3React } from "@web3-react/core";
 import '../styles/App.css'
 import '../styles/CreateDao.css'
 import '../styles/Dashboard.css'
 import '../styles/Modal.css'
 import '../styles/Sidebar.css'
-import { useWeb3React } from "@web3-react/core";
-import { factoryCall } from 'connection/DaoFactoryCall'
 import BasicsComponent from '../components/BasicsComponent'
 import TokenComponent from '../components/TokenComponent'
 import SettingsComponent from '../components/SettingsComponent'
-import { LineWobble } from '@uiball/loaders'
-import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'state/hooks'
 import {
   Modal,
@@ -100,11 +99,12 @@ const GoLivePage = (props: Web3AuthPropType) => {
     console.log("DEploying GOv")
     console.log(deployedTokenAddress)
     const creatingGovernor = factory && deployedTokenAddress !== null && await factory.createGovernor(title, deployedTokenAddress, title, purpose, longDesc, shortDesc);
-    await creatingGovernor.wait();
+    const transactionInfo = await creatingGovernor.wait();
+    addTransaction(creatingGovernor, transactionInfo)
     const governorAddress = await factory?.deployedGovernorAddress();
     await addToken(deployedTokenAddress);
     setisLoading(false)
-    saveObject();
+    // saveObject();
     dispatch(updatedeployedGovernorAddress(governorAddress))
     setdeployedGovernor(governorAddress);
   }
@@ -121,7 +121,7 @@ const GoLivePage = (props: Web3AuthPropType) => {
         console.log("token address is:", tokenAddress)
         dispatch(updatedeployedTokenAddress(tokenAddress))
         DeployDAO(tokenAddress)
-        localStorage.removeItem('maxStep');
+        // localStorage.removeItem('maxStep');
       }
     }
   }
