@@ -36,6 +36,7 @@ const TokenPage = (props: Web3AuthPropType) => {
     const web3authAddress = useAppSelector((state) => state.proposal.Web3AuthAddress)
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [fileUploadFailed, setFileUploadFailed] = useState(false);
 
     async function handleUpload(event: any) {
         console.log('Handle upload.....')
@@ -45,9 +46,16 @@ const TokenPage = (props: Web3AuthPropType) => {
         }
         setFile(files[0]);
         setLoading(true);
-        const result: any = await fileUpload(files[0]);
+        try {
+            const result: any = await fileUpload(files[0]);
+            setFileUploadFailed(false);
+            dispatch(updateIconImgPath(result));
+        } catch (e) {
+            console.log("try again")
+            setFileUploadFailed(true);
+            setFile(null);
+        }
         setLoading(false);
-        dispatch(updateIconImgPath(result));
     }
 
     function handleRemoveCover() {
@@ -284,7 +292,11 @@ const TokenPage = (props: Web3AuthPropType) => {
                         {!loading && !file && <div id="upload-file">
                             <button>
                                 <input type="file" style={{ opacity: "0", position: "relative", zIndex: 2 }} onChange={handleUpload} />
+                                {fileUploadFailed &&
+                                    <p style={{ margin: "30px 0 0 -60px" }}> Try again...</p>
+                                }
                             </button>
+
                         </div>}
                         {!loading && file && <ImageThumb image={file} />}
                     </div>

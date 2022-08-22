@@ -104,7 +104,7 @@ const GoLivePage = (props: Web3AuthPropType) => {
     const governorAddress = await factory?.deployedGovernorAddress();
     await addToken(deployedTokenAddress);
     setisLoading(false)
-    saveObject();
+    saveObject(deployedTokenAddress);
     dispatch(updatedeployedGovernorAddress(governorAddress))
     setdeployedGovernor(governorAddress);
   }
@@ -128,7 +128,7 @@ const GoLivePage = (props: Web3AuthPropType) => {
 
   const showHeader = !!web3authAddress ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
 
-  const saveObject = async () => {
+  const saveObject = async (deployedTokenAddress: string) => {
     const data = {
       title: title,
       purpose: purpose,
