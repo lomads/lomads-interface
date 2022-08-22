@@ -10,7 +10,7 @@ const useStepRouter = (currentStep: number) => {
 
     useEffect(() => {
         const prevStepNumber = parseInt(localStorage.getItem('stepNumber') ?? '1');
-        const maxStep = parseInt(localStorage.getItem('maxStep') ?? '0');
+        const maxStep = parseInt(localStorage.getItem('maxStep') ?? '2');
 
         if (currentStep <= maxStep) {
             dispatch(updateStepNumber(currentStep))

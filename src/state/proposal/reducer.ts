@@ -129,7 +129,7 @@ const proposalSlice = createSlice({
     updateStepNumber(state, action) {
       localStorage.setItem('stepNumber', action.payload);
 
-      const maxStep = parseInt(localStorage.getItem('maxStep') ?? '0');
+      const maxStep = parseInt(localStorage.getItem('maxStep') ?? '2');
       if (maxStep < action.payload) {
         localStorage.setItem('maxStep', action.payload);
       }
