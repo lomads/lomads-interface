@@ -1,13 +1,13 @@
-//Governor: 0x6580801bd41a9B3dc3E99a93e5E328F401f1528a
-// token: 0x8eBfD16CDe9672566D47eed8612FfbB922A3Fc75
-//factory : 0xd940F6323F8287F49baE5dE14B6CbaCA641a48F5
+//Governor: 0x576e6a5622dfE1Da0769b8e8072DB29E6303A704
+// token: 0x25Ca786741Cb26fD9A03fBD9487f5e4535E6a12f
+//factory : 0xb75eC48cE7b47b27772870AE4Ad9712193F1A6A6
 import { ethers } from "ethers";
 import { ABI } from "abis/DaoFactory";
 import { SafeEventEmitterProvider } from "@web3auth/base";
 
 
 export const factoryCall= async (provider: any) =>{
-    const factoryAddress = "0x50DABA7aFEACCDc3234875E82152F09174C8f481";
+    const factoryAddress = "0xb75eC48cE7b47b27772870AE4Ad9712193F1A6A6";
     let signer = provider?.getSigner();
     const factory = new ethers.Contract(factoryAddress,ABI,signer);
     return factory;

@@ -106,7 +106,7 @@ const GoLivePage = (props: Web3AuthPropType) => {
   };
 
   const DeployDAO = async (deployedTokenAddress: string) => {
-    console.log("DEploying GOv");
+    console.log("DEploying Goerli");
     console.log(deployedTokenAddress);
     const creatingGovernor =
       factory &&
@@ -124,7 +124,7 @@ const GoLivePage = (props: Web3AuthPropType) => {
     const governorAddress = await factory?.deployedGovernorAddress();
     await addToken(deployedTokenAddress);
     setisLoading(false);
-    // saveObject();
+    saveObject();
     dispatch(updatedeployedGovernorAddress(governorAddress));
     setdeployedGovernor(governorAddress);
   };

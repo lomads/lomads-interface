@@ -103,6 +103,9 @@ export default function Modal({
 }: ModalProps) {
   const fadeTransition = useTransition(isOpen, null, {
     config: { duration: 0 },
+    from: { opacity: 0 },
+    enter: { opacity: 1 },
+    leave: { opacity: 0 },
   });
 
   const [{ y }, set] = useSpring(() => ({
