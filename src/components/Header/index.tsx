@@ -118,7 +118,6 @@ const UniIcon = styled.div`
   position: relative;
 `
 export default function Header() {
-  console.log('TIGER header')
   const { account, chainId, connector } = useWeb3React()
 
   const chainAllowed = chainId && isChainAllowed(connector, chainId)
@@ -134,7 +133,6 @@ export default function Header() {
   } = CHAIN_INFO[!chainId || !chainAllowed ? SupportedChainId.MAINNET : chainId]
   const balance = userEthBalance?.toSignificant(3);
   const symbol = nativeCurrency.symbol;
-  console.log('TIGER', balance, symbol)
   return (
     <HeaderFrame showBackground={scrollY > 45}>
       <Title href=".">

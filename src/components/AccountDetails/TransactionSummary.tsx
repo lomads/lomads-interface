@@ -139,7 +139,7 @@ function WrapSummary({ info: { chainId, currencyAmountRaw, unwrapped } }: { info
 function DepositLiquidityStakingSummary({hash, info}: { hash:string, info: DepositLiquidityStakingTransactionInfo }) {
   // not worth rendering the tokens since you can should no longer deposit liquidity in the staking contracts
   // todo: deprecate and delete the code paths that allow this, show user more information
-  return <Trans>{formatAddress(hash)}</Trans>
+  return <span>{formatAddress(hash)}</span>
 }
 
 function WithdrawLiquidityStakingSummary(_: { info: WithdrawLiquidityStakingTransactionInfo }) {
