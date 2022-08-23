@@ -4,34 +4,33 @@ import SettingsPage from './SettingsPage'
 import TokenPage from './TokenPage'
 import GoLivePage from './GoLivePage'
 import Dashboard from './Dashboard'
-import { sidebarPropType, Web3AuthPropType } from '../types'
 
-const SidebarPage = (props: Web3AuthPropType) => {
+const SidebarPage = (props: any) => {
 
   const renderPage = () => {
     if (props.page === "Basics") {
       return (
         <div>
-          <BasicsPage web3Provider={props.web3Provider} />
+          <BasicsPage />
         </div>
       );
     } else if (props.page === "Token") {
       return (
         <div>
-          <TokenPage web3Provider={props.web3Provider} />
+          <TokenPage />
         </div>
       );
     }
     else if (props.page === "Settings") {
       return (
         <div>
-          <SettingsPage web3Provider={props.web3Provider} />
+          <SettingsPage />
         </div>
       );
     } else if (props.page === "Go Live") {
       return (
         <div>
-          <GoLivePage web3Provider={props.web3Provider} />
+          <GoLivePage />
         </div>
       );
     } else if (props.page === "Dao") {
