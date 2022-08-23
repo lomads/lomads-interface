@@ -396,7 +396,9 @@
   align-items: center;
   cursor: pointer;
 }
-
+#upload-file button {
+  cursor: pointer;
+}
 .nextButton {
     right: 22%;
     height: 40px;

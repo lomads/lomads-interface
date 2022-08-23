@@ -289,14 +289,16 @@ const TokenPage = (props: Web3AuthPropType) => {
                             strokeWidth={2}
                             strokeWidthSecondary={2}
                         />}
-                        {!loading && !file && <div id="upload-file">
-                            <button>
-                                <input type="file" style={{ opacity: "0", position: "relative", zIndex: 2 }} onChange={handleUpload} />
-                                {fileUploadFailed &&
-                                    <p style={{ margin: "30px 0 0 -60px" }}> Try again...</p>
-                                }
-                            </button>
+                        {!loading && !file && <div>
+                            <div id="upload-file">
+                                <button>
+                                    <input type="file" style={{ opacity: "0", position: "relative", zIndex: 2}} onChange={handleUpload} />
+                                </button>
 
+                            </div>
+                            {fileUploadFailed &&
+                                <p style={{ margin: "10px 0 0 -10px" }}> Try again...</p>
+                            }
                         </div>}
                         {!loading && file && <ImageThumb image={file} />}
                     </div>

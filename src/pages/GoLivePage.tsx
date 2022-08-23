@@ -39,6 +39,7 @@ const GoLivePage = (props: Web3AuthPropType) => {
   const { provider, connector } = useWeb3React();
   const [deployedGovernor, setdeployedGovernor] = useState<string>("");
   const [isLoading, setisLoading] = useState(false);
+  const [isTokenDeploy, setIsTokenDeploy] = useState(false)
   const title = useAppSelector((state) => state.proposal.title);
   const purpose = useAppSelector((state) => state.proposal.purpose);
   const deployedTokenAddress = useAppSelector((state) => state.proposal.deployedTokenAddress);
@@ -111,6 +112,7 @@ const GoLivePage = (props: Web3AuthPropType) => {
   const createToken = async () => {
     if (factory) {
       setisLoading(true);
+      setIsTokenDeploy(false)
       onClose()
       const creatingToken = await factory.createToken(tokenTitle, tokenSymbol, supply, holder, explain);
       const transactionInfo = await creatingToken.wait();
@@ -120,8 +122,10 @@ const GoLivePage = (props: Web3AuthPropType) => {
       if (tokenAddress) {
         console.log("token address is:", tokenAddress)
         dispatch(updatedeployedTokenAddress(tokenAddress))
+        setIsTokenDeploy(true)
         DeployDAO(tokenAddress)
         // localStorage.removeItem('maxStep');
+
       }
     }
   }
@@ -187,7 +191,7 @@ const GoLivePage = (props: Web3AuthPropType) => {
             isLoading ? (
               <div>
                 <div className={"subItemHeader"} style={{ paddingBottom: 20 }}>
-                  Hold on we are deploying your Governor and Token
+                  {!isTokenDeploy ? "Hold on we are deploying Token" : "Hold on we are deploying Governor"}
                 </div>
                 <LineWobble size={750} color="#C94B32" />
               </div>) : (null)
