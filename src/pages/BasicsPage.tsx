@@ -35,6 +35,7 @@ const BasicsPage = (props: Web3AuthPropType) => {
     const shortDesc = useAppSelector((state) => state.proposal.shortDesc)
     const longDesc = useAppSelector((state) => state.proposal.longDesc)
     const [file, setFile] = useState(null);
+    const [fileUploadFailed, setFileUploadFailed] = useState(false);
     const [loading, setLoading] = useState(false);
     const web3authAddress = useAppSelector((state) => state.proposal.Web3AuthAddress)
     const navigate = useNavigate();
@@ -56,6 +57,7 @@ const BasicsPage = (props: Web3AuthPropType) => {
     }, [errors]);
 
     async function handleUpload(event: any) {
+        
         console.log('Handle upload.....')
         const files = event.target.files;
         if (!files || files.length === 0) {
@@ -63,9 +65,16 @@ const BasicsPage = (props: Web3AuthPropType) => {
         }
         setFile(files[0]);
         setLoading(true);
-        const result: any = await fileUpload(files[0]);
+        try{
+            const result: any = await fileUpload(files[0]);
+            setFileUploadFailed(false);
+            dispatch(updateCoverImgPath(result));
+        } catch (e) {
+            console.log("try again")
+            setFileUploadFailed(true);
+            setFile(null);
+        }
         setLoading(false);
-        dispatch(updateCoverImgPath(result));
     }
 
     function handleRemoveCover() {
@@ -234,6 +243,9 @@ const BasicsPage = (props: Web3AuthPropType) => {
                         {!loading && !file && <div id="upload-file">
                             <button>
                                 <input type="file" style={{ opacity: "0", position: "relative", zIndex: 2 }} onChange={handleUpload} />
+                                {fileUploadFailed && 
+                                    <p style={{margin: "30px 0 0 -60px"}}> Try again...</p>
+                                }
                             </button>
                         </div>}
                         {!loading && file && <ImageThumb image={file} />}

@@ -27,6 +27,7 @@ export interface ProposalState {
   readonly voteDurDay: number
   readonly voteDurHour: number
   readonly stepNumber: number
+  readonly decimals: string
 }
 
 const initialState: ProposalState = {
@@ -53,7 +54,8 @@ const initialState: ProposalState = {
   minApproval: 0,
   voteDurDay: 0,
   voteDurHour: 0,
-  stepNumber: 0
+  stepNumber: 0,
+  decimals: ''
 }
 
 const proposalSlice = createSlice({
@@ -138,9 +140,12 @@ const proposalSlice = createSlice({
     },
     updateTemplateVal(state, action) {
       state.templateVal = action.payload
+    },
+    updateDecimals(state,action) {
+      state.decimals = action.payload
     }
   },
 })
 
-export const { updateTitle, updatePurpose,updatetokenSymbol,updatetokenTitle, updateSupply, updatedeployedTokenAddress, updateShortDesc, updateLongDesc, updateExplain, updateHolder, updatedeployedGovernorAddress,updateWeb3AuthAddress,updateWeb3AuthAddressPvtKey, updateCoverImgPath, updateIconImgPath, updateTags, updateCommunityTags, updateTemplate, updateMinApproval, updateSupport, updateVoteDurDay, updateVoteDurHour, updateStepNumber, updateTemplateVal } = proposalSlice.actions
+export const { updateTitle, updatePurpose,updatetokenSymbol,updatetokenTitle, updateSupply, updatedeployedTokenAddress, updateShortDesc, updateLongDesc, updateExplain, updateHolder, updatedeployedGovernorAddress,updateWeb3AuthAddress,updateWeb3AuthAddressPvtKey, updateCoverImgPath, updateIconImgPath, updateTags, updateCommunityTags, updateTemplate, updateMinApproval, updateSupport, updateVoteDurDay, updateVoteDurHour, updateStepNumber, updateTemplateVal,updateDecimals } = proposalSlice.actions
 export default proposalSlice.reducer

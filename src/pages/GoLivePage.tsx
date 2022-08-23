@@ -69,6 +69,9 @@ const GoLivePage = (props: Web3AuthPropType) => {
   );
   const coverImgPath = useAppSelector((state) => state.proposal.coverImgPath);
   const iconImgPath = useAppSelector((state) => state.proposal.iconImgPath);
+  const tokenAddress = useAppSelector(
+    (state) => state.proposal.deployedTokenAddress
+  );
   const { save } = useNewMoralisObject("DAOInfo");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const addTransaction = useTransactionAdder();
@@ -108,6 +111,8 @@ const GoLivePage = (props: Web3AuthPropType) => {
   const DeployDAO = async (deployedTokenAddress: string) => {
     console.log("DEploying Goerli");
     console.log(deployedTokenAddress);
+    onClose();
+    setisLoading(true);
     const creatingGovernor =
       factory &&
       deployedTokenAddress !== null &&
@@ -124,7 +129,7 @@ const GoLivePage = (props: Web3AuthPropType) => {
     const governorAddress = await factory?.deployedGovernorAddress();
     await addToken(deployedTokenAddress);
     setisLoading(false);
-    saveObject();
+    saveObject(deployedTokenAddress);
     dispatch(updatedeployedGovernorAddress(governorAddress));
     setdeployedGovernor(governorAddress);
   };
@@ -158,7 +163,7 @@ const GoLivePage = (props: Web3AuthPropType) => {
     <Header />
   );
 
-  const saveObject = async () => {
+  const saveObject = async (deployedTokenAddress: string) => {
     const data = {
       title: title,
       purpose: purpose,
@@ -193,6 +198,14 @@ const GoLivePage = (props: Web3AuthPropType) => {
         );
       },
     });
+  };
+
+  const Deploy = () => {
+    if (tokenAddress) {
+      DeployDAO(tokenAddress);
+    } else {
+      createToken();
+    }
   };
 
   return (
@@ -275,7 +288,7 @@ const GoLivePage = (props: Web3AuthPropType) => {
                 variant="solid"
                 colorScheme="#C94B32"
                 bg="#C94B32"
-                onClick={createToken}
+                onClick={Deploy}
                 width="180px"
                 color="#FFFFFF"
               >

@@ -7,9 +7,8 @@ import { TOKEN_ABI } from "abis/DaoToken";
 
 
 export const tokenCall= async (provider: any,_tokenAddress:string) =>{
-    const tokenAddress = _tokenAddress;
     const signer = provider?.getSigner();
-    const token = new ethers.Contract(tokenAddress,TOKEN_ABI,signer);
+    const token = new ethers.Contract(_tokenAddress,TOKEN_ABI,signer);
     return token;
 }
 

@@ -21,10 +21,14 @@ try {
 
 export const fileUpload = async (coverImg: any) => {
   return new Promise(async(resolve, reject)=> {
-  
     if(ipfs) {
-      const result = await ipfs.add(coverImg);
-      resolve(result.path);
+      try{
+        const result = await ipfs.add(coverImg);
+        resolve(result.path);
+      } catch (e) {
+        console.log(e)
+        reject()
+      }
     }
   });
 }
