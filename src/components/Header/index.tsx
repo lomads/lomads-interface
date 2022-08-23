@@ -11,6 +11,7 @@ import { useDarkModeManager } from 'state/user/hooks'
 import styled from 'styled-components/macro'
 import { isChainAllowed, switchChain } from 'utils/switchChain'
 import Web3Status from '../Web3Status'
+import { Spacer } from '@chakra-ui/react'
 // import NetworkSelector from './NetworkSelector'
 
 const HeaderFrame = styled.div<{ showBackground: boolean }>`
@@ -151,7 +152,7 @@ export default function Header() {
             {chainAllowed && userEthBalance ? (
               <BalanceText style={{ flexShrink: 0, userSelect: 'none' }} pl="0.75rem" pr="0.5rem" fontWeight={500}>
                 <Trans>
-                  {userEthBalance?.toSignificant(3)} {nativeCurrencySymbol}
+                  <span>{userEthBalance?.toSignificant(3)}</span> <span>{nativeCurrencySymbol}</span>
                 </Trans>
               </BalanceText>
             ) : null}
