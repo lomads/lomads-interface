@@ -118,7 +118,7 @@ const UniIcon = styled.div`
   position: relative;
 `
 export default function Header() {
-  console.log('midas header')
+  console.log('TIGER header')
   const { account, chainId, connector } = useWeb3React()
 
   const chainAllowed = chainId && isChainAllowed(connector, chainId)
