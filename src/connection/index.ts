@@ -84,7 +84,7 @@ const [web3CoinbaseWallet, web3CoinbaseWalletHooks] = initializeConnector<Coinba
       actions,
       options: {
         url: INFURA_NETWORK_URLS[SupportedChainId.MAINNET],
-        appName: '<app-name>',
+        // appName: '<app-name>',
         // appLogoUrl: UNISWAP_LOGO_URL,
         // reloadOnDisconnect: false,
       },

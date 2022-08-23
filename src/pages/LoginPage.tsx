@@ -7,7 +7,6 @@ import '../styles/App.css'
 import '../styles/CreateDao.css'
 import '../styles/Dashboard.css'
 import '../styles/Modal.css'
-import { Web3AuthPropType } from 'types';
 import { Connector } from '@web3-react/types'
 import Header from 'components/Header';
 import { updateSelectedWallet } from 'state/user/reducer'
@@ -23,7 +22,7 @@ const WALLET_VIEWS = {
     PENDING: 'pending',
 }
 
-const LoginPage = (props: Web3AuthPropType) => {
+const LoginPage = (props: any) => {
     const dispatch = useAppDispatch()
     const navigate = useNavigate()
     const toggleWalletModal = useToggleWalletModal()

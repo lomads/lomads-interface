@@ -4,7 +4,6 @@
 //factory : 0xb75eC48cE7b47b27772870AE4Ad9712193F1A6A6
 import { ethers } from "ethers";
 import { ABI } from "abis/DaoFactory";
-import { SafeEventEmitterProvider } from "@web3auth/base";
 
 
 export const factoryCall= async (provider: any) =>{
@@ -12,21 +11,6 @@ export const factoryCall= async (provider: any) =>{
     let signer = provider?.getSigner();
     const factory = new ethers.Contract(factoryAddress,ABI,signer);
     return factory;
-}
-
-let web3authProvider: SafeEventEmitterProvider | null;
-
-export const setWeb3authProvider = (provider: SafeEventEmitterProvider | null) =>{
-    web3authProvider = provider;
-}
-
-export const getweb3authProvider = () =>{
-    const factoryAddress = "0x50DABA7aFEACCDc3234875E82152F09174C8f481";
-    let provider = new ethers.providers.Web3Provider(web3authProvider as any)
-    const signer = provider?.getSigner();
-    const factory = new ethers.Contract(factoryAddress,ABI,signer);
-    return factory;
-
 }
 
 export const deploywebToken = (provider: any,pvtKey: string) =>{

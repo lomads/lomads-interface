@@ -18,12 +18,11 @@ import { useAppDispatch } from 'state/hooks'
 import { updatetokenTitle, updatetokenSymbol, updateExplain, updateSupply, updateHolder, updateIconImgPath, updateStepNumber } from 'state/proposal/reducer'
 import { useAppSelector } from 'state/hooks'
 import Header from 'components/Header';
-import Navbar from 'components/Web3AuthNavbar/Navbar'
-import { imageType, Web3AuthPropType } from 'types'
+import { imageType } from 'types'
 import { fileUpload } from '../utils/ipfs'
 import useStepRouter from 'hooks/useStepRouter'
 
-const TokenPage = (props: Web3AuthPropType) => {
+const TokenPage = () => {
     useStepRouter(4);
 
     const dispatch = useAppDispatch()
@@ -109,7 +108,7 @@ const TokenPage = (props: Web3AuthPropType) => {
     const ImageThumb: React.FC<imageType> = ({ image }) => {
         return <img src={URL.createObjectURL(image)} alt={image.name} width="300" height={"300"} style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: '100%' }} />;
     };
-    const showHeader = !!web3authAddress ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
+    const showHeader = <Header />;
     return (
         <>
             <div className='absolute top-0 right-0'>
