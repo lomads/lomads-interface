@@ -150,9 +150,7 @@ export default function Header() {
           <AccountElement active={!!account}>
             {chainAllowed && userEthBalance ? (
               <BalanceText style={{ flexShrink: 0, userSelect: 'none' }} pl="0.75rem" pr="0.5rem" fontWeight={500}>
-                <Trans>
-                  {balance} {symbol}
-                </Trans>
+                {balance}
               </BalanceText>
             ) : null}
             <Web3Status />
