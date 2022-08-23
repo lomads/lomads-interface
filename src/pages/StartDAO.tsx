@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Header from 'components/Header';
-import Navbar from 'components/Web3AuthNavbar/Navbar';
 import { useAppDispatch, useAppSelector } from 'state/hooks'
-import { Web3AuthPropType } from 'types';
 import { StepBlock } from '../components/sub/StepBlock';
 import { StepBlockOptional } from '../components/sub/StepBlockOptional';
 import { updateStepNumber } from 'state/proposal/reducer'
@@ -12,10 +10,10 @@ import '../styles/Dashboard.css'
 import '../styles/Modal.css'
 import '../styles/Sidebar.css'
 
-const StartDAO = (props: Web3AuthPropType) => {
+const StartDAO = () => {
     const dispatch = useAppDispatch()
     const web3authAddress = useAppSelector((state) => state.proposal.Web3AuthAddress)
-    const showHeader = !!web3authAddress ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
+    const showHeader = <Header />;
 
     useEffect(() => {
         dispatch(updateStepNumber(1))

@@ -12,14 +12,12 @@ import ChangeComponent from '../components/sub/ChangeComponent'
 import SliderThumbWithTooltip from 'components/sub/SupportSlider'
 import ApprovalSliderThumbWithTooltip from 'components/sub/ApprovalSlider'
 import Header from 'components/Header';
-import Navbar from 'components/Web3AuthNavbar/Navbar'
 import { useAppSelector, useAppDispatch } from 'state/hooks'
-import { Web3AuthPropType } from 'types'
 import { updateTemplate, updateTemplateVal} from 'state/proposal/reducer'
 import { updateStepNumber } from 'state/proposal/reducer'
 import useStepRouter from 'hooks/useStepRouter';
 
-const SettingsPage = (props: Web3AuthPropType) => {
+const SettingsPage = () => {
     useStepRouter(3);
     
     const dispatch = useAppDispatch();
@@ -29,7 +27,7 @@ const SettingsPage = (props: Web3AuthPropType) => {
     const templateVal = useAppSelector((state) => state.proposal.templateVal)
     const voteDurDay = useAppSelector((state) => state.proposal.voteDurDay)
     const voteDurHour = useAppSelector((state) => state.proposal.voteDurHour)
-    const showHeader = !!web3authAddress ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
+    const showHeader = <Header />;
 
     const TEMPLATE = [
         "template 1",

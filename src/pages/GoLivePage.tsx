@@ -23,16 +23,14 @@ import {
 } from '@chakra-ui/react'
 import { updatedeployedGovernorAddress, updatedeployedTokenAddress } from '../state/proposal/reducer'
 import Header from 'components/Header';
-import Navbar from 'components/Web3AuthNavbar/Navbar'
 import { useNewMoralisObject } from "react-moralis";
-import { Web3AuthPropType } from 'types'
 import useStepRouter from 'hooks/useStepRouter'
 import { useTransactionAdder } from 'state/transactions/hooks'
 import { useDAOContract } from 'hooks/useContract';
 import { TransactionInfo } from 'state/transactions/types'
 import { TransactionType } from 'state/transactions/types'
 
-const GoLivePage = (props: Web3AuthPropType) => {
+const GoLivePage = () => {
   useStepRouter(5);
 
   const navigate = useNavigate()
@@ -133,7 +131,7 @@ const GoLivePage = (props: Web3AuthPropType) => {
     }
   }
 
-  const showHeader = !!web3authAddress ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
+  const showHeader = <Header />;
 
   const saveObject = async (deployedTokenAddress: string) => {
     const data = {

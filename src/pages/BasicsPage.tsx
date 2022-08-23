@@ -15,20 +15,18 @@ import '../styles/CreateDao.css'
 import '../styles/Dashboard.css'
 import '../styles/Modal.css'
 import '../styles/Sidebar.css'
-import { imageType, tagType, Web3AuthPropType } from '../types';
+import { imageType } from '../types';
 import { useAppDispatch } from 'state/hooks'
 import { updateTitle, updatePurpose, updateShortDesc, updateLongDesc, updateCoverImgPath, updateStepNumber } from 'state/proposal/reducer'
 import { useAppSelector } from 'state/hooks'
 import CommunityTag from './CommunityTag';
 import KeywordTag from './KeywordTag';
 import Header from 'components/Header';
-import Navbar from 'components/Web3AuthNavbar/Navbar';
 import { fileUpload } from '../utils/ipfs'
 import useStepRouter from 'hooks/useStepRouter';
 
-const BasicsPage = (props: Web3AuthPropType) => {
+const BasicsPage = () => {
     useStepRouter(2);
-
     const dispatch = useAppDispatch()
     const title = useAppSelector((state) => state.proposal.title)
     const purpose = useAppSelector((state) => state.proposal.purpose)
@@ -108,7 +106,7 @@ const BasicsPage = (props: Web3AuthPropType) => {
     const ImageThumb: React.FC<imageType> = ({ image }) => {
         return <img src={URL.createObjectURL(image)} alt={image.name} width="300" height={"300"} style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: '100%' }} />;
     };
-    const showHeader = !!web3authAddress ? <Navbar web3Provider={props.web3Provider} /> : <Header />;
+    const showHeader = <Header />;
     return (
         <>
             <div className='absolute top-0 right-0'>
