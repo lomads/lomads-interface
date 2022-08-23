@@ -171,7 +171,7 @@ function Web3StatusInner() {
         {hasPendingTransactions ? (
           <RowBetween>
             <Text>
-              <Trans>{pending?.length} Pending</Trans>
+              {pending?.length} Pending
             </Text>{' '}
             <Loader stroke="white" />
           </RowBetween>
