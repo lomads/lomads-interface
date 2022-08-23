@@ -131,6 +131,8 @@ export default function Header() {
   const {
     nativeCurrency: { symbol: nativeCurrencySymbol },
   } = CHAIN_INFO[!chainId || !chainAllowed ? SupportedChainId.MAINNET : chainId]
+  console.log("midas account", account, chainAllowed, chainId)
+  console.log("midas header", userEthBalance, nativeCurrencySymbol)
 
   return (
     <HeaderFrame showBackground={scrollY > 45}>
