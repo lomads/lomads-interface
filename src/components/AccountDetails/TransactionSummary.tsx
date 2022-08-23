@@ -25,6 +25,7 @@ import {
   WithdrawLiquidityStakingTransactionInfo,
   WrapTransactionInfo,
 } from '../../state/transactions/types'
+import { formatAddress } from 'utils'
 
 function formatAmount(amountRaw: string, decimals: number, sigFigs: number): string {
   return new Fraction(amountRaw, JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(decimals))).toSignificant(sigFigs)
@@ -135,10 +136,10 @@ function WrapSummary({ info: { chainId, currencyAmountRaw, unwrapped } }: { info
   }
 }
 
-function DepositLiquidityStakingSummary(_: { info: DepositLiquidityStakingTransactionInfo }) {
+function DepositLiquidityStakingSummary({hash, info}: { hash:string, info: DepositLiquidityStakingTransactionInfo }) {
   // not worth rendering the tokens since you can should no longer deposit liquidity in the staking contracts
   // todo: deprecate and delete the code paths that allow this, show user more information
-  return <Trans>Deposit liquidity</Trans>
+  return <Trans>{formatAddress(hash)}</Trans>
 }
 
 function WithdrawLiquidityStakingSummary(_: { info: WithdrawLiquidityStakingTransactionInfo }) {
@@ -267,7 +268,7 @@ function SwapSummary({ info }: { info: ExactInputSwapTransactionInfo | ExactOutp
   }
 }
 
-export function TransactionSummary({ info }: { info: TransactionInfo }) {
+export function TransactionSummary({hash, info }: {hash: string, info: TransactionInfo } ) {
   switch (info.type) {
     case TransactionType.ADD_LIQUIDITY_V3_POOL:
       return <AddLiquidityV3PoolSummary info={info} />
@@ -279,7 +280,7 @@ export function TransactionSummary({ info }: { info: TransactionInfo }) {
       return <ClaimSummary info={info} />
 
     case TransactionType.DEPOSIT_LIQUIDITY_STAKING:
-      return <DepositLiquidityStakingSummary info={info} />
+      return <DepositLiquidityStakingSummary hash={hash} info={info} />
 
     case TransactionType.WITHDRAW_LIQUIDITY_STAKING:
       return <WithdrawLiquidityStakingSummary info={info} />

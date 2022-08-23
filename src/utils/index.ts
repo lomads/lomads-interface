@@ -13,6 +13,10 @@ export function isAddress(value: any): string | false {
   }
 }
 
+export const formatAddress = (address: string ) => {
+  return address.slice(0, 8) + '...' + address.slice(-6);
+}
+
 // shorten the checksummed version of the input address to have 0x + 4 characters at start and end
 export function shortenAddress(address: string, chars = 4): string {
   const parsed = isAddress(address)

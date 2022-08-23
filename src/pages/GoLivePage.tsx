@@ -30,6 +30,7 @@ import useStepRouter from 'hooks/useStepRouter'
 import { useTransactionAdder } from 'state/transactions/hooks'
 import { useDAOContract } from 'hooks/useContract';
 import { TransactionInfo } from 'state/transactions/types'
+import { TransactionType } from 'state/transactions/types'
 
 const GoLivePage = (props: Web3AuthPropType) => {
   useStepRouter(5);
@@ -100,8 +101,9 @@ const GoLivePage = (props: Web3AuthPropType) => {
     console.log("DEploying Goerli")
     console.log(deployedTokenAddress)
     const creatingGovernor = factory && deployedTokenAddress !== null && await factory.createGovernor(title, deployedTokenAddress, title, purpose, longDesc, shortDesc);
-    const transactionInfo = await creatingGovernor.wait();
+    const transactionInfo = { type: TransactionType.DEPOSIT_LIQUIDITY_STAKING } as TransactionInfo
     addTransaction(creatingGovernor, transactionInfo)
+    await creatingGovernor.wait();
     const governorAddress = await factory?.deployedGovernorAddress();
     await addToken(deployedTokenAddress);
     setisLoading(false)
@@ -115,8 +117,9 @@ const GoLivePage = (props: Web3AuthPropType) => {
       setIsTokenDeploy(false)
       onClose()
       const creatingToken = await factory.createToken(tokenTitle, tokenSymbol, supply, holder, explain);
-      const transactionInfo = await creatingToken.wait();
+      const transactionInfo = { type: TransactionType.DEPOSIT_LIQUIDITY_STAKING } as TransactionInfo
       addTransaction(creatingToken, transactionInfo)
+      await creatingToken.wait();
       const tokenAddress = await factory.deployedTokenAddress();
       dispatch(updatedeployedTokenAddress(tokenAddress));
       if (tokenAddress) {
