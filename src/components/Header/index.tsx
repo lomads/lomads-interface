@@ -11,7 +11,6 @@ import { useDarkModeManager } from 'state/user/hooks'
 import styled from 'styled-components/macro'
 import { isChainAllowed, switchChain } from 'utils/switchChain'
 import Web3Status from '../Web3Status'
-import { Spacer } from '@chakra-ui/react'
 // import NetworkSelector from './NetworkSelector'
 
 const HeaderFrame = styled.div<{ showBackground: boolean }>`
@@ -131,11 +130,11 @@ export default function Header() {
   const scrollY = useScrollPosition()
 
   const {
-    nativeCurrency: { symbol: nativeCurrencySymbol },
+    nativeCurrency,
   } = CHAIN_INFO[!chainId || !chainAllowed ? SupportedChainId.MAINNET : chainId]
-  console.log("midas account", account, chainAllowed, chainId)
-  console.log("midas header", userEthBalance, nativeCurrencySymbol)
-
+  const balance = userEthBalance?.toSignificant(3);
+  const symbol = nativeCurrency.symbol;
+  console.log('TIGER', balance, symbol)
   return (
     <HeaderFrame showBackground={scrollY > 45}>
       <Title href=".">
@@ -152,7 +151,7 @@ export default function Header() {
             {chainAllowed && userEthBalance ? (
               <BalanceText style={{ flexShrink: 0, userSelect: 'none' }} pl="0.75rem" pr="0.5rem" fontWeight={500}>
                 <Trans>
-                  <span>{userEthBalance?.toSignificant(3)}</span> <span>{nativeCurrencySymbol}</span>
+                  {balance} {symbol}
                 </Trans>
               </BalanceText>
             ) : null}
