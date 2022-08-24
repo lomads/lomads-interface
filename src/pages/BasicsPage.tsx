@@ -28,7 +28,7 @@ import useStepRouter from 'hooks/useStepRouter';
 
 const BasicsPage = (props: Web3AuthPropType) => {
     useStepRouter(2);
-    
+
     const dispatch = useAppDispatch()
     const title = useAppSelector((state) => state.proposal.title)
     const purpose = useAppSelector((state) => state.proposal.purpose)
@@ -57,7 +57,7 @@ const BasicsPage = (props: Web3AuthPropType) => {
     }, [errors]);
 
     async function handleUpload(event: any) {
-        
+
         console.log('Handle upload.....')
         const files = event.target.files;
         if (!files || files.length === 0) {
@@ -65,7 +65,7 @@ const BasicsPage = (props: Web3AuthPropType) => {
         }
         setFile(files[0]);
         setLoading(true);
-        try{
+        try {
             const result: any = await fileUpload(files[0]);
             setFileUploadFailed(false);
             dispatch(updateCoverImgPath(result));
@@ -240,13 +240,16 @@ const BasicsPage = (props: Web3AuthPropType) => {
                             strokeWidthSecondary={2}
 
                         />}
-                        {!loading && !file && <div id="upload-file">
-                            <button>
-                                <input type="file" style={{ opacity: "0", position: "relative", zIndex: 2 }} onChange={handleUpload} />
-                                {fileUploadFailed && 
-                                    <p style={{margin: "30px 0 0 -60px"}}> Try again...</p>
-                                }
-                            </button>
+                        {!loading && !file && <div>
+                            <div id="upload-file">
+                                <button>
+                                    <input type="file" style={{ opacity: "0", position: "relative", zIndex: 2}} onChange={handleUpload} />
+                                </button>
+
+                            </div>
+                            {fileUploadFailed &&
+                                <p style={{ margin: "10px 0 0 -10px" }}> Try again...</p>
+                            }
                         </div>}
                         {!loading && file && <ImageThumb image={file} />}
                     </div>
