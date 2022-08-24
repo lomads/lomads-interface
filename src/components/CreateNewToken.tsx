@@ -26,12 +26,11 @@ import {
 } from "state/proposal/reducer";
 import { useAppSelector } from "state/hooks";
 import Header from "components/Header";
-import Navbar from "components/Web3AuthNavbar/Navbar";
-import { imageType, Web3AuthPropType } from "types";
 import { fileUpload } from "../utils/ipfs";
 import useStepRouter from "hooks/useStepRouter";
+import { imageType } from "types";
 
-const CreateNewToken = (props: Web3AuthPropType) => {
+const CreateNewToken = () => {
   useStepRouter(4);
 
   const dispatch = useAppDispatch();

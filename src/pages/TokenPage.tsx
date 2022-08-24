@@ -7,25 +7,20 @@ import "../styles/Modal.css";
 import "../styles/Sidebar.css";
 import { useAppSelector } from "state/hooks";
 import Header from "components/Header";
-import Navbar from "components/Web3AuthNavbar/Navbar";
-import { imageType, Web3AuthPropType } from "types";
 import { fileUpload } from "../utils/ipfs";
 import useStepRouter from "hooks/useStepRouter";
 import CreateNewToken from "components/CreateNewToken";
 import UseExistingToken from "components/UseExistingToken";
 
-const TokenPage = (props: Web3AuthPropType) => {
+const TokenPage = () => {
   useStepRouter(4);
   const web3authAddress = useAppSelector(
     (state) => state.proposal.Web3AuthAddress
   );
   const [newToken, setNewToken] = useState<boolean>(true);
 
-  const showHeader = !!web3authAddress ? (
-    <Navbar web3Provider={props.web3Provider} />
-  ) : (
-    <Header />
-  );
+  const showHeader = <Header />;
+
   return (
     <>
       <div className="absolute top-0 right-0">{showHeader}</div>

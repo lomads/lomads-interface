@@ -19,6 +19,7 @@ import { useWeb3React } from "@web3-react/core";
 import { ethers } from "ethers";
 import { TOKEN_ABI } from "abis/DaoToken";
 import { updateTokenAddress } from "state/deploy/reducer";
+import { DotPulse } from "@uiball/loaders";
 
 const UseExistingToken = () => {
   const { provider } = useWeb3React();
@@ -36,6 +37,7 @@ const UseExistingToken = () => {
     (state) => state.proposal.Web3AuthAddress
   );
   const [errors, setErrors] = useState<any>({});
+  const [isSearching, setisSearching] = useState<boolean>(false);
 
   useEffect(() => {
     if (!_.isEmpty(errors)) {
@@ -83,6 +85,7 @@ const UseExistingToken = () => {
   };
 
   const searchDetails = async () => {
+    setisSearching(true);
     const signer = provider?.getSigner();
     const token = new ethers.Contract(
       tokenAddress as string,
@@ -98,6 +101,7 @@ const UseExistingToken = () => {
     dispatch(updateHolder(holder));
     dispatch(updateSupply(supply.toString()));
     console.log(supply.toString());
+    setisSearching(false);
   };
 
   return (
@@ -144,7 +148,13 @@ const UseExistingToken = () => {
                   className={"searchButton"}
                   onClick={searchDetails}
                 >
-                  SEARCH
+                  {!isSearching ? (
+                    "SEARCH"
+                  ) : (
+                    <div className="ml-20">
+                      <DotPulse color="white" />
+                    </div>
+                  )}
                 </button>
               </div>
             </div>

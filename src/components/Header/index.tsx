@@ -129,9 +129,10 @@ export default function Header() {
   const scrollY = useScrollPosition()
 
   const {
-    nativeCurrency: { symbol: nativeCurrencySymbol },
+    nativeCurrency,
   } = CHAIN_INFO[!chainId || !chainAllowed ? SupportedChainId.MAINNET : chainId]
-
+  const balance = userEthBalance?.toSignificant(3);
+  const symbol = nativeCurrency.symbol;
   return (
     <HeaderFrame showBackground={scrollY > 45}>
       <Title href=".">
@@ -147,9 +148,7 @@ export default function Header() {
           <AccountElement active={!!account}>
             {chainAllowed && userEthBalance ? (
               <BalanceText style={{ flexShrink: 0, userSelect: 'none' }} pl="0.75rem" pr="0.5rem" fontWeight={500}>
-                <Trans>
-                  {userEthBalance?.toSignificant(3)} {nativeCurrencySymbol}
-                </Trans>
+                {balance} {symbol}
               </BalanceText>
             ) : null}
             <Web3Status />

@@ -25,6 +25,7 @@ import {
   WithdrawLiquidityStakingTransactionInfo,
   WrapTransactionInfo,
 } from '../../state/transactions/types'
+import { formatAddress } from 'utils'
 
 function formatAmount(amountRaw: string, decimals: number, sigFigs: number): string {
   return new Fraction(amountRaw, JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(decimals))).toSignificant(sigFigs)
@@ -70,12 +71,12 @@ function FormattedCurrencyAmountManaged({
 
 function ClaimSummary({ info: { recipient, uniAmountRaw } }: { info: ClaimTransactionInfo }) {
   return typeof uniAmountRaw === 'string' ? (
-    <Trans>
+    <span>
       Claim <FormattedCurrencyAmount rawAmount={uniAmountRaw} symbol={'UNI'} decimals={18} sigFigs={4} /> for{' '}
       {recipient}
-    </Trans>
+    </span>
   ) : (
-    <Trans>Claim UNI reward for {recipient}</Trans>
+    <span>Claim UNI reward for {recipient}</span>
   )
 }
 
@@ -86,21 +87,21 @@ function SubmitProposalTransactionSummary(_: { info: SubmitProposalTransactionIn
 function ApprovalSummary({ info }: { info: ApproveTransactionInfo }) {
   const token = useToken(info.tokenAddress)
 
-  return <Trans>Approve {token?.symbol}</Trans>
+  return <span>Approve {token?.symbol}</span>
 }
 
 function QueueSummary({ info }: { info: QueueTransactionInfo }) {
   const proposalKey = `${info.governorAddress}/${info.proposalId}`
-  return <Trans>Queue proposal {proposalKey}.</Trans>
+  return <span>Queue proposal {proposalKey}.</span>
 }
 
 function ExecuteSummary({ info }: { info: ExecuteTransactionInfo }) {
   const proposalKey = `${info.governorAddress}/${info.proposalId}`
-  return <Trans>Execute proposal {proposalKey}.</Trans>
+  return <span>Execute proposal {proposalKey}.</span>
 }
 
 function DelegateSummary({ info: { delegatee } }: { info: DelegateTransactionInfo }) {
-  return <Trans>Delegate voting power to {delegatee}</Trans>
+  return <span>Delegate voting power to {delegatee}</span>
 }
 
 function WrapSummary({ info: { chainId, currencyAmountRaw, unwrapped } }: { info: WrapTransactionInfo }) {
@@ -108,7 +109,7 @@ function WrapSummary({ info: { chainId, currencyAmountRaw, unwrapped } }: { info
 
   if (unwrapped) {
     return (
-      <Trans>
+      <span>
         Unwrap{' '}
         <FormattedCurrencyAmount
           rawAmount={currencyAmountRaw}
@@ -117,11 +118,11 @@ function WrapSummary({ info: { chainId, currencyAmountRaw, unwrapped } }: { info
           sigFigs={6}
         />{' '}
         to {native?.symbol ?? 'ETH'}
-      </Trans>
+      </span>
     )
   } else {
     return (
-      <Trans>
+      <span>
         Wrap{' '}
         <FormattedCurrencyAmount
           rawAmount={currencyAmountRaw}
@@ -130,15 +131,15 @@ function WrapSummary({ info: { chainId, currencyAmountRaw, unwrapped } }: { info
           sigFigs={6}
         />{' '}
         to {native?.wrapped?.symbol ?? 'WETH'}
-      </Trans>
+      </span>
     )
   }
 }
 
-function DepositLiquidityStakingSummary(_: { info: DepositLiquidityStakingTransactionInfo }) {
+function DepositLiquidityStakingSummary({hash, info}: { hash:string, info: DepositLiquidityStakingTransactionInfo }) {
   // not worth rendering the tokens since you can should no longer deposit liquidity in the staking contracts
   // todo: deprecate and delete the code paths that allow this, show user more information
-  return <Trans>Deposit liquidity</Trans>
+  return <span>{formatAddress(hash)}</span>
 }
 
 function WithdrawLiquidityStakingSummary(_: { info: WithdrawLiquidityStakingTransactionInfo }) {
@@ -154,9 +155,9 @@ function MigrateLiquidityToV3Summary({
   const quoteCurrency = useCurrency(quoteCurrencyId)
 
   return (
-    <Trans>
+    <span>
       Migrate {baseCurrency?.symbol}/{quoteCurrency?.symbol} liquidity to V3
-    </Trans>
+    </span>
   )
 }
 
@@ -165,9 +166,9 @@ function CreateV3PoolSummary({ info: { quoteCurrencyId, baseCurrencyId } }: { in
   const quoteCurrency = useCurrency(quoteCurrencyId)
 
   return (
-    <Trans>
+    <span>
       Create {baseCurrency?.symbol}/{quoteCurrency?.symbol} V3 pool
-    </Trans>
+    </span>
   )
 }
 
@@ -176,9 +177,9 @@ function CollectFeesSummary({ info: { currencyId0, currencyId1 } }: { info: Coll
   const currency1 = useCurrency(currencyId1)
 
   return (
-    <Trans>
+    <span>
       Collect {currency0?.symbol}/{currency1?.symbol} fees
-    </Trans>
+    </span>
   )
 }
 
@@ -188,11 +189,11 @@ function RemoveLiquidityV3Summary({
   info: RemoveLiquidityV3TransactionInfo
 }) {
   return (
-    <Trans>
+    <span>
       Remove{' '}
       <FormattedCurrencyAmountManaged rawAmount={expectedAmountBaseRaw} currencyId={baseCurrencyId} sigFigs={3} /> and{' '}
       <FormattedCurrencyAmountManaged rawAmount={expectedAmountQuoteRaw} currencyId={quoteCurrencyId} sigFigs={3} />
-    </Trans>
+    </span>
   )
 }
 
@@ -205,13 +206,13 @@ function AddLiquidityV3PoolSummary({
   const quoteCurrency = useCurrency(quoteCurrencyId)
 
   return createPool ? (
-    <Trans>
+    <span>
       Create pool and add {baseCurrency?.symbol}/{quoteCurrency?.symbol} V3 liquidity
-    </Trans>
+    </span>
   ) : (
-    <Trans>
+    <span>
       Add {baseCurrency?.symbol}/{quoteCurrency?.symbol} V3 liquidity
-    </Trans>
+    </span>
   )
 }
 
@@ -221,18 +222,18 @@ function AddLiquidityV2PoolSummary({
   info: AddLiquidityV2PoolTransactionInfo
 }) {
   return (
-    <Trans>
+    <span>
       Add <FormattedCurrencyAmountManaged rawAmount={expectedAmountBaseRaw} currencyId={baseCurrencyId} sigFigs={3} />{' '}
       and <FormattedCurrencyAmountManaged rawAmount={expectedAmountQuoteRaw} currencyId={quoteCurrencyId} sigFigs={3} />{' '}
       to Uniswap V2
-    </Trans>
+    </span>
   )
 }
 
 function SwapSummary({ info }: { info: ExactInputSwapTransactionInfo | ExactOutputSwapTransactionInfo }) {
   if (info.tradeType === TradeType.EXACT_INPUT) {
     return (
-      <Trans>
+      <span>
         Swap exactly{' '}
         <FormattedCurrencyAmountManaged
           rawAmount={info.inputCurrencyAmountRaw}
@@ -245,11 +246,11 @@ function SwapSummary({ info }: { info: ExactInputSwapTransactionInfo | ExactOutp
           currencyId={info.outputCurrencyId}
           sigFigs={6}
         />
-      </Trans>
+      </span>
     )
   } else {
     return (
-      <Trans>
+      <span>
         Swap{' '}
         <FormattedCurrencyAmountManaged
           rawAmount={info.expectedInputCurrencyAmountRaw}
@@ -262,12 +263,12 @@ function SwapSummary({ info }: { info: ExactInputSwapTransactionInfo | ExactOutp
           currencyId={info.outputCurrencyId}
           sigFigs={6}
         />
-      </Trans>
+      </span>
     )
   }
 }
 
-export function TransactionSummary({ info }: { info: TransactionInfo }) {
+export function TransactionSummary({hash, info }: {hash: string, info: TransactionInfo } ) {
   switch (info.type) {
     case TransactionType.ADD_LIQUIDITY_V3_POOL:
       return <AddLiquidityV3PoolSummary info={info} />
@@ -279,7 +280,7 @@ export function TransactionSummary({ info }: { info: TransactionInfo }) {
       return <ClaimSummary info={info} />
 
     case TransactionType.DEPOSIT_LIQUIDITY_STAKING:
-      return <DepositLiquidityStakingSummary info={info} />
+      return <DepositLiquidityStakingSummary hash={hash} info={info} />
 
     case TransactionType.WITHDRAW_LIQUIDITY_STAKING:
       return <WithdrawLiquidityStakingSummary info={info} />

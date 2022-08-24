@@ -26,15 +26,14 @@ import {
   updatedeployedTokenAddress,
 } from "../state/proposal/reducer";
 import Header from "components/Header";
-import Navbar from "components/Web3AuthNavbar/Navbar";
 import { useNewMoralisObject } from "react-moralis";
-import { Web3AuthPropType } from "types";
 import useStepRouter from "hooks/useStepRouter";
 import { useTransactionAdder } from "state/transactions/hooks";
 import { useDAOContract } from "hooks/useContract";
 import { TransactionInfo } from "state/transactions/types";
+import { TransactionType } from "state/transactions/types";
 
-const GoLivePage = (props: Web3AuthPropType) => {
+const GoLivePage = () => {
   useStepRouter(5);
 
   const navigate = useNavigate();
@@ -109,10 +108,12 @@ const GoLivePage = (props: Web3AuthPropType) => {
   };
 
   const DeployDAO = async (deployedTokenAddress: string) => {
+    onClose();
+    if (!isLoading) {
+      setisLoading(true);
+    }
     console.log("DEploying Goerli");
     console.log(deployedTokenAddress);
-    onClose();
-    setisLoading(true);
     const creatingGovernor =
       factory &&
       deployedTokenAddress !== null &&
@@ -124,8 +125,11 @@ const GoLivePage = (props: Web3AuthPropType) => {
         longDesc,
         shortDesc
       ));
-    const transactionInfo = await creatingGovernor.wait();
+    const transactionInfo = {
+      type: TransactionType.DEPOSIT_LIQUIDITY_STAKING,
+    } as TransactionInfo;
     addTransaction(creatingGovernor, transactionInfo);
+    await creatingGovernor.wait();
     const governorAddress = await factory?.deployedGovernorAddress();
     await addToken(deployedTokenAddress);
     setisLoading(false);
@@ -136,6 +140,7 @@ const GoLivePage = (props: Web3AuthPropType) => {
   const createToken = async () => {
     if (factory) {
       setisLoading(true);
+      // setIsTokenDeploy(false)
       onClose();
       const creatingToken = await factory.createToken(
         tokenTitle,
@@ -144,8 +149,11 @@ const GoLivePage = (props: Web3AuthPropType) => {
         holder,
         explain
       );
-      const transactionInfo = await creatingToken.wait();
+      const transactionInfo = {
+        type: TransactionType.DEPOSIT_LIQUIDITY_STAKING,
+      } as TransactionInfo;
       addTransaction(creatingToken, transactionInfo);
+      await creatingToken.wait();
       const tokenAddress = await factory.deployedTokenAddress();
       dispatch(updatedeployedTokenAddress(tokenAddress));
       if (tokenAddress) {
@@ -157,11 +165,7 @@ const GoLivePage = (props: Web3AuthPropType) => {
     }
   };
 
-  const showHeader = !!web3authAddress ? (
-    <Navbar web3Provider={props.web3Provider} />
-  ) : (
-    <Header />
-  );
+  const showHeader = <Header />;
 
   const saveObject = async (deployedTokenAddress: string) => {
     const data = {

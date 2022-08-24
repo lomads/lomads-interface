@@ -229,7 +229,7 @@ export default function AccountDetails({
       .map((k) => SUPPORTED_WALLETS[k].name)[0]
     return (
       <WalletName>
-        <Trans>Connected with {name}</Trans>
+        Connected with {name}
       </WalletName>
     )
   }
