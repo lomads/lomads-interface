@@ -600,3 +600,45 @@
   letter-spacing: -0.011em;
   color: #76808D;
 }
+.searchButton {
+  height: 40px;
+  position: relative;
+  width: 270px;
+  background: #C94B32;
+  box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+  border-radius: 5px;
+  border-width: 0px;
+  border-color: #FFFFFF;
+  align-content: inherit;
+  color: #FFFFFF;
+}
+.tileItemHeaderToken {
+  width: 55%;
+  font-family: 'Open Sans';
+  font-style: normal;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 18px;
+  padding-top: 30px;
+  padding-bottom: 10px;
+  letter-spacing: -0.011em;
+  color: #76808D;
+}
+.tileItemHeaderToken .rect2 {
+  width: 110px;
+  height: 34px;
+  text-align: center;
+  background: #e7cfcb;
+  /*opacity: 0.1;*/
+  border-radius: 100px;
+  /*z-index: 7000;*/
+}
+/* .tokentitleTileno {
+  display: flex;
+  padding-left: 20px;
+  padding-bottom: 20px;
+  height: fit-content;
+} */
