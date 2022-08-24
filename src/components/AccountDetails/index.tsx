@@ -1,6 +1,6 @@
 import { Trans } from '@lingui/macro'
 import { useWeb3React } from '@web3-react/core'
-import CopyHelper from './Copy'
+import {CopyHelper} from './Copy'
 import { coinbaseWalletConnection, injectedConnection } from 'connection'
 import { getConnection } from 'connection/utils'
 import { useCallback, useContext } from 'react'
@@ -20,7 +20,6 @@ import { ButtonSecondary } from '../Button'
 import StatusIcon from '../Identicon/StatusIcon'
 import { AutoRow } from '../Row'
 import Transaction from './Transaction'
-import { useMoralis } from "react-moralis";
 
 const HeaderRow = styled.div`
   ${({ theme }) => theme.flexRowNoWrap};
@@ -130,7 +129,7 @@ const AccountControl = styled.div`
   }
 `
 
-const AddressLink = styled(ExternalLink)<{ hasENS: boolean; isENS: boolean }>`
+const AddressLink = styled(ExternalLink) <{ hasENS: boolean; isENS: boolean }>`
   font-size: 0.825rem;
   color: ${({ theme }) => theme.text3};
   margin-left: 1rem;
@@ -215,7 +214,6 @@ export default function AccountDetails({
   const isMetaMask = !!window.ethereum?.isMetaMask
   const isCoinbaseWallet = !!window.ethereum?.isCoinbaseWallet
   const isInjectedMobileBrowser = (isMetaMask || isCoinbaseWallet) && isMobile
-  const {logout } = useMoralis();
 
   function formatConnectorName() {
     const { ethereum } = window
@@ -253,7 +251,6 @@ export default function AccountDetails({
 
     dispatch(updateSelectedWallet({ wallet: undefined }))
     openOptions()
-    await logout();
   }
 
   return (
@@ -304,11 +301,10 @@ export default function AccountDetails({
                   <>
                     <AccountControl>
                       <div>
+
                         {account && (
-                          <CopyHelper toCopy={account} iconPosition="left">
-                            <span style={{ marginLeft: '4px' }}>
-                              <Trans>Copy Address</Trans>
-                            </span>
+                          <CopyHelper toCopy={account} iconPosition="left" gap={6} iconSize={16} fontSize={14}>
+                            <Trans>Copy Address</Trans>
                           </CopyHelper>
                         )}
                         {chainId && account && (
@@ -331,10 +327,8 @@ export default function AccountDetails({
                     <AccountControl>
                       <div>
                         {account && (
-                          <CopyHelper toCopy={account} iconPosition="left">
-                            <span style={{ marginLeft: '4px' }}>
-                              <Trans>Copy Address</Trans>
-                            </span>
+                          <CopyHelper toCopy={account} iconPosition="left" gap={6} iconSize={16} fontSize={14}>
+                            <Trans>Copy Address</Trans>
                           </CopyHelper>
                         )}
                         {chainId && account && (
