@@ -85,23 +85,25 @@ const UseExistingToken = () => {
   };
 
   const searchDetails = async () => {
-    setisSearching(true);
-    const signer = provider?.getSigner();
-    const token = new ethers.Contract(
-      tokenAddress as string,
-      TOKEN_ABI,
-      signer
-    );
-    tokenTitle = await token.name();
-    tokenSymbol = await token.symbol();
-    holder = await token.owner();
-    supply = await token.totalSupply();
-    dispatch(updatetokenTitle(tokenTitle));
-    dispatch(updatetokenSymbol(tokenSymbol));
-    dispatch(updateHolder(holder));
-    dispatch(updateSupply(supply.toString()));
-    console.log(supply.toString());
-    setisSearching(false);
+    if (tokenAddress !== null) {
+      setisSearching(true);
+      const signer = provider?.getSigner();
+      const token = new ethers.Contract(
+        tokenAddress as string,
+        TOKEN_ABI,
+        signer
+      );
+      tokenTitle = await token.name();
+      tokenSymbol = await token.symbol();
+      holder = await token.owner();
+      supply = await token.totalSupply();
+      dispatch(updatetokenTitle(tokenTitle));
+      dispatch(updatetokenSymbol(tokenSymbol));
+      dispatch(updateHolder(holder));
+      dispatch(updateSupply(supply.toString()));
+      console.log(supply.toString());
+      setisSearching(false);
+    }
   };
 
   return (
@@ -223,7 +225,7 @@ const UseExistingToken = () => {
           <div className={"subItemHeader"}>
             <div>Supply</div>
           </div>
-          <div className={"fieldDesc"}>Define the initial token supply.</div>
+          <div className={"fieldDesc"}>Total Token Supply.</div>
         </div>
         <FormControl isInvalid={!supply && errors.supply}>
           <Input

@@ -36,7 +36,11 @@ const TokenPage = () => {
         <div className={"pageTitle"}>Token</div>
         <div className="flex flex-row text-lg justify-start items-center mb-5">
           <button
-            className="focus:text-button_color focus:border-b-2 focus:border-button_color text-text_color mr-5"
+            className={`text-text_color mr-3 ${
+              !newToken
+                ? "border-b-2 border-button_color text-button_color"
+                : null
+            }`}
             onClick={() => {
               setNewToken(false);
             }}
@@ -44,7 +48,11 @@ const TokenPage = () => {
             USE AN EXISTING TOKEN
           </button>
           <button
-            className="focus:text-button_color focus:border-b-2 focus:border-button_color text-text_color"
+            className={`text-text_color ${
+              newToken
+                ? "border-b-2 border-button_color text-button_color"
+                : null
+            }`}
             onClick={() => {
               setNewToken(true);
             }}

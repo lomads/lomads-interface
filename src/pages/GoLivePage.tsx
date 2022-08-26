@@ -32,6 +32,8 @@ import { useTransactionAdder } from "state/transactions/hooks";
 import { useDAOContract } from "hooks/useContract";
 import { TransactionInfo } from "state/transactions/types";
 import { TransactionType } from "state/transactions/types";
+import { ethers } from "ethers";
+import { TOKEN_ABI } from "abis/DaoToken";
 
 const GoLivePage = () => {
   useStepRouter(5);
@@ -159,10 +161,18 @@ const GoLivePage = () => {
       if (tokenAddress) {
         console.log("token address is:", tokenAddress);
         dispatch(updatedeployedTokenAddress(tokenAddress));
+        await MintToken(tokenAddress);
         DeployDAO(tokenAddress);
         // localStorage.removeItem('maxStep');
       }
     }
+  };
+
+  const MintToken = async (tokenAddress: string) => {
+    const signer = provider?.getSigner();
+    const token = await new ethers.Contract(tokenAddress, TOKEN_ABI, signer);
+    const mintToken = await token.mint(holder, supply);
+    await mintToken.wait();
   };
 
   const showHeader = <Header />;
@@ -227,9 +237,8 @@ const GoLivePage = () => {
       >
         <div className={"pageTitle"}>Go live</div>
         <div className={"pageDescription"} style={{ width: "486px" }}>
-          Take your crowdfund public by completing the final checklist,
-          cross-checking the values, and ensuring there aren’t any
-          mis-spellings.
+          Take your DAO public by completing the final checklist, cross-checking
+          the values, and ensuring there aren’t any mis-spellings.
         </div>
         <div>
           <BasicsComponent />
@@ -272,9 +281,7 @@ const GoLivePage = () => {
           <ModalHeader color="#C94B32">Final Check</ModalHeader>
           <ModalBody className={"pageDescription"}>
             Ensure All values above are correct before proceeding. These values
-            cannot be changed after deploying. However, you can keep editing the
-            story text after the crowdfund is deployed. The Mirror protocol
-            takes a 2.5% on amount raised during the crowdfund.
+            cannot be changed after deploying.
           </ModalBody>
           <ModalFooter>
             <div className="flex flex-row justify-between items-center w-full">

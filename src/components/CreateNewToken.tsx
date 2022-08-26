@@ -29,6 +29,7 @@ import Header from "components/Header";
 import { fileUpload } from "../utils/ipfs";
 import useStepRouter from "hooks/useStepRouter";
 import { imageType } from "types";
+import { ethers } from "ethers";
 
 const CreateNewToken = () => {
   useStepRouter(4);
@@ -46,7 +47,6 @@ const CreateNewToken = () => {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fileUploadFailed, setFileUploadFailed] = useState(false);
-  const [newToken, setNewToken] = useState<boolean>(true);
 
   async function handleUpload(event: any) {
     console.log("Handle upload.....");
@@ -104,9 +104,8 @@ const CreateNewToken = () => {
     if (!supply) {
       terrors.supply = "* Total supply is required.";
     }
-
-    if (!holder) {
-      terrors.holder = "* Holder address is required.";
+    if (!isAddressValid(holder)) {
+      terrors.isholder = " * Holder address is not valid.";
     }
     if (_.isEmpty(terrors)) {
       dispatch(updateStepNumber(5));
@@ -115,6 +114,15 @@ const CreateNewToken = () => {
       setErrors(terrors);
     }
   };
+
+  const isAddressValid = (holderAddress: string) => {
+    const isValid: boolean = ethers.utils.isAddress(holderAddress);
+    return isValid;
+  };
+
+  useEffect(() => {
+    isAddressValid(holder);
+  }, [holder]);
 
   const ImageThumb: React.FC<imageType> = ({ image }) => {
     return (
@@ -137,7 +145,6 @@ const CreateNewToken = () => {
     <>
       <div className={"pageDescription"}>
         Mint ERC20 tokens to create new communities and distribute ownership.
-        Learn more
       </div>
       <div className={"titleBar"}>
         <div className={"tokentitleTile"} style={{ width: 750 }}>
@@ -149,8 +156,7 @@ const CreateNewToken = () => {
               </div>
             </div>
             <div className={"tokenpageDescription"}>
-              A Short but descriptive name for your project token. This name
-              will be used in block explorers and token wallets.
+              A Short but descriptive name for your project token.
             </div>
             <FormControl isInvalid={!tokenTitle && errors.tokenTitle}>
               <Input
@@ -180,8 +186,7 @@ const CreateNewToken = () => {
               </div>
             </div>
             <div className={"tokenpageDescription"}>
-              A one owrd symbol signifying your project token. This symbol will
-              be used in block explorers and token wallets.
+              A one word symbol signifying your project token.
             </div>
             <FormControl isInvalid={!tokenSymbol && errors.tokenSymbol}>
               <Input
@@ -204,12 +209,7 @@ const CreateNewToken = () => {
           </div>
         </div>
       </div>
-      <div className="pageItemHeader">
-        Description
-        <div className={"fieldDesc"}>
-          Briefly describe your token for use on Mirror and social sharing.
-        </div>
-      </div>
+      <div className="pageItemHeader">Description</div>
       <textarea
         className={"textField"}
         name="longDesc"
@@ -256,11 +256,10 @@ const CreateNewToken = () => {
           </div>
         </div>
         <div className={"fieldDesc"}>
-          Enter the address that controls the token. This should probably be a
-          multi-sig. Make sure to enter the Ethereum address, not the ENS name.
+          Enter the address that controls the token.
         </div>
       </div>
-      <FormControl isInvalid={!holder && errors.holder}>
+      <FormControl isInvalid={errors.isholder}>
         <Input
           id="holder"
           className={"inputField"}
@@ -272,9 +271,9 @@ const CreateNewToken = () => {
             dispatch(updateHolder(e.target.value));
           }}
         />
-        {!holder && errors.holder && (
+        {errors.isholder && (
           <FormErrorMessage style={{ marginTop: 0, fontSize: "x-small" }}>
-            {errors.holder}
+            {!isAddressValid(holder) ? errors.isholder : errors.holder}
           </FormErrorMessage>
         )}
       </FormControl>

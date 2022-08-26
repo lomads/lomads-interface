@@ -28,6 +28,7 @@ import requiredSelect from "../../assets/svg/requiredSelect.svg";
 import optionalSelect from "../../assets/svg/optionalSelect.svg";
 import highlightSelect from "../../assets/svg/highlightSelect.svg";
 import updateIcon from "../../assets/svg/updateIcon.svg";
+import pexels from "../../assets/images/metamask.png";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import { updateStepNumber } from "state/proposal/reducer";
@@ -113,6 +114,7 @@ const CreateDashBoardSidebar = () => {
   const BodyExpand = () => {
     return (
       <div>
+        <div></div>
         <div
           className={"daoNameSidebar"}
           style={{ paddingTop: 250, paddingBottom: 80, marginLeft: 42 }}
