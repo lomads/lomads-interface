@@ -145,7 +145,7 @@ const BasicsPage = (props: sidebarPropType) => {
   const showHeader = <Header />;
   return (
     <>
-      <div className="absolute top-0 right-0">{showHeader}</div>
+      {/* <div className="absolute top-0 right-0">{showHeader}</div> */}
       <div
         className={"something"}
         style={{

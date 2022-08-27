@@ -184,7 +184,6 @@ const GoLivePage = (props: sidebarPropType) => {
       navigate("/login");
     }
   }, [props.account, props.chainAllowed, navigate]);
-  const showHeader = <Header />;
 
   const saveObject = async (deployedTokenAddress: string) => {
     const data = {
@@ -233,7 +232,6 @@ const GoLivePage = (props: sidebarPropType) => {
 
   return (
     <>
-      <div className="absolute top-0 right-0">{showHeader}</div>
       <div
         className={"something"}
         style={{

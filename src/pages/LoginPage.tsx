@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import createDao from "../assets/svg/createDao.svg";
 import metamask2 from "../assets/svg/metamask2.svg";
 import walletconnect from "../assets/svg/walletconnect.svg";
+import { useWeb3React } from "@web3-react/core";
 import "../styles/App.css";
 import "../styles/CreateDao.css";
 import "../styles/Dashboard.css";
@@ -29,6 +30,7 @@ const WALLET_VIEWS = {
 const LoginPage = (props: any) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { account } = useWeb3React();
   const toggleWalletModal = useToggleWalletModal();
   const [walletView, setWalletView] = useState(WALLET_VIEWS.ACCOUNT);
   const selectedWallet = useAppSelector((state) => state.user.selectedWallet);
@@ -37,7 +39,7 @@ const LoginPage = (props: any) => {
   >();
 
   useEffect(() => {
-    if (selectedWallet) {
+    if (selectedWallet && account) {
       navigate("/createdao");
     }
   }, [selectedWallet, navigate]);
@@ -59,9 +61,6 @@ const LoginPage = (props: any) => {
 
   return (
     <>
-      <div className="absolute top-0 right-0">
-        <Header />
-      </div>
       <div className={"createDaoLogin"}>
         <div className="logo">
           <img src={createDao} alt="" />

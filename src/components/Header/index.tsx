@@ -1,16 +1,16 @@
-import { useContext, useEffect } from 'react'
-import { Trans } from '@lingui/macro'
-import useScrollPosition from '@react-hook/window-scroll'
-import { useWeb3React } from '@web3-react/core'
-import { Text } from 'rebass'
-import { CHAIN_INFO } from 'constants/chainInfo'
-import { SupportedChainId } from 'constants/chains'
-import useTheme from 'hooks/useTheme'
-import { useNativeCurrencyBalances } from 'state/connection/hooks'
-import { useDarkModeManager } from 'state/user/hooks'
-import styled from 'styled-components/macro'
-import { isChainAllowed, switchChain } from 'utils/switchChain'
-import Web3Status from '../Web3Status'
+import { useContext, useEffect } from "react";
+import { Trans } from "@lingui/macro";
+import useScrollPosition from "@react-hook/window-scroll";
+import { useWeb3React } from "@web3-react/core";
+import { Text } from "rebass";
+import { CHAIN_INFO } from "constants/chainInfo";
+import { SupportedChainId } from "constants/chains";
+import useTheme from "hooks/useTheme";
+import { useNativeCurrencyBalances } from "state/connection/hooks";
+import { useDarkModeManager } from "state/user/hooks";
+import styled from "styled-components/macro";
+import { isChainAllowed, switchChain } from "utils/switchChain";
+import Web3Status from "../Web3Status";
 // import NetworkSelector from './NetworkSelector'
 
 const HeaderFrame = styled.div<{ showBackground: boolean }>`
@@ -20,17 +20,21 @@ const HeaderFrame = styled.div<{ showBackground: boolean }>`
   justify-content: space-between;
   align-items: center;
   flex-direction: row;
-  width: 100%;
-  top: 0;
-  position: relative;
+  width: 40%;
+  top: 10;
+  position: absolute;
+  right: -20px;
   padding: 1rem;
-  z-index: 21;
-  position: relative;
+  z-index: 10000;
   /* Background slide effect on scroll. */
-  background-image: ${({ theme }) => `linear-gradient(to bottom, transparent 50%, ${theme.bg0} 50% )}}`};
-  background-position: ${({ showBackground }) => (showBackground ? '0 -100%' : '0 0')};
+  background-image: ${({ theme }) =>
+    `linear-gradient(to bottom, transparent 50%, ${theme.bg0} 50% )}}`};
+  background-position: ${({ showBackground }) =>
+    showBackground ? "0 -100%" : "0 0"};
   background-size: 100% 200%;
-  box-shadow: 0px 0px 0px 1px ${({ theme, showBackground }) => (showBackground ? theme.bg2 : 'transparent;')};
+  box-shadow: 0px 0px 0px 1px
+    ${({ theme, showBackground }) =>
+      showBackground ? theme.bg2 : "transparent;"};
   transition: background-position 0.1s, box-shadow 0.1s;
   background-blend-mode: hard-light;
 
@@ -47,14 +51,14 @@ const HeaderFrame = styled.div<{ showBackground: boolean }>`
     padding:  1rem;
     grid-template-columns: 36px 1fr;
   `};
-`
+`;
 
 const HeaderControls = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-self: flex-end;
-`
+`;
 
 const HeaderElement = styled.div`
   display: flex;
@@ -72,7 +76,7 @@ const HeaderElement = styled.div`
   ${({ theme }) => theme.mediaWidth.upToMedium`
     align-items: center;
   `};
-`
+`;
 
 const AccountElement = styled.div<{ active: boolean }>`
   display: flex;
@@ -87,13 +91,13 @@ const AccountElement = styled.div<{ active: boolean }>`
   :focus {
     border: 1px solid blue;
   }
-`
+`;
 
 const BalanceText = styled(Text)`
   ${({ theme }) => theme.mediaWidth.upToExtraSmall`
     display: none;
   `};
-`
+`;
 
 const Title = styled.a`
   display: flex;
@@ -107,7 +111,7 @@ const Title = styled.a`
   :hover {
     cursor: pointer;
   }
-`
+`;
 
 const UniIcon = styled.div`
   transition: transform 0.3s ease;
@@ -116,38 +120,40 @@ const UniIcon = styled.div`
   }
 
   position: relative;
-`
+`;
 export default function Header() {
-  const { account, chainId, connector } = useWeb3React()
+  const { account, chainId, connector } = useWeb3React();
 
-  const chainAllowed = chainId && isChainAllowed(connector, chainId)
+  const chainAllowed = chainId && isChainAllowed(connector, chainId);
 
-  const userEthBalance = useNativeCurrencyBalances(account ? [account] : [])?.[account ?? '']
-  const [darkMode] = useDarkModeManager()
-  const { white, black } = useTheme()
+  const userEthBalance = useNativeCurrencyBalances(account ? [account] : [])?.[
+    account ?? ""
+  ];
+  const [darkMode] = useDarkModeManager();
+  const { white, black } = useTheme();
 
-  const scrollY = useScrollPosition()
+  const scrollY = useScrollPosition();
 
-  const {
-    nativeCurrency,
-  } = CHAIN_INFO[!chainId || !chainAllowed ? SupportedChainId.MAINNET : chainId]
+  const { nativeCurrency } =
+    CHAIN_INFO[!chainId || !chainAllowed ? SupportedChainId.MAINNET : chainId];
   const balance = userEthBalance?.toSignificant(3);
   const symbol = nativeCurrency.symbol;
   return (
     <HeaderFrame showBackground={scrollY > 45}>
       <Title href=".">
-        <UniIcon>
-          
-        </UniIcon>
+        <UniIcon></UniIcon>
       </Title>
       <HeaderControls>
-        <HeaderElement>
-          {/* <NetworkSelector /> */}
-        </HeaderElement>
+        <HeaderElement>{/* <NetworkSelector /> */}</HeaderElement>
         <HeaderElement>
           <AccountElement active={!!account}>
             {chainAllowed && userEthBalance ? (
-              <BalanceText style={{ flexShrink: 0, userSelect: 'none' }} pl="0.75rem" pr="0.5rem" fontWeight={500}>
+              <BalanceText
+                style={{ flexShrink: 0, userSelect: "none" }}
+                pl="0.75rem"
+                pr="0.5rem"
+                fontWeight={500}
+              >
                 {balance} {symbol}
               </BalanceText>
             ) : null}
@@ -156,5 +162,5 @@ export default function Header() {
         </HeaderElement>
       </HeaderControls>
     </HeaderFrame>
-  )
+  );
 }

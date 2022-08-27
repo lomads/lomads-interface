@@ -33,7 +33,6 @@ const SettingsPage = (props: sidebarPropType) => {
   const minApproval = useAppSelector((state) => state.proposal.minApproval);
   const support = useAppSelector((state) => state.proposal.support);
   const [errors, setErrors] = useState<any>({});
-  const showHeader = <Header />;
 
   useEffect(() => {
     if (!_.isEmpty(errors)) {
@@ -97,7 +96,6 @@ const SettingsPage = (props: sidebarPropType) => {
 
   return (
     <>
-      <div className="absolute top-0 right-0">{showHeader}</div>
       <div
         className={"something"}
         style={{

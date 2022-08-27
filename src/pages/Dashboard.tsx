@@ -6,17 +6,10 @@ import "../styles/Modal.css";
 import "../styles/Sidebar.css";
 import MintTokenComponent from "../components/MintTokenComponent";
 import SendTokenComponent from "../components/SendTokenComponent";
-import { useWeb3React } from "@web3-react/core";
 import { useAppSelector } from "state/hooks";
-import { tokenCall } from "connection/DaoTokenCall";
 import { useMoralis } from "react-moralis";
 import { useAppDispatch } from "state/hooks";
-import {
-  updatedeployedGovernorAddress,
-  updatedeployedTokenAddress,
-} from "../state/proposal/reducer";
 import { fetchFile } from "../utils/ipfs";
-import Header from "components/Header";
 
 const Dashboard = () => {
   const dispatch = useAppDispatch();
@@ -96,9 +89,6 @@ const Dashboard = () => {
 
   return (
     <>
-      <div>
-        <Header />
-      </div>
       <div
         className={"something"}
         style={{

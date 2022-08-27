@@ -31,11 +31,9 @@ const TokenPage = (props: sidebarPropType) => {
     }
   }, [props.chainAllowed, props.account, navigate]);
 
-  const showHeader = <Header />;
 
   return (
     <>
-      <div className="absolute top-0 right-0">{showHeader}</div>
       <div
         className={"something"}
         style={{
