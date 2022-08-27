@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { Trans } from '@lingui/macro'
 import useScrollPosition from '@react-hook/window-scroll'
 import { useWeb3React } from '@web3-react/core'
@@ -9,11 +9,7 @@ import useTheme from 'hooks/useTheme'
 import { useNativeCurrencyBalances } from 'state/connection/hooks'
 import { useDarkModeManager } from 'state/user/hooks'
 import styled from 'styled-components/macro'
-import { isChainAllowed } from 'utils/switchChain'
-import { ThemeContext } from 'styled-components/macro'
-
-import { ReactComponent as Logo } from '../../assets/svg/logo.svg'
-import Menu from '../Menu'
+import { isChainAllowed, switchChain } from 'utils/switchChain'
 import Web3Status from '../Web3Status'
 // import NetworkSelector from './NetworkSelector'
 
@@ -121,7 +117,6 @@ const UniIcon = styled.div`
 
   position: relative;
 `
-
 export default function Header() {
   const { account, chainId, connector } = useWeb3React()
 
@@ -134,14 +129,15 @@ export default function Header() {
   const scrollY = useScrollPosition()
 
   const {
-    nativeCurrency: { symbol: nativeCurrencySymbol },
+    nativeCurrency,
   } = CHAIN_INFO[!chainId || !chainAllowed ? SupportedChainId.MAINNET : chainId]
-
+  const balance = userEthBalance?.toSignificant(3);
+  const symbol = nativeCurrency.symbol;
   return (
     <HeaderFrame showBackground={scrollY > 45}>
       <Title href=".">
         <UniIcon>
-          <Logo fill={darkMode ? white : black} width="24px" height="100%" title="logo" />
+          
         </UniIcon>
       </Title>
       <HeaderControls>
@@ -150,18 +146,13 @@ export default function Header() {
         </HeaderElement>
         <HeaderElement>
           <AccountElement active={!!account}>
-            {account && userEthBalance ? (
+            {chainAllowed && userEthBalance ? (
               <BalanceText style={{ flexShrink: 0, userSelect: 'none' }} pl="0.75rem" pr="0.5rem" fontWeight={500}>
-                <Trans>
-                  {userEthBalance?.toSignificant(3)} {nativeCurrencySymbol}
-                </Trans>
+                {balance} {symbol}
               </BalanceText>
             ) : null}
             <Web3Status />
           </AccountElement>
-        </HeaderElement>
-        <HeaderElement>
-          <Menu />
         </HeaderElement>
       </HeaderControls>
     </HeaderFrame>

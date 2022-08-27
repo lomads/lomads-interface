@@ -536,3 +536,13 @@
   border-radius: 100px;
   /*z-index: 7000;*/
 }
+.message {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 16px;
+  padding-top: 5px;
+  padding-bottom: 0px;
+  color: rgba(118, 128, 141, 0.5);
+}

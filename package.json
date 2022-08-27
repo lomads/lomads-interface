@@ -27,6 +27,7 @@
     "@types/rebass": "^4.0.10",
     "@types/styled-components": "^5.1.25",
     "@types/ua-parser-js": "^0.7.36",
+    "@uiball/loaders": "^1.2.6",
     "@uniswap/redux-multicall": "^1.1.5",
     "@uniswap/router-sdk": "^1.0.6",
     "@uniswap/sdk-core": "^3.0.1",
