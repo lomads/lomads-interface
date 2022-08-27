@@ -161,7 +161,7 @@ function Web3StatusInner() {
     return null;
   } else if (!chainAllowed) {
     return (
-      <Web3StatusError onClick={() => switchChain(connector, 1)}>
+      <Web3StatusError onClick={() => switchChain(connector, 80001)}>
         <NetworkIcon />
         <Text>
           <Trans>Wrong Network</Trans>

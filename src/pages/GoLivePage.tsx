@@ -34,8 +34,9 @@ import { TransactionInfo } from "state/transactions/types";
 import { TransactionType } from "state/transactions/types";
 import { ethers } from "ethers";
 import { TOKEN_ABI } from "abis/DaoToken";
+import { sidebarPropType } from "types";
 
-const GoLivePage = () => {
+const GoLivePage = (props: sidebarPropType) => {
   useStepRouter(5);
 
   const navigate = useNavigate();
@@ -134,10 +135,10 @@ const GoLivePage = () => {
     await creatingGovernor.wait();
     const governorAddress = await factory?.deployedGovernorAddress();
     await addToken(deployedTokenAddress);
-    setisLoading(false);
-    saveObject(deployedTokenAddress);
+    await saveObject(deployedTokenAddress);
     dispatch(updatedeployedGovernorAddress(governorAddress));
     setdeployedGovernor(governorAddress);
+    setisLoading(false);
   };
   const createToken = async () => {
     if (factory) {
@@ -175,6 +176,14 @@ const GoLivePage = () => {
     await mintToken.wait();
   };
 
+  useEffect(() => {
+    if (!props.chainAllowed) {
+      navigate("/login");
+    }
+    if (!props.account) {
+      navigate("/login");
+    }
+  }, [props.account, props.chainAllowed, navigate]);
   const showHeader = <Header />;
 
   const saveObject = async (deployedTokenAddress: string) => {
@@ -198,7 +207,7 @@ const GoLivePage = () => {
       holder: holder,
       iconImg: iconImgPath,
     };
-    save(data, {
+    await save(data, {
       onSuccess: (daoinfo) => {
         // Execute any logic that should take place after the object is saved.
         console.log("New object created with objectId: " + daoinfo.id);

@@ -16,8 +16,9 @@ import { useAppSelector, useAppDispatch } from "state/hooks";
 import { updateTemplate, updateTemplateVal } from "state/proposal/reducer";
 import { updateStepNumber } from "state/proposal/reducer";
 import useStepRouter from "hooks/useStepRouter";
+import { sidebarPropType } from "types";
 
-const SettingsPage = () => {
+const SettingsPage = (props: sidebarPropType) => {
   useStepRouter(3);
 
   const dispatch = useAppDispatch();
@@ -48,6 +49,15 @@ const SettingsPage = () => {
       }
     }
   }, [errors]);
+
+  useEffect(() => {
+    if (!props.chainAllowed) {
+      navigate("/login");
+    }
+    if (!props.account) {
+      navigate("/login");
+    }
+  }, [props.account, props.chainAllowed, navigate]);
   const TEMPLATE = ["Collective", "Service Network", "Shared Owner"];
 
   // const handleTemplateSelect = (val: number) => {
@@ -59,6 +69,13 @@ const SettingsPage = () => {
   //     dispatch(updateTemplate(TEMPLATE[val]));
   //   }
   // };
+
+  const [isClicked, setIsClicked] = useState<boolean>(true);
+
+  useEffect(() => {
+    dispatch(updateTemplateVal(1));
+    dispatch(updateTemplate("Service Network"));
+  }, [dispatch]);
 
   const handleClick = () => {
     let terrors: any = {};
@@ -113,7 +130,7 @@ const SettingsPage = () => {
             <SelectTemplate
               blockTitle={TEMPLATE[0]}
               blockDescription="Comming Soon"
-              iconColor={"#b5b8ba"}
+              iconColor={"#b2b4b7"}
               bgColor={"#b5b8ba"}
               isCommingSoon={true}
               // onClick={() => handleTemplateSelect(0)}
@@ -121,7 +138,7 @@ const SettingsPage = () => {
             <SelectTemplate
               blockTitle={TEMPLATE[1]}
               blockDescription="Comming soon"
-              iconColor={"white"}
+              iconColor={isClicked ? "#C94B32" : "white"}
               bgColor={"#FFFFFF"}
               isCommingSoon={false}
               // onClick={() => handleTemplateSelect(1)}
@@ -129,7 +146,7 @@ const SettingsPage = () => {
             <SelectTemplate
               blockTitle={TEMPLATE[2]}
               blockDescription="Comming Soon"
-              iconColor={"#b5b8ba"}
+              iconColor={"#b2b4b7"}
               bgColor={"#b5b8ba"}
               isCommingSoon={true}
               // onClick={() => handleTemplateSelect(2)}

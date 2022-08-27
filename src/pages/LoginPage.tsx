@@ -31,10 +31,16 @@ const LoginPage = (props: any) => {
   const navigate = useNavigate();
   const toggleWalletModal = useToggleWalletModal();
   const [walletView, setWalletView] = useState(WALLET_VIEWS.ACCOUNT);
-  //   const selectedWallet = useAppSelector((state) => state.user.selectedWallet);
+  const selectedWallet = useAppSelector((state) => state.user.selectedWallet);
   const [pendingConnector, setPendingConnector] = useState<
     Connector | undefined
   >();
+
+  useEffect(() => {
+    if (selectedWallet) {
+      navigate("/createdao");
+    }
+  }, [selectedWallet, navigate]);
 
   const nextLogin = async (connector: Connector) => {
     const connectionType = getConnection(connector).type;

@@ -1,36 +1,47 @@
-import CreateDaoSidebar from '../components/CreateDaoSidebar'
-import BasicsPage from './BasicsPage'
-import SettingsPage from './SettingsPage'
-import TokenPage from './TokenPage'
-import GoLivePage from './GoLivePage'
-import Dashboard from './Dashboard'
+import CreateDaoSidebar from "../components/CreateDaoSidebar";
+import BasicsPage from "./BasicsPage";
+import SettingsPage from "./SettingsPage";
+import TokenPage from "./TokenPage";
+import GoLivePage from "./GoLivePage";
+import Dashboard from "./Dashboard";
+import { sidebarPropType } from "types";
 
-const SidebarPage = (props: any) => {
-
+const SidebarPage = (props: sidebarPropType) => {
   const renderPage = () => {
     if (props.page === "Basics") {
       return (
         <div>
-          <BasicsPage />
+          <BasicsPage
+            chainAllowed={props.chainAllowed}
+            account={props.account}
+          />
         </div>
       );
     } else if (props.page === "Token") {
       return (
         <div>
-          <TokenPage />
+          <TokenPage
+            chainAllowed={props.chainAllowed}
+            account={props.account}
+          />
         </div>
       );
-    }
-    else if (props.page === "Settings") {
+    } else if (props.page === "Settings") {
       return (
         <div>
-          <SettingsPage />
+          <SettingsPage
+            chainAllowed={props.chainAllowed}
+            account={props.account}
+          />
         </div>
       );
     } else if (props.page === "Go Live") {
       return (
         <div>
-          <GoLivePage />
+          <GoLivePage
+            chainAllowed={props.chainAllowed}
+            account={props.account}
+          />
         </div>
       );
     } else if (props.page === "Dao") {
@@ -40,19 +51,15 @@ const SidebarPage = (props: any) => {
         </div>
       );
     }
-    return (
-      <div></div>
-    );
-  }
+    return <div></div>;
+  };
 
   return (
     <div style={{ display: "flex" }}>
       <CreateDaoSidebar />
-      <div className='combine'>
-        {renderPage()}
-      </div>
+      <div className="combine">{renderPage()}</div>
     </div>
-  )
-}
+  );
+};
 
-export default SidebarPage
+export default SidebarPage;

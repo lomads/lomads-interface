@@ -10,7 +10,7 @@ export interface templateType {
   iconColor: string;
   bgColor?: string;
   isCommingSoon: boolean;
-  // onClick: () => void;
+  onClick?: () => void;
 }
 export type imageType = any;
 
@@ -31,4 +31,6 @@ export interface ChangeComponentType {
 }
 export interface sidebarPropType {
   page?: string;
+  chainAllowed: number | boolean | undefined;
+  account: string | undefined;
 }

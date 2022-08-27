@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import _ from "lodash";
+import { useNavigate } from "react-router-dom";
 import "../styles/App.css";
 import "../styles/CreateDao.css";
 import "../styles/Dashboard.css";
@@ -11,13 +12,24 @@ import { fileUpload } from "../utils/ipfs";
 import useStepRouter from "hooks/useStepRouter";
 import CreateNewToken from "components/CreateNewToken";
 import UseExistingToken from "components/UseExistingToken";
+import { sidebarPropType } from "types";
 
-const TokenPage = () => {
+const TokenPage = (props: sidebarPropType) => {
+  const navigate = useNavigate();
   useStepRouter(4);
   const web3authAddress = useAppSelector(
     (state) => state.proposal.Web3AuthAddress
   );
   const [newToken, setNewToken] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (!props.chainAllowed) {
+      navigate("/login");
+    }
+    if (!props.account) {
+      navigate("/login");
+    }
+  }, [props.chainAllowed, props.account, navigate]);
 
   const showHeader = <Header />;
 

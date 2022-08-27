@@ -12,7 +12,7 @@ const SelectTemplate = (props: templateType) => {
       <div className="template-image">
         {/* <img src={optionalSelect} className="checkImage" alt="" /> */}
         <Icon
-          color={props.iconColor ? props.iconColor : "white"}
+          color={props.iconColor}
           m={[2, 2]}
           w={46}
           h={46}

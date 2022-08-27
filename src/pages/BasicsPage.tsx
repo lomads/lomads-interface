@@ -21,7 +21,7 @@ import "../styles/CreateDao.css";
 import "../styles/Dashboard.css";
 import "../styles/Modal.css";
 import "../styles/Sidebar.css";
-import { imageType } from "../types";
+import { imageType, sidebarPropType } from "../types";
 import { useAppDispatch } from "state/hooks";
 import {
   updateTitle,
@@ -38,7 +38,7 @@ import Header from "components/Header";
 import { fileUpload } from "../utils/ipfs";
 import useStepRouter from "hooks/useStepRouter";
 
-const BasicsPage = () => {
+const BasicsPage = (props: sidebarPropType) => {
   useStepRouter(2);
   const dispatch = useAppDispatch();
   const title = useAppSelector((state) => state.proposal.title);
@@ -68,6 +68,15 @@ const BasicsPage = () => {
       }
     }
   }, [errors]);
+
+  useEffect(() => {
+    if (!props.chainAllowed) {
+      navigate("/login");
+    }
+    if (!props.account) {
+      navigate("/login");
+    }
+  }, [props.account, props.chainAllowed, navigate]);
 
   async function handleUpload(event: any) {
     console.log("Handle upload.....");
