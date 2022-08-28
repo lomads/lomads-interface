@@ -1,21 +1,18 @@
-import { useContext, useEffect } from "react";
-import { Trans } from "@lingui/macro";
+import { useEffect } from "react";
 import useScrollPosition from "@react-hook/window-scroll";
 import { useWeb3React } from "@web3-react/core";
 import { Text } from "rebass";
 import { CHAIN_INFO } from "constants/chainInfo";
 import { SupportedChainId } from "constants/chains";
-import useTheme from "hooks/useTheme";
 import { useNativeCurrencyBalances } from "state/connection/hooks";
-import { useDarkModeManager } from "state/user/hooks";
 import styled from "styled-components/macro";
-import { isChainAllowed, switchChain } from "utils/switchChain";
+import { isChainAllowed } from "utils/switchChain";
 import Web3Status from "../Web3Status";
+import { useNavigate } from "react-router-dom";
 // import NetworkSelector from './NetworkSelector'
 
 const HeaderFrame = styled.div<{ showBackground: boolean }>`
-  display: grid;
-  grid-template-columns: 120px 1fr 120px;
+  display: flex,
   align-items: center;
   justify-content: space-between;
   align-items: center;
@@ -23,7 +20,7 @@ const HeaderFrame = styled.div<{ showBackground: boolean }>`
   width: 40%;
   top: 10;
   position: absolute;
-  right: -20px;
+  right: 20px;
   padding: 1rem;
   z-index: 10000;
   /* Background slide effect on scroll. */
@@ -129,8 +126,14 @@ export default function Header() {
   const userEthBalance = useNativeCurrencyBalances(account ? [account] : [])?.[
     account ?? ""
   ];
-  const [darkMode] = useDarkModeManager();
-  const { white, black } = useTheme();
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!chainAllowed && !account) {
+      navigate("/login");
+    }
+  }, [account, chainAllowed, navigate]);
 
   const scrollY = useScrollPosition();
 

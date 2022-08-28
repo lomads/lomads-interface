@@ -20,6 +20,7 @@ import {
 import { getConnection } from "connection/utils";
 import { useModalIsOpen, useToggleWalletModal } from "state/application/hooks";
 import { updateConnectionError } from "state/connection/reducer";
+import { isChainAllowed } from "utils/switchChain";
 
 const WALLET_VIEWS = {
   OPTIONS: "options",
@@ -30,7 +31,6 @@ const WALLET_VIEWS = {
 const LoginPage = (props: any) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { account } = useWeb3React();
   const toggleWalletModal = useToggleWalletModal();
   const [walletView, setWalletView] = useState(WALLET_VIEWS.ACCOUNT);
   const selectedWallet = useAppSelector((state) => state.user.selectedWallet);
@@ -38,11 +38,15 @@ const LoginPage = (props: any) => {
     Connector | undefined
   >();
 
+  const { chainId, connector, account } = useWeb3React();
+
+  const chainAllowed = chainId && isChainAllowed(connector, chainId);
+
   useEffect(() => {
-    if (selectedWallet && account) {
+    if (selectedWallet && account && chainAllowed) {
       navigate("/createdao");
     }
-  }, [selectedWallet, navigate]);
+  }, [selectedWallet, navigate, account]);
 
   const nextLogin = async (connector: Connector) => {
     const connectionType = getConnection(connector).type;

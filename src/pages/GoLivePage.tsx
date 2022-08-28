@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { LineWobble } from "@uiball/loaders";
 import { useNavigate } from "react-router-dom";
 import { useWeb3React } from "@web3-react/core";
@@ -172,18 +172,10 @@ const GoLivePage = (props: sidebarPropType) => {
   const MintToken = async (tokenAddress: string) => {
     const signer = provider?.getSigner();
     const token = await new ethers.Contract(tokenAddress, TOKEN_ABI, signer);
-    const mintToken = await token.mint(holder, supply);
+    const amount = supply * 10 ** 18;
+    const mintToken = await token.mint(holder, BigInt(amount));
     await mintToken.wait();
   };
-
-  useEffect(() => {
-    if (!props.chainAllowed) {
-      navigate("/login");
-    }
-    if (!props.account) {
-      navigate("/login");
-    }
-  }, [props.account, props.chainAllowed, navigate]);
 
   const saveObject = async (deployedTokenAddress: string) => {
     const data = {

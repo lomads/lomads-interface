@@ -147,10 +147,10 @@ export default function WalletModal({
   useEffect(() => {
     if (walletModalOpen) {
       setWalletView(account ? WALLET_VIEWS.ACCOUNT : WALLET_VIEWS.OPTIONS);
-    } else if (!walletModalOpen && walletView == "options") {
+    } else if (!walletModalOpen && walletView === "options") {
       navigate("/login");
     }
-  }, [walletModalOpen, setWalletView, account]);
+  }, [walletModalOpen, setWalletView, account, walletView, navigate]);
 
   useEffect(() => {
     if (pendingConnector && walletView !== WALLET_VIEWS.PENDING) {
@@ -187,7 +187,7 @@ export default function WalletModal({
         );
       }
     },
-    [dispatch, toggleWalletModal]
+    [dispatch, navigate, toggleWalletModal]
   );
 
   // get wallets user can switch too, depending on device/browser

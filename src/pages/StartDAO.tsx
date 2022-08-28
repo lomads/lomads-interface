@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
-import Header from "components/Header";
-import { useAppDispatch, useAppSelector } from "state/hooks";
+import React, { useEffect } from "react";
+import { useAppDispatch } from "state/hooks";
 import { StepBlock } from "../components/sub/StepBlock";
 import { StepBlockOptional } from "../components/sub/StepBlockOptional";
 import { updateStepNumber } from "state/proposal/reducer";
@@ -12,21 +11,16 @@ import "../styles/Sidebar.css";
 
 const StartDAO = () => {
   const dispatch = useAppDispatch();
-  const web3authAddress = useAppSelector(
-    (state) => state.proposal.Web3AuthAddress
-  );
-  const showHeader = <Header />;
 
   useEffect(() => {
     dispatch(updateStepNumber(1));
-  }, []);
+  }, [dispatch]);
 
   return (
     <>
-      <div className="absolute top-0 right-0">{showHeader}</div>
       <div className={"createDaoLogin"}>
         <div>
-          <div className={"welcomeText2"} style={{ paddingTop: 100}}>
+          <div className={"welcomeText2"} style={{ paddingTop: 100 }}>
             Start Your DAO
           </div>
           <StepBlockOptional

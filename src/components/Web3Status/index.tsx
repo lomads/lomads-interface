@@ -3,7 +3,7 @@ import { t, Trans } from "@lingui/macro";
 import { useWeb3React } from "@web3-react/core";
 import { getConnection } from "connection/utils";
 import { darken } from "polished";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Activity } from "react-feather";
 import { useAppSelector } from "state/hooks";
 import styled, { css } from "styled-components/macro";
@@ -22,6 +22,7 @@ import StatusIcon from "../Identicon/StatusIcon";
 import Loader from "../Loader";
 import { RowBetween } from "../Row";
 import WalletModal from "../WalletModal";
+import { useNavigate } from "react-router-dom";
 
 const Web3StatusGeneric = styled(ButtonSecondary)`
   ${({ theme }) => theme.flexRowNoWrap}
@@ -157,11 +158,23 @@ function Web3StatusInner() {
   const hasSocks = useHasSocks();
   const toggleWalletModal = useToggleWalletModal();
 
+  const navigate = useNavigate();
+
   if (!chainId) {
     return null;
   } else if (!chainAllowed) {
     return (
-      <Web3StatusError onClick={() => switchChain(connector, 80001)}>
+      <Web3StatusError
+        onClick={() => {
+          switchChain(connector, 80001)
+            .then(() => {
+              navigate("/createdao");
+            })
+            .catch((err) => {
+              console.log("Error occurred while switching");
+            });
+        }}
+      >
         <NetworkIcon />
         <Text>
           <Trans>Wrong Network</Trans>

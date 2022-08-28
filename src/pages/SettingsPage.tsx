@@ -49,14 +49,14 @@ const SettingsPage = (props: sidebarPropType) => {
     }
   }, [errors]);
 
-  useEffect(() => {
-    if (!props.chainAllowed) {
-      navigate("/login");
-    }
-    if (!props.account) {
-      navigate("/login");
-    }
-  }, [props.account, props.chainAllowed, navigate]);
+  // useEffect(() => {
+  //   if (!props.chainAllowed) {
+  //     navigate("/login");
+  //   }
+  //   if (!props.account) {
+  //     navigate("/login");
+  //   }
+  // }, [props.account, props.chainAllowed, navigate]);
   const TEMPLATE = ["Collective", "Service Network", "Shared Owner"];
 
   // const handleTemplateSelect = (val: number) => {

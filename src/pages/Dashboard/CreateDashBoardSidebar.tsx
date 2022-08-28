@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   ProSidebar,
@@ -32,16 +32,31 @@ import pexels from "../../assets/images/metamask.png";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import { updateStepNumber } from "state/proposal/reducer";
+import { useMoralis } from "react-moralis";
 // import {STEP_NUMBER} from "./CreateDAO";
 
 const CreateDashBoardSidebar = () => {
   const dispatch = useAppDispatch();
   const [menuCollapse, setMenuCollapse] = useState(false); //useState(isMenuCollapsed);
   const stepNumber = useAppSelector((state) => state.proposal.stepNumber);
+  const { Moralis } = useMoralis();
+  const [title, setTitle] = useState("");
 
   const menuIconClick = () => {
     setMenuCollapse(!menuCollapse);
   };
+
+  useEffect(() => {
+    getHistories();
+  }, []);
+
+  async function getHistories() {
+    const daoinfo = Moralis.Object.extend("DAOInfo");
+    const query = new Moralis.Query(daoinfo);
+    const results = await query.find({ useMasterKey: true });
+    const lastIndex = results.length - 1;
+    setTitle(results[lastIndex].get("title"));
+  }
 
   let navigate = useNavigate();
 
@@ -117,9 +132,9 @@ const CreateDashBoardSidebar = () => {
         <div></div>
         <div
           className={"daoNameSidebar"}
-          style={{ paddingTop: 250, paddingBottom: 80, marginLeft: 42 }}
+          style={{ paddingTop: 250, paddingBottom: 30, marginLeft: 42 }}
         >
-          <div className="w-56">Ethic Comfort fashion group</div>
+          <div className="w-56">{title}</div>
         </div>
         <div style={{ paddingLeft: 80, paddingBottom: 100 }}>
           <Menu>

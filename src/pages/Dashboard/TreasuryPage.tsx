@@ -17,6 +17,7 @@ const Dashboard = (props: sidebarPropType) => {
     (state) => state.proposal.deployedTokenAddress
   );
   const { Moralis } = useMoralis();
+  const [title, setTitle] = useState("");
   const [tokenName, setTokenName] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
   const [supply, setSupply] = useState("");
@@ -30,6 +31,7 @@ const Dashboard = (props: sidebarPropType) => {
     const query = new Moralis.Query(daoinfo);
     const results = await query.find({ useMasterKey: true });
     const lastIndex = results.length - 1;
+    setTitle(results[lastIndex].get("title"));
     setTokenName(results[lastIndex].get("tokenName"));
     setTokenSymbol(results[lastIndex].get("tokenSymbol"));
     setSupply(results[lastIndex].get("supply"));
@@ -45,7 +47,11 @@ const Dashboard = (props: sidebarPropType) => {
     setisLoading(true);
     const token = await tokenCall(provider, tokenAddress as string);
     if (recipient.length >= 30 && parseInt(amount) >= 1) {
-      const transferToken = await token.transfer(recipient, amount);
+      const transferAmount: number = parseInt(amount) * 10 ** 18;
+      const transferToken = await token.transfer(
+        recipient,
+        BigInt(transferAmount)
+      );
       await transferToken.wait();
       setMessage(
         `Token have been transferred successfully to address: ${recipient}`
