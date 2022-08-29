@@ -1,6 +1,6 @@
 import { Trans } from '@lingui/macro'
 import { useWeb3React } from '@web3-react/core'
-import CopyHelper from './Copy'
+import {CopyHelper} from './Copy'
 import { coinbaseWalletConnection, injectedConnection } from 'connection'
 import { getConnection } from 'connection/utils'
 import { useCallback, useContext } from 'react'
@@ -129,7 +129,7 @@ const AccountControl = styled.div`
   }
 `
 
-const AddressLink = styled(ExternalLink)<{ hasENS: boolean; isENS: boolean }>`
+const AddressLink = styled(ExternalLink) <{ hasENS: boolean; isENS: boolean }>`
   font-size: 0.825rem;
   color: ${({ theme }) => theme.text3};
   margin-left: 1rem;
@@ -189,6 +189,7 @@ function renderTransactions(transactions: string[]) {
   )
 }
 
+
 interface AccountDetailsProps {
   toggleWalletModal: () => void
   pendingTransactions: string[]
@@ -226,7 +227,7 @@ export default function AccountDetails({
       .map((k) => SUPPORTED_WALLETS[k].name)[0]
     return (
       <WalletName>
-        <Trans>Connected with {name}</Trans>
+        Connected with {name}
       </WalletName>
     )
   }
@@ -234,6 +235,23 @@ export default function AccountDetails({
   const clearAllTransactionsCallback = useCallback(() => {
     if (chainId) dispatch(clearAllTransactions({ chainId }))
   }, [dispatch, chainId])
+
+  const disconnect = async () => {
+    if (connector.deactivate) {
+      connector.deactivate()
+      // Coinbase Wallet SDK does not emit a disconnect event to the provider,
+      // which is what web3-react uses to reset state. As a workaround we manually
+      // reset state.
+      if (connector === coinbaseWalletConnection.connector) {
+        connector.resetState()
+      }
+    } else {
+      connector.resetState()
+    }
+
+    dispatch(updateSelectedWallet({ wallet: undefined }))
+    openOptions()
+  }
 
   return (
     <>
@@ -254,23 +272,7 @@ export default function AccountDetails({
                     <>
                       <WalletAction
                         style={{ fontSize: '.825rem', fontWeight: 400, marginRight: '8px' }}
-                        onClick={() => {
-                          if (connector.deactivate) {
-                            connector.deactivate()
-
-                            // Coinbase Wallet SDK does not emit a disconnect event to the provider,
-                            // which is what web3-react uses to reset state. As a workaround we manually
-                            // reset state.
-                            if (connector === coinbaseWalletConnection.connector) {
-                              connector.resetState()
-                            }
-                          } else {
-                            connector.resetState()
-                          }
-
-                          dispatch(updateSelectedWallet({ wallet: undefined }))
-                          openOptions()
-                        }}
+                        onClick={disconnect}
                       >
                         <Trans>Disconnect</Trans>
                       </WalletAction>
@@ -299,11 +301,10 @@ export default function AccountDetails({
                   <>
                     <AccountControl>
                       <div>
+
                         {account && (
-                          <CopyHelper toCopy={account} iconPosition="left">
-                            <span style={{ marginLeft: '4px' }}>
-                              <Trans>Copy Address</Trans>
-                            </span>
+                          <CopyHelper toCopy={account} iconPosition="left" gap={6} iconSize={16} fontSize={14}>
+                            <Trans>Copy Address</Trans>
                           </CopyHelper>
                         )}
                         {chainId && account && (
@@ -326,10 +327,8 @@ export default function AccountDetails({
                     <AccountControl>
                       <div>
                         {account && (
-                          <CopyHelper toCopy={account} iconPosition="left">
-                            <span style={{ marginLeft: '4px' }}>
-                              <Trans>Copy Address</Trans>
-                            </span>
+                          <CopyHelper toCopy={account} iconPosition="left" gap={6} iconSize={16} fontSize={14}>
+                            <Trans>Copy Address</Trans>
                           </CopyHelper>
                         )}
                         {chainId && account && (

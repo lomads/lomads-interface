@@ -22,11 +22,14 @@ import optionalSelect from "../assets/svg/optionalSelect.svg";
 import highlightSelect from "../assets/svg/highlightSelect.svg";
 import updateIcon from "../assets/svg/updateIcon.svg";
 import  { useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "state/hooks";
+import { updateStepNumber } from "state/proposal/reducer";
 // import {STEP_NUMBER} from "./CreateDAO";
 
 const CreateDaoSidebar = () => {
-
+    const dispatch = useAppDispatch()
     const [menuCollapse, setMenuCollapse] = useState(false); //useState(isMenuCollapsed);
+    const stepNumber = useAppSelector((state) => state.proposal.stepNumber)
 
     const menuIconClick = () => {
         setMenuCollapse(!menuCollapse);
@@ -76,10 +79,10 @@ const CreateDaoSidebar = () => {
                 <div  style={{paddingBottom:120,paddingLeft:30}}>
                     <Menu>
                         <MenuItem>{getNavigationIcon(proposalIcon)}</MenuItem>
-                        <MenuItem>{getNavigationIcon(updateIcon, "/basics")}</MenuItem>
-                        <MenuItem>{getNavigationIcon(treasuryIcon, "/settings")}</MenuItem>
-                        <MenuItem>{getNavigationIcon(membersIcon, "/token")}</MenuItem>
-                        <MenuItem>{getNavigationIcon(chatIcon, "/golive")}</MenuItem>
+                        <MenuItem>{getNavigationIcon(updateIcon, "/basics", stepNumber > 2)}</MenuItem>
+                        <MenuItem>{getNavigationIcon(treasuryIcon, "/settings", stepNumber > 3)}</MenuItem>
+                        <MenuItem>{getNavigationIcon(membersIcon, "/token", stepNumber > 4)}</MenuItem>
+                        <MenuItem>{getNavigationIcon(chatIcon, "/golive", stepNumber > 5)}</MenuItem>
                     </Menu>
                 </div>
             </div>
@@ -95,10 +98,10 @@ const CreateDaoSidebar = () => {
                 <div style={{paddingLeft:80, paddingBottom:100}}>
                     <Menu>
                         <MenuItem>{getNavigationItem("Creation Guide", true,true)}</MenuItem>
-                        <MenuItem onClick={(e) => navigateFunc(e, '/basics')}>{getNavigationItem("BASICS", true, false)}</MenuItem>
-                        <MenuItem onClick={(e) => navigateFunc(e, '/settings')}>{getNavigationItem("SETTINGS", true, false)}</MenuItem>
-                        <MenuItem onClick={(e) => navigateFunc(e, '/token')}>{getNavigationItem("TOKEN", false, false)}</MenuItem>
-                        <MenuItem onClick={(e) => navigateFunc(e, '/golive')}>{getNavigationItem("GO LIVE", true, false)}</MenuItem>
+                        <MenuItem onClick={(e) => {stepNumber > 2 ? navigateFunc(e, '/basics') : console.log("no navigation")}}>{getNavigationItem("BASICS", true, stepNumber > 2)}</MenuItem>
+                        <MenuItem onClick={(e) => {stepNumber > 3 ? navigateFunc(e, '/settings') : console.log("no navigation")}}>{getNavigationItem("SETTINGS", true, stepNumber > 3)}</MenuItem>
+                        <MenuItem onClick={(e) => {stepNumber > 4 ? navigateFunc(e, '/token') : console.log("no navigation")}}>{getNavigationItem("TOKEN", false, stepNumber > 4)}</MenuItem>
+                        <MenuItem onClick={(e) => {stepNumber > 5 ? navigateFunc(e, '/golive') : console.log("no navigation")}}>{getNavigationItem("GO LIVE", true, stepNumber > 5)}</MenuItem>
                     </Menu>
                 </div>
             </div>
@@ -126,15 +129,15 @@ const CreateDaoSidebar = () => {
         );
     }
 
-    // const updateCurrentStepNo = (stepNumber:number) => {
-    //     console.log(stepNumber);
-    //     updateCurrentStep(stepNumber);
-    // }
+    const updateCurrentStepNo = (stepNumber:number) => {
+        console.log(stepNumber)
+        dispatch(updateStepNumber(stepNumber))
+    }
 
-    const getNavigationIcon = (icon: any, pageUrl?: string) => {
+    const getNavigationIcon = (icon: any, pageUrl?: string, gotoStep?: boolean) => {
         return (
             <div style={{paddingBottom:10}} >
-                <img src={icon} onClick={(e) => navigateFunc(e, pageUrl)} alt=""/>
+                <img src={icon} onClick={(e) => gotoStep ? navigateFunc(e, pageUrl) : console.log("no navigation")} alt=""/>
             </div>
         );
     }
