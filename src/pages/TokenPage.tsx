@@ -63,7 +63,7 @@ const TokenPage = () => {
                     <div>
                         <div className={"tileItemHeader"}>
                             <div>
-                                Name
+                                Name of token
                             </div>
                             <div className={"rect2"}>
                                 <div className={"reqText"}>
