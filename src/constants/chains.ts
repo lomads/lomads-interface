@@ -1,7 +1,7 @@
 /**
  * List of all the networks supported by the Uniswap Interface
  */
-export enum SupportedChainId {
+ export enum SupportedChainId {
   MAINNET = 1,
   ROPSTEN = 3,
   RINKEBY = 4,
@@ -38,6 +38,12 @@ export const CHAIN_IDS_TO_NAMES = {
 export const ALL_SUPPORTED_CHAIN_IDS: SupportedChainId[] = Object.values(SupportedChainId).filter(
   (id) => typeof id === 'number'
 ) as SupportedChainId[]
+
+export const SUPPORTED_CHAIN_IDS: SupportedChainId[] = [
+  SupportedChainId.MAINNET,
+  SupportedChainId.POLYGON_MUMBAI,
+  SupportedChainId.GOERLI,
+]
 
 export const SUPPORTED_GAS_ESTIMATE_CHAIN_IDS = [
   SupportedChainId.MAINNET,

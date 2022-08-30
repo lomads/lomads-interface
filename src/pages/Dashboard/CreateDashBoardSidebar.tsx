@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   ProSidebar,
@@ -9,38 +9,54 @@ import {
   SidebarContent,
 } from "react-pro-sidebar";
 import "react-pro-sidebar/dist/css/styles.css";
-import "../styles/Sidebar.css";
-import daoImageShaped from "../assets/svg/daoImageShaped.svg";
-import collapseIcon from "../assets/svg/collapseIcon.svg";
-import expandIcon from "../assets/svg/expandIcon.svg";
-import proposalIcon from "../assets/svg/proposalIcon.svg";
-import treasuryIcon from "../assets/svg/treasuryIcon.svg";
-import membersIcon from "../assets/svg/membersIcon.svg";
-import chatIcon from "../assets/svg/chatIcon.svg";
-import lomadsLogo from "../assets/svg/lomadsLogo.svg";
-import lomadsLogoExpand from "../assets/svg/lomadsLogoExpand.svg";
-import polyMainnet from "../assets/svg/polyMainnet.svg";
-import linkedIn from "../assets/svg/linkedIn.svg";
-import twitter from "../assets/svg/twitter.svg";
-import instagram from "../assets/svg/instagram.svg";
-import completeSelect from "../assets/svg/completeSelect.svg";
-import requiredSelect from "../assets/svg/requiredSelect.svg";
-import optionalSelect from "../assets/svg/optionalSelect.svg";
-import highlightSelect from "../assets/svg/highlightSelect.svg";
-import updateIcon from "../assets/svg/updateIcon.svg";
+import "../../styles/Sidebar.css";
+import daoImageShaped from "../../assets/svg/daoImageShaped.svg";
+import collapseIcon from "../../assets/svg/collapseIcon.svg";
+import expandIcon from "../../assets/svg/expandIcon.svg";
+import proposalIcon from "../../assets/svg/proposalIcon.svg";
+import treasuryIcon from "../../assets/svg/treasuryIcon.svg";
+import membersIcon from "../../assets/svg/membersIcon.svg";
+import chatIcon from "../../assets/svg/chatIcon.svg";
+import lomadsLogo from "../../assets/svg/lomadsLogo.svg";
+import lomadsLogoExpand from "../../assets/svg/lomadsLogoExpand.svg";
+import polyMainnet from "../../assets/svg/polyMainnet.svg";
+import linkedIn from "../../assets/svg/linkedIn.svg";
+import twitter from "../../assets/svg/twitter.svg";
+import instagram from "../../assets/svg/instagram.svg";
+import completeSelect from "../../assets/svg/completeSelect.svg";
+import requiredSelect from "../../assets/svg/requiredSelect.svg";
+import optionalSelect from "../../assets/svg/optionalSelect.svg";
+import highlightSelect from "../../assets/svg/highlightSelect.svg";
+import updateIcon from "../../assets/svg/updateIcon.svg";
+import pexels from "../../assets/images/metamask.png";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import { updateStepNumber } from "state/proposal/reducer";
+import { useMoralis } from "react-moralis";
 // import {STEP_NUMBER} from "./CreateDAO";
 
-const CreateDaoSidebar = () => {
+const CreateDashBoardSidebar = () => {
   const dispatch = useAppDispatch();
   const [menuCollapse, setMenuCollapse] = useState(false); //useState(isMenuCollapsed);
   const stepNumber = useAppSelector((state) => state.proposal.stepNumber);
+  const { Moralis } = useMoralis();
+  const [title, setTitle] = useState("");
 
   const menuIconClick = () => {
     setMenuCollapse(!menuCollapse);
   };
+
+  useEffect(() => {
+    getHistories();
+  }, []);
+
+  async function getHistories() {
+    const daoinfo = Moralis.Object.extend("DAOInfo");
+    const query = new Moralis.Query(daoinfo);
+    const results = await query.find({ useMasterKey: true });
+    const lastIndex = results.length - 1;
+    setTitle(results[lastIndex].get("title"));
+  }
 
   let navigate = useNavigate();
 
@@ -93,16 +109,16 @@ const CreateDaoSidebar = () => {
           <Menu>
             <MenuItem>{getNavigationIcon(proposalIcon)}</MenuItem>
             <MenuItem>
-              {getNavigationIcon(updateIcon, "/basics", stepNumber > 2)}
+              {getNavigationIcon(updateIcon, "", stepNumber > 2)}
             </MenuItem>
             <MenuItem>
-              {getNavigationIcon(treasuryIcon, "/settings", stepNumber > 3)}
+              {getNavigationIcon(treasuryIcon, "", stepNumber > 3)}
             </MenuItem>
             <MenuItem>
-              {getNavigationIcon(membersIcon, "/token", stepNumber > 4)}
+              {getNavigationIcon(membersIcon, "", stepNumber > 4)}
             </MenuItem>
             <MenuItem>
-              {getNavigationIcon(chatIcon, "/golive", stepNumber > 5)}
+              {getNavigationIcon(chatIcon, "", stepNumber > 5)}
             </MenuItem>
           </Menu>
         </div>
@@ -113,52 +129,64 @@ const CreateDaoSidebar = () => {
   const BodyExpand = () => {
     return (
       <div>
+        <div></div>
         <div
           className={"daoNameSidebar"}
-          style={{ paddingTop: 250, paddingBottom: 80 }}
+          style={{ paddingTop: 250, paddingBottom: 30, marginLeft: 42 }}
         >
-          Start your DAO
+          <div className="w-56">{title}</div>
         </div>
         <div style={{ paddingLeft: 80, paddingBottom: 100 }}>
           <Menu>
-            <MenuItem>
-              {getNavigationItem("Creation Guide", true, true)}
+            <MenuItem
+              onClick={(e) => {
+                stepNumber > 2
+                  ? navigateFunc(e, "")
+                  : console.log("no navigation");
+              }}
+              className="my-2"
+            >
+              {getNavigationItem("PROPOSALS", proposalIcon)}
             </MenuItem>
             <MenuItem
               onClick={(e) => {
                 stepNumber > 2
-                  ? navigateFunc(e, "/basics")
+                  ? navigateFunc(e, "")
                   : console.log("no navigation");
               }}
+              className="my-2"
             >
-              {getNavigationItem("BASICS", true, stepNumber > 2)}
+              {getNavigationItem("UPDATES", updateIcon)}
+            </MenuItem>
+            <MenuItem
+              onClick={(e) => {
+                stepNumber > 2
+                  ? navigateFunc(e, "")
+                  : console.log("no navigation");
+              }}
+              className="my-2"
+            >
+              {getNavigationItem("TREASURY", treasuryIcon)}
             </MenuItem>
             <MenuItem
               onClick={(e) => {
                 stepNumber > 3
-                  ? navigateFunc(e, "/settings")
+                  ? navigateFunc(e, "")
                   : console.log("no navigation");
               }}
+              className="my-2"
             >
-              {getNavigationItem("SETTINGS", true, stepNumber > 3)}
+              {getNavigationItem("MEMBERS", membersIcon)}
             </MenuItem>
             <MenuItem
               onClick={(e) => {
                 stepNumber > 4
-                  ? navigateFunc(e, "/token")
+                  ? navigateFunc(e, "TREASURY")
                   : console.log("no navigation");
               }}
+              className="my-2"
             >
-              {getNavigationItem("TOKEN", false, stepNumber > 4)}
-            </MenuItem>
-            <MenuItem
-              onClick={(e) => {
-                stepNumber > 5
-                  ? navigateFunc(e, "/golive")
-                  : console.log("no navigation");
-              }}
-            >
-              {getNavigationItem("GO LIVE", true, stepNumber > 5)}
+              {getNavigationItem("CHAT", chatIcon)}
             </MenuItem>
           </Menu>
         </div>
@@ -166,16 +194,10 @@ const CreateDaoSidebar = () => {
     );
   };
 
-  const getNavigationItem = (
-    text: string,
-    isRequired: boolean,
-    isComplete: boolean
-  ) => {
+  const getNavigationItem = (text: string, icon: any) => {
     return (
       <div className={"daoNavItem"} style={{ paddingBottom: 0 }}>
-        {/* onClick={() => updateCurrentStepNo(stepNumber)}  */}
-        {/*onClick={(e) => navigateFunc(e, pageUrl)}*/}
-        {getIcon(isRequired, isComplete)}
+        {addIcon(icon)}
         {text}
       </div>
     );
@@ -192,6 +214,18 @@ const CreateDaoSidebar = () => {
         style={{
           paddingRight: 20,
           paddingLeft: source === highlightSelect ? -40 : 0,
+        }}
+        alt=""
+      />
+    );
+  };
+  const addIcon = (icon: any) => {
+    return (
+      <img
+        src={icon}
+        style={{
+          paddingRight: 20,
+          paddingLeft: icon === highlightSelect ? -40 : 0,
         }}
         alt=""
       />
@@ -307,4 +341,4 @@ const CreateDaoSidebar = () => {
   );
 };
 
-export default CreateDaoSidebar;
+export default CreateDashBoardSidebar;

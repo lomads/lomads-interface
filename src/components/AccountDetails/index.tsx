@@ -1,35 +1,36 @@
-import { Trans } from '@lingui/macro'
-import { useWeb3React } from '@web3-react/core'
-import CopyHelper from './Copy'
-import { coinbaseWalletConnection, injectedConnection } from 'connection'
-import { getConnection } from 'connection/utils'
-import { useCallback, useContext } from 'react'
-import { ExternalLink as LinkIcon } from 'react-feather'
-import { useAppDispatch } from 'state/hooks'
-import { updateSelectedWallet } from 'state/user/reducer'
-import styled, { ThemeContext } from 'styled-components/macro'
-import { isMobile } from 'utils/userAgent'
+import { Trans } from "@lingui/macro";
+import { useWeb3React } from "@web3-react/core";
+import { CopyHelper } from "./Copy";
+import { coinbaseWalletConnection, injectedConnection } from "connection";
+import { getConnection } from "connection/utils";
+import { useCallback, useContext } from "react";
+import { ExternalLink as LinkIcon } from "react-feather";
+import { useAppDispatch } from "state/hooks";
+import { updateSelectedWallet } from "state/user/reducer";
+import styled, { ThemeContext } from "styled-components/macro";
+import { isMobile } from "utils/userAgent";
 
-import { ReactComponent as Close } from '../../assets/images/x.svg'
-import { SUPPORTED_WALLETS } from '../../constants/wallet'
-import { clearAllTransactions } from '../../state/transactions/reducer'
-import { ExternalLink, LinkStyledButton, ThemedText } from '../../theme'
-import { shortenAddress } from '../../utils'
-import { ExplorerDataType, getExplorerLink } from 'utils/getExplorerLink'
-import { ButtonSecondary } from '../Button'
-import StatusIcon from '../Identicon/StatusIcon'
-import { AutoRow } from '../Row'
-import Transaction from './Transaction'
+import { ReactComponent as Close } from "../../assets/images/x.svg";
+import { SUPPORTED_WALLETS } from "../../constants/wallet";
+import { clearAllTransactions } from "../../state/transactions/reducer";
+import { ExternalLink, LinkStyledButton, ThemedText } from "../../theme";
+import { shortenAddress } from "../../utils";
+import { ExplorerDataType, getExplorerLink } from "utils/getExplorerLink";
+import { ButtonSecondary } from "../Button";
+import StatusIcon from "../Identicon/StatusIcon";
+import { AutoRow } from "../Row";
+import Transaction from "./Transaction";
 
 const HeaderRow = styled.div`
   ${({ theme }) => theme.flexRowNoWrap};
   padding: 1rem 1rem;
   font-weight: 500;
-  color: ${(props) => (props.color === 'blue' ? ({ theme }) => theme.primary1 : 'inherit')};
+  color: ${(props) =>
+    props.color === "blue" ? ({ theme }) => theme.primary1 : "inherit"};
   ${({ theme }) => theme.mediaWidth.upToMedium`
     padding: 1rem;
   `};
-`
+`;
 
 const UpperSection = styled.div`
   position: relative;
@@ -49,7 +50,7 @@ const UpperSection = styled.div`
     margin-top: 0;
     font-weight: 500;
   }
-`
+`;
 
 const InfoCard = styled.div`
   padding: 1rem;
@@ -59,7 +60,7 @@ const InfoCard = styled.div`
   display: grid;
   grid-row-gap: 12px;
   margin-bottom: 20px;
-`
+`;
 
 const AccountGroupingRow = styled.div`
   ${({ theme }) => theme.flexRowNoWrap};
@@ -72,12 +73,13 @@ const AccountGroupingRow = styled.div`
     ${({ theme }) => theme.flexRowNoWrap}
     align-items: center;
   }
-`
+`;
 
 const AccountSection = styled.div`
   padding: 0rem 1rem;
-  ${({ theme }) => theme.mediaWidth.upToMedium`padding: 0rem 1rem 1.5rem 1rem;`};
-`
+  ${({ theme }) =>
+    theme.mediaWidth.upToMedium`padding: 0rem 1rem 1.5rem 1rem;`};
+`;
 
 const YourAccount = styled.div`
   h5 {
@@ -89,7 +91,7 @@ const YourAccount = styled.div`
     margin: 0;
     font-weight: 500;
   }
-`
+`;
 
 const LowerSection = styled.div`
   ${({ theme }) => theme.flexColumnNoWrap}
@@ -105,7 +107,7 @@ const LowerSection = styled.div`
     font-weight: 400;
     color: ${({ theme }) => theme.text3};
   }
-`
+`;
 
 const AccountControl = styled.div`
   display: flex;
@@ -127,7 +129,7 @@ const AccountControl = styled.div`
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-`
+`;
 
 const AddressLink = styled(ExternalLink)<{ hasENS: boolean; isENS: boolean }>`
   font-size: 0.825rem;
@@ -138,7 +140,7 @@ const AddressLink = styled(ExternalLink)<{ hasENS: boolean; isENS: boolean }>`
   :hover {
     color: ${({ theme }) => theme.text2};
   }
-`
+`;
 
 const CloseIcon = styled.div`
   position: absolute;
@@ -148,24 +150,24 @@ const CloseIcon = styled.div`
     cursor: pointer;
     opacity: 0.6;
   }
-`
+`;
 
 const CloseColor = styled(Close)`
   path {
     stroke: ${({ theme }) => theme.text4};
   }
-`
+`;
 
 const WalletName = styled.div`
   width: initial;
   font-size: 0.825rem;
   font-weight: 500;
   color: ${({ theme }) => theme.text3};
-`
+`;
 
 const TransactionListWrapper = styled.div`
   ${({ theme }) => theme.flexColumnNoWrap};
-`
+`;
 
 const WalletAction = styled(ButtonSecondary)`
   width: fit-content;
@@ -177,24 +179,24 @@ const WalletAction = styled(ButtonSecondary)`
     cursor: pointer;
     text-decoration: underline;
   }
-`
+`;
 
 function renderTransactions(transactions: string[]) {
   return (
     <TransactionListWrapper>
       {transactions.map((hash, i) => {
-        return <Transaction key={i} hash={hash} />
+        return <Transaction key={i} hash={hash} />;
       })}
     </TransactionListWrapper>
-  )
+  );
 }
 
 interface AccountDetailsProps {
-  toggleWalletModal: () => void
-  pendingTransactions: string[]
-  confirmedTransactions: string[]
-  ENSName?: string
-  openOptions: () => void
+  toggleWalletModal: () => void;
+  pendingTransactions: string[];
+  confirmedTransactions: string[];
+  ENSName?: string;
+  openOptions: () => void;
 }
 
 export default function AccountDetails({
@@ -204,36 +206,50 @@ export default function AccountDetails({
   ENSName,
   openOptions,
 }: AccountDetailsProps) {
-  const { chainId, account, connector } = useWeb3React()
-  const connectionType = getConnection(connector).type
+  const { chainId, account, connector } = useWeb3React();
+  const connectionType = getConnection(connector).type;
 
-  const theme = useContext(ThemeContext)
-  const dispatch = useAppDispatch()
+  const theme = useContext(ThemeContext);
+  const dispatch = useAppDispatch();
 
-  const isMetaMask = !!window.ethereum?.isMetaMask
-  const isCoinbaseWallet = !!window.ethereum?.isCoinbaseWallet
-  const isInjectedMobileBrowser = (isMetaMask || isCoinbaseWallet) && isMobile
+  const isMetaMask = !!window.ethereum?.isMetaMask;
+  const isCoinbaseWallet = !!window.ethereum?.isCoinbaseWallet;
+  const isInjectedMobileBrowser = (isMetaMask || isCoinbaseWallet) && isMobile;
 
   function formatConnectorName() {
-    const { ethereum } = window
-    const isMetaMask = !!(ethereum && ethereum.isMetaMask)
+    const { ethereum } = window;
+    const isMetaMask = !!(ethereum && ethereum.isMetaMask);
     const name = Object.keys(SUPPORTED_WALLETS)
       .filter(
         (k) =>
           SUPPORTED_WALLETS[k].connector === connector &&
-          (connector !== injectedConnection.connector || isMetaMask === (k === 'METAMASK'))
+          (connector !== injectedConnection.connector ||
+            isMetaMask === (k === "METAMASK"))
       )
-      .map((k) => SUPPORTED_WALLETS[k].name)[0]
-    return (
-      <WalletName>
-        <Trans>Connected with {name}</Trans>
-      </WalletName>
-    )
+      .map((k) => SUPPORTED_WALLETS[k].name)[0];
+    return <WalletName>Connected with {name}</WalletName>;
   }
 
   const clearAllTransactionsCallback = useCallback(() => {
-    if (chainId) dispatch(clearAllTransactions({ chainId }))
-  }, [dispatch, chainId])
+    if (chainId) dispatch(clearAllTransactions({ chainId }));
+  }, [dispatch, chainId]);
+
+  const disconnect = async () => {
+    if (connector.deactivate) {
+      connector.deactivate();
+      // Coinbase Wallet SDK does not emit a disconnect event to the provider,
+      // which is what web3-react uses to reset state. As a workaround we manually
+      // reset state.
+      if (connector === coinbaseWalletConnection.connector) {
+        connector.resetState();
+      }
+    } else {
+      connector.resetState();
+    }
+
+    dispatch(updateSelectedWallet({ wallet: undefined }));
+    openOptions();
+  };
 
   return (
     <>
@@ -253,31 +269,19 @@ export default function AccountDetails({
                   {!isInjectedMobileBrowser && (
                     <>
                       <WalletAction
-                        style={{ fontSize: '.825rem', fontWeight: 400, marginRight: '8px' }}
-                        onClick={() => {
-                          if (connector.deactivate) {
-                            connector.deactivate()
-
-                            // Coinbase Wallet SDK does not emit a disconnect event to the provider,
-                            // which is what web3-react uses to reset state. As a workaround we manually
-                            // reset state.
-                            if (connector === coinbaseWalletConnection.connector) {
-                              connector.resetState()
-                            }
-                          } else {
-                            connector.resetState()
-                          }
-
-                          dispatch(updateSelectedWallet({ wallet: undefined }))
-                          openOptions()
+                        style={{
+                          fontSize: ".825rem",
+                          fontWeight: 400,
+                          marginRight: "8px",
                         }}
+                        onClick={disconnect}
                       >
                         <Trans>Disconnect</Trans>
                       </WalletAction>
                       <WalletAction
-                        style={{ fontSize: '.825rem', fontWeight: 400 }}
+                        style={{ fontSize: ".825rem", fontWeight: 400 }}
                         onClick={() => {
-                          openOptions()
+                          openOptions();
                         }}
                       >
                         <Trans>Change</Trans>
@@ -290,7 +294,9 @@ export default function AccountDetails({
                 <AccountControl>
                   <div>
                     <StatusIcon connectionType={connectionType} />
-                    <p>{ENSName ? ENSName : account && shortenAddress(account)}</p>
+                    <p>
+                      {ENSName ? ENSName : account && shortenAddress(account)}
+                    </p>
                   </div>
                 </AccountControl>
               </AccountGroupingRow>
@@ -300,20 +306,28 @@ export default function AccountDetails({
                     <AccountControl>
                       <div>
                         {account && (
-                          <CopyHelper toCopy={account} iconPosition="left">
-                            <span style={{ marginLeft: '4px' }}>
-                              <Trans>Copy Address</Trans>
-                            </span>
+                          <CopyHelper
+                            toCopy={account}
+                            iconPosition="left"
+                            gap={6}
+                            iconSize={16}
+                            fontSize={14}
+                          >
+                            <Trans>Copy Address</Trans>
                           </CopyHelper>
                         )}
                         {chainId && account && (
                           <AddressLink
                             hasENS={!!ENSName}
                             isENS={true}
-                            href={getExplorerLink(chainId, ENSName, ExplorerDataType.ADDRESS)}
+                            href={getExplorerLink(
+                              chainId,
+                              ENSName,
+                              ExplorerDataType.ADDRESS
+                            )}
                           >
                             <LinkIcon size={16} />
-                            <span style={{ marginLeft: '4px' }}>
+                            <span style={{ marginLeft: "4px" }}>
                               <Trans>View on Explorer</Trans>
                             </span>
                           </AddressLink>
@@ -326,20 +340,28 @@ export default function AccountDetails({
                     <AccountControl>
                       <div>
                         {account && (
-                          <CopyHelper toCopy={account} iconPosition="left">
-                            <span style={{ marginLeft: '4px' }}>
-                              <Trans>Copy Address</Trans>
-                            </span>
+                          <CopyHelper
+                            toCopy={account}
+                            iconPosition="left"
+                            gap={6}
+                            iconSize={16}
+                            fontSize={14}
+                          >
+                            <Trans>Copy Address</Trans>
                           </CopyHelper>
                         )}
                         {chainId && account && (
                           <AddressLink
                             hasENS={!!ENSName}
                             isENS={false}
-                            href={getExplorerLink(chainId, account, ExplorerDataType.ADDRESS)}
+                            href={getExplorerLink(
+                              chainId,
+                              account,
+                              ExplorerDataType.ADDRESS
+                            )}
                           >
                             <LinkIcon size={16} />
-                            <span style={{ marginLeft: '4px' }}>
+                            <span style={{ marginLeft: "4px" }}>
                               <Trans>View on Explorer</Trans>
                             </span>
                           </AddressLink>
@@ -355,7 +377,7 @@ export default function AccountDetails({
       </UpperSection>
       {!!pendingTransactions.length || !!confirmedTransactions.length ? (
         <LowerSection>
-          <AutoRow mb={'1rem'} style={{ justifyContent: 'space-between' }}>
+          <AutoRow mb={"1rem"} style={{ justifyContent: "space-between" }}>
             <ThemedText.Body>
               <Trans>Recent Transactions</Trans>
             </ThemedText.Body>
@@ -374,5 +396,5 @@ export default function AccountDetails({
         </LowerSection>
       )}
     </>
-  )
+  );
 }
