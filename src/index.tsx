@@ -21,6 +21,7 @@ const root = ReactDOM.createRoot(
 );
 const serverUrl = process.env.REACT_APP_MORALIS_SERVER_URL as string;
 const appId = process.env.REACT_APP_MORALIS_APP_ID as string;
+
 root.render(
   <React.StrictMode>
     <Provider store={store}>
