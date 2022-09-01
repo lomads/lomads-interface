@@ -10,7 +10,6 @@ import {
 } from "react-pro-sidebar";
 import "react-pro-sidebar/dist/css/styles.css";
 import "../../styles/Sidebar.css";
-import daoImageShaped from "../../assets/svg/daoImageShaped.svg";
 import collapseIcon from "../../assets/svg/collapseIcon.svg";
 import expandIcon from "../../assets/svg/expandIcon.svg";
 import proposalIcon from "../../assets/svg/proposalIcon.svg";
@@ -23,24 +22,19 @@ import polyMainnet from "../../assets/svg/polyMainnet.svg";
 import linkedIn from "../../assets/svg/linkedIn.svg";
 import twitter from "../../assets/svg/twitter.svg";
 import instagram from "../../assets/svg/instagram.svg";
-import completeSelect from "../../assets/svg/completeSelect.svg";
-import requiredSelect from "../../assets/svg/requiredSelect.svg";
-import optionalSelect from "../../assets/svg/optionalSelect.svg";
 import highlightSelect from "../../assets/svg/highlightSelect.svg";
 import updateIcon from "../../assets/svg/updateIcon.svg";
-import pexels from "../../assets/images/metamask.png";
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "state/hooks";
-import { updateStepNumber } from "state/proposal/reducer";
+import { useAppSelector } from "state/hooks";
 import { useMoralis } from "react-moralis";
-// import {STEP_NUMBER} from "./CreateDAO";
+import { fetchFile } from "utils/ipfs";
 
 const CreateDashBoardSidebar = () => {
-  const dispatch = useAppDispatch();
   const [menuCollapse, setMenuCollapse] = useState(false); //useState(isMenuCollapsed);
   const stepNumber = useAppSelector((state) => state.proposal.stepNumber);
   const { Moralis } = useMoralis();
   const [title, setTitle] = useState("");
+  const [coverImg64, setCoverImg64] = useState("");
 
   const menuIconClick = () => {
     setMenuCollapse(!menuCollapse);
@@ -56,7 +50,18 @@ const CreateDashBoardSidebar = () => {
     const results = await query.find({ useMasterKey: true });
     const lastIndex = results.length - 1;
     setTitle(results[lastIndex].get("title"));
+    setCoverImg64(results[lastIndex].get("coverImg"));
   }
+
+  useEffect(() => {
+    const init = async () => {
+      if (!!coverImg64) {
+        const result: any = await fetchFile(coverImg64);
+        setCoverImg64(result);
+      }
+    };
+    init();
+  }, [coverImg64]);
 
   let navigate = useNavigate();
 
@@ -90,22 +95,22 @@ const CreateDashBoardSidebar = () => {
 
   const BodyCollapse = () => {
     return (
-      <div>
+      <div className="flex flex-col items-center">
         <div>
           <img
-            src={daoImageShaped}
-            alt=""
+            alt={`Uploaded coverImg`}
+            src={"data:image/jpeg;base64," + coverImg64}
             style={{
-              maxHeight: 100,
-              maxWidth: 100,
-              paddingLeft: 20,
-              paddingTop: 50,
-              paddingBottom: 150,
+              width: "80px",
+              height: "80px",
+              borderRadius: "20% 20% 20% 20%",
+              transform: "rotate(-45deg)",
+              marginTop: 100,
+              marginBottom: 40,
             }}
-            onClick={(e) => navigateFunc(e, "/")}
           />
         </div>
-        <div style={{ paddingBottom: 120, paddingLeft: 30 }}>
+        <div style={{ paddingBottom: 120 }}>
           <Menu>
             <MenuItem>{getNavigationIcon(proposalIcon)}</MenuItem>
             <MenuItem>
@@ -129,14 +134,29 @@ const CreateDashBoardSidebar = () => {
   const BodyExpand = () => {
     return (
       <div>
-        <div></div>
+        <div>
+          <img
+            alt={`Uploaded coverImg`}
+            src={"data:image/jpeg;base64," + coverImg64}
+            style={{
+              width: "200px",
+              height: "200px",
+              margin: "15px",
+              borderRadius: "20% 20% 20% 20%",
+              transform: "rotate(-45deg)",
+              marginTop: 100,
+              marginBottom: 40,
+              marginLeft: 100,
+            }}
+          />
+        </div>
         <div
           className={"daoNameSidebar"}
-          style={{ paddingTop: 250, paddingBottom: 30, marginLeft: 42 }}
+          style={{ marginBottom: 20, marginLeft: 70 }}
         >
           <div className="w-56">{title}</div>
         </div>
-        <div style={{ paddingLeft: 80, paddingBottom: 100 }}>
+        <div style={{ paddingLeft: 100, paddingBottom: 100 }}>
           <Menu>
             <MenuItem
               onClick={(e) => {
@@ -202,23 +222,6 @@ const CreateDashBoardSidebar = () => {
       </div>
     );
   };
-
-  const getIcon = (isRequired: boolean, isComplete: boolean) => {
-    let source = isRequired ? requiredSelect : optionalSelect;
-    if (isComplete) {
-      source = completeSelect;
-    }
-    return (
-      <img
-        src={source}
-        style={{
-          paddingRight: 20,
-          paddingLeft: source === highlightSelect ? -40 : 0,
-        }}
-        alt=""
-      />
-    );
-  };
   const addIcon = (icon: any) => {
     return (
       <img
@@ -230,11 +233,6 @@ const CreateDashBoardSidebar = () => {
         alt=""
       />
     );
-  };
-
-  const updateCurrentStepNo = (stepNumber: number) => {
-    console.log(stepNumber);
-    dispatch(updateStepNumber(stepNumber));
   };
 
   const getNavigationIcon = (

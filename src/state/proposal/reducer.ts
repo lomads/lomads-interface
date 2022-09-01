@@ -50,9 +50,9 @@ const initialState: ProposalState = {
   iconImgPath: "",
   tags:[],
   communityTags:[],
-  support: 0,
-  minApproval: 0,
-  voteDurDay: 0,
+  support: 50,
+  minApproval: 5,
+  voteDurDay: 3,
   voteDurHour: 0,
   stepNumber: 0,
   decimals: ''

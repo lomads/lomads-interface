@@ -29,6 +29,7 @@ import { V3Migrator } from 'types/v3/V3Migrator'
 
 import { ABI as DAOAbi } from "abis/DaoFactory";
 import { getContract } from '../utils'
+import { TOKEN_ABI } from 'abis/DaoToken'
 
 const { abi: IUniswapV2PairABI } = IUniswapV2PairJson
 const { abi: IUniswapV2Router02ABI } = IUniswapV2Router02Json
@@ -119,3 +120,6 @@ export function useInterfaceMulticall() {
 export function useDAOContract() {
   return useContract(DAOFACTORY_ADDRESSES, DAOAbi, true);
 } 
+export function useDAOTokenContract(_tokenAddress: String) {
+  return useContract(_tokenAddress,TOKEN_ABI,true)
+}

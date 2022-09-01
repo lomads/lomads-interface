@@ -6,18 +6,16 @@ import "../../styles/Modal.css";
 import "../../styles/Sidebar.css";
 import { useAppSelector } from "state/hooks";
 import { useMoralis } from "react-moralis";
-import { sidebarPropType } from "types";
 import { useWeb3React } from "@web3-react/core";
 import { tokenCall } from "connection/DaoTokenCall";
 import euro from "../../assets/svg/euro.svg";
 import { LeapFrog } from "@uiball/loaders";
 
-const Dashboard = (props: sidebarPropType) => {
+const Dashboard = () => {
   const tokenAddress = useAppSelector(
     (state) => state.proposal.deployedTokenAddress
   );
   const { Moralis } = useMoralis();
-  const [title, setTitle] = useState("");
   const [tokenName, setTokenName] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
   const [supply, setSupply] = useState("");
@@ -31,7 +29,6 @@ const Dashboard = (props: sidebarPropType) => {
     const query = new Moralis.Query(daoinfo);
     const results = await query.find({ useMasterKey: true });
     const lastIndex = results.length - 1;
-    setTitle(results[lastIndex].get("title"));
     setTokenName(results[lastIndex].get("tokenName"));
     setTokenSymbol(results[lastIndex].get("tokenSymbol"));
     setSupply(results[lastIndex].get("supply"));

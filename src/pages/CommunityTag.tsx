@@ -25,7 +25,7 @@ export default function CommunityTag() {
       });
       dispatch(updateCommunityTags(filteredTags));
     },
-    []
+    [dispatch]
   );
 
   return (

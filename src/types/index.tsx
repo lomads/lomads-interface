@@ -31,6 +31,6 @@ export interface ChangeComponentType {
 }
 export interface sidebarPropType {
   page?: string;
-  chainAllowed: number | boolean | undefined;
-  account: string | undefined;
+  chainAllowed?: number | boolean | undefined;
+  account?: string | undefined;
 }

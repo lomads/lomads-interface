@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import createDao from "../assets/svg/createDao.svg";
 import metamask2 from "../assets/svg/metamask2.svg";
@@ -9,34 +9,17 @@ import "../styles/CreateDao.css";
 import "../styles/Dashboard.css";
 import "../styles/Modal.css";
 import { Connector } from "@web3-react/types";
-import Header from "components/Header";
 import { updateSelectedWallet } from "state/user/reducer";
 import { useAppDispatch, useAppSelector } from "state/hooks";
-import {
-  ConnectionType,
-  injectedConnection,
-  walletConnectConnection,
-} from "connection";
+import { injectedConnection, walletConnectConnection } from "connection";
 import { getConnection } from "connection/utils";
-import { useModalIsOpen, useToggleWalletModal } from "state/application/hooks";
 import { updateConnectionError } from "state/connection/reducer";
 import { isChainAllowed } from "utils/switchChain";
-
-const WALLET_VIEWS = {
-  OPTIONS: "options",
-  ACCOUNT: "account",
-  PENDING: "pending",
-};
 
 const LoginPage = (props: any) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const toggleWalletModal = useToggleWalletModal();
-  const [walletView, setWalletView] = useState(WALLET_VIEWS.ACCOUNT);
   const selectedWallet = useAppSelector((state) => state.user.selectedWallet);
-  const [pendingConnector, setPendingConnector] = useState<
-    Connector | undefined
-  >();
 
   const { chainId, connector, account } = useWeb3React();
 
@@ -46,13 +29,11 @@ const LoginPage = (props: any) => {
     if (selectedWallet && account && chainAllowed) {
       navigate("/createdao");
     }
-  }, [selectedWallet, navigate, account]);
+  }, [selectedWallet, navigate, account, chainAllowed]);
 
   const nextLogin = async (connector: Connector) => {
     const connectionType = getConnection(connector).type;
     try {
-      setPendingConnector(connector);
-      setWalletView(WALLET_VIEWS.PENDING);
       dispatch(updateConnectionError({ connectionType, error: undefined }));
       await connector.activate();
       dispatch(updateSelectedWallet({ wallet: connectionType }));

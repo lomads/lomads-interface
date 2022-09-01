@@ -29,12 +29,9 @@ import optionalSelect from "../assets/svg/optionalSelect.svg";
 import highlightSelect from "../assets/svg/highlightSelect.svg";
 import updateIcon from "../assets/svg/updateIcon.svg";
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "state/hooks";
-import { updateStepNumber } from "state/proposal/reducer";
-// import {STEP_NUMBER} from "./CreateDAO";
+import { useAppSelector } from "state/hooks";
 
 const CreateDaoSidebar = () => {
-  const dispatch = useAppDispatch();
   const [menuCollapse, setMenuCollapse] = useState(false); //useState(isMenuCollapsed);
   const stepNumber = useAppSelector((state) => state.proposal.stepNumber);
 
@@ -46,8 +43,6 @@ const CreateDaoSidebar = () => {
 
   const navigateFunc = (e?: any, pageUrl?: string) => {
     if (pageUrl !== undefined) {
-      const abc = window.location.href + pageUrl;
-      console.log(abc);
       navigate(pageUrl);
     }
   };
@@ -196,11 +191,6 @@ const CreateDaoSidebar = () => {
         alt=""
       />
     );
-  };
-
-  const updateCurrentStepNo = (stepNumber: number) => {
-    console.log(stepNumber);
-    dispatch(updateStepNumber(stepNumber));
   };
 
   const getNavigationIcon = (

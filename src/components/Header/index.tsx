@@ -8,7 +8,7 @@ import { useNativeCurrencyBalances } from "state/connection/hooks";
 import styled from "styled-components/macro";
 import { isChainAllowed } from "utils/switchChain";
 import Web3Status from "../Web3Status";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useMatch } from "react-router-dom";
 // import NetworkSelector from './NetworkSelector'
 
 const HeaderFrame = styled.div<{ showBackground: boolean }>`
@@ -128,12 +128,13 @@ export default function Header() {
   ];
 
   const navigate = useNavigate();
+  const treasuryPage = useMatch("/dao/:deployedAddress");
 
   useEffect(() => {
-    if (!chainAllowed && !account) {
-      navigate("/login");
+    if (!chainAllowed && !account && !treasuryPage) {
+      navigate("/");
     }
-  }, [account, chainAllowed, navigate]);
+  }, [account, chainAllowed, navigate, treasuryPage]);
 
   const scrollY = useScrollPosition();
 

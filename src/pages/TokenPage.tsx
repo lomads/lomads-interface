@@ -1,18 +1,14 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "../styles/App.css";
 import "../styles/CreateDao.css";
 import "../styles/Dashboard.css";
 import "../styles/Modal.css";
 import "../styles/Sidebar.css";
-import { useAppSelector } from "state/hooks";
 import useStepRouter from "hooks/useStepRouter";
 import CreateNewToken from "components/CreateNewToken";
 import UseExistingToken from "components/UseExistingToken";
-import { sidebarPropType } from "types";
 
-const TokenPage = (props: sidebarPropType) => {
-  const navigate = useNavigate();
+const TokenPage = () => {
   useStepRouter(4);
   const [newToken, setNewToken] = useState<boolean>(true);
 

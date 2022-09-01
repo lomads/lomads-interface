@@ -8,10 +8,7 @@ const DashBoardSidebarPage = (props: sidebarPropType) => {
     if (props.page === "Treasury") {
       return (
         <div>
-          <TreasuryPage
-            chainAllowed={props.chainAllowed}
-            account={props.account}
-          />
+          <TreasuryPage />
         </div>
       );
     }

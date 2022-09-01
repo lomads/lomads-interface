@@ -1,4 +1,4 @@
-import { SyntheticEvent, useCallback, useState } from "react";
+import { SyntheticEvent, useCallback } from "react";
 
 import { Container } from "@chakra-ui/react";
 
@@ -13,7 +13,7 @@ export default function KeywordTag() {
     (event: SyntheticEvent, tags: string[]) => {
       dispatch(updateTags(tags));
     },
-    []
+    [dispatch]
   );
   return (
     <Container>

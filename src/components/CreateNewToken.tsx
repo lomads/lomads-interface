@@ -7,13 +7,7 @@ import "../styles/Modal.css";
 import "../styles/Sidebar.css";
 import { useNavigate } from "react-router-dom";
 import { Oval } from "react-loader-spinner";
-import {
-  Input,
-  FormControl,
-  FormLabel,
-  FormErrorMessage,
-  FormHelperText,
-} from "@chakra-ui/react";
+import { Input, FormControl, FormErrorMessage } from "@chakra-ui/react";
 import { useAppDispatch } from "state/hooks";
 import {
   updatetokenTitle,
@@ -25,7 +19,6 @@ import {
   updateStepNumber,
 } from "state/proposal/reducer";
 import { useAppSelector } from "state/hooks";
-import Header from "components/Header";
 import { fileUpload } from "../utils/ipfs";
 import useStepRouter from "hooks/useStepRouter";
 import { imageType } from "types";
@@ -41,15 +34,11 @@ const CreateNewToken = () => {
   const explain = useAppSelector((state) => state.proposal.explain);
   const supply = useAppSelector((state) => state.proposal.supply);
   const holder = useAppSelector((state) => state.proposal.holder);
-  const web3authAddress = useAppSelector(
-    (state) => state.proposal.Web3AuthAddress
-  );
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fileUploadFailed, setFileUploadFailed] = useState(false);
 
   async function handleUpload(event: any) {
-    console.log("Handle upload.....");
     const files = event.target.files;
     if (!files || files.length === 0) {
       return alert("No files selected");
@@ -61,7 +50,6 @@ const CreateNewToken = () => {
       setFileUploadFailed(false);
       dispatch(updateIconImgPath(result));
     } catch (e) {
-      console.log("try again");
       setFileUploadFailed(true);
       setFile(null);
     }
@@ -305,6 +293,7 @@ const CreateNewToken = () => {
               <button>
                 <input
                   type="file"
+                  accept="Image/jpeg, Image/png, Image/apng, Image/jpg"
                   style={{ opacity: "0", position: "relative", zIndex: 2 }}
                   onChange={handleUpload}
                 />

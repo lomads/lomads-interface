@@ -20,6 +20,7 @@ import { ethers } from "ethers";
 import { TOKEN_ABI } from "abis/DaoToken";
 import { updateTokenAddress } from "state/deploy/reducer";
 import { DotPulse } from "@uiball/loaders";
+import { useDAOTokenContract } from "hooks/useContract";
 
 const UseExistingToken = () => {
   const { provider } = useWeb3React();
@@ -32,12 +33,10 @@ const UseExistingToken = () => {
   let tokenSymbol = useAppSelector((state) => state.proposal.tokenSymbol);
   let supply = useAppSelector((state) => state.proposal.supply);
   let holder = useAppSelector((state) => state.proposal.holder);
-  let decimals = useAppSelector((state) => state.proposal.decimals);
-  let web3authAddress = useAppSelector(
-    (state) => state.proposal.Web3AuthAddress
-  );
   const [errors, setErrors] = useState<any>({});
   const [isSearching, setisSearching] = useState<boolean>(false);
+
+  const token = useDAOTokenContract(tokenAddress as String);
 
   useEffect(() => {
     if (!_.isEmpty(errors)) {
@@ -87,21 +86,14 @@ const UseExistingToken = () => {
   const searchDetails = async () => {
     if (tokenAddress !== null) {
       setisSearching(true);
-      const signer = provider?.getSigner();
-      const token = new ethers.Contract(
-        tokenAddress as string,
-        TOKEN_ABI,
-        signer
-      );
-      tokenTitle = await token.name();
-      tokenSymbol = await token.symbol();
-      holder = await token.owner();
-      supply = await token.totalSupply();
+      tokenTitle = await token?.name();
+      tokenSymbol = await token?.symbol();
+      holder = await token?.owner();
+      supply = await token?.totalSupply();
       dispatch(updatetokenTitle(tokenTitle));
       dispatch(updatetokenSymbol(tokenSymbol));
       dispatch(updateHolder(holder));
       dispatch(updateSupply(supply.toString()));
-      console.log(supply.toString());
       setisSearching(false);
     }
   };

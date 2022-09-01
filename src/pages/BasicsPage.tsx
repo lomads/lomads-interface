@@ -13,7 +13,7 @@ import "../styles/CreateDao.css";
 import "../styles/Dashboard.css";
 import "../styles/Modal.css";
 import "../styles/Sidebar.css";
-import { imageType, sidebarPropType } from "../types";
+import { imageType } from "../types";
 import { useAppDispatch } from "state/hooks";
 import {
   updateTitle,
@@ -29,7 +29,7 @@ import KeywordTag from "./KeywordTag";
 import { fileUpload } from "../utils/ipfs";
 import useStepRouter from "hooks/useStepRouter";
 
-const BasicsPage = (props: sidebarPropType) => {
+const BasicsPage = () => {
   useStepRouter(2);
   const dispatch = useAppDispatch();
   const title = useAppSelector((state) => state.proposal.title);
@@ -57,17 +57,7 @@ const BasicsPage = (props: sidebarPropType) => {
     }
   }, [errors]);
 
-  // useEffect(() => {
-  //   if (!props.chainAllowed) {
-  //     navigate("/login");
-  //   }
-  //   if (!props.account) {
-  //     navigate("/login");
-  //   }
-  // }, [props.account, props.chainAllowed, navigate]);
-
   async function handleUpload(event: any) {
-    console.log("Handle upload.....");
     const files = event.target.files;
     if (!files || files.length === 0) {
       return alert("No files selected");
@@ -79,7 +69,6 @@ const BasicsPage = (props: sidebarPropType) => {
       setFileUploadFailed(false);
       dispatch(updateCoverImgPath(result));
     } catch (e) {
-      console.log("try again");
       setFileUploadFailed(true);
       setFile(null);
     }
@@ -132,7 +121,6 @@ const BasicsPage = (props: sidebarPropType) => {
   };
   return (
     <>
-      {/* <div className="absolute top-0 right-0">{showHeader}</div> */}
       <div
         className={"something"}
         style={{
@@ -264,6 +252,7 @@ const BasicsPage = (props: sidebarPropType) => {
                   <button>
                     <input
                       type="file"
+                      accept="Image/jpeg, Image/png, Image/apng, Image/jpg"
                       style={{ opacity: "0", position: "relative", zIndex: 2 }}
                       onChange={handleUpload}
                     />

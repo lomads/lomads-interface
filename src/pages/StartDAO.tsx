@@ -31,7 +31,7 @@ const StartDAO = () => {
           />
           <StepBlock
             blockTitle={"Basics"}
-            onClickGoToStep="/sidepage"
+            onClickGoToStep="/basics"
             blockDescription={
               "Name your project, upload an image, and set the details."
             }

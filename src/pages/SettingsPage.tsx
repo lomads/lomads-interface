@@ -11,23 +11,18 @@ import "../styles/Sidebar.css";
 import ChangeComponent from "../components/sub/ChangeComponent";
 import SliderThumbWithTooltip from "components/sub/SupportSlider";
 import ApprovalSliderThumbWithTooltip from "components/sub/ApprovalSlider";
-import Header from "components/Header";
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import { updateTemplate, updateTemplateVal } from "state/proposal/reducer";
 import { updateStepNumber } from "state/proposal/reducer";
 import useStepRouter from "hooks/useStepRouter";
-import { sidebarPropType } from "types";
 
-const SettingsPage = (props: sidebarPropType) => {
+const SettingsPage = () => {
   useStepRouter(3);
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const web3authAddress = useAppSelector(
-    (state) => state.proposal.Web3AuthAddress
-  );
-  const template = useAppSelector((state) => state.proposal.template);
-  const templateVal = useAppSelector((state) => state.proposal.templateVal);
+  // const template = useAppSelector((state) => state.proposal.template);
+  // const templateVal = useAppSelector((state) => state.proposal.templateVal);
   const voteDurDay = useAppSelector((state) => state.proposal.voteDurDay);
   const voteDurHour = useAppSelector((state) => state.proposal.voteDurHour);
   const minApproval = useAppSelector((state) => state.proposal.minApproval);
@@ -49,14 +44,6 @@ const SettingsPage = (props: sidebarPropType) => {
     }
   }, [errors]);
 
-  // useEffect(() => {
-  //   if (!props.chainAllowed) {
-  //     navigate("/login");
-  //   }
-  //   if (!props.account) {
-  //     navigate("/login");
-  //   }
-  // }, [props.account, props.chainAllowed, navigate]);
   const TEMPLATE = ["Collective", "Service Network", "Shared Owner"];
 
   // const handleTemplateSelect = (val: number) => {
@@ -69,7 +56,7 @@ const SettingsPage = (props: sidebarPropType) => {
   //   }
   // };
 
-  const [isClicked, setIsClicked] = useState<boolean>(true);
+  // const [isClicked, setIsClicked] = useState<boolean>(true);
 
   useEffect(() => {
     dispatch(updateTemplateVal(1));
@@ -136,9 +123,9 @@ const SettingsPage = (props: sidebarPropType) => {
             <SelectTemplate
               blockTitle={TEMPLATE[1]}
               blockDescription="Comming soon"
-              iconColor={isClicked ? "#C94B32" : "white"}
-              bgColor={"#FFFFFF"}
-              isCommingSoon={false}
+              iconColor={"#b2b4b7"}
+              bgColor={"#b5b8ba"}
+              isCommingSoon={true}
               // onClick={() => handleTemplateSelect(1)}
             />
             <SelectTemplate

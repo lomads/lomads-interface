@@ -25,15 +25,12 @@ import {
   updatedeployedGovernorAddress,
   updatedeployedTokenAddress,
 } from "../state/proposal/reducer";
-import Header from "components/Header";
 import { useNewMoralisObject } from "react-moralis";
 import useStepRouter from "hooks/useStepRouter";
 import { useTransactionAdder } from "state/transactions/hooks";
-import { useDAOContract } from "hooks/useContract";
+import { useDAOContract, useDAOTokenContract } from "hooks/useContract";
 import { TransactionInfo } from "state/transactions/types";
 import { TransactionType } from "state/transactions/types";
-import { ethers } from "ethers";
-import { TOKEN_ABI } from "abis/DaoToken";
 import { sidebarPropType } from "types";
 
 const GoLivePage = (props: sidebarPropType) => {
@@ -41,14 +38,11 @@ const GoLivePage = (props: sidebarPropType) => {
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { provider, connector } = useWeb3React();
+  const { connector } = useWeb3React();
   const [deployedGovernor, setdeployedGovernor] = useState<string>("");
   const [isLoading, setisLoading] = useState(false);
   const title = useAppSelector((state) => state.proposal.title);
   const purpose = useAppSelector((state) => state.proposal.purpose);
-  const deployedTokenAddress = useAppSelector(
-    (state) => state.proposal.deployedTokenAddress
-  );
   const deployedTokenSymbol = useAppSelector(
     (state) => state.proposal.tokenSymbol
   );
@@ -66,9 +60,6 @@ const GoLivePage = (props: sidebarPropType) => {
   const minApproval = useAppSelector((state) => state.proposal.minApproval);
   const voteDurDay = useAppSelector((state) => state.proposal.voteDurDay);
   const voteDurHour = useAppSelector((state) => state.proposal.voteDurHour);
-  const web3authAddress = useAppSelector(
-    (state) => state.proposal.Web3AuthAddress
-  );
   const coverImgPath = useAppSelector((state) => state.proposal.coverImgPath);
   const iconImgPath = useAppSelector((state) => state.proposal.iconImgPath);
   const tokenAddress = useAppSelector(
@@ -77,7 +68,9 @@ const GoLivePage = (props: sidebarPropType) => {
   const { save } = useNewMoralisObject("DAOInfo");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const addTransaction = useTransactionAdder();
-  const factory = useDAOContract();
+
+  const daoContract = useDAOContract();
+  const token = useDAOTokenContract(tokenAddress as String);
 
   const addToken = async (deployedTokenAddress: string) => {
     const tokenAddress = deployedTokenAddress;
@@ -115,12 +108,10 @@ const GoLivePage = (props: sidebarPropType) => {
     if (!isLoading) {
       setisLoading(true);
     }
-    console.log("DEploying Goerli");
-    console.log(deployedTokenAddress);
     const creatingGovernor =
-      factory &&
+      daoContract &&
       deployedTokenAddress !== null &&
-      (await factory.createGovernor(
+      (await daoContract.createGovernor(
         title,
         deployedTokenAddress,
         title,
@@ -133,7 +124,7 @@ const GoLivePage = (props: sidebarPropType) => {
     } as TransactionInfo;
     addTransaction(creatingGovernor, transactionInfo);
     await creatingGovernor.wait();
-    const governorAddress = await factory?.deployedGovernorAddress();
+    const governorAddress = await daoContract?.deployedGovernorAddress();
     await addToken(deployedTokenAddress);
     await saveObject(deployedTokenAddress);
     dispatch(updatedeployedGovernorAddress(governorAddress));
@@ -141,11 +132,10 @@ const GoLivePage = (props: sidebarPropType) => {
     setisLoading(false);
   };
   const createToken = async () => {
-    if (factory) {
+    if (daoContract) {
       setisLoading(true);
-      // setIsTokenDeploy(false)
       onClose();
-      const creatingToken = await factory.createToken(
+      const creatingToken = await daoContract.createToken(
         tokenTitle,
         tokenSymbol,
         supply,
@@ -157,23 +147,19 @@ const GoLivePage = (props: sidebarPropType) => {
       } as TransactionInfo;
       addTransaction(creatingToken, transactionInfo);
       await creatingToken.wait();
-      const tokenAddress = await factory.deployedTokenAddress();
-      dispatch(updatedeployedTokenAddress(tokenAddress));
+      const _tokenAddress = await daoContract.deployedTokenAddress();
+      dispatch(updatedeployedTokenAddress(_tokenAddress));
       if (tokenAddress) {
-        console.log("token address is:", tokenAddress);
-        dispatch(updatedeployedTokenAddress(tokenAddress));
-        await MintToken(tokenAddress);
-        DeployDAO(tokenAddress);
+        await MintToken();
+        DeployDAO(_tokenAddress);
         // localStorage.removeItem('maxStep');
       }
     }
   };
 
-  const MintToken = async (tokenAddress: string) => {
-    const signer = provider?.getSigner();
-    const token = await new ethers.Contract(tokenAddress, TOKEN_ABI, signer);
+  const MintToken = async () => {
     const amount = supply * 10 ** 18;
-    const mintToken = await token.mint(holder, BigInt(amount));
+    const mintToken = await token?.mint(holder, BigInt(amount));
     await mintToken.wait();
   };
 
@@ -201,7 +187,6 @@ const GoLivePage = (props: sidebarPropType) => {
     await save(data, {
       onSuccess: (daoinfo) => {
         // Execute any logic that should take place after the object is saved.
-        console.log("New object created with objectId: " + daoinfo.id);
         navigate(`/dao/${deployedTokenAddress}`);
       },
       onError: (error) => {
