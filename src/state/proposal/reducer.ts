@@ -1,6 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { saturate } from 'polished'
-import { isObjectBindingPattern } from 'typescript'
 
 export interface ProposalState {
   readonly title: string
@@ -11,7 +9,7 @@ export interface ProposalState {
   readonly tokenSymbol: string
   readonly supply: number
   readonly shortDesc: string
-  readonly deployedTokenAddress: string | null,
+  readonly deployedTokenAddress: string,
   readonly longDesc: string
   readonly explain: string
   readonly holder: string
@@ -39,7 +37,7 @@ const initialState: ProposalState = {
   tokenSymbol: "",
   supply: 0,
   shortDesc: "",
-  deployedTokenAddress: null,
+  deployedTokenAddress: "",
   longDesc: "",
   explain: "",
   holder: "",

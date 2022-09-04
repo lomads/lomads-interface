@@ -12,15 +12,6 @@ const TokenPage = () => {
   useStepRouter(4);
   const [newToken, setNewToken] = useState<boolean>(true);
 
-  // useEffect(() => {
-  //   if (!props.chainAllowed) {
-  //     navigate("/login");
-  //   }
-  //   if (!props.account) {
-  //     navigate("/login");
-  //   }
-  // }, [props.chainAllowed, props.account, navigate]);
-
   return (
     <>
       <div

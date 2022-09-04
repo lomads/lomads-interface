@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { LineWobble } from "@uiball/loaders";
 import { useNavigate } from "react-router-dom";
-import { useWeb3React } from "@web3-react/core";
 import "../styles/App.css";
 import "../styles/CreateDao.css";
 import "../styles/Dashboard.css";
@@ -28,14 +27,16 @@ import {
 import { useNewMoralisObject } from "react-moralis";
 import useStepRouter from "hooks/useStepRouter";
 import { useTransactionAdder } from "state/transactions/hooks";
-import { useDAOContract, useDAOTokenContract } from "hooks/useContract";
+import { useDAOContract } from "hooks/useContract";
 import { TransactionInfo } from "state/transactions/types";
 import { TransactionType } from "state/transactions/types";
 import { sidebarPropType } from "types";
+import { tokenCall } from "connection/DaoTokenCall";
+import { useWeb3React } from "@web3-react/core";
 
 const GoLivePage = (props: sidebarPropType) => {
   useStepRouter(5);
-
+  const { provider } = useWeb3React();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { connector } = useWeb3React();
@@ -70,7 +71,6 @@ const GoLivePage = (props: sidebarPropType) => {
   const addTransaction = useTransactionAdder();
 
   const daoContract = useDAOContract();
-  const token = useDAOTokenContract(tokenAddress as String);
 
   const addToken = async (deployedTokenAddress: string) => {
     const tokenAddress = deployedTokenAddress;
@@ -80,7 +80,7 @@ const GoLivePage = (props: sidebarPropType) => {
       "https://user-images.githubusercontent.com/87822922/182279388-17db0814-b7f4-4b74-b79a-fdbda12c696b.png";
 
     try {
-      const wasAdded = connector.provider?.request({
+      connector.provider?.request({
         method: "wallet_watchAsset",
         params: {
           type: "ERC20",
@@ -92,12 +92,6 @@ const GoLivePage = (props: sidebarPropType) => {
           },
         },
       });
-
-      if (wasAdded) {
-        console.log("Thanks for your interest!");
-      } else {
-        console.log("Your loss!");
-      }
     } catch (error) {
       console.log(error);
     }
@@ -147,19 +141,23 @@ const GoLivePage = (props: sidebarPropType) => {
       } as TransactionInfo;
       addTransaction(creatingToken, transactionInfo);
       await creatingToken.wait();
-      const _tokenAddress = await daoContract.deployedTokenAddress();
+      const _tokenAddress: string = await daoContract?.deployedTokenAddress();
       dispatch(updatedeployedTokenAddress(_tokenAddress));
-      if (tokenAddress) {
-        await MintToken();
+      if (_tokenAddress.length >= 32) {
+        await MintToken(_tokenAddress);
         DeployDAO(_tokenAddress);
-        // localStorage.removeItem('maxStep');
       }
     }
   };
 
-  const MintToken = async () => {
+  const MintToken = async (newtokenAddress: string) => {
+    const token = await tokenCall(provider, newtokenAddress);
     const amount = supply * 10 ** 18;
-    const mintToken = await token?.mint(holder, BigInt(amount));
+    const mintToken = await token.mint(holder, BigInt(amount));
+    const transactionInfo = {
+      type: TransactionType.DEPOSIT_LIQUIDITY_STAKING,
+    } as TransactionInfo;
+    addTransaction(mintToken, transactionInfo);
     await mintToken.wait();
   };
 
@@ -200,7 +198,7 @@ const GoLivePage = (props: sidebarPropType) => {
   };
 
   const Deploy = () => {
-    if (tokenAddress) {
+    if (tokenAddress.length > 32) {
       DeployDAO(tokenAddress);
     } else {
       createToken();

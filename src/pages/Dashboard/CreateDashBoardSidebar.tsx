@@ -107,6 +107,7 @@ const CreateDashBoardSidebar = () => {
               transform: "rotate(-45deg)",
               marginTop: 100,
               marginBottom: 40,
+              border: "7px solid #ec917f",
             }}
           />
         </div>
@@ -147,6 +148,7 @@ const CreateDashBoardSidebar = () => {
               marginTop: 100,
               marginBottom: 40,
               marginLeft: 100,
+              border: "15px solid #ec917f",
             }}
           />
         </div>

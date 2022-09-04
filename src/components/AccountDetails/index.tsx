@@ -3,7 +3,7 @@ import { useWeb3React } from "@web3-react/core";
 import { CopyHelper } from "./Copy";
 import { coinbaseWalletConnection, injectedConnection } from "connection";
 import { getConnection } from "connection/utils";
-import { useCallback, useContext } from "react";
+import { useCallback, useContext, useEffect } from "react";
 import { ExternalLink as LinkIcon } from "react-feather";
 import { useAppDispatch } from "state/hooks";
 import { updateSelectedWallet } from "state/user/reducer";
@@ -20,6 +20,16 @@ import { ButtonSecondary } from "../Button";
 import StatusIcon from "../Identicon/StatusIcon";
 import { AutoRow } from "../Row";
 import Transaction from "./Transaction";
+import {
+  updatetokenTitle,
+  updatetokenSymbol,
+  updateSupply,
+  updateHolder,
+  updateStepNumber,
+  updatedeployedTokenAddress,
+  updateExplain,
+  updateIconImgPath,
+} from "state/proposal/reducer";
 
 const HeaderRow = styled.div`
   ${({ theme }) => theme.flexRowNoWrap};
@@ -234,9 +244,20 @@ export default function AccountDetails({
     if (chainId) dispatch(clearAllTransactions({ chainId }));
   }, [dispatch, chainId]);
 
+  const clearOnDisconnect = () => {
+    dispatch(updatedeployedTokenAddress(""));
+    dispatch(updatetokenTitle(""));
+    dispatch(updatetokenSymbol(""));
+    dispatch(updateHolder(""));
+    dispatch(updateExplain(""));
+    dispatch(updateSupply(0));
+    dispatch(updateIconImgPath(""));
+  };
+
   const disconnect = async () => {
     if (connector.deactivate) {
       connector.deactivate();
+
       // Coinbase Wallet SDK does not emit a disconnect event to the provider,
       // which is what web3-react uses to reset state. As a workaround we manually
       // reset state.
@@ -245,8 +266,8 @@ export default function AccountDetails({
       }
     } else {
       connector.resetState();
+      clearOnDisconnect();
     }
-
     dispatch(updateSelectedWallet({ wallet: undefined }));
     openOptions();
   };

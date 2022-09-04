@@ -148,7 +148,7 @@ export default function WalletModal({
     if (walletModalOpen) {
       setWalletView(account ? WALLET_VIEWS.ACCOUNT : WALLET_VIEWS.OPTIONS);
     } else if (!walletModalOpen && walletView === "options") {
-      navigate("/login");
+      navigate("/");
     }
   }, [walletModalOpen, setWalletView, account, walletView, navigate]);
 

@@ -10,6 +10,9 @@ import { useWeb3React } from "@web3-react/core";
 import { tokenCall } from "connection/DaoTokenCall";
 import euro from "../../assets/svg/euro.svg";
 import { LeapFrog } from "@uiball/loaders";
+import { useTransactionAdder } from "state/transactions/hooks";
+import { TransactionInfo } from "state/transactions/types";
+import { TransactionType } from "state/transactions/types";
 
 const Dashboard = () => {
   const tokenAddress = useAppSelector(
@@ -18,7 +21,9 @@ const Dashboard = () => {
   const { Moralis } = useMoralis();
   const [tokenName, setTokenName] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
-  const [supply, setSupply] = useState("");
+  const [supply, setSupply] = useState(0);
+
+  const addTransaction = useTransactionAdder();
 
   useEffect(() => {
     getHistories();
@@ -31,7 +36,7 @@ const Dashboard = () => {
     const lastIndex = results.length - 1;
     setTokenName(results[lastIndex].get("tokenName"));
     setTokenSymbol(results[lastIndex].get("tokenSymbol"));
-    setSupply(results[lastIndex].get("supply"));
+    setSupply(parseInt(results[lastIndex].get("supply")));
   }
 
   const { provider } = useWeb3React();
@@ -49,6 +54,10 @@ const Dashboard = () => {
         recipient,
         BigInt(transferAmount)
       );
+      const transactionInfo = {
+        type: TransactionType.DEPOSIT_LIQUIDITY_STAKING,
+      } as TransactionInfo;
+      addTransaction(transferToken, transactionInfo);
       await transferToken.wait();
       setMessage(
         `Token have been transferred successfully to address: ${recipient}`

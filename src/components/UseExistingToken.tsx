@@ -5,25 +5,19 @@ import { useAppDispatch } from "state/hooks";
 import {
   updatetokenTitle,
   updatetokenSymbol,
-  updateExplain,
   updateSupply,
   updateHolder,
-  updateIconImgPath,
   updateStepNumber,
   updatedeployedTokenAddress,
-  updateDecimals,
+  updateExplain,
+  updateIconImgPath,
 } from "state/proposal/reducer";
 import { useAppSelector } from "state/hooks";
 import { useNavigate } from "react-router-dom";
-import { useWeb3React } from "@web3-react/core";
-import { ethers } from "ethers";
-import { TOKEN_ABI } from "abis/DaoToken";
-import { updateTokenAddress } from "state/deploy/reducer";
 import { DotPulse } from "@uiball/loaders";
-import { useDAOTokenContract } from "hooks/useContract";
+import { DAOTokenContract } from "hooks/useContract";
 
 const UseExistingToken = () => {
-  const { provider } = useWeb3React();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const tokenAddress = useAppSelector(
@@ -36,7 +30,7 @@ const UseExistingToken = () => {
   const [errors, setErrors] = useState<any>({});
   const [isSearching, setisSearching] = useState<boolean>(false);
 
-  const token = useDAOTokenContract(tokenAddress as String);
+  const token = DAOTokenContract(tokenAddress as string);
 
   useEffect(() => {
     if (!_.isEmpty(errors)) {
@@ -84,7 +78,7 @@ const UseExistingToken = () => {
   };
 
   const searchDetails = async () => {
-    if (tokenAddress !== null) {
+    if (tokenAddress.length >= 32) {
       setisSearching(true);
       tokenTitle = await token?.name();
       tokenSymbol = await token?.symbol();
