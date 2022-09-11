@@ -52,7 +52,9 @@ const GoLivePage = (props: sidebarPropType) => {
   const tags = useAppSelector((state) => state.proposal.tags);
   const communityTags = useAppSelector((state) => state.proposal.communityTags);
   const tokenTitle = useAppSelector((state) => state.proposal.tokenTitle);
-  const tokenSymbol = useAppSelector((state) => state.proposal.tokenSymbol);
+  const tokenSymbol: any = useAppSelector(
+    (state) => state.proposal.tokenSymbol
+  );
   const explain = useAppSelector((state) => state.proposal.explain);
   const supply = useAppSelector((state) => state.proposal.supply);
   const holder = useAppSelector((state) => state.proposal.holder);
@@ -66,6 +68,7 @@ const GoLivePage = (props: sidebarPropType) => {
   const tokenAddress = useAppSelector(
     (state) => state.proposal.deployedTokenAddress
   );
+  const safeName = useAppSelector((state) => state.proposal.safeName);
   const { save } = useNewMoralisObject("DAOInfo");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const addTransaction = useTransactionAdder();
@@ -181,6 +184,7 @@ const GoLivePage = (props: sidebarPropType) => {
       supply: supply.toString(),
       holder: holder,
       iconImg: iconImgPath,
+      safeName: safeName,
     };
     await save(data, {
       onSuccess: (daoinfo) => {

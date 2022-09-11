@@ -97,7 +97,7 @@ const BasicsPage = () => {
 
     if (_.isEmpty(terrors)) {
       dispatch(updateStepNumber(3));
-      navigate("/settings");
+      navigate("/safe");
     } else {
       setErrors(terrors);
     }

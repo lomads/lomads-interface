@@ -253,6 +253,7 @@ const CreateNewToken = () => {
           className={"inputField"}
           style={{ height: 50, width: 500 }}
           name="holder"
+          disabled={true}
           value={holder}
           placeholder="0x3429…"
           onChange={(e) => {

@@ -4,6 +4,7 @@ import SettingsPage from "./SettingsPage";
 import TokenPage from "./TokenPage";
 import GoLivePage from "./GoLivePage";
 import { sidebarPropType } from "types";
+import GnosisPage from "./gnosisPage";
 
 const SidebarPage = (props: sidebarPropType) => {
   const renderPage = () => {
@@ -19,10 +20,10 @@ const SidebarPage = (props: sidebarPropType) => {
           <TokenPage />
         </div>
       );
-    } else if (props.page === "Settings") {
+    } else if (props.page === "Safe") {
       return (
         <div>
-          <SettingsPage />
+          <GnosisPage />
         </div>
       );
     } else if (props.page === "Go Live") {

@@ -15,7 +15,7 @@ export default function App() {
         <Route path="/" element={[<LoginPage />]} />
         <Route path="/createdao" element={[<StartDAO />]} />
         <Route path="/basics" element={<SidebarPage page="Basics" />} />
-        <Route path="/settings" element={<SidebarPage page="Settings" />} />
+        <Route path="/safe" element={<SidebarPage page="Safe" />} />
         <Route path="/token" element={<SidebarPage page="Token" />} />
         <Route path="/golive" element={<SidebarPage page="Go Live" />} />
         <Route

@@ -91,7 +91,7 @@ const CreateDaoSidebar = () => {
               {getNavigationIcon(updateIcon, "/basics", stepNumber > 2)}
             </MenuItem>
             <MenuItem>
-              {getNavigationIcon(treasuryIcon, "/settings", stepNumber > 3)}
+              {getNavigationIcon(treasuryIcon, "/safe", stepNumber > 3)}
             </MenuItem>
             <MenuItem>
               {getNavigationIcon(membersIcon, "/token", stepNumber > 4)}
@@ -131,11 +131,11 @@ const CreateDaoSidebar = () => {
             <MenuItem
               onClick={(e) => {
                 stepNumber > 3
-                  ? navigateFunc(e, "/settings")
+                  ? navigateFunc(e, "/safe")
                   : console.log("no navigation");
               }}
             >
-              {getNavigationItem("SETTINGS", true, stepNumber > 3)}
+              {getNavigationItem("CREATE SAFE", true, stepNumber > 3)}
             </MenuItem>
             <MenuItem
               onClick={(e) => {
