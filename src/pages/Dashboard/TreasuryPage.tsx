@@ -4,26 +4,34 @@ import "../../styles/CreateDao.css";
 import "../../styles/Dashboard.css";
 import "../../styles/Modal.css";
 import "../../styles/Sidebar.css";
-import { useAppSelector } from "state/hooks";
 import { useMoralis } from "react-moralis";
 import { useWeb3React } from "@web3-react/core";
-import { tokenCall } from "connection/DaoTokenCall";
+import { tokenCallSafe } from "connection/DaoTokenCall";
 import euro from "../../assets/svg/euro.svg";
 import { LeapFrog } from "@uiball/loaders";
-import { useTransactionAdder } from "state/transactions/hooks";
-import { TransactionInfo } from "state/transactions/types";
-import { TransactionType } from "state/transactions/types";
-
+import {
+  SafeTransactionData,
+  SafeTransactionDataPartial,
+} from "@gnosis.pm/safe-core-sdk-types";
+import { ImportSafe, safeService } from "connection/SafeCall";
+import { BiRefresh } from "react-icons/bi";
+import { EthSignSignature } from "@gnosis.pm/safe-core-sdk";
 const Dashboard = () => {
-  const tokenAddress = useAppSelector(
-    (state) => state.proposal.deployedTokenAddress
-  );
   const { Moralis } = useMoralis();
   const [tokenName, setTokenName] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
+  const [tokenAddress, setTokenAddress] = useState("");
   const [supply, setSupply] = useState(0);
-
-  const addTransaction = useTransactionAdder();
+  const { provider, account } = useWeb3React();
+  const [recipient, setRecipient] = useState("");
+  const [amount, setamount] = useState("");
+  const [isLoading, setisLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [tokens, settokens] = useState<any>([]);
+  const [transactions, setTransactions] = useState<any>([]);
+  const [pendingTransactions, setPendingTransactions] = useState<any>([]);
+  const [safeTxHashs, setSafeTxhashs] = useState<string>("");
+  const [safeAddress, setSafeAddress] = useState<string>("");
 
   useEffect(() => {
     getHistories();
@@ -37,34 +45,243 @@ const Dashboard = () => {
     setTokenName(results[lastIndex].get("tokenName"));
     setTokenSymbol(results[lastIndex].get("tokenSymbol"));
     setSupply(parseInt(results[lastIndex].get("supply")));
+    setSafeAddress(results[lastIndex].get("holder"));
   }
 
-  const { provider } = useWeb3React();
-  const [recipient, setRecipient] = useState("");
-  const [amount, setamount] = useState("");
-  const [isLoading, setisLoading] = useState(false);
-  const [message, setMessage] = useState("");
-
-  const transferToken = async () => {
+  const createTransaction = async () => {
     setisLoading(true);
-    const token = await tokenCall(provider, tokenAddress as string);
-    if (recipient.length >= 30 && parseInt(amount) >= 1) {
-      const transferAmount: number = parseInt(amount) * 10 ** 18;
-      const transferToken = await token.transfer(
-        recipient,
-        BigInt(transferAmount)
-      );
-      const transactionInfo = {
-        type: TransactionType.DEPOSIT_LIQUIDITY_STAKING,
-      } as TransactionInfo;
-      addTransaction(transferToken, transactionInfo);
-      await transferToken.wait();
-      setMessage(
-        `Token have been transferred successfully to address: ${recipient}`
-      );
-    }
+    const token = await tokenCallSafe(
+      "0xDA00Ed082613acC055a39B1a9436B1Ba505646D7"
+    );
+    const tokenAmount = BigInt(parseInt(amount) * 10 ** 18);
+    const safeSDK = await ImportSafe(provider, safeAddress);
+    const safeTransactionData: SafeTransactionDataPartial = {
+      to: "0xDA00Ed082613acC055a39B1a9436B1Ba505646D7",
+      data: (await token.populateTransaction.transfer(recipient, tokenAmount))
+        .data as string,
+      value: "0",
+    };
+    const safeTransaction = await safeSDK.createTransaction({
+      safeTransactionData,
+    });
+    console.log(safeTransaction.data);
+    const safeTxHash = await safeSDK.getTransactionHash(safeTransaction);
+    setSafeTxhashs(safeTxHash);
+    const senderSignature = await safeSDK.signTransactionHash(safeTxHash);
+    const senderAddress = account as string;
+    (await safeService(provider))
+      .proposeTransaction({
+        safeAddress,
+        safeTransactionData: safeTransaction.data,
+        safeTxHash,
+        senderAddress,
+        senderSignature: senderSignature.data,
+      })
+      .then((value) => {
+        console.log("transaction has been proposed");
+        setisLoading(false);
+      })
+      .catch((error) => {
+        console.log("an error occoured while proposing transaction", error);
+        setisLoading(false);
+      });
+    await (
+      await safeService(provider)
+    )
+      .confirmTransaction(safeTxHash, senderSignature.data)
+      .then((success) => {
+        setisLoading(false);
+        console.log("transaction is successful");
+      })
+      .catch((err) => {
+        console.log("error occured while confirming transaction", err);
+        setisLoading(false);
+      });
     setisLoading(false);
   };
+
+  const getPendingTransactions = async () => {
+    console.log(tokens);
+    const pendingTxs = await (
+      await safeService(provider)
+    ).getPendingTransactions(safeAddress);
+    setPendingTransactions(pendingTxs.results);
+    console.log(pendingTxs);
+  };
+
+  useEffect(() => {
+    getTokens();
+    getPendingTransactions();
+  }, [safeAddress, provider]);
+
+  const getTokens = async () => {
+    const tokens = await (await safeService(provider)).getBalances(safeAddress);
+    settokens(tokens);
+  };
+
+  const getTransactions = async () => {
+    const Txs = await (
+      await safeService(provider)
+    ).getAllTransactions(safeAddress);
+    setTransactions(Txs.results);
+    console.log(Txs.results);
+  };
+
+  const hasUserApproved = async (_safeTxHashs: string) => {
+    let approved: boolean = false;
+    const Txs = await (
+      await safeService(provider)
+    ).getTransactionConfirmations(_safeTxHashs);
+    Txs.results.map((result: any) => {
+      if (result.owner === account) {
+        approved = true;
+      }
+    });
+    return approved;
+  };
+
+  const confirmTransaction = async (_safeTxHashs: string) => {
+    const safeSDK = await ImportSafe(provider, safeAddress);
+    const isOwner = await safeSDK.isOwner(account as string);
+    const approvedOrNot = await hasUserApproved(_safeTxHashs);
+    if (isOwner && !approvedOrNot) {
+      const senderSignature = await safeSDK.signTransactionHash(_safeTxHashs);
+      await (
+        await safeService(provider)
+      )
+        .confirmTransaction(_safeTxHashs, senderSignature.data)
+        .then((success) => {
+          console.log("User confirmed the transaction");
+        })
+        .catch((err) => {
+          console.log("error occured while confirming transaction", err);
+        });
+    } else {
+      console.log("sorry you already approved the transaction");
+    }
+  };
+  const rejectTransaction = async (_safeTxHashs: any, _nonce: any) => {
+    console.log("this is nonce:", _nonce);
+    const safeSDK = await ImportSafe(provider, safeAddress);
+    const transaction = await safeSDK.createRejectionTransaction(_nonce);
+    const hash = (await safeSDK.signTransaction(transaction)).data;
+
+    await (
+      await safeService(provider)
+    )
+      .confirmTransaction(_safeTxHashs, hash.data)
+      .then((success) => {
+        console.log("User has rejected the Transaction");
+      })
+      .catch((err) => {
+        console.log("Error occured while rejecting the transaction:", err);
+      });
+  };
+
+  const executeTransactions = async (_txs: any) => {
+    console.log(_txs);
+    const safeSDK = await ImportSafe(provider, safeAddress);
+    const safeTransactionData: SafeTransactionData = {
+      to: _txs.to,
+      value: _txs.value,
+      data: _txs.data,
+      operation: _txs.operation,
+      safeTxGas: _txs.safeTxGas,
+      baseGas: _txs.baseGas,
+      gasPrice: _txs.gasPrice,
+      gasToken: _txs.gasToken,
+      refundReceiver: _txs.refundReceiver,
+      nonce: _txs.nonce,
+    };
+    const safeTransaction = await safeSDK.createTransaction({
+      safeTransactionData,
+    });
+    _txs.confirmations.forEach((confirmation: any) => {
+      const signature = new EthSignSignature(
+        confirmation.owner,
+        confirmation.signature
+      );
+      safeTransaction.addSignature(signature);
+    });
+    const executeTxResponse = await safeSDK.executeTransaction(safeTransaction);
+    const receipt =
+      executeTxResponse.transactionResponse &&
+      (await executeTxResponse.transactionResponse.wait());
+    console.log("confirmed", receipt);
+  };
+
+  const checkApproved = (_txs: any) => {
+    const confirmations: number = _txs.confirmations.length;
+    let isApproved = false;
+    _txs.confirmations.map((result: any, index: any) => {
+      if (result.owner.includes(account)) {
+        isApproved = true;
+      }
+    });
+    const show = isApproved ? (
+      <>
+        <button
+          id="buttonDeploy"
+          className={"nextButton"}
+          style={{
+            background: confirmations === 3 ? "#C94B32" : "#76808D",
+            position: "relative",
+            left: 0,
+            marginBottom: 5,
+            marginRight: 5,
+            textAlign: "center",
+          }}
+          disabled={confirmations === 3 ? false : true}
+          onClick={() => {
+            executeTransactions(_txs);
+          }}
+        >
+          Execute
+        </button>
+      </>
+    ) : (
+      <>
+        <button
+          id="buttonDeploy"
+          className={"nextButton"}
+          style={{
+            background: "#C94B32",
+            position: "relative",
+            left: 0,
+            marginBottom: 5,
+            marginRight: 5,
+            textAlign: "center",
+          }}
+          onClick={() => {
+            confirmTransaction(_txs.safeTxHash);
+          }}
+        >
+          Confirm
+        </button>
+        <button
+          id="buttonDeploy"
+          className={"nextButton"}
+          style={{
+            background: "#C94B32",
+            position: "relative",
+            left: 0,
+            marginBottom: 5,
+            textAlign: "center",
+          }}
+          onClick={() => {
+            rejectTransaction(_txs.safeTxHash, _txs.nonce);
+          }}
+        >
+          Reject
+        </button>
+      </>
+    );
+    return show;
+  };
+
+  useEffect(() => {
+    console.log(tokenAddress);
+  }, [tokenAddress]);
 
   return (
     <>
@@ -81,6 +298,28 @@ const Dashboard = () => {
         <div>
           <div className="sendToken">
             <div className={"ItemHeader"}>Send Token</div>
+            <select
+              style={{
+                width: 340,
+                height: 40,
+                backgroundColor: "#f5f5f5",
+                borderRadius: "10px",
+                padding: "0px 10px 0px 10px",
+                margin: "18px 0px 18px 0px",
+              }}
+              placeholder="select token"
+              onChange={(e) => setTokenAddress(e.target.value)}
+            >
+              {tokens
+                ? tokens.map((token: any, index: any) =>
+                    token.tokenAddress !== null ? (
+                      <option key={index} value={token.tokenAddress}>
+                        {token.token.symbol}
+                      </option>
+                    ) : null
+                  )
+                : null}
+            </select>
             <input
               className={"dashboardInputField"}
               type="text"
@@ -114,7 +353,7 @@ const Dashboard = () => {
                 marginTop: 5,
                 textAlign: "center",
               }}
-              onClick={transferToken}
+              onClick={createTransaction}
             >
               {isLoading ? (
                 <div style={{ marginLeft: 48 }}>
@@ -138,6 +377,76 @@ const Dashboard = () => {
             <img src={euro} alt="euro" className="euro" />
             <div className="ItemHeader">{supply}</div>
             <div className="Itemdesc">Total Supply</div>
+          </div>
+          <div>
+            <div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <div className={"ItemHeader"}>Pending Transactions</div>
+                <BiRefresh
+                  color="grey"
+                  style={{ height: 35, width: 35, marginTop: 25 }}
+                  onClick={getPendingTransactions}
+                />
+              </div>
+              <div>
+                <table>
+                  <tr>
+                    <th>Token</th>
+                    <th>Amount</th>
+                    <th>Recipient</th>
+                    <th>status</th>
+                  </tr>
+                  {pendingTransactions.length >= 1
+                    ? pendingTransactions.map((txs: any, index: any) => (
+                        <tr>
+                          <td>
+                            {txs.to.slice(0, 8) + "..." + txs.to.slice(-6)}
+                          </td>
+                          <td>
+                            {parseInt(txs.dataDecoded.parameters[1].value) /
+                              10 ** 18}
+                          </td>
+                          <td>
+                            {txs.dataDecoded.parameters[0].value.slice(0, 8) +
+                              "..." +
+                              txs.dataDecoded.parameters[0].value.slice(-6)}
+                          </td>
+                          <td>{checkApproved(txs)}</td>
+                        </tr>
+                      ))
+                    : null}
+                </table>
+              </div>
+            </div>
+            <div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <div className={"ItemHeader"}>Transactions</div>
+                <BiRefresh
+                  color="grey"
+                  style={{ height: 35, width: 35, marginTop: 25 }}
+                  onClick={getTransactions}
+                />
+              </div>
+              <div>
+                {transactions.length >= 1
+                  ? transactions.map((txs: any, index: any) => (
+                      <p>{txs.txHash}</p>
+                    ))
+                  : "No transactions found"}
+              </div>
+            </div>
           </div>
         </div>
       </div>

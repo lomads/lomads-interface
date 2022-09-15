@@ -21,6 +21,7 @@ import EthersAdapter from "@gnosis.pm/safe-ethers-lib";
 import Safe from "@gnosis.pm/safe-core-sdk";
 import axios from "axios";
 import { LeapFrog } from "@uiball/loaders";
+import { ImportSafe } from "connection/SafeCall";
 
 const CreateNewSafe = () => {
   useStepRouter(4);
@@ -78,17 +79,7 @@ const CreateNewSafe = () => {
 
   const UseExistingSafe = async () => {
     setisLoading(true);
-    const safeOwner = provider?.getSigner(0);
-
-    const ethAdapter = new EthersAdapter({
-      ethers,
-      signer: safeOwner as any,
-    });
-
-    const safeSDK: Safe = await Safe.create({
-      ethAdapter: ethAdapter,
-      safeAddress,
-    });
+    const safeSDK = await ImportSafe(provider, safeAddress);
 
     dispatch(updateHolder(safeSDK.getAddress() as string));
     const safeOwners: string[] = await safeSDK.getOwners();

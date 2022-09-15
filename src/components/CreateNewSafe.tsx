@@ -24,11 +24,11 @@ import useStepRouter from "hooks/useStepRouter";
 import { ethers } from "ethers";
 import { useWeb3React } from "@web3-react/core";
 import EthersAdapter from "@gnosis.pm/safe-ethers-lib";
-import Safe, { SafeFactory, SafeAccountConfig } from "@gnosis.pm/safe-core-sdk";
+import { SafeFactory, SafeAccountConfig } from "@gnosis.pm/safe-core-sdk";
 import AddressInputField from "UIpack/AddressInputField";
 import SimpleInputField from "UIpack/SimpleInputField";
 import { LeapFrog } from "@uiball/loaders";
-// import {} from "@gnosis.pm/safe-react-gateway-sdk";
+import { useNewMoralisObject } from "react-moralis";
 
 const CreateNewSafe = () => {
   useStepRouter(4);
@@ -48,6 +48,8 @@ const CreateNewSafe = () => {
 
   const [errors, setErrors] = useState<any>({});
   const [isLoading, setisLoading] = useState<boolean>(false);
+
+  const { save } = useNewMoralisObject("safe");
 
   useEffect(() => {
     if (!_.isEmpty(errors)) {
@@ -113,7 +115,7 @@ const CreateNewSafe = () => {
       ethAdapter,
     });
     const owners = [owner1, owner2, owner3];
-    const threshold: number = Threshold;
+    const threshold: number = parseInt(Threshold.toString());
     const safeAccountConfig: SafeAccountConfig = {
       owners,
       threshold,
@@ -121,10 +123,10 @@ const CreateNewSafe = () => {
 
     await safeFactory
       .deploySafe({ safeAccountConfig })
-      .then((tx) => {
+      .then(async (tx) => {
         dispatch(updateHolder(tx.getAddress() as string));
-        setisLoading(false);
         setText("NEXT STEP");
+        setisLoading(false);
       })
       .catch((err) => {
         setisLoading(false);
