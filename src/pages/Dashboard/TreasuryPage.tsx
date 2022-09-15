@@ -50,13 +50,11 @@ const Dashboard = () => {
 
   const createTransaction = async () => {
     setisLoading(true);
-    const token = await tokenCallSafe(
-      "0xDA00Ed082613acC055a39B1a9436B1Ba505646D7"
-    );
+    const token = await tokenCallSafe(tokenAddress);
     const tokenAmount = BigInt(parseInt(amount) * 10 ** 18);
     const safeSDK = await ImportSafe(provider, safeAddress);
     const safeTransactionData: SafeTransactionDataPartial = {
-      to: "0xDA00Ed082613acC055a39B1a9436B1Ba505646D7",
+      to: tokenAddress,
       data: (await token.populateTransaction.transfer(recipient, tokenAmount))
         .data as string,
       value: "0",
