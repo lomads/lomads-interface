@@ -3,7 +3,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    height: fit-content;
+    padding: 20vh 0vh 10vh 0vh;
 }
 .centerText {
     font-size: 20px;
@@ -60,4 +61,131 @@
 }
 .findSafe {
     margin: 25px 0px 15px 0px
+}
+.safeinfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    margin-top: 25px;
+}
+.safedata {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    background: #FFFFFF;
+    border: 1px solid #f1f4f4;
+    border-radius: 5px;
+    max-height: fit-content;
+    width: 500px;
+    padding: 20px;
+    margin-top: 2px;
+}
+.safeName {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 35px;
+    text-align: center;
+    color: #76808D;
+}
+.safeBalance {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 35px;
+    text-align: center;
+    color: #188C7C;
+}
+.safeDivider hr {
+    width: 30px;
+    height: 0px;
+    border: 1px solid #76808D;
+    background-color: #76808D;
+    border-radius: 50px;
+    transform: rotate(90deg);
+}
+.balance {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+img[alt="coin"] {
+    margin-right: 1vh;
+}
+.asset {
+    height: 7vh;
+    width: 7vh;
+    background-color: #F5F5F5;
+    border-radius: 50%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.amount {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 35px;
+    text-align: center;
+    color: #76808D;
+    margin-left: 1vh;
+}
+.ownerCount {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 800;
+    font-size: 18px;
+    line-height: 35px;
+    text-align: center;
+    color: #76808D;
+    margin-left: 1vh;
+}
+.safeOwners {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    background: #FFFFFF;
+    border: 1px solid #f1f4f4;
+    border-radius: 5px;
+    max-height: fit-content;
+    width: 500px;
+    padding: 20px;
+    margin-top: 2px;
+}
+.ownerList {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+.address {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 35px;
+    text-align: center;
+    color: #76808D;
+    margin-left: 2vh;
+}
+.footerText {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+    width: 480px;
+    text-align: center;
+    margin-top: 25px;
+    margin-bottom: 25px;
 }

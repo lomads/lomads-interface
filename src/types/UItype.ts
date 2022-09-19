@@ -50,3 +50,9 @@ export interface InviteGangType {
   name: string;
   address: string;
 }
+export interface LoadingButtonType extends ButtonType {
+  condition: boolean;
+}
+export interface OutlineButtonType extends ButtonType {
+  borderColor: string;
+}

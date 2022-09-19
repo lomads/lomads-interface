@@ -33,7 +33,9 @@ const NameDAO = () => {
   const handleDaoName = (event: any) => {
     dispatch(updateDaoName(event.target.value));
     dispatch(
-      updateDaoAddress("https://" + daoName.replace(/ /g, "-") + ".com")
+      updateDaoAddress(
+        "https://app.lomads.xyz/".concat(daoName).replace(/ /g, "-")
+      )
     );
   };
   return (
@@ -74,7 +76,6 @@ const NameDAO = () => {
         </div>
         <div className="createName">
           <SimpleButton
-          
             title="CREATE PUBLIC ADDRESS"
             height={50}
             fontsize={20}

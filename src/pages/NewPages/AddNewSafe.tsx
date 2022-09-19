@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import _ from "lodash";
 import "../../styles/pages/AddNewSafe.css";
@@ -21,24 +21,39 @@ import { useWeb3React } from "@web3-react/core";
 import EthersAdapter from "@gnosis.pm/safe-ethers-lib";
 import { SafeFactory, SafeAccountConfig } from "@gnosis.pm/safe-core-sdk";
 import { ethers } from "ethers";
+import SimpleLoadButton from "UIpack/SimpleLoadButton";
 
 const AddNewSafe = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { provider, account } = useWeb3React();
   const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
   const [myowers, setMyOwers] = useState<InviteGangType[]>(invitedMembers);
   const [showContinue, setshowContinue] = useState<boolean>(true);
   const [ownerSelected, setOwnerSelected] = useState<boolean>(false);
   const [errors, setErrors] = useState<any>({});
+  const [isLoading, setisLoading] = useState<boolean>(false);
   const safeName = useAppSelector((state) => state.flow.safeName);
   const selectedOwners = useAppSelector((state) => state.flow.owners);
   const Threshold = useAppSelector((state) => state.flow.threshold);
+  let Myvalue = useRef<Array<InviteGangType>>([
+    {
+      name: "creator",
+      address: account as string,
+    },
+  ]);
 
-  const handleCheck = (event: any) => {
-    const index = event.target.value;
-    const newData: InviteGangType = myowers[index];
-    const newMember = [...selectedOwners, newData];
-    dispatch(updateOwners(newMember));
+  const handleCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const index: number = parseInt(event.target.value);
+    const checked = event.target.checked;
+    if (checked) {
+      const newData: InviteGangType = myowers[index];
+      Myvalue.current.push(newData);
+      console.log(Myvalue.current);
+    } else {
+      Myvalue.current.splice(index + 1, 1);
+      console.log(Myvalue.current);
+    }
   };
 
   const handleSafeName = () => {
@@ -53,9 +68,8 @@ const AddNewSafe = () => {
     }
   };
 
-  const { provider } = useWeb3React();
-
   const deployNewSafe = async () => {
+    setisLoading(true);
     const safeOwner = provider?.getSigner(0);
 
     const ethAdapter = new EthersAdapter({
@@ -65,10 +79,9 @@ const AddNewSafe = () => {
     const safeFactory = await SafeFactory.create({
       ethAdapter,
     });
-    const owners: any = selectedOwners.map((result) => {
+    const owners: any = Myvalue.current.map((result) => {
       return result.address;
     });
-    console.log(owners);
     const threshold: number = parseInt(Threshold.toString());
     const safeAccountConfig: SafeAccountConfig = {
       owners,
@@ -80,10 +93,12 @@ const AddNewSafe = () => {
       .then(async (tx) => {
         dispatch(updateHolder(tx.getAddress() as string));
         console.log(tx.getAddress);
+        setisLoading(false);
         navigate("/success");
       })
       .catch((err) => {
         console.log("An error occured while creating safe", err);
+        setisLoading(false);
       });
   };
 
@@ -96,6 +111,24 @@ const AddNewSafe = () => {
         <div className="addOwner">
           <div className="inputFieldTitle">Select Owners</div>
           <div className="ownerArea">
+            <div className="owner">
+              <div className="avatarName">
+                <img src={daoMember2} alt={Myvalue.current[0].address} />
+                <p className="text">{Myvalue.current[0].name}</p>
+              </div>
+              <p className="text">
+                {Myvalue.current[0].address.slice(0, 18) +
+                  "..." +
+                  Myvalue.current[0].address.slice(-6)}
+              </p>
+              <Checkbox
+                size="lg"
+                colorScheme="orange"
+                name="owner"
+                defaultChecked={true}
+                disabled={true}
+              />
+            </div>
             {invitedMembers.map((result: any, index: any) => {
               return (
                 <>
@@ -110,10 +143,12 @@ const AddNewSafe = () => {
                         result.address.slice(-6)}
                     </p>
                     <Checkbox
+                      size="lg"
+                      colorScheme="orange"
+                      id={index}
+                      name="owner"
                       value={index}
-                      onChange={(event) => {
-                        handleCheck(event);
-                      }}
+                      onChange={(event) => handleCheck(event)}
                     />
                   </div>
                 </>
@@ -126,7 +161,7 @@ const AddNewSafe = () => {
                 bgColor="#C94B32"
                 width={180}
                 onClick={() => {
-                  if (selectedOwners.length >= 1) {
+                  if (Myvalue.current.length >= 1) {
                     setOwnerSelected(true);
                   }
                 }}
@@ -147,7 +182,7 @@ const AddNewSafe = () => {
         <div className="addOwner">
           <div className="inputFieldTitle">Owners</div>
           <div className="ownerArea">
-            {selectedOwners.map((result: any, index: any) => {
+            {Myvalue.current.map((result: any, index: any) => {
               return (
                 <>
                   <div key={index} className="owner">
@@ -193,13 +228,13 @@ const AddNewSafe = () => {
                   dispatch(updateThreshold(e.target.value));
                 }}
               >
-                {selectedOwners.map((result: any, index: any) => {
+                {Myvalue.current.map((result: any, index: any) => {
                   return <option value={index + 1}>{index + 1}</option>;
                 })}
               </select>
             </div>
             <div className="thresholdCount">
-              of {selectedOwners.length} owner(s)
+              of {Myvalue.current.length} owner(s)
             </div>
           </div>
         </div>
@@ -212,26 +247,23 @@ const AddNewSafe = () => {
           transaction with your curentry connected wallet.
           <span className="boldText">
             The creation will cost approximately 0.01256 GOR.
-          </span>{" "}
+          </span>
           The exact amount will be teterminated by your wallet.
         </div>
-        <div>
-          <SimpleButton
+        <div className="createButton">
+          <SimpleLoadButton
             title="CREATE SAFE"
             bgColor="#C94B32"
             height={50}
             width={250}
             fontsize={20}
             onClick={deployNewSafe}
+            condition={isLoading}
           />
         </div>
       </>
     );
   };
-
-  useEffect(() => {
-    console.log(Threshold);
-  }, [Threshold]);
 
   return (
     <>
@@ -301,7 +333,7 @@ const AddNewSafe = () => {
             <AddOwners />
           )
         ) : (
-          <SelectThreshold />
+          <SelectedOwners />
         )}
       </div>
     </>
