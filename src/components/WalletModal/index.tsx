@@ -177,7 +177,7 @@ export default function WalletModal({
         dispatch(updateConnectionError({ connectionType, error: undefined }));
 
         await connector.activate();
-        navigate("/createdao");
+        navigate("/namedao");
 
         dispatch(updateSelectedWallet({ wallet: connectionType }));
       } catch (error: any) {

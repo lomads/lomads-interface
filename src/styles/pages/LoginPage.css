@@ -1,0 +1,55 @@
+.createDaoLogin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100vh;
+  }
+  .welcomeText1 {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 25px;
+    text-align: center;
+    letter-spacing: -0.011em;
+    color: #76808D;
+    margin: 100px 0px 20px 0px;
+  }
+  .welcomeText2 {
+    font-family: 'Insignia';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 35px;
+    line-height: 35px;
+    padding-bottom: 30px;
+    text-align: center;
+    color: #C94B32;
+  
+  }
+  .modalLoginButton {
+    border-width: 0px;
+    filter: drop-shadow(3px 5px 4px rgba(27, 43, 65, 0.05)) drop-shadow(-3px -3px 8px rgba(201, 75, 50, 0.1));
+    margin: 10px;
+    background: #FFFFFF;
+    border-color: #C94B32;
+    border-radius: 10px;
+    align-content: inherit;
+  }
+  .humangroup {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    margin-top: 700px;
+  }
+  .modalbuttons {
+    margin-bottom: 170px;
+  } 
+
+  .logo {
+    margin-top: 100px;
+  }

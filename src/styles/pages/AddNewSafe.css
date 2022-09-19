@@ -1,0 +1,154 @@
+.StartSafe{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+.centerText {
+    font-size: 20px;
+    font-weight: 400;
+    color: #C94B32;
+}
+.buttonArea {
+    display: flex;
+    width: 500px;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 25px;
+}
+.divider hr {
+    width: 210px;
+    height: 0px;
+    border: 2px solid #C94B32;
+    background-color: #C94B32;
+    border-radius: 50px;
+}
+.centerCard {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-items: flex-start;
+    background: #FFFFFF;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    max-height: fit-content;
+    width: 500px;
+    padding: 20px;
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+.dropdown {
+    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
+    border-radius: 10px;
+    width: 150px;
+    height: 50px;
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+    padding: 0px 15px 0px 15px;
+    margin-top: 25px;
+    margin-right: 25px;
+}
+.inputArea {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+
+}
+.findSafe {
+    margin: 25px 0px 15px 0px
+}
+.continueButton {
+    margin-top: 25px;
+}
+
+.addOwner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-items: flex-start;
+    background: #FFFFFF;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    max-height: fit-content;
+    width: 500px;
+    padding: 20px;
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+.ownerArea {
+    width: 100%;
+}
+.owner {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+.avatarName {
+    display: flex;
+    width: 80px;
+    justify-content: space-between;
+    align-items: center;
+}
+.text {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+.cardButton {
+    margin-top: 25px;
+}
+.thresholdText {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 15px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+.selectionArea {
+    width: 100%;
+    display: flex;
+    flex-direction: row; 
+    justify-content: flex-start;
+    align-items: center;
+    text-align: center;
+}
+.thresholdCount {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 15px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+    margin-top: 15px;
+}
+.footerText {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+    width: 480px;
+    text-align: center;
+    margin-bottom: 25px;
+}
+.footerText .boldText {
+    font-weight: 800;
+}

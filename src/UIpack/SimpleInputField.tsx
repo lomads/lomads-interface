@@ -1,7 +1,6 @@
 import React from "react";
 import { Input, FormControl, FormErrorMessage } from "@chakra-ui/react";
 import { InputFieldType } from "types/UItype";
-import { ethers } from "ethers";
 
 const SimpleInputField = (props: InputFieldType) => {
   return (
