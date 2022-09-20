@@ -19,6 +19,8 @@ export interface ButtonType {
   fontsize?: number;
   fontweight?: number;
   bgColor?: string;
+  className?: string;
+  shadow?: string;
 }
 
 export interface IconButtonType {
@@ -29,10 +31,13 @@ export interface IconButtonType {
   fontweight?: number;
   Icon: any;
   bgColor?: string;
+  className?: string;
 }
 export interface SafeButtonType extends ButtonType {
   bgColor: string;
   titleColor: string;
+  disabled: boolean;
+  opacity?: string;
 }
 export interface Colorstype {
   backgroudColor: string;

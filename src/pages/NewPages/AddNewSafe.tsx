@@ -35,7 +35,6 @@ const AddNewSafe = () => {
   const [isLoading, setisLoading] = useState<boolean>(false);
   const safeName = useAppSelector((state) => state.flow.safeName);
   const selectedOwners = useAppSelector((state) => state.flow.owners);
-  const Threshold = useAppSelector((state) => state.flow.threshold);
   let Myvalue = useRef<Array<InviteGangType>>([
     {
       name: "creator",
@@ -43,16 +42,22 @@ const AddNewSafe = () => {
     },
   ]);
 
+  let thresholdValue = useRef<number>(1);
+
   const handleCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const index: number = parseInt(event.target.value);
+    // const index: number = parseInt(event.target.value);
     const checked = event.target.checked;
     if (checked) {
+      const index = myowers.findIndex(
+        (result: InviteGangType) => result.address === event.target.value
+      );
       const newData: InviteGangType = myowers[index];
       Myvalue.current.push(newData);
-      console.log(Myvalue.current);
     } else {
-      Myvalue.current.splice(index + 1, 1);
-      console.log(Myvalue.current);
+      const refIndex = Myvalue.current.findIndex(
+        (result: InviteGangType) => result.address === event.target.value
+      );
+      Myvalue.current.splice(refIndex, 1);
     }
   };
 
@@ -82,7 +87,7 @@ const AddNewSafe = () => {
     const owners: any = Myvalue.current.map((result) => {
       return result.address;
     });
-    const threshold: number = parseInt(Threshold.toString());
+    const threshold: number = thresholdValue.current;
     const safeAccountConfig: SafeAccountConfig = {
       owners,
       threshold,
@@ -101,7 +106,6 @@ const AddNewSafe = () => {
         setisLoading(false);
       });
   };
-
   const AddOwners = () => {
     return (
       <>
@@ -114,9 +118,9 @@ const AddNewSafe = () => {
             <div className="owner">
               <div className="avatarName">
                 <img src={daoMember2} alt={Myvalue.current[0].address} />
-                <p className="text">{Myvalue.current[0].name}</p>
+                <p className="nameText">{Myvalue.current[0].name}</p>
               </div>
-              <p className="text">
+              <p className="addressText">
                 {Myvalue.current[0].address.slice(0, 18) +
                   "..." +
                   Myvalue.current[0].address.slice(-6)}
@@ -135,7 +139,7 @@ const AddNewSafe = () => {
                   <div key={index} className="owner">
                     <div className="avatarName">
                       <img src={daoMember2} alt={result.address} />
-                      <p className="text">{result.name}</p>
+                      <p className="nameText">{result.name}</p>
                     </div>
                     <p className="text">
                       {result.address.slice(0, 18) +
@@ -147,7 +151,7 @@ const AddNewSafe = () => {
                       colorScheme="orange"
                       id={index}
                       name="owner"
-                      value={index}
+                      value={result.address}
                       onChange={(event) => handleCheck(event)}
                     />
                   </div>
@@ -156,6 +160,7 @@ const AddNewSafe = () => {
             })}
             <div className="cardButton">
               <SimpleButton
+                className="button"
                 title="NEXT"
                 height={40}
                 bgColor="#C94B32"
@@ -188,7 +193,7 @@ const AddNewSafe = () => {
                   <div key={index} className="owner">
                     <div className="avatarName">
                       <img src={daoMember2} alt={result.address} />
-                      <p className="text">{result.name}</p>
+                      <p className="nameText">{result.name}</p>
                     </div>
                     <p className="text">
                       {result.address.slice(0, 18) +
@@ -224,8 +229,8 @@ const AddNewSafe = () => {
                 name="chain"
                 id="chain"
                 className="dropdown"
-                onChange={(e) => {
-                  dispatch(updateThreshold(e.target.value));
+                onChange={(event) => {
+                  thresholdValue.current = parseInt(event.target.value);
                 }}
               >
                 {Myvalue.current.map((result: any, index: any) => {
@@ -238,11 +243,11 @@ const AddNewSafe = () => {
             </div>
           </div>
         </div>
-        <div className="footerText">
+        <div className="footer">
           By continuing you consent to the terms of use and privacy policy of
           Gnosis Safe
         </div>
-        <div className="footerText">
+        <div className="footer">
           You’re about to create a new safe and will have to confirm a
           transaction with your curentry connected wallet.
           <span className="boldText">
@@ -275,22 +280,25 @@ const AddNewSafe = () => {
               title="CREATE NEW SAFE"
               titleColor="#C94B32"
               bgColor="#FFFFFF"
-              height={55}
-              width={225}
+              height={58}
+              width={228}
               fontsize={20}
               fontweight={400}
+              disabled={false}
             />
           </div>
           <div className="centerText">or</div>
           <div>
             <SafeButton
               title="ADD EXISTING SAFE"
-              titleColor="#C94B32"
+              titleColor="rgba(201, 75, 50, 0.6)"
               bgColor="#FFFFFF"
-              height={55}
-              width={225}
+              height={58}
+              width={228}
               fontsize={20}
               fontweight={400}
+              disabled={true}
+              opacity="0.6"
             />
           </div>
         </div>
@@ -317,12 +325,18 @@ const AddNewSafe = () => {
           <>
             <div className="continueButton">
               <SimpleButton
+                className="button"
                 title="CONTINUE"
                 height={50}
                 width={250}
                 fontsize={20}
                 onClick={handleSafeName}
-                bgColor="#C94B32"
+                bgColor={safeName ? "#C94B32" : "rgba(27, 43, 65, 0.2)"}
+                shadow={
+                  safeName
+                    ? "3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)"
+                    : undefined
+                }
               />
             </div>
           </>

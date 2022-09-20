@@ -18,7 +18,7 @@ const initialState: FlowState = {
   owners: [],
   safeName: "",
   safeAddress: "",
-  threshold: 1,
+  threshold: 0,
 };
 
 const flowSlice = createSlice({

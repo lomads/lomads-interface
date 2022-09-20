@@ -1,7 +1,7 @@
 import React from "react";
 import "../../styles/pages/DAOSuccess.css";
 import "../../styles/Global.css";
-import lomadsfulllogo from "../../assets/svg/lomadsfulllogo.svg";
+import lomadslogodark from "../../assets/svg/lomadslogodark.svg";
 import GroupEnjoy from "../../assets/svg/GroupEnjoy.svg";
 import { colors } from "assets/colors";
 import { Colorstype } from "types/UItype";
@@ -11,17 +11,17 @@ const DAOsuccess = () => {
       <div className="DAOsuccess">
         <div className="itemsGroup">
           <div className="logo">
-            <img src={lomadsfulllogo} alt="logo" />
+            <img src={lomadslogodark} alt="logo" />
           </div>
           <div className="congrats">Well done!</div>
-          <div className="headerText">Your DAO is live</div>
-          <div className="infoText">
-            you will be redirected to the dashboard in a few secons
+          <div className="header">Your DAO is live</div>
+          <div className="redirectText">
+            you will be redirected to the dashboard in a few seconds
           </div>
+          <img src={GroupEnjoy} alt="Congrats" className="groupenjoy" />
         </div>
-        <div className="groupenjoy">
-          <img src={GroupEnjoy} alt="Congrats" />
-        </div>
+        <img src={GroupEnjoy} alt="Congrats" className="groupenjoy" />
+
         {colors.map((result: Colorstype) => {
           return (
             <div

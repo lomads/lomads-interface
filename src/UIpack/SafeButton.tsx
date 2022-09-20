@@ -16,7 +16,9 @@ const SafeButton = (props: SafeButtonType) => {
           fontWeight: props.fontweight,
           color: props.titleColor,
           backgroundColor: props.bgColor,
+          opacity: props.opacity,
         }}
+        disabled={props.disabled}
       >
         {props.title}
       </button>

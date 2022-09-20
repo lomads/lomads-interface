@@ -2,13 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer components {
-    .pageSubItemHeader {
-        font-family: 'Open Sans';
-        font-style: normal;
-        letter-spacing: -0.011em;
-        color: ;
-      }
+.body {
+  margin: 0;
+  background: linear-gradient(169.22deg, #FDF7F7 12.19%, #EFEFEF 92%);
 }
 /* ::-webkit-scrollbar {
   width:0.5rem

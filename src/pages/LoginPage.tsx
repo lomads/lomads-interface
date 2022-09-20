@@ -46,9 +46,7 @@ const LoginPage = (props: any) => {
     <>
       <div className={"createDaoLogin"}>
         <div>
-          <div className="logo">
-            <img src={lomadsfulllogo} alt="" />
-          </div>
+          <img src={lomadsfulllogo} alt="logo" className="logo" />
           <div className="welcomeText1">Hello there!</div>
           <div className="welcomeText2">Connect Your Wallet</div>
         </div>
@@ -72,10 +70,8 @@ const LoginPage = (props: any) => {
             />
           </button>
         </div>
-        <div className="humangroup">
-          <img src={humangroup} alt="human group" />
-        </div>
       </div>
+      <img src={humangroup} alt="human group" className="humangroup" />
     </>
   );
 };

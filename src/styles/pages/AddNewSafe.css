@@ -16,14 +16,14 @@
     width: 500px;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 25px;
+    padding-bottom: 35px;
 }
-.divider hr {
+hr {
     width: 210px;
-    height: 0px;
     border: 2px solid #C94B32;
-    background-color: #C94B32;
-    border-radius: 50px;
+    flex: none;
+    order: 2;
+    flex-grow: 0;
 }
 .centerCard {
     display: flex;
@@ -36,13 +36,13 @@
     max-height: fit-content;
     width: 500px;
     padding: 20px;
-    margin-top: 25px;
-    margin-bottom: 25px;
+    margin-top: 35px;
+    margin-bottom: 35px;
 }
 .dropdown {
-    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
+    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%) ;
     border-radius: 10px;
-    width: 150px;
+    width: 109px;
     height: 50px;
     font-family: 'Open Sans';
     font-style: normal;
@@ -52,7 +52,7 @@
     letter-spacing: -0.011em;
     color: #76808D;
     padding: 0px 15px 0px 15px;
-    margin-top: 25px;
+    margin-top: 10px;
     margin-right: 25px;
 }
 .inputArea {
@@ -80,8 +80,8 @@
     max-height: fit-content;
     width: 500px;
     padding: 20px;
-    margin-top: 25px;
-    margin-bottom: 25px;
+    margin-top: 35px;
+    margin-bottom: 35px;
 }
 .ownerArea {
     width: 100%;
@@ -92,12 +92,13 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    margin: 2vh 0vh 2vh 0vh;
 }
 .avatarName {
     display: flex;
-    width: 80px;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
+    width: 30%;
 }
 .text {
     font-family: 'Open Sans';
@@ -107,6 +108,27 @@
     line-height: 15px;
     letter-spacing: -0.011em;
     color: #76808D;
+}
+.nameText {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+    margin-left: 16px;
+    text-align: center;
+}
+.addressText {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+    text-align: center;
 }
 .cardButton {
     margin-top: 25px;
@@ -140,9 +162,8 @@
     line-height: 15px;
     letter-spacing: -0.011em;
     color: #76808D;
-    margin-top: 15px;
 }
-.footerText {
+.footer {
     font-family: 'Open Sans';
     font-style: normal;
     font-weight: 400;
@@ -152,8 +173,11 @@
     color: #76808D;
     width: 480px;
     text-align: center;
-    margin-top: 20px;
+    margin-bottom: 9px;
 }
-.footerText .boldText {
+.boldText {
     font-weight: 800;
+}
+.createButton {
+    margin-top: 35px;
 }

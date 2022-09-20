@@ -18,6 +18,7 @@ const AddressInputField = (props: InputFieldType) => {
         value={props.value}
         placeholder={props.placeholder}
         onChange={props.onchange}
+        bg="#F5F5F5"
       />
       {props.isInvalid && (
         <FormErrorMessage style={{ marginTop: 0, fontSize: "x-small" }}>
