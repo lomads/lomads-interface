@@ -1,0 +1,80 @@
+.InviteGang{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+.centerCard {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-items: flex-start;
+    background: #FFFFFF;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    max-height: fit-content;
+    width: 500px;
+    padding: 20px;
+}
+.inputArea {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+
+}
+.inviteGang {
+    margin: 25px 0px 15px 0px
+}
+.invitedMembers {
+    padding: 20px;
+    background-color: rgba(118, 128, 141, 0.05);
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 5px;
+    width: 460px;
+    height: fit-content;
+
+}
+.owner {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1vh 0vh 1vh 0vh;
+}
+.avatarName {
+    display: flex;
+    width: 80px;
+    justify-content: space-between;
+    align-items: center;
+}
+.text {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+.infoText {
+    font-family: 'Open Sans';
+    font-style: italic;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 25px;
+    text-align: center;
+    letter-spacing: -0.011em;
+    color: #76808D;
+    text-decoration: underline;
+    cursor: pointer;
+    }
+.deleteButton {
+    background-color: #76808D;
+    padding: 5px;
+    border-radius: 5px;
+    color: #FFFFFF;
+    cursor: pointer;
+}

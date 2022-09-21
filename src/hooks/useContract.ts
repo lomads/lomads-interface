@@ -20,18 +20,22 @@ import {
   MULTICALL_ADDRESS,
   V2_ROUTER_ADDRESS,
   V3_MIGRATOR_ADDRESSES,
+  DAOFACTORY_ADDRESSES,
 } from 'constants/addresses'
 import { WRAPPED_NATIVE_CURRENCY } from 'constants/tokens'
 import { useMemo } from 'react'
 import { UniswapInterfaceMulticall } from 'types/v3'
 import { V3Migrator } from 'types/v3/V3Migrator'
 
+import { ABI as DAOAbi } from "abis/DaoFactory";
 import { getContract } from '../utils'
+import { TOKEN_ABI as TokenAbi } from 'abis/DaoToken'
 
 const { abi: IUniswapV2PairABI } = IUniswapV2PairJson
 const { abi: IUniswapV2Router02ABI } = IUniswapV2Router02Json
 const { abi: MulticallABI } = UniswapInterfaceMulticallJson
 const { abi: V2MigratorABI } = V3MigratorJson
+
 
 // returns null on errors
 export function useContract<T extends Contract = Contract>(
@@ -111,4 +115,11 @@ export function useV2RouterContract(): Contract | null {
 
 export function useInterfaceMulticall() {
   return useContract<UniswapInterfaceMulticall>(MULTICALL_ADDRESS, MulticallABI, false) as UniswapInterfaceMulticall
+}
+
+export function useDAOContract() {
+  return useContract(DAOFACTORY_ADDRESSES, DAOAbi, true);
+} 
+export function DAOTokenContract(_tokenAddress: string) {
+  return useContract(_tokenAddress,TokenAbi,true)
 }

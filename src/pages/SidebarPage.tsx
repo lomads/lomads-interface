@@ -1,14 +1,12 @@
-import React, { useState } from 'react'
-import CreateDaoSidebar from '../components/CreateDaoSidebar'
-import BasicsPage from './BasicsPage'
-import SettingsPage from './SettingsPage'
-import TokenPage from './TokenPage'
-import GoLivePage from './GoLivePage'
-import Dashboard from './Dashboard'
-import { sidebarPropType } from '../types'
+import CreateDaoSidebar from "../components/CreateDaoSidebar";
+import BasicsPage from "./BasicsPage";
+import SettingsPage from "./SettingsPage";
+import TokenPage from "./TokenPage";
+import GoLivePage from "./GoLivePage";
+import { sidebarPropType } from "types";
+import GnosisPage from "./gnosisPage";
 
 const SidebarPage = (props: sidebarPropType) => {
-
   const renderPage = () => {
     if (props.page === "Basics") {
       return (
@@ -22,11 +20,10 @@ const SidebarPage = (props: sidebarPropType) => {
           <TokenPage />
         </div>
       );
-    }
-    else if (props.page === "Settings") {
+    } else if (props.page === "Safe") {
       return (
         <div>
-          <SettingsPage />
+          <GnosisPage />
         </div>
       );
     } else if (props.page === "Go Live") {
@@ -35,23 +32,16 @@ const SidebarPage = (props: sidebarPropType) => {
           <GoLivePage />
         </div>
       );
-    } else if (props.page === "Dashboard") {
-      return (
-        <div>
-          <Dashboard />
-        </div>
-      );
     }
-    return (
-      <div></div>
-    );
-  }
+    return <div></div>;
+  };
+
   return (
     <div style={{ display: "flex" }}>
       <CreateDaoSidebar />
-      {renderPage()}
+      <div className="combine">{renderPage()}</div>
     </div>
-  )
-}
+  );
+};
 
-export default SidebarPage
+export default SidebarPage;

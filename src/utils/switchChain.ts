@@ -8,8 +8,10 @@ import {
   walletConnectConnection,
 } from 'connection'
 import { CHAIN_INFO } from 'constants/chainInfo'
-import { ALL_SUPPORTED_CHAIN_IDS, SupportedChainId } from 'constants/chains'
+import { SUPPORTED_CHAIN_IDS, SupportedChainId } from 'constants/chains'
 import { INFURA_NETWORK_URLS } from 'constants/infura'
+import { updateSelectedWallet } from 'state/user/reducer'
+
 
 function getRpcUrls(chainId: SupportedChainId): [string] {
   switch (chainId) {
@@ -40,13 +42,12 @@ function getRpcUrls(chainId: SupportedChainId): [string] {
 export function isChainAllowed(connector: Connector, chainId: number) {
   switch (connector) {
     case fortmaticConnection.connector:
-      return chainId === SupportedChainId.MAINNET
     case injectedConnection.connector:
     case coinbaseWalletConnection.connector:
     case walletConnectConnection.connector:
     case networkConnection.connector:
     case gnosisSafeConnection.connector:
-      return ALL_SUPPORTED_CHAIN_IDS.includes(chainId)
+      return SUPPORTED_CHAIN_IDS.includes(chainId)
     default:
       return false
   }
@@ -67,5 +68,6 @@ export const switchChain = async (connector: Connector, chainId: number) => {
       blockExplorerUrls: [info.explorer],
     }
     await connector.activate(addChainParameter)
+    
   }
 }
