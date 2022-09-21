@@ -5,7 +5,7 @@
     justify-content: center;
     height: 100vh;
 }
-.centerCard {
+.centerInputCard {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -14,8 +14,19 @@
     box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
     border-radius: 5px;
     max-height: fit-content;
-    width: 500px;
-    padding: 20px;
+    width: 541.13px;
+    padding: 26px 22px 30px 22px;
+    gap: 10px;
+}
+.inputTitle {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+    margin: 0vh 0px 0vh 1vh;
 }
 .inputArea {
     display: flex;
@@ -25,16 +36,15 @@
 
 }
 .inviteGang {
-    margin: 25px 0px 15px 0px
+    margin: 35px 0px 15px 0px
 }
 .invitedMembers {
-    padding: 20px;
-    background-color: rgba(118, 128, 141, 0.05);
+    padding: 26px 22px;
+    background-color: rgba(118, 128, 141, 0.09);
     box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
-    border-radius: 5px;
+    border-radius: 0px 0px 5px 5px;
     width: 460px;
     height: fit-content;
-
 }
 .owner {
     width: 100%;
@@ -44,11 +54,11 @@
     align-items: center;
     margin: 1vh 0vh 1vh 0vh;
 }
-.avatarName {
+.avatarPlusName {
     display: flex;
-    width: 80px;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
+    width: 30%;
 }
 .text {
     font-family: 'Open Sans';
@@ -58,6 +68,17 @@
     line-height: 15px;
     letter-spacing: -0.011em;
     color: #76808D;
+}
+.nameText {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+    margin-left: 16px;
+    text-align: center;
 }
 .infoText {
     font-family: 'Open Sans';
@@ -77,4 +98,14 @@
     border-radius: 5px;
     color: #FFFFFF;
     cursor: pointer;
+}
+.inviteButton,.addButton {
+    padding: 0px 10px 0px 10px;
+    border-radius: 5px;
+    border-width: 0px;
+    border-color: #FFFFFF;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #FFFFFF;
 }

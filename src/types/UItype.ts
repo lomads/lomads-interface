@@ -2,8 +2,8 @@ export interface InputFieldType {
   isInvalid?: any;
   id?: string;
   className?: string;
-  height?: number;
-  width?: number;
+  height?: number | string;
+  width?: number | string;
   name?: string;
   value?: string | number;
   placeholder?: string;
@@ -14,11 +14,13 @@ export interface InputFieldType {
 export interface ButtonType {
   title: string;
   onClick?: () => void;
-  height?: number;
-  width?: number;
+  height?: number | string;
+  width?: number | string;
   fontsize?: number;
   fontweight?: number;
   bgColor?: string;
+  className?: string;
+  shadow?: string;
 }
 
 export interface IconButtonType {
@@ -29,10 +31,14 @@ export interface IconButtonType {
   fontweight?: number;
   Icon: any;
   bgColor?: string;
+  className?: string;
+  border?: string;
 }
 export interface SafeButtonType extends ButtonType {
   bgColor: string;
   titleColor: string;
+  disabled: boolean;
+  opacity?: string;
 }
 export interface Colorstype {
   backgroudColor: string;

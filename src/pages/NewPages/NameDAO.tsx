@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import _ from "lodash";
 import { useNavigate } from "react-router-dom";
 import SimpleButton from "UIpack/SimpleButton";
@@ -12,29 +12,35 @@ import { updateDaoAddress, updateDaoName } from "state/flow/reducer";
 const NameDAO = () => {
   const dispatch = useAppDispatch();
   const [errors, setErrors] = useState<any>({});
+  const refSafeName = useRef<string>("");
   const daoName = useAppSelector((state) => state.flow.daoName);
   const daoAddress = useAppSelector((state) => state.flow.daoAddress);
   const navigate = useNavigate();
   const handleClick = () => {
     let terrors: any = {};
-    if (!daoName) {
+    if (!refSafeName.current) {
       terrors.daoName = " * DAO name is required.";
     }
     if (!daoAddress) {
       terrors.daoAddress = " * DAO Address is required.";
     }
     if (_.isEmpty(terrors)) {
-      navigate("/invitegang");
+      handleNavigate();
     } else {
       setErrors(terrors);
     }
   };
 
+  const handleNavigate = () => {
+    daoName && navigate("/invitegang");
+  };
   const handleDaoName = (event: any) => {
-    dispatch(updateDaoName(event.target.value));
+    refSafeName.current = event.target.value;
+    dispatch(updateDaoName(refSafeName.current.toString()));
     dispatch(
       updateDaoAddress(
-        "https://app.lomads.xyz/".concat(daoName).replace(/ /g, "-")
+        "https://app.lomads.xyz/" +
+          refSafeName.current.replace(/ /g, "-").toLowerCase()
       )
     );
   };
@@ -51,7 +57,6 @@ const NameDAO = () => {
                 height={50}
                 width={460}
                 placeholder="Epic DAO"
-                value={daoName}
                 onchange={(event) => {
                   handleDaoName(event);
                 }}
@@ -76,6 +81,7 @@ const NameDAO = () => {
         </div>
         <div className="createName">
           <SimpleButton
+            className="button"
             title="CREATE PUBLIC ADDRESS"
             height={50}
             fontsize={20}

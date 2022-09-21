@@ -128,7 +128,7 @@ export default function Header() {
   ];
 
   const navigate = useNavigate();
-  const treasuryPage = useMatch("/dao/:deployedAddress");
+  const treasuryPage = useMatch("/dashboard");
 
   useEffect(() => {
     if (!chainAllowed && !account && !treasuryPage) {
@@ -151,16 +151,6 @@ export default function Header() {
         <HeaderElement>{/* <NetworkSelector /> */}</HeaderElement>
         <HeaderElement>
           <AccountElement active={!!account}>
-            {chainAllowed && userEthBalance ? (
-              <BalanceText
-                style={{ flexShrink: 0, userSelect: "none" }}
-                pl="0.75rem"
-                pr="0.5rem"
-                fontWeight={500}
-              >
-                {balance} {symbol}
-              </BalanceText>
-            ) : null}
             <Web3Status />
           </AccountElement>
         </HeaderElement>

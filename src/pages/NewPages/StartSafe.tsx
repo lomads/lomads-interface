@@ -27,6 +27,7 @@ const StartSafe = () => {
               fontsize={20}
               fontweight={400}
               onClick={createNewSafe}
+              disabled={false}
             />
           </div>
           <div className="centerText">or</div>
@@ -40,6 +41,7 @@ const StartSafe = () => {
               fontsize={20}
               fontweight={400}
               onClick={importExistingSafe}
+              disabled={false}
             />
           </div>
         </div>

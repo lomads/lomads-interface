@@ -18,7 +18,7 @@
     text-align: center;
     letter-spacing: -0.011em;
     color: #76808D;
-    margin: 40px 0px 20px 0px;
+    margin: 133px 0px 13.5px 0px;
 }
 
 .groupenjoy {
@@ -29,7 +29,8 @@
     bottom: 0px;
     left: 0px;
     right: 0px;
-    margin-top: 700px;
+    margin: auto;
+    width: 300px;
 }
 .colors {
     height: 1vw;
@@ -41,5 +42,27 @@
     right: 0;
 }
 .logo {
-    margin-left: 90px;
+    margin-left: 110px;
+}
+.redirectText {
+    font-family: 'Open Sans';
+    font-style: italic;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 25px;
+    text-align: center;
+    letter-spacing: -0.011em;
+    color: #76808D;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.header {
+    font-family: 'Insignia';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 35px;
+    line-height: 35px;
+    padding-bottom: 13px;
+    text-align: center;
+    color: #C94B32;
 }
