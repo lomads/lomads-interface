@@ -128,7 +128,7 @@ export default function Header() {
   ];
 
   const navigate = useNavigate();
-  const treasuryPage = useMatch("/dao/:deployedAddress");
+  const treasuryPage = useMatch("/dashboard");
 
   useEffect(() => {
     if (!chainAllowed && !account && !treasuryPage) {

@@ -5,7 +5,13 @@ import lomadslogodark from "../../assets/svg/lomadslogodark.svg";
 import GroupEnjoy from "../../assets/svg/GroupEnjoy.svg";
 import { colors } from "assets/colors";
 import { Colorstype } from "types/UItype";
+import { useNavigate } from "react-router-dom";
 const DAOsuccess = () => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate("/dashboard");
+  };
   return (
     <>
       <div className="DAOsuccess">
@@ -15,7 +21,7 @@ const DAOsuccess = () => {
           </div>
           <div className="congrats">Well done!</div>
           <div className="header">Your DAO is live</div>
-          <div className="redirectText">
+          <div className="redirectText" onClick={handleClick}>
             you will be redirected to the dashboard in a few seconds
           </div>
           <img src={GroupEnjoy} alt="Congrats" className="groupenjoy" />

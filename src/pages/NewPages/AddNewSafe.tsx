@@ -12,6 +12,7 @@ import { useAppSelector } from "state/hooks";
 import { useAppDispatch } from "state/hooks";
 import {
   updateOwners,
+  updateSafeAddress,
   updatesafeName,
   updateThreshold,
 } from "state/flow/reducer";
@@ -35,6 +36,7 @@ const AddNewSafe = () => {
   const [isLoading, setisLoading] = useState<boolean>(false);
   const safeName = useAppSelector((state) => state.flow.safeName);
   const selectedOwners = useAppSelector((state) => state.flow.owners);
+  const safeAddress = useAppSelector((state) => state.flow.safeAddress);
   let Myvalue = useRef<Array<InviteGangType>>([
     {
       name: "creator",
@@ -75,6 +77,7 @@ const AddNewSafe = () => {
 
   const deployNewSafe = async () => {
     setisLoading(true);
+    dispatch(updateOwners(Myvalue.current));
     const safeOwner = provider?.getSigner(0);
 
     const ethAdapter = new EthersAdapter({
@@ -96,8 +99,7 @@ const AddNewSafe = () => {
     await safeFactory
       .deploySafe({ safeAccountConfig })
       .then(async (tx) => {
-        dispatch(updateHolder(tx.getAddress() as string));
-        console.log(tx.getAddress);
+        dispatch(updateSafeAddress(tx.getAddress() as string));
         setisLoading(false);
         navigate("/success");
       })

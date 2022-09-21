@@ -15,6 +15,7 @@ const IconButton = (props: IconButtonType) => {
           fontSize: props.fontsize,
           fontWeight: props.fontweight,
           background: props.bgColor,
+          border: props.border,
         }}
       >
         {props.Icon}

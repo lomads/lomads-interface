@@ -8,9 +8,12 @@ import StartSafe from "./NewPages/StartSafe";
 import InviteGang from "./NewPages/InviteGang";
 import AddExistingSafe from "./NewPages/AddExistingSafe";
 import AddNewSafe from "./NewPages/AddNewSafe";
+import Dashboard from "./NewPages/DashBoard/Dashboard";
 
 export default function App() {
   const landingPage = useMatch("/");
+  
+
   return (
     <div className="body">
       {!landingPage && <Header />}
@@ -22,6 +25,7 @@ export default function App() {
         <Route path="/addsafe" element={<AddExistingSafe />} />
         <Route path="/newsafe" element={<AddNewSafe />} />
         <Route path="/success" element={<DAOsuccess />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </div>
   );
