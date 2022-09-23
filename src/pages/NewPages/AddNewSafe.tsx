@@ -15,6 +15,7 @@ import {
   updateSafeAddress,
   updatesafeName,
   updateThreshold,
+  updateTotalMembers,
 } from "state/flow/reducer";
 import daoMember2 from "../../assets/svg/daoMember2.svg";
 import { updateHolder } from "state/proposal/reducer";
@@ -100,6 +101,17 @@ const AddNewSafe = () => {
       .deploySafe({ safeAccountConfig })
       .then(async (tx) => {
         dispatch(updateSafeAddress(tx.getAddress() as string));
+        const totalAddresses = [...invitedMembers, ...Myvalue.current];
+        const value = totalAddresses.reduce((final: any, current: any) => {
+          let object = final.find(
+            (item: any) => item.address === current.address
+          );
+          if (object) {
+            return final;
+          }
+          return final.concat([current]);
+        }, []);
+        dispatch(updateTotalMembers(value));
         setisLoading(false);
         navigate("/success");
       })

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import _ from "lodash";
 import "../../styles/pages/AddExistingSafe.css";
 import "../../styles/Global.css";
@@ -10,13 +10,18 @@ import { useWeb3React } from "@web3-react/core";
 import { updateHolder } from "state/proposal/reducer";
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import { ImportSafe } from "connection/SafeCall";
-import { updateSafeAddress, updatesafeName } from "state/flow/reducer";
+import {
+  updateSafeAddress,
+  updatesafeName,
+  updateTotalMembers,
+} from "state/flow/reducer";
 import { ethers } from "ethers";
 import AddressInputField from "UIpack/AddressInputField";
 import coin from "../../assets/svg/coin.svg";
 import axios from "axios";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import OutlineButton from "UIpack/OutlineButton";
+import { InviteGangType } from "types/UItype";
 
 const AddExistingSafe = () => {
   const dispatch = useAppDispatch();
@@ -24,11 +29,13 @@ const AddExistingSafe = () => {
   const safeAddress = useAppSelector((state) => state.flow.safeAddress);
   const safeName = useAppSelector((state) => state.flow.safeName);
   const selectedOwners = useAppSelector((state) => state.flow.owners);
+  const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
   const [safeOwners, setSafeOwners] = useState<string[]>([]);
   const [tokens, setTokens] = useState<any>([]);
   const [errors, setErrors] = useState<any>({});
   const [balance, setBalance] = useState<string>("");
   const [isLoading, setisLoading] = useState<boolean>(false);
+  const owners = useRef<InviteGangType[]>([]);
 
   const { provider } = useWeb3React();
 
@@ -36,8 +43,14 @@ const AddExistingSafe = () => {
     setisLoading(true);
     const safeSDK = await ImportSafe(provider, safeAddress);
     dispatch(updateHolder(safeSDK.getAddress() as string));
-    const safeOwners: string[] = await safeSDK.getOwners();
-    setSafeOwners(safeOwners);
+    const safeowners: string[] = await safeSDK.getOwners();
+    safeowners.map((ownerAddress: string, index: number) => {
+      let obj: InviteGangType = { name: "", address: "" };
+      obj["address"] = ownerAddress;
+      owners.current.push(obj);
+    });
+    console.log(safeowners);
+    console.log(owners.current);
     const bal = await safeSDK.getBalance();
     setBalance(bal.toString());
     await getTokens(safeAddress);
@@ -72,6 +85,19 @@ const AddExistingSafe = () => {
     } else {
       setErrors(terrors);
     }
+  };
+
+  const handleAddSafe = () => {
+    const totalAddresses = [...invitedMembers, ...owners.current];
+    const value = totalAddresses.reduce((final: any, current: any) => {
+      let object = final.find((item: any) => item.address === current.address);
+      if (object) {
+        return final;
+      }
+      return final.concat([current]);
+    }, []);
+    dispatch(updateTotalMembers(value));
+    navigate("/success");
   };
 
   return (
@@ -109,7 +135,7 @@ const AddExistingSafe = () => {
         <div className="divider">
           <hr />
         </div>
-        {safeOwners.length >= 1 ? (
+        {owners.current.length >= 1 ? (
           <>
             <div className="safeinfo">
               <div className="safedata">
@@ -178,25 +204,35 @@ const AddExistingSafe = () => {
                 </div>
               </div>
               <div className="safeOwners">
-                <div className="ownerCount">{safeOwners.length} Owners :</div>
+                <div className="ownerCount">
+                  {owners.current.length} Owners :
+                </div>
                 <div className="ownerList">
-                  {safeOwners.map((result: any, index: any) => {
-                    return (
-                      <>
-                        <div className="safeowner" key={index}>
-                          <SimpleInputField
-                            className="inputField"
-                            height={30}
-                            width={151}
-                            placeholder="Name"
-                          />
-                          <div className="address">
-                            {result.slice(0, 18) + "..." + result.slice(-6)}
+                  {owners.current.map(
+                    (result: InviteGangType, index: number) => {
+                      return (
+                        <>
+                          <div className="safeowner" key={index}>
+                            <SimpleInputField
+                              className="inputField"
+                              height={30}
+                              width={151}
+                              placeholder="Name"
+                              type="text"
+                              onchange={(e) => {
+                                owners.current[index].name = e.target.value;
+                              }}
+                            />
+                            <div className="address">
+                              {result.address.slice(0, 18) +
+                                "..." +
+                                result.address.slice(-6)}
+                            </div>
                           </div>
-                        </div>
-                      </>
-                    );
-                  })}
+                        </>
+                      );
+                    }
+                  )}
                 </div>
               </div>
               <div className="footerText">
@@ -228,7 +264,7 @@ const AddExistingSafe = () => {
                     fontsize={20}
                     fontweight={400}
                     onClick={() => {
-                      navigate("/success");
+                      handleAddSafe();
                     }}
                   />
                 </div>
@@ -294,7 +330,7 @@ const AddExistingSafe = () => {
                 fontweight={400}
                 onClick={handleClick}
                 bgColor={
-                  isAddressValid(safeAddress)
+                  isAddressValid(safeAddress) && owners.current.length < 1
                     ? "#C94B32"
                     : "rgba(27, 43, 65, 0.2)"
                 }

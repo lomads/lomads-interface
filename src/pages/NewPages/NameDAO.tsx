@@ -35,7 +35,7 @@ const NameDAO = () => {
     daoName && navigate("/invitegang");
   };
   const handleDaoName = (event: any) => {
-    refSafeName.current = event.target.value;
+    refSafeName.current = event.target.value.replace(/[^a-z0-9 ]/gi, "");
     dispatch(updateDaoName(refSafeName.current.toString()));
     dispatch(
       updateDaoAddress(

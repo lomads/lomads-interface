@@ -13,7 +13,7 @@ export interface InputFieldType {
 
 export interface ButtonType {
   title: string;
-  onClick?: () => void;
+  onClick?: (e?: any) => void;
   height?: number | string;
   width?: number | string;
   fontsize?: number;
@@ -24,7 +24,7 @@ export interface ButtonType {
 }
 
 export interface IconButtonType {
-  onClick?: () => void;
+  onClick?: (e?: any) => void;
   height?: number;
   width?: number;
   fontsize?: number;

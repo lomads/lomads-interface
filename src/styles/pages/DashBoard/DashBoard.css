@@ -1,3 +1,6 @@
+body.active-modal {
+    overflow-y: hidden;
+}
 .dashBoardBody {
     margin-left: 10%;
     margin-right: 2%;
@@ -9,7 +12,7 @@
 .DAOdetails {
     display: flex;
     flex-direction: row;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: center;
     background: transparent;
     padding: 35px 0px 35px 0px
@@ -25,10 +28,51 @@
 }
 .notificationsArea {
     width: 100%;
-    height: 326.5px;
+    height: 158.8px;
     background: rgba(118, 128, 141, 0.05);
     border-radius: 40px;
     margin: 20px 0px 20px 0px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 26px 22px;
+}
+.notification {
+    height: 106.35px;
+    width: 315.72px;
+    background: #FFFFFF;
+    box-shadow: 3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18);
+    border-radius: 20px;
+    padding: 26px 22px;
+    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+#notificationHeader {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+#notificationTextButtonGrp {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+}
+#notificationMainText {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 25px;
+    letter-spacing: -0.011em;
+    color: #B12F15;
 }
 .treasuryCard {
     display: flex;
@@ -58,6 +102,19 @@
     line-height: 25px;
     letter-spacing: -0.011em;
     color: #76808D;
+}
+#treasuryCardTitle{
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 25px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+    text-decoration: underline;
+}
+#treasuryCardTitle:hover{
+    cursor: pointer;
 }
 .headerDetails {
     display: flex;
@@ -91,6 +148,11 @@
     justify-content: center;
     margin-right: 10px;
 }
+.safeCopyImage:hover{
+    height: 25;
+    width: 25;
+    cursor: pointer;
+}
 .dashboardText {
     font-family: 'Open Sans';
     font-style: italic;
@@ -103,7 +165,7 @@
 }
 .dashboardTextBold {
     font-family: 'Open Sans';
-    font-style: italic;
+    font-style: normal;
     font-weight: 800;
     font-size: 16px;
     line-height: 16px;
@@ -133,6 +195,7 @@
     background: #FFFFFF;
     border-radius: 5px;
     margin-top: 2px;
+    overflow-y: scroll;
 }
 .iconButtons {
     border-radius: 5px;
@@ -160,7 +223,10 @@
     width: 9%;
 }
 .transactionName {
-    width: 55%;
+    width: 47%;
+}
+.transactionAddress {
+    width: 19%;
 }
 .memberCard {
     display: flex;
@@ -206,13 +272,16 @@
     align-items: center;
     width: 100%;
 }
-.avatarAndName {
+.avatarAndName, #recipientAvatarAndName {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    gap: 20px;
     width: 45%;
+    
+}
+.avatarAndName {
+    gap: 20px;
     margin-right: 35px;
 }
 .Joined {
@@ -237,13 +306,268 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    width: 55%;
+    width: 60%;
 }
 .coinText {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    width: 5%;
+    width: 10%;
     gap: 30px;
+}
+.sidebarModal, .overlay {
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: fixed;
+}
+.overlay {
+    background: #1B2B41;
+    opacity: 0.2;
+}
+.sidebarModal {
+    z-index: 10000;
+}
+.SideModal {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 43px 23px;
+    gap: 35px;
+    background: #FFFFFF;;
+    border-radius: 20px 0px 0px 20px;
+    position: absolute;
+    height: 100vh;
+    width: 40vw;
+    right: 0;
+    top: 0;
+}
+.closeButtonArea {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+}
+.sideModalCloseButton {
+    border-radius: 5px;
+    border-width: 0px;
+    border-color: #FFFFFF;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+#doubleEuro {
+    width: 79.16px;
+    height: 60px;
+}
+#doubleEuro {
+    margin-top: 20vh;
+}
+#recipientDoubleEuro {
+    margin-top: 6vh;
+}
+.transactionDetails,#transactionDetails {
+    font-family: 'Open Sans';
+font-style: normal;
+font-weight: 400;
+font-size: 40px;
+line-height: 33px;
+text-align: center;
+color: #C94B32;
+}
+#transactionDetails{
+    margin-top: 35px;
+}
+.currencySelectionArea {
+    display: flex;
+    flex-direction: row;
+    gap: 22px;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: 35px;
+}
+.tokenDropdown {
+    background:linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
+    border-radius: 10px;
+    width: 13vw;
+    height: 50px;
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+    padding: 0px 15px 0px 15px;
+    margin-top: 10px;
+    margin-right: 25px;
+}
+#SelectRecipientsHeader,#recipientButtonArea {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 75%;
+    align-items: center;
+}
+.selectRecipient, #assignAmount {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    
+}
+.selectRecipient {
+    width: 75%;
+    justify-content: space-between;
+    margin: 2vh 0vh 2vh 0vh;
+}
+#assignAmount {
+    width: 100%;
+    justify-content: flex-start;
+    margin: 0vh 0vh 0vh 0vh;
+}
+#amountInputFields {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+}
+
+#addMember {
+    width: 58%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    align-self: center;
+    margin-top: 20px;
+}
+
+/* sidebar css style */
+.navBarInitialBox {
+    background: linear-gradient(178.31deg, #C94B32 0.74%, #A54536 63.87%);
+    border-radius: 0px 0px 30px 0px;
+    height: 8%;
+    width: 8%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+.invertedBox, .stripInvertedBox {
+    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 10px;
+    transform: rotate(45deg);
+    height: 40px;
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.stripInvertedBox {
+    margin-top: 30px;
+}
+.navbarText {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 25px;
+    text-align: center;
+    letter-spacing: -0.011em;
+    color: #C94B32;
+    transform: rotate(-45deg);
+}
+.sideBarStrip {
+    background: linear-gradient(178.31deg, #C94B32 0.74%, #A54536 63.87%);
+    height: 100%;
+    width: 8%;
+    padding-top: 8%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    scale: 1;
+    gap: 20px;
+}
+.stripInvertedBoxOutline {
+    background: #C94B32;
+    border-radius: 10px;
+    transform: rotate(45deg);
+    height: 40px;
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border:2px solid #FFFFFF;
+    color: #FFFFFF;
+}
+#transactionSuccessPage {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 35px;
+    padding: 93px 23px;
+}
+#transactionSendPage {
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-self: center;
+    overflow-y: scroll;
+}
+#transactionSendDivider1, #transactionSendDivider2{
+    width: 210px;
+    height: 0px;
+    border: 2px solid #C94B32;
+    background-color: #C94B32;
+    border-radius: 50px;
+    margin-top: 35px;
+    margin-bottom: 35px;
+    align-self: center;
+}
+#recipientList{
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    gap: 20px;
+    margin-left: 5%;
+}
+#transactionSendButton {
+    align-self: center;
+}
+#doubleEuroImage {
+    align-self: center;
+}
+#createADAOText{
+    font-family: 'Open Sans';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 16px;
+color: #FFFFFF;
+
+opacity: 0.9;
 }

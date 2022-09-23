@@ -37,7 +37,7 @@ const MemberCard = (props: any) => {
             <div className="copyArea">
               <img src={membersIcon} alt="asset" />
               <div className="dashboardText">
-                {props.invitedMembers.length} members
+                {props.totalMembers.length} members
               </div>
             </div>
             <SafeButton
@@ -58,7 +58,7 @@ const MemberCard = (props: any) => {
             <div className="dashboardText">Name</div>
             <div className="dashboardText">Joined</div>
           </div>
-          {props.invitedMembers.map((result: any, index: any) => {
+          {props.totalMembers.map((result: any, index: any) => {
             return (
               <NameAndAvatar name={result.name} address={result.address} />
             );
