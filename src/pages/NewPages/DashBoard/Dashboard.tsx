@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAppSelector } from "state/hooks";
 import "../../../styles/Global.css";
 import "../../../styles/pages/DashBoard/DashBoard.css";
@@ -11,48 +11,83 @@ import {
 import { ImportSafe, safeService } from "connection/SafeCall";
 import { EthSignSignature } from "@gnosis.pm/safe-core-sdk";
 import { useWeb3React } from "@web3-react/core";
-import { AllTransactionsOptions } from "@gnosis.pm/safe-service-client";
+import {
+  AllTransactionsListResponse,
+  AllTransactionsOptions,
+  SafeMultisigTransactionListResponse,
+} from "@gnosis.pm/safe-service-client";
+import SideModal from "./SideModal";
+import SideBar from "./SideBar";
+import axios from "axios";
+import NotificationArea from "./NotificationArea";
 
 const Dashboard = () => {
-  const { provider } = useWeb3React();
+  const { provider, account } = useWeb3React();
   const daoName = useAppSelector((state) => state.flow.daoName);
   const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
   const safeAddress = useAppSelector((state) => state.flow.safeAddress);
-  const pendingTransactions = useRef<Array<Object>>([]);
-  const executedTransactions = useRef<any>([]);
-  const ownerCount = useRef<number>();
+  const totalMembers = useAppSelector((state) => state.flow.totalMembers);
+  const [pendingTransactions, setPendingTransactions] =
+    useState<SafeMultisigTransactionListResponse>();
+  const [executedTransactions, setExecutedTransactions] =
+    useState<AllTransactionsListResponse>();
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [ownerCount, setOwnerCount] = useState<number>();
+  const [safeTokens, setSafeTokens] = useState<Array<any>>([]);
 
+  const toggleModal = () => {
+    setShowModal(!showModal);
+  };
   const getPendingTransactions = async () => {
     const pendingTxs = await (
       await safeService(provider)
     ).getPendingTransactions(safeAddress);
-    pendingTransactions.current = pendingTxs.results;
+    setPendingTransactions(pendingTxs);
     await ownersCount();
+    console.log("pending", pendingTransactions?.results);
+    await getTokens(safeAddress);
   };
 
   const getExecutedTransactions = async () => {
     const options: AllTransactionsOptions = {
       executed: true,
-      queued: true,
+      queued: false,
       trusted: true,
     };
     const executedTxs = await (
       await safeService(provider)
     ).getAllTransactions(safeAddress, options);
-    executedTransactions.current = executedTxs.results;
-    console.log(executedTransactions.current);
+    setExecutedTransactions(executedTxs);
+    console.log("executedTxs:", executedTxs);
   };
 
   const ownersCount = async () => {
     const safeSDK = await ImportSafe(provider, safeAddress);
     const owners = await safeSDK.getOwners();
-    ownerCount.current = owners.length;
+    setOwnerCount(owners.length);
+  };
+
+  const getTokens = async (safeAddress: string) => {
+    await axios
+      .get(
+        `https://safe-transaction.goerli.gnosis.io/api/v1/safes/${safeAddress}/balances/usd/`
+      )
+      .then((tokens: any) => {
+        setSafeTokens(tokens.data);
+      });
   };
 
   useEffect(() => {
     getPendingTransactions();
     getExecutedTransactions();
-  }, []);
+    getTokens(safeAddress);
+  }, [safeAddress]);
+
+  if (showModal) {
+    document.body.classList.add("active-modal");
+  } else {
+    document.body.classList.remove("active-modal");
+  }
 
   return (
     <>
@@ -62,15 +97,31 @@ const Dashboard = () => {
             {daoName}
           </div>
         </div>
-        <div className="notificationsArea"></div>
+        <NotificationArea
+          pendingTransactionCount={pendingTransactions?.count}
+        />
         <TreasuryCard
           safeAddress={safeAddress}
-          pendingTransactions={pendingTransactions.current}
-          executedTransactions={executedTransactions.current}
-          ownerCount={ownerCount.current}
+          pendingTransactions={pendingTransactions}
+          executedTransactions={executedTransactions}
+          ownerCount={ownerCount}
+          toggleModal={toggleModal}
+          fiatBalance={safeTokens.length >= 1 && safeTokens[0].fiatBalance}
+          account={account}
+          getPendingTransactions={getPendingTransactions}
         />
-        <MemberCard invitedMembers={invitedMembers} />
+        <MemberCard totalMembers={totalMembers} />
       </div>
+      {showModal && (
+        <SideModal
+          toggleModal={toggleModal}
+          tokens={safeTokens}
+          totalMembers={totalMembers}
+          safeAddress={safeAddress}
+          getPendingTransactions={getPendingTransactions}
+        />
+      )}
+      <SideBar name={daoName} />
     </>
   );
 };
