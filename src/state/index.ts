@@ -10,6 +10,7 @@ import proposal from "./proposal/reducer";
 import deploy from "./deploy/reducer";
 import multicall from "state/multicall";
 import flow from "./flow/reducer";
+import tempdata from "./tempdata/reducer";
 
 const PERSISTED_KEYS: string[] = ["user", "transactions", "lists"];
 
@@ -21,6 +22,7 @@ const store = configureStore({
     transactions,
     proposal,
     flow,
+    tempdata,
     deploy,
     lists,
     multicall: multicall.reducer,

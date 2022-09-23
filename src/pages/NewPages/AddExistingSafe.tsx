@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import _ from "lodash";
 import "../../styles/pages/AddExistingSafe.css";
 import "../../styles/Global.css";
@@ -10,14 +10,18 @@ import { useWeb3React } from "@web3-react/core";
 import { updateHolder } from "state/proposal/reducer";
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import { ImportSafe } from "connection/SafeCall";
-import { updateSafeAddress, updatesafeName } from "state/flow/reducer";
+import {
+  updateSafeAddress,
+  updatesafeName,
+  updateTotalMembers,
+} from "state/flow/reducer";
 import { ethers } from "ethers";
 import AddressInputField from "UIpack/AddressInputField";
-import polygongrey from "../../assets/svg/polygongrey.svg";
 import coin from "../../assets/svg/coin.svg";
 import axios from "axios";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import OutlineButton from "UIpack/OutlineButton";
+import { InviteGangType } from "types/UItype";
 
 const AddExistingSafe = () => {
   const dispatch = useAppDispatch();
@@ -25,11 +29,13 @@ const AddExistingSafe = () => {
   const safeAddress = useAppSelector((state) => state.flow.safeAddress);
   const safeName = useAppSelector((state) => state.flow.safeName);
   const selectedOwners = useAppSelector((state) => state.flow.owners);
+  const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
   const [safeOwners, setSafeOwners] = useState<string[]>([]);
   const [tokens, setTokens] = useState<any>([]);
   const [errors, setErrors] = useState<any>({});
   const [balance, setBalance] = useState<string>("");
   const [isLoading, setisLoading] = useState<boolean>(false);
+  const owners = useRef<InviteGangType[]>([]);
 
   const { provider } = useWeb3React();
 
@@ -37,8 +43,14 @@ const AddExistingSafe = () => {
     setisLoading(true);
     const safeSDK = await ImportSafe(provider, safeAddress);
     dispatch(updateHolder(safeSDK.getAddress() as string));
-    const safeOwners: string[] = await safeSDK.getOwners();
-    setSafeOwners(safeOwners);
+    const safeowners: string[] = await safeSDK.getOwners();
+    safeowners.map((ownerAddress: string, index: number) => {
+      let obj: InviteGangType = { name: "", address: "" };
+      obj["address"] = ownerAddress;
+      owners.current.push(obj);
+    });
+    console.log(safeowners);
+    console.log(owners.current);
     const bal = await safeSDK.getBalance();
     setBalance(bal.toString());
     await getTokens(safeAddress);
@@ -47,7 +59,7 @@ const AddExistingSafe = () => {
   const getTokens = async (safeAddress: string) => {
     axios
       .get(
-        `https://safe-transaction.goerli.gnosis.io/api/v1/safes/${safeAddress}/balances/`
+        `https://safe-transaction.goerli.gnosis.io/api/v1/safes/${safeAddress}/balances/usd/`
       )
       .then((tokens: any) => {
         setTokens(tokens.data);
@@ -75,6 +87,19 @@ const AddExistingSafe = () => {
     }
   };
 
+  const handleAddSafe = () => {
+    const totalAddresses = [...invitedMembers, ...owners.current];
+    const value = totalAddresses.reduce((final: any, current: any) => {
+      let object = final.find((item: any) => item.address === current.address);
+      if (object) {
+        return final;
+      }
+      return final.concat([current]);
+    }, []);
+    dispatch(updateTotalMembers(value));
+    navigate("/success");
+  };
+
   return (
     <>
       <div className="StartSafe">
@@ -83,12 +108,14 @@ const AddExistingSafe = () => {
           <div>
             <SafeButton
               title="CREATE NEW SAFE"
-              titleColor="#C94B32"
+              titleColor="rgba(201, 75, 50, 0.6)"
               bgColor="#FFFFFF"
-              height={55}
-              width={225}
+              height={58}
+              width={228}
               fontsize={20}
               fontweight={400}
+              disabled={true}
+              opacity="0.6"
             />
           </div>
           <div className="centerText">or</div>
@@ -97,68 +124,115 @@ const AddExistingSafe = () => {
               title="ADD EXISTING SAFE"
               titleColor="#C94B32"
               bgColor="#FFFFFF"
-              height={55}
-              width={225}
+              height={58}
+              width={228}
               fontsize={20}
               fontweight={400}
+              disabled={false}
             />
           </div>
         </div>
         <div className="divider">
           <hr />
         </div>
-        {safeOwners.length >= 1 ? (
+        {owners.current.length >= 1 ? (
           <>
             <div className="safeinfo">
               <div className="safedata">
-                <div className="safeName">{safeName}</div>
+                <div className="safeName">
+                  {safeName ? (
+                    safeName
+                  ) : (
+                    <SimpleInputField
+                      className="inputField"
+                      height={30}
+                      width={151}
+                      placeholder="Safe Name"
+                      value={safeName}
+                      onchange={(e) => {
+                        dispatch(updatesafeName(e.target.value));
+                      }}
+                    />
+                  )}
+                </div>
                 <div className="safeDivider">
                   <hr />
                 </div>
-                <div className="text">{safeAddress}</div>
+                <div className="address">
+                  {safeAddress.slice(0, 18) + "..." + safeAddress.slice(-6)}
+                </div>
               </div>
               {/* assets */}
               <div className="safedata">
                 <div className="balance">
                   <img src={coin} alt="coin" />
-                  <div className="safeBalance">$ {balance}</div>
+                  <div className="safeBalance">
+                    $ {tokens.length >= 1 && tokens[0].fiatBalance}
+                  </div>
                 </div>
-                {tokens.length > 1 ? (
-                  <>
-                    <div className="balance">
-                      <div className="asset">
-                        <div className="safeName">
-                          {tokens[1].token.symbol.slice(0, 1) +
-                            tokens[1].token.symbol.slice(-1)}
-                        </div>
-                      </div>
-                      <div className="amount">
-                        {tokens[1].balance / 10 ** 18}
-                      </div>
-                    </div>
-                  </>
-                ) : null}
-              </div>
-              <div className="safeOwners">
-                <div className="ownerCount">4 Owners :</div>
-                <div className="ownerList">
-                  {safeOwners.map((result: any, index: any) => {
-                    return (
-                      <>
-                        <div className="owner" key={index}>
-                          <SimpleInputField
-                            className="inputField"
-                            height={30}
-                            width={100}
-                            placeholder="Name"
-                          />
-                          <div className="address">
-                            {result.slice(0, 28) + "..." + result.slice(-6)}
+                <div className="tokenAssets">
+                  {tokens.length > 1 ? (
+                    <>
+                      <div className="balance">
+                        <div className="asset">
+                          <div className="safeName">
+                            {tokens[1].token.symbol.slice(0, 1) +
+                              tokens[1].token.symbol.slice(-1)}
                           </div>
                         </div>
-                      </>
-                    );
-                  })}
+                        <div className="amount">
+                          {tokens[1].balance / 10 ** 18}
+                        </div>
+                      </div>
+                    </>
+                  ) : null}
+                  {tokens.length === 3 ? (
+                    <>
+                      <div className="balance">
+                        <div className="asset">
+                          <div className="safeName">
+                            {tokens[2].token.symbol.slice(0, 1) +
+                              tokens[2].token.symbol.slice(-1)}
+                          </div>
+                        </div>
+                        <div className="amount">
+                          {tokens[2].balance / 10 ** 18}
+                        </div>
+                      </div>
+                    </>
+                  ) : null}
+                </div>
+              </div>
+              <div className="safeOwners">
+                <div className="ownerCount">
+                  {owners.current.length} Owners :
+                </div>
+                <div className="ownerList">
+                  {owners.current.map(
+                    (result: InviteGangType, index: number) => {
+                      return (
+                        <>
+                          <div className="safeowner" key={index}>
+                            <SimpleInputField
+                              className="inputField"
+                              height={30}
+                              width={151}
+                              placeholder="Name"
+                              type="text"
+                              onchange={(e) => {
+                                owners.current[index].name = e.target.value;
+                              }}
+                            />
+                            <div className="address">
+                              {result.address.slice(0, 18) +
+                                "..." +
+                                result.address.slice(-6)}
+                            </div>
+                          </div>
+                        </>
+                      );
+                    }
+                  )}
                 </div>
               </div>
               <div className="footerText">
@@ -168,7 +242,7 @@ const AddExistingSafe = () => {
               <div className="buttonArea">
                 <div>
                   <OutlineButton
-                    title="CREATE NEW SAFE"
+                    title="CHANGE SAFE"
                     borderColor="#C94B32"
                     bgColor="#FFFFFF"
                     height={55}
@@ -182,6 +256,7 @@ const AddExistingSafe = () => {
                 </div>
                 <div>
                   <SimpleButton
+                    className="button"
                     title="ADD SAFE"
                     bgColor="#C94B32"
                     height={55}
@@ -189,7 +264,7 @@ const AddExistingSafe = () => {
                     fontsize={20}
                     fontweight={400}
                     onClick={() => {
-                      navigate("/success");
+                      handleAddSafe();
                     }}
                   />
                 </div>
@@ -199,11 +274,13 @@ const AddExistingSafe = () => {
         ) : (
           <>
             <div className="centerCard">
-              <div>
+              <div className="chainDetails">
                 <div>
-                  <div className="inputFieldTitle">Name Your DAO</div>
+                  <div className="inputFieldTitle">
+                    Select the network on which the Safe was created
+                  </div>
                 </div>
-                <select name="chain" id="chain" className="dropdown">
+                <select name="chain" id="chain" className="drop">
                   <option value="polygon">Polygon Mumbai</option>
                   <option value="goerli">Goerli</option>
                 </select>
@@ -252,7 +329,11 @@ const AddExistingSafe = () => {
                 fontsize={20}
                 fontweight={400}
                 onClick={handleClick}
-                bgColor="#C94B32"
+                bgColor={
+                  isAddressValid(safeAddress) && owners.current.length < 1
+                    ? "#C94B32"
+                    : "rgba(27, 43, 65, 0.2)"
+                }
                 condition={isLoading}
               />
             </div>

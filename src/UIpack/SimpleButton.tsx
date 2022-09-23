@@ -7,7 +7,7 @@ const SimpleButton = (props: ButtonType) => {
     <>
       <button
         id="nextButtonToken"
-        className={"button"}
+        className={props.className}
         onClick={props.onClick}
         style={{
           height: props.height,
@@ -15,6 +15,7 @@ const SimpleButton = (props: ButtonType) => {
           fontSize: props.fontsize,
           fontWeight: props.fontweight,
           background: props.bgColor,
+          boxShadow: props.shadow,
         }}
       >
         {props.title}

@@ -9,6 +9,7 @@ export interface FlowState {
   readonly safeAddress: string;
   readonly owners: Array<OwnerType>;
   readonly threshold: number;
+  readonly totalMembers: Array<InviteGangType>;
 }
 
 const initialState: FlowState = {
@@ -18,7 +19,8 @@ const initialState: FlowState = {
   owners: [],
   safeName: "",
   safeAddress: "",
-  threshold: 1,
+  threshold: 0,
+  totalMembers: [],
 };
 
 const flowSlice = createSlice({
@@ -46,6 +48,9 @@ const flowSlice = createSlice({
     updateThreshold(state, action) {
       state.threshold = action.payload;
     },
+    updateTotalMembers(state, action) {
+      state.totalMembers = action.payload;
+    },
   },
 });
 export const {
@@ -56,5 +61,6 @@ export const {
   updatesafeName,
   updateSafeAddress,
   updateThreshold,
+  updateTotalMembers,
 } = flowSlice.actions;
 export default flowSlice.reducer;

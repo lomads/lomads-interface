@@ -7,7 +7,7 @@ const IconButton = (props: IconButtonType) => {
     <>
       <button
         id="nextButtonToken"
-        className={"button"}
+        className={props.className}
         onClick={props.onClick}
         style={{
           height: props.height,
@@ -15,6 +15,7 @@ const IconButton = (props: IconButtonType) => {
           fontSize: props.fontsize,
           fontWeight: props.fontweight,
           background: props.bgColor,
+          border: props.border,
         }}
       >
         {props.Icon}
