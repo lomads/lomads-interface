@@ -4,7 +4,7 @@ import { GrFormAdd } from "react-icons/gr";
 import plus from "../../../assets/svg/plus.svg";
 
 const SideBar = (props: any) => {
-  const [showNavBar, setShowNavBar] = useState<boolean>(false);
+  // const [showNavBar, setShowNavBar] = useState<boolean>(false);
   const name = props.name.split(" ");
   const SideBarStrip = () => {
     return (
@@ -22,15 +22,7 @@ const SideBar = (props: any) => {
   };
   return (
     <>
-      <div
-        className="navBarInitialBox"
-        onMouseOver={() => {
-          setShowNavBar(true);
-        }}
-        onMouseLeave={() => {
-          setShowNavBar(false);
-        }}
-      >
+      <div className="navBarInitialBox">
         <div className="invertedBox">
           <div className="navbarText">
             {name.length === 1
@@ -39,7 +31,7 @@ const SideBar = (props: any) => {
           </div>
         </div>
       </div>
-      {showNavBar && <SideBarStrip />}
+      <SideBarStrip />
     </>
   );
 };

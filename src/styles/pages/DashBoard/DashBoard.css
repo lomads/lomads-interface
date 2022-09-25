@@ -456,8 +456,8 @@ color: #C94B32;
 .navBarInitialBox {
     background: linear-gradient(178.31deg, #C94B32 0.74%, #A54536 63.87%);
     border-radius: 0px 0px 30px 0px;
-    height: 8%;
-    width: 8%;
+    height: 116px;
+    width: 107px;
     position: absolute;
     top: 0;
     left: 0;
@@ -466,13 +466,28 @@ color: #C94B32;
     align-items: center;
     z-index: 1000;
 }
+.navBarInitialBox:hover + .sideBarStrip {
+    background: linear-gradient(178.31deg, #C94B32 0.74%, #A54536 63.87%);
+    height: 100%;
+    width: 8%;
+    padding-top: 8%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    scale: 1;
+    gap: 20px;
+}
 .invertedBox, .stripInvertedBox {
     background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
     box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
     border-radius: 10px;
     transform: rotate(45deg);
-    height: 40px;
-    width: 40px;
+    height: 35px;
+    width: 35px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -492,19 +507,7 @@ color: #C94B32;
     transform: rotate(-45deg);
 }
 .sideBarStrip {
-    background: linear-gradient(178.31deg, #C94B32 0.74%, #A54536 63.87%);
-    height: 100%;
-    width: 8%;
-    padding-top: 8%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    scale: 1;
-    gap: 20px;
+    display: none;
 }
 .stripInvertedBoxOutline {
     background: #C94B32;
