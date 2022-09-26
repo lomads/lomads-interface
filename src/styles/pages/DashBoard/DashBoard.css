@@ -8,6 +8,8 @@ body.active-modal {
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
+    min-height: 100vh;
+    max-height: fit-content;
 }
 .DAOdetails {
     display: flex;
@@ -182,20 +184,20 @@ body.active-modal {
     text-align: center;
     color: #188C7C;
 }
-.treasuryTransactions {
+#treasuryTransactions {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
     padding: 26px 22px;
     width: 100%;
-    height: 360px;
-    gap: 10px;
-    height: 360px;
+    gap: 18px;
+    min-height: fit-content;
+    max-height: 360px;
     background: #FFFFFF;
     border-radius: 5px;
     margin-top: 2px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 .iconButtons {
     border-radius: 5px;
@@ -232,7 +234,7 @@ body.active-modal {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    width: 65%;
+    width: 60%;
     height: fit-content;
     margin-bottom: 20px;
 }
@@ -250,19 +252,20 @@ body.active-modal {
     align-items: flex-start;
     padding: 26px 22px;
     width: 100%;
-    height: 230px;
-    gap: 10px;
-    height: 360px;
+    gap: 35px;
+    min-height: fit-content;
+    max-height: 230px;
     background: #FFFFFF;
     border-radius: 5px;
     margin-top: 2px;
+    overflow-y: auto;
 }
 .NameAndAvatar {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    width: 60%;
+    width: 65%;
     gap: 10px;
 }
 .memberRow {
@@ -306,7 +309,7 @@ body.active-modal {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    width: 60%;
+    width: 65%;
 }
 .coinText {
     display: flex;
@@ -417,6 +420,12 @@ color: #C94B32;
     width: 75%;
     align-items: center;
 }
+#recipientButtonArea {
+    position: sticky;
+    bottom: 52px;
+    background: rgba(255, 255, 255, 0.2); 
+  backdrop-filter: blur(0.7px);
+}
 .selectRecipient, #assignAmount {
     display: flex;
     flex-direction: row;
@@ -456,8 +465,8 @@ color: #C94B32;
 .navBarInitialBox {
     background: linear-gradient(178.31deg, #C94B32 0.74%, #A54536 63.87%);
     border-radius: 0px 0px 30px 0px;
-    height: 116px;
-    width: 107px;
+    height: 10%;
+    width: 8%;
     position: absolute;
     top: 0;
     left: 0;
@@ -480,6 +489,7 @@ color: #C94B32;
     align-items: center;
     scale: 1;
     gap: 20px;
+    overflow: visible;
 }
 .invertedBox, .stripInvertedBox {
     background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
@@ -532,12 +542,13 @@ color: #C94B32;
 }
 #transactionSendPage {
     width: 100%;
-    height: fit-content;
+    min-height: 100%;
+    max-height: fit-content;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
     align-self: center;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 #transactionSendDivider1, #transactionSendDivider2{
     width: 210px;
@@ -560,6 +571,10 @@ color: #C94B32;
 }
 #transactionSendButton {
     align-self: center;
+    position: sticky;
+    bottom: 52px;
+    background: rgba(255, 255, 255, 0.2); 
+  backdrop-filter: blur(0.7px);
 }
 #doubleEuroImage {
     align-self: center;
@@ -573,4 +588,70 @@ line-height: 16px;
 color: #FFFFFF;
 
 opacity: 0.9;
+}
+#AddNewMember {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: flex-start;
+    background: #FFFFFF;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 20px;
+    max-height: fit-content;
+    width: 449px;
+    padding: 26px 22px 30px 22px;
+    gap: 25px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    z-index: 10000;
+}
+#AddNewMemberComponent, #AddNewMemberOverlay {
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: fixed;
+}
+#AddNewMemberOverlay {
+    background: #1B2B41;
+    opacity: 0.2;
+}
+#addMemberButtonArea {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+#AddNewRecipientComponent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: flex-start;
+    background: #FFFFFF;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 20px;
+    max-height: fit-content;
+    width: 449px;
+    padding: 26px 22px 30px 22px;
+    gap: 25px;
+    position: absolute;
+    top: 45%;
+}
+.SelectNewRecipientPage {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100%;
+    max-height: fit-content;
+    width: 100%;
+    overflow-y: auto;
+
 }

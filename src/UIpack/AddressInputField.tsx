@@ -22,7 +22,9 @@ const AddressInputField = (props: InputFieldType) => {
       />
       {props.isInvalid && (
         <FormErrorMessage style={{ marginTop: 0, fontSize: "x-small" }}>
-          {!isAddressValid(props.value as string) ? props.isInvalid : null}
+          {!isAddressValid(props.value as string)
+            ? props.isInvalid
+            : props.isInvalid}
         </FormErrorMessage>
       )}
     </FormControl>

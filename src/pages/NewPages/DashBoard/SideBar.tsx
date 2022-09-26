@@ -4,7 +4,7 @@ import { GrFormAdd } from "react-icons/gr";
 import plus from "../../../assets/svg/plus.svg";
 
 const SideBar = (props: any) => {
-  // const [showNavBar, setShowNavBar] = useState<boolean>(false);
+  const [showNavBar, setShowNavBar] = useState<boolean>(false);
   const name = props.name.split(" ");
   const SideBarStrip = () => {
     return (

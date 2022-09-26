@@ -38,11 +38,14 @@ const TransactionDetails = (props: ItransactionDetailsType) => {
             name="chain"
             id="chain"
             className="tokenDropdown"
-            placeholder="Select Token"
             onChange={(e) => {
               props.selectToken(e.target.value);
             }}
+            defaultValue={props.selectedToken}
           >
+            <option value="" disabled={true}>
+              select a token
+            </option>
             {props.tokens.map((result: any, index: any) => {
               return (
                 result.tokenAddress !== null && (

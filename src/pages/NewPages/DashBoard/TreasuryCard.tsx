@@ -136,62 +136,83 @@ const TreasuryCard = (props: ItreasuryCardType) => {
           />
         </div>
       </div>
-      <div className="treasuryTransactions">
-        <div className="dashboardText">Last Transactions</div>
-        {props.pendingTransactions !== undefined &&
-          props.pendingTransactions.results.length >= 1 &&
-          props.pendingTransactions.results.map(
-            (result: any, index: number) => {
-              return result.dataDecoded.method !== "multiSend" ? (
-                <PendingTransactions
-                  showExecute={hasUserApproved(index)}
-                  amount={result.dataDecoded.parameters[1].value}
-                  recipient={result.dataDecoded.parameters[0].value}
-                  confirmations={result.confirmations.length}
-                  ownerCount={ownerCount}
-                  confirmTransaction={confirmTransaction}
-                  safeTxHash={result.safeTxHash}
-                  isOwner={isOwner}
-                  key={index}
-                  executeTransactions={executeTransactions}
-                />
-              ) : (
-                <PendingTransactions
-                  showExecute={hasUserApproved(index)}
-                  amount={"multisend"}
-                  recipient={"multisend"}
-                  confirmations={result.confirmations.length}
-                  ownerCount={ownerCount}
-                  confirmTransaction={confirmTransaction}
-                  safeTxHash={result.safeTxHash}
-                  isOwner={isOwner}
-                  key={index}
-                  executeTransactions={executeTransactions}
-                  txs={result}
-                />
-              );
-            }
-          )}
-        {props.executedTransactions !== undefined &&
-          props.executedTransactions.results.length >= 1 &&
-          props.executedTransactions.results.map((result: any, index: any) => {
-            return (
-              result.safe &&
-              result.dataDecoded.method !== "multiSend" && (
-                <TransactionComplete
-                  amount={result.dataDecoded.parameters[1].value}
-                  recipient={result.dataDecoded.parameters[0].value}
-                  ownerCount={ownerCount}
-                  key={index}
-                  submissionDate={
-                    result.confirmations[result.confirmations.length - 1]
-                      .submissionDate
-                  }
-                />
-              )
-            );
-          })}
-      </div>
+      {(props.executedTransactions !== undefined ||
+        props.pendingTransactions?.count !== undefined) && (
+        <>
+          <div id="treasuryTransactions">
+            <div className="dashboardText">Last Transactions</div>
+            {props.pendingTransactions !== undefined &&
+              props.pendingTransactions.results.length >= 1 &&
+              props.pendingTransactions.results.map(
+                (result: any, index: number) => {
+                  return result.dataDecoded.method !== "multiSend" ? (
+                    <PendingTransactions
+                      showExecute={hasUserApproved(index)}
+                      amount={result.dataDecoded.parameters[1].value}
+                      recipient={result.dataDecoded.parameters[0].value}
+                      confirmations={result.confirmations.length}
+                      ownerCount={ownerCount}
+                      confirmTransaction={confirmTransaction}
+                      safeTxHash={result.safeTxHash}
+                      isOwner={isOwner}
+                      key={index}
+                      executeTransactions={executeTransactions}
+                    />
+                  ) : (
+                    <PendingTransactions
+                      showExecute={hasUserApproved(index)}
+                      amount={"multisend"}
+                      recipient={"multisend"}
+                      confirmations={result.confirmations.length}
+                      ownerCount={ownerCount}
+                      confirmTransaction={confirmTransaction}
+                      safeTxHash={result.safeTxHash}
+                      isOwner={isOwner}
+                      key={index}
+                      executeTransactions={executeTransactions}
+                      txs={result}
+                    />
+                  );
+                }
+              )}
+            {props.executedTransactions !== undefined &&
+              props.executedTransactions.results.length >= 1 &&
+              props.executedTransactions.results.map(
+                (result: any, index: any) => {
+                  return result.txType !== "ETHEREUM_TRANSACTION" ? (
+                    result.safe &&
+                      result.dataDecoded.method !== "multiSend" && (
+                        <TransactionComplete
+                          credit={false}
+                          amount={result.dataDecoded.parameters[1].value}
+                          recipient={result.dataDecoded.parameters[0].value}
+                          ownerCount={ownerCount}
+                          key={index}
+                          submissionDate={
+                            result.confirmations[
+                              result.confirmations.length - 1
+                            ].submissionDate
+                          }
+                        />
+                      )
+                  ) : (
+                    <>
+                      <TransactionComplete
+                        credit={true}
+                        amount={result.transfers[0].value}
+                        recipient={result.transfers[0].to}
+                        ownerCount={ownerCount}
+                        key={index}
+                        submissionDate={result.executionDate}
+                        tokenSymbol={result.transfers[0].tokenInfo.symbol}
+                      />
+                    </>
+                  );
+                }
+              )}
+          </div>
+        </>
+      )}
     </div>
   );
 };

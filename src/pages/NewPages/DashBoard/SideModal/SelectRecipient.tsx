@@ -11,6 +11,7 @@ import SimpleInputField from "UIpack/SimpleInputField";
 import { ethers } from "ethers";
 import { InviteGangType } from "types/UItype";
 import { IselectRecipientType, IsetRecipientType } from "types/DashBoardType";
+import AddRecipient from "./AddRecipient";
 
 const SelectRecipient = (props: IselectRecipientType) => {
   const [showNext, setShowNext] = useState<boolean>();
@@ -82,68 +83,76 @@ const SelectRecipient = (props: IselectRecipientType) => {
           }}
         />
       </div>
-      <div id="SelectRecipientsHeader">
-        <div className="dashboardTextBold">Select recipients</div>
-        <div>
-          <SafeButton
+      <div className="SelectNewRecipientPage">
+        <div id="SelectRecipientsHeader">
+          <div className="dashboardTextBold">Select recipients</div>
+          <div>
+            <SafeButton
+              bgColor="#FFFFFF"
+              disabled={false}
+              title="ADD NEW RECIPIENT"
+              titleColor="#76808D"
+              fontsize={16}
+              fontweight={400}
+              height={40}
+              width={209}
+              onClick={props.toggleAddNewRecipient}
+            />
+          </div>
+        </div>
+        {props.totalMembers &&
+          props.totalMembers.map((result: any, index: any) => {
+            return (
+              <div className="selectRecipient">
+                <div className="avatarName">
+                  <img src={daoMember2} alt={result.address} />
+                  <p className="nameText">{result.name}</p>
+                </div>
+                <p className="addressText">
+                  {result.address.slice(0, 18) +
+                    "..." +
+                    result.address.slice(-6)}
+                </p>
+                <Checkbox
+                  size="lg"
+                  colorScheme="orange"
+                  name="owner"
+                  defaultChecked={false}
+                  disabled={false}
+                  value={result.address}
+                  onChange={(event) => {
+                    handleCheck(event);
+                  }}
+                />
+              </div>
+            );
+          })}
+        <div id="recipientButtonArea">
+          <OutlineButton
+            title="CANCEL"
+            borderColor="#C94B32"
             bgColor="#FFFFFF"
-            disabled={false}
-            title="ADD NEW RECIPIENT"
-            titleColor="#76808D"
+            height={40}
+            width={129}
             fontsize={16}
             fontweight={400}
+          />
+          <SimpleButton
+            title="NEXT"
+            bgColor={"#C94B32"}
+            className="button"
             height={40}
-            width={209}
+            width={184}
+            fontsize={16}
+            onClick={() => {
+              handleSetRecipient();
+            }}
           />
         </div>
       </div>
-      {props.totalMembers &&
-        props.totalMembers.map((result: any, index: any) => {
-          return (
-            <div className="selectRecipient">
-              <div className="avatarName">
-                <img src={daoMember2} alt={result.address} />
-                <p className="nameText">{result.name}</p>
-              </div>
-              <p className="addressText">
-                {result.address.slice(0, 18) + "..." + result.address.slice(-6)}
-              </p>
-              <Checkbox
-                size="lg"
-                colorScheme="orange"
-                name="owner"
-                defaultChecked={false}
-                disabled={false}
-                value={result.address}
-                onChange={(event) => {
-                  handleCheck(event);
-                }}
-              />
-            </div>
-          );
-        })}
-      <div id="recipientButtonArea">
-        <OutlineButton
-          title="CANCEL"
-          borderColor="#C94B32"
-          bgColor="#FFFFFF"
-          height={40}
-          width={129}
-          fontsize={16}
-          fontweight={400}
-        />
-        <SimpleButton
-          title="NEXT"
-          bgColor={"#C94B32"}
-          className="button"
-          height={40}
-          width={184}
-          fontsize={16}
-          onClick={() => {
-            handleSetRecipient();
-          }}
-        />
-      </div>
+      {props.addNewRecipient && (
+        <AddRecipient toggleAddNewRecipient={props.toggleAddNewRecipient} />
+      )}
     </>
   );
 };

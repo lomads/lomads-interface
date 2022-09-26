@@ -81,14 +81,7 @@ const TransactionSend = (props: IselectTransactionSend) => {
                 return (
                   result.tokenAddress !== null && (
                     <>
-                      <option
-                        value={
-                          props.selectedToken
-                            ? props.selectedToken
-                            : result.tokenAddress
-                        }
-                        key={index}
-                      >
+                      <option value={result.tokenAddress} key={index}>
                         {result.token.symbol}
                       </option>
                     </>

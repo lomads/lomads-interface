@@ -11,6 +11,8 @@ export interface IsideModal {
   totalMembers: InviteGangType[];
   safeAddress: string;
   getPendingTransactions: () => Promise<void>;
+  showNotificationArea: (_choice: boolean) => void;
+  toggleShowMember: () => void;
 }
 export interface ItransactionDetailsType {
   tokens: any;
@@ -32,6 +34,8 @@ export interface IselectRecipientType {
   ) => void;
   selectedRecipients: React.MutableRefObject<InviteGangType[]>;
   setRecipient: React.MutableRefObject<IsetRecipientType[]>;
+  toggleAddNewRecipient: () => void;
+  addNewRecipient: boolean;
 }
 export interface IselectTransactionSend {
   showNavigation: (

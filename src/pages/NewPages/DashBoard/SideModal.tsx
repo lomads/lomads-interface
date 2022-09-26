@@ -18,6 +18,7 @@ import TransactionSuccess from "./SideModal/TransactionSuccess";
 const SideModal = (props: IsideModal) => {
   const { provider, account } = useWeb3React();
   const [selectedToken, setSelectedToken] = useState<string>("");
+  const [addNewRecipient, setAddNewRecipient] = useState<boolean>(false);
   const [modalNavigation, setModalNavigation] = useState({
     showRecipient: false,
     showTransactionSender: false,
@@ -43,6 +44,10 @@ const SideModal = (props: IsideModal) => {
     });
   };
   const transactionData = useRef<TransactionDataType[]>([]);
+
+  const toggleAddNewRecipient = () => {
+    setAddNewRecipient(!addNewRecipient);
+  };
 
   const createTransaction = async () => {
     const token = await tokenCallSafe(selectedToken);
@@ -123,6 +128,8 @@ const SideModal = (props: IsideModal) => {
                 showNavigation={showNavigation}
                 selectedRecipients={selectedRecipients}
                 setRecipient={setRecipient}
+                toggleAddNewRecipient={toggleAddNewRecipient}
+                addNewRecipient={addNewRecipient}
               />
             )}
           {!modalNavigation.showRecipient &&

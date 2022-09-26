@@ -20,6 +20,7 @@ import SideModal from "./SideModal";
 import SideBar from "./SideBar";
 import axios from "axios";
 import NotificationArea from "./NotificationArea";
+import AddMember from "./MemberCard/AddMember";
 
 const Dashboard = () => {
   const { provider, account } = useWeb3React();
@@ -34,9 +35,14 @@ const Dashboard = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [ownerCount, setOwnerCount] = useState<number>();
   const [safeTokens, setSafeTokens] = useState<Array<any>>([]);
-
+  const [showNotification, setShowNotification] = useState<boolean>(true);
+  const [showAddMember, setShowAddMember] = useState<boolean>(false);
   const toggleModal = () => {
     setShowModal(!showModal);
+  };
+
+  const toggleShowMember = () => {
+    setShowAddMember(!showAddMember);
   };
   const getPendingTransactions = async () => {
     const pendingTxs = await (
@@ -46,6 +52,7 @@ const Dashboard = () => {
     await ownersCount();
     console.log("pending", pendingTransactions?.results);
     await getTokens(safeAddress);
+    setShowNotification(true);
   };
 
   const getExecutedTransactions = async () => {
@@ -88,6 +95,9 @@ const Dashboard = () => {
   } else {
     document.body.classList.remove("active-modal");
   }
+  const showNotificationArea = (_choice: boolean) => {
+    setShowNotification(_choice);
+  };
 
   return (
     <>
@@ -97,9 +107,14 @@ const Dashboard = () => {
             {daoName}
           </div>
         </div>
-        <NotificationArea
-          pendingTransactionCount={pendingTransactions?.count}
-        />
+        {pendingTransactions !== undefined &&
+          pendingTransactions?.count >= 1 &&
+          showNotification && (
+            <NotificationArea
+              pendingTransactionCount={pendingTransactions?.count}
+              showNotificationArea={showNotificationArea}
+            />
+          )}
         <TreasuryCard
           safeAddress={safeAddress}
           pendingTransactions={pendingTransactions}
@@ -110,7 +125,10 @@ const Dashboard = () => {
           account={account}
           getPendingTransactions={getPendingTransactions}
         />
-        <MemberCard totalMembers={totalMembers} />
+        <MemberCard
+          totalMembers={totalMembers}
+          toggleShowMember={toggleShowMember}
+        />
       </div>
       {showModal && (
         <SideModal
@@ -119,9 +137,12 @@ const Dashboard = () => {
           totalMembers={totalMembers}
           safeAddress={safeAddress}
           getPendingTransactions={getPendingTransactions}
+          showNotificationArea={showNotificationArea}
+          toggleShowMember={toggleShowMember}
         />
       )}
       <SideBar name={daoName} />
+      {showAddMember && <AddMember toggleShowMember={toggleShowMember} />}
     </>
   );
 };

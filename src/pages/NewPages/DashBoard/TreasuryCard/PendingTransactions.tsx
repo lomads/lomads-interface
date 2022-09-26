@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import receiveTokenOutline from "../../../../assets/svg/receiveTokenOutline.svg";
+import sendTokenOutline from "../../../../assets/svg/sendTokenOutline.svg";
 import SimpleInputField from "UIpack/SimpleInputField";
 import IconButton from "UIpack/IconButton";
 import { AiOutlineClose, AiOutlineCheck } from "react-icons/ai";
@@ -10,7 +10,7 @@ const PendingTransactions = (props: any) => {
     <>
       <div className="transactionRow">
         <div className="coinText">
-          <img src={receiveTokenOutline} alt="" />
+          <img src={sendTokenOutline} alt="" />
 
           <div className="dashboardTextBold">
             {props.amount === "multisend"
@@ -40,17 +40,13 @@ const PendingTransactions = (props: any) => {
           {props.confirmations + "/" + props.ownerCount} vote
         </div>
         <div className="confirmIconGrp">
-          {props.showExecute && props.isOwner && (
+          {props.confirmations === props.ownerCount && props.isOwner && (
             <>
               <SimpleButton
                 width={"100%"}
                 height={30}
                 title="EXECUTE"
-                bgColor={
-                  props.confirmations === props.ownerCount
-                    ? "#C94B32"
-                    : "rgba(27, 43, 65, 0.2)"
-                }
+                bgColor={"#C94B32"}
                 className="button"
                 onClick={(e) => {
                   if (props.confirmations === props.ownerCount) {
@@ -96,17 +92,6 @@ const PendingTransactions = (props: any) => {
                 onClick={(e) => {
                   props.confirmTransaction(props.safeTxHash);
                 }}
-              />
-            </>
-          )}
-          {!props.showExecute && !props.isOwner && (
-            <>
-              <SimpleButton
-                width={"100%"}
-                height={30}
-                title="Visitor"
-                bgColor="#C94B32"
-                className="button"
               />
             </>
           )}

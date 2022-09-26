@@ -3,27 +3,28 @@ import _ from "lodash";
 import IconButton from "UIpack/IconButton";
 import SimpleButton from "UIpack/SimpleButton";
 import SimpleInputField from "UIpack/SimpleInputField";
-import "../../styles/Global.css";
-import "../../styles/pages/InviteGang.css";
+import "../../../../styles/Global.css";
+import "../../../../styles/pages/InviteGang.css";
 import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import AddressInputField from "UIpack/AddressInputField";
 import { useAppSelector } from "state/hooks";
 import { useAppDispatch } from "state/hooks";
-import { updateInvitedGang } from "state/flow/reducer";
+import { updateInvitedGang, updateTotalMembers } from "state/flow/reducer";
 import { ethers } from "ethers";
 import { InviteGangType } from "types/UItype";
 import daoMember2 from "../../assets/svg/daoMember2.svg";
 import { useWeb3React } from "@web3-react/core";
 import { useEnsAddress } from "react-moralis";
+import OutlineButton from "UIpack/OutlineButton";
 
-const InviteGang = () => {
+const AddMember = (props: any) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [ownerName, setOwnerName] = useState<string>("");
   const [ownerAddress, setOwnerAddress] = useState<string>("");
   const [errors, setErrors] = useState<any>({});
-  const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
+  const totalMembers = useAppSelector((state) => state.flow.totalMembers);
   const { account } = useWeb3React();
 
   const isAddressValid = (holderAddress: string) => {
@@ -32,16 +33,16 @@ const InviteGang = () => {
   };
 
   const isPresent = (_address: string) => {
-    const check = invitedMembers.some((mem) => mem.address === _address);
+    const check = totalMembers.some((mem) => mem.address === _address);
     return check;
   };
   useEffect(() => {
-    const check = invitedMembers.some(
+    const check = totalMembers.some(
       (member) => member.address === (account as string)
     );
     if (!check) {
       const creator = [
-        ...invitedMembers,
+        ...totalMembers,
         { name: "creator", address: account as string },
       ];
       dispatch(updateInvitedGang(creator));
@@ -59,8 +60,8 @@ const InviteGang = () => {
   const addMember = (_ownerName: string, _ownerAddress: string) => {
     const member: InviteGangType = { name: _ownerName, address: _ownerAddress };
     if (!isPresent(member.address)) {
-      const newMember = [...invitedMembers, member];
-      dispatch(updateInvitedGang(newMember));
+      const newMember = [...totalMembers, member];
+      dispatch(updateTotalMembers(newMember));
       setOwnerName("");
       setOwnerAddress("");
     }
@@ -80,30 +81,11 @@ const InviteGang = () => {
       setErrors(terrors);
     }
   };
-
-  const deleteMember = (_address: any) => {
-    const deleteMember = [...invitedMembers];
-
-    const newContract = deleteMember.splice(
-      deleteMember.findIndex((ele) => ele.address === _address),
-      1
-    );
-    dispatch(updateInvitedGang(deleteMember));
-    console.log(newContract);
-    console.log("rest length:", deleteMember);
-  };
-
-  const handleNavigate = () => {
-    if (invitedMembers.length >= 1) {
-      navigate("/startsafe");
-    }
-  };
-
   return (
     <>
-      <div className="InviteGang">
-        <div className="headerText">2/3 Original Gang</div>
-        <div className="centerInputCard">
+      <div id="AddNewMemberComponent">
+        <div onClick={props.toggleModal} id="AddNewMemberOverlay"></div>
+        <div id="AddNewMember">
           <div>
             <div className="inputTitle">Add member :</div>
           </div>
@@ -133,82 +115,40 @@ const InviteGang = () => {
                 isInvalid={errors.ownerAddress}
               />
             </div>
+          </div>
+          <div id="addMemberButtonArea">
             <div>
-              <IconButton
-                className="addButton"
-                Icon={<AiOutlinePlus style={{ height: 30, width: 30 }} />}
-                height={50}
-                width={50}
+              <OutlineButton
+                borderColor="#C94B32"
+                bgColor="#FFFFFF"
+                title="CANCEL"
+                className="button"
+                height={40}
+                width={129}
+                fontsize={16}
+                fontweight={400}
+                onClick={props.toggleShowMember}
+              />
+            </div>
+            <div>
+              <SimpleButton
+                title="OK"
+                bgColor="#C94B32"
+                className="button"
+                fontsize={16}
+                fontweight={400}
+                height={40}
+                width={129}
                 onClick={() => {
                   handleClick(ownerName, ownerAddress);
                 }}
-                bgColor={
-                  isAddressValid(ownerAddress)
-                    ? "#C94B32"
-                    : "rgba(27, 43, 65, 0.2)"
-                }
               />
             </div>
           </div>
-        </div>
-        {invitedMembers.length >= 1 && (
-          <>
-            <div className="invitedMembers">
-              {invitedMembers.map((result: any, index: any) => {
-                return (
-                  <div key={index} className="owner">
-                    <div className="avatarPlusName">
-                      <img src={daoMember2} alt={result.address} />
-                      <p className="nameText">{result.name}</p>
-                    </div>
-                    {result.address !== undefined && (
-                      <p className="text">
-                        {result.address.slice(0, 18) +
-                          "..." +
-                          result.address.slice(-6)}
-                      </p>
-                    )}
-                    {result.address !== account && (
-                      <div
-                        className="deleteButton"
-                        onClick={() => {
-                          deleteMember(result.address);
-                        }}
-                      >
-                        <AiOutlineClose style={{ height: 15, width: 15 }} />
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </>
-        )}
-        <div className="inviteGang">
-          <SimpleButton
-            className="inviteButton"
-            title="INVITE"
-            height={51}
-            width={277}
-            fontsize={20}
-            fontweight={400}
-            bgColor={
-              invitedMembers.length >= 1 ? "#C94B32" : "rgba(27, 43, 65, 0.2)"
-            }
-            onClick={handleNavigate}
-          />
-        </div>
-        <div
-          className="infoText"
-          onClick={() => {
-            navigate("/startsafe");
-          }}
-        >
-          skip
         </div>
       </div>
     </>
   );
 };
 
-export default InviteGang;
+export default AddMember;
