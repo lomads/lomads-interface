@@ -157,6 +157,8 @@ const TreasuryCard = (props: ItreasuryCardType) => {
                       isOwner={isOwner}
                       key={index}
                       executeTransactions={executeTransactions}
+                      tokenAddress={result.to}
+                      tokens={props.tokens}
                     />
                   ) : (
                     <PendingTransactions

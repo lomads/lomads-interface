@@ -24,11 +24,16 @@ const InviteGang = () => {
   const [ownerAddress, setOwnerAddress] = useState<string>("");
   const [errors, setErrors] = useState<any>({});
   const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
-  const { account } = useWeb3React();
+  const { account, provider } = useWeb3React();
 
   const isAddressValid = (holderAddress: string) => {
-    const isValid: boolean = ethers.utils.isAddress(holderAddress);
-    return isValid;
+    const ENSdomain = holderAddress.slice(-4);
+    if (ENSdomain === ".eth") {
+      return true;
+    } else {
+      const isValid: boolean = ethers.utils.isAddress(holderAddress);
+      return isValid;
+    }
   };
 
   const isPresent = (_address: string) => {
@@ -56,8 +61,14 @@ const InviteGang = () => {
     isPresent(ownerAddress);
   }, [ownerAddress]);
 
-  const addMember = (_ownerName: string, _ownerAddress: string) => {
+  const addMember = async (_ownerName: string, _ownerAddress: string) => {
     const member: InviteGangType = { name: _ownerName, address: _ownerAddress };
+    if (_ownerAddress.slice(-4) === ".eth") {
+      const resolver = await provider?.getResolver(_ownerAddress);
+      const EnsAddress = await resolver?.getAddress();
+    } else {
+      const ENSname = await provider?.lookupAddress(_ownerAddress);
+    }
     if (!isPresent(member.address)) {
       const newMember = [...invitedMembers, member];
       dispatch(updateInvitedGang(newMember));
@@ -168,9 +179,18 @@ const InviteGang = () => {
                           result.address.slice(-6)}
                       </p>
                     )}
-                    {result.address !== account && (
+                    {result.address !== account ? (
                       <div
                         className="deleteButton"
+                        onClick={() => {
+                          deleteMember(result.address);
+                        }}
+                      >
+                        <AiOutlineClose style={{ height: 15, width: 15 }} />
+                      </div>
+                    ) : (
+                      <div
+                        className="creatordeletebutton"
                         onClick={() => {
                           deleteMember(result.address);
                         }}

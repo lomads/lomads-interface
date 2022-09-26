@@ -6,6 +6,9 @@ import { AiOutlineClose, AiOutlineCheck } from "react-icons/ai";
 import SimpleButton from "UIpack/SimpleButton";
 
 const PendingTransactions = (props: any) => {
+  const handleChange = () => {
+    console.log(props.tokens);
+  };
   return (
     <>
       <div className="transactionRow">
@@ -15,7 +18,14 @@ const PendingTransactions = (props: any) => {
           <div className="dashboardTextBold">
             {props.amount === "multisend"
               ? "multisend"
-              : props.amount / 10 ** 18}
+              : props.amount / 10 ** 18}{" "}
+            {props.tokens !== undefined &&
+              props.tokens.map((result: any, index: any) => {
+                return (
+                  props.tokenAddress === result.tokenAddress &&
+                  result.token.symbol
+                );
+              })}
           </div>
         </div>
         <div className="transactionName">
@@ -24,6 +34,9 @@ const PendingTransactions = (props: any) => {
             height={30}
             width={"100%"}
             placeholder="Name Transaction"
+            onchange={(e) => {
+              handleChange();
+            }}
           />
         </div>
         <div className="transactionAddress">

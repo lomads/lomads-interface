@@ -99,6 +99,13 @@
     color: #FFFFFF;
     cursor: pointer;
 }
+.creatordeletebutton {
+        background-color: #c7c3c3;
+        padding: 5px;
+        border-radius: 5px;
+        color: #FFFFFF;
+        cursor: pointer;
+}
 .inviteButton,.addButton {
     padding: 0px 10px 0px 10px;
     border-radius: 5px;

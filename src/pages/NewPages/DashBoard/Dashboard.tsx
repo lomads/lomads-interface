@@ -124,6 +124,7 @@ const Dashboard = () => {
           fiatBalance={safeTokens.length >= 1 && safeTokens[0].fiatBalance}
           account={account}
           getPendingTransactions={getPendingTransactions}
+          tokens= {safeTokens}
         />
         <MemberCard
           totalMembers={totalMembers}
