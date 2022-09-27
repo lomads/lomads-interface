@@ -36,6 +36,12 @@ const AddRecipient = (props: any) => {
     const check = totalMembers.some((mem) => mem.address === _address);
     return check;
   };
+  const isRecipientPresent = (_address: string) => {
+    const check = props.setRecipient.some(
+      (mem: any) => mem.address === _address
+    );
+    return check;
+  };
   useEffect(() => {
     const check = totalMembers.some(
       (member) => member.address === (account as string)
@@ -64,6 +70,7 @@ const AddRecipient = (props: any) => {
       dispatch(updateTotalMembers(newMember));
       setOwnerName("");
       setOwnerAddress("");
+      props.toggleAddNewRecipient();
     }
   };
 
@@ -108,6 +115,7 @@ const AddRecipient = (props: any) => {
               placeholder="ENS Domain and Wallet Address"
               value={ownerAddress}
               onchange={(event) => {
+                setErrors({ ownerAddress: "" });
                 setOwnerAddress(event.target.value);
               }}
               isInvalid={errors.ownerAddress}

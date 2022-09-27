@@ -44,9 +44,7 @@ const PendingTransactions = (props: any) => {
             to{" "}
             {props.recipient === "multisend"
               ? "multisend"
-              : props.recipient.slice(0, 18) +
-                "..." +
-                props.recipient.slice(-6)}
+              : props.recipient.slice(0, 6) + "..." + props.recipient.slice(-4)}
           </div>
         </div>
         <div className="dashboardTextBold">

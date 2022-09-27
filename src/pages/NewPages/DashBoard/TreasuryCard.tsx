@@ -9,10 +9,13 @@ import PendingTransactions from "./TreasuryCard/PendingTransactions";
 import TransactionComplete from "./TreasuryCard/TransactionComplete";
 import { EthSignSignature } from "@gnosis.pm/safe-core-sdk";
 import { SafeTransactionData } from "@gnosis.pm/safe-core-sdk-types/dist/src/types";
+import { t } from "@lingui/macro";
+import { Tooltip } from "@chakra-ui/react";
 
 const TreasuryCard = (props: ItreasuryCardType) => {
   const { provider, account } = useWeb3React();
   const ownerCount = props.ownerCount;
+  const [copy, setCopy] = useState<boolean>(false);
 
   const hasUserApproved = (_index: number) => {
     return (
@@ -100,25 +103,35 @@ const TreasuryCard = (props: ItreasuryCardType) => {
           <div>
             <hr className="vl" />
           </div>
-          <div className="copyArea">
-            <div
-              className="copyLinkButton"
-              onClick={() => {
-                navigator.clipboard.writeText(props.safeAddress);
-              }}
-            >
-              <img src={copyIcon} alt="copy" className="safeCopyImage" />
-            </div>
+          <div
+            className="copyArea"
+            onMouseDown={() => {
+              setCopy(true);
+            }}
+            onMouseUp={() => {
+              setCopy(false);
+            }}
+          >
+            <Tooltip label={copy ? "copied" : "copy"}>
+              <div
+                className="copyLinkButton"
+                onClick={() => {
+                  navigator.clipboard.writeText(props.safeAddress);
+                }}
+              >
+                <img src={copyIcon} alt="copy" className="safeCopyImage" />
+              </div>
+            </Tooltip>
             <div className="dashboardText">
-              {props.safeAddress.slice(0, 18) +
+              {props.safeAddress.slice(0, 6) +
                 "..." +
-                props.safeAddress.slice(-6)}
+                props.safeAddress.slice(-4)}
             </div>
           </div>
           <div className="copyArea">
             <img src={coin} alt="asset" />
             <div id="safeBalance">
-              $ {props.fiatBalance && props.fiatBalance}
+              $ {props.fiatBalance ? props.fiatBalance : "0.0"}
             </div>
             <div className="dashboardText">total balance</div>
           </div>
@@ -157,6 +170,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
                       isOwner={isOwner}
                       key={index}
                       executeTransactions={executeTransactions}
+                      txs={result}
                       tokenAddress={result.to}
                       tokens={props.tokens}
                     />
@@ -173,6 +187,8 @@ const TreasuryCard = (props: ItreasuryCardType) => {
                       key={index}
                       executeTransactions={executeTransactions}
                       txs={result}
+                      tokenAddress={result.to}
+                      tokens={props.tokens}
                     />
                   );
                 }
@@ -181,35 +197,41 @@ const TreasuryCard = (props: ItreasuryCardType) => {
               props.executedTransactions.results.length >= 1 &&
               props.executedTransactions.results.map(
                 (result: any, index: any) => {
-                  return result.txType !== "ETHEREUM_TRANSACTION" ? (
-                    result.safe &&
-                      result.dataDecoded.method !== "multiSend" && (
-                        <TransactionComplete
-                          credit={false}
-                          amount={result.dataDecoded.parameters[1].value}
-                          recipient={result.dataDecoded.parameters[0].value}
-                          ownerCount={ownerCount}
-                          key={index}
-                          submissionDate={
-                            result.confirmations[
-                              result.confirmations.length - 1
-                            ].submissionDate
-                          }
-                        />
-                      )
-                  ) : (
-                    <>
-                      <TransactionComplete
-                        credit={true}
-                        amount={result.transfers[0].value}
-                        recipient={result.transfers[0].to}
-                        ownerCount={ownerCount}
-                        key={index}
-                        submissionDate={result.executionDate}
-                        tokenSymbol={result.transfers[0].tokenInfo.symbol}
-                      />
-                    </>
-                  );
+                  return result.txtype === "MULTISIG_TRANSACTION" &&
+                    result.txType !== "ETHEREUM_TRANSACTION"
+                    ? result.safe &&
+                        result.dataDecoded.method !== "multiSend" && (
+                          <TransactionComplete
+                            credit={false}
+                            amount={result.dataDecoded.parameters[1].value}
+                            recipient={result.dataDecoded.parameters[0].value}
+                            ownerCount={ownerCount}
+                            key={index}
+                            submissionDate={
+                              result.confirmations[
+                                result.confirmations.length - 1
+                              ].submissionDate
+                            }
+                            tokenAddress={result.to}
+                            tokens={props.tokens}
+                          />
+                        )
+                    : result.transfers[0] !== undefined &&
+                        result.transfers[0].tokenInfo !== null && (
+                          <>
+                            <TransactionComplete
+                              credit={true}
+                              amount={result.transfers[0].value}
+                              recipient={result.transfers[0].to}
+                              ownerCount={ownerCount}
+                              key={index}
+                              submissionDate={result.executionDate}
+                              tokenSymbol={result.transfers[0].tokenInfo.symbol}
+                              tokenAddress={result.to}
+                              tokens={props.tokens}
+                            />
+                          </>
+                        );
                 }
               )}
           </div>

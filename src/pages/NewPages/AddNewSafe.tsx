@@ -144,9 +144,9 @@ const AddNewSafe = () => {
                       <p className="nameText">{result.name}</p>
                     </div>
                     <p className="text">
-                      {result.address.slice(0, 18) +
+                      {result.address.slice(0, 6) +
                         "..." +
-                        result.address.slice(-6)}
+                        result.address.slice(-4)}
                     </p>
                     {result.address !== account ? (
                       <>
@@ -212,9 +212,9 @@ const AddNewSafe = () => {
                       <p className="nameText">{result.name}</p>
                     </div>
                     <p className="text">
-                      {result.address.slice(0, 18) +
+                      {result.address.slice(0, 6) +
                         "..." +
-                        result.address.slice(-6)}
+                        result.address.slice(-4)}
                     </p>
                   </div>
                 </>

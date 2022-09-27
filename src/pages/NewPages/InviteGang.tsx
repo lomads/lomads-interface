@@ -36,6 +36,11 @@ const InviteGang = () => {
     }
   };
 
+  const isRightAddress = (holderAddress: string) => {
+    const isValid: boolean = ethers.utils.isAddress(holderAddress);
+    return isValid;
+  };
+
   const isPresent = (_address: string) => {
     const check = invitedMembers.some((mem) => mem.address === _address);
     return check;
@@ -66,10 +71,22 @@ const InviteGang = () => {
     if (_ownerAddress.slice(-4) === ".eth") {
       const resolver = await provider?.getResolver(_ownerAddress);
       const EnsAddress = await resolver?.getAddress();
+      if (EnsAddress !== undefined) {
+        member.address = EnsAddress as string;
+        member.name = _ownerAddress;
+        const present = isPresent(member.address);
+        present && setErrors({ ownerAddress: " * address already exists." });
+      } else {
+        setErrors({ ownerAddress: " * address is not correct." });
+        member.address = _ownerAddress;
+      }
     } else {
       const ENSname = await provider?.lookupAddress(_ownerAddress);
+      if (ENSname) {
+        member.name = ENSname;
+      }
     }
-    if (!isPresent(member.address)) {
+    if (!isPresent(member.address) && isRightAddress(member.address)) {
       const newMember = [...invitedMembers, member];
       dispatch(updateInvitedGang(newMember));
       setOwnerName("");
@@ -139,6 +156,7 @@ const InviteGang = () => {
                 placeholder="ENS Domain and Wallet Address"
                 value={ownerAddress}
                 onchange={(event) => {
+                  setErrors({ ownerAddress: "" });
                   setOwnerAddress(event.target.value);
                 }}
                 isInvalid={errors.ownerAddress}
@@ -150,7 +168,7 @@ const InviteGang = () => {
                 Icon={<AiOutlinePlus style={{ height: 30, width: 30 }} />}
                 height={50}
                 width={50}
-                onClick={() => {
+                onClick={(e) => {
                   handleClick(ownerName, ownerAddress);
                 }}
                 bgColor={
@@ -172,25 +190,23 @@ const InviteGang = () => {
                       <img src={daoMember2} alt={result.address} />
                       <p className="nameText">{result.name}</p>
                     </div>
-                    {result.address !== undefined && (
+                    {result.address !== undefined &&
+                    result.address !== account ? (
                       <p className="text">
-                        {result.address.slice(0, 18) +
+                        {result.address.slice(0, 6) +
                           "..." +
-                          result.address.slice(-6)}
+                          result.address.slice(-4)}
+                      </p>
+                    ) : (
+                      <p className="creatorText">
+                        {result.address.slice(0, 6) +
+                          "..." +
+                          result.address.slice(-4)}
                       </p>
                     )}
-                    {result.address !== account ? (
+                    {result.address !== account && (
                       <div
                         className="deleteButton"
-                        onClick={() => {
-                          deleteMember(result.address);
-                        }}
-                      >
-                        <AiOutlineClose style={{ height: 15, width: 15 }} />
-                      </div>
-                    ) : (
-                      <div
-                        className="creatordeletebutton"
                         onClick={() => {
                           deleteMember(result.address);
                         }}

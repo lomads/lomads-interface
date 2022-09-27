@@ -15,7 +15,13 @@ const TransactionComplete = (props: any) => {
             {props.amount === "multisend"
               ? "multisend"
               : props.amount / 10 ** 18}{" "}
-            {props.tokenSymbol}
+            {props.tokens !== undefined &&
+              props.tokens.map((result: any, index: any) => {
+                return (
+                  props.tokenAddress === result.tokenAddress &&
+                  result.token.symbol
+                );
+              })}
           </div>
         </div>
         <div className="transactionName">
@@ -29,15 +35,17 @@ const TransactionComplete = (props: any) => {
         <div className="transactionAddress">
           <div className="dashboardText">
             to{" "}
-            {props.recipient === "multisend"
+            {props.recipient !== undefined && props.recipient === "multisend"
               ? "multisend"
-              : props.recipient.slice(0, 18) +
-                "..." +
-                props.recipient.slice(-6)}
+              : props.recipient.slice(0, 6) + "..." + props.recipient.slice(-4)}
           </div>
         </div>
-        <div className="dashboardTextBold">
-          {props.ownerCount + "/" + props.ownerCount} vote
+        <div id="voteArea">
+          <div className="dashboardTextBold">
+            {!props.credit
+              ? props.ownerCount + "/" + props.ownerCount + " vote"
+              : null}
+          </div>
         </div>
         <div className="confirmIconGrp">
           <div className="dashboardText">{`${date.getMonth()}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}`}</div>

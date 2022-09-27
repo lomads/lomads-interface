@@ -63,26 +63,6 @@ const SelectRecipient = (props: IselectRecipientType) => {
   };
   return (
     <>
-      <div className="closeButtonArea">
-        <IconButton
-          Icon={
-            <AiOutlineClose
-              style={{
-                color: "#C94B32",
-                height: "16px",
-                width: "16px",
-              }}
-            />
-          }
-          bgColor="linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)"
-          height={37}
-          width={37}
-          className="sideModalCloseButton"
-          onClick={(e) => {
-            managePreviousNavigation();
-          }}
-        />
-      </div>
       <div className="SelectNewRecipientPage">
         <div id="SelectRecipientsHeader">
           <div className="dashboardTextBold">Select recipients</div>
@@ -109,9 +89,9 @@ const SelectRecipient = (props: IselectRecipientType) => {
                   <p className="nameText">{result.name}</p>
                 </div>
                 <p className="addressText">
-                  {result.address.slice(0, 18) +
+                  {result.address.slice(0, 6) +
                     "..." +
-                    result.address.slice(-6)}
+                    result.address.slice(-4)}
                 </p>
                 <Checkbox
                   size="lg"
@@ -136,6 +116,9 @@ const SelectRecipient = (props: IselectRecipientType) => {
             width={129}
             fontsize={16}
             fontweight={400}
+            onClick={() => {
+              props.showNavigation(false, false, false);
+            }}
           />
           <SimpleButton
             title="NEXT"
@@ -151,7 +134,10 @@ const SelectRecipient = (props: IselectRecipientType) => {
         </div>
       </div>
       {props.addNewRecipient && (
-        <AddRecipient toggleAddNewRecipient={props.toggleAddNewRecipient} />
+        <AddRecipient
+          toggleAddNewRecipient={props.toggleAddNewRecipient}
+          isTransactionSendPage={false}
+        />
       )}
     </>
   );

@@ -14,7 +14,7 @@ const MemberCard = (props: any) => {
               <div className="dashboardText">{props.name}</div>
             </div>
             <div className="dashboardText">
-              {props.address.slice(0, 18) + "..." + props.address.slice(-6)}
+              {props.address.slice(0, 6) + "..." + props.address.slice(-4)}
             </div>
             <div className="memberdivider">
               <hr />

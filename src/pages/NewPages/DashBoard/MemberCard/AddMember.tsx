@@ -64,6 +64,7 @@ const AddMember = (props: any) => {
       dispatch(updateTotalMembers(newMember));
       setOwnerName("");
       setOwnerAddress("");
+      props.toggleShowMember();
     }
   };
 
@@ -110,6 +111,7 @@ const AddMember = (props: any) => {
                 placeholder="ENS Domain and Wallet Address"
                 value={ownerAddress}
                 onchange={(event) => {
+                  setErrors({ ownerAddress: "" });
                   setOwnerAddress(event.target.value);
                 }}
                 isInvalid={errors.ownerAddress}

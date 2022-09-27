@@ -21,6 +21,7 @@ import SideBar from "./SideBar";
 import axios from "axios";
 import NotificationArea from "./NotificationArea";
 import AddMember from "./MemberCard/AddMember";
+import dashboardfooterlogo from "../../../assets/svg/dashboardfooterlogo.svg";
 
 const Dashboard = () => {
   const { provider, account } = useWeb3React();
@@ -37,12 +38,16 @@ const Dashboard = () => {
   const [safeTokens, setSafeTokens] = useState<Array<any>>([]);
   const [showNotification, setShowNotification] = useState<boolean>(true);
   const [showAddMember, setShowAddMember] = useState<boolean>(false);
+  const [showNavBar, setShowNavBar] = useState<boolean>(false);
   const toggleModal = () => {
     setShowModal(!showModal);
   };
 
   const toggleShowMember = () => {
     setShowAddMember(!showAddMember);
+  };
+  const showSideBar = (_choice: boolean) => {
+    setShowNavBar(_choice);
   };
   const getPendingTransactions = async () => {
     const pendingTxs = await (
@@ -101,7 +106,12 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="dashBoardBody">
+      <div
+        className="dashBoardBody"
+        onMouseEnter={() => {
+          showSideBar(false);
+        }}
+      >
         <div className="DAOdetails">
           <div className="DAOname" onClick={getPendingTransactions}>
             {daoName}
@@ -124,12 +134,18 @@ const Dashboard = () => {
           fiatBalance={safeTokens.length >= 1 && safeTokens[0].fiatBalance}
           account={account}
           getPendingTransactions={getPendingTransactions}
-          tokens= {safeTokens}
+          tokens={safeTokens}
         />
         <MemberCard
           totalMembers={totalMembers}
           toggleShowMember={toggleShowMember}
         />
+        {/* <div className="appLogoArea">
+          <div className="dashboardText">powered by Gnosis Safe</div>
+          <div>
+            <img src={dashboardfooterlogo} alt="footer logo" id="footerImage" />
+          </div>
+        </div> */}
       </div>
       {showModal && (
         <SideModal
@@ -142,7 +158,11 @@ const Dashboard = () => {
           toggleShowMember={toggleShowMember}
         />
       )}
-      <SideBar name={daoName} />
+      <SideBar
+        name={daoName}
+        showSideBar={showSideBar}
+        showNavBar={showNavBar}
+      />
       {showAddMember && <AddMember toggleShowMember={toggleShowMember} />}
     </>
   );

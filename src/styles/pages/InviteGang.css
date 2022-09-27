@@ -69,6 +69,16 @@
     letter-spacing: -0.011em;
     color: #76808D;
 }
+.creatorText {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+    margin-right: 28%;
+}
 .nameText {
     font-family: 'Open Sans';
     font-style: normal;

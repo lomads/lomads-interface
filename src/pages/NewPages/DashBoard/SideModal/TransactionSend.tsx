@@ -11,13 +11,13 @@ import SimpleInputField from "UIpack/SimpleInputField";
 import { ethers } from "ethers";
 import { InviteGangType } from "types/UItype";
 import { IselectTransactionSend, IsetRecipientType } from "types/DashBoardType";
+import AddRecipient from "./AddRecipient";
+import NumberInputStepper from "UIpack/NumberInputStepper";
 
 const TransactionSend = (props: IselectTransactionSend) => {
   const managePreviousNavigation = () => {
     const length = props.setRecipient.current.length;
-    console.log("set length:", length);
     props.setRecipient.current.splice(0, length);
-    console.log("after set length:", length);
     props.showNavigation(true, false, false);
   };
 
@@ -29,36 +29,13 @@ const TransactionSend = (props: IselectTransactionSend) => {
       1
     );
     props.setRecipient.current = deleteMember;
-    console.log("update setrecipient:", props.setRecipient.current);
     console.log(newContract);
-    console.log("rest length:", deleteMember);
     setShowInput(props.setRecipient.current);
-    console.log("showinput:", showInput);
   };
 
   const [showInput, setShowInput] = useState(props.setRecipient.current);
   return (
     <>
-      <div className="closeButtonArea">
-        <IconButton
-          Icon={
-            <AiOutlineClose
-              style={{
-                color: "#C94B32",
-                height: "16px",
-                width: "16px",
-              }}
-            />
-          }
-          bgColor="linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)"
-          height={37}
-          width={37}
-          className="sideModalCloseButton"
-          onClick={(e) => {
-            managePreviousNavigation();
-          }}
-        />
-      </div>
       <div id="transactionSendPage">
         <div id="doubleEuroImage">
           <img src={doubleEuro} alt="euro" id="recipientDoubleEuro" />
@@ -103,7 +80,7 @@ const TransactionSend = (props: IselectTransactionSend) => {
                   </div>
                   <div id="amountInputFields">
                     <div>
-                      <SimpleInputField
+                      <NumberInputStepper
                         height={50}
                         width={106}
                         placeholder="Amount"
@@ -157,24 +134,15 @@ const TransactionSend = (props: IselectTransactionSend) => {
             <SafeButton
               bgColor="#FFFFFF"
               disabled={false}
-              title="ADD OTHER"
-              titleColor="#76808D"
-              fontsize={16}
-              fontweight={400}
-              height={40}
-              width={162}
-            />
-          </div>
-          <div>
-            <SafeButton
-              bgColor="#FFFFFF"
-              disabled={false}
               title="ADD A MEMBER"
               titleColor="#76808D"
               fontsize={16}
               fontweight={400}
               height={40}
               width={162}
+              onClick={() => {
+                managePreviousNavigation();
+              }}
             />
           </div>
         </div>
@@ -194,6 +162,9 @@ const TransactionSend = (props: IselectTransactionSend) => {
           />
         </div>
       </div>
+      {props.addNewRecipient && (
+        <AddRecipient toggleAddNewRecipient={props.toggleAddNewRecipient} />
+      )}
     </>
   );
 };

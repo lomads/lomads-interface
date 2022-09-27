@@ -33,7 +33,7 @@ body.active-modal {
     height: 158.8px;
     background: rgba(118, 128, 141, 0.05);
     border-radius: 40px;
-    margin: 20px 0px 20px 0px;
+    margin: 20px 0px 0px 0px;
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
@@ -83,6 +83,7 @@ body.active-modal {
     width: 100%;
     height: fit-content;
     margin-bottom: 20px;
+    margin-top: 20px;
 }
 .treasuryHeader {
     display: flex;
@@ -193,7 +194,7 @@ body.active-modal {
     width: 100%;
     gap: 18px;
     min-height: fit-content;
-    max-height: 360px;
+    max-height: 390px;
     background: #FFFFFF;
     border-radius: 5px;
     margin-top: 2px;
@@ -225,16 +226,16 @@ body.active-modal {
     width: 9%;
 }
 .transactionName {
-    width: 47%;
+    width: 57%;
 }
 .transactionAddress {
-    width: 19%;
+    width: 10%;
 }
 .memberCard {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    width: 60%;
+    width: 54%;
     height: fit-content;
     margin-bottom: 20px;
 }
@@ -254,7 +255,7 @@ body.active-modal {
     width: 100%;
     gap: 35px;
     min-height: fit-content;
-    max-height: 230px;
+    max-height: 260px;
     background: #FFFFFF;
     border-radius: 5px;
     margin-top: 2px;
@@ -265,7 +266,7 @@ body.active-modal {
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    width: 65%;
+    width: 60%;
     gap: 10px;
 }
 .memberRow {
@@ -309,7 +310,7 @@ body.active-modal {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    width: 65%;
+    width: 60%;
 }
 .coinText {
     display: flex;
@@ -356,6 +357,9 @@ body.active-modal {
     justify-content: flex-end;
     align-items: center;
     width: 100%;
+    position: absolute;
+    top: 36px;
+    right: 28px;
 }
 .sideModalCloseButton {
     border-radius: 5px;
@@ -370,11 +374,8 @@ body.active-modal {
     width: 79.16px;
     height: 60px;
 }
-#doubleEuro {
-    margin-top: 20vh;
-}
 #recipientDoubleEuro {
-    margin-top: 6vh;
+    margin-top: 0vh;
 }
 .transactionDetails,#transactionDetails {
     font-family: 'Open Sans';
@@ -386,7 +387,7 @@ text-align: center;
 color: #C94B32;
 }
 #transactionDetails{
-    margin-top: 35px;
+    margin-top: 0px;
 }
 .currencySelectionArea {
     display: flex;
@@ -395,7 +396,6 @@ color: #C94B32;
     justify-content: center;
     align-items: center;
     width: 100%;
-    margin-top: 35px;
 }
 .tokenDropdown {
     background:linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
@@ -419,6 +419,7 @@ color: #C94B32;
     justify-content: space-between;
     width: 75%;
     align-items: center;
+    margin-bottom: 15px;
 }
 #recipientButtonArea {
     position: sticky;
@@ -435,7 +436,7 @@ color: #C94B32;
 .selectRecipient {
     width: 75%;
     justify-content: space-between;
-    margin: 2vh 0vh 2vh 0vh;
+    margin: 0vh 0vh 0vh 0vh;
 }
 #assignAmount {
     width: 100%;
@@ -452,10 +453,10 @@ color: #C94B32;
 }
 
 #addMember {
-    width: 58%;
+    width: 100%;
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     align-self: center;
     margin-top: 20px;
@@ -475,7 +476,19 @@ color: #C94B32;
     align-items: center;
     z-index: 1000;
 }
-.navBarInitialBox:hover + .sideBarStrip {
+
+@media only screen and (min-width: 1280px){
+    .navBarInitialBox {
+        height: 10%;
+        width: 8%;
+      }
+      .sideBarStrip {
+        height: 10%;
+        width: 8%;
+      }
+}
+
+.sideBarStrip  {
     background: linear-gradient(178.31deg, #C94B32 0.74%, #A54536 63.87%);
     height: 100%;
     width: 8%;
@@ -487,10 +500,24 @@ color: #C94B32;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    scale: 1;
     gap: 20px;
-    overflow: visible;
+    transition: 0.5s;
 }
+@media only screen and (min-width: 1920px){
+    .navBarInitialBox {
+        height: 10%;
+        width: 7%;
+      }
+      .sideBarStrip {
+        height: 100%;
+        width: 7%;
+      }
+}
+/* .navBarInitialBox:hover + .sideBarStrip {
+    left: 0%;
+    transition: 0.5s;
+} */
+
 .invertedBox, .stripInvertedBox {
     background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
     box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
@@ -516,9 +543,6 @@ color: #C94B32;
     color: #C94B32;
     transform: rotate(-45deg);
 }
-.sideBarStrip {
-    display: none;
-}
 .stripInvertedBoxOutline {
     background: #C94B32;
     border-radius: 10px;
@@ -530,6 +554,7 @@ color: #C94B32;
     align-items: center;
     border:2px solid #FFFFFF;
     color: #FFFFFF;
+    cursor: pointer;
 }
 #transactionSuccessPage {
     display: flex;
@@ -549,6 +574,7 @@ color: #C94B32;
     justify-content: center;
     align-self: center;
     overflow-y: auto;
+    gap: 35px;
 }
 #transactionSendDivider1, #transactionSendDivider2{
     width: 210px;
@@ -556,8 +582,6 @@ color: #C94B32;
     border: 2px solid #C94B32;
     background-color: #C94B32;
     border-radius: 50px;
-    margin-top: 35px;
-    margin-bottom: 35px;
     align-self: center;
 }
 #recipientList{
@@ -653,5 +677,47 @@ opacity: 0.9;
     max-height: fit-content;
     width: 100%;
     overflow-y: auto;
+    gap: 35px;
 
+}
+#voteArea {
+    width: 4%;
+}
+#transactionDetailsPage {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    gap: 35px;
+}
+#footerImage {
+    height: 32px;
+    width: 235px;
+    margin-right: 5%;
+}
+/* .appLogoArea {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    right: 2%;
+    width: 90%;
+    margin-top: 35px;
+    margin-bottom: 35px;
+} */
+.appLogoArea {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    position: relative;
+    bottom: 0;
+    margin-top: 35px;
+    margin-bottom: 35px;
 }

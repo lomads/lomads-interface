@@ -50,6 +50,8 @@ export interface IselectTransactionSend {
   tokens: any;
   selectToken: (_tokenAddress: string) => void;
   selectedToken: string;
+  toggleAddNewRecipient: () => void;
+  addNewRecipient: boolean;
 }
 export interface TransactionDataType {
   to: string;

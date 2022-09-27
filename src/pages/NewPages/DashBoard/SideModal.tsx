@@ -14,6 +14,12 @@ import { ImportSafe, safeService } from "connection/SafeCall";
 import { useWeb3React } from "@web3-react/core";
 import { SafeTransactionDataPartial } from "@gnosis.pm/safe-core-sdk-types";
 import TransactionSuccess from "./SideModal/TransactionSuccess";
+import { Checkbox } from "@chakra-ui/react";
+import { AiOutlineClose } from "react-icons/ai";
+import IconButton from "UIpack/IconButton";
+import SimpleButton from "UIpack/SimpleButton";
+import doubleEuro from "../../../../assets/svg/doubleEuro.svg";
+import { ItransactionDetailsType } from "types/DashBoardType";
 
 const SideModal = (props: IsideModal) => {
   const { provider, account } = useWeb3React();
@@ -109,6 +115,24 @@ const SideModal = (props: IsideModal) => {
       <div className="sidebarModal">
         <div onClick={props.toggleModal} className="overlay"></div>
         <div className="SideModal">
+          <div className="closeButtonArea">
+            <IconButton
+              Icon={
+                <AiOutlineClose
+                  style={{
+                    color: "#C94B32",
+                    height: "16px",
+                    width: "16px",
+                  }}
+                />
+              }
+              bgColor="linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)"
+              height={37}
+              width={37}
+              className="sideModalCloseButton"
+              onClick={props.toggleModal}
+            />
+          </div>
           {!modalNavigation.showRecipient &&
             !modalNavigation.showSuccess &&
             !modalNavigation.showTransactionSender && (
@@ -144,6 +168,8 @@ const SideModal = (props: IsideModal) => {
                 tokens={props.tokens}
                 selectToken={selectToken}
                 selectedToken={selectedToken}
+                toggleAddNewRecipient={toggleAddNewRecipient}
+                addNewRecipient={addNewRecipient}
               />
             )}
           {!modalNavigation.showRecipient &&
