@@ -43,7 +43,7 @@ const AddExistingSafe = () => {
 
   const UseExistingSafe = async () => {
     setisLoading(true);
-    const safeSDK = await ImportSafe(provider, safeAddress);
+    const safeSDK = await ImportSafe(provider, safeAddress)
     dispatch(updateHolder(safeSDK.getAddress() as string));
     const safeowners: string[] = await safeSDK.getOwners();
     safeowners.map((ownerAddress: string, index: number) => {

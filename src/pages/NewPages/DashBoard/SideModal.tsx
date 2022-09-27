@@ -17,11 +17,11 @@ import TransactionSuccess from "./SideModal/TransactionSuccess";
 import { Checkbox } from "@chakra-ui/react";
 import { AiOutlineClose } from "react-icons/ai";
 import IconButton from "UIpack/IconButton";
-import SimpleButton from "UIpack/SimpleButton";
-import doubleEuro from "../../../../assets/svg/doubleEuro.svg";
-import { ItransactionDetailsType } from "types/DashBoardType";
+import { SafeTransactionOptionalProps } from "@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/types";
+import { useDispatch } from "react-redux";
 
 const SideModal = (props: IsideModal) => {
+  const dispatch = useDispatch();
   const { provider, account } = useWeb3React();
   const [selectedToken, setSelectedToken] = useState<string>("");
   const [addNewRecipient, setAddNewRecipient] = useState<boolean>(false);
@@ -38,6 +38,7 @@ const SideModal = (props: IsideModal) => {
   };
   const selectedRecipients = useRef<InviteGangType[]>([]);
   const setRecipient = useRef<IsetRecipientType[]>([]);
+  const currentNonce = useAppSelector((state) => state.flow.currentNonce);
 
   const showNavigation = (
     _showRecipient: boolean,
@@ -76,11 +77,14 @@ const SideModal = (props: IsideModal) => {
         }
       )
     );
+    const options: SafeTransactionOptionalProps = {
+      nonce: currentNonce,
+    };
     const safeTransaction = await safeSDK.createTransaction({
       safeTransactionData,
+      options,
     });
     const safeTxHash = await safeSDK.getTransactionHash(safeTransaction);
-    console.log("here I'm:", safeTxHash);
     const signature = await safeSDK.signTransactionHash(safeTxHash);
     const senderAddress = account as string;
     const safeAddress = props.safeAddress;

@@ -4,8 +4,10 @@ import SimpleInputField from "UIpack/SimpleInputField";
 import IconButton from "UIpack/IconButton";
 import { AiOutlineClose, AiOutlineCheck } from "react-icons/ai";
 import SimpleButton from "UIpack/SimpleButton";
+import { useAppSelector } from "state/hooks";
 
 const PendingTransactions = (props: any) => {
+  const safeThreshold = useAppSelector((state) => state.flow.safeThreshold);
   const handleChange = () => {
     console.log(props.tokens);
   };
@@ -53,7 +55,7 @@ const PendingTransactions = (props: any) => {
           </div>
         </div>
         <div className="confirmIconGrp">
-          {props.confirmations === props.ownerCount && props.isOwner && (
+          {props.confirmations === safeThreshold && props.isOwner && (
             <>
               <SimpleButton
                 width={"100%"}
@@ -62,7 +64,7 @@ const PendingTransactions = (props: any) => {
                 bgColor={"#C94B32"}
                 className="button"
                 onClick={(e) => {
-                  if (props.confirmations === props.ownerCount) {
+                  if (props.confirmations === safeThreshold) {
                     props.executeTransactions(props.txs);
                   }
                 }}

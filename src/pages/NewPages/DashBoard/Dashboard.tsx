@@ -22,8 +22,11 @@ import axios from "axios";
 import NotificationArea from "./NotificationArea";
 import AddMember from "./MemberCard/AddMember";
 import dashboardfooterlogo from "../../../assets/svg/dashboardfooterlogo.svg";
+import { useDispatch } from "react-redux";
+import { updateCurrentNonce, updateSafeThreshold } from "state/flow/reducer";
 
 const Dashboard = () => {
+  const dispatch = useDispatch();
   const { provider, account } = useWeb3React();
   const daoName = useAppSelector((state) => state.flow.daoName);
   const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
@@ -39,6 +42,7 @@ const Dashboard = () => {
   const [showNotification, setShowNotification] = useState<boolean>(true);
   const [showAddMember, setShowAddMember] = useState<boolean>(false);
   const [showNavBar, setShowNavBar] = useState<boolean>(false);
+  const currentNonce = useAppSelector((state) => state.flow.currentNonce);
   const toggleModal = () => {
     setShowModal(!showModal);
   };
@@ -56,6 +60,10 @@ const Dashboard = () => {
     setPendingTransactions(pendingTxs);
     await ownersCount();
     console.log("pending", pendingTransactions?.results);
+    const nonce = pendingTxs.results[0] && pendingTxs.results[0].nonce;
+    console.log("nonce", nonce);
+    dispatch(updateCurrentNonce(nonce + 1));
+    console.log("updated nonce:", currentNonce);
     await getTokens(safeAddress);
     setShowNotification(true);
   };
@@ -76,6 +84,8 @@ const Dashboard = () => {
   const ownersCount = async () => {
     const safeSDK = await ImportSafe(provider, safeAddress);
     const owners = await safeSDK.getOwners();
+    const threshold = await safeSDK.getThreshold();
+    dispatch(updateSafeThreshold(threshold));
     setOwnerCount(owners.length);
   };
 
