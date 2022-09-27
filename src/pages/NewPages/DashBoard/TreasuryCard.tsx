@@ -105,10 +105,10 @@ const TreasuryCard = (props: ItreasuryCardType) => {
           </div>
           <div
             className="copyArea"
-            onMouseDown={() => {
+            onClick={() => {
               setCopy(true);
             }}
-            onMouseUp={() => {
+            onMouseOut={() => {
               setCopy(false);
             }}
           >
@@ -197,41 +197,53 @@ const TreasuryCard = (props: ItreasuryCardType) => {
               props.executedTransactions.results.length >= 1 &&
               props.executedTransactions.results.map(
                 (result: any, index: any) => {
-                  return result.txtype === "MULTISIG_TRANSACTION" &&
-                    result.txType !== "ETHEREUM_TRANSACTION"
-                    ? result.safe &&
-                        result.dataDecoded.method !== "multiSend" && (
+                  return result.txType === "ETHEREUM_TRANSACTION" ? (
+                    result.transfers[0] !== undefined &&
+                      result.transfers[0].tokenInfo !== null && (
+                        <>
                           <TransactionComplete
-                            credit={false}
-                            amount={result.dataDecoded.parameters[1].value}
-                            recipient={result.dataDecoded.parameters[0].value}
+                            credit={true}
+                            amount={result.transfers[0].value}
+                            recipient={result.transfers[0].to}
                             ownerCount={ownerCount}
                             key={index}
-                            submissionDate={
-                              result.confirmations[
-                                result.confirmations.length - 1
-                              ].submissionDate
-                            }
+                            submissionDate={result.executionDate}
+                            tokenSymbol={result.transfers[0].tokenInfo.symbol}
                             tokenAddress={result.to}
                             tokens={props.tokens}
                           />
-                        )
-                    : result.transfers[0] !== undefined &&
-                        result.transfers[0].tokenInfo !== null && (
-                          <>
-                            <TransactionComplete
-                              credit={true}
-                              amount={result.transfers[0].value}
-                              recipient={result.transfers[0].to}
-                              ownerCount={ownerCount}
-                              key={index}
-                              submissionDate={result.executionDate}
-                              tokenSymbol={result.transfers[0].tokenInfo.symbol}
-                              tokenAddress={result.to}
-                              tokens={props.tokens}
-                            />
-                          </>
-                        );
+                        </>
+                      )
+                  ) : result.safe &&
+                    result.dataDecoded.method !== "multiSend" ? (
+                    <TransactionComplete
+                      credit={false}
+                      amount={result.dataDecoded.parameters[1].value}
+                      recipient={result.dataDecoded.parameters[0].value}
+                      ownerCount={ownerCount}
+                      key={index}
+                      submissionDate={
+                        result.confirmations[result.confirmations.length - 1]
+                          .submissionDate
+                      }
+                      tokenAddress={result.to}
+                      tokens={props.tokens}
+                    />
+                  ) : (
+                    <TransactionComplete
+                      credit={false}
+                      amount={"multisend"}
+                      recipient={"multisend"}
+                      ownerCount={ownerCount}
+                      key={index}
+                      submissionDate={
+                        result.confirmations[result.confirmations.length - 1]
+                          .submissionDate
+                      }
+                      tokenAddress={result.to}
+                      tokens={props.tokens}
+                    />
+                  );
                 }
               )}
           </div>

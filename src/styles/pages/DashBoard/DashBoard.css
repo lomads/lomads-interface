@@ -564,6 +564,7 @@ color: #C94B32;
     text-align: center;
     gap: 35px;
     padding: 93px 23px;
+    height: 100%;
 }
 #transactionSendPage {
     width: 100%;

@@ -151,7 +151,7 @@ const TransactionSend = (props: IselectTransactionSend) => {
           <SimpleButton
             title="SEND TOKENS"
             height={50}
-            width={150}
+            width={180}
             bgColor="#C94B32"
             className="button"
             fontsize={20}
