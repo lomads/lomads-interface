@@ -54,63 +54,65 @@ const PendingTransactions = (props: any) => {
             {props.confirmations + "/" + props.ownerCount} vote
           </div>
         </div>
-        <div className="confirmIconGrp">
-          {props.confirmations === safeThreshold && props.isOwner && (
-            <>
-              <SimpleButton
-                width={"100%"}
-                height={30}
-                title="EXECUTE"
-                bgColor={"#C94B32"}
-                className="button"
-                onClick={(e) => {
-                  if (props.confirmations === safeThreshold) {
-                    props.executeTransactions(props.txs);
+        {props.isAddressValid && (
+          <div className="confirmIconGrp">
+            {props.confirmations === safeThreshold && props.isOwner && (
+              <>
+                <SimpleButton
+                  width={"100%"}
+                  height={30}
+                  title="EXECUTE"
+                  bgColor={"#C94B32"}
+                  className="button"
+                  onClick={(e) => {
+                    if (props.confirmations === safeThreshold) {
+                      props.executeTransactions(props.txs);
+                    }
+                  }}
+                />
+              </>
+            )}
+            {!props.showExecute && props.isOwner && (
+              <>
+                <IconButton
+                  Icon={
+                    <AiOutlineClose
+                      style={{
+                        color: "#C94B32",
+                        height: "16px",
+                        width: "16px",
+                      }}
+                    />
                   }
-                }}
-              />
-            </>
-          )}
-          {!props.showExecute && props.isOwner && (
-            <>
-              <IconButton
-                Icon={
-                  <AiOutlineClose
-                    style={{
-                      color: "#C94B32",
-                      height: "16px",
-                      width: "16px",
-                    }}
-                  />
-                }
-                bgColor="#FFFFFF"
-                height={30}
-                width={30}
-                border="2px solid #C94B32"
-                className="iconButtons"
-              />
-              <IconButton
-                Icon={
-                  <AiOutlineCheck
-                    style={{
-                      color: "#FFFFFF",
-                      height: "16px",
-                      width: "16px",
-                    }}
-                  />
-                }
-                bgColor="#C94B32"
-                height={30}
-                width={30}
-                border="2px solid #C94B32"
-                className="iconButtons"
-                onClick={(e) => {
-                  props.confirmTransaction(props.safeTxHash);
-                }}
-              />
-            </>
-          )}
-        </div>
+                  bgColor="#FFFFFF"
+                  height={30}
+                  width={30}
+                  border="2px solid #C94B32"
+                  className="iconButtons"
+                />
+                <IconButton
+                  Icon={
+                    <AiOutlineCheck
+                      style={{
+                        color: "#FFFFFF",
+                        height: "16px",
+                        width: "16px",
+                      }}
+                    />
+                  }
+                  bgColor="#C94B32"
+                  height={30}
+                  width={30}
+                  border="2px solid #C94B32"
+                  className="iconButtons"
+                  onClick={(e) => {
+                    props.confirmTransaction(props.safeTxHash);
+                  }}
+                />
+              </>
+            )}
+          </div>
+        )}
       </div>
     </>
   );

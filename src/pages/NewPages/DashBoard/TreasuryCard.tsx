@@ -9,14 +9,19 @@ import PendingTransactions from "./TreasuryCard/PendingTransactions";
 import TransactionComplete from "./TreasuryCard/TransactionComplete";
 import { EthSignSignature } from "@gnosis.pm/safe-core-sdk";
 import { SafeTransactionData } from "@gnosis.pm/safe-core-sdk-types/dist/src/types";
-import { t } from "@lingui/macro";
 import { Tooltip } from "@chakra-ui/react";
 
 const TreasuryCard = (props: ItreasuryCardType) => {
   const { provider, account } = useWeb3React();
   const ownerCount = props.ownerCount;
   const [copy, setCopy] = useState<boolean>(false);
+  const [isAddressValid, setisAddressValid] = useState<boolean>(false);
 
+  const isOwner = async () => {
+    const safeSDK = await ImportSafe(provider, props.safeAddress);
+    const condition = await safeSDK.isOwner(account as string);
+    return condition;
+  };
   const hasUserApproved = (_index: number) => {
     return (
       props.pendingTransactions !== undefined &&
@@ -31,10 +36,18 @@ const TreasuryCard = (props: ItreasuryCardType) => {
     );
   };
 
-  const isOwner = async () => {
-    const safeSDK = await ImportSafe(provider, props.safeAddress);
-    return await safeSDK.isOwner(account as string);
-  };
+  useEffect(() => {
+    (async (_address: string, _safeAddress: string) => {
+      const condition = await isOwner();
+      if (condition) {
+        setisAddressValid(true);
+      }
+    })(account as string, props.safeAddress);
+  }, [account, isOwner, props.safeAddress, provider]);
+
+  useEffect(() => {
+    setisAddressValid(false);
+  }, [account as string]);
 
   const confirmTransaction = async (_safeTxHashs: string) => {
     const safeSDK = await ImportSafe(provider, props.safeAddress);
@@ -138,18 +151,20 @@ const TreasuryCard = (props: ItreasuryCardType) => {
             </div>
             <div className="dashboardText">total balance</div>
           </div>
-          <SafeButton
-            height={40}
-            width={150}
-            titleColor="#B12F15"
-            title="SEND TOKEN"
-            bgColor="#FFFFFF"
-            opacity="1"
-            disabled={false}
-            fontweight={400}
-            fontsize={16}
-            onClick={props.toggleModal}
-          />
+          {isAddressValid && (
+            <SafeButton
+              height={40}
+              width={150}
+              titleColor="#B12F15"
+              title="SEND TOKEN"
+              bgColor="#FFFFFF"
+              opacity="1"
+              disabled={false}
+              fontweight={400}
+              fontsize={16}
+              onClick={props.toggleModal}
+            />
+          )}
         </div>
       </div>
       {(props.executedTransactions !== undefined ||
@@ -176,6 +191,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
                       txs={result}
                       tokenAddress={result.to}
                       tokens={props.tokens}
+                      isAddressValid={isAddressValid}
                     />
                   ) : (
                     <PendingTransactions
@@ -192,6 +208,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
                       txs={result}
                       tokenAddress={result.to}
                       tokens={props.tokens}
+                      isAddressValid={isAddressValid}
                     />
                   );
                 }

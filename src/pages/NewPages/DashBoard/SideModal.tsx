@@ -19,6 +19,7 @@ import { AiOutlineClose } from "react-icons/ai";
 import IconButton from "UIpack/IconButton";
 import { SafeTransactionOptionalProps } from "@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/types";
 import { useDispatch } from "react-redux";
+import ethers from "ethers";
 
 const SideModal = (props: IsideModal) => {
   const dispatch = useDispatch();
@@ -39,6 +40,7 @@ const SideModal = (props: IsideModal) => {
   const selectedRecipients = useRef<InviteGangType[]>([]);
   const setRecipient = useRef<IsetRecipientType[]>([]);
   const currentNonce = useAppSelector((state) => state.flow.currentNonce);
+  const safeAddress = useAppSelector((state) => state.flow.safeAddress);
 
   const showNavigation = (
     _showRecipient: boolean,

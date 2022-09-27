@@ -14,6 +14,7 @@ import { IselectTransactionSend, IsetRecipientType } from "types/DashBoardType";
 import AddRecipient from "./AddRecipient";
 import NumberInputStepper from "UIpack/NumberInputStepper";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
+import { ImportSafe } from "connection/SafeCall";
 
 const TransactionSend = (props: IselectTransactionSend) => {
   const managePreviousNavigation = () => {

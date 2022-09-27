@@ -43,7 +43,7 @@ const AddExistingSafe = () => {
 
   const UseExistingSafe = async () => {
     setisLoading(true);
-    const safeSDK = await ImportSafe(provider, safeAddress)
+    const safeSDK = await ImportSafe(provider, safeAddress);
     dispatch(updateHolder(safeSDK.getAddress() as string));
     const safeowners: string[] = await safeSDK.getOwners();
     safeowners.map((ownerAddress: string, index: number) => {
@@ -91,7 +91,7 @@ const AddExistingSafe = () => {
   };
 
   const handleAddSafe = () => {
-    const totalAddresses = [...owners.current];
+    const totalAddresses = [...invitedMembers, ...owners.current];
     const value = totalAddresses.reduce((final: any, current: any) => {
       let object = final.find((item: any) => item.address === current.address);
       if (object) {
