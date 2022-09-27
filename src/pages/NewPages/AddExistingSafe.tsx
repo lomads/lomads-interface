@@ -91,7 +91,7 @@ const AddExistingSafe = () => {
   };
 
   const handleAddSafe = () => {
-    const totalAddresses = [...invitedMembers, ...owners.current];
+    const totalAddresses = [...owners.current];
     const value = totalAddresses.reduce((final: any, current: any) => {
       let object = final.find((item: any) => item.address === current.address);
       if (object) {

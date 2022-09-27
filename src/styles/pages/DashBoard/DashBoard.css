@@ -442,6 +442,7 @@ color: #C94B32;
     width: 100%;
     justify-content: flex-start;
     margin: 0vh 0vh 0vh 0vh;
+    
 }
 #amountInputFields {
     width: 100%;
@@ -459,7 +460,6 @@ color: #C94B32;
     justify-content: center;
     align-items: center;
     align-self: center;
-    margin-top: 20px;
 }
 
 /* sidebar css style */
@@ -596,8 +596,6 @@ color: #C94B32;
 }
 #transactionSendButton {
     align-self: center;
-    position: sticky;
-    bottom: 52px;
     background: rgba(255, 255, 255, 0.2); 
   backdrop-filter: blur(0.7px);
 }
@@ -682,7 +680,7 @@ opacity: 0.9;
 
 }
 #voteArea {
-    width: 4%;
+    width: 5%;
 }
 #transactionDetailsPage {
     display: flex;
@@ -732,4 +730,15 @@ opacity: 0.9;
     align-items: center;
     color: #76808D;
     width: 20%;
+}
+#recipientListandButtons{
+    min-height: fit-content;
+    max-height: 60%;
+    width: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 35px;
+    align-items: center;
 }

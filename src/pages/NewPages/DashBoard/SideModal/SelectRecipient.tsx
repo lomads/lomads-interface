@@ -1,20 +1,16 @@
 import { Checkbox } from "@chakra-ui/react";
-import React, { useEffect, useRef, useState } from "react";
-import { AiOutlineClose } from "react-icons/ai";
-import IconButton from "UIpack/IconButton";
+import React, { useState } from "react";
 import SimpleButton from "UIpack/SimpleButton";
-import doubleEuro from "../../../assets/svg/doubleEuro.svg";
 import daoMember2 from "../../../../assets/svg/daoMember2.svg";
 import SafeButton from "UIpack/SafeButton";
 import OutlineButton from "UIpack/OutlineButton";
-import SimpleInputField from "UIpack/SimpleInputField";
-import { ethers } from "ethers";
 import { InviteGangType } from "types/UItype";
 import { IselectRecipientType, IsetRecipientType } from "types/DashBoardType";
 import AddRecipient from "./AddRecipient";
 
 const SelectRecipient = (props: IselectRecipientType) => {
-  const [showNext, setShowNext] = useState<boolean>();
+  const [selectedRecipientCount, setSelectedRecipientCount] =
+    useState<number>(0);
   const handleCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked;
     if (checked) {
@@ -47,18 +43,13 @@ const SelectRecipient = (props: IselectRecipientType) => {
       }
     );
     let length = props.selectedRecipients.current.length;
-    console.log(length);
     props.selectedRecipients.current.splice(0, length);
-    length = props.selectedRecipients.current.length;
-    console.log(length);
     props.showNavigation(false, false, true);
   };
 
   const managePreviousNavigation = () => {
     const length = props.selectedRecipients.current.length;
-    console.log("select length:", length);
     props.selectedRecipients.current.splice(0, length);
-    console.log("select length:", length);
     props.showNavigation(false, false, false);
   };
   return (
@@ -117,7 +108,7 @@ const SelectRecipient = (props: IselectRecipientType) => {
             fontsize={16}
             fontweight={400}
             onClick={() => {
-              props.showNavigation(false, false, false);
+              managePreviousNavigation();
             }}
           />
           <SimpleButton

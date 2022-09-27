@@ -13,6 +13,7 @@ import { InviteGangType } from "types/UItype";
 import { IselectTransactionSend, IsetRecipientType } from "types/DashBoardType";
 import AddRecipient from "./AddRecipient";
 import NumberInputStepper from "UIpack/NumberInputStepper";
+import SimpleLoadButton from "UIpack/SimpleLoadButton";
 
 const TransactionSend = (props: IselectTransactionSend) => {
   const managePreviousNavigation = () => {
@@ -69,18 +70,19 @@ const TransactionSend = (props: IselectTransactionSend) => {
           </div>
         </div>
         <div id="transactionSendDivider1"></div>
-        <div id="recipientList">
-          {showInput.map((result: IsetRecipientType, index: number) => {
-            return (
-              <div>
+        <div id="recipientListandButtons">
+          <div id="recipientList">
+            {showInput.map((result: IsetRecipientType, index: number) => {
+              return (
                 <div id="assignAmount">
                   <div id="recipientAvatarAndName">
                     <img src={daoMember2} alt={result.recipient} />
                     <p className="nameText">
-                      {result.name.length < 1 &&
-                        result.recipient.slice(0, 6) +
+                      {result.name.length < 1
+                        ? result.recipient.slice(0, 6) +
                           "..." +
-                          result.recipient.slice(-4)}
+                          result.recipient.slice(-4)
+                        : result.name}
                     </p>
                   </div>
                   <div id="amountInputFields">
@@ -130,41 +132,42 @@ const TransactionSend = (props: IselectTransactionSend) => {
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-        <div id="addMember">
-          <div>
-            <SafeButton
-              bgColor="#FFFFFF"
-              disabled={false}
-              title="ADD A MEMBER"
-              titleColor="#76808D"
-              fontsize={16}
+              );
+            })}
+          </div>
+          <div id="addMember">
+            <div>
+              <SafeButton
+                bgColor="#FFFFFF"
+                disabled={false}
+                title="ADD A MEMBER"
+                titleColor="#76808D"
+                fontsize={16}
+                fontweight={400}
+                height={40}
+                width={162}
+                onClick={() => {
+                  managePreviousNavigation();
+                }}
+              />
+            </div>
+          </div>
+          <div id="transactionSendDivider2"></div>
+          <div id="transactionSendButton">
+            <SimpleLoadButton
+              title="SEND TOKENS"
+              height={50}
+              width={180}
+              bgColor="#C94B32"
+              className="button"
+              fontsize={20}
               fontweight={400}
-              height={40}
-              width={162}
               onClick={() => {
-                managePreviousNavigation();
+                props.createTransaction();
               }}
+              condition={props.isLoading}
             />
           </div>
-        </div>
-        <div id="transactionSendDivider2"></div>
-        <div id="transactionSendButton">
-          <SimpleButton
-            title="SEND TOKENS"
-            height={50}
-            width={180}
-            bgColor="#C94B32"
-            className="button"
-            fontsize={20}
-            fontweight={400}
-            onClick={() => {
-              props.createTransaction();
-            }}
-          />
         </div>
       </div>
       {props.addNewRecipient && (

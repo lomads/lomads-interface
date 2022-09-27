@@ -43,12 +43,14 @@ const PendingTransactions = (props: any) => {
           <div className="dashboardText">
             to{" "}
             {props.recipient === "multisend"
-              ? "multisend"
+              ? "Multisend"
               : props.recipient.slice(0, 6) + "..." + props.recipient.slice(-4)}
           </div>
         </div>
-        <div className="dashboardTextBold">
-          {props.confirmations + "/" + props.ownerCount} vote
+        <div id="voteArea">
+          <div className="dashboardTextBold">
+            {props.confirmations + "/" + props.ownerCount} vote
+          </div>
         </div>
         <div className="confirmIconGrp">
           {props.confirmations === props.ownerCount && props.isOwner && (

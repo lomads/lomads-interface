@@ -30,6 +30,7 @@ const SideModal = (props: IsideModal) => {
     showTransactionSender: false,
     showSuccess: false,
   });
+  const [isLoading, setisLoading] = useState<boolean>(false);
   const totalMembers = useAppSelector((state) => state.flow.totalMembers);
   const selectToken = (_tokenAddress: string) => {
     setSelectedToken(_tokenAddress);
@@ -56,6 +57,7 @@ const SideModal = (props: IsideModal) => {
   };
 
   const createTransaction = async () => {
+    setisLoading(true);
     const token = await tokenCallSafe(selectedToken);
     const safeSDK = await ImportSafe(provider, props.safeAddress);
     const safeTransactionData: SafeTransactionDataPartial[] = await Promise.all(
@@ -97,6 +99,7 @@ const SideModal = (props: IsideModal) => {
       })
       .catch((error) => {
         console.log("an error occoured while proposing transaction", error);
+        setisLoading(false);
       });
     await (
       await safeService(provider)
@@ -106,8 +109,10 @@ const SideModal = (props: IsideModal) => {
         console.log("transaction is successful");
         await props.getPendingTransactions();
         showNavigation(false, true, false);
+        setisLoading(false);
       })
       .catch((err) => {
+        setisLoading(false);
         console.log("error occured while confirming transaction", err);
       });
   };
@@ -172,6 +177,7 @@ const SideModal = (props: IsideModal) => {
                 selectedToken={selectedToken}
                 toggleAddNewRecipient={toggleAddNewRecipient}
                 addNewRecipient={addNewRecipient}
+                isLoading={isLoading}
               />
             )}
           {!modalNavigation.showRecipient &&
