@@ -266,7 +266,7 @@ body.active-modal {
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    width: 60%;
+    width: 65%;
     gap: 10px;
 }
 .memberRow {
@@ -310,7 +310,7 @@ body.active-modal {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    width: 60%;
+    width: 65%;
 }
 .coinText {
     display: flex;
@@ -721,4 +721,15 @@ opacity: 0.9;
     bottom: 0;
     margin-top: 35px;
     margin-bottom: 35px;
+}
+#memberAddressText {
+    font-family: 'Open Sans';
+    font-style: italic;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 16px;
+    display: flex;
+    align-items: center;
+    color: #76808D;
+    width: 20%;
 }

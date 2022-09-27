@@ -13,7 +13,7 @@ const MemberCard = (props: any) => {
               <img src={daoMember2} alt="avatar" />
               <div className="dashboardText">{props.name}</div>
             </div>
-            <div className="dashboardText">
+            <div id="memberAddressText">
               {props.address.slice(0, 6) + "..." + props.address.slice(-4)}
             </div>
             <div className="memberdivider">

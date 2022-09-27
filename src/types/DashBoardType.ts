@@ -74,5 +74,6 @@ export interface ItreasuryCardType {
   fiatBalance: string;
   account: string | undefined;
   getPendingTransactions: () => Promise<void>;
+  getExecutedTransactions: () => Promise<void>;
   tokens: any;
 }

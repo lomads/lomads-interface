@@ -135,6 +135,7 @@ const Dashboard = () => {
           account={account}
           getPendingTransactions={getPendingTransactions}
           tokens={safeTokens}
+          getExecutedTransactions={getExecutedTransactions}
         />
         <MemberCard
           totalMembers={totalMembers}

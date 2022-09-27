@@ -95,6 +95,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
           id="treasuryCardTitle"
           onClick={(e) => {
             props.getPendingTransactions();
+            props.getExecutedTransactions();
           }}
         >
           Treasury
