@@ -74,15 +74,17 @@ const SideModal = (props: IsideModal) => {
         }
       )
     );
-    console.log(safeTransactionData);
     const safeTransaction = await safeSDK.createTransaction({
       safeTransactionData,
     });
     const safeTxHash = await safeSDK.getTransactionHash(safeTransaction);
+    console.log("here I'm:", safeTxHash);
     const signature = await safeSDK.signTransactionHash(safeTxHash);
     const senderAddress = account as string;
     const safeAddress = props.safeAddress;
-    (await safeService(provider))
+    await (
+      await safeService(provider)
+    )
       .proposeTransaction({
         safeAddress,
         safeTransactionData: safeTransaction.data,

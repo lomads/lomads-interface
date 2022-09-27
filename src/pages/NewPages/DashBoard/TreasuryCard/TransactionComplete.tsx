@@ -13,7 +13,7 @@ const TransactionComplete = (props: any) => {
 
           <div className="dashboardTextBold">
             {props.amount === "multisend"
-              ? "multisend"
+              ? "Multisend"
               : props.amount / 10 ** 18}{" "}
             {props.tokens !== undefined &&
               props.tokens.map((result: any, index: any) => {

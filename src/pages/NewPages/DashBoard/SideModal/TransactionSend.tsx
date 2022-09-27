@@ -76,7 +76,12 @@ const TransactionSend = (props: IselectTransactionSend) => {
                 <div id="assignAmount">
                   <div id="recipientAvatarAndName">
                     <img src={daoMember2} alt={result.recipient} />
-                    <p className="nameText">{result.name}</p>
+                    <p className="nameText">
+                      {result.name.length < 1 &&
+                        result.recipient.slice(0, 6) +
+                          "..." +
+                          result.recipient.slice(-4)}
+                    </p>
                   </div>
                   <div id="amountInputFields">
                     <div>

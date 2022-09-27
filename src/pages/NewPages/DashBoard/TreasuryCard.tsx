@@ -45,8 +45,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
         await safeService(provider)
       )
         .confirmTransaction(_safeTxHashs, senderSignature.data)
-        .then((success) => {
+        .then(async (success) => {
           console.log("User confirmed the transaction");
+          await props.getPendingTransactions();
         })
         .catch((err) => {
           console.log("error occured while confirming transaction", err);
@@ -86,6 +87,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
       executeTxResponse.transactionResponse &&
       (await executeTxResponse.transactionResponse.wait());
     console.log("confirmed", receipt);
+    await props.getPendingTransactions();
   };
 
   return (
@@ -210,7 +212,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
                             key={index}
                             submissionDate={result.executionDate}
                             tokenSymbol={result.transfers[0].tokenInfo.symbol}
-                            tokenAddress={result.to}
+                            tokenAddress={result.transfers[0].tokenAddress}
                             tokens={props.tokens}
                           />
                         </>
