@@ -20,8 +20,13 @@ import SideModal from "./SideModal";
 import SideBar from "./SideBar";
 import axios from "axios";
 import NotificationArea from "./NotificationArea";
+import AddMember from "./MemberCard/AddMember";
+import dashboardfooterlogo from "../../../assets/svg/dashboardfooterlogo.svg";
+import { useDispatch } from "react-redux";
+import { updateCurrentNonce, updateSafeThreshold } from "state/flow/reducer";
 
 const Dashboard = () => {
+  const dispatch = useDispatch();
   const { provider, account } = useWeb3React();
   const daoName = useAppSelector((state) => state.flow.daoName);
   const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
@@ -34,9 +39,19 @@ const Dashboard = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [ownerCount, setOwnerCount] = useState<number>();
   const [safeTokens, setSafeTokens] = useState<Array<any>>([]);
-
+  const [showNotification, setShowNotification] = useState<boolean>(true);
+  const [showAddMember, setShowAddMember] = useState<boolean>(false);
+  const [showNavBar, setShowNavBar] = useState<boolean>(false);
+  const currentNonce = useAppSelector((state) => state.flow.currentNonce);
   const toggleModal = () => {
     setShowModal(!showModal);
+  };
+
+  const toggleShowMember = () => {
+    setShowAddMember(!showAddMember);
+  };
+  const showSideBar = (_choice: boolean) => {
+    setShowNavBar(_choice);
   };
   const getPendingTransactions = async () => {
     const pendingTxs = await (
@@ -45,7 +60,12 @@ const Dashboard = () => {
     setPendingTransactions(pendingTxs);
     await ownersCount();
     console.log("pending", pendingTransactions?.results);
+    const nonce = pendingTxs.results[0] && pendingTxs.results[0].nonce;
+    console.log("nonce", nonce);
+    dispatch(updateCurrentNonce(nonce + 1));
+    console.log("updated nonce:", currentNonce);
     await getTokens(safeAddress);
+    setShowNotification(true);
   };
 
   const getExecutedTransactions = async () => {
@@ -64,6 +84,8 @@ const Dashboard = () => {
   const ownersCount = async () => {
     const safeSDK = await ImportSafe(provider, safeAddress);
     const owners = await safeSDK.getOwners();
+    const threshold = await safeSDK.getThreshold();
+    dispatch(updateSafeThreshold(threshold));
     setOwnerCount(owners.length);
   };
 
@@ -88,18 +110,31 @@ const Dashboard = () => {
   } else {
     document.body.classList.remove("active-modal");
   }
+  const showNotificationArea = (_choice: boolean) => {
+    setShowNotification(_choice);
+  };
 
   return (
     <>
-      <div className="dashBoardBody">
+      <div
+        className="dashBoardBody"
+        onMouseEnter={() => {
+          showSideBar(false);
+        }}
+      >
         <div className="DAOdetails">
           <div className="DAOname" onClick={getPendingTransactions}>
             {daoName}
           </div>
         </div>
-        <NotificationArea
-          pendingTransactionCount={pendingTransactions?.count}
-        />
+        {pendingTransactions !== undefined &&
+          pendingTransactions?.count >= 1 &&
+          showNotification && (
+            <NotificationArea
+              pendingTransactionCount={pendingTransactions?.count}
+              showNotificationArea={showNotificationArea}
+            />
+          )}
         <TreasuryCard
           safeAddress={safeAddress}
           pendingTransactions={pendingTransactions}
@@ -109,9 +144,19 @@ const Dashboard = () => {
           fiatBalance={safeTokens.length >= 1 && safeTokens[0].fiatBalance}
           account={account}
           getPendingTransactions={getPendingTransactions}
+          tokens={safeTokens}
+          getExecutedTransactions={getExecutedTransactions}
         />
-        {/* Project component */}
-        <MemberCard totalMembers={totalMembers} />
+        <MemberCard
+          totalMembers={totalMembers}
+          toggleShowMember={toggleShowMember}
+        />
+        {/* <div className="appLogoArea">
+          <div className="dashboardText">powered by Gnosis Safe</div>
+          <div>
+            <img src={dashboardfooterlogo} alt="footer logo" id="footerImage" />
+          </div>
+        </div> */}
       </div>
       {showModal && (
         <SideModal
@@ -120,9 +165,16 @@ const Dashboard = () => {
           totalMembers={totalMembers}
           safeAddress={safeAddress}
           getPendingTransactions={getPendingTransactions}
+          showNotificationArea={showNotificationArea}
+          toggleShowMember={toggleShowMember}
         />
       )}
-      <SideBar name={daoName} />
+      <SideBar
+        name={daoName}
+        showSideBar={showSideBar}
+        showNavBar={showNavBar}
+      />
+      {showAddMember && <AddMember toggleShowMember={toggleShowMember} />}
     </>
   );
 };

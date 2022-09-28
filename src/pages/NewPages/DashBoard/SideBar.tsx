@@ -1,16 +1,21 @@
 import React, { useState } from "react";
 import "../../../styles/pages/DashBoard/DashBoard.css";
-import { GrFormAdd } from "react-icons/gr";
 import plus from "../../../assets/svg/plus.svg";
+import { useNavigate } from "react-router-dom";
 
 const SideBar = (props: any) => {
-  // const [showNavBar, setShowNavBar] = useState<boolean>(false);
+  const navigate = useNavigate();
   const name = props.name.split(" ");
   const SideBarStrip = () => {
     return (
       <>
         <div className="sideBarStrip">
-          <div className="stripInvertedBoxOutline">
+          <div
+            className="stripInvertedBoxOutline"
+            onClick={() => {
+              navigate("/namedao");
+            }}
+          >
             <div className="navbarText">
               <img src={plus} alt="add" />
             </div>
@@ -22,7 +27,12 @@ const SideBar = (props: any) => {
   };
   return (
     <>
-      <div className="navBarInitialBox">
+      <div
+        className="navBarInitialBox"
+        onMouseEnter={() => {
+          props.showSideBar(true);
+        }}
+      >
         <div className="invertedBox">
           <div className="navbarText">
             {name.length === 1
@@ -31,7 +41,7 @@ const SideBar = (props: any) => {
           </div>
         </div>
       </div>
-      <SideBarStrip />
+      {props.showNavBar && <SideBarStrip />}
     </>
   );
 };
