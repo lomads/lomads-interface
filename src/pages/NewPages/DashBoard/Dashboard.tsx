@@ -110,6 +110,7 @@ const Dashboard = () => {
           account={account}
           getPendingTransactions={getPendingTransactions}
         />
+        {/* Project component */}
         <MemberCard totalMembers={totalMembers} />
       </div>
       {showModal && (

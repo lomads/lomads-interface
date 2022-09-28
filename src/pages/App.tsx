@@ -9,23 +9,25 @@ import InviteGang from "./NewPages/InviteGang";
 import AddExistingSafe from "./NewPages/AddExistingSafe";
 import AddNewSafe from "./NewPages/AddNewSafe";
 import Dashboard from "./NewPages/DashBoard/Dashboard";
+import CreateProject from "./NewPages/CreateProject";
 
 export default function App() {
-  const landingPage = useMatch("/");
+	// const landingPage = useMatch("/");
 
-  return (
-    <div className="body">
-      {!landingPage && <Header />}
-      <Routes>
-        <Route path="/" element={[<LoginPage />]} />
-        <Route path="/namedao" element={<NameDAO />} />
-        <Route path="/invitegang" element={<InviteGang />} />
-        <Route path="/startsafe" element={<StartSafe />} />
-        <Route path="/addsafe" element={<AddExistingSafe />} />
-        <Route path="/newsafe" element={<AddNewSafe />} />
-        <Route path="/success" element={<DAOsuccess />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
-    </div>
-  );
+	return (
+		<div className="body">
+			{/* {!landingPage && <Header />} */}
+			<Routes>
+				<Route path="/" element={[<LoginPage />]} />
+				<Route path="/createProject" element={<CreateProject />} />
+				<Route path="/namedao" element={<NameDAO />} />
+				<Route path="/invitegang" element={<InviteGang />} />
+				<Route path="/startsafe" element={<StartSafe />} />
+				<Route path="/addsafe" element={<AddExistingSafe />} />
+				<Route path="/newsafe" element={<AddNewSafe />} />
+				<Route path="/success" element={<DAOsuccess />} />
+				<Route path="/dashboard" element={<Dashboard />} />
+			</Routes>
+		</div>
+	);
 }
