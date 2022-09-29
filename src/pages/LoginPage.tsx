@@ -26,16 +26,18 @@ const LoginPage = (props: any) => {
   const chainAllowed = chainId && isChainAllowed(connector, chainId);
 
   const generateToken = async () => {
-    if(!localStorage.getItem('LOMADS_WEB3_TOKEN')){
+    if(!localStorage.getItem('__lmds_web3_token')){
       if(window.ethereum) {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         const token = await Web3Token.sign(async (msg:string) => await signer.signMessage(msg), '1d');
         console.log(token)
-        localStorage.setItem('LOMADS_WEB3_TOKEN', token);
+        localStorage.setItem('__lmds_web3_token', token);
+        setTimeout(() => navigate("/namedao"), 500);
       }
+    } else {
+      navigate("/namedao")
     }
-    navigate("/namedao");
   }
 
   useEffect(() => {

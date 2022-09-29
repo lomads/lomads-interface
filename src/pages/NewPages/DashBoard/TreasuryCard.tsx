@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { get as _get } from 'lodash';
 import copyIcon from "../../../assets/svg/copyIcon.svg";
 import coin from "../../../assets/svg/coin.svg";
 import SafeButton from "UIpack/SafeButton";
@@ -10,15 +11,17 @@ import TransactionComplete from "./TreasuryCard/TransactionComplete";
 import { EthSignSignature } from "@gnosis.pm/safe-core-sdk";
 import { SafeTransactionData } from "@gnosis.pm/safe-core-sdk-types/dist/src/types";
 import { Tooltip } from "@chakra-ui/react";
+import { useAppSelector } from "state/hooks";
 
 const TreasuryCard = (props: ItreasuryCardType) => {
   const { provider, account } = useWeb3React();
   const ownerCount = props.ownerCount;
   const [copy, setCopy] = useState<boolean>(false);
   const [isAddressValid, setisAddressValid] = useState<boolean>(false);
+  const { DAO, DAOLoading } = useAppSelector((state) => state.dashboard);
 
   const isOwner = async () => {
-    const safeSDK = await ImportSafe(provider, props.safeAddress);
+    const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
     const condition = await safeSDK.isOwner(account as string);
     return condition;
   };
@@ -42,15 +45,15 @@ const TreasuryCard = (props: ItreasuryCardType) => {
       if (condition) {
         setisAddressValid(true);
       }
-    })(account as string, props.safeAddress);
-  }, [account, isOwner, props.safeAddress, provider]);
+    })(account as string, _get(DAO, 'safe.address', ''));
+  }, [account, isOwner, _get(DAO, 'safe.address', ''), provider]);
 
   useEffect(() => {
     setisAddressValid(false);
   }, [account as string]);
 
   const confirmTransaction = async (_safeTxHashs: string) => {
-    const safeSDK = await ImportSafe(provider, props.safeAddress);
+    const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
     const isOwner = await safeSDK.isOwner(account as string);
     if (isOwner) {
       const senderSignature = await safeSDK.signTransactionHash(_safeTxHashs);
@@ -72,7 +75,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
   const executeTransactions = async (_txs: any) => {
     console.log(_txs);
-    const safeSDK = await ImportSafe(provider, props.safeAddress);
+    const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
     const safeTransactionData: SafeTransactionData = {
       to: _txs.to,
       value: _txs.value,
@@ -104,12 +107,12 @@ const TreasuryCard = (props: ItreasuryCardType) => {
   };
 
   const rejectTransaction = async (_nonce: number) => {
-    const safeSDK = await ImportSafe(provider, props.safeAddress);
+    const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
     const transactionObject = await safeSDK.createRejectionTransaction(_nonce);
     const safeTxHash = await safeSDK.getTransactionHash(transactionObject);
     const signature = await safeSDK.signTransactionHash(safeTxHash);
     const senderAddress = account as string;
-    const safeAddress = props.safeAddress;
+    const safeAddress = _get(DAO, 'safe.address', '');
     await (
       await safeService(provider)
     )
@@ -169,16 +172,16 @@ const TreasuryCard = (props: ItreasuryCardType) => {
               <div
                 className="copyLinkButton"
                 onClick={() => {
-                  navigator.clipboard.writeText(props.safeAddress);
+                  navigator.clipboard.writeText(_get(DAO, 'safe.address', ''));
                 }}
               >
                 <img src={copyIcon} alt="copy" className="safeCopyImage" />
               </div>
             </Tooltip>
             <div className="dashboardText">
-              {props.safeAddress.slice(0, 6) +
+              {_get(DAO, 'safe.address', '').slice(0, 6) +
                 "..." +
-                props.safeAddress.slice(-4)}
+                _get(DAO, 'safe.address', '').slice(-4)}
             </div>
           </div>
           <div className="copyArea">

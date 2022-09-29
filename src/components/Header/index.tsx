@@ -5,9 +5,11 @@ import { Text } from "rebass";
 import { CHAIN_INFO } from "constants/chainInfo";
 import { SupportedChainId } from "constants/chains";
 import { useNativeCurrencyBalances } from "state/connection/hooks";
+import { setDAOList } from "state/dashboard/reducer";
 import styled from "styled-components/macro";
 import { isChainAllowed } from "utils/switchChain";
 import Web3Status from "../Web3Status";
+import axiosHttp from '../../api';
 import { useNavigate, useMatch } from "react-router-dom";
 // import NetworkSelector from './NetworkSelector'
 

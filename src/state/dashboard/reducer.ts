@@ -5,11 +5,13 @@ import { getDao } from "./actions";
 export interface DashboardState {
   DAO: DAOType | null;
   DAOLoading: boolean | null;
+  DAOList: Array<DAOType>;
 }
 
 const initialState: DashboardState = {
   DAO: null,
-  DAOLoading: null
+  DAOLoading: false,
+  DAOList: [],
 };
 
 const dashboardSlice = createSlice({
@@ -19,6 +21,9 @@ const dashboardSlice = createSlice({
     resetCreateDAOLoader(state) {
       state.DAOLoading = null
     },
+    setDAOList(state, action) {
+      state.DAOList = action.payload
+    }
   },
   extraReducers: {
     [`${getDao.fulfilled}`]: (state, action) => {
@@ -32,6 +37,7 @@ const dashboardSlice = createSlice({
 });
 
 export const {
+  setDAOList,
   resetCreateDAOLoader
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

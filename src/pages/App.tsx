@@ -19,12 +19,13 @@ export default function App() {
       <Routes>
         <Route path="/" element={[<LoginPage />]} />
         <Route path="/namedao" element={<NameDAO />} />
+        <Route path="/createdao" element={<NameDAO />} />
         <Route path="/invitegang" element={<InviteGang />} />
         <Route path="/startsafe" element={<StartSafe />} />
         <Route path="/addsafe" element={<AddExistingSafe />} />
         <Route path="/newsafe" element={<AddNewSafe />} />
         <Route path="/success" element={<DAOsuccess />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/:daoURL" element={<Dashboard />} />
       </Routes>
     </div>
   );

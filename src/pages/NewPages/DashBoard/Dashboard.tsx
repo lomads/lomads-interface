@@ -1,9 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
+import { get as _get } from 'lodash';
 import { useAppSelector } from "state/hooks";
+import {useParams} from "react-router-dom";
 import "../../../styles/Global.css";
 import "../../../styles/pages/DashBoard/DashBoard.css";
 import MemberCard from "./MemberCard";
 import TreasuryCard from "./TreasuryCard";
+import { LeapFrog } from "@uiball/loaders";
 import {
   SafeTransactionData,
   SafeTransactionDataPartial,
@@ -22,11 +25,13 @@ import axios from "axios";
 import NotificationArea from "./NotificationArea";
 import AddMember from "./MemberCard/AddMember";
 import dashboardfooterlogo from "../../../assets/svg/dashboardfooterlogo.svg";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "state/hooks";
+import { getDao } from "state/dashboard/actions";
 import { updateCurrentNonce, updateSafeThreshold } from "state/flow/reducer";
 
 const Dashboard = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+  const { daoURL } = useParams()
   const { provider, account } = useWeb3React();
   const daoName = useAppSelector((state) => state.flow.daoName);
   const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
@@ -43,6 +48,7 @@ const Dashboard = () => {
   const [showAddMember, setShowAddMember] = useState<boolean>(false);
   const [showNavBar, setShowNavBar] = useState<boolean>(false);
   const currentNonce = useAppSelector((state) => state.flow.currentNonce);
+  const { DAO, DAOLoading } = useAppSelector((state) => state.dashboard);
   const toggleModal = () => {
     setShowModal(!showModal);
   };
@@ -53,6 +59,12 @@ const Dashboard = () => {
   const showSideBar = (_choice: boolean) => {
     setShowNavBar(_choice);
   };
+
+  useEffect(() => {
+    if(daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
+      dispatch(getDao(daoURL))
+  }, [daoURL])
+
   const getPendingTransactions = async () => {
     const pendingTxs = await (
       await safeService(provider)
@@ -99,7 +111,7 @@ const Dashboard = () => {
         setSafeTokens(tokens.data);
       });
   };
-
+  
   useEffect(() => {
     getPendingTransactions();
     getExecutedTransactions();
@@ -117,7 +129,11 @@ const Dashboard = () => {
 
   return (
     <>
-      <div
+     { DAOLoading ?
+      <div style={{ height: '100vh', zIndex: 99999, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <LeapFrog size={50} color="#C94B32" />
+      </div> :
+     <div
         className="dashBoardBody"
         onMouseEnter={() => {
           showSideBar(false);
@@ -125,7 +141,7 @@ const Dashboard = () => {
       >
         <div className="DAOdetails">
           <div className="DAOname" onClick={getPendingTransactions}>
-            {daoName}
+            { _get(DAO, 'name', '') }
           </div>
         </div>
         {pendingTransactions !== undefined &&
@@ -158,7 +174,7 @@ const Dashboard = () => {
             <img src={dashboardfooterlogo} alt="footer logo" id="footerImage" />
           </div>
         </div> */}
-      </div>
+      </div> }
       {showModal && (
         <SideModal
           toggleModal={toggleModal}

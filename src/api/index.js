@@ -11,7 +11,9 @@ var axiosConfig = axios.create({
 
 axiosConfig.interceptors.request.use(
 	(axiosConf) => {
-        // May attach headers here
+		const token = localStorage.getItem('__lmds_web3_token');
+		console.log('token :: ', token);
+		if (token) axiosConf.headers.Authorization = token;
 		return axiosConf;
 	},
 	error => Promise.reject(error)

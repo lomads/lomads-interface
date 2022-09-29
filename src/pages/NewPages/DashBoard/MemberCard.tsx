@@ -1,9 +1,14 @@
 import React from "react";
+import { get as _get } from 'lodash';
+import { useAppSelector } from "state/hooks";
 import membersIcon from "../../../assets/svg/membersIcon.svg";
 import SafeButton from "UIpack/SafeButton";
 import daoMember2 from "../../../assets/svg/daoMember2.svg";
 
 const MemberCard = (props: any) => {
+
+  const { DAO, DAOLoading } = useAppSelector((state) => state.dashboard);
+
   const NameAndAvatar = (props: any) => {
     return (
       <>
@@ -41,7 +46,7 @@ const MemberCard = (props: any) => {
                 style={{ height: 35, width: 35 }}
               />
               <div className="dashboardText">
-                {props.totalMembers.length} members
+                {_get(DAO, 'members', []).length} members
               </div>
             </div>
             <SafeButton
@@ -63,9 +68,9 @@ const MemberCard = (props: any) => {
             <div className="dashboardText">Name</div>
             <div className="dashboardText">Joined</div>
           </div>
-          {props.totalMembers.map((result: any, index: any) => {
+          {_get(DAO, 'members', []).map((result: any, index: any) => {
             return (
-              <NameAndAvatar name={result.name} address={result.address} />
+              <NameAndAvatar name={_get(result, 'member.name', '')} address={_get(result, 'member.wallet', '')} />
             );
           })}
         </div>

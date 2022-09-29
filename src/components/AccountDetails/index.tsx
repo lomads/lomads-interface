@@ -245,7 +245,7 @@ export default function AccountDetails({
   }, [dispatch, chainId]);
 
   const clearOnDisconnect = () => {
-    localStorage.removeItem('LOMADS_WEB3_TOKEN');
+    localStorage.removeItem('__lmds_web3_token');
     dispatch(updatedeployedTokenAddress(""));
     dispatch(updatetokenTitle(""));
     dispatch(updatetokenSymbol(""));
