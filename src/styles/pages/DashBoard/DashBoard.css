@@ -216,6 +216,7 @@ body.active-modal {
     align-items: center;
     gap: 30px;
     width: 100%;
+    overflow-y: visible;
 }
 .confirmIconGrp {
     display: flex;
@@ -224,6 +225,7 @@ body.active-modal {
     align-items: center;
     gap: 10px;
     width: 9%;
+    overflow-y: visible;
 }
 .transactionName {
     width: 57%;
@@ -741,4 +743,22 @@ opacity: 0.9;
     justify-content: flex-start;
     gap: 35px;
     align-items: center;
+}
+.confirmIconGrp .multiSendDivider::after .multiSendDivider::before {
+
+    content: "";
+    position: absolute;
+    right:  120px;
+}
+.confirmIconGrp .multiSendDivider::before {
+    border-top: 1px solid #000;
+    top: 9px;
+    width: 8px;
+    height: 0;
+}
+.confirmIconGrp .multiSendDivider::after {
+    border-left: 1px solid #000;
+    height: 100%;
+    width: 0px;
+    top: 2px;
 }

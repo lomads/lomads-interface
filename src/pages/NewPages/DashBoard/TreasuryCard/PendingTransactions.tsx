@@ -18,8 +18,10 @@ const PendingTransactions = (props: any) => {
           <img src={sendTokenOutline} alt="" />
 
           <div className="dashboardTextBold">
-            {props.amount === "multisend"
-              ? "multisend"
+            {props.amount === "multisend" || props.amount === "rejection"
+              ? props.amount === "multisend"
+                ? "Multisend"
+                : "rejection"
               : props.amount / 10 ** 18}{" "}
             {props.tokens !== undefined &&
               props.tokens.map((result: any, index: any) => {
@@ -56,40 +58,49 @@ const PendingTransactions = (props: any) => {
         </div>
         {props.isAddressValid && (
           <div className="confirmIconGrp">
-            {props.confirmations === safeThreshold && props.isOwner && (
-              <>
-                <SimpleButton
-                  width={"100%"}
-                  height={30}
-                  title="EXECUTE"
-                  bgColor={"#C94B32"}
-                  className="button"
-                  onClick={(e) => {
-                    if (props.confirmations === safeThreshold) {
-                      props.executeTransactions(props.txs);
-                    }
-                  }}
-                />
-              </>
-            )}
+            {props.confirmations === safeThreshold &&
+              props.isOwner &&
+              props.showExecute && (
+                <>
+                  <SimpleButton
+                    width={"100%"}
+                    height={30}
+                    title="EXECUTE"
+                    bgColor={"#C94B32"}
+                    className="button"
+                    onClick={(e) => {
+                      if (props.confirmations === safeThreshold) {
+                        props.executeTransactions(props.txs);
+                      }
+                    }}
+                  />
+                </>
+              )}
             {!props.showExecute && props.isOwner && (
               <>
-                <IconButton
-                  Icon={
-                    <AiOutlineClose
-                      style={{
-                        color: "#C94B32",
-                        height: "16px",
-                        width: "16px",
+                {props.amount !== "rejection" && (
+                  <>
+                    <IconButton
+                      Icon={
+                        <AiOutlineClose
+                          style={{
+                            color: "#C94B32",
+                            height: "16px",
+                            width: "16px",
+                          }}
+                        />
+                      }
+                      bgColor="#FFFFFF"
+                      height={30}
+                      width={30}
+                      border="2px solid #C94B32"
+                      className="iconButtons"
+                      onClick={(e: any) => {
+                        props.rejectTransaction(props.txs.nonce);
                       }}
                     />
-                  }
-                  bgColor="#FFFFFF"
-                  height={30}
-                  width={30}
-                  border="2px solid #C94B32"
-                  className="iconButtons"
-                />
+                  </>
+                )}
                 <IconButton
                   Icon={
                     <AiOutlineCheck

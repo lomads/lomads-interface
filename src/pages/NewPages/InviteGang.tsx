@@ -193,15 +193,17 @@ const InviteGang = () => {
                     {result.address !== undefined &&
                     result.address !== account ? (
                       <p className="text">
-                        {result.address.slice(0, 6) +
-                          "..." +
-                          result.address.slice(-4)}
+                        {result.address &&
+                          result.address.slice(0, 6) +
+                            "..." +
+                            result.address.slice(-4)}
                       </p>
                     ) : (
                       <p className="creatorText">
-                        {result.address.slice(0, 6) +
-                          "..." +
-                          result.address.slice(-4)}
+                        {result.address &&
+                          result.address.slice(0, 6) +
+                            "..." +
+                            result.address.slice(-4)}
                       </p>
                     )}
                     {result.address !== account && (

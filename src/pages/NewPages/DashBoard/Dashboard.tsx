@@ -60,9 +60,10 @@ const Dashboard = () => {
     setPendingTransactions(pendingTxs);
     await ownersCount();
     console.log("pending", pendingTransactions?.results);
-    const nonce = pendingTxs.results[0] && pendingTxs.results[0].nonce;
+    // const nonce = pendingTxs.results[0] && pendingTxs.results[0].nonce;
+    const nonce = await (await safeService(provider)).getNextNonce(safeAddress);
     console.log("nonce", nonce);
-    dispatch(updateCurrentNonce(nonce + 1));
+    dispatch(updateCurrentNonce(nonce));
     console.log("updated nonce:", currentNonce);
     await getTokens(safeAddress);
     setShowNotification(true);

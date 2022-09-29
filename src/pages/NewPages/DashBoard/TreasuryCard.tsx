@@ -103,6 +103,43 @@ const TreasuryCard = (props: ItreasuryCardType) => {
     await props.getPendingTransactions();
   };
 
+  const rejectTransaction = async (_nonce: number) => {
+    const safeSDK = await ImportSafe(provider, props.safeAddress);
+    const transactionObject = await safeSDK.createRejectionTransaction(_nonce);
+    const safeTxHash = await safeSDK.getTransactionHash(transactionObject);
+    const signature = await safeSDK.signTransactionHash(safeTxHash);
+    const senderAddress = account as string;
+    const safeAddress = props.safeAddress;
+    await (
+      await safeService(provider)
+    )
+      .proposeTransaction({
+        safeAddress,
+        safeTransactionData: transactionObject.data,
+        safeTxHash,
+        senderAddress,
+        senderSignature: signature.data,
+      })
+      .then((result) => {
+        console.log(
+          "on chain rejection transaction has been proposed successfully."
+        );
+      })
+      .catch((err) => {
+        console.log("an error occured while proposing a reject transaction.");
+      });
+    await (
+      await safeService(provider)
+    )
+      .confirmTransaction(safeTxHash, signature.data)
+      .then(async (result) => {
+        console.log("on chain transaction has been confirmed by the signer");
+        await props.getPendingTransactions();
+      })
+      .catch((err) => {
+        console.log("an error occured while confirming a reject transaction.");
+      });
+  };
   return (
     <div className="treasuryCard">
       <div className="treasuryHeader">
@@ -174,13 +211,23 @@ const TreasuryCard = (props: ItreasuryCardType) => {
             <div className="dashboardText">Last Transactions</div>
             {props.pendingTransactions !== undefined &&
               props.pendingTransactions.results.length >= 1 &&
-              props.pendingTransactions.results.map(
-                (result: any, index: number) => {
-                  return result.dataDecoded.method !== "multiSend" ? (
+              props.pendingTransactions.results
+                .sort((a, b) => {
+                  return a.nonce - b.nonce;
+                })
+                .map((result: any, index: number) => {
+                  return result.dataDecoded !== null &&
+                    result.dataDecoded.method !== "multiSend" ? (
                     <PendingTransactions
                       showExecute={hasUserApproved(index)}
-                      amount={result.dataDecoded.parameters[1].value}
-                      recipient={result.dataDecoded.parameters[0].value}
+                      amount={
+                        result.dataDecoded !== null &&
+                        result.dataDecoded.parameters[1].value
+                      }
+                      recipient={
+                        result.dataDecoded !== null &&
+                        result.dataDecoded.parameters[0].value
+                      }
                       confirmations={result.confirmations.length}
                       ownerCount={ownerCount}
                       confirmTransaction={confirmTransaction}
@@ -192,27 +239,57 @@ const TreasuryCard = (props: ItreasuryCardType) => {
                       tokenAddress={result.to}
                       tokens={props.tokens}
                       isAddressValid={isAddressValid}
+                      rejectTransaction={rejectTransaction}
                     />
+                  ) : result.dataDecoded !== null ? (
+                    result.dataDecoded.parameters[0].valueDecoded.map(
+                      (multiresult: any, index: number) => {
+                        return (
+                          <PendingTransactions
+                            showExecute={hasUserApproved(index)}
+                            amount={multiresult.dataDecoded.parameters[1].value}
+                            recipient={
+                              multiresult.dataDecoded.parameters[0].value +
+                              "mul "
+                            }
+                            confirmations={result.confirmations.length}
+                            ownerCount={ownerCount}
+                            confirmTransaction={confirmTransaction}
+                            safeTxHash={result.safeTxHash}
+                            isOwner={isOwner}
+                            key={index}
+                            executeTransactions={executeTransactions}
+                            txs={result}
+                            tokenAddress={multiresult.dataDecoded.to}
+                            tokens={props.tokens}
+                            isAddressValid={isAddressValid}
+                            rejectTransaction={rejectTransaction}
+                          />
+                        );
+                      }
+                    )
                   ) : (
-                    <PendingTransactions
-                      showExecute={hasUserApproved(index)}
-                      amount={"multisend"}
-                      recipient={"multisend"}
-                      confirmations={result.confirmations.length}
-                      ownerCount={ownerCount}
-                      confirmTransaction={confirmTransaction}
-                      safeTxHash={result.safeTxHash}
-                      isOwner={isOwner}
-                      key={index}
-                      executeTransactions={executeTransactions}
-                      txs={result}
-                      tokenAddress={result.to}
-                      tokens={props.tokens}
-                      isAddressValid={isAddressValid}
-                    />
+                    <>
+                      <PendingTransactions
+                        showExecute={hasUserApproved(index)}
+                        amount={"rejection"}
+                        recipient={"rejection"}
+                        confirmations={result.confirmations.length}
+                        ownerCount={ownerCount}
+                        confirmTransaction={confirmTransaction}
+                        safeTxHash={result.safeTxHash}
+                        isOwner={isOwner}
+                        key={index}
+                        executeTransactions={executeTransactions}
+                        txs={result}
+                        tokenAddress={undefined}
+                        tokens={props.tokens}
+                        isAddressValid={isAddressValid}
+                        rejectTransaction={rejectTransaction}
+                      />
+                    </>
                   );
-                }
-              )}
+                })}
             {props.executedTransactions !== undefined &&
               props.executedTransactions.results.length >= 1 &&
               props.executedTransactions.results.map(
@@ -235,6 +312,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
                         </>
                       )
                   ) : result.safe &&
+                    result.dataDecoded !== null &&
                     result.dataDecoded.method !== "multiSend" ? (
                     <TransactionComplete
                       credit={false}
@@ -250,19 +328,31 @@ const TreasuryCard = (props: ItreasuryCardType) => {
                       tokens={props.tokens}
                     />
                   ) : (
-                    <TransactionComplete
-                      credit={false}
-                      amount={"multisend"}
-                      recipient={"multisend"}
-                      ownerCount={ownerCount}
-                      key={index}
-                      submissionDate={
-                        result.confirmations[result.confirmations.length - 1]
-                          .submissionDate
+                    result.dataDecoded !== null &&
+                    result.dataDecoded.parameters[0].valueDecoded.map(
+                      (multiresult: any, index: number) => {
+                        return (
+                          <TransactionComplete
+                            credit={false}
+                            amount={multiresult.dataDecoded.parameters[1].value}
+                            recipient={
+                              multiresult.dataDecoded.parameters[0].value +
+                              "mul "
+                            }
+                            ownerCount={ownerCount}
+                            key={index}
+                            submissionDate={
+                              result.confirmations[
+                                result.confirmations.length - 1
+                              ].submissionDate
+                            }
+                            tokenAddress={multiresult.to}
+                            tokens={props.tokens}
+                            index={index}
+                          />
+                        );
                       }
-                      tokenAddress={result.to}
-                      tokens={props.tokens}
-                    />
+                    )
                   );
                 }
               )}
