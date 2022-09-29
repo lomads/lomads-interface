@@ -11,6 +11,7 @@ import deploy from "./deploy/reducer";
 import multicall from "state/multicall";
 import flow from "./flow/reducer";
 import tempdata from "./tempdata/reducer";
+import dashboard from './dashboard/reducer';
 
 const PERSISTED_KEYS: string[] = ["user", "transactions", "lists"];
 
@@ -25,6 +26,7 @@ const store = configureStore({
     tempdata,
     deploy,
     lists,
+    dashboard,
     multicall: multicall.reducer,
   },
   middleware: (getDefaultMiddleware) =>

@@ -24,6 +24,7 @@ import EthersAdapter from "@gnosis.pm/safe-ethers-lib";
 import { SafeFactory, SafeAccountConfig } from "@gnosis.pm/safe-core-sdk";
 import { ethers } from "ethers";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
+import { createDAO } from '../../state/flow/actions';
 
 const AddNewSafe = () => {
   const dispatch = useAppDispatch();
@@ -38,6 +39,8 @@ const AddNewSafe = () => {
   const safeName = useAppSelector((state) => state.flow.safeName);
   const selectedOwners = useAppSelector((state) => state.flow.owners);
   const safeAddress = useAppSelector((state) => state.flow.safeAddress);
+  const createDAOLoading = useAppSelector((state) => state.flow.createDAOLoading);
+  const flow = useAppSelector((state) => state.flow);
   let Myvalue = useRef<Array<InviteGangType>>([
     {
       name: "creator",
@@ -63,6 +66,15 @@ const AddNewSafe = () => {
       Myvalue.current.splice(refIndex, 1);
     }
   };
+
+  useEffect(() => {
+    if(createDAOLoading == false){
+      setisLoading(false)
+      return navigate("/success");
+    }
+    if(createDAOLoading == true)
+      setisLoading(true)
+  }, [createDAOLoading])
 
   const handleSafeName = () => {
     let terrors: any = {};
@@ -112,8 +124,20 @@ const AddNewSafe = () => {
           return final.concat([current]);
         }, []);
         dispatch(updateTotalMembers(value));
-        setisLoading(false);
-        navigate("/success");
+        //setisLoading(false);
+        const payload: any = {
+          contractAddress: '',
+          name: flow.daoName,
+          url: flow.daoAddress,
+          image: null,
+          members: value,
+          safe: {
+            name: safeName,
+            address: tx.getAddress(),
+            owners: owners,
+          }
+        }
+        dispatch(createDAO(payload))
       })
       .catch((err) => {
         console.log("An error occured while creating safe", err);
