@@ -11,7 +11,7 @@ export interface FlowState {
   readonly owners: Array<OwnerType>;
   readonly threshold: number;
   readonly totalMembers: Array<InviteGangType>;
-  readonly createDAOLoading: any;
+  readonly createDAOLoading: boolean | null;
 }
 
 const initialState: FlowState = {
@@ -77,5 +77,6 @@ export const {
   updateSafeAddress,
   updateThreshold,
   updateTotalMembers,
+  resetCreateDAOLoader
 } = flowSlice.actions;
 export default flowSlice.reducer;

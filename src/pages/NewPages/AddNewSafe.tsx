@@ -16,6 +16,7 @@ import {
   updatesafeName,
   updateThreshold,
   updateTotalMembers,
+  resetCreateDAOLoader
 } from "state/flow/reducer";
 import daoMember2 from "../../assets/svg/daoMember2.svg";
 import { updateHolder } from "state/proposal/reducer";
@@ -70,6 +71,7 @@ const AddNewSafe = () => {
   useEffect(() => {
     if(createDAOLoading == false){
       setisLoading(false)
+      resetCreateDAOLoader()
       return navigate("/success");
     }
     if(createDAOLoading == true)

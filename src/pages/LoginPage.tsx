@@ -13,6 +13,8 @@ import { injectedConnection, walletConnectConnection } from "connection";
 import { getConnection } from "connection/utils";
 import { updateConnectionError } from "state/connection/reducer";
 import { isChainAllowed } from "utils/switchChain";
+import { ethers } from "ethers";
+import Web3Token from 'web3-token';
 
 const LoginPage = (props: any) => {
   const dispatch = useAppDispatch();
@@ -23,11 +25,24 @@ const LoginPage = (props: any) => {
 
   const chainAllowed = chainId && isChainAllowed(connector, chainId);
 
+  const generateToken = async () => {
+    if(!localStorage.getItem('LOMADS_WEB3_TOKEN')){
+      if(window.ethereum) {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const token = await Web3Token.sign(async (msg:string) => await signer.signMessage(msg), '1d');
+        console.log(token)
+        localStorage.setItem('LOMADS_WEB3_TOKEN', token);
+      }
+    }
+    navigate("/namedao");
+  }
+
   useEffect(() => {
     if (selectedWallet && account && chainAllowed) {
-      navigate("/namedao");
+      generateToken()
     }
-  }, [selectedWallet, navigate, account, chainAllowed]);
+  }, [selectedWallet, account, chainAllowed]);
 
   const nextLogin = async (connector: Connector) => {
     const connectionType = getConnection(connector).type;
@@ -35,7 +50,7 @@ const LoginPage = (props: any) => {
       dispatch(updateConnectionError({ connectionType, error: undefined }));
       await connector.activate();
       dispatch(updateSelectedWallet({ wallet: connectionType }));
-      navigate("/namedao");
+      //generateToken()
     } catch (error: any) {
       console.debug(`web3-react connection error: ${error}`);
       dispatch(updateConnectionError({ connectionType, error: error.message }));
