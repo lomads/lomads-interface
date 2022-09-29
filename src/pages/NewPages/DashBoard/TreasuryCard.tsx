@@ -24,7 +24,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
   };
   const hasUserApproved = (_index: number) => {
     return (
-      props.pendingTransactions !== undefined &&
+      props.pendingTransactions &&
       props.pendingTransactions?.results[_index].confirmations?.some(
         (signer) => {
           if (signer.owner === account) {
