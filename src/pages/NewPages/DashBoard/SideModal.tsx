@@ -14,15 +14,24 @@ import { ImportSafe, safeService } from "connection/SafeCall";
 import { useWeb3React } from "@web3-react/core";
 import { SafeTransactionDataPartial } from "@gnosis.pm/safe-core-sdk-types";
 import TransactionSuccess from "./SideModal/TransactionSuccess";
+import { Checkbox } from "@chakra-ui/react";
+import { AiOutlineClose } from "react-icons/ai";
+import IconButton from "UIpack/IconButton";
+import { SafeTransactionOptionalProps } from "@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/types";
+import { useDispatch } from "react-redux";
+import ethers from "ethers";
 
 const SideModal = (props: IsideModal) => {
+  const dispatch = useDispatch();
   const { provider, account } = useWeb3React();
   const [selectedToken, setSelectedToken] = useState<string>("");
+  const [addNewRecipient, setAddNewRecipient] = useState<boolean>(false);
   const [modalNavigation, setModalNavigation] = useState({
     showRecipient: false,
     showTransactionSender: false,
     showSuccess: false,
   });
+  const [isLoading, setisLoading] = useState<boolean>(false);
   const totalMembers = useAppSelector((state) => state.flow.totalMembers);
   const selectToken = (_tokenAddress: string) => {
     setSelectedToken(_tokenAddress);
@@ -30,6 +39,8 @@ const SideModal = (props: IsideModal) => {
   };
   const selectedRecipients = useRef<InviteGangType[]>([]);
   const setRecipient = useRef<IsetRecipientType[]>([]);
+  const currentNonce = useAppSelector((state) => state.flow.currentNonce);
+  const safeAddress = useAppSelector((state) => state.flow.safeAddress);
 
   const showNavigation = (
     _showRecipient: boolean,
@@ -44,7 +55,12 @@ const SideModal = (props: IsideModal) => {
   };
   const transactionData = useRef<TransactionDataType[]>([]);
 
+  const toggleAddNewRecipient = () => {
+    setAddNewRecipient(!addNewRecipient);
+  };
+
   const createTransaction = async () => {
+    setisLoading(true);
     const token = await tokenCallSafe(selectedToken);
     const safeSDK = await ImportSafe(provider, props.safeAddress);
     const safeTransactionData: SafeTransactionDataPartial[] = await Promise.all(
@@ -63,15 +79,20 @@ const SideModal = (props: IsideModal) => {
         }
       )
     );
-    console.log(safeTransactionData);
+    const options: SafeTransactionOptionalProps = {
+      nonce: currentNonce,
+    };
     const safeTransaction = await safeSDK.createTransaction({
       safeTransactionData,
+      options,
     });
     const safeTxHash = await safeSDK.getTransactionHash(safeTransaction);
     const signature = await safeSDK.signTransactionHash(safeTxHash);
     const senderAddress = account as string;
     const safeAddress = props.safeAddress;
-    (await safeService(provider))
+    await (
+      await safeService(provider)
+    )
       .proposeTransaction({
         safeAddress,
         safeTransactionData: safeTransaction.data,
@@ -84,6 +105,7 @@ const SideModal = (props: IsideModal) => {
       })
       .catch((error) => {
         console.log("an error occoured while proposing transaction", error);
+        setisLoading(false);
       });
     await (
       await safeService(provider)
@@ -93,8 +115,10 @@ const SideModal = (props: IsideModal) => {
         console.log("transaction is successful");
         await props.getPendingTransactions();
         showNavigation(false, true, false);
+        setisLoading(false);
       })
       .catch((err) => {
+        setisLoading(false);
         console.log("error occured while confirming transaction", err);
       });
   };
@@ -104,6 +128,24 @@ const SideModal = (props: IsideModal) => {
       <div className="sidebarModal">
         <div onClick={props.toggleModal} className="overlay"></div>
         <div className="SideModal">
+          <div className="closeButtonArea">
+            <IconButton
+              Icon={
+                <AiOutlineClose
+                  style={{
+                    color: "#C94B32",
+                    height: "16px",
+                    width: "16px",
+                  }}
+                />
+              }
+              bgColor="linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)"
+              height={37}
+              width={37}
+              className="sideModalCloseButton"
+              onClick={props.toggleModal}
+            />
+          </div>
           {!modalNavigation.showRecipient &&
             !modalNavigation.showSuccess &&
             !modalNavigation.showTransactionSender && (
@@ -123,6 +165,8 @@ const SideModal = (props: IsideModal) => {
                 showNavigation={showNavigation}
                 selectedRecipients={selectedRecipients}
                 setRecipient={setRecipient}
+                toggleAddNewRecipient={toggleAddNewRecipient}
+                addNewRecipient={addNewRecipient}
               />
             )}
           {!modalNavigation.showRecipient &&
@@ -137,6 +181,9 @@ const SideModal = (props: IsideModal) => {
                 tokens={props.tokens}
                 selectToken={selectToken}
                 selectedToken={selectedToken}
+                toggleAddNewRecipient={toggleAddNewRecipient}
+                addNewRecipient={addNewRecipient}
+                isLoading={isLoading}
               />
             )}
           {!modalNavigation.showRecipient &&

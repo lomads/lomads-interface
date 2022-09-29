@@ -42,14 +42,20 @@ const AddNewSafe = () => {
   const safeAddress = useAppSelector((state) => state.flow.safeAddress);
   const createDAOLoading = useAppSelector((state) => state.flow.createDAOLoading);
   const flow = useAppSelector((state) => state.flow);
-  let Myvalue = useRef<Array<InviteGangType>>([
-    {
-      name: "creator",
-      address: account as string,
-    },
-  ]);
+  let Myvalue = useRef<Array<InviteGangType>>([]);
 
-  let thresholdValue = useRef<number>(1);
+  let thresholdValue = useRef<string>("");
+
+  useEffect(() => {
+    const { name, address } = invitedMembers[0];
+    const creator = { name: name, address: address };
+    const check = Myvalue.current.some(
+      (owner) => owner.address === creator.address
+    );
+    if (!check) {
+      Myvalue.current.push(creator);
+    }
+  }, [invitedMembers]);
 
   const handleCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
     // const index: number = parseInt(event.target.value);
@@ -105,7 +111,7 @@ const AddNewSafe = () => {
     const owners: any = Myvalue.current.map((result) => {
       return result.address;
     });
-    const threshold: number = thresholdValue.current;
+    const threshold: number = parseInt(thresholdValue.current);
     const safeAccountConfig: SafeAccountConfig = {
       owners,
       threshold,
@@ -155,24 +161,6 @@ const AddNewSafe = () => {
         <div className="addOwner">
           <div className="inputFieldTitle">Select Owners</div>
           <div className="ownerArea">
-            <div className="owner">
-              <div className="avatarName">
-                <img src={daoMember2} alt={Myvalue.current[0].address} />
-                <p className="nameText">{Myvalue.current[0].name}</p>
-              </div>
-              <p className="addressText">
-                {Myvalue.current[0].address.slice(0, 18) +
-                  "..." +
-                  Myvalue.current[0].address.slice(-6)}
-              </p>
-              <Checkbox
-                size="lg"
-                colorScheme="orange"
-                name="owner"
-                defaultChecked={true}
-                disabled={true}
-              />
-            </div>
             {invitedMembers.map((result: any, index: any) => {
               return (
                 <>
@@ -182,18 +170,32 @@ const AddNewSafe = () => {
                       <p className="nameText">{result.name}</p>
                     </div>
                     <p className="text">
-                      {result.address.slice(0, 18) +
+                      {result.address.slice(0, 6) +
                         "..." +
-                        result.address.slice(-6)}
+                        result.address.slice(-4)}
                     </p>
-                    <Checkbox
-                      size="lg"
-                      colorScheme="orange"
-                      id={index}
-                      name="owner"
-                      value={result.address}
-                      onChange={(event) => handleCheck(event)}
-                    />
+                    {result.address !== account ? (
+                      <>
+                        <Checkbox
+                          size="lg"
+                          colorScheme="orange"
+                          id={index}
+                          name="owner"
+                          value={result.address}
+                          onChange={(event) => handleCheck(event)}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <Checkbox
+                          size="lg"
+                          colorScheme="orange"
+                          name="owner"
+                          defaultChecked={true}
+                          disabled={true}
+                        />
+                      </>
+                    )}
                   </div>
                 </>
               );
@@ -236,9 +238,9 @@ const AddNewSafe = () => {
                       <p className="nameText">{result.name}</p>
                     </div>
                     <p className="text">
-                      {result.address.slice(0, 18) +
+                      {result.address.slice(0, 6) +
                         "..." +
-                        result.address.slice(-6)}
+                        result.address.slice(-4)}
                     </p>
                   </div>
                 </>
@@ -250,6 +252,30 @@ const AddNewSafe = () => {
       </>
     );
   };
+
+  const DropDown = React.memo((props: any) => {
+    return (
+      <>
+        <select
+          name="chain"
+          id="chain"
+          className="dropdown"
+          onChange={(event) => {
+            props.threshold.current = event.target.value;
+          }}
+          defaultValue={thresholdValue.current}
+        >
+          {props.value.current.map((result: any, index: any) => {
+            return (
+              <option value={index + 1} key={index}>
+                {index + 1}
+              </option>
+            );
+          })}
+        </select>
+      </>
+    );
+  });
 
   const SelectThreshold = () => {
     return (
@@ -265,18 +291,7 @@ const AddNewSafe = () => {
           </div>
           <div className="selectionArea">
             <div>
-              <select
-                name="chain"
-                id="chain"
-                className="dropdown"
-                onChange={(event) => {
-                  thresholdValue.current = parseInt(event.target.value);
-                }}
-              >
-                {Myvalue.current.map((result: any, index: any) => {
-                  return <option value={index + 1}>{index + 1}</option>;
-                })}
-              </select>
+              <DropDown value={Myvalue} threshold={thresholdValue} />
             </div>
             <div className="thresholdCount">
               of {Myvalue.current.length} owner(s)

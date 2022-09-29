@@ -36,6 +36,8 @@ const AddExistingSafe = () => {
   const [balance, setBalance] = useState<string>("");
   const [isLoading, setisLoading] = useState<boolean>(false);
   const owners = useRef<InviteGangType[]>([]);
+  const safeNameRef = useRef<string>("");
+  const [showSafeDetails, setShowSafeDetails] = useState<boolean>(false);
 
   const { provider } = useWeb3React();
 
@@ -54,6 +56,7 @@ const AddExistingSafe = () => {
     const bal = await safeSDK.getBalance();
     setBalance(bal.toString());
     await getTokens(safeAddress);
+    setShowSafeDetails(true);
     setisLoading(false);
   };
   const getTokens = async (safeAddress: string) => {
@@ -135,7 +138,7 @@ const AddExistingSafe = () => {
         <div className="divider">
           <hr />
         </div>
-        {owners.current.length >= 1 ? (
+        {owners.current.length >= 1 && showSafeDetails ? (
           <>
             <div className="safeinfo">
               <div className="safedata">
@@ -143,23 +146,25 @@ const AddExistingSafe = () => {
                   {safeName ? (
                     safeName
                   ) : (
-                    <SimpleInputField
-                      className="inputField"
-                      height={30}
-                      width={151}
-                      placeholder="Safe Name"
-                      value={safeName}
-                      onchange={(e) => {
-                        dispatch(updatesafeName(e.target.value));
-                      }}
-                    />
+                    <>
+                      <SimpleInputField
+                        className="inputField"
+                        height={30}
+                        width={151}
+                        placeholder="Pied Piper"
+                        name="safeName"
+                        onchange={(e) => {
+                          safeNameRef.current = e.target.value;
+                        }}
+                      />
+                    </>
                   )}
                 </div>
                 <div className="safeDivider">
                   <hr />
                 </div>
                 <div className="address">
-                  {safeAddress.slice(0, 18) + "..." + safeAddress.slice(-6)}
+                  {safeAddress.slice(0, 6) + "..." + safeAddress.slice(-4)}
                 </div>
               </div>
               {/* assets */}
@@ -224,9 +229,9 @@ const AddExistingSafe = () => {
                               }}
                             />
                             <div className="address">
-                              {result.address.slice(0, 18) +
+                              {result.address.slice(0, 6) +
                                 "..." +
-                                result.address.slice(-6)}
+                                result.address.slice(-4)}
                             </div>
                           </div>
                         </>
@@ -249,8 +254,8 @@ const AddExistingSafe = () => {
                     width={225}
                     fontsize={20}
                     fontweight={400}
-                    onClick={() => {
-                      setSafeOwners([]);
+                    onClick={(e) => {
+                      setShowSafeDetails(false);
                     }}
                   />
                 </div>
@@ -314,6 +319,7 @@ const AddExistingSafe = () => {
                     value={safeAddress}
                     name="safeAddress"
                     onchange={(e) => {
+                      setErrors({ issafeAddress: "" });
                       dispatch(updateSafeAddress(e.target.value));
                     }}
                     isInvalid={errors.issafeAddress}
@@ -330,7 +336,7 @@ const AddExistingSafe = () => {
                 fontweight={400}
                 onClick={handleClick}
                 bgColor={
-                  isAddressValid(safeAddress) && owners.current.length < 1
+                  isAddressValid(safeAddress)
                     ? "#C94B32"
                     : "rgba(27, 43, 65, 0.2)"
                 }

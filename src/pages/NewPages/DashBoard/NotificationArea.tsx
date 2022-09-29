@@ -28,6 +28,9 @@ const NotificationArea = (props: any) => {
                   height={25}
                   width={25}
                   className="sideModalCloseButton"
+                  onClick={(e) => {
+                    props.showNotificationArea(false);
+                  }}
                 />
               </div>
             </div>

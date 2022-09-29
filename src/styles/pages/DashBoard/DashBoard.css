@@ -8,6 +8,8 @@ body.active-modal {
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
+    min-height: 100vh;
+    max-height: fit-content;
 }
 .DAOdetails {
     display: flex;
@@ -31,7 +33,7 @@ body.active-modal {
     height: 158.8px;
     background: rgba(118, 128, 141, 0.05);
     border-radius: 40px;
-    margin: 20px 0px 20px 0px;
+    margin: 20px 0px 0px 0px;
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
@@ -81,6 +83,7 @@ body.active-modal {
     width: 100%;
     height: fit-content;
     margin-bottom: 20px;
+    margin-top: 20px;
 }
 .treasuryHeader {
     display: flex;
@@ -182,20 +185,20 @@ body.active-modal {
     text-align: center;
     color: #188C7C;
 }
-.treasuryTransactions {
+#treasuryTransactions {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
     padding: 26px 22px;
     width: 100%;
-    height: 360px;
-    gap: 10px;
-    height: 360px;
+    gap: 18px;
+    min-height: fit-content;
+    max-height: 390px;
     background: #FFFFFF;
     border-radius: 5px;
     margin-top: 2px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 .iconButtons {
     border-radius: 5px;
@@ -213,6 +216,7 @@ body.active-modal {
     align-items: center;
     gap: 30px;
     width: 100%;
+    overflow-y: visible;
 }
 .confirmIconGrp {
     display: flex;
@@ -221,18 +225,19 @@ body.active-modal {
     align-items: center;
     gap: 10px;
     width: 9%;
+    overflow-y: visible;
 }
 .transactionName {
-    width: 47%;
+    width: 57%;
 }
 .transactionAddress {
-    width: 19%;
+    width: 10%;
 }
 .memberCard {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    width: 65%;
+    width: 54%;
     height: fit-content;
     margin-bottom: 20px;
 }
@@ -250,19 +255,20 @@ body.active-modal {
     align-items: flex-start;
     padding: 26px 22px;
     width: 100%;
-    height: 230px;
-    gap: 10px;
-    height: 360px;
+    gap: 35px;
+    min-height: fit-content;
+    max-height: 260px;
     background: #FFFFFF;
     border-radius: 5px;
     margin-top: 2px;
+    overflow-y: auto;
 }
 .NameAndAvatar {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    width: 60%;
+    width: 65%;
     gap: 10px;
 }
 .memberRow {
@@ -306,7 +312,7 @@ body.active-modal {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    width: 60%;
+    width: 65%;
 }
 .coinText {
     display: flex;
@@ -353,6 +359,9 @@ body.active-modal {
     justify-content: flex-end;
     align-items: center;
     width: 100%;
+    position: absolute;
+    top: 36px;
+    right: 28px;
 }
 .sideModalCloseButton {
     border-radius: 5px;
@@ -367,11 +376,8 @@ body.active-modal {
     width: 79.16px;
     height: 60px;
 }
-#doubleEuro {
-    margin-top: 20vh;
-}
 #recipientDoubleEuro {
-    margin-top: 6vh;
+    margin-top: 0vh;
 }
 .transactionDetails,#transactionDetails {
     font-family: 'Open Sans';
@@ -383,7 +389,7 @@ text-align: center;
 color: #C94B32;
 }
 #transactionDetails{
-    margin-top: 35px;
+    margin-top: 0px;
 }
 .currencySelectionArea {
     display: flex;
@@ -392,7 +398,6 @@ color: #C94B32;
     justify-content: center;
     align-items: center;
     width: 100%;
-    margin-top: 35px;
 }
 .tokenDropdown {
     background:linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
@@ -416,6 +421,13 @@ color: #C94B32;
     justify-content: space-between;
     width: 75%;
     align-items: center;
+    margin-bottom: 15px;
+}
+#recipientButtonArea {
+    position: sticky;
+    bottom: 52px;
+    background: rgba(255, 255, 255, 0.2); 
+  backdrop-filter: blur(0.7px);
 }
 .selectRecipient, #assignAmount {
     display: flex;
@@ -426,12 +438,13 @@ color: #C94B32;
 .selectRecipient {
     width: 75%;
     justify-content: space-between;
-    margin: 2vh 0vh 2vh 0vh;
+    margin: 0vh 0vh 0vh 0vh;
 }
 #assignAmount {
     width: 100%;
     justify-content: flex-start;
     margin: 0vh 0vh 0vh 0vh;
+    
 }
 #amountInputFields {
     width: 100%;
@@ -443,21 +456,20 @@ color: #C94B32;
 }
 
 #addMember {
-    width: 58%;
+    width: 100%;
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     align-self: center;
-    margin-top: 20px;
 }
 
 /* sidebar css style */
 .navBarInitialBox {
     background: linear-gradient(178.31deg, #C94B32 0.74%, #A54536 63.87%);
     border-radius: 0px 0px 30px 0px;
-    height: 116px;
-    width: 107px;
+    height: 10%;
+    width: 8%;
     position: absolute;
     top: 0;
     left: 0;
@@ -466,11 +478,23 @@ color: #C94B32;
     align-items: center;
     z-index: 1000;
 }
-.navBarInitialBox:hover + .sideBarStrip {
+
+@media only screen and (min-width: 1280px){
+    .navBarInitialBox {
+        height: 10%;
+        width: 8%;
+      }
+      .sideBarStrip {
+        height: 10%;
+        width: 8%;
+      }
+}
+
+.sideBarStrip  {
     background: linear-gradient(178.31deg, #C94B32 0.74%, #A54536 63.87%);
     height: 100%;
     width: 8%;
-    padding-top: 8%;
+    padding-top: 10%;
     position: absolute;
     top: 0;
     left: 0;
@@ -478,9 +502,20 @@ color: #C94B32;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    scale: 1;
     gap: 20px;
+    transition: 0.5s;
 }
+@media only screen and (min-width: 1920px){
+    .navBarInitialBox {
+        height: 10%;
+        width: 7%;
+      }
+      .sideBarStrip {
+        height: 100%;
+        width: 7%;
+      }
+}
+
 .invertedBox, .stripInvertedBox {
     background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
     box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
@@ -506,9 +541,6 @@ color: #C94B32;
     color: #C94B32;
     transform: rotate(-45deg);
 }
-.sideBarStrip {
-    display: none;
-}
 .stripInvertedBoxOutline {
     background: #C94B32;
     border-radius: 10px;
@@ -520,6 +552,7 @@ color: #C94B32;
     align-items: center;
     border:2px solid #FFFFFF;
     color: #FFFFFF;
+    cursor: pointer;
 }
 #transactionSuccessPage {
     display: flex;
@@ -529,15 +562,18 @@ color: #C94B32;
     text-align: center;
     gap: 35px;
     padding: 93px 23px;
+    height: 100%;
 }
 #transactionSendPage {
     width: 100%;
-    height: fit-content;
+    min-height: 100%;
+    max-height: fit-content;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
     align-self: center;
-    overflow-y: scroll;
+    overflow-y: auto;
+    gap: 35px;
 }
 #transactionSendDivider1, #transactionSendDivider2{
     width: 210px;
@@ -545,8 +581,6 @@ color: #C94B32;
     border: 2px solid #C94B32;
     background-color: #C94B32;
     border-radius: 50px;
-    margin-top: 35px;
-    margin-bottom: 35px;
     align-self: center;
 }
 #recipientList{
@@ -560,6 +594,8 @@ color: #C94B32;
 }
 #transactionSendButton {
     align-self: center;
+    background: rgba(255, 255, 255, 0.2); 
+  backdrop-filter: blur(0.7px);
 }
 #doubleEuroImage {
     align-self: center;
@@ -573,4 +609,152 @@ line-height: 16px;
 color: #FFFFFF;
 
 opacity: 0.9;
+}
+#AddNewMember {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: flex-start;
+    background: #FFFFFF;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 20px;
+    max-height: fit-content;
+    width: 449px;
+    padding: 26px 22px 30px 22px;
+    gap: 25px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    z-index: 10000;
+}
+#AddNewMemberComponent, #AddNewMemberOverlay {
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: fixed;
+}
+#AddNewMemberOverlay {
+    background: #1B2B41;
+    opacity: 0.2;
+}
+#addMemberButtonArea {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+#AddNewRecipientComponent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: flex-start;
+    background: #FFFFFF;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 20px;
+    max-height: fit-content;
+    width: 449px;
+    padding: 26px 22px 30px 22px;
+    gap: 25px;
+    position: absolute;
+    top: 45%;
+}
+.SelectNewRecipientPage {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100%;
+    max-height: fit-content;
+    width: 100%;
+    overflow-y: auto;
+    gap: 35px;
+
+}
+#voteArea {
+    width: 5%;
+}
+#transactionDetailsPage {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    gap: 35px;
+}
+#footerImage {
+    height: 32px;
+    width: 235px;
+    margin-right: 5%;
+}
+/* .appLogoArea {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    right: 2%;
+    width: 90%;
+    margin-top: 35px;
+    margin-bottom: 35px;
+} */
+.appLogoArea {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    position: relative;
+    bottom: 0;
+    margin-top: 35px;
+    margin-bottom: 35px;
+}
+#memberAddressText {
+    font-family: 'Open Sans';
+    font-style: italic;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 16px;
+    display: flex;
+    align-items: center;
+    color: #76808D;
+    width: 20%;
+}
+#recipientListandButtons{
+    min-height: fit-content;
+    max-height: 60%;
+    width: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 35px;
+    align-items: center;
+}
+.confirmIconGrp .multiSendDivider::after .multiSendDivider::before {
+
+    content: "";
+    position: absolute;
+    right:  120px;
+}
+.confirmIconGrp .multiSendDivider::before {
+    border-top: 1px solid #000;
+    top: 9px;
+    width: 8px;
+    height: 0;
+}
+.confirmIconGrp .multiSendDivider::after {
+    border-left: 1px solid #000;
+    height: 100%;
+    width: 0px;
+    top: 2px;
 }

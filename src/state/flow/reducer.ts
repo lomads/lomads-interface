@@ -12,6 +12,8 @@ export interface FlowState {
   readonly threshold: number;
   readonly totalMembers: Array<InviteGangType>;
   readonly createDAOLoading: boolean | null;
+  readonly currentNonce: number;
+  readonly safeThreshold: number;
 }
 
 const initialState: FlowState = {
@@ -23,7 +25,9 @@ const initialState: FlowState = {
   safeAddress: "",
   threshold: 0,
   totalMembers: [],
-  createDAOLoading: null
+  createDAOLoading: null,
+  currentNonce: 0,
+  safeThreshold: 0,
 };
 
 const flowSlice = createSlice({
@@ -57,6 +61,12 @@ const flowSlice = createSlice({
     resetCreateDAOLoader(state) {
       state.createDAOLoading = null
     },
+    updateCurrentNonce(state, action) {
+      state.currentNonce = action.payload;
+    },
+    updateSafeThreshold(state, action) {
+      state.safeThreshold = action.payload;
+    },
   },
   extraReducers: {
     [`${createDAO.fulfilled}`]: (state) => {
@@ -77,6 +87,8 @@ export const {
   updateSafeAddress,
   updateThreshold,
   updateTotalMembers,
-  resetCreateDAOLoader
+  resetCreateDAOLoader,
+  updateCurrentNonce,
+  updateSafeThreshold,
 } = flowSlice.actions;
 export default flowSlice.reducer;

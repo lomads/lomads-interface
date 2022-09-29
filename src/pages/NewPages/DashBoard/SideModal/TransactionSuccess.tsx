@@ -1,16 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Checkbox } from "@chakra-ui/react";
-import { AiOutlineClose } from "react-icons/ai";
-import IconButton from "UIpack/IconButton";
-import SimpleButton from "UIpack/SimpleButton";
+import React from "react";
 import doubleEuro from "../../../../assets/svg/doubleEuro.svg";
-import daoMember2 from "../../../../assets/svg/daoMember2.svg";
-import SafeButton from "UIpack/SafeButton";
-import OutlineButton from "UIpack/OutlineButton";
-import SimpleInputField from "UIpack/SimpleInputField";
-import { ethers } from "ethers";
-import { InviteGangType } from "types/UItype";
-import { IselectTransactionSend, IsetRecipientType } from "types/DashBoardType";
 
 const TransactionSuccess = () => {
   return (
