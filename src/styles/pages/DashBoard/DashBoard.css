@@ -494,7 +494,7 @@ color: #C94B32;
     background: linear-gradient(178.31deg, #C94B32 0.74%, #A54536 63.87%);
     height: 100%;
     width: 8%;
-    padding-top: 8%;
+    padding-top: 10%;
     position: absolute;
     top: 0;
     left: 0;
@@ -515,10 +515,6 @@ color: #C94B32;
         width: 7%;
       }
 }
-/* .navBarInitialBox:hover + .sideBarStrip {
-    left: 0%;
-    transition: 0.5s;
-} */
 
 .invertedBox, .stripInvertedBox {
     background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);

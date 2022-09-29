@@ -76,7 +76,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
     const safeTransactionData: SafeTransactionData = {
       to: _txs.to,
       value: _txs.value,
-      data: _txs.data,
+      data: _txs.data !== null ? _txs.data : "0x",
       operation: _txs.operation,
       safeTxGas: _txs.safeTxGas,
       baseGas: _txs.baseGas,
