@@ -3,6 +3,7 @@ import { Routes, Route, useMatch } from "react-router-dom";
 import LoginPage from "./LoginPage";
 import Header from "components/Header";
 import DAOsuccess from "./NewPages/DAOsuccess";
+import DAONoAccess from "./NewPages/DAONoAccess";
 import NameDAO from "./NewPages/NameDAO";
 import StartSafe from "./NewPages/StartSafe";
 import InviteGang from "./NewPages/InviteGang";
@@ -25,6 +26,7 @@ export default function App() {
         <Route path="/addsafe" element={<AddExistingSafe />} />
         <Route path="/newsafe" element={<AddNewSafe />} />
         <Route path="/success" element={<DAOsuccess />} />
+        <Route path="/noaccess" element={<DAONoAccess />} />
         <Route path="/:daoURL" element={<Dashboard />} />
       </Routes>
     </div>

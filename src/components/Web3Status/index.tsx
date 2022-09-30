@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-restricted-imports
-import { get as _get } from 'lodash';
+import { get as _get, find as _find } from 'lodash';
 import { t, Trans } from "@lingui/macro";
 import { useWeb3React } from "@web3-react/core";
 import { getConnection } from "connection/utils";
@@ -162,6 +162,30 @@ function Web3StatusInner() {
 
   const navigate = useNavigate();
 
+
+  const navigateTo = async () => {
+    return axiosHttp.get('dao').then(res => {
+      if(res.data && res.data.length > 0) {
+        const activeDao = localStorage.getItem('__lmds_active_dao')
+        if(activeDao) {
+          let hasAccess = _find(res.data, d => d.url === activeDao)
+          if(hasAccess)
+            return `/${activeDao}`
+          else
+            return `/noaccess`
+        }
+        else
+          return `/${_get(res.data, '[0].url')}`
+      } else {
+        const activeDao = localStorage.getItem('__lmds_active_dao')
+        if(activeDao) 
+          return `/noaccess`
+        return "/namedao"
+      }
+    })
+  }
+
+
   if (!chainId) {
     return null;
   } else if (!chainAllowed) {
@@ -169,18 +193,8 @@ function Web3StatusInner() {
       <Web3StatusError
         onClick={() => {
           switchChain(connector, 80001)
-            .then(() => {
-              axiosHttp.get('dao').then(res => {
-                if(res.data && res.data.length > 0) {
-                  const activeDao = localStorage.getItem('__lmds_active_dao')
-                  if(activeDao)
-                    navigate(`/${activeDao}`);
-                  else
-                    navigate(`/${_get(res.data, '[0].url')}`);
-                } else {
-                  navigate("/namedao");
-                }
-              })
+            .then(async () => {
+              navigate(await navigateTo())
             })
             .catch((err) => {
               console.log("Error occurred while switching");

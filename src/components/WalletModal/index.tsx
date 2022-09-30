@@ -1,4 +1,4 @@
-import { get as _get } from 'lodash';
+import { get as _get, find as _find } from 'lodash';
 import { Trans } from "@lingui/macro";
 import { useWeb3React } from "@web3-react/core";
 import { Connector } from "@web3-react/types";
@@ -164,6 +164,28 @@ export default function WalletModal({
     }
   }, [pendingConnector, walletView]);
 
+  const navigateTo = async () => {
+    return axiosHttp.get('dao').then(res => {
+      if(res.data && res.data.length > 0) {
+        const activeDao = localStorage.getItem('__lmds_active_dao')
+        if(activeDao) {
+          let hasAccess = _find(res.data, d => d.url === activeDao)
+          if(hasAccess)
+            return `/${activeDao}`
+          else
+            return `/noaccess`
+        }
+        else
+          return `/${_get(res.data, '[0].url')}`
+      } else {
+        const activeDao = localStorage.getItem('__lmds_active_dao')
+        if(activeDao) 
+          return `/noaccess`
+        return "/namedao"
+      }
+    })
+  }
+
   const tryActivation = useCallback(
     async (connector: Connector) => {
       const connectionType = getConnection(connector).type;
@@ -180,17 +202,7 @@ export default function WalletModal({
 
         await connector.activate();
         dispatch(updateSelectedWallet({ wallet: connectionType }));
-        axiosHttp.get('dao').then(res => {
-          if(res.data && res.data.length > 0) {
-            const activeDao = localStorage.getItem('__lmds_active_dao')
-            if(activeDao)
-              navigate(`/${activeDao}`);
-            else
-              navigate(`/${_get(res.data, '[0].url')}`);
-          } else {
-            navigate("/namedao");
-          }
-        })
+        navigate(await navigateTo())
       } catch (error: any) {
         console.debug(`web3-react connection error: ${error}`);
         dispatch(

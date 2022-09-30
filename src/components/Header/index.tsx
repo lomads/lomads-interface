@@ -10,6 +10,7 @@ import styled from "styled-components/macro";
 import { isChainAllowed } from "utils/switchChain";
 import Web3Status from "../Web3Status";
 import axiosHttp from '../../api';
+import { usePrevious } from "hooks/usePrevious";
 import { useNavigate, useMatch } from "react-router-dom";
 // import NetworkSelector from './NetworkSelector'
 
@@ -137,6 +138,17 @@ export default function Header() {
       navigate("/");
     }
   }, [account, chainAllowed, navigate, dashboard]);
+
+    
+  const previousAccount = usePrevious(account);
+
+  useEffect(() => {
+    if(previousAccount && account && account !== previousAccount) {
+      localStorage.removeItem('__lmds_web3_token');
+      localStorage.removeItem('__lmds_active_dao')
+      navigate("/");
+    }
+  }, [account, previousAccount])
 
   const scrollY = useScrollPosition();
 

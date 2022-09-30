@@ -26,7 +26,7 @@ import { getDao } from "state/dashboard/actions";
 import { loadDao } from 'state/dashboard/actions';
 import copyIcon from "../../../assets/svg/copyIcon.svg";
 import { useDispatch } from "react-redux";
-import { updateCurrentNonce, updateSafeThreshold } from "state/flow/reducer";
+import { updateCurrentNonce, updateSafeThreshold, updateSafeAddress } from "state/flow/reducer";
 import { Tooltip } from "@chakra-ui/react";
 
 const Dashboard = () => {
@@ -71,12 +71,17 @@ const Dashboard = () => {
     if(daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
       dispatch(getDao(daoURL))
   }, [daoURL])
+  
+  useEffect(() => {
+    if(DAO)
+      dispatch(updateSafeAddress(_get(DAO, 'safe.address', '')))
+  }, [DAO])
 
   const getPendingTransactions = async () => {
     await (
       await safeService(provider)
     )
-      .getPendingTransactions(safeAddress)
+      .getPendingTransactions(_get(DAO, 'safe.address', ''))
       .then((res) => {
         setPendingTransactions(res);
         console.log(res.results);

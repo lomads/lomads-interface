@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { get as _get } from 'lodash';
+import { get as _get, find as _find } from 'lodash';
 import { useNavigate } from "react-router-dom";
 import lomadsfulllogo from "../assets/svg/lomadsfulllogo.svg";
 import humangroup from "../assets/svg/humangroup.svg";
@@ -32,11 +32,19 @@ const LoginPage = (props: any) => {
     return axiosHttp.get('dao').then(res => {
       if(res.data && res.data.length > 0) {
         const activeDao = localStorage.getItem('__lmds_active_dao')
-        if(activeDao)
-          return `/${activeDao}`
+        if(activeDao) {
+          let hasAccess = _find(res.data, d => d.url === activeDao)
+          if(hasAccess)
+            return `/${activeDao}`
+          else
+            return `/noaccess`
+        }
         else
           return `/${_get(res.data, '[0].url')}`
       } else {
+        const activeDao = localStorage.getItem('__lmds_active_dao')
+        if(activeDao) 
+          return `/noaccess`
         return "/namedao"
       }
     })

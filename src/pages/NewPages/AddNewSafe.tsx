@@ -46,7 +46,8 @@ const AddNewSafe = () => {
   const flow = useAppSelector((state) => state.flow);
   let Myvalue = useRef<Array<InviteGangType>>([]);
 
-  let thresholdValue = useRef<string>("");
+  //let thresholdValue = useRef<string>("");
+  const [thresholdValue, setThresholdValue] = useState<number>(1);
 
   useEffect(() => {
     const { name, address } = invitedMembers[0];
@@ -117,7 +118,9 @@ const AddNewSafe = () => {
     const owners: any = Myvalue.current.map((result) => {
       return result.address;
     });
-    const threshold: number = parseInt(thresholdValue.current);
+    console.log(owners);
+    const threshold: number = thresholdValue;
+    console.log(threshold);
     const safeAccountConfig: SafeAccountConfig = {
       owners,
       threshold,
@@ -267,9 +270,10 @@ const AddNewSafe = () => {
           id="chain"
           className="dropdown"
           onChange={(event) => {
-            props.threshold.current = event.target.value;
+            //props.threshold.current = event.target.value;
+            setThresholdValue(+event.target.value)
           }}
-          defaultValue={thresholdValue.current}
+          defaultValue={thresholdValue}
         >
           {props.value.current.map((result: any, index: any) => {
             return (
