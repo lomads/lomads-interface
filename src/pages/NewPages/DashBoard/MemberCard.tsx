@@ -1,5 +1,6 @@
-import React from "react";
-import { get as _get } from 'lodash';
+import React, { useMemo } from "react";
+import { get as _get, find as _find } from 'lodash';
+import { useWeb3React } from "@web3-react/core";
 import { useAppSelector } from "state/hooks";
 import membersIcon from "../../../assets/svg/membersIcon.svg";
 import SafeButton from "UIpack/SafeButton";
@@ -7,7 +8,18 @@ import daoMember2 from "../../../assets/svg/daoMember2.svg";
 
 const MemberCard = (props: any) => {
 
+  const { provider, account } = useWeb3React();
   const { DAO, DAOLoading } = useAppSelector((state) => state.dashboard);
+
+  const amIAdmin = useMemo(() => {
+    if(DAO) {
+      let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet') === account?.toLowerCase() && m.role === 'ADMIN')
+      if(user)
+        return true
+      return false
+    }
+    return false;
+  }, [account, DAO])
 
   const NameAndAvatar = (props: any) => {
     return (
@@ -25,6 +37,10 @@ const MemberCard = (props: any) => {
               <hr />
             </div>
             <div className="dashboardText">10/20/23</div>
+            <div className="memberdivider">
+              <hr />
+            </div>
+            <div className="dashboardText">{ props.role === 'ADMIN' ? 'Admin' : 'Member' }</div>
           </div>
         </div>
       </>
@@ -49,7 +65,7 @@ const MemberCard = (props: any) => {
                 {_get(DAO, 'members', []).length} members
               </div>
             </div>
-            <SafeButton
+            { amIAdmin && <SafeButton
               height={40}
               width={150}
               titleColor="#B12F15"
@@ -60,17 +76,24 @@ const MemberCard = (props: any) => {
               fontweight={400}
               fontsize={16}
               onClick={props.toggleShowMember}
-            />
+            /> }
           </div>
         </div>
         <div className="membersList">
-          <div className="memberheaders">
-            <div className="dashboardText">Name</div>
-            <div className="dashboardText">Joined</div>
+          <div className="NameAndAvatar">
+            <div className="memberRow">
+              <div className="avatarAndName">
+                
+                <div className="dashboardText">Name</div>
+              </div>
+              <div id="memberAddressText"></div>
+              <div className="dashboardText" style={{ marginLeft: 60 }}>Joined</div>
+              <div className="dashboardText"></div>
+            </div>
           </div>
           {_get(DAO, 'members', []).map((result: any, index: any) => {
             return (
-              <NameAndAvatar name={_get(result, 'member.name', '')} address={_get(result, 'member.wallet', '')} />
+              <NameAndAvatar name={_get(result, 'member.name', '')} role={_get(result, 'role', 'MEMBER')} address={_get(result, 'member.wallet', '')} />
             );
           })}
         </div>

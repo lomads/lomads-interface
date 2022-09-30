@@ -1,3 +1,4 @@
+import { get as _get } from 'lodash';
 import { Trans } from "@lingui/macro";
 import { useWeb3React } from "@web3-react/core";
 import { Connector } from "@web3-react/types";
@@ -25,6 +26,7 @@ import Modal from "../Modal";
 import Option from "./Option";
 import PendingView from "./PendingView";
 import { useNavigate } from "react-router-dom";
+import axiosHttp from '../../api';
 
 const CloseIcon = styled.div`
   position: absolute;
@@ -177,9 +179,18 @@ export default function WalletModal({
         dispatch(updateConnectionError({ connectionType, error: undefined }));
 
         await connector.activate();
-        navigate("/namedao");
-
         dispatch(updateSelectedWallet({ wallet: connectionType }));
+        axiosHttp.get('dao').then(res => {
+          if(res.data && res.data.length > 0) {
+            const activeDao = localStorage.getItem('__lmds_active_dao')
+            if(activeDao)
+              navigate(`/${activeDao}`);
+            else
+              navigate(`/${_get(res.data, '[0].url')}`);
+          } else {
+            navigate("/namedao");
+          }
+        })
       } catch (error: any) {
         console.debug(`web3-react connection error: ${error}`);
         dispatch(

@@ -9,3 +9,12 @@ export const getDao = createAsyncThunk(
 		.catch(e => thunkApi.rejectWithValue(e))
 	}
 );
+
+export const loadDao = createAsyncThunk(
+	'dao/load',
+	async (params: any, thunkApi) => {
+		return axiosHttp.get(`dao`)
+		.then(res => res.data)
+		.catch(e => thunkApi.rejectWithValue(e))
+	}
+);

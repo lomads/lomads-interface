@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { get as _get } from 'lodash';
+import lomadsfulllogo from "../../../assets/svg/lomadsfulllogo.svg";
 import { useAppSelector } from "state/hooks";
 import {useParams} from "react-router-dom";
 import "../../../styles/Global.css";
@@ -28,10 +29,12 @@ import dashboardfooterlogo from "../../../assets/svg/dashboardfooterlogo.svg";
 import { useAppDispatch } from "state/hooks";
 import { getDao } from "state/dashboard/actions";
 import { updateCurrentNonce, updateSafeThreshold } from "state/flow/reducer";
+import { loadDao } from 'state/dashboard/actions';
 
 const Dashboard = () => {
   const dispatch = useAppDispatch();
   const { daoURL } = useParams()
+  localStorage.setItem('__lmds_active_dao', `${daoURL}`);
   const { provider, account } = useWeb3React();
   const daoName = useAppSelector((state) => state.flow.daoName);
   const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
@@ -48,7 +51,7 @@ const Dashboard = () => {
   const [showAddMember, setShowAddMember] = useState<boolean>(false);
   const [showNavBar, setShowNavBar] = useState<boolean>(false);
   const currentNonce = useAppSelector((state) => state.flow.currentNonce);
-  const { DAO, DAOLoading } = useAppSelector((state) => state.dashboard);
+  const { DAO, DAOList, DAOLoading } = useAppSelector((state) => state.dashboard);
   const toggleModal = () => {
     setShowModal(!showModal);
   };
@@ -59,6 +62,10 @@ const Dashboard = () => {
   const showSideBar = (_choice: boolean) => {
     setShowNavBar(_choice);
   };
+
+  useEffect(() => {
+    dispatch(loadDao({}))
+  }, [])
 
   useEffect(() => {
     if(daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
@@ -129,10 +136,13 @@ const Dashboard = () => {
 
   return (
     <>
-     { DAOLoading ?
-      <div style={{ height: '100vh', zIndex: 99999, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+     { !DAO || DAOLoading ?
+        <div style={{ backgroundColor: '#FFF', height: '100vh', zIndex: 99999, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="logo">
+          <img src={lomadsfulllogo} alt="" />
+        </div>
         <LeapFrog size={50} color="#C94B32" />
-      </div> :
+      </div> : null }
      <div
         className="dashBoardBody"
         onMouseEnter={() => {
@@ -174,7 +184,7 @@ const Dashboard = () => {
             <img src={dashboardfooterlogo} alt="footer logo" id="footerImage" />
           </div>
         </div> */}
-      </div> }
+      </div> 
       {showModal && (
         <SideModal
           toggleModal={toggleModal}
@@ -187,7 +197,7 @@ const Dashboard = () => {
         />
       )}
       <SideBar
-        name={daoName}
+        name={_get(DAO, 'name', '')}
         showSideBar={showSideBar}
         showNavBar={showNavBar}
       />

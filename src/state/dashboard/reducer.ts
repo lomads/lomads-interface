@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { DAOType } from "types/UItype";
-import { getDao } from "./actions";
+import { getDao, loadDao } from "./actions";
 
 export interface DashboardState {
   DAO: DAOType | null;
@@ -32,6 +32,12 @@ const dashboardSlice = createSlice({
     },
     [`${getDao.pending}`]: (state) => {
       state.DAOLoading = true;
+    },
+    [`${loadDao.fulfilled}`]: (state, action) => {
+      state.DAOList = action.payload
+    },
+    [`${loadDao.pending}`]: (state) => {
+
     }
 	},
 });

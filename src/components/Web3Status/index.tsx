@@ -1,4 +1,5 @@
 // eslint-disable-next-line no-restricted-imports
+import { get as _get } from 'lodash';
 import { t, Trans } from "@lingui/macro";
 import { useWeb3React } from "@web3-react/core";
 import { getConnection } from "connection/utils";
@@ -23,6 +24,7 @@ import Loader from "../Loader";
 import { RowBetween } from "../Row";
 import WalletModal from "../WalletModal";
 import { useNavigate } from "react-router-dom";
+import axiosHttp from '../../api';
 
 const Web3StatusGeneric = styled(ButtonSecondary)`
   ${({ theme }) => theme.flexRowNoWrap}
@@ -168,7 +170,17 @@ function Web3StatusInner() {
         onClick={() => {
           switchChain(connector, 80001)
             .then(() => {
-              navigate("/namedao");
+              axiosHttp.get('dao').then(res => {
+                if(res.data && res.data.length > 0) {
+                  const activeDao = localStorage.getItem('__lmds_active_dao')
+                  if(activeDao)
+                    navigate(`/${activeDao}`);
+                  else
+                    navigate(`/${_get(res.data, '[0].url')}`);
+                } else {
+                  navigate("/namedao");
+                }
+              })
             })
             .catch((err) => {
               console.log("Error occurred while switching");

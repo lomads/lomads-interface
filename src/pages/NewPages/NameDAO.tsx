@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import _ from "lodash";
+import lomadsfulllogo from "../../assets/svg/lomadsfulllogo.svg";
 import { useNavigate, useLocation } from "react-router-dom";
 import SimpleButton from "UIpack/SimpleButton";
 import SimpleInputField from "UIpack/SimpleInputField";
@@ -15,7 +16,7 @@ import axiosHttp from '../../api'
 const NameDAO = () => {
   const dispatch = useAppDispatch();
   const location = useLocation();
-  const [DAOListLoading, setDAOListLoading] = useState<boolean>(location.pathname.indexOf('namedao') > -1 ? true : false);
+  const [DAOListLoading, setDAOListLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<any>({});
   const refSafeName = useRef<string>("");
   const daoName = useAppSelector((state) => state.flow.daoName);
@@ -37,19 +38,19 @@ const NameDAO = () => {
     }
   };
 
-  useEffect(() => {
-    if(location.pathname.indexOf('namedao') > -1) {
-      if(DAOList.length == 0) {
-        setDAOListLoading(true)
-        axiosHttp.get("dao").then(res => { 
-          setDAOList(res.data) 
-          if(res.data.length > 0)
-            navigate(`/${_.get(res.data, '[0].url')}`)
-        })
-        .finally(() => setDAOListLoading(false))
-      }
-    }
-  }, [DAOList])
+  // useEffect(() => {
+  //   if(location.pathname.indexOf('namedao') > -1) {
+  //     if(DAOList.length == 0) {
+  //       setDAOListLoading(true)
+  //       axiosHttp.get("dao").then(res => { 
+  //         setDAOList(res.data) 
+  //         if(res.data.length > 0)
+  //           navigate(`/${_.get(res.data, '[0].url')}`)
+  //       })
+  //       .finally(() => setDAOListLoading(false))
+  //     }
+  //   }
+  // }, [DAOList])
 
   const handleNavigate = () => {
     console.log("esfsffsf");
@@ -70,9 +71,13 @@ const NameDAO = () => {
   return (
     <>
       { DAOListLoading ? 
-      <div style={{ height: '100vh', zIndex: 99999, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ backgroundColor: '#FFF', height: '100vh', zIndex: 99999, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="logo">
+          <img src={lomadsfulllogo} alt="" />
+        </div>
         <LeapFrog size={50} color="#C94B32" />
-      </div> :
+      </div> : null
+      }
       <div className="NameDAO">
         <div className="headerText">1/3 Name your new DAO</div>
         <div className="centerCard">
@@ -119,7 +124,6 @@ const NameDAO = () => {
           />
         </div>
       </div>
-      }
     </>
   );
 };

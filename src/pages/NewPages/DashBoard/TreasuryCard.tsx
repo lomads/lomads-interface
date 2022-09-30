@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { get as _get } from 'lodash';
+import React, { useEffect, useState, useMemo } from "react";
+import { get as _get, find as _find } from 'lodash';
 import copyIcon from "../../../assets/svg/copyIcon.svg";
 import coin from "../../../assets/svg/coin.svg";
 import SafeButton from "UIpack/SafeButton";
@@ -38,6 +38,17 @@ const TreasuryCard = (props: ItreasuryCardType) => {
       )
     );
   };
+
+  const amIAdmin = useMemo(() => {
+    if(DAO) {
+      let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet') === account?.toLowerCase() && m.role === 'ADMIN')
+      if(user)
+        return true
+      return false
+    }
+    return false;
+  }, [account, DAO])
+
 
   useEffect(() => {
     (async (_address: string, _safeAddress: string) => {
@@ -191,7 +202,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
             </div>
             <div className="dashboardText">total balance</div>
           </div>
-          {isAddressValid && (
+          {isAddressValid && amIAdmin && (
             <SafeButton
               height={40}
               width={150}

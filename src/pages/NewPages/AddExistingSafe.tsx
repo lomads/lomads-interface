@@ -14,6 +14,7 @@ import {
   updateSafeAddress,
   updatesafeName,
   updateTotalMembers,
+  resetCreateDAOLoader
 } from "state/flow/reducer";
 import { ethers } from "ethers";
 import AddressInputField from "UIpack/AddressInputField";
@@ -22,6 +23,7 @@ import axios from "axios";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import OutlineButton from "UIpack/OutlineButton";
 import { InviteGangType } from "types/UItype";
+import { createDAO } from '../../state/flow/actions';
 
 const AddExistingSafe = () => {
   const dispatch = useAppDispatch();
@@ -38,6 +40,8 @@ const AddExistingSafe = () => {
   const owners = useRef<InviteGangType[]>([]);
   const safeNameRef = useRef<string>("");
   const [showSafeDetails, setShowSafeDetails] = useState<boolean>(false);
+  const flow = useAppSelector((state) => state.flow);
+  const createDAOLoading = useAppSelector((state) => state.flow.createDAOLoading);
 
   const { provider } = useWeb3React();
 
@@ -90,6 +94,16 @@ const AddExistingSafe = () => {
     }
   };
 
+  useEffect(() => {
+    if(createDAOLoading == false){
+      setisLoading(false)
+      resetCreateDAOLoader()
+      return navigate("/success");
+    }
+    if(createDAOLoading == true)
+      setisLoading(true)
+  }, [createDAOLoading])
+
   const handleAddSafe = () => {
     const totalAddresses = [...invitedMembers, ...owners.current];
     const value = totalAddresses.reduce((final: any, current: any) => {
@@ -100,7 +114,19 @@ const AddExistingSafe = () => {
       return final.concat([current]);
     }, []);
     dispatch(updateTotalMembers(value));
-    navigate("/success");
+    const payload: any = {
+      contractAddress: '',
+      name: flow.daoName,
+      url: flow.daoAddress,
+      image: null,
+      members: value,
+      safe: {
+        name: safeName,
+        address: safeAddress,
+        owners: owners.current.map(o => o.address),
+      }
+    }
+    dispatch(createDAO(payload))
   };
 
   return (

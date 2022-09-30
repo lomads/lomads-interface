@@ -283,7 +283,7 @@ body.active-modal {
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    width: 45%;
+    min-width: 45%;
     
 }
 .avatarAndName {
@@ -727,7 +727,7 @@ opacity: 0.9;
     display: flex;
     align-items: center;
     color: #76808D;
-    width: 20%;
+    min-width: 20%;
 }
 #recipientListandButtons{
     min-height: fit-content;

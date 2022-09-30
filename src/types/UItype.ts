@@ -101,7 +101,6 @@ export interface DAOType {
   image?: string;
   createdAt?: string;
   updatedAt?: string;
-  members?: Array<MemberType>;
-  roles?: Array<RoleType>;
+  members?: Array<RoleType>;
   safe?: SafeType
 }

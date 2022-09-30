@@ -26,6 +26,7 @@ import { SafeFactory, SafeAccountConfig } from "@gnosis.pm/safe-core-sdk";
 import { ethers } from "ethers";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import { createDAO } from '../../state/flow/actions';
+import { loadDao } from '../../state/dashboard/actions';
 
 const AddNewSafe = () => {
   const dispatch = useAppDispatch();
@@ -41,6 +42,7 @@ const AddNewSafe = () => {
   const selectedOwners = useAppSelector((state) => state.flow.owners);
   const safeAddress = useAppSelector((state) => state.flow.safeAddress);
   const createDAOLoading = useAppSelector((state) => state.flow.createDAOLoading);
+  const { DAOList } = useAppSelector((state) => state.dashboard);
   const flow = useAppSelector((state) => state.flow);
   let Myvalue = useRef<Array<InviteGangType>>([]);
 
@@ -56,6 +58,10 @@ const AddNewSafe = () => {
       Myvalue.current.push(creator);
     }
   }, [invitedMembers]);
+
+  useEffect(() => {
+    dispatch(loadDao({}))
+  }, [])
 
   const handleCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
     // const index: number = parseInt(event.target.value);
