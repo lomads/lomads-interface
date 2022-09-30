@@ -4,12 +4,7 @@ import "../../../styles/Global.css";
 import "../../../styles/pages/DashBoard/DashBoard.css";
 import MemberCard from "./MemberCard";
 import TreasuryCard from "./TreasuryCard";
-import {
-  SafeTransactionData,
-  SafeTransactionDataPartial,
-} from "@gnosis.pm/safe-core-sdk-types";
 import { ImportSafe, safeService } from "connection/SafeCall";
-import { EthSignSignature } from "@gnosis.pm/safe-core-sdk";
 import { useWeb3React } from "@web3-react/core";
 import {
   AllTransactionsListResponse,
@@ -21,14 +16,16 @@ import SideBar from "./SideBar";
 import axios from "axios";
 import NotificationArea from "./NotificationArea";
 import AddMember from "./MemberCard/AddMember";
-import dashboardfooterlogo from "../../../assets/svg/dashboardfooterlogo.svg";
+import copyIcon from "../../../assets/svg/copyIcon.svg";
 import { useDispatch } from "react-redux";
 import { updateCurrentNonce, updateSafeThreshold } from "state/flow/reducer";
+import { Tooltip } from "@chakra-ui/react";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
   const { provider, account } = useWeb3React();
   const daoName = useAppSelector((state) => state.flow.daoName);
+  const daoAddress = useAppSelector((state) => state.flow.daoAddress);
   const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
   const safeAddress = useAppSelector((state) => state.flow.safeAddress);
   const totalMembers = useAppSelector((state) => state.flow.totalMembers);
@@ -43,6 +40,7 @@ const Dashboard = () => {
   const [showAddMember, setShowAddMember] = useState<boolean>(false);
   const [showNavBar, setShowNavBar] = useState<boolean>(false);
   const currentNonce = useAppSelector((state) => state.flow.currentNonce);
+  const [copy, setCopy] = useState<boolean>(false);
   const toggleModal = () => {
     setShowModal(!showModal);
   };
@@ -54,10 +52,17 @@ const Dashboard = () => {
     setShowNavBar(_choice);
   };
   const getPendingTransactions = async () => {
-    const pendingTxs = await (
+    await (
       await safeService(provider)
-    ).getPendingTransactions(safeAddress);
-    setPendingTransactions(pendingTxs);
+    )
+      .getPendingTransactions(safeAddress)
+      .then((res) => {
+        setPendingTransactions(res);
+        console.log(res.results);
+      })
+      .catch((err) => {
+        console.log("error occoured while fetcging pending transactions:", err);
+      });
     await ownersCount();
     console.log("pending", pendingTransactions?.results);
     // const nonce = pendingTxs.results[0] && pendingTxs.results[0].nonce;
@@ -126,6 +131,26 @@ const Dashboard = () => {
         <div className="DAOdetails">
           <div className="DAOname" onClick={getPendingTransactions}>
             {daoName}
+          </div>
+          <div
+            className="copyArea"
+            onClick={() => {
+              setCopy(true);
+            }}
+            onMouseOut={() => {
+              setCopy(false);
+            }}
+          >
+            <Tooltip label={copy ? "copied" : "copy"}>
+              <div
+                className="copyLinkButton"
+                onClick={() => {
+                  navigator.clipboard.writeText(daoAddress);
+                }}
+              >
+                <img src={copyIcon} alt="copy" className="safeCopyImage" />
+              </div>
+            </Tooltip>
           </div>
         </div>
         {pendingTransactions !== undefined &&
