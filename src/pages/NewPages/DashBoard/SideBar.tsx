@@ -13,7 +13,7 @@ const SideBar = (props: any) => {
           <div
             className="stripInvertedBoxOutline"
             onClick={() => {
-              navigate("/createdao");
+              navigate("/namedao");
             }}
           >
             <div className="navbarText">

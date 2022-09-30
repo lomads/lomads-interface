@@ -27,7 +27,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
   };
   const hasUserApproved = (_index: number) => {
     return (
-      props.pendingTransactions &&
+      props.pendingTransactions !== undefined &&
       props.pendingTransactions?.results[_index].confirmations?.some(
         (signer) => {
           if (signer.owner === account) {
@@ -102,13 +102,14 @@ const TreasuryCard = (props: ItreasuryCardType) => {
     const safeTransaction = await safeSDK.createTransaction({
       safeTransactionData,
     });
-    _txs.confirmations.forEach((confirmation: any) => {
-      const signature = new EthSignSignature(
-        confirmation.owner,
-        confirmation.signature
-      );
-      safeTransaction.addSignature(signature);
-    });
+    _txs.confirmations &&
+      _txs.confirmations.forEach((confirmation: any) => {
+        const signature = new EthSignSignature(
+          confirmation.owner,
+          confirmation.signature
+        );
+        safeTransaction.addSignature(signature);
+      });
     const executeTxResponse = await safeSDK.executeTransaction(safeTransaction);
     const receipt =
       executeTxResponse.transactionResponse &&
@@ -242,7 +243,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
                         result.dataDecoded !== null &&
                         result.dataDecoded.parameters[0].value
                       }
-                      confirmations={result.confirmations.length}
+                      confirmations={
+                        result.confirmations && result.confirmations.length
+                      }
                       ownerCount={ownerCount}
                       confirmTransaction={confirmTransaction}
                       safeTxHash={result.safeTxHash}
@@ -257,7 +260,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
                     />
                   ) : result.dataDecoded !== null ? (
                     result.dataDecoded.parameters[0].valueDecoded.map(
-                      (multiresult: any, index: number) => {
+                      (multiresult: any, multiIndex: number) => {
                         return (
                           <PendingTransactions
                             showExecute={hasUserApproved(index)}
@@ -266,18 +269,22 @@ const TreasuryCard = (props: ItreasuryCardType) => {
                               multiresult.dataDecoded.parameters[0].value +
                               "mul "
                             }
-                            confirmations={result.confirmations.length}
+                            confirmations={
+                              result.confirmations &&
+                              result.confirmations.length
+                            }
                             ownerCount={ownerCount}
                             confirmTransaction={confirmTransaction}
                             safeTxHash={result.safeTxHash}
                             isOwner={isOwner}
-                            key={index}
+                            key={multiIndex}
                             executeTransactions={executeTransactions}
                             txs={result}
                             tokenAddress={multiresult.dataDecoded.to}
                             tokens={props.tokens}
                             isAddressValid={isAddressValid}
                             rejectTransaction={rejectTransaction}
+                            multiIndex={multiIndex}
                           />
                         );
                       }
@@ -288,7 +295,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
                         showExecute={hasUserApproved(index)}
                         amount={"rejection"}
                         recipient={"rejection"}
-                        confirmations={result.confirmations.length}
+                        confirmations={
+                          result.confirmations && result.confirmations.length
+                        }
                         ownerCount={ownerCount}
                         confirmTransaction={confirmTransaction}
                         safeTxHash={result.safeTxHash}

@@ -6,14 +6,9 @@ import {useParams} from "react-router-dom";
 import "../../../styles/Global.css";
 import "../../../styles/pages/DashBoard/DashBoard.css";
 import MemberCard from "./MemberCard";
-import TreasuryCard from "./TreasuryCard";
 import { LeapFrog } from "@uiball/loaders";
-import {
-  SafeTransactionData,
-  SafeTransactionDataPartial,
-} from "@gnosis.pm/safe-core-sdk-types";
+import TreasuryCard from "./TreasuryCard";
 import { ImportSafe, safeService } from "connection/SafeCall";
-import { EthSignSignature } from "@gnosis.pm/safe-core-sdk";
 import { useWeb3React } from "@web3-react/core";
 import {
   AllTransactionsListResponse,
@@ -28,8 +23,11 @@ import AddMember from "./MemberCard/AddMember";
 import dashboardfooterlogo from "../../../assets/svg/dashboardfooterlogo.svg";
 import { useAppDispatch } from "state/hooks";
 import { getDao } from "state/dashboard/actions";
-import { updateCurrentNonce, updateSafeThreshold } from "state/flow/reducer";
 import { loadDao } from 'state/dashboard/actions';
+import copyIcon from "../../../assets/svg/copyIcon.svg";
+import { useDispatch } from "react-redux";
+import { updateCurrentNonce, updateSafeThreshold } from "state/flow/reducer";
+import { Tooltip } from "@chakra-ui/react";
 
 const Dashboard = () => {
   const dispatch = useAppDispatch();
@@ -37,6 +35,7 @@ const Dashboard = () => {
   localStorage.setItem('__lmds_active_dao', `${daoURL}`);
   const { provider, account } = useWeb3React();
   const daoName = useAppSelector((state) => state.flow.daoName);
+  const daoAddress = useAppSelector((state) => state.flow.daoAddress);
   const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
   const safeAddress = useAppSelector((state) => state.flow.safeAddress);
   const totalMembers = useAppSelector((state) => state.flow.totalMembers);
@@ -52,6 +51,7 @@ const Dashboard = () => {
   const [showNavBar, setShowNavBar] = useState<boolean>(false);
   const currentNonce = useAppSelector((state) => state.flow.currentNonce);
   const { DAO, DAOList, DAOLoading } = useAppSelector((state) => state.dashboard);
+  const [copy, setCopy] = useState<boolean>(false);
   const toggleModal = () => {
     setShowModal(!showModal);
   };
@@ -73,10 +73,17 @@ const Dashboard = () => {
   }, [daoURL])
 
   const getPendingTransactions = async () => {
-    const pendingTxs = await (
+    await (
       await safeService(provider)
-    ).getPendingTransactions(safeAddress);
-    setPendingTransactions(pendingTxs);
+    )
+      .getPendingTransactions(safeAddress)
+      .then((res) => {
+        setPendingTransactions(res);
+        console.log(res.results);
+      })
+      .catch((err) => {
+        console.log("error occoured while fetcging pending transactions:", err);
+      });
     await ownersCount();
     console.log("pending", pendingTransactions?.results);
     // const nonce = pendingTxs.results[0] && pendingTxs.results[0].nonce;
@@ -152,6 +159,26 @@ const Dashboard = () => {
         <div className="DAOdetails">
           <div className="DAOname" onClick={getPendingTransactions}>
             { _get(DAO, 'name', '') }
+          </div>
+          <div
+            className="copyArea"
+            onClick={() => {
+              setCopy(true);
+            }}
+            onMouseOut={() => {
+              setCopy(false);
+            }}
+          >
+            <Tooltip label={copy ? "copied" : "copy"}>
+              <div
+                className="copyLinkButton"
+                onClick={() => {
+                  navigator.clipboard.writeText(daoAddress);
+                }}
+              >
+                <img src={copyIcon} alt="copy" className="safeCopyImage" />
+              </div>
+            </Tooltip>
           </div>
         </div>
         {pendingTransactions !== undefined &&
