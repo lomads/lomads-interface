@@ -12,6 +12,8 @@ import ERC20_ABI from '../abis/erc20.json'
 import ERC20_BYTES32_ABI from '../abis/erc20_bytes32.json'
 import ERC721_ABI from '../abis/erc721.json'
 import ERC1155_ABI from '../abis/erc1155.json'
+import SBTDEPLOYER_ABI from "../abis/SBTDeployer.json";
+import SBT_ABI from "../abis/SBT.json";
 import { ArgentWalletDetector, EnsPublicResolver, EnsRegistrar, Erc20, Erc721, Erc1155, Weth } from '../abis/types'
 import WETH_ABI from '../abis/weth.json'
 import {
@@ -21,6 +23,7 @@ import {
   V2_ROUTER_ADDRESS,
   V3_MIGRATOR_ADDRESSES,
   DAOFACTORY_ADDRESSES,
+  SBT_DEPLOYER_ADDRESSES
 } from 'constants/addresses'
 import { WRAPPED_NATIVE_CURRENCY } from 'constants/tokens'
 import { useMemo } from 'react'
@@ -122,4 +125,12 @@ export function useDAOContract() {
 } 
 export function DAOTokenContract(_tokenAddress: string) {
   return useContract(_tokenAddress,TokenAbi,true)
+}
+
+export function useSBTDeployerContract(){
+  return useContract(SBT_DEPLOYER_ADDRESSES, SBTDEPLOYER_ABI, true);
+}
+
+export function useSBTContract(contractAddr : String) {
+  return useContract(contractAddr, SBT_ABI, true);
 }

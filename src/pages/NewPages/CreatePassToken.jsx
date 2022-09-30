@@ -1,23 +1,41 @@
 
 import "../../styles/pages/CreatePassToken.css";
-import DogIcon from '../../assets/svg/dogIcon.svg';
 import Frame from '../../assets/svg/Frame.svg';
 import uploadIcon from '../../assets/svg/ico-upload.svg';
 import hklogo from '../../assets/svg/hklogo.svg';
 import editToken from '../../assets/svg/editToken.svg';
 import memberIcon from '../../assets/svg/memberIcon.svg';
-
-import {MdKeyboardArrowDown} from 'react-icons/md';
 import { AiOutlinePlus } from "react-icons/ai";
 import { useState } from "react";
+import { useWeb3React } from "@web3-react/core";
+import { useSBTDeployerContract } from "hooks/useContract";
+import { createNewSBT, getCurrentId, getContractById } from "hooks/SBT/sbtDeployer";
+import { APInewContract } from "hooks/SBT/sbtAPI";
+import {toast, ToastContainer} from "react-toastify";
+import { isAddressValid, isENSValid } from "utils/checkAddr";
+import { useNavigate } from "react-router-dom";
+import SimpleLoadButton from "UIpack/SimpleLoadButton";
+import trimAddress from "utils/sliceAddr";
 
 const CreatePassToken = () => {
+    const {account, provider} = useWeb3React();
+    const navigate = useNavigate();
+    const sbtDeployerContract = useSBTDeployerContract();
     const [tab,setTab] = useState(1);
+    const [isLoading, setIsLoading] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [showMembers, setShowMembers] = useState(false);
     const [memberList,setMemberList] = useState([]);
     const [name,setName] = useState('');
     const [address,setAddress] = useState('');
+    /*
+    State used to define main parameters for a the new SBT contract
+    */
+    const [SBTConstructor, setSBTConstructor] = useState({
+        name : '',
+        supply : '',
+        img : ''
+    });
 
     const handleOptions = (value) => {
         if(selectedOptions.includes(value)){
@@ -29,35 +47,73 @@ const CreatePassToken = () => {
     }
 
     const handleAddMember = () => {
-        let member={};
+        if(isAddressValid(address)){
+        let member = {};
         member.name = name;
         member.address = address;
-
         setMemberList([...memberList, member]);
+        }
+        else {
+            toast.error("Invalid address OR ens");
+        }
+
         setName('');
         setAddress('');
+
     }
 
     const handleRemoveMember = (position) => {
         setMemberList(memberList.filter((_, index) => index !== position));
     }
 
+    const addSBTConstructor = () => {
+
+      const sbtName = document.querySelector("#token-name");
+      const sbtSupply = document.querySelector("#token-supply");
+
+      setSBTConstructor({
+        name : sbtName.value,
+        supply : sbtSupply.value,
+        img : null /// need to be save in base64 format when DB is ready
+      });
+     setTab(2)
+    }
+
+    const deploySBTContract = async () => {
+        if (account){
+            setIsLoading(true);
+            const counter = await getCurrentId(sbtDeployerContract);
+            const tx = await createNewSBT(sbtDeployerContract, SBTConstructor, memberList);
+            if (!tx){
+                setIsLoading(false);
+                toast.error("Error during deployment");
+                return;
+            }
+            else {
+                console.log("Contract deployed");
+                const contractAddr = await getContractById(sbtDeployerContract, counter);
+                const contractJSON = {
+                    address : contractAddr,
+                    admin : account,
+                    contactDetail : selectedOptions, 
+                    metadata : []
+                }
+                const req = await APInewContract(contractJSON);
+                if (req){
+                    setIsLoading(false)
+                    navigate(`/success/${contractAddr}`);
+                    return;
+                }
+               return;
+            }
+        }
+        toast.error("Please connect your account before !")
+        return;
+    }
+
     return(
+        <>
         <div className="createPassToken-container">
-            <div className="address-dropdown-container">
-                    <div className="address-dropdown-div1">
-                        <img src={DogIcon} alt="dog-icon"/>
-                        <p>0X984…MHg</p>
-                    </div>
-                    <div className="address-dropdown-div2">
-                        <span>
-                            <MdKeyboardArrowDown
-                                size={20}
-                                color="#76808D"
-                            />
-                        </span>
-                    </div>
-                </div>
             <div className="createPassToken-body">
                 <img src={Frame} alt="frame-icon"/>
                 <p className="heading-text">Create New Pass Token</p>
@@ -68,7 +124,7 @@ const CreatePassToken = () => {
                     <>
                     <div className="createPassToken-form-container">
                         <label>Name of the Pass Token</label>
-                        <input className="text-input" placeholder="Enter token name"/>
+                        <input id="token-name" className="text-input" placeholder="Enter token name"/>
                         <div className="optional-div">
                             <label>Pass Token Icon</label>
                             <div>
@@ -88,8 +144,8 @@ const CreatePassToken = () => {
                                 <p>Optional</p>
                             </div>
                         </div>
-                        <input className="text-input" placeholder="Number of existing tokens"/>
-                        <button onClick={() => setTab(2)}>NEXT</button>
+                        <input id="token-supply" className="text-input" placeholder="Number of existing tokens"/>
+                        <button onClick={addSBTConstructor}>NEXT</button>
                     </div>
                     </>
                     :
@@ -104,11 +160,11 @@ const CreatePassToken = () => {
                         <div className="tokenName-container">
                             <div className="tokenName-box">
                                 <img src={hklogo} alt="hk-logo"/>
-                                <input type="text" placeholder="Token name"/>
-                                <p>x100</p>
+                                <p style={{marginLeft : "5px"}}>{SBTConstructor.name}</p>
+                                <p style={{marginLeft : "auto", marginRight : "20px"}}>x{SBTConstructor.supply}</p>
                             </div>
                             <div className="tokenName-btn">
-                                <img src={editToken} alt="hk-logo"/>
+                                <img onClick={()=>setTab(1)} src={editToken} alt="hk-logo"/>
                             </div>
                         </div>
                         <div className="divider"></div>
@@ -210,13 +266,13 @@ const CreatePassToken = () => {
                                         {
                                             memberList.map((item,index) => {
                                                 return(
-                                                    <div className="member-li" key={index}>
+                                                    <div className="member-li"  key={index}>
                                                         <div className="member-img-name">
                                                             <img src={memberIcon} alt="member-icon"/>
-                                                            <p>{item.name}</p>
+                                                            <p style={{color : "white"}}>{item.name}</p>
                                                         </div>
                                                         <div className="member-address">
-                                                            <p>{item.address}</p>
+                                                            <p style={{color : "white"}}>{trimAddress(item.address)}</p>
                                                             <button onClick={() => handleRemoveMember(index)}>X</button>
                                                         </div>
                                                     </div>
@@ -224,10 +280,21 @@ const CreatePassToken = () => {
                                             })
                                         }
                                     </div>
+                                    
                                     :
                                     null
                                 }
-                                <button className="create" onClick={() => console.log(memberList)}>CREATE PASS TOKEN</button>
+                                <div style={{height : '20px'}}></div>
+                                <SimpleLoadButton
+                                    title="CREATE PASS"
+                                    height={50}
+                                    width={160}
+                                    fontsize={20}
+                                    fontweight={400}
+                                    onClick={deploySBTContract}
+                                    bgColor={"#C94B32"}
+                                    condition={isLoading}
+                                />
                             </>
                             :
                             null
@@ -238,6 +305,15 @@ const CreatePassToken = () => {
                 }
             </div>
         </div>
+                <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                    hideProgressBar={true}
+                    newestOnTop={false}
+                    closeOnClick
+                    theme='dark'
+                rtl={false} />
+                </>
     )
 }
 

@@ -15,6 +15,7 @@ import { LanguageProvider } from "./i18n";
 import { ChakraProvider } from "@chakra-ui/react";
 import { MoralisProvider } from "react-moralis";
 import "./polyfill";
+import 'react-toastify/dist/ReactToastify.css';
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement

@@ -7,6 +7,15 @@
     position: relative;
 }
 
+p {
+    font-family : "Insignia", sans-serif;
+}
+
+@font-face {
+    font-family: "Insignia";
+    src: url("../fonts/Insignia.ttf") format("truetype"),
+   }
+
 .mintPassToken-container .address-dropdown-container{
     width: 220px;
     height: 60px;
@@ -103,6 +112,7 @@
 .mintPassToken-container .mintPassToken-body .userName-box label {
     font-style: normal;
     font-weight: 700;
+    font-family: "Insignia";
     font-size: 16px;
     line-height: 18px;
     color: #76808D;
@@ -183,6 +193,7 @@
 .mintPassToken-container .mintPassToken-footer p {
     font-weight: 400;
     font-size: 14px;
+    font-family: "Insignia";
     line-height: 18px;
     text-align: center;
     letter-spacing: -0.011em;
@@ -204,6 +215,7 @@
 
 .notAllowedText {
     font-style: normal;
+    font-family: "Insignia";
     font-weight: 400;
     font-size: 30px;
     line-height: 33px;
@@ -219,6 +231,7 @@
 .notAllowedText2 {
     font-style: normal;
 font-weight: 400;
+font-family: "Insignia";
 font-size: 14px;
 line-height: 16px;
 /* or 114% */

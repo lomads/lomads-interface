@@ -130,11 +130,6 @@ export default function Header() {
   const navigate = useNavigate();
   const treasuryPage = useMatch("/dashboard");
 
-  useEffect(() => {
-    if (!chainAllowed && !account && !treasuryPage) {
-      navigate("/");
-    }
-  }, [account, chainAllowed, navigate, treasuryPage]);
 
   const scrollY = useScrollPosition();
 

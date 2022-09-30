@@ -168,7 +168,7 @@ function Web3StatusInner() {
         onClick={() => {
           switchChain(connector, 80001)
             .then(() => {
-              navigate("/namedao");
+              navigate("/");
             })
             .catch((err) => {
               console.log("Error occurred while switching");

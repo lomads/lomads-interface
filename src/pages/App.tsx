@@ -14,6 +14,7 @@ import Dashboard from "./NewPages/DashBoard/Dashboard";
 // New page added
 import CreatePassToken from "./NewPages/CreatePassToken";
 import MintPassToken from "./NewPages/MintPassToken";
+import CreatePassSucess from "./NewPages/CreatePassSucess";
 
 export default function App() {
 //   const landingPage = useMatch("/");
@@ -33,9 +34,11 @@ export default function App() {
     //   </Routes>
     // </div>
 	<div className="body">
+    <Header />
 		<Routes>
 			<Route path="/create" element={<CreatePassToken />}/>
-			<Route path="/mint" element={<MintPassToken />}/>
+			<Route path="/mint/:contractAddr" element={<MintPassToken />}/>
+      <Route path="/success/:contractAddr" element={<CreatePassSucess />} />
 		</Routes>
 	</div>
   );

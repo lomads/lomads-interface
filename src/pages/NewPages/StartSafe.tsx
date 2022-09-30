@@ -12,6 +12,7 @@ const StartSafe = () => {
   const importExistingSafe = () => {
     navigate("/addsafe");
   };
+
   return (
     <>
       <div className="StartSafe">
