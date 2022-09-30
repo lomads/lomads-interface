@@ -43,7 +43,6 @@ const AddExistingSafe = () => {
 
 	const UseExistingSafe = async () => {
 		owners.current = [];
-		console.log("45 current owners before fetch : ", owners.current);
 		setisLoading(true);
 		const safeSDK = await ImportSafe(provider, safeAddress);
 		dispatch(updateHolder(safeSDK.getAddress() as string));
@@ -53,8 +52,6 @@ const AddExistingSafe = () => {
 			obj["address"] = ownerAddress;
 			owners.current.push(obj);
 		});
-		console.log("54 safeowners : ", safeowners);
-		console.log("55 current owners : ", owners.current);
 		const bal = await safeSDK.getBalance();
 		setBalance(bal.toString());
 		await getTokens(safeAddress);
@@ -95,19 +92,14 @@ const AddExistingSafe = () => {
 	};
 
 	const handleAddSafe = () => {
-		console.log("invited members : ", invitedMembers);
 		const totalAddresses = [...invitedMembers, ...owners.current];
-		console.log("total address : ", totalAddresses);
 		const value = totalAddresses.reduce((final: any, current: any) => {
-			console.log("Final : ", final);
-			console.log("Current : ", current);
 			let object = final.find((item: any) => item.address === current.address);
 			if (object) {
 				return final;
 			}
 			return final.concat([current]);
 		}, []);
-		console.log("value : ", value)
 		dispatch(updateTotalMembers(value));
 		navigate("/success");
 	};
@@ -236,7 +228,6 @@ const AddExistingSafe = () => {
 															type="text"
 															onchange={(e) => {
 																owners.current[index].name = e.target.value;
-																console.log("233 name changed : ", owners.current)
 															}}
 														/>
 														<div className="address">
