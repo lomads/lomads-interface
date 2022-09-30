@@ -130,12 +130,13 @@ export default function Header() {
   const navigate = useNavigate();
   const treasuryPage = useMatch("/dashboard");
   const createProjectPage = useMatch("/createProject");
+  const projectDetailPage = useMatch("/projectDetails");
 
   useEffect(() => {
-    if (!chainAllowed && !account && !treasuryPage && !createProjectPage) {
+    if (!chainAllowed && !account && !treasuryPage && !createProjectPage && !projectDetailPage) {
       navigate("/");
     }
-  }, [account, chainAllowed, navigate, treasuryPage, createProjectPage]);
+  }, [account, chainAllowed, navigate, treasuryPage, createProjectPage, projectDetailPage]);
 
   const scrollY = useScrollPosition();
 

@@ -507,3 +507,25 @@
     justify-content: center;
     color: #F0F0F0;
 }
+
+.createProject-container .createProject-success {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.createProject-container .createProject-success p {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 33px;
+    color: #C94B32;
+    margin: 1.5rem 0;
+}
+
+.createProject-container .createProject-success span {
+    color: #76808D;
+    font-style: italic;
+}
