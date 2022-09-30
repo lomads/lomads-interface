@@ -18,7 +18,7 @@ const NameDAO = () => {
   const navigate = useNavigate();
   const handleClick = () => {
     let terrors: any = {};
-    if (!refSafeName.current) {
+    if (!daoName) {
       terrors.daoName = " * DAO name is required.";
     }
     if (!daoAddress) {
@@ -32,7 +32,8 @@ const NameDAO = () => {
   };
 
   const handleNavigate = () => {
-    daoName && navigate("/invitegang");
+    console.log("esfsffsf");
+    daoName.length >= 1 && navigate("/invitegang");
   };
   const handleDaoName = (event: any) => {
     refSafeName.current = event.target.value.replace(/[^a-z0-9 ]/gi, "");
@@ -57,6 +58,7 @@ const NameDAO = () => {
                 height={50}
                 width={460}
                 placeholder="Epic DAO"
+                value={daoName}
                 onchange={(event) => {
                   handleDaoName(event);
                 }}
@@ -87,7 +89,7 @@ const NameDAO = () => {
             fontsize={20}
             fontweight={400}
             onClick={handleClick}
-            bgColor="#C94B32"
+            bgColor={daoName.length >= 1 ? "#C94B32" : "rgba(27, 43, 65, 0.2)"}
           />
         </div>
       </div>

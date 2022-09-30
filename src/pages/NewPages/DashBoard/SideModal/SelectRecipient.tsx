@@ -1,19 +1,16 @@
 import { Checkbox } from "@chakra-ui/react";
-import React, { useEffect, useRef, useState } from "react";
-import { AiOutlineClose } from "react-icons/ai";
-import IconButton from "UIpack/IconButton";
+import React, { useState } from "react";
 import SimpleButton from "UIpack/SimpleButton";
-import doubleEuro from "../../../assets/svg/doubleEuro.svg";
 import daoMember2 from "../../../../assets/svg/daoMember2.svg";
 import SafeButton from "UIpack/SafeButton";
 import OutlineButton from "UIpack/OutlineButton";
-import SimpleInputField from "UIpack/SimpleInputField";
-import { ethers } from "ethers";
 import { InviteGangType } from "types/UItype";
 import { IselectRecipientType, IsetRecipientType } from "types/DashBoardType";
+import AddRecipient from "./AddRecipient";
 
 const SelectRecipient = (props: IselectRecipientType) => {
-  const [showNext, setShowNext] = useState<boolean>();
+  const [selectedRecipientCount, setSelectedRecipientCount] =
+    useState<number>(0);
   const handleCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked;
     if (checked) {
@@ -46,104 +43,93 @@ const SelectRecipient = (props: IselectRecipientType) => {
       }
     );
     let length = props.selectedRecipients.current.length;
-    console.log(length);
     props.selectedRecipients.current.splice(0, length);
-    length = props.selectedRecipients.current.length;
-    console.log(length);
     props.showNavigation(false, false, true);
   };
 
   const managePreviousNavigation = () => {
     const length = props.selectedRecipients.current.length;
-    console.log("select length:", length);
     props.selectedRecipients.current.splice(0, length);
-    console.log("select length:", length);
     props.showNavigation(false, false, false);
   };
   return (
     <>
-      <div className="closeButtonArea">
-        <IconButton
-          Icon={
-            <AiOutlineClose
-              style={{
-                color: "#C94B32",
-                height: "16px",
-                width: "16px",
-              }}
+      <div className="SelectNewRecipientPage">
+        <div id="SelectRecipientsHeader">
+          <div className="dashboardTextBold">Select recipients</div>
+          <div>
+            <SafeButton
+              bgColor="#FFFFFF"
+              disabled={false}
+              title="ADD NEW RECIPIENT"
+              titleColor="#76808D"
+              fontsize={16}
+              fontweight={400}
+              height={40}
+              width={209}
+              onClick={props.toggleAddNewRecipient}
             />
-          }
-          bgColor="linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)"
-          height={37}
-          width={37}
-          className="sideModalCloseButton"
-          onClick={(e) => {
-            managePreviousNavigation();
-          }}
-        />
-      </div>
-      <div id="SelectRecipientsHeader">
-        <div className="dashboardTextBold">Select recipients</div>
-        <div>
-          <SafeButton
+          </div>
+        </div>
+        {props.totalMembers &&
+          props.totalMembers.map((result: any, index: any) => {
+            return (
+              <div className="selectRecipient">
+                <div className="avatarName">
+                  <img src={daoMember2} alt={result.address} />
+                  <p className="nameText">{result.name}</p>
+                </div>
+                <p className="addressText">
+                  {result.address.slice(0, 6) +
+                    "..." +
+                    result.address.slice(-4)}
+                </p>
+                <Checkbox
+                  size="lg"
+                  colorScheme="orange"
+                  name="owner"
+                  defaultChecked={false}
+                  disabled={false}
+                  value={result.address}
+                  onChange={(event) => {
+                    handleCheck(event);
+                  }}
+                />
+              </div>
+            );
+          })}
+        <div id="recipientButtonArea">
+          <OutlineButton
+            title="CANCEL"
+            borderColor="#C94B32"
             bgColor="#FFFFFF"
-            disabled={false}
-            title="ADD NEW RECIPIENT"
-            titleColor="#76808D"
+            height={40}
+            width={129}
             fontsize={16}
             fontweight={400}
+            onClick={() => {
+              managePreviousNavigation();
+            }}
+          />
+          <SimpleButton
+            title="NEXT"
+            bgColor={"#C94B32"}
+            className="button"
             height={40}
-            width={209}
+            width={184}
+            fontsize={16}
+            onClick={() => {
+              handleSetRecipient();
+            }}
           />
         </div>
       </div>
-      {props.totalMembers &&
-        props.totalMembers.map((result: any, index: any) => {
-          return (
-            <div className="selectRecipient">
-              <div className="avatarName">
-                <img src={daoMember2} alt={result.address} />
-                <p className="nameText">{result.name}</p>
-              </div>
-              <p className="addressText">
-                {result.address.slice(0, 18) + "..." + result.address.slice(-6)}
-              </p>
-              <Checkbox
-                size="lg"
-                colorScheme="orange"
-                name="owner"
-                defaultChecked={false}
-                disabled={false}
-                value={result.address}
-                onChange={(event) => {
-                  handleCheck(event);
-                }}
-              />
-            </div>
-          );
-        })}
-      <div id="recipientButtonArea">
-        <OutlineButton
-          title="CANCEL"
-          borderColor="#C94B32"
-          bgColor="#FFFFFF"
-          height={40}
-          width={129}
-          fontsize={16}
-          fontweight={400}
+      {props.addNewRecipient && (
+        <AddRecipient
+          toggleAddNewRecipient={props.toggleAddNewRecipient}
+          isTransactionSendPage={false}
         />
-        <SimpleButton
-          title="NEXT"
-          bgColor={"#C94B32"}
-          className="button"
-          height={40}
-          width={184}
-          fontsize={16}
-          onClick={() => {
-            handleSetRecipient();
-          }}
-        />
-      </div>
+      )}
     </>
   );
 };

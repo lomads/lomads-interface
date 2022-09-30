@@ -15,6 +15,7 @@ import { ethers } from "ethers";
 import { InviteGangType } from "types/UItype";
 import daoMember2 from "../../assets/svg/daoMember2.svg";
 import { useWeb3React } from "@web3-react/core";
+import { useEnsAddress } from "react-moralis";
 
 const InviteGang = () => {
   const dispatch = useAppDispatch();
@@ -23,21 +24,69 @@ const InviteGang = () => {
   const [ownerAddress, setOwnerAddress] = useState<string>("");
   const [errors, setErrors] = useState<any>({});
   const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
-  const { account } = useWeb3React();
+  const { account, provider } = useWeb3React();
 
   const isAddressValid = (holderAddress: string) => {
+    const ENSdomain = holderAddress.slice(-4);
+    if (ENSdomain === ".eth") {
+      return true;
+    } else {
+      const isValid: boolean = ethers.utils.isAddress(holderAddress);
+      return isValid;
+    }
+  };
+
+  const isRightAddress = (holderAddress: string) => {
     const isValid: boolean = ethers.utils.isAddress(holderAddress);
     return isValid;
   };
+
+  const isPresent = (_address: string) => {
+    const check = invitedMembers.some((mem) => mem.address === _address);
+    return check;
+  };
+  useEffect(() => {
+    const check = invitedMembers.some(
+      (member) => member.address === (account as string)
+    );
+    if (!check) {
+      const creator = [
+        ...invitedMembers,
+        { name: "creator", address: account as string },
+      ];
+      dispatch(updateInvitedGang(creator));
+    }
+  });
 
   useEffect(() => {
     isAddressValid(ownerAddress);
   }, [ownerAddress]);
 
-  const addMember = (_ownerName: string, _ownerAddress: string) => {
+  useEffect(() => {
+    isPresent(ownerAddress);
+  }, [ownerAddress]);
+
+  const addMember = async (_ownerName: string, _ownerAddress: string) => {
     const member: InviteGangType = { name: _ownerName, address: _ownerAddress };
-    const check = invitedMembers.some((mem) => mem.address === member.address);
-    if (!check && member.address !== (account as string)) {
+    if (_ownerAddress.slice(-4) === ".eth") {
+      const resolver = await provider?.getResolver(_ownerAddress);
+      const EnsAddress = await resolver?.getAddress();
+      if (EnsAddress !== undefined) {
+        member.address = EnsAddress as string;
+        member.name = _ownerAddress;
+        const present = isPresent(member.address);
+        present && setErrors({ ownerAddress: " * address already exists." });
+      } else {
+        setErrors({ ownerAddress: " * address is not correct." });
+        member.address = _ownerAddress;
+      }
+    } else {
+      const ENSname = await provider?.lookupAddress(_ownerAddress);
+      if (ENSname) {
+        member.name = ENSname;
+      }
+    }
+    if (!isPresent(member.address) && isRightAddress(member.address)) {
       const newMember = [...invitedMembers, member];
       dispatch(updateInvitedGang(newMember));
       setOwnerName("");
@@ -48,7 +97,10 @@ const InviteGang = () => {
   const handleClick = (_ownerName: string, _ownerAddress: string) => {
     let terrors: any = {};
     if (!isAddressValid(ownerAddress)) {
-      terrors.ownerAddress = " * owner address is not valid.";
+      terrors.ownerAddress = " * address is not correct.";
+    }
+    if (isPresent(ownerAddress)) {
+      terrors.ownerAddress = " * address already exists.";
     }
     if (_.isEmpty(terrors)) {
       addMember(_ownerName, _ownerAddress);
@@ -104,6 +156,7 @@ const InviteGang = () => {
                 placeholder="ENS Domain and Wallet Address"
                 value={ownerAddress}
                 onchange={(event) => {
+                  setErrors({ ownerAddress: "" });
                   setOwnerAddress(event.target.value);
                 }}
                 isInvalid={errors.ownerAddress}
@@ -115,7 +168,7 @@ const InviteGang = () => {
                 Icon={<AiOutlinePlus style={{ height: 30, width: 30 }} />}
                 height={50}
                 width={50}
-                onClick={() => {
+                onClick={(e) => {
                   handleClick(ownerName, ownerAddress);
                 }}
                 bgColor={
@@ -137,19 +190,32 @@ const InviteGang = () => {
                       <img src={daoMember2} alt={result.address} />
                       <p className="nameText">{result.name}</p>
                     </div>
-                    <p className="text">
-                      {result.address.slice(0, 18) +
-                        "..." +
-                        result.address.slice(-6)}
-                    </p>
-                    <div
-                      className="deleteButton"
-                      onClick={() => {
-                        deleteMember(result.address);
-                      }}
-                    >
-                      <AiOutlineClose style={{ height: 15, width: 15 }} />
-                    </div>
+                    {result.address !== undefined &&
+                    result.address !== account ? (
+                      <p className="text">
+                        {result.address &&
+                          result.address.slice(0, 6) +
+                            "..." +
+                            result.address.slice(-4)}
+                      </p>
+                    ) : (
+                      <p className="creatorText">
+                        {result.address &&
+                          result.address.slice(0, 6) +
+                            "..." +
+                            result.address.slice(-4)}
+                      </p>
+                    )}
+                    {result.address !== account && (
+                      <div
+                        className="deleteButton"
+                        onClick={() => {
+                          deleteMember(result.address);
+                        }}
+                      >
+                        <AiOutlineClose style={{ height: 15, width: 15 }} />
+                      </div>
+                    )}
                   </div>
                 );
               })}

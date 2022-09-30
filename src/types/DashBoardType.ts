@@ -11,6 +11,8 @@ export interface IsideModal {
   totalMembers: InviteGangType[];
   safeAddress: string;
   getPendingTransactions: () => Promise<void>;
+  showNotificationArea: (_choice: boolean) => void;
+  toggleShowMember: () => void;
 }
 export interface ItransactionDetailsType {
   tokens: any;
@@ -32,6 +34,8 @@ export interface IselectRecipientType {
   ) => void;
   selectedRecipients: React.MutableRefObject<InviteGangType[]>;
   setRecipient: React.MutableRefObject<IsetRecipientType[]>;
+  toggleAddNewRecipient: () => void;
+  addNewRecipient: boolean;
 }
 export interface IselectTransactionSend {
   showNavigation: (
@@ -46,6 +50,9 @@ export interface IselectTransactionSend {
   tokens: any;
   selectToken: (_tokenAddress: string) => void;
   selectedToken: string;
+  toggleAddNewRecipient: () => void;
+  addNewRecipient: boolean;
+  isLoading: boolean;
 }
 export interface TransactionDataType {
   to: string;
@@ -68,4 +75,6 @@ export interface ItreasuryCardType {
   fiatBalance: string;
   account: string | undefined;
   getPendingTransactions: () => Promise<void>;
+  getExecutedTransactions: () => Promise<void>;
+  tokens: any;
 }

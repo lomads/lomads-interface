@@ -13,8 +13,8 @@ const MemberCard = (props: any) => {
               <img src={daoMember2} alt="avatar" />
               <div className="dashboardText">{props.name}</div>
             </div>
-            <div className="dashboardText">
-              {props.address.slice(0, 18) + "..." + props.address.slice(-6)}
+            <div id="memberAddressText">
+              {props.address.slice(0, 6) + "..." + props.address.slice(-4)}
             </div>
             <div className="memberdivider">
               <hr />
@@ -31,11 +31,15 @@ const MemberCard = (props: any) => {
         <div className="treasuryHeader">
           <div className="titleHeader">Members</div>
           <div className="memberHeaderDetails">
-            <div>
-              <hr className="vl" />
-            </div>
             <div className="copyArea">
-              <img src={membersIcon} alt="asset" />
+              <div>
+                <hr className="vl" />
+              </div>
+              <img
+                src={membersIcon}
+                alt="asset"
+                style={{ height: 35, width: 35 }}
+              />
               <div className="dashboardText">
                 {props.totalMembers.length} members
               </div>
@@ -50,6 +54,7 @@ const MemberCard = (props: any) => {
               disabled={false}
               fontweight={400}
               fontsize={16}
+              onClick={props.toggleShowMember}
             />
           </div>
         </div>
