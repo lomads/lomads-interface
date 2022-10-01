@@ -3,7 +3,7 @@ import { get as _get } from 'lodash';
 import axiosRetry from 'axios-retry';
 
 var axiosConfig = axios.create({
-	baseURL: `${process.env.REACT_APP_NODE_BASE_URL}/api/v1`,
+	baseURL: `${process.env.REACT_APP_NODE_BASE_URL}/v1`,
 	headers: {
 		'Content-Type': 'application/json'
 	}
