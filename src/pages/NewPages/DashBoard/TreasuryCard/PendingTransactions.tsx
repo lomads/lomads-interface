@@ -59,28 +59,44 @@ const PendingTransactions = (props: any) => {
         {props.isAddressValid && (
           <div className="confirmIconGrp">
             {props.confirmations === safeThreshold &&
-            props.multiIndex &&
-            props.multiIndex !== 0 ? null : (
-              <>
-                <SimpleButton
-                  width={"100%"}
-                  height={30}
-                  title="EXECUTE"
-                  bgColor={"#C94B32"}
-                  className="button"
-                  onClick={(e) => {
-                    if (props.confirmations === safeThreshold) {
-                      props.executeTransactions(props.txs);
-                    }
-                  }}
-                />
-              </>
-            )}
+              props.isOwner &&
+              (props.multiIndex !== undefined && props.multiIndex === 0 ? (
+                <>
+                  <SimpleButton
+                    width={"100%"}
+                    height={30}
+                    title="EXECUTE"
+                    bgColor={"#C94B32"}
+                    className="button"
+                    onClick={(e) => {
+                      if (props.confirmations === safeThreshold) {
+                        props.executeTransactions(props.txs);
+                      }
+                    }}
+                  />
+                </>
+              ) : props.multiIndex === undefined ? (
+                <>
+                  <SimpleButton
+                    width={"100%"}
+                    height={30}
+                    title="EXECUTE"
+                    bgColor={"#C94B32"}
+                    className="button"
+                    onClick={(e) => {
+                      if (props.confirmations === safeThreshold) {
+                        props.executeTransactions(props.txs);
+                      }
+                    }}
+                  />
+                </>
+              ) : null)}
             {!props.showExecute &&
               props.confirmations !== safeThreshold &&
-              props.isOwner && (
+              props.isOwner &&
+              (props.multiIndex !== undefined && props.multiIndex === 0 ? (
                 <>
-                  {props.amount !== "rejection" && (
+                  {/* {props.amount !== "rejection" && (
                     <>
                       <IconButton
                         Icon={
@@ -102,7 +118,7 @@ const PendingTransactions = (props: any) => {
                         }}
                       />
                     </>
-                  )}
+                  )} */}
                   <IconButton
                     Icon={
                       <AiOutlineCheck
@@ -123,7 +139,27 @@ const PendingTransactions = (props: any) => {
                     }}
                   />
                 </>
-              )}
+              ) : props.multiIndex === undefined ? (
+                <IconButton
+                  Icon={
+                    <AiOutlineCheck
+                      style={{
+                        color: "#FFFFFF",
+                        height: "16px",
+                        width: "16px",
+                      }}
+                    />
+                  }
+                  bgColor="#C94B32"
+                  height={30}
+                  width={30}
+                  border="2px solid #C94B32"
+                  className="iconButtons"
+                  onClick={(e) => {
+                    props.confirmTransaction(props.safeTxHash);
+                  }}
+                />
+              ) : null)}
           </div>
         )}
       </div>
