@@ -52,7 +52,7 @@ const InviteGang = () => {
 		if (!check) {
 			const creator = [
 				...invitedMembers,
-				{ name: "creator", address: account as string },
+				{ name: "", address: account as string },
 			];
 			dispatch(updateInvitedGang(creator));
 		}

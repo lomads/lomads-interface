@@ -61,7 +61,7 @@ const NameDAO = () => {
     dispatch(updateDaoName(refSafeName.current.toString()));
     dispatch(
       updateDaoAddress(
-        "https://app.lomads.xyz/" +
+        process.env.REACT_APP_URL + "/" +
           refSafeName.current.replace(/ /g, "-").toLowerCase()
       )
     );

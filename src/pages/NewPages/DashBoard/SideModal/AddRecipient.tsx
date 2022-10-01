@@ -49,7 +49,7 @@ const AddRecipient = (props: any) => {
     if (!check) {
       const creator = [
         ...totalMembers,
-        { name: "creator", address: account as string },
+        { name: "", address: account as string },
       ];
       dispatch(updateInvitedGang(creator));
     }

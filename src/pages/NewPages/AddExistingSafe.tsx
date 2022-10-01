@@ -43,7 +43,7 @@ const AddExistingSafe = () => {
   const flow = useAppSelector((state) => state.flow);
   const createDAOLoading = useAppSelector((state) => state.flow.createDAOLoading);
 
-	const { provider } = useWeb3React();
+	const { provider, account } = useWeb3React();
 
 	const UseExistingSafe = async () => {
 		owners.current = [];
@@ -62,6 +62,10 @@ const AddExistingSafe = () => {
 		setShowSafeDetails(true);
 		setisLoading(false);
 	};
+
+	useEffect(() => {
+		dispatch(updateSafeAddress(''))
+	}, [])
 
 	const getTokens = async (safeAddress: string) => {
 		axios
@@ -86,7 +90,7 @@ const AddExistingSafe = () => {
     if(createDAOLoading == false){
       setisLoading(false)
       resetCreateDAOLoader()
-      return navigate(`/success?dao=${flow.daoAddress.replace('https://app.lomads.xyz/', "")}`);
+      return navigate(`/success?dao=${flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, '')}`);
     }
     if(createDAOLoading == true)
       setisLoading(true)
@@ -105,9 +109,11 @@ const AddExistingSafe = () => {
     const payload: any = {
       contractAddress: '',
       name: flow.daoName,
-      url: flow.daoAddress,
+      url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
       image: null,
-      members: value,
+      members: value.map((m:any) => {
+		return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase() }
+	  }),
       safe: {
         name: safeName,
         address: safeAddress,

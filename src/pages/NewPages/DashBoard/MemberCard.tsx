@@ -96,7 +96,7 @@ const MemberCard = (props: any) => {
               disabled={false}
               fontweight={400}
               fontsize={16}
-              onClick={props.toggleShowMember}
+              onClick={() => props.toggleShowMember()}
             /> }
           </div>
         </div>

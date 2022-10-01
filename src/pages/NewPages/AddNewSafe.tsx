@@ -85,7 +85,7 @@ const AddNewSafe = () => {
     if(createDAOLoading == false){
       setisLoading(false)
       resetCreateDAOLoader()
-      return navigate(`/success?dao=${flow.daoAddress.replace('https://app.lomads.xyz/', "")}`);
+      return navigate(`/success?dao=${flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, '')}`);
     }
     if(createDAOLoading == true)
       setisLoading(true)
@@ -145,9 +145,13 @@ const AddNewSafe = () => {
         const payload: any = {
           contractAddress: '',
           name: flow.daoName,
-          url: flow.daoAddress,
+          url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
           image: null,
-          members: value,
+          members: value.map((m:any) => {
+            return {
+              ...m, creator: m.address.toLowerCase() === account?.toLowerCase()
+            }
+          }),
           safe: {
             name: safeName,
             address: tx.getAddress(),
