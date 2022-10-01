@@ -61,7 +61,9 @@ const MemberCard = (props: any) => {
             <div className="memberdivider">
               <hr />
             </div>
-            <div className="dashboardText">{ props.role === 'ADMIN' ? 'Admin' : 'Member' }</div>
+            <div className="dashboardText">{ 
+              props.role === 'ADMIN' ? props.creator ?  'Admin (Creator)' : 'Admin' : 'Member' 
+            }</div>
           </div>
         </div>
       </>

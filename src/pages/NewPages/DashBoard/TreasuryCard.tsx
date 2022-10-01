@@ -21,6 +21,16 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
 	const { DAO }  = useAppSelector(store => store.dashboard);
 
+  const amIAdmin = useMemo(() => {
+    if(DAO) {
+      let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'ADMIN')
+      if(user)
+        return true
+      return false
+    }
+    return false;
+  }, [account, DAO])
+
 	const isOwner = async () => {
 		const safeSDK = await ImportSafe(provider, props.safeAddress);
 		const condition = await safeSDK.isOwner(account as string);
@@ -193,7 +203,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
             </div>
             <div className="dashboardText">total balance</div>
           </div>
-          {isAddressValid && (
+          {isAddressValid && amIAdmin && (
             <SafeButton
               height={40}
               width={150}

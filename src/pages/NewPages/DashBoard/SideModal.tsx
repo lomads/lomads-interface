@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { get as _get } from 'lodash';
 import TransactionDetails from "./SideModal/TransactionDetails";
 import {
   IsetRecipientType,
@@ -7,7 +8,7 @@ import {
 } from "types/DashBoardType";
 import { InviteGangType } from "types/UItype";
 import SelectRecipient from "./SideModal/SelectRecipient";
-import { useAppSelector } from "state/hooks";
+import { useAppSelector,useAppDispatch } from "state/hooks";
 import TransactionSend from "./SideModal/TransactionSend";
 import { tokenCallSafe } from "connection/DaoTokenCall";
 import { ImportSafe, safeService } from "connection/SafeCall";
@@ -18,12 +19,12 @@ import { Checkbox, getToken } from "@chakra-ui/react";
 import { AiOutlineClose } from "react-icons/ai";
 import IconButton from "UIpack/IconButton";
 import { SafeTransactionOptionalProps } from "@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/types";
-import { useDispatch } from "react-redux";
 import ethers from "ethers";
 import axios from "axios";
+import { updateTotalMembers } from "state/flow/reducer";
 
 const SideModal = (props: IsideModal) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { provider, account } = useWeb3React();
   const [selectedToken, setSelectedToken] = useState<string>("");
   const [addNewRecipient, setAddNewRecipient] = useState<boolean>(false);
@@ -44,6 +45,8 @@ const SideModal = (props: IsideModal) => {
   const setRecipient = useRef<IsetRecipientType[]>([]);
   const currentNonce = useAppSelector((state) => state.flow.currentNonce);
   const safeAddress = useAppSelector((state) => state.flow.safeAddress);
+
+  const { DAO } = useAppSelector(store => store.dashboard);
 
   const showNavigation = (
     _showRecipient: boolean,
@@ -141,6 +144,11 @@ const SideModal = (props: IsideModal) => {
     getTokens(props.safeAddress);
     return () => {};
   }, [props.safeAddress]);
+
+  useEffect(() => {
+    if(DAO)
+      dispatch(updateTotalMembers(_get(DAO, 'members', []).map((m:any) => { return { name: m.member.name, address: m.member.wallet } })))
+  }, [DAO])
 
   return (
     <>
