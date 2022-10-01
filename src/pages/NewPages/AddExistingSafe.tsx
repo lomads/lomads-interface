@@ -43,56 +43,44 @@ const AddExistingSafe = () => {
   const flow = useAppSelector((state) => state.flow);
   const createDAOLoading = useAppSelector((state) => state.flow.createDAOLoading);
 
-  const { provider } = useWeb3React();
+	const { provider } = useWeb3React();
 
-  const UseExistingSafe = async () => {
-    setisLoading(true);
-    const safeSDK = await ImportSafe(provider, safeAddress);
-    dispatch(updateHolder(safeSDK.getAddress() as string));
-    const safeowners: string[] = await safeSDK.getOwners();
-    safeowners.map((ownerAddress: string, index: number) => {
-      let obj: InviteGangType = { name: "", address: "" };
-      obj["address"] = ownerAddress;
-      owners.current.push(obj);
-    });
-    console.log(safeowners);
-    console.log(owners.current);
-    const bal = await safeSDK.getBalance();
-    setBalance(bal.toString());
-    await getTokens(safeAddress);
-    setShowSafeDetails(true);
-    setisLoading(false);
-  };
-  const getTokens = async (safeAddress: string) => {
-    axios
-      .get(
-        `https://safe-transaction.goerli.gnosis.io/api/v1/safes/${safeAddress}/balances/usd/`
-      )
-      .then((tokens: any) => {
-        setTokens(tokens.data);
-      });
-  };
+	const UseExistingSafe = async () => {
+		owners.current = [];
+		setisLoading(true);
+		const safeSDK = await ImportSafe(provider, safeAddress);
+		dispatch(updateHolder(safeSDK.getAddress() as string));
+		const safeowners: string[] = await safeSDK.getOwners();
+		safeowners.map((ownerAddress: string, index: number) => {
+			let obj: InviteGangType = { name: "", address: "" };
+			obj["address"] = ownerAddress;
+			owners.current.push(obj);
+		});
+		const bal = await safeSDK.getBalance();
+		setBalance(bal.toString());
+		await getTokens(safeAddress);
+		setShowSafeDetails(true);
+		setisLoading(false);
+	};
 
-  const isAddressValid = (holderAddress: string) => {
-    const isValid: boolean = ethers.utils.isAddress(holderAddress);
-    return isValid;
-  };
+	const getTokens = async (safeAddress: string) => {
+		axios
+			.get(
+				`https://safe-transaction.goerli.gnosis.io/api/v1/safes/${safeAddress}/balances/usd/`
+			)
+			.then((tokens: any) => {
+				setTokens(tokens.data);
+			});
+	};
 
-  useEffect(() => {
-    isAddressValid(safeAddress);
-  }, [safeAddress]);
+	const isAddressValid = (holderAddress: string) => {
+		const isValid: boolean = ethers.utils.isAddress(holderAddress);
+		return isValid;
+	};
 
-  const handleClick = () => {
-    let terrors: any = {};
-    if (!isAddressValid(safeAddress)) {
-      terrors.issafeAddress = " * Safe Address is not valid.";
-    }
-    if (_.isEmpty(terrors)) {
-      UseExistingSafe();
-    } else {
-      setErrors(terrors);
-    }
-  };
+	useEffect(() => {
+		isAddressValid(safeAddress);
+	}, [safeAddress]);
 
   useEffect(() => {
     if(createDAOLoading == false){
@@ -128,252 +116,265 @@ const AddExistingSafe = () => {
     }
     dispatch(createDAO(payload))
   };
+	const handleClick = () => {
+		let terrors: any = {};
+		if (!isAddressValid(safeAddress)) {
+			terrors.issafeAddress = " * Safe Address is not valid.";
+		}
+		if (_.isEmpty(terrors)) {
+			UseExistingSafe();
+		}
+		else {
+			setErrors(terrors);
+		}
+	};
 
-  return (
-    <>
-      <div className="StartSafe">
-        <div className="headerText">3/3 DAO Treasury</div>
-        <div className="buttonArea">
-          <div>
-            <SafeButton
-              title="CREATE NEW SAFE"
-              titleColor="rgba(201, 75, 50, 0.6)"
-              bgColor="#FFFFFF"
-              height={58}
-              width={228}
-              fontsize={20}
-              fontweight={400}
-              disabled={true}
-              opacity="0.6"
-            />
-          </div>
-          <div className="centerText">or</div>
-          <div>
-            <SafeButton
-              title="ADD EXISTING SAFE"
-              titleColor="#C94B32"
-              bgColor="#FFFFFF"
-              height={58}
-              width={228}
-              fontsize={20}
-              fontweight={400}
-              disabled={false}
-            />
-          </div>
-        </div>
-        <div className="divider">
-          <hr />
-        </div>
-        {owners.current.length >= 1 && showSafeDetails ? (
-          <>
-            <div className="safeinfo">
-              <div className="safedata">
-                <div className="safeName">
-                  {safeName ? (
-                    safeName
-                  ) : (
-                    <>
-                      <SimpleInputField
-                        className="inputField"
-                        height={30}
-                        width={151}
-                        placeholder="Pied Piper"
-                        name="safeName"
-                        onchange={(e) => {
-                          safeNameRef.current = e.target.value;
-                        }}
-                      />
-                    </>
-                  )}
-                </div>
-                <div className="safeDivider">
-                  <hr />
-                </div>
-                <div className="address">
-                  {safeAddress.slice(0, 6) + "..." + safeAddress.slice(-4)}
-                </div>
-              </div>
-              {/* assets */}
-              <div className="safedata">
-                <div className="balance">
-                  <img src={coin} alt="coin" />
-                  <div className="safeBalance">
-                    $ {tokens.length >= 1 && tokens[0].fiatBalance}
-                  </div>
-                </div>
-                <div className="tokenAssets">
-                  {tokens.length > 1 ? (
-                    <>
-                      <div className="balance">
-                        <div className="asset">
-                          <div className="safeName">
-                            {tokens[1].token.symbol.slice(0, 1) +
-                              tokens[1].token.symbol.slice(-1)}
-                          </div>
-                        </div>
-                        <div className="amount">
-                          {tokens[1].balance / 10 ** 18}
-                        </div>
-                      </div>
-                    </>
-                  ) : null}
-                  {tokens.length === 3 ? (
-                    <>
-                      <div className="balance">
-                        <div className="asset">
-                          <div className="safeName">
-                            {tokens[2].token.symbol.slice(0, 1) +
-                              tokens[2].token.symbol.slice(-1)}
-                          </div>
-                        </div>
-                        <div className="amount">
-                          {tokens[2].balance / 10 ** 18}
-                        </div>
-                      </div>
-                    </>
-                  ) : null}
-                </div>
-              </div>
-              <div className="safeOwners">
-                <div className="ownerCount">
-                  {owners.current.length} Owners :
-                </div>
-                <div className="ownerList">
-                  {owners.current.map(
-                    (result: InviteGangType, index: number) => {
-                      return (
-                        <>
-                          <div className="safeowner" key={index}>
-                            <SimpleInputField
-                              className="inputField"
-                              height={30}
-                              width={151}
-                              placeholder="Name"
-                              type="text"
-                              onchange={(e) => {
-                                owners.current[index].name = e.target.value;
-                              }}
-                            />
-                            <div className="address">
-                              {result.address.slice(0, 6) +
-                                "..." +
-                                result.address.slice(-4)}
-                            </div>
-                          </div>
-                        </>
-                      );
-                    }
-                  )}
-                </div>
-              </div>
-              <div className="footerText">
-                By continuing you consent to the terms of use and privacy policy
-                of Gnosis Safe
-              </div>
-              <div className="buttonArea">
-                <div>
-                  <OutlineButton
-                    title="CHANGE SAFE"
-                    borderColor="#C94B32"
-                    bgColor="#FFFFFF"
-                    height={55}
-                    width={225}
-                    fontsize={20}
-                    fontweight={400}
-                    onClick={(e) => {
-                      setShowSafeDetails(false);
-                    }}
-                  />
-                </div>
-                <div>
-                  <SimpleButton
-                    className="button"
-                    title="ADD SAFE"
-                    bgColor="#C94B32"
-                    height={55}
-                    width={225}
-                    fontsize={20}
-                    fontweight={400}
-                    onClick={() => {
-                      handleAddSafe();
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="centerCard">
-              <div className="chainDetails">
-                <div>
-                  <div className="inputFieldTitle">
-                    Select the network on which the Safe was created
-                  </div>
-                </div>
-                <select name="chain" id="chain" className="drop">
-                  <option value="polygon">Polygon Mumbai</option>
-                  <option value="goerli">Goerli</option>
-                </select>
-              </div>
-              <div className="inputArea">
-                <div>
-                  <div>
-                    <div className="inputFieldTitle">Safe Name</div>
-                  </div>
-                  <SimpleInputField
-                    className="inputField"
-                    height={50}
-                    width={150}
-                    placeholder="Pied Piper"
-                    name="safeName"
-                    value={safeName}
-                    onchange={(e) => {
-                      dispatch(updatesafeName(e.target.value));
-                    }}
-                  />
-                </div>
-                <div>
-                  <div>
-                    <div className="inputFieldTitle">Safe Address</div>
-                  </div>
-                  <AddressInputField
-                    className="inputField"
-                    height={50}
-                    width={280}
-                    placeholder="0xbeee39"
-                    value={safeAddress}
-                    name="safeAddress"
-                    onchange={(e) => {
-                      setErrors({ issafeAddress: "" });
-                      dispatch(updateSafeAddress(e.target.value));
-                    }}
-                    isInvalid={errors.issafeAddress}
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="findSafe">
-              <SimpleLoadButton
-                title="FIND SAFE"
-                height={50}
-                width={160}
-                fontsize={20}
-                fontweight={400}
-                onClick={handleClick}
-                bgColor={
-                  isAddressValid(safeAddress)
-                    ? "#C94B32"
-                    : "rgba(27, 43, 65, 0.2)"
-                }
-                condition={isLoading}
-              />
-            </div>
-          </>
-        )}
-      </div>
-    </>
-  );
+	return (
+		<>
+			<div className="StartSafe">
+				<div className="headerText">3/3 DAO Treasury</div>
+				<div className="buttonArea">
+					<div>
+						<SafeButton
+							title="CREATE NEW SAFE"
+							titleColor="rgba(201, 75, 50, 0.6)"
+							bgColor="#FFFFFF"
+							height={58}
+							width={228}
+							fontsize={20}
+							fontweight={400}
+							disabled={false}
+							opacity="0.6"
+							onClick={() => navigate("/newsafe")}
+						/>
+					</div>
+					<div className="centerText">or</div>
+					<div>
+						<SafeButton
+							title="ADD EXISTING SAFE"
+							titleColor="#C94B32"
+							bgColor="#FFFFFF"
+							height={58}
+							width={228}
+							fontsize={20}
+							fontweight={400}
+							disabled={false}
+						/>
+					</div>
+				</div>
+				<div className="divider">
+					<hr />
+				</div>
+				{owners.current.length >= 1 && showSafeDetails ? (
+					<>
+						<div className="safeinfo">
+							<div className="safedata">
+								<div className="safeName">
+									{safeName ? (
+										safeName
+									) : (
+										<>
+											<SimpleInputField
+												className="inputField"
+												height={30}
+												width={151}
+												placeholder="Pied Piper"
+												name="safeName"
+												onchange={(e) => {
+													safeNameRef.current = e.target.value;
+												}}
+											/>
+										</>
+									)}
+								</div>
+								<div className="safeDivider">
+									<hr />
+								</div>
+								<div className="address">
+									{safeAddress.slice(0, 6) + "..." + safeAddress.slice(-4)}
+								</div>
+							</div>
+							{/* assets */}
+							<div className="safedata">
+								<div className="balance">
+									<img src={coin} alt="coin" />
+									<div className="safeBalance">
+										$ {tokens.length >= 1 && tokens[0].fiatBalance}
+									</div>
+								</div>
+								<div className="tokenAssets">
+									{tokens.length > 1 ? (
+										<>
+											<div className="balance">
+												<div className="asset">
+													<div className="safeName">
+														{tokens[1].token.symbol.slice(0, 1) +
+															tokens[1].token.symbol.slice(-1)}
+													</div>
+												</div>
+												<div className="amount">
+													{tokens[1].balance / 10 ** 18}
+												</div>
+											</div>
+										</>
+									) : null}
+									{tokens.length === 3 ? (
+										<>
+											<div className="balance">
+												<div className="asset">
+													<div className="safeName">
+														{tokens[2].token.symbol.slice(0, 1) +
+															tokens[2].token.symbol.slice(-1)}
+													</div>
+												</div>
+												<div className="amount">
+													{tokens[2].balance / 10 ** 18}
+												</div>
+											</div>
+										</>
+									) : null}
+								</div>
+							</div>
+							<div className="safeOwners">
+								<div className="ownerCount">
+									{owners.current.length} Owners :
+								</div>
+								<div className="ownerList">
+									{owners.current.map(
+										(result: InviteGangType, index: number) => {
+											return (
+												<>
+													<div className="safeowner" key={index}>
+														<SimpleInputField
+															className="inputField"
+															height={30}
+															width={151}
+															placeholder="Name"
+															type="text"
+															onchange={(e) => {
+																owners.current[index].name = e.target.value;
+															}}
+														/>
+														<div className="address">
+															{result.address.slice(0, 6) +
+																"..." +
+																result.address.slice(-4)}
+														</div>
+													</div>
+												</>
+											);
+										}
+									)}
+								</div>
+							</div>
+							<div className="footerText">
+								By continuing you consent to the terms of use and privacy policy
+								of Gnosis Safe
+							</div>
+							<div className="buttonArea">
+								<div>
+									<OutlineButton
+										title="CHANGE SAFE"
+										borderColor="#C94B32"
+										bgColor="#FFFFFF"
+										height={55}
+										width={225}
+										fontsize={20}
+										fontweight={400}
+										onClick={(e) => {
+											setShowSafeDetails(false);
+										}}
+									/>
+								</div>
+								<div>
+									<SimpleButton
+										className="button"
+										title="ADD SAFE"
+										bgColor="#C94B32"
+										height={55}
+										width={225}
+										fontsize={20}
+										fontweight={400}
+										onClick={() => {
+											handleAddSafe();
+										}}
+									/>
+								</div>
+							</div>
+						</div>
+					</>
+				) : (
+					<>
+						<div className="centerCard">
+							<div className="chainDetails">
+								<div>
+									<div className="inputFieldTitle">
+										Select the network on which the Safe was created
+									</div>
+								</div>
+								<select name="chain" id="chain" className="drop">
+									{/* <option value="polygon">Polygon Mumbai</option> */}
+									<option value="goerli">Goerli</option>
+								</select>
+							</div>
+							<div className="inputArea">
+								<div>
+									<div>
+										<div className="inputFieldTitle">Safe Name</div>
+									</div>
+									<SimpleInputField
+										className="inputField"
+										height={50}
+										width={150}
+										placeholder="Pied Piper"
+										name="safeName"
+										value={safeName}
+										onchange={(e) => {
+											dispatch(updatesafeName(e.target.value));
+										}}
+									/>
+								</div>
+								<div>
+									<div>
+										<div className="inputFieldTitle">Safe Address</div>
+									</div>
+									<AddressInputField
+										className="inputField"
+										height={50}
+										width={280}
+										placeholder="0xbeee39"
+										value={safeAddress}
+										name="safeAddress"
+										onchange={(e) => {
+											setErrors({ issafeAddress: "" });
+											dispatch(updateSafeAddress(e.target.value));
+										}}
+										isInvalid={errors.issafeAddress}
+									/>
+								</div>
+							</div>
+						</div>
+						<div className="findSafe">
+							<SimpleLoadButton
+								title="FIND SAFE"
+								height={50}
+								width={160}
+								fontsize={20}
+								fontweight={400}
+								onClick={handleClick}
+								bgColor={
+									isAddressValid(safeAddress)
+										? "#C94B32"
+										: "rgba(27, 43, 65, 0.2)"
+								}
+								condition={isLoading}
+							/>
+						</div>
+					</>
+				)}
+			</div>
+		</>
+	);
 };
 
 export default AddExistingSafe;

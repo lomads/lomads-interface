@@ -362,8 +362,9 @@ const AddNewSafe = () => {
               width={228}
               fontsize={20}
               fontweight={400}
-              disabled={true}
+              disabled={false}
               opacity="0.6"
+              onClick={() => navigate('/addsafe')}
             />
           </div>
         </div>
