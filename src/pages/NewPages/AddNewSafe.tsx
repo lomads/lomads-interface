@@ -85,7 +85,7 @@ const AddNewSafe = () => {
     if(createDAOLoading == false){
       setisLoading(false)
       resetCreateDAOLoader()
-      return navigate("/success");
+      return navigate(`/success?dao=${flow.daoAddress.replace('https://app.lomads.xyz/', "")}`);
     }
     if(createDAOLoading == true)
       setisLoading(true)

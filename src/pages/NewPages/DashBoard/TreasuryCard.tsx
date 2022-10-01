@@ -19,6 +19,8 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	const [copy, setCopy] = useState<boolean>(false);
 	const [isAddressValid, setisAddressValid] = useState<boolean>(false);
 
+	const { DAO }  = useAppSelector(store => store.dashboard);
+
 	const isOwner = async () => {
 		const safeSDK = await ImportSafe(provider, props.safeAddress);
 		const condition = await safeSDK.isOwner(account as string);

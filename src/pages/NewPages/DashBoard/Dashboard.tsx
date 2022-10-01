@@ -180,7 +180,7 @@ const Dashboard = () => {
               <div
                 className="copyLinkButton"
                 onClick={() => {
-                  navigator.clipboard.writeText(`https://lomads.xyz/${_get(DAO, 'url', '')}`);
+                  navigator.clipboard.writeText(`https://app.lomads.xyz/${_get(DAO, 'url', '')}`);
                 }}
               >
                 <img src={copyIcon} alt="copy" className="safeCopyImage" />

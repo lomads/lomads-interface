@@ -5,17 +5,19 @@ import lomadslogodark from "../../assets/svg/lomadslogodark.svg";
 import GroupEnjoy from "../../assets/svg/GroupEnjoy.svg";
 import { colors } from "assets/colors";
 import { Colorstype } from "types/UItype";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 const DAOsuccess = () => {
 	const navigate = useNavigate();
-
+	const [searchParams, setSearchParams] = useSearchParams();
 	const handleClick = () => {
-		navigate("/dashboard");
+		const dao = searchParams.get("dao")
+		navigate(`/${dao}`);
 	};
 
 	useEffect(() => {
 		setTimeout(() => {
-			navigate("/dashboard");
+			const dao = searchParams.get("dao")
+			navigate(`/${dao}`);
 		}, 2000);
 	}, []);
 	return (
