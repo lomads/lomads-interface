@@ -14,12 +14,13 @@ import { ImportSafe, safeService } from "connection/SafeCall";
 import { useWeb3React } from "@web3-react/core";
 import { SafeTransactionDataPartial } from "@gnosis.pm/safe-core-sdk-types";
 import TransactionSuccess from "./SideModal/TransactionSuccess";
-import { Checkbox } from "@chakra-ui/react";
+import { Checkbox, getToken } from "@chakra-ui/react";
 import { AiOutlineClose } from "react-icons/ai";
 import IconButton from "UIpack/IconButton";
 import { SafeTransactionOptionalProps } from "@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/types";
 import { useDispatch } from "react-redux";
 import ethers from "ethers";
+import axios from "axios";
 
 const SideModal = (props: IsideModal) => {
   const dispatch = useDispatch();
@@ -32,11 +33,13 @@ const SideModal = (props: IsideModal) => {
     showSuccess: false,
   });
   const [isLoading, setisLoading] = useState<boolean>(false);
+  const [safeTokens, setSafeTokens] = useState<Array<any>>([]);
   const totalMembers = useAppSelector((state) => state.flow.totalMembers);
   const selectToken = (_tokenAddress: string) => {
     setSelectedToken(_tokenAddress);
     console.log(selectedToken);
   };
+
   const selectedRecipients = useRef<InviteGangType[]>([]);
   const setRecipient = useRef<IsetRecipientType[]>([]);
   const currentNonce = useAppSelector((state) => state.flow.currentNonce);
@@ -113,6 +116,7 @@ const SideModal = (props: IsideModal) => {
       .confirmTransaction(safeTxHash, signature.data)
       .then(async (success) => {
         console.log("transaction is successful");
+        console.log("success:", success);
         await props.getPendingTransactions();
         showNavigation(false, true, false);
         setisLoading(false);
@@ -122,6 +126,21 @@ const SideModal = (props: IsideModal) => {
         console.log("error occured while confirming transaction", err);
       });
   };
+
+  const getTokens = async (safeAddress: string) => {
+    await axios
+      .get(
+        `https://safe-transaction.goerli.gnosis.io/api/v1/safes/${safeAddress}/balances/usd/`
+      )
+      .then((tokens: any) => {
+        setSafeTokens(tokens.data);
+      });
+  };
+
+  useEffect(() => {
+    getTokens(props.safeAddress);
+    return () => {};
+  }, [props.safeAddress]);
 
   return (
     <>
@@ -184,6 +203,7 @@ const SideModal = (props: IsideModal) => {
                 toggleAddNewRecipient={toggleAddNewRecipient}
                 addNewRecipient={addNewRecipient}
                 isLoading={isLoading}
+                safeTokens={safeTokens}
               />
             )}
           {!modalNavigation.showRecipient &&

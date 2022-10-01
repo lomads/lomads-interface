@@ -243,6 +243,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
                       tokens={props.tokens}
                       isAddressValid={isAddressValid}
                       rejectTransaction={rejectTransaction}
+                      multiIndex={undefined}
                     />
                   ) : result.dataDecoded !== null ? (
                     result.dataDecoded.parameters[0].valueDecoded.map(
