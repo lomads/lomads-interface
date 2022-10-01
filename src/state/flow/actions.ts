@@ -4,7 +4,7 @@ import axiosHttp from '../../api';
 export const createDAO = createAsyncThunk(
 	'dao/create',
 	async (params: any, thunkApi) => {
-		return axiosHttp.post('dao/create', params)
+		return axiosHttp.post('dao', params)
 		.then(res => res.data)
 		.catch(e => thunkApi.rejectWithValue(e))
 	}

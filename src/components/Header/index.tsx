@@ -131,13 +131,13 @@ export default function Header() {
   ];
 
   const navigate = useNavigate();
-  const dashboard = useMatch("/dashboard");
+  //const dashboard = useMatch("/dashboard");
 
   useEffect(() => {
-    if (!chainAllowed && !account && !dashboard) {
+    if (!chainAllowed && !account) {
       navigate("/");
     }
-  }, [account, chainAllowed, navigate, dashboard]);
+  }, [account, chainAllowed, navigate]);
 
     
   const previousAccount = usePrevious(account);

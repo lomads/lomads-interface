@@ -500,11 +500,20 @@ color: #C94B32;
     top: 0;
     left: 0;
     display: flex;
+    overflow-x: hidden;
+    overflow-y: auto;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
     gap: 20px;
     transition: 0.5s;
+}
+.sideBarStripItem  {
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
 }
 @media only screen and (min-width: 1920px){
     .navBarInitialBox {
