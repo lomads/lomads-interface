@@ -90,7 +90,11 @@ const PendingTransactions = (props: any) => {
                     }}
                   />
                 </>
-              ) : null)}
+              ) : (
+                <>
+                  <div className="multiSendDivider"></div>
+                </>
+              ))}
             {!props.showExecute &&
               props.confirmations !== safeThreshold &&
               props.isOwner &&
@@ -159,7 +163,11 @@ const PendingTransactions = (props: any) => {
                     props.confirmTransaction(props.safeTxHash);
                   }}
                 />
-              ) : null)}
+              ) : (
+                <>
+                  <div className="multiSendDivider"></div>
+                </>
+              ))}
           </div>
         )}
       </div>

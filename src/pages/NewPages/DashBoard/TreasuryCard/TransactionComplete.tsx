@@ -48,7 +48,11 @@ const TransactionComplete = (props: any) => {
           </div>
         </div>
         <div className="confirmIconGrp">
-          <div className="dashboardText">{`${date.getMonth()}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}`}</div>
+          {props.multiIndex !== undefined && props.multiIndex !== 0 ? (
+            <div className="multiSendDivider"></div>
+          ) : (
+            <div className="dashboardText">{`${date.getMonth()}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}`}</div>
+          )}
         </div>
       </div>
     </>
