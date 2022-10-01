@@ -751,21 +751,21 @@ opacity: 0.9;
     gap: 35px;
     align-items: center;
 }
-.confirmIconGrp .multiSendDivider::after .multiSendDivider::before {
-
-    content: "";
-    position: absolute;
-    right:  120px;
-}
-.confirmIconGrp .multiSendDivider::before {
-    border-top: 1px solid #000;
-    top: 9px;
-    width: 8px;
+.multiSendDivider  {
+    border: 1px solid #76808D;
+    background-color: #76808D;
     height: 0;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
 }
-.confirmIconGrp .multiSendDivider::after {
-    border-left: 1px solid #000;
-    height: 100%;
-    width: 0px;
-    top: 2px;
+.ErrorText {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 800;
+    font-size: 16px;
+    line-height: 16px;
+    display: flex;
+    align-items: center;
+    color: #ed641a;
 }

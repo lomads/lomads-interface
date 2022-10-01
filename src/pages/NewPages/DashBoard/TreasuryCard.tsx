@@ -106,278 +106,280 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		await props.getPendingTransactions();
 	};
 
-	const rejectTransaction = async (_nonce: number) => {
-		const safeSDK = await ImportSafe(provider, props.safeAddress);
-		const transactionObject = await safeSDK.createRejectionTransaction(_nonce);
-		const safeTxHash = await safeSDK.getTransactionHash(transactionObject);
-		const signature = await safeSDK.signTransactionHash(safeTxHash);
-		const senderAddress = account as string;
-		const safeAddress = props.safeAddress;
-		await (
-			await safeService(provider)
-		)
-			.proposeTransaction({
-				safeAddress,
-				safeTransactionData: transactionObject.data,
-				safeTxHash,
-				senderAddress,
-				senderSignature: signature.data,
-			})
-			.then((result) => {
-				console.log(
-					"on chain rejection transaction has been proposed successfully."
-				);
-			})
-			.catch((err) => {
-				console.log("an error occured while proposing a reject transaction.");
-			});
-		await (
-			await safeService(provider)
-		)
-			.confirmTransaction(safeTxHash, signature.data)
-			.then(async (result) => {
-				console.log("on chain transaction has been confirmed by the signer");
-				await props.getPendingTransactions();
-			})
-			.catch((err) => {
-				console.log("an error occured while confirming a reject transaction.");
-			});
-	};
-	return (
-		<div className="treasuryCard">
-			<div className="treasuryHeader">
-				<div
-					id="treasuryCardTitle"
-					onClick={(e) => {
-						props.getPendingTransactions();
-						props.getExecutedTransactions();
-					}}
-				>
-					Treasury
-				</div>
-				<div className="headerDetails">
-					<div>
-						<hr className="vl" />
-					</div>
-					<div
-						className="copyArea"
-						onClick={() => {
-							setCopy(true);
-						}}
-						onMouseOut={() => {
-							setCopy(false);
-						}}
-					>
-						<Tooltip label={copy ? "copied" : "copy"}>
-							<div
-								className="copyLinkButton"
-								onClick={() => {
-									navigator.clipboard.writeText(props.safeAddress);
-								}}
-							>
-								<img src={copyIcon} alt="copy" className="safeCopyImage" />
-							</div>
-						</Tooltip>
-						<div className="dashboardText">
-							{props.safeAddress.slice(0, 6) +
-								"..." +
-								props.safeAddress.slice(-4)}
-						</div>
-					</div>
-					<div className="copyArea">
-						<img src={coin} alt="asset" />
-						<div id="safeBalance">
-							$ {props.fiatBalance ? props.fiatBalance : "0.0"}
-						</div>
-						<div className="dashboardText">total balance</div>
-					</div>
-					{isAddressValid && (
-						<SafeButton
-							height={40}
-							width={150}
-							titleColor="#B12F15"
-							title="SEND TOKEN"
-							bgColor="#FFFFFF"
-							opacity="1"
-							disabled={false}
-							fontweight={400}
-							fontsize={16}
-							onClick={props.toggleModal}
-						/>
-					)}
-				</div>
-			</div>
-			{(props.executedTransactions !== undefined ||
-				props.pendingTransactions?.count !== undefined) && (
-					<>
-						<div id="treasuryTransactions">
-							<div className="dashboardText">Last Transactions</div>
-							{props.pendingTransactions !== undefined &&
-								props.pendingTransactions.results.length >= 1 &&
-								props.pendingTransactions.results
-									.sort((a, b) => {
-										return a.nonce - b.nonce;
-									})
-									.map((result: any, index: number) => {
-										return result.dataDecoded !== null &&
-											result.dataDecoded.method !== "multiSend" ? (
-											<PendingTransactions
-												showExecute={hasUserApproved(index)}
-												amount={
-													result.dataDecoded !== null &&
-													result.dataDecoded.parameters[1].value
-												}
-												recipient={
-													result.dataDecoded !== null &&
-													result.dataDecoded.parameters[0].value
-												}
-												confirmations={
-													result.confirmations && result.confirmations.length
-												}
-												ownerCount={ownerCount}
-												confirmTransaction={confirmTransaction}
-												safeTxHash={result.safeTxHash}
-												isOwner={isOwner}
-												key={index}
-												executeTransactions={executeTransactions}
-												txs={result}
-												tokenAddress={result.to}
-												tokens={props.tokens}
-												isAddressValid={isAddressValid}
-												rejectTransaction={rejectTransaction}
-											/>
-										)
-											:
-											result.dataDecoded !== null
-												?
-												(
-													result.dataDecoded.parameters[0].valueDecoded.map(
-														(multiresult: any, multiIndex: number) => {
-															return (
-																<PendingTransactions
-																	showExecute={hasUserApproved(index)}
-																	amount={multiresult.dataDecoded.parameters[1].value}
-																	recipient={
-																		multiresult.dataDecoded.parameters[0].value +
-																		"mul "
-																	}
-																	confirmations={
-																		result.confirmations &&
-																		result.confirmations.length
-																	}
-																	ownerCount={ownerCount}
-																	confirmTransaction={confirmTransaction}
-																	safeTxHash={result.safeTxHash}
-																	isOwner={isOwner}
-																	key={multiIndex}
-																	executeTransactions={executeTransactions}
-																	txs={result}
-																	tokenAddress={multiresult.dataDecoded.to}
-																	tokens={props.tokens}
-																	isAddressValid={isAddressValid}
-																	rejectTransaction={rejectTransaction}
-																	multiIndex={multiIndex}
-																/>
-															);
-														}
-													)
-												)
-												:
-												(
-													<>
-														<PendingTransactions
-															showExecute={hasUserApproved(index)}
-															amount={"rejection"}
-															recipient={"rejection"}
-															confirmations={
-																result.confirmations && result.confirmations.length
-															}
-															ownerCount={ownerCount}
-															confirmTransaction={confirmTransaction}
-															safeTxHash={result.safeTxHash}
-															isOwner={isOwner}
-															key={index}
-															executeTransactions={executeTransactions}
-															txs={result}
-															tokenAddress={undefined}
-															tokens={props.tokens}
-															isAddressValid={isAddressValid}
-															rejectTransaction={rejectTransaction}
-														/>
-													</>
-												);
-									})}
-							{props.executedTransactions !== undefined &&
-								props.executedTransactions.results.length >= 1 &&
-								props.executedTransactions.results.map(
-									(result: any, index: any) => {
-										return result.txType === "ETHEREUM_TRANSACTION" ? (
-											result.transfers[0] !== undefined &&
-											result.transfers[0].tokenInfo !== null && (
-												<>
-													<TransactionComplete
-														credit={true}
-														amount={result.transfers[0].value}
-														recipient={result.transfers[0].to}
-														ownerCount={ownerCount}
-														key={index}
-														submissionDate={result.executionDate}
-														tokenSymbol={result.transfers[0].tokenInfo.symbol}
-														tokenAddress={result.transfers[0].tokenAddress}
-														tokens={props.tokens}
-													/>
-												</>
-											)
-										) : result.safe &&
-											result.dataDecoded !== null &&
-											result.dataDecoded.method !== "multiSend" ? (
-											<TransactionComplete
-												credit={false}
-												amount={result.dataDecoded.parameters[1].value}
-												recipient={result.dataDecoded.parameters[0].value}
-												ownerCount={ownerCount}
-												key={index}
-												submissionDate={
-													result.confirmations[result.confirmations.length - 1]
-														.submissionDate
-												}
-												tokenAddress={result.to}
-												tokens={props.tokens}
-											/>
-										) : (
-											result.dataDecoded !== null &&
-											result.dataDecoded.parameters[0].valueDecoded.map(
-												(multiresult: any, index: number) => {
-													return (
-														<TransactionComplete
-															credit={false}
-															amount={multiresult.dataDecoded.parameters[1].value}
-															recipient={
-																multiresult.dataDecoded.parameters[0].value +
-																"mul "
-															}
-															ownerCount={ownerCount}
-															key={index}
-															submissionDate={
-																result.confirmations[
-																	result.confirmations.length - 1
-																].submissionDate
-															}
-															tokenAddress={multiresult.to}
-															tokens={props.tokens}
-															index={index}
-														/>
-													);
-												}
-											)
-										);
-									}
-								)}
-						</div>
-					</>
-				)}
-		</div>
-	);
+  const rejectTransaction = async (_nonce: number) => {
+    const safeSDK = await ImportSafe(provider, props.safeAddress);
+    const transactionObject = await safeSDK.createRejectionTransaction(_nonce);
+    const safeTxHash = await safeSDK.getTransactionHash(transactionObject);
+    const signature = await safeSDK.signTransactionHash(safeTxHash);
+    const senderAddress = account as string;
+    const safeAddress = props.safeAddress;
+    await (
+      await safeService(provider)
+    )
+      .proposeTransaction({
+        safeAddress,
+        safeTransactionData: transactionObject.data,
+        safeTxHash,
+        senderAddress,
+        senderSignature: signature.data,
+      })
+      .then((result) => {
+        console.log(
+          "on chain rejection transaction has been proposed successfully."
+        );
+      })
+      .catch((err) => {
+        console.log("an error occured while proposing a reject transaction.");
+      });
+    await (
+      await safeService(provider)
+    )
+      .confirmTransaction(safeTxHash, signature.data)
+      .then(async (result) => {
+        console.log("on chain transaction has been confirmed by the signer");
+        await props.getPendingTransactions();
+      })
+      .catch((err) => {
+        console.log("an error occured while confirming a reject transaction.");
+      });
+  };
+  return (
+    <div className="treasuryCard">
+      <div className="treasuryHeader">
+        <div
+          id="treasuryCardTitle"
+          onClick={(e) => {
+            props.getPendingTransactions();
+            props.getExecutedTransactions();
+          }}
+        >
+          Treasury
+        </div>
+        <div className="headerDetails">
+          <div>
+            <hr className="vl" />
+          </div>
+          <div
+            className="copyArea"
+            onClick={() => {
+              setCopy(true);
+            }}
+            onMouseOut={() => {
+              setCopy(false);
+            }}
+          >
+            <Tooltip label={copy ? "copied" : "copy"}>
+              <div
+                className="copyLinkButton"
+                onClick={() => {
+                  navigator.clipboard.writeText(props.safeAddress);
+                }}
+              >
+                <img src={copyIcon} alt="copy" className="safeCopyImage" />
+              </div>
+            </Tooltip>
+            <div className="dashboardText">
+              {props.safeAddress.slice(0, 6) +
+                "..." +
+                props.safeAddress.slice(-4)}
+            </div>
+          </div>
+          <div className="copyArea">
+            <img src={coin} alt="asset" />
+            <div id="safeBalance">
+              $ {props.fiatBalance ? props.fiatBalance : "0.0"}
+            </div>
+            <div className="dashboardText">total balance</div>
+          </div>
+          {isAddressValid && (
+            <SafeButton
+              height={40}
+              width={150}
+              titleColor="#B12F15"
+              title="SEND TOKEN"
+              bgColor="#FFFFFF"
+              opacity="1"
+              disabled={false}
+              fontweight={400}
+              fontsize={16}
+              onClick={props.toggleModal}
+            />
+          )}
+        </div>
+      </div>
+      {(props.executedTransactions !== undefined ||
+        props.pendingTransactions?.count !== undefined) && (
+        <>
+          <div id="treasuryTransactions">
+            <div className="dashboardText">Last Transactions</div>
+            {props.pendingTransactions !== undefined &&
+              props.pendingTransactions.results.length >= 1 &&
+              props.pendingTransactions.results
+                .sort((a, b) => {
+                  return a.nonce - b.nonce;
+                })
+                .map((result: any, index: number) => {
+                  return result.dataDecoded !== null &&
+                    result.dataDecoded.method !== "multiSend" ? (
+                    <PendingTransactions
+                      showExecute={hasUserApproved(index)}
+                      amount={
+                        result.dataDecoded !== null &&
+                        result.dataDecoded.parameters[1].value
+                      }
+                      recipient={
+                        result.dataDecoded !== null &&
+                        result.dataDecoded.parameters[0].value
+                      }
+                      confirmations={
+                        result.confirmations && result.confirmations.length
+                      }
+                      ownerCount={ownerCount}
+                      confirmTransaction={confirmTransaction}
+                      safeTxHash={result.safeTxHash}
+                      isOwner={isOwner}
+                      key={index}
+                      executeTransactions={executeTransactions}
+                      txs={result}
+                      tokenAddress={result.to}
+                      tokens={props.tokens}
+                      isAddressValid={isAddressValid}
+                      rejectTransaction={rejectTransaction}
+                      multiIndex={undefined}
+                    />
+                  ) : (
+                    result.dataDecoded !== null &&
+                      result.dataDecoded.parameters[0].valueDecoded.map(
+                        (multiresult: any, multiIndex: number) => {
+                          return (
+                            <PendingTransactions
+                              showExecute={hasUserApproved(index)}
+                              amount={
+                                multiresult.dataDecoded.parameters[1].value
+                              }
+                              recipient={
+                                multiresult.dataDecoded.parameters[0].value +
+                                "mul "
+                              }
+                              confirmations={
+                                result.confirmations &&
+                                result.confirmations.length
+                              }
+                              ownerCount={ownerCount}
+                              confirmTransaction={confirmTransaction}
+                              safeTxHash={result.safeTxHash}
+                              isOwner={isOwner}
+                              key={multiIndex}
+                              executeTransactions={executeTransactions}
+                              txs={result}
+                              tokenAddress={multiresult.dataDecoded.to}
+                              tokens={props.tokens}
+                              isAddressValid={isAddressValid}
+                              rejectTransaction={rejectTransaction}
+                              multiIndex={multiIndex}
+                            />
+                          );
+                        }
+                      )
+                  );
+                  //  : (
+                  //   <>
+                  //     <PendingTransactions
+                  //       showExecute={hasUserApproved(index)}
+                  //       amount={"rejection"}
+                  //       recipient={"rejection"}
+                  //       confirmations={
+                  //         result.confirmations && result.confirmations.length
+                  //       }
+                  //       ownerCount={ownerCount}
+                  //       confirmTransaction={confirmTransaction}
+                  //       safeTxHash={result.safeTxHash}
+                  //       isOwner={isOwner}
+                  //       key={index}
+                  //       executeTransactions={executeTransactions}
+                  //       txs={result}
+                  //       tokenAddress={undefined}
+                  //       tokens={props.tokens}
+                  //       isAddressValid={isAddressValid}
+                  //       rejectTransaction={rejectTransaction}
+                  //     />
+                  //   </>
+                  // );
+                })}
+            {props.executedTransactions !== undefined &&
+              props.executedTransactions.results.length >= 1 &&
+              props.executedTransactions.results.map(
+                (result: any, index: any) => {
+                  return result.txType === "ETHEREUM_TRANSACTION" ? (
+                    result.transfers[0] !== undefined &&
+                      result.transfers[0].tokenInfo !== null && (
+                        <>
+                          <TransactionComplete
+                            credit={true}
+                            amount={result.transfers[0].value}
+                            recipient={result.transfers[0].to}
+                            ownerCount={ownerCount}
+                            key={index}
+                            submissionDate={result.executionDate}
+                            tokenSymbol={result.transfers[0].tokenInfo.symbol}
+                            tokenAddress={result.transfers[0].tokenAddress}
+                            tokens={props.tokens}
+                            multiIndex={undefined}
+                          />
+                        </>
+                      )
+                  ) : result.safe &&
+                    result.dataDecoded !== null &&
+                    result.dataDecoded.method !== "multiSend" ? (
+                    <TransactionComplete
+                      credit={false}
+                      amount={result.dataDecoded.parameters[1].value}
+                      recipient={result.dataDecoded.parameters[0].value}
+                      ownerCount={ownerCount}
+                      key={index}
+                      submissionDate={
+                        result.confirmations[result.confirmations.length - 1]
+                          .submissionDate
+                      }
+                      tokenAddress={result.to}
+                      tokens={props.tokens}
+                      multiIndex={undefined}
+                    />
+                  ) : (
+                    result.dataDecoded !== null &&
+                    result.dataDecoded.parameters[0].valueDecoded.map(
+                      (multiresult: any, multiIndex: number) => {
+                        return (
+                          <TransactionComplete
+                            credit={false}
+                            amount={multiresult.dataDecoded.parameters[1].value}
+                            recipient={
+                              multiresult.dataDecoded.parameters[0].value +
+                              "mul "
+                            }
+                            ownerCount={ownerCount}
+                            key={index}
+                            submissionDate={
+                              result.confirmations[
+                                result.confirmations.length - 1
+                              ].submissionDate
+                            }
+                            tokenAddress={multiresult.to}
+                            tokens={props.tokens}
+                            index={index}
+                            multiIndex={multiIndex}
+                          />
+                        );
+                      }
+                    )
+                  );
+                }
+              )}
+          </div>
+        </>
+      )}
+    </div>
+  );
 };
 
 export default TreasuryCard;
