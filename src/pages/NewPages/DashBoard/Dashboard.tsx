@@ -180,27 +180,7 @@ const Dashboard = () => {
               <div
                 className="copyLinkButton"
                 onClick={() => {
-                  navigator.clipboard.writeText(daoAddress);
-                }}
-              >
-                <img src={copyIcon} alt="copy" className="safeCopyImage" />
-              </div>
-            </Tooltip>
-          </div>
-          <div
-            className="copyArea"
-            onClick={() => {
-              setCopy(true);
-            }}
-            onMouseOut={() => {
-              setCopy(false);
-            }}
-          >
-            <Tooltip label={copy ? "copied" : "copy"}>
-              <div
-                className="copyLinkButton"
-                onClick={() => {
-                  navigator.clipboard.writeText(daoAddress);
+                  navigator.clipboard.writeText(`https://lomads.xyz/${_get(DAO, 'url', '')}`);
                 }}
               >
                 <img src={copyIcon} alt="copy" className="safeCopyImage" />

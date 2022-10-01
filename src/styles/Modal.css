@@ -88,7 +88,7 @@
 .modalBuyButton {
   width: 170px;
   height: 50px;
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 20px;
@@ -148,7 +148,7 @@
 
 
 .modalContainer .loginWithoutWallet {
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 18px;
@@ -160,7 +160,7 @@
 }
 
 .paymentOptionsText {
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 30px;
@@ -179,7 +179,7 @@
   text-align: center;
   box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
   border-radius: 30px;
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-weight: 400;
   text-decoration-color: #C94B32;
   font-size: 14px;
@@ -201,7 +201,7 @@
   box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
   border-radius: 0px 10px 10px 0px;
   border-width: 0px;
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 18px;
@@ -210,7 +210,7 @@
 }
 
 .fontAmountFees {
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-size: 14px;
   line-height: 16px;
@@ -221,7 +221,7 @@
 }
 
 .fontAmountFeesText {
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-size: 16px;
   line-height: 18px;

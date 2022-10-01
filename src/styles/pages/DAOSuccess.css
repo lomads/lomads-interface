@@ -13,7 +13,7 @@
     flex-direction: column;
 }
 .congrats {
-    font-family: 'Open Sans';
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 400;
     font-size: 22px;
@@ -24,7 +24,7 @@
     margin: 133px 0px 13.5px 0px;
 }
 .message {
-    font-family: 'Open Sans';
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     color: #C94B32;
     font-weight: 400;
@@ -38,7 +38,7 @@
 }
 
 .message-subtext {
-    font-family: 'Open Sans';
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
@@ -72,7 +72,7 @@
     margin-left: 110px;
 }
 .redirectText {
-    font-family: 'Open Sans';
+    font-family: 'Inter', sans-serif;
     font-style: italic;
     font-weight: 400;
     font-size: 16px;

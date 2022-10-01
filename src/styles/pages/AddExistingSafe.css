@@ -46,7 +46,7 @@ hr {
     border-radius: 10px;
     width: 100%;
     height: 50px;
-    font-family: 'Open Sans';
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 400;
     font-size: 16px;
@@ -87,7 +87,7 @@ hr {
     margin-top: 2px;
 }
 .safeName {
-    font-family: 'Open Sans';
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 600;
     font-size: 16px;
@@ -96,7 +96,7 @@ hr {
     color: #76808D;
 }
 .safeBalance {
-    font-family: 'Open Sans';
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 400;
     font-size: 16px;
@@ -137,7 +137,7 @@ img[alt="coin"] {
     align-items: center;
 }
 .amount {
-    font-family: 'Open Sans';
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 400;
     font-size: 16px;
@@ -147,7 +147,7 @@ img[alt="coin"] {
     margin-left: 1vh;
 }
 .ownerCount {
-    font-family: 'Open Sans';
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 800;
     font-size: 18px;
@@ -183,7 +183,7 @@ img[alt="coin"] {
     margin-top: 10px;
 }
 .address {
-    font-family: 'Open Sans';
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 400;
     font-size: 16px;
@@ -193,7 +193,7 @@ img[alt="coin"] {
     margin-left: 2vh;
 }
 .footerText {
-    font-family: 'Open Sans';
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 400;
     font-size: 14px;

@@ -78,9 +78,9 @@ const LoginPage = (props: any) => {
     const connectionType = getConnection(connector).type;
     try {
       dispatch(updateConnectionError({ connectionType, error: undefined }));
+      localStorage.removeItem('__lmds_web3_token')
       await connector.activate();
       dispatch(updateSelectedWallet({ wallet: connectionType }));
-      //generateToken()
     } catch (error: any) {
       console.debug(`web3-react connection error: ${error}`);
       dispatch(updateConnectionError({ connectionType, error: error.message }));

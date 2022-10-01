@@ -20,7 +20,7 @@ const DAONoAccess = () => {
           <div className="logo" style={{ display: 'flex', alignItems: 'center', justifyContent:'center' }}>
             <img src={frameicon} style={{ width: 250, height: 250 }} alt="logo" />
           </div>
-          <div className="message">This organization allows membership only for whitelisted individuals</div>
+          <div className="message">You are currently not on the member list</div>
           <div className="message-subtext">Please contact the admin through email or other social channels</div>
         </div>
       </div>
