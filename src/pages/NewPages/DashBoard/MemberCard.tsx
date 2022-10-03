@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import moment from 'moment';
 import { get as _get, find as _find } from 'lodash';
 import { useWeb3React } from "@web3-react/core";
 import { useAppSelector } from "state/hooks";
@@ -54,10 +55,10 @@ const MemberCard = (props: any) => {
             <div id="memberAddressText">
               {props.address.slice(0, 6) + "..." + props.address.slice(-4)}
             </div>
-            <div className="memberdivider">
+            <div style={{ marginLeft: 12 }} className="memberdivider">
               <hr />
             </div>
-            <div className="dashboardText">10/20/23</div>
+            <div className="dashboardText">{ moment(props.joined).local().format('MM/DD/YYYY') }</div>
             <div className="memberdivider">
               <hr />
             </div>
@@ -110,13 +111,13 @@ const MemberCard = (props: any) => {
                 <div className="dashboardText">Name</div>
               </div>
               <div id="memberAddressText"></div>
-              <div className="dashboardText" style={{ marginLeft: 60 }}>Joined</div>
+              <div className="dashboardText" style={{ marginLeft: 90 }}>Joined</div>
               <div className="dashboardText"></div>
             </div>
           </div>
           {_get(DAO, 'members', []).map((result: any, index: any) => {
             return (
-              <NameAndAvatar name={_get(result, 'member.name', '')} position={index} role={_get(result, 'role', 'MEMBER')} address={_get(result, 'member.wallet', '')} />
+              <NameAndAvatar name={_get(result, 'member.name', '')} position={index} joined={_get(result, 'joined')} role={_get(result, 'role', 'MEMBER')} address={_get(result, 'member.wallet', '')} />
             );
           })}
         </div>

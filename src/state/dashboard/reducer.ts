@@ -1,17 +1,19 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { DAOType } from "types/UItype";
-import { getDao, loadDao } from "./actions";
+import { getDao, loadDao, addDaoMember } from "./actions";
 
 export interface DashboardState {
   DAO: DAOType | null;
   DAOLoading: boolean | null;
   DAOList: Array<DAOType>;
+  addMemberLoading: boolean | null;
 }
 
 const initialState: DashboardState = {
   DAO: null,
   DAOLoading: false,
   DAOList: [],
+  addMemberLoading: null
 };
 
 const dashboardSlice = createSlice({
@@ -20,6 +22,9 @@ const dashboardSlice = createSlice({
   reducers: {
     resetCreateDAOLoader(state) {
       state.DAOLoading = null
+    },
+    resetAddMemberLoader(state) {
+      state.addMemberLoading = null
     },
     setDAOList(state, action) {
       state.DAOList = action.payload
@@ -38,12 +43,20 @@ const dashboardSlice = createSlice({
     },
     [`${loadDao.pending}`]: (state) => {
 
+    },
+    [`${addDaoMember.fulfilled}`]: (state, action) => {
+      state.addMemberLoading = false
+      state.DAO = action.payload
+    },
+    [`${addDaoMember.pending}`]: (state) => {
+      state.addMemberLoading = true
     }
 	},
 });
 
 export const {
   setDAOList,
-  resetCreateDAOLoader
+  resetCreateDAOLoader,
+  resetAddMemberLoader
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

@@ -58,6 +58,7 @@
     "fortmatic": "^2.4.0",
     "framer-motion": "^6.5.0",
     "ipfs-http-client": "^57.0.3",
+    "moment": "^2.29.4",
     "moralis": "1.11.0",
     "moralis-v1": "^1.11.0",
     "ms.macro": "^2.0.0",
