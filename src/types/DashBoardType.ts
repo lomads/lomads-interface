@@ -78,4 +78,5 @@ export interface ItreasuryCardType {
   getPendingTransactions: () => Promise<void>;
   getExecutedTransactions: () => Promise<void>;
   tokens: any;
+  DbData: any;
 }

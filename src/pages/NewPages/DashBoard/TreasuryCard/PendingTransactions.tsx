@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import sendTokenOutline from "../../../../assets/svg/sendTokenOutline.svg";
 import SimpleInputField from "UIpack/SimpleInputField";
 import IconButton from "UIpack/IconButton";
@@ -6,11 +6,40 @@ import { AiOutlineClose, AiOutlineCheck } from "react-icons/ai";
 import SimpleButton from "UIpack/SimpleButton";
 import { useAppSelector } from "state/hooks";
 
+interface PendingTxType {
+  txReason: string;
+  rejectTxHash: string;
+}
+
 const PendingTransactions = (props: any) => {
   const safeThreshold = useAppSelector((state) => state.flow.safeThreshold);
-  const handleChange = () => {
-    console.log(props.tokens);
+  const [rejectTxHash, setRejectTxHash] = useState<PendingTxType>({
+    txReason: "",
+    rejectTxHash: "",
+  });
+
+  const compareData = (_nonce: any) => {
+    return (
+      props.DbData !== undefined &&
+      props.DbData.find((result: any, index: any) => {
+        if (result.nonce === _nonce) {
+          setRejectTxHash({
+            txReason: result.data[0].reason,
+            rejectTxHash: result.rejectTxHash,
+          });
+          return true;
+        } else {
+          console.log("nana");
+          return false;
+        }
+      })
+    );
   };
+
+  useEffect(() => {
+    compareData(props.txs.nonce);
+  }, [props.txs.nonce, props.DbData]);
+
   return (
     <>
       <div className="transactionRow">
@@ -33,15 +62,16 @@ const PendingTransactions = (props: any) => {
           </div>
         </div>
         <div className="transactionName">
-          <SimpleInputField
-            className="inputField"
-            height={30}
-            width={"100%"}
-            placeholder="Name Transaction"
-            onchange={(e) => {
-              handleChange();
-            }}
-          />
+          {rejectTxHash.txReason ? (
+            <div className="dashboardText">{rejectTxHash.txReason}</div>
+          ) : (
+            <SimpleInputField
+              className="inputField"
+              height={30}
+              width={"100%"}
+              placeholder="Name Transaction"
+            />
+          )}
         </div>
         <div className="transactionAddress">
           <div className="dashboardText">
@@ -95,12 +125,11 @@ const PendingTransactions = (props: any) => {
                   <div className="multiSendDivider"></div>
                 </>
               ))}
-            {!props.showExecute &&
-              props.confirmations !== safeThreshold &&
+            {props.confirmations !== safeThreshold &&
               props.isOwner &&
               (props.multiIndex !== undefined && props.multiIndex === 0 ? (
                 <>
-                  {/* {props.amount !== "rejection" && (
+                  {props.amount !== "rejection" && (
                     <>
                       <IconButton
                         Icon={
@@ -122,7 +151,7 @@ const PendingTransactions = (props: any) => {
                         }}
                       />
                     </>
-                  )} */}
+                  )}
                   <IconButton
                     Icon={
                       <AiOutlineCheck
@@ -144,25 +173,48 @@ const PendingTransactions = (props: any) => {
                   />
                 </>
               ) : props.multiIndex === undefined ? (
-                <IconButton
-                  Icon={
-                    <AiOutlineCheck
-                      style={{
-                        color: "#FFFFFF",
-                        height: "16px",
-                        width: "16px",
-                      }}
-                    />
-                  }
-                  bgColor="#C94B32"
-                  height={30}
-                  width={30}
-                  border="2px solid #C94B32"
-                  className="iconButtons"
-                  onClick={(e) => {
-                    props.confirmTransaction(props.safeTxHash);
-                  }}
-                />
+                <>
+                  <IconButton
+                    Icon={
+                      <AiOutlineClose
+                        style={{
+                          color: "#C94B32",
+                          height: "16px",
+                          width: "16px",
+                        }}
+                      />
+                    }
+                    bgColor="#FFFFFF"
+                    height={30}
+                    width={30}
+                    border="2px solid #C94B32"
+                    className="iconButtons"
+                    onClick={(e: any) => {
+                      rejectTxHash.rejectTxHash
+                        ? props.confirmTransaction(rejectTxHash.rejectTxHash)
+                        : props.rejectTransaction(props.txs.nonce);
+                    }}
+                  />
+                  <IconButton
+                    Icon={
+                      <AiOutlineCheck
+                        style={{
+                          color: "#FFFFFF",
+                          height: "16px",
+                          width: "16px",
+                        }}
+                      />
+                    }
+                    bgColor="#C94B32"
+                    height={30}
+                    width={30}
+                    border="2px solid #C94B32"
+                    className="iconButtons"
+                    onClick={(e) => {
+                      props.confirmTransaction(props.safeTxHash);
+                    }}
+                  />
+                </>
               ) : (
                 <>
                   <div className="multiSendDivider"></div>

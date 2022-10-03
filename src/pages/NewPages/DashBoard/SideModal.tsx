@@ -116,7 +116,22 @@ const SideModal = (props: IsideModal) => {
       .confirmTransaction(safeTxHash, signature.data)
       .then(async (success) => {
         console.log("transaction is successful");
-        console.log("success:", success);
+        await axios
+          .post("http://localhost:4000/api/creationsave", {
+            safeTxHash: safeTxHash,
+            rejectTxHash: null,
+            data: setRecipient.current,
+            nonce: currentNonce,
+          })
+          .then((success) => {
+            console.log("creation data has been uploaded successfully to db");
+          })
+          .catch((err) => {
+            console.log(
+              "their is some error while uploading creation data to database.",
+              err
+            );
+          });
         await props.getPendingTransactions();
         showNavigation(false, true, false);
         setisLoading(false);

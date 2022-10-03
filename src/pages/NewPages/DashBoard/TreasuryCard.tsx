@@ -10,6 +10,7 @@ import TransactionComplete from "./TreasuryCard/TransactionComplete";
 import { EthSignSignature } from "@gnosis.pm/safe-core-sdk";
 import { SafeTransactionData } from "@gnosis.pm/safe-core-sdk-types/dist/src/types";
 import { Tooltip } from "@chakra-ui/react";
+import axios from "axios";
 
 const TreasuryCard = (props: ItreasuryCardType) => {
   const { provider, account } = useWeb3React();
@@ -135,6 +136,21 @@ const TreasuryCard = (props: ItreasuryCardType) => {
       .confirmTransaction(safeTxHash, signature.data)
       .then(async (result) => {
         console.log("on chain transaction has been confirmed by the signer");
+        await axios
+          .post("http://localhost:4000/api/update", {
+            rejectTxHash: safeTxHash,
+            nonce: _nonce,
+          })
+          .then(() => {
+            console.log(
+              "reject transaction has been successfully updated to db."
+            );
+          })
+          .catch((err) => {
+            console.log(
+              "error occured while updating reject transaction data to db."
+            );
+          });
         await props.getPendingTransactions();
       })
       .catch((err) => {
@@ -244,6 +260,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
                       isAddressValid={isAddressValid}
                       rejectTransaction={rejectTransaction}
                       multiIndex={undefined}
+                      DbData={props.DbData}
                     />
                   ) : (
                     result.dataDecoded !== null &&
