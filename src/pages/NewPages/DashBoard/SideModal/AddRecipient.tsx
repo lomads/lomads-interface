@@ -53,7 +53,7 @@ const AddRecipient = (props: any) => {
       ];
       dispatch(updateInvitedGang(creator));
     }
-  });
+  }, []);
 
   useEffect(() => {
     isAddressValid(ownerAddress);
