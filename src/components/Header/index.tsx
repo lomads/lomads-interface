@@ -21,20 +21,20 @@ const HeaderFrame = styled.div<{ showBackground: boolean }>`
   align-items: center;
   flex-direction: row;
   width: 40%;
-  top: 10;
   position: absolute;
-  right: 20px;
+  top: 26px;
+  right: 18px;
   padding: 1rem;
   z-index: 10000;
   /* Background slide effect on scroll. */
   background-image: ${({ theme }) =>
-    `linear-gradient(to bottom, transparent 50%, ${theme.bg0} 50% )}}`};
+		`linear-gradient(to bottom, transparent 50%, ${theme.bg0} 50% )}}`};
   background-position: ${({ showBackground }) =>
-    showBackground ? "0 -100%" : "0 0"};
+		showBackground ? "0 -100%" : "0 0"};
   background-size: 100% 200%;
   box-shadow: 0px 0px 0px 1px
     ${({ theme, showBackground }) =>
-      showBackground ? theme.bg2 : "transparent;"};
+		showBackground ? theme.bg2 : "transparent;"};
   transition: background-position 0.1s, box-shadow 0.1s;
   background-blend-mode: hard-light;
 
@@ -122,53 +122,53 @@ const UniIcon = styled.div`
   position: relative;
 `;
 export default function Header() {
-  const { account, chainId, connector } = useWeb3React();
+	const { account, chainId, connector } = useWeb3React();
 
-  const chainAllowed = chainId && isChainAllowed(connector, chainId);
+	const chainAllowed = chainId && isChainAllowed(connector, chainId);
 
-  const userEthBalance = useNativeCurrencyBalances(account ? [account] : [])?.[
-    account ?? ""
-  ];
+	const userEthBalance = useNativeCurrencyBalances(account ? [account] : [])?.[
+		account ?? ""
+	];
 
-  const navigate = useNavigate();
-  //const dashboard = useMatch("/dashboard");
+	const navigate = useNavigate();
+	//const dashboard = useMatch("/dashboard");
 
-  useEffect(() => {
-    if (!chainAllowed && !account) {
-      navigate("/");
-    }
-  }, [account, chainAllowed, navigate]);
+	useEffect(() => {
+		if (!chainAllowed && !account) {
+			navigate("/");
+		}
+	}, [account, chainAllowed, navigate]);
 
-    
-  const previousAccount = usePrevious(account);
 
-  useEffect(() => {
-    if(previousAccount && account && account !== previousAccount) {
-      localStorage.removeItem('__lmds_web3_token');
-      localStorage.removeItem('__lmds_active_dao')
-      navigate("/");
-    }
-  }, [account, previousAccount])
+	const previousAccount = usePrevious(account);
 
-  const scrollY = useScrollPosition();
+	useEffect(() => {
+		if (previousAccount && account && account !== previousAccount) {
+			localStorage.removeItem('__lmds_web3_token');
+			localStorage.removeItem('__lmds_active_dao')
+			navigate("/");
+		}
+	}, [account, previousAccount])
 
-  const { nativeCurrency } =
-    CHAIN_INFO[!chainId || !chainAllowed ? SupportedChainId.MAINNET : chainId];
-  const balance = userEthBalance?.toSignificant(3);
-  const symbol = nativeCurrency.symbol;
-  return (
-    <HeaderFrame showBackground={scrollY > 45}>
-      <Title href=".">
-        <UniIcon></UniIcon>
-      </Title>
-      <HeaderControls>
-        <HeaderElement>{/* <NetworkSelector /> */}</HeaderElement>
-        <HeaderElement>
-          <AccountElement active={!!account}>
-            <Web3Status />
-          </AccountElement>
-        </HeaderElement>
-      </HeaderControls>
-    </HeaderFrame>
-  );
+	const scrollY = useScrollPosition();
+
+	const { nativeCurrency } =
+		CHAIN_INFO[!chainId || !chainAllowed ? SupportedChainId.MAINNET : chainId];
+	const balance = userEthBalance?.toSignificant(3);
+	const symbol = nativeCurrency.symbol;
+	return (
+		<HeaderFrame showBackground={scrollY > 45}>
+			<Title href=".">
+				<UniIcon></UniIcon>
+			</Title>
+			<HeaderControls>
+				<HeaderElement>{/* <NetworkSelector /> */}</HeaderElement>
+				<HeaderElement>
+					<AccountElement active={!!account}>
+						<Web3Status />
+					</AccountElement>
+				</HeaderElement>
+			</HeaderControls>
+		</HeaderFrame>
+	);
 }
