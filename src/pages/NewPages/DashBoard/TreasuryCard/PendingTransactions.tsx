@@ -7,16 +7,16 @@ import SimpleButton from "UIpack/SimpleButton";
 import { useAppSelector } from "state/hooks";
 
 const PendingTransactions = (props: any) => {
-	console.log("10 txs : ", props.txs);
-	const safeThreshold = useAppSelector((state) => state.flow.safeThreshold);
-	const handleChange = () => {
-		console.log(props.tokens);
-	};
-	return (
-		<>
-			<div className="transactionRow">
-				<div className="coinText">
-					<img src={sendTokenOutline} alt="" />
+  console.log("10 txs : ", props.txs);
+  const safeThreshold = useAppSelector((state) => state.flow.safeThreshold);
+  const handleChange = () => {
+    console.log(props.tokens);
+  };
+  return (
+    <>
+      <div className="transactionRow">
+        <div className="coinText">
+          <img src={sendTokenOutline} alt="" />
 
           <div className="dashboardTextBold">
             {props.amount === "multisend" || props.amount === "rejection"

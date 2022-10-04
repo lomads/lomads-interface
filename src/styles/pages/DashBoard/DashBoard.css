@@ -262,13 +262,13 @@ body.active-modal {
     align-items: flex-start;
     padding: 26px 22px;
     width: 100%;
-    gap: 18px;
+    /* gap: 18px; */
     min-height: fit-content;
-    max-height: 390px;
+    /* max-height: 450px; */
     background: #FFFFFF;
     border-radius: 5px;
     margin-top: 2px;
-    overflow-y: auto;
+    overflow-y: scroll;
 }
 
 .iconButtons {
@@ -284,11 +284,12 @@ body.active-modal {
 .transactionRow {
     display: flex;
     flex-direction: row;
-    justify-content: flex-start;
     align-items: center;
     gap: 30px;
     width: 100%;
+    height: 50px;
     overflow-y: visible;
+    /* margin-bottom: 10px; */
 }
 
 .confirmIconGrp {
@@ -297,16 +298,35 @@ body.active-modal {
     justify-content: flex-end;
     align-items: center;
     gap: 10px;
-    width: 9%;
+    width: 10%;
+    height: 100%;
     overflow-y: visible;
 }
 
+.confirmIconGrp .ex {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.confirmIconGrp .ex .line {
+    width: 1px;
+    height: 15px;
+    background-color: gray;
+    position: absolute;
+    right: 20px;
+    bottom: 0;
+}
+
 .transactionName {
-    width: 57%;
+    width: 50%;
 }
 
 .transactionAddress {
-    width: 10%;
+    width: 15%;
 }
 
 .memberCard {
@@ -406,7 +426,7 @@ body.active-modal {
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    width: 10%;
+    width: 15%;
     gap: 30px;
 }
 
@@ -578,8 +598,8 @@ body.active-modal {
 .navBarInitialBox {
     background: linear-gradient(178.31deg, #C94B32 0.74%, #A54536 63.87%);
     border-radius: 0px 0px 30px 0px;
-    height: 10%;
-    width: 8%;
+    height: 100px !important;
+    width: 100px !important;
     position: absolute;
     top: 0;
     left: 0;
@@ -589,7 +609,7 @@ body.active-modal {
     z-index: 1000;
 }
 
-@media only screen and (min-width: 1280px) {
+/* @media only screen and (min-width: 1280px) {
     .navBarInitialBox {
         height: 10%;
         width: 8%;
@@ -599,12 +619,12 @@ body.active-modal {
         height: 10%;
         width: 8%;
     }
-}
+} */
 
 .sideBarStrip {
     background: linear-gradient(178.31deg, #C94B32 0.74%, #A54536 63.87%);
     height: 100%;
-    width: 10%;
+    width: 100px;
     padding-top: 10%;
     position: absolute;
     top: 0;
@@ -822,7 +842,7 @@ body.active-modal {
 }
 
 #voteArea {
-    width: 5%;
+    width: 10%;
 }
 
 #transactionDetailsPage {
@@ -891,13 +911,46 @@ body.active-modal {
 }
 
 .multiSendDivider {
-    border: 1px solid #76808D;
-    background-color: #76808D;
-    height: 0;
+    /* border-bottom: 1px solid #76808D;
+    border-right: 1px solid #76808D; */
+    height: 50px;
     width: 100%;
+    display: flex;
     justify-content: center;
     align-items: center;
+    padding-right: 20px;
+    position: relative;
 }
+
+.multiSendDivider .test {
+    position: relative;
+    width: 100%;
+    height: 1px;
+    background-color: #76808D;
+}
+
+.multiSendDivider .test::before {
+    content: '';
+    position: absolute;
+    top: -25px;
+    right: 0;
+    width: 1px;
+    height: 25px;
+    background-color: #76808D;
+}
+
+/* Dynamic --- last row multisend will not have line */
+
+.multiSendDivider .line {
+    position: absolute;
+    top: 25px;
+    right: 20px;
+    width: 1px;
+    height: 25px;
+    background-color: #76808D;
+}
+
+
 
 .ErrorText {
     font-family: 'Open Sans';

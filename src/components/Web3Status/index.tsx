@@ -9,6 +9,7 @@ import { Activity } from "react-feather";
 import { useAppSelector } from "state/hooks";
 import styled, { css } from "styled-components/macro";
 import { isChainAllowed, switchChain } from "utils/switchChain";
+import { SupportedChainId } from 'constants/chains'
 
 import { useHasSocks } from "hooks/useSocksBalance";
 import { useToggleWalletModal } from "state/application/hooks";
@@ -159,10 +160,11 @@ function Web3StatusInner() {
 		return null;
 	}
 	else if (!chainAllowed) {
+		console.log("Network switched")
 		return (
 			<Web3StatusError
 				onClick={() => {
-					switchChain(connector, 80001)
+					switchChain(connector, SupportedChainId.GOERLI)
 						.then(async () => {
 							navigate(await navigateTo())
 						})

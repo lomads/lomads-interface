@@ -27,14 +27,15 @@ const LoginPage = (props: any) => {
   const { chainId, connector, account } = useWeb3React();
 
   const chainAllowed = chainId && isChainAllowed(connector, chainId);
+  console.log(chainAllowed, chainId);
 
   const navigateTo = async () => {
     return axiosHttp.get('dao').then(res => {
-      if(res.data && res.data.length > 0) {
+      if (res.data && res.data.length > 0) {
         const activeDao = localStorage.getItem('__lmds_active_dao')
-        if(activeDao) {
+        if (activeDao) {
           let hasAccess = _find(res.data, d => d.url === activeDao)
-          if(hasAccess)
+          if (hasAccess)
             return `/${activeDao}`
           else
             return `/noaccess`
@@ -43,20 +44,20 @@ const LoginPage = (props: any) => {
           return `/${_get(res.data, '[0].url')}`
       } else {
         const activeDao = localStorage.getItem('__lmds_active_dao')
-        if(activeDao) 
+        if (activeDao)
           return `/noaccess`
         return "/namedao"
       }
     })
-    .finally(() => setCheckLoading(false))
+      .finally(() => setCheckLoading(false))
   }
 
   const generateToken = async () => {
-    if(!localStorage.getItem('__lmds_web3_token')){
-      if(window.ethereum) {
+    if (!localStorage.getItem('__lmds_web3_token')) {
+      if (window.ethereum) {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
-        const token = await Web3Token.sign(async (msg:string) => await signer.signMessage(msg), '1d');
+        const token = await Web3Token.sign(async (msg: string) => await signer.signMessage(msg), '1d');
         console.log(token)
         localStorage.setItem('__lmds_web3_token', token);
         const nTo = await navigateTo();
@@ -70,6 +71,7 @@ const LoginPage = (props: any) => {
 
   useEffect(() => {
     if (selectedWallet && account && chainAllowed) {
+      console.log(chainAllowed);
       generateToken()
     }
   }, [selectedWallet, account, chainAllowed]);
@@ -90,13 +92,13 @@ const LoginPage = (props: any) => {
   return (
     <>
       {
-        checkLoading ? 
-        <div style={{ backgroundColor: '#FFF', height: '100vh', zIndex: 99999, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="logo">
-            <img style={{ marginBottom: 32 }} src={lomadsfulllogo} alt="" />
-          </div>
-          <LeapFrog size={50} color="#C94B32" />
-        </div> : null
+        checkLoading ?
+          <div style={{ backgroundColor: '#FFF', height: '100vh', zIndex: 99999, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="logo">
+              <img style={{ marginBottom: 32 }} src={lomadsfulllogo} alt="" />
+            </div>
+            <LeapFrog size={50} color="#C94B32" />
+          </div> : null
       }
       <div className={"createDaoLogin"}>
         <div>
