@@ -34,8 +34,8 @@ const Dashboard = () => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const { daoURL } = useParams()
-	localStorage.setItem('__lmds_active_dao', `${daoURL}`);
-	const { provider, account } = useWeb3React();
+	//sessionStorage.setItem('__lmds_active_dao', `${daoURL}`);
+	const { provider, account, chainId } = useWeb3React();
 	const daoName = useAppSelector((state) => state.flow.daoName);
 	const daoAddress = useAppSelector((state) => state.flow.daoAddress);
 	const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
@@ -66,13 +66,29 @@ const Dashboard = () => {
 	};
 
 	useEffect(() => {
-		dispatch(loadDao({}))
-	}, [])
+		if(chainId && account)
+			dispatch(loadDao({}))
+	}, [chainId, account])
+
+	const hasDAOAccess = useMemo(() => {
+		if(!DAOList || DAOList.length == 0) return false;
+		let hasAccess = _find(DAOList, d => d.url === daoURL)
+		if(hasAccess) return true;
+		return false
+	}, [DAOList, daoURL])
+	
+	useEffect(() => {
+		if(DAOList && DAOList.length > 0) {
+			if(!hasDAOAccess){
+				navigate('/noaccess')
+			}
+		}
+	}, [DAOList, hasDAOAccess])
 
 	useEffect(() => {
-		if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
+		if (hasDAOAccess && chainId && account && daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
 			dispatch(getDao(daoURL))
-	}, [daoURL])
+	}, [hasDAOAccess, DAOList, daoURL, chainId, account])
 
 	useEffect(() => {
 		if (DAO)
@@ -134,9 +150,11 @@ const Dashboard = () => {
 	};
 
 	useEffect(() => {
-		getPendingTransactions();
-		getExecutedTransactions();
-		getTokens(safeAddress);
+		if(safeAddress){
+			getPendingTransactions();
+			getExecutedTransactions();
+			getTokens(safeAddress);
+		}
 	}, [safeAddress]);
 
 	if (showModal) {

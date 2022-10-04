@@ -40,8 +40,8 @@ export const ALL_SUPPORTED_CHAIN_IDS: SupportedChainId[] = Object.values(Support
 ) as SupportedChainId[]
 
 export const SUPPORTED_CHAIN_IDS: SupportedChainId[] = [
-  SupportedChainId.MAINNET,
-  SupportedChainId.POLYGON_MUMBAI,
+  // SupportedChainId.MAINNET,
+  // SupportedChainId.POLYGON_MUMBAI,
   SupportedChainId.GOERLI,
 ]
 

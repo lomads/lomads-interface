@@ -136,18 +136,14 @@ function Web3StatusInner() {
 	const navigateTo = async () => {
 		return axiosHttp.get('dao').then(res => {
 			if (res.data && res.data.length > 0) {
-				const activeDao = localStorage.getItem('__lmds_active_dao')
+				const activeDao = sessionStorage.getItem('__lmds_active_dao')
 				if (activeDao) {
-					let hasAccess = _find(res.data, d => d.url === activeDao)
-					if (hasAccess)
-						return `/${activeDao}`
-					else
-						return `/noaccess`
+					return `/${activeDao}`
 				}
 				else
 					return `/${_get(res.data, '[0].url')}`
 			} else {
-				const activeDao = localStorage.getItem('__lmds_active_dao')
+				const activeDao = sessionStorage.getItem('__lmds_active_dao')
 				if (activeDao)
 					return `/noaccess`
 				return "/namedao"
@@ -160,7 +156,6 @@ function Web3StatusInner() {
 		return null;
 	}
 	else if (!chainAllowed) {
-		console.log("Network switched")
 		return (
 			<Web3StatusError
 				onClick={() => {

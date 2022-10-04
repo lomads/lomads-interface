@@ -1,6 +1,7 @@
 
 import "../../styles/pages/CreatePassToken.css";
-import Frame from '../../assets/svg/Frame.svg';
+import { useEffect } from "react";
+import Frame from '../../assets/svg/frame.svg';
 import uploadIcon from '../../assets/svg/ico-upload.svg';
 import hklogo from '../../assets/svg/hklogo.svg';
 import editToken from '../../assets/svg/editToken.svg';
@@ -16,18 +17,25 @@ import { isAddressValid, isENSValid } from "utils/checkAddr";
 import { useNavigate } from "react-router-dom";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import trimAddress from "utils/sliceAddr";
+import { useAppDispatch, useAppSelector } from "state/hooks";
+import { createContract } from '../../state/contract/actions';
+import { resetCreateContractLoader } from '../../state/contract/reducer';
 
 const CreatePassToken = () => {
     const {account, provider} = useWeb3React();
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
     const sbtDeployerContract = useSBTDeployerContract();
     const [tab,setTab] = useState(1);
+    const [contractAddr, setContractAddr] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [showMembers, setShowMembers] = useState(false);
     const [memberList,setMemberList] = useState([]);
     const [name,setName] = useState('');
     const [address,setAddress] = useState('');
+
+    const { createContractLoading } = useAppSelector(store => store.contract)
     /*
     State used to define main parameters for a the new SBT contract
     */
@@ -79,6 +87,17 @@ const CreatePassToken = () => {
      setTab(2)
     }
 
+    useEffect(() => {
+        if(contractAddr){
+            if(createContractLoading === false) {
+                setContractAddr(null)
+                dispatch(resetCreateContractLoader())
+                setIsLoading(false)
+                navigate(`/sbt/success/${contractAddr}`);
+            }
+        }
+    }, [createContractLoading, contractAddr])
+
     const deploySBTContract = async () => {
         if (account){
             setIsLoading(true);
@@ -92,23 +111,25 @@ const CreatePassToken = () => {
             else {
                 console.log("Contract deployed");
                 const contractAddr = await getContractById(sbtDeployerContract, counter);
+                setContractAddr(contractAddr);
                 const contractJSON = {
                     address : contractAddr,
                     admin : account,
                     contactDetail : selectedOptions, 
                     metadata : []
                 }
-                const req = await APInewContract(contractJSON);
-                if (req){
-                    setIsLoading(false)
-                    navigate(`/sbt/success/${contractAddr}`);
-                    return;
-                }
-               return;
+                dispatch(createContract(contractJSON))
+            //     const req = await APInewContract(contractJSON);
+            //     if (req){
+            //         setIsLoading(false)
+            //         navigate(`/sbt/success/${contractAddr}`);
+            //         return;
+            //     }
+            //    return;
             }
         }
-        toast.error("Please connect your account before !")
-        return;
+       // toast.error("Please connect your account before !")
+       // return;
     }
 
     return(

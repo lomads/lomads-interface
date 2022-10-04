@@ -4,6 +4,7 @@ import { load, save } from "redux-localstorage-simple";
 import application from "./application/reducer";
 import user from "./user/reducer";
 import connection from "./connection/reducer";
+import contract from "./contract/reducer";
 import transactions from "./transactions/reducer";
 import lists from "./lists/reducer";
 import proposal from "./proposal/reducer";
@@ -24,6 +25,7 @@ const store = configureStore({
     proposal,
     flow,
     tempdata,
+    contract,
     deploy,
     lists,
     dashboard,

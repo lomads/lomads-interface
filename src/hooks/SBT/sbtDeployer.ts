@@ -37,7 +37,7 @@ export const createNewSBT = async (sbtDeployerContract : Contract, SBTConstructo
     }
     if(sbtDeployerContract.signer){
         try {
-            const tx = await sbtDeployerContract.deployNewSBT(SBTConstructor.name, "SBT", SBTConstructor.supply, process.env.REACT_APP_SBT_API, needWhitelist, memberAddr);
+            const tx = await sbtDeployerContract.deployNewSBT(SBTConstructor.name, "SBT", SBTConstructor.supply, process.env.REACT_APP_NODE_BASE_URL, needWhitelist, memberAddr);
             return await tx.wait();
         }
         catch (e){

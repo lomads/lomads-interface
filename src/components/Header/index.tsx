@@ -1,17 +1,32 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useScrollPosition from "@react-hook/window-scroll";
 import { useWeb3React } from "@web3-react/core";
 import { Text } from "rebass";
+import lomadsfulllogo from "../../assets/svg/lomadsfulllogo.svg";
+import { coinbaseWalletConnection, injectedConnection } from "connection";
+import { LeapFrog } from "@uiball/loaders";
 import { CHAIN_INFO } from "constants/chainInfo";
 import { SupportedChainId } from "constants/chains";
 import { useNativeCurrencyBalances } from "state/connection/hooks";
 import { setDAOList } from "state/dashboard/reducer";
 import styled from "styled-components/macro";
 import { isChainAllowed } from "utils/switchChain";
+import { updateSelectedWallet } from "state/user/reducer";
 import Web3Status from "../Web3Status";
+import { useAppDispatch } from "state/hooks";
 import axiosHttp from '../../api';
+import {
+  updatetokenTitle,
+  updatetokenSymbol,
+  updateSupply,
+  updateHolder,
+  updateStepNumber,
+  updatedeployedTokenAddress,
+  updateExplain,
+  updateIconImgPath,
+} from "state/proposal/reducer";
 import { usePrevious } from "hooks/usePrevious";
-import { useNavigate, useMatch } from "react-router-dom";
+import { useNavigate, useMatch, useLocation } from "react-router-dom";
 // import NetworkSelector from './NetworkSelector'
 
 const HeaderFrame = styled.div<{ showBackground: boolean }>`
@@ -120,8 +135,10 @@ const UniIcon = styled.div`
   position: relative;
 `;
 export default function Header() {
-  const { account, chainId, connector } = useWeb3React();
 
+  const { account, chainId, connector } = useWeb3React();
+  const dispatch = useAppDispatch()
+  const location = useLocation()
   const chainAllowed = chainId && isChainAllowed(connector, chainId);
 
   const userEthBalance = useNativeCurrencyBalances(account ? [account] : [])?.[
@@ -132,19 +149,51 @@ export default function Header() {
   //const dashboard = useMatch("/dashboard");
 
   useEffect(() => {
-    if (!chainAllowed && !account) {
+    if ((chainId && !chainAllowed && !account) || !localStorage.getItem('__lmds_web3_token')) {
+      sessionStorage.setItem('__lmds_active_dao', location.pathname.substring(1))
       navigate("/");
     }
-  }, [account, chainAllowed, navigate]);
+  }, [chainId , account, chainAllowed, navigate]);
 
 
   const previousAccount = usePrevious(account);
 
+  const clearOnDisconnect = () => {
+    localStorage.removeItem('__lmds_web3_token');
+    dispatch(updatedeployedTokenAddress(""));
+    dispatch(updatetokenTitle(""));
+    dispatch(updatetokenSymbol(""));
+    dispatch(updateHolder(""));
+    dispatch(updateExplain(""));
+    dispatch(updateSupply(0));
+    dispatch(updateIconImgPath(""));
+  };
+
+
+
+  const disconnect = async () => {
+    if (connector.deactivate) {
+      connector.deactivate();
+      // Coinbase Wallet SDK does not emit a disconnect event to the provider,
+      // which is what web3-react uses to reset state. As a workaround we manually
+      // reset state.
+      if (connector === coinbaseWalletConnection.connector) {
+        connector.resetState();
+      }
+    } else {
+      connector.resetState();
+      clearOnDisconnect();
+    }
+    dispatch(updateSelectedWallet({ wallet: undefined }));
+    navigate("/");
+    //openOptions();
+  };
+
   useEffect(() => {
-    if (previousAccount && account && account !== previousAccount) {
+    if (previousAccount && account !== previousAccount) {
       localStorage.removeItem('__lmds_web3_token');
-      localStorage.removeItem('__lmds_active_dao')
-      navigate("/");
+      sessionStorage.removeItem('__lmds_active_dao')
+      disconnect()
     }
   }, [account, previousAccount])
 
@@ -154,6 +203,21 @@ export default function Header() {
     CHAIN_INFO[!chainId || !chainAllowed ? SupportedChainId.MAINNET : chainId];
   const balance = userEthBalance?.toSignificant(3);
   const symbol = nativeCurrency.symbol;
+
+
+  if(chainId === undefined) {
+    return (
+      <div style={{ backgroundColor: '#FFF', height: '100vh', zIndex: 99999, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="logo">
+          <img src={lomadsfulllogo} alt="" />
+        </div>
+        <div style={{ marginTop: 32 }}>
+          <LeapFrog size={50} color="#C94B32" />
+        </div>
+      </div> 
+    )
+  }
+  
   return (
     <HeaderFrame showBackground={scrollY > 45}>
       <Title href=".">

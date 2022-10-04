@@ -24,7 +24,7 @@ export type metadataAPI = {
 export const APInewContract = async (contractData : contractAPI) => {
     const config = {
         method : "post",
-        url : process.env.REACT_APP_SBT_API+"new-contract",
+        url : process.env.REACT_APP_NODE_BASE_URL+"new-contract",
         headers : {
             "Content-Type":"application/json",  
         },
@@ -43,7 +43,7 @@ export const APInewContract = async (contractData : contractAPI) => {
 export const APInewSBTtoken = async (metadata : metadataAPI) => {
     const config = {
         method : "post",
-        url : process.env.REACT_APP_SBT_API+`add-metadata/${metadata.contract}`,
+        url : process.env.REACT_APP_NODE_BASE_URL+`add-metadata/${metadata.contract}`,
         headers : {
             "Content-Type":"application/json",  
         },
@@ -63,7 +63,7 @@ export const APInewSBTtoken = async (metadata : metadataAPI) => {
 export const APIgetContract = async (contract : string) => {
     const config = {
         method : "get",
-        url : process.env.REACT_APP_SBT_API+`get-contract/${contract}`,
+        url : process.env.REACT_APP_NODE_BASE_URL+`get-contract/${contract}`,
         headers : {
             'Access-Control-Allow-Origin' : '*' 
         },

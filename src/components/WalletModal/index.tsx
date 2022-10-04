@@ -167,18 +167,13 @@ export default function WalletModal({
   const navigateTo = async () => {
     return axiosHttp.get('dao').then(res => {
       if(res.data && res.data.length > 0) {
-        const activeDao = localStorage.getItem('__lmds_active_dao')
-        if(activeDao) {
-          let hasAccess = _find(res.data, d => d.url === activeDao)
-          if(hasAccess)
+        const activeDao = sessionStorage.getItem('__lmds_active_dao')
+        if(activeDao)
             return `/${activeDao}`
-          else
-            return `/noaccess`
-        }
         else
           return `/${_get(res.data, '[0].url')}`
       } else {
-        const activeDao = localStorage.getItem('__lmds_active_dao')
+        const activeDao = sessionStorage.getItem('__lmds_active_dao')
         if(activeDao) 
           return `/noaccess`
         return "/namedao"

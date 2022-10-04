@@ -4,8 +4,12 @@ import editIcon from '../../assets/svg/editButton.svg';
 import copy from '../../assets/svg/copyIcon.svg';
 import logo from '../../assets/svg/lomadsLogoExpand.svg';
 import { CgClose } from 'react-icons/cg'
+import { useNavigate } from 'react-router-dom';
 
 const Settings = () => {
+
+    const navigate = useNavigate();
+
     return (
         <div className='settings-page'>
             <div className='settings-left-bar'>
@@ -75,7 +79,7 @@ const Settings = () => {
                 <div className='settings-token'>
                     <h1>Pass Tokens</h1>
                     <p>The organisation doesn’t have token yet</p>
-                    <button>configure pass token</button>
+                    <button onClick={() => navigate('/sbt/create')}>configure pass token</button>
                 </div>
 
                 <div className='settings-footer'>
@@ -84,7 +88,7 @@ const Settings = () => {
                 </div>
             </div>
             <div className='settings-right-bar'>
-                <button>
+                <button onClick={() => navigate(-1)}>
                     <CgClose color='#FFF' size={24} />
                 </button>
             </div>
