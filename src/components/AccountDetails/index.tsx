@@ -270,7 +270,7 @@ export default function AccountDetails({
       clearOnDisconnect();
     }
     dispatch(updateSelectedWallet({ wallet: undefined }));
-    //openOptions();
+    openOptions();
   };
 
   return (
