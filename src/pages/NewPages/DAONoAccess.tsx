@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import "../../styles/pages/DAOSuccess.css";
 import "../../styles/Global.css";
-import frameicon from "../../assets/svg/frame.svg";
+import frameicon from "../../assets/svg/Frame.svg";
 import GroupEnjoy from "../../assets/svg/GroupEnjoy.svg";
 import { colors } from "assets/colors";
 import { Colorstype } from "types/UItype";
