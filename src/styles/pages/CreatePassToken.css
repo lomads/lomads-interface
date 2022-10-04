@@ -1,0 +1,478 @@
+.createPassToken-container {
+    width: 100%;
+    padding: 10vh 0;
+    background: linear-gradient(178.31deg, #C94B32 0.74%, #A54536 63.87%);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.createPassToken-container .address-dropdown-container{
+    width: 220px;
+    height: 60px;
+    border-radius: 30px;
+    background-color: #FFF;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+}
+
+.createPassToken-container .address-dropdown-container .address-dropdown-div1{
+    height: 100%;
+    width: 75%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid #F0F0F0;
+}
+
+.createPassToken-container .address-dropdown-container .address-dropdown-div1 p {
+    color: #909090;
+    font-size: 14px;
+    font-style: italic;
+    margin-left: 10px;
+}
+
+.createPassToken-container .address-dropdown-container .address-dropdown-div2 {
+    height: 100%;
+    width: 25%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.createPassToken-container .address-dropdown-container .address-dropdown-div2 span {
+    transform: translateX(-5px);
+    cursor: pointer;
+}
+
+.createPassToken-container .createPassToken-body {
+    width: 100%;
+    /* background-color: blue; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.createPassToken-container .createPassToken-body .heading-text {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 33px;
+    color: #FFF;
+    margin: 1.5rem 0;
+}
+
+.createPassToken-container .createPassToken-body .createPassToken-form-container {
+    background-color: #FFF;
+    border-radius: 5px;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 30px 22px;
+}
+
+.createPassToken-container .createPassToken-body .createPassToken-form-container label {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
+    color: #76808D;
+    margin-bottom: 0.5rem;
+}
+
+.createPassToken-container .createPassToken-body .createPassToken-form-container .text-input {
+    width: 350px;
+    height: 50px;
+    border-radius: 10px;
+    background: #F5F5F5;
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    padding: 0 1rem;
+    outline: none;
+    margin-bottom: 1rem;
+}
+
+.createPassToken-container .createPassToken-body .createPassToken-form-container .optional-div{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.createPassToken-container .createPassToken-body .createPassToken-form-container .optional-div label {
+    margin: 0;
+}
+
+.createPassToken-container .createPassToken-body .createPassToken-form-container .optional-div div{
+    width: 110px;
+    height: 25px;
+    border-radius: 100px;
+    background: rgba(118, 128, 141, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.createPassToken-container .createPassToken-body .createPassToken-form-container .optional-div div p {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 16px;
+    color: rgba(118, 128, 141, 0.5);
+}
+
+.createPassToken-container .createPassToken-body .createPassToken-form-container span {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+
+    letter-spacing: -0.011em;
+
+    color: rgba(118, 128, 141, 0.5);
+}
+
+.createPassToken-container .createPassToken-body .createPassToken-form-container .image-picker-container {
+    width: 200px;
+    height: 200px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #F5F5F5;
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    margin: 1rem 0;
+    cursor: pointer;
+    position: relative;
+}
+
+.createPassToken-container .createPassToken-body .createPassToken-form-container .image-picker-container p {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    text-align: center;
+    letter-spacing: -0.011em;
+    color: rgba(27, 45, 65, 0.6);
+    margin-top: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.createPassToken-container .createPassToken-body .createPassToken-form-container .image-picker-container span {
+    color: rgba(27, 45, 65, 0.2);
+    font-style: normal;
+}
+
+.createPassToken-container .createPassToken-body .createPassToken-form-container .image-picker-container input {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.createPassToken-container .createPassToken-body .createPassToken-form-container button {
+    width: 350px;
+    height: 40px;
+    border-radius: 5px;
+    background: #C94B32;
+    color: #FFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.createPassToken-container .createPassToken-body .createPassToken-form-container button:hover{
+    background: #F24822;
+}
+
+/* Second step */
+
+.createPassToken-container .createPassToken-body .tokenName-container {
+    width: 478px;
+    background: #FFFFFF;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    padding: 30px 22px;
+}
+
+.createPassToken-container .createPassToken-body .tokenName-container .tokenName-box {
+    width: 85%;
+    height: 100%;
+    /* padding-right: 25px; */
+    display: flex;
+    align-items: center;
+    /* justify-content: space-between; */
+    border-right: 1px solid #c5c5c5;
+}
+
+.createPassToken-container .createPassToken-body .tokenName-container input {
+    outline: none;
+    width: 65%;
+    margin-left: 10px;
+}
+
+.createPassToken-container .createPassToken-body .tokenName-container .tokenName-box p {
+    color: #76808D;
+}
+
+.createPassToken-container .createPassToken-body .tokenName-container .tokenName-btn {
+    width: 15%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    cursor: pointer;
+}
+
+.createPassToken-container .createPassToken-body .divider {
+    width: 200px;
+    border: 2px solid #EA6447;
+    margin: 35px 0;
+}
+
+
+.createPassToken-container .createPassToken-body .contact-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 26px 22px 30px;
+    width: 393px;
+    background: #FFFFFF;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+}
+
+.createPassToken-container .createPassToken-body .contact-container h1{
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
+    color: #76808D;
+    margin-bottom: 20px;
+}
+
+.createPassToken-container .createPassToken-body .contact-container p{
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    color: rgba(118, 128, 141, 0.5);
+    margin-bottom: 1rem;
+}
+
+.createPassToken-container .createPassToken-body .contact-container .option {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+}
+
+.createPassToken-container .createPassToken-body .contact-container .option div{
+    display: flex;
+    margin-bottom: 0.5rem;
+}
+
+.createPassToken-container .createPassToken-body .contact-container .option div label {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    color: #76808D;
+    margin-left: 10px;
+}
+
+.createPassToken-container .createPassToken-body .contact-container .option span {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+    color: rgba(118, 128, 141, 0.5);
+}
+
+.createPassToken-container .createPassToken-body .contact-container button {
+    width: 100%;
+    height: 40px;
+    border-radius: 5px;
+    background: #C94B32;
+    color: #FFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.createPassToken-container .createPassToken-body .contact-container button:hover{
+    background: #F24822;
+}
+
+.createPassToken-container .createPassToken-body .member-container{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 26px 22px;
+    background: #FFFFFF;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+}
+
+.createPassToken-container .createPassToken-body .member-container .member-header{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.createPassToken-container .createPassToken-body .member-container .member-header h1{
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
+    color: #76808D;
+}
+
+.createPassToken-container .createPassToken-body .member-container .member-header div{
+    width: 110px;
+    height: 25px;
+    border-radius: 100px;
+    background: rgba(118, 128, 141, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.createPassToken-container .createPassToken-body .member-container .member-header div p {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 16px;
+    color: rgba(118, 128, 141, 0.5);
+}
+
+.createPassToken-container .createPassToken-body .member-container .member-body{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.createPassToken-container .createPassToken-body .member-container .member-body .input1{
+    width: 144px;
+    height: 50px;
+    padding: 0 1rem;
+    background: #F5F5F5;
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 10px;
+    margin-right: 12px;
+    font-size: 14px;
+    outline: none;
+}
+
+.createPassToken-container .createPassToken-body .member-container .member-body .input2{
+    width: 250px;
+    height: 50px;
+    padding: 0 1rem;
+    background: #F5F5F5;
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    margin-right: 40px;
+}
+
+.createPassToken-container .createPassToken-body .member-container .member-body button {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(27, 43, 65, 0.2);
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.createPassToken-container .createPassToken-body .member-list {
+    width: 500px;
+    background: rgba(118, 128, 141, 0.05);
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    padding: 22px 26px;
+}
+
+.createPassToken-container .createPassToken-body .member-list .member-li {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    cursor: pointer;
+}
+
+.createPassToken-container .createPassToken-body .member-list .member-li:last-child{
+    margin-bottom: 0;
+}
+
+.createPassToken-container .createPassToken-body .member-list .member-li .member-img-name{
+    width: 50%;
+    display: flex;
+    align-items: center;
+}
+
+.createPassToken-container .createPassToken-body .member-list .member-li .member-img-name img {
+    margin-right: 15px;
+}
+
+.createPassToken-container .createPassToken-body .member-list .member-li .member-img-name{
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+
+
+.createPassToken-container .createPassToken-body .member-list .member-li .member-address{
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.createPassToken-container .createPassToken-body .member-list .member-li .member-address p {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+
+.createPassToken-container .createPassToken-body .member-list .member-li .member-address button {
+    display: none;
+    color: #fff;
+}
+
+.createPassToken-container .createPassToken-body .member-list .member-li:hover .member-address button {
+    display: block;
+}
+
+.createPassToken-container .createPassToken-body .create{
+    width: 250px;
+    height: 50px;
+    background: #C94B32;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFF;
+    margin-top: 1rem;
+}

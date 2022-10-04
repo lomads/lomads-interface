@@ -11,6 +11,11 @@ import AddExistingSafe from "./NewPages/AddExistingSafe";
 import AddNewSafe from "./NewPages/AddNewSafe";
 import Dashboard from "./NewPages/DashBoard/Dashboard";
 
+// New page added
+import CreatePassToken from "./NewPages/CreatePassToken";
+import MintPassToken from "./NewPages/MintPassToken";
+import CreatePassSucess from "./NewPages/CreatePassSucess";
+
 export default function App() {
   const landingPage = useMatch("/");
 
@@ -27,6 +32,9 @@ export default function App() {
         <Route path="/newsafe" element={<AddNewSafe />} />
         <Route path="/success" element={<DAOsuccess />} />
         <Route path="/noaccess" element={<DAONoAccess />} />
+        <Route path="/sbt/create" element={<CreatePassToken />}/>
+			  <Route path="/sbt/mint/:contractAddr" element={<MintPassToken />}/>
+        <Route path="/sbt/success/:contractAddr" element={<CreatePassSucess />} />
         <Route path="/:daoURL" element={<Dashboard />} />
       </Routes>
     </div>
