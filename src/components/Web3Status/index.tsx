@@ -9,12 +9,13 @@ import { Activity } from "react-feather";
 import { useAppSelector } from "state/hooks";
 import styled, { css } from "styled-components/macro";
 import { isChainAllowed, switchChain } from "utils/switchChain";
+import { SupportedChainId } from 'constants/chains'
 
 import { useHasSocks } from "hooks/useSocksBalance";
 import { useToggleWalletModal } from "state/application/hooks";
 import {
-  isTransactionRecent,
-  useAllTransactions,
+	isTransactionRecent,
+	useAllTransactions,
 } from "state/transactions/hooks";
 import { TransactionDetails } from "state/transactions/types";
 import { shortenAddress } from "utils";
@@ -26,88 +27,57 @@ import WalletModal from "../WalletModal";
 import { useNavigate } from "react-router-dom";
 import axiosHttp from '../../api';
 
+import dogIcon from '../../assets/svg/dogIcon.svg';
+import { MdKeyboardArrowDown } from 'react-icons/md';
+
 const Web3StatusGeneric = styled(ButtonSecondary)`
   ${({ theme }) => theme.flexRowNoWrap}
   width: 100%;
   align-items: center;
-  padding: 0.5rem;
-  border-radius: 14px;
+  border-radius: 30px;
+  background-color: #FFF;
+  box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
   cursor: pointer;
   user-select: none;
-  height: 36px;
-  margin-right: 2px;
-  margin-left: 1px;
-  :focus {
-    outline: none;
-  }
+  height: 60px;
+  border:none;
+  outline:none;
 `;
 const Web3StatusError = styled(Web3StatusGeneric)`
   background-color: ${({ theme }) => theme.red1};
-  border: 1px solid ${({ theme }) => theme.red1};
   color: ${({ theme }) => theme.white};
   font-weight: 500;
-  :hover,
-  :focus {
-    background-color: ${({ theme }) => darken(0.1, theme.red1)};
-  }
+  border:none;
+  outline:none;
 `;
 
-const Web3StatusConnect = styled(Web3StatusGeneric)<{ faded?: boolean }>`
+const Web3StatusConnect = styled(Web3StatusGeneric) <{ faded?: boolean }>`
   background-color: ${({ theme }) => theme.primary4};
   border: none;
 
   color: ${({ theme }) => theme.primaryText1};
   font-weight: 500;
 
-  :hover,
-  :focus {
-    border: 1px solid ${({ theme }) => darken(0.05, theme.primary4)};
-    color: ${({ theme }) => theme.primaryText1};
-  }
-
   ${({ faded }) =>
-    faded &&
-    css`
+		faded &&
+		css`
       background-color: ${({ theme }) => theme.primary5};
-      border: 1px solid ${({ theme }) => theme.primary5};
       color: ${({ theme }) => theme.primaryText1};
-
-      :hover,
-      :focus {
-        border: 1px solid ${({ theme }) => darken(0.05, theme.primary4)};
-        color: ${({ theme }) => darken(0.05, theme.primaryText1)};
-      }
     `}
 `;
 
-const Web3StatusConnected = styled(Web3StatusGeneric)<{ pending?: boolean }>`
-  background-color: ${({ pending, theme }) =>
-    pending ? theme.primary1 : theme.bg1};
-  border: 1px solid
-    ${({ pending, theme }) => (pending ? theme.primary1 : theme.bg1)};
-  color: ${({ pending, theme }) => (pending ? theme.white : theme.text1)};
-  font-weight: 500;
-  :hover,
-  :focus {
-    border: 1px solid ${({ theme }) => darken(0.05, theme.bg3)};
-
-    :focus {
-      border: 1px solid
-        ${({ pending, theme }) =>
-          pending ? darken(0.1, theme.primary1) : darken(0.1, theme.bg2)};
-    }
-  }
+const Web3StatusConnected = styled(Web3StatusGeneric) <{ pending?: boolean }>`
+	width: 220px;
+	height:60px;
+	color: ${({ pending, theme }) => (pending ? theme.white : theme.text1)};
+	font-weight: 500;
 `;
 
 const Text = styled.p`
-  flex: 1 1 auto;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  margin: 0 0.5rem 0 0.25rem;
-  font-size: 1rem;
-  width: fit-content;
-  font-weight: 500;
+  	color: #909090;
+    font-size: 14px;
+    font-style: italic;
+    margin-left: 10px;
 `;
 
 const NetworkIcon = styled(Activity)`
@@ -119,161 +89,185 @@ const NetworkIcon = styled(Activity)`
 
 // we want the latest one to come first, so return negative if a is after b
 function newTransactionsFirst(a: TransactionDetails, b: TransactionDetails) {
-  return b.addedTime - a.addedTime;
+	return b.addedTime - a.addedTime;
 }
 
 function Sock() {
-  return (
-    <span
-      role="img"
-      aria-label={t`has socks emoji`}
-      style={{ marginTop: -4, marginBottom: -4 }}
-    >
-      🧦
-    </span>
-  );
+	return (
+		<span
+			role="img"
+			aria-label={t`has socks emoji`}
+			style={{ marginTop: -4, marginBottom: -4 }}
+		>
+			🧦
+		</span>
+	);
 }
 
 function Web3StatusInner() {
-  const { account, connector, chainId, ENSName } = useWeb3React();
-  const connectionType = getConnection(connector).type;
+	const { account, connector, chainId, ENSName } = useWeb3React();
+	const connectionType = getConnection(connector).type;
 
-  const error = useAppSelector(
-    (state) =>
-      state.connection.errorByConnectionType[getConnection(connector).type]
-  );
+	const error = useAppSelector(
+		(state) =>
+			state.connection.errorByConnectionType[getConnection(connector).type]
+	);
 
-  const chainAllowed = chainId && isChainAllowed(connector, chainId);
+	const chainAllowed = chainId && isChainAllowed(connector, chainId);
 
-  const allTransactions = useAllTransactions();
+	const allTransactions = useAllTransactions();
 
-  const sortedRecentTransactions = useMemo(() => {
-    const txs = Object.values(allTransactions);
-    return txs.filter(isTransactionRecent).sort(newTransactionsFirst);
-  }, [allTransactions]);
+	const sortedRecentTransactions = useMemo(() => {
+		const txs = Object.values(allTransactions);
+		return txs.filter(isTransactionRecent).sort(newTransactionsFirst);
+	}, [allTransactions]);
 
-  const pending = sortedRecentTransactions
-    .filter((tx) => !tx.receipt)
-    .map((tx) => tx.hash);
+	const pending = sortedRecentTransactions
+		.filter((tx) => !tx.receipt)
+		.map((tx) => tx.hash);
 
-  const hasPendingTransactions = !!pending.length;
-  const hasSocks = useHasSocks();
-  const toggleWalletModal = useToggleWalletModal();
+	const hasPendingTransactions = !!pending.length;
+	const hasSocks = useHasSocks();
+	const toggleWalletModal = useToggleWalletModal();
 
-  const navigate = useNavigate();
-
-
-  const navigateTo = async () => {
-    return axiosHttp.get('dao').then(res => {
-      if(res.data && res.data.length > 0) {
-        const activeDao = localStorage.getItem('__lmds_active_dao')
-        if(activeDao) {
-          let hasAccess = _find(res.data, d => d.url === activeDao)
-          if(hasAccess)
-            return `/${activeDao}`
-          else
-            return `/noaccess`
-        }
-        else
-          return `/${_get(res.data, '[0].url')}`
-      } else {
-        const activeDao = localStorage.getItem('__lmds_active_dao')
-        if(activeDao) 
-          return `/noaccess`
-        return "/namedao"
-      }
-    })
-  }
+	const navigate = useNavigate();
 
 
-  if (!chainId) {
-    return null;
-  } else if (!chainAllowed) {
-    return (
-      <Web3StatusError
-        onClick={() => {
-          switchChain(connector, 80001)
-            .then(async () => {
-              navigate(await navigateTo())
-            })
-            .catch((err) => {
-              console.log("Error occurred while switching");
-            });
-        }}
-      >
-        <NetworkIcon />
-        <Text>
-          <Trans>Wrong Network</Trans>
-        </Text>
-      </Web3StatusError>
-    );
-  } else if (error) {
-    return (
-      <Web3StatusError onClick={toggleWalletModal}>
-        <NetworkIcon />
-        <Text>
-          <Trans>Error</Trans>
-        </Text>
-      </Web3StatusError>
-    );
-  } else if (account) {
-    return (
-      <Web3StatusConnected
-        data-testid="web3-status-connected"
-        onClick={toggleWalletModal}
-        pending={hasPendingTransactions}
-      >
-        {hasPendingTransactions ? (
-          <RowBetween>
-            <Text>{pending?.length} Pending</Text> <Loader stroke="white" />
-          </RowBetween>
-        ) : (
-          <>
-            {hasSocks ? <Sock /> : null}
-            <Text>{ENSName || shortenAddress(account)}</Text>
-          </>
-        )}
-        {!hasPendingTransactions && (
-          <StatusIcon connectionType={connectionType} />
-        )}
-      </Web3StatusConnected>
-    );
-  } else {
-    return (
-      <Web3StatusConnect onClick={toggleWalletModal} faded={!account}>
-        <Text>
-          <Trans>Connect Wallet</Trans>
-        </Text>
-      </Web3StatusConnect>
-    );
-  }
+	const navigateTo = async () => {
+		return axiosHttp.get('dao').then(res => {
+			if (res.data && res.data.length > 0) {
+				const activeDao = localStorage.getItem('__lmds_active_dao')
+				if (activeDao) {
+					let hasAccess = _find(res.data, d => d.url === activeDao)
+					if (hasAccess)
+						return `/${activeDao}`
+					else
+						return `/noaccess`
+				}
+				else
+					return `/${_get(res.data, '[0].url')}`
+			} else {
+				const activeDao = localStorage.getItem('__lmds_active_dao')
+				if (activeDao)
+					return `/noaccess`
+				return "/namedao"
+			}
+		})
+	}
+
+
+	if (!chainId) {
+		return null;
+	}
+	else if (!chainAllowed) {
+		console.log("Network switched")
+		return (
+			<Web3StatusError
+				onClick={() => {
+					switchChain(connector, SupportedChainId.GOERLI)
+						.then(async () => {
+							navigate(await navigateTo())
+						})
+						.catch((err) => {
+							console.log("Error occurred while switching");
+						});
+				}}
+			>
+				<NetworkIcon />
+				<Text>
+					<Trans>Wrong Network</Trans>
+				</Text>
+			</Web3StatusError>
+		);
+	}
+	else if (error) {
+		return (
+			<Web3StatusError onClick={toggleWalletModal}>
+				<NetworkIcon />
+				<Text>
+					<Trans>Error</Trans>
+				</Text>
+			</Web3StatusError>
+		);
+	}
+	else if (account) {
+		return (
+			<Web3StatusConnected
+				data-testid="web3-status-connected"
+				onClick={toggleWalletModal}
+				pending={hasPendingTransactions}
+			>
+				{
+					!hasPendingTransactions && (
+						// <StatusIcon connectionType={connectionType} />
+						<img src={dogIcon} alt="dog-icon" />
+					)
+				}
+				{
+					hasPendingTransactions
+						?
+						<RowBetween>
+							<Text>{pending?.length} Pending</Text> <Loader stroke="white" />
+						</RowBetween>
+						:
+						<>
+							{
+								hasSocks
+									?
+									<Sock />
+									:
+									null
+							}
+							<Text>{ENSName || shortenAddress(account)}</Text>
+						</>
+				}
+				<div style={{ height: '100%', width: '25%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderLeft: '1px solid #F0F0F0', marginLeft: '10px' }}>
+					<span>
+						<MdKeyboardArrowDown
+							size={20}
+							color="#76808D"
+						/>
+					</span>
+				</div>
+			</Web3StatusConnected>
+		);
+	}
+	else {
+		return (
+			<Web3StatusConnect onClick={toggleWalletModal} faded={!account}>
+				<Text>
+					<Trans>Connect Wallet</Trans>
+				</Text>
+			</Web3StatusConnect>
+		);
+	}
 }
 
 export default function Web3Status() {
-  const { ENSName } = useWeb3React();
+	const { ENSName } = useWeb3React();
 
-  const allTransactions = useAllTransactions();
+	const allTransactions = useAllTransactions();
 
-  const sortedRecentTransactions = useMemo(() => {
-    const txs = Object.values(allTransactions);
-    return txs.filter(isTransactionRecent).sort(newTransactionsFirst);
-  }, [allTransactions]);
+	const sortedRecentTransactions = useMemo(() => {
+		const txs = Object.values(allTransactions);
+		return txs.filter(isTransactionRecent).sort(newTransactionsFirst);
+	}, [allTransactions]);
 
-  const pending = sortedRecentTransactions
-    .filter((tx) => !tx.receipt)
-    .map((tx) => tx.hash);
-  const confirmed = sortedRecentTransactions
-    .filter((tx) => tx.receipt)
-    .map((tx) => tx.hash);
+	const pending = sortedRecentTransactions
+		.filter((tx) => !tx.receipt)
+		.map((tx) => tx.hash);
+	const confirmed = sortedRecentTransactions
+		.filter((tx) => tx.receipt)
+		.map((tx) => tx.hash);
 
-  return (
-    <>
-      <Web3StatusInner />
-      <WalletModal
-        ENSName={ENSName ?? undefined}
-        pendingTransactions={pending}
-        confirmedTransactions={confirmed}
-      />
-    </>
-  );
+	return (
+		<>
+			<Web3StatusInner />
+			<WalletModal
+				ENSName={ENSName ?? undefined}
+				pendingTransactions={pending}
+				confirmedTransactions={confirmed}
+			/>
+		</>
+	);
 }

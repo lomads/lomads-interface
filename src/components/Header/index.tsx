@@ -20,12 +20,10 @@ const HeaderFrame = styled.div<{ showBackground: boolean }>`
   justify-content: space-between;
   align-items: center;
   flex-direction: row;
-  width: 40%;
-  top: 10;
   position: absolute;
-  right: 20px;
-  padding: 1rem;
-  z-index: 10000;
+  top: 20px;
+  right: 18px;
+  padding: 1rem 0;
   /* Background slide effect on scroll. */
   background-image: ${({ theme }) =>
     `linear-gradient(to bottom, transparent 50%, ${theme.bg0} 50% )}}`};
@@ -34,7 +32,7 @@ const HeaderFrame = styled.div<{ showBackground: boolean }>`
   background-size: 100% 200%;
   box-shadow: 0px 0px 0px 1px
     ${({ theme, showBackground }) =>
-      showBackground ? theme.bg2 : "transparent;"};
+    showBackground ? theme.bg2 : "transparent;"};
   transition: background-position 0.1s, box-shadow 0.1s;
   background-blend-mode: hard-light;
 
@@ -139,11 +137,11 @@ export default function Header() {
     }
   }, [account, chainAllowed, navigate]);
 
-    
+
   const previousAccount = usePrevious(account);
 
   useEffect(() => {
-    if(previousAccount && account && account !== previousAccount) {
+    if (previousAccount && account && account !== previousAccount) {
       localStorage.removeItem('__lmds_web3_token');
       localStorage.removeItem('__lmds_active_dao')
       navigate("/");

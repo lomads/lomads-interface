@@ -14,109 +14,113 @@ import { Tooltip } from "@chakra-ui/react";
 import { useAppSelector } from "state/hooks";
 
 const TreasuryCard = (props: ItreasuryCardType) => {
-	const { provider, account } = useWeb3React();
-	const ownerCount = props.ownerCount;
-	const [copy, setCopy] = useState<boolean>(false);
-	const [isAddressValid, setisAddressValid] = useState<boolean>(false);
+  const { provider, account } = useWeb3React();
+  const ownerCount = props.ownerCount;
+  const [copy, setCopy] = useState<boolean>(false);
+  const [isAddressValid, setisAddressValid] = useState<boolean>(false);
 
-	const { DAO }  = useAppSelector(store => store.dashboard);
+  const { DAO } = useAppSelector(store => store.dashboard);
 
   const amIAdmin = useMemo(() => {
-    if(DAO) {
+    if (DAO) {
       let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'ADMIN')
-      if(user)
+      if (user)
         return true
       return false
     }
     return false;
   }, [account, DAO])
 
-	const isOwner = async () => {
-		const safeSDK = await ImportSafe(provider, props.safeAddress);
-		const condition = await safeSDK.isOwner(account as string);
-		return condition;
-	};
-	const hasUserApproved = (_index: number) => {
-		return (
-			props.pendingTransactions !== undefined &&
-			props.pendingTransactions?.results[_index].confirmations?.some(
-				(signer) => {
-					if (signer.owner === account) {
-						return true;
-					}
-					return false;
-				}
-			)
-		);
-	};
+  const isOwner = async () => {
+    const safeSDK = await ImportSafe(provider, props.safeAddress);
+    const condition = await safeSDK.isOwner(account as string);
+    return condition;
+  };
+  const hasUserApproved = (_index: number) => {
+    return (
+      props.pendingTransactions !== undefined &&
+      props.pendingTransactions?.results[_index].confirmations?.some(
+        (signer) => {
+          if (signer.owner === account) {
+            return true;
+          }
+          return false;
+        }
+      )
+    );
+  };
 
-	useEffect(() => {
-		(async (_address: string, _safeAddress: string) => {
-			const condition = await isOwner();
-			if (condition) {
-				setisAddressValid(true);
-			}
-		})(account as string, props.safeAddress);
-	}, [account, isOwner, props.safeAddress, provider]);
+  useEffect(() => {
+    (async (_address: string, _safeAddress: string) => {
+      const condition = await isOwner();
+      if (condition) {
+        setisAddressValid(true);
+      }
+    })(account as string, props.safeAddress);
+  }, [account, isOwner, props.safeAddress, provider]);
 
-	useEffect(() => {
-		setisAddressValid(false);
-	}, [account as string]);
+  useEffect(() => {
+    setisAddressValid(false);
+  }, [account as string]);
 
-	const confirmTransaction = async (_safeTxHashs: string) => {
-		const safeSDK = await ImportSafe(provider, props.safeAddress);
-		const isOwner = await safeSDK.isOwner(account as string);
-		if (isOwner) {
-			const senderSignature = await safeSDK.signTransactionHash(_safeTxHashs);
-			await (
-				await safeService(provider)
-			)
-				.confirmTransaction(_safeTxHashs, senderSignature.data)
-				.then(async (success) => {
-					console.log("User confirmed the transaction");
-					await props.getPendingTransactions();
-				})
-				.catch((err) => {
-					console.log("error occured while confirming transaction", err);
-				});
-		} else {
-			console.log("sorry you already approved the transaction");
-		}
-	};
+  const confirmTransaction = async (_safeTxHashs: string) => {
+    const safeSDK = await ImportSafe(provider, props.safeAddress);
+    const isOwner = await safeSDK.isOwner(account as string);
+    if (isOwner) {
+      const senderSignature = await safeSDK.signTransactionHash(_safeTxHashs);
+      await (
+        await safeService(provider)
+      )
+        .confirmTransaction(_safeTxHashs, senderSignature.data)
+        .then(async (success) => {
+          console.log("User confirmed the transaction");
+          await props.getPendingTransactions();
+        })
+        .catch((err) => {
+          console.log("error occured while confirming transaction", err);
+        });
+    } else {
+      console.log("sorry you already approved the transaction");
+    }
+  };
 
-	const executeTransactions = async (_txs: any) => {
-		console.log(_txs);
-		const safeSDK = await ImportSafe(provider, props.safeAddress);
-		const safeTransactionData: SafeTransactionData = {
-			to: _txs.to,
-			value: _txs.value,
-			data: _txs.data !== null ? _txs.data : "0x",
-			operation: _txs.operation,
-			safeTxGas: _txs.safeTxGas,
-			baseGas: _txs.baseGas,
-			gasPrice: _txs.gasPrice,
-			gasToken: _txs.gasToken,
-			refundReceiver: _txs.refundReceiver,
-			nonce: _txs.nonce,
-		};
-		const safeTransaction = await safeSDK.createTransaction({
-			safeTransactionData,
-		});
-		_txs.confirmations &&
-			_txs.confirmations.forEach((confirmation: any) => {
-				const signature = new EthSignSignature(
-					confirmation.owner,
-					confirmation.signature
-				);
-				safeTransaction.addSignature(signature);
-			});
-		const executeTxResponse = await safeSDK.executeTransaction(safeTransaction);
-		const receipt =
-			executeTxResponse.transactionResponse &&
-			(await executeTxResponse.transactionResponse.wait());
-		console.log("confirmed", receipt);
-		await props.getPendingTransactions();
-	};
+  const checkIsLast = (current: any, next: any) => {
+
+  }
+
+  const executeTransactions = async (_txs: any) => {
+    console.log(_txs);
+    const safeSDK = await ImportSafe(provider, props.safeAddress);
+    const safeTransactionData: SafeTransactionData = {
+      to: _txs.to,
+      value: _txs.value,
+      data: _txs.data !== null ? _txs.data : "0x",
+      operation: _txs.operation,
+      safeTxGas: _txs.safeTxGas,
+      baseGas: _txs.baseGas,
+      gasPrice: _txs.gasPrice,
+      gasToken: _txs.gasToken,
+      refundReceiver: _txs.refundReceiver,
+      nonce: _txs.nonce,
+    };
+    const safeTransaction = await safeSDK.createTransaction({
+      safeTransactionData,
+    });
+    _txs.confirmations &&
+      _txs.confirmations.forEach((confirmation: any) => {
+        const signature = new EthSignSignature(
+          confirmation.owner,
+          confirmation.signature
+        );
+        safeTransaction.addSignature(signature);
+      });
+    const executeTxResponse = await safeSDK.executeTransaction(safeTransaction);
+    const receipt =
+      executeTxResponse.transactionResponse &&
+      (await executeTxResponse.transactionResponse.wait());
+    console.log("confirmed", receipt);
+    await props.getPendingTransactions();
+  };
 
   const rejectTransaction = async (_nonce: number) => {
     const safeSDK = await ImportSafe(provider, props.safeAddress);
@@ -221,46 +225,46 @@ const TreasuryCard = (props: ItreasuryCardType) => {
       </div>
       {(props.executedTransactions !== undefined ||
         props.pendingTransactions?.count !== undefined) && (
-        <>
-          <div id="treasuryTransactions">
-            <div className="dashboardText">Last Transactions</div>
-            {props.pendingTransactions !== undefined &&
-              props.pendingTransactions.results.length >= 1 &&
-              props.pendingTransactions.results
-                .sort((a, b) => {
-                  return a.nonce - b.nonce;
-                })
-                .map((result: any, index: number) => {
-                  return result.dataDecoded !== null &&
-                    result.dataDecoded.method !== "multiSend" ? (
-                    <PendingTransactions
-                      showExecute={hasUserApproved(index)}
-                      amount={
-                        result.dataDecoded !== null &&
-                        result.dataDecoded.parameters[1].value
-                      }
-                      recipient={
-                        result.dataDecoded !== null &&
-                        result.dataDecoded.parameters[0].value
-                      }
-                      confirmations={
-                        result.confirmations && result.confirmations.length
-                      }
-                      ownerCount={ownerCount}
-                      confirmTransaction={confirmTransaction}
-                      safeTxHash={result.safeTxHash}
-                      isOwner={isOwner}
-                      key={index}
-                      executeTransactions={executeTransactions}
-                      txs={result}
-                      tokenAddress={result.to}
-                      tokens={props.tokens}
-                      isAddressValid={isAddressValid}
-                      rejectTransaction={rejectTransaction}
-                      multiIndex={undefined}
-                    />
-                  ) : (
-                    result.dataDecoded !== null &&
+          <>
+            <div id="treasuryTransactions">
+              <div className="dashboardText">Last Transactions</div>
+              {props.pendingTransactions !== undefined &&
+                props.pendingTransactions.results.length >= 1 &&
+                props.pendingTransactions.results
+                  .sort((a, b) => {
+                    return a.nonce - b.nonce;
+                  })
+                  .map((result: any, index: number) => {
+                    return result.dataDecoded !== null &&
+                      result.dataDecoded.method !== "multiSend" ? (
+                      <PendingTransactions
+                        showExecute={hasUserApproved(index)}
+                        amount={
+                          result.dataDecoded !== null &&
+                          result.dataDecoded.parameters[1].value
+                        }
+                        recipient={
+                          result.dataDecoded !== null &&
+                          result.dataDecoded.parameters[0].value
+                        }
+                        confirmations={
+                          result.confirmations && result.confirmations.length
+                        }
+                        ownerCount={ownerCount}
+                        confirmTransaction={confirmTransaction}
+                        safeTxHash={result.safeTxHash}
+                        isOwner={isOwner}
+                        key={index}
+                        executeTransactions={executeTransactions}
+                        txs={result}
+                        tokenAddress={result.to}
+                        tokens={props.tokens}
+                        isAddressValid={isAddressValid}
+                        rejectTransaction={rejectTransaction}
+                        multiIndex={undefined}
+                      />
+                    ) : (
+                      result.dataDecoded !== null &&
                       result.dataDecoded.parameters[0].valueDecoded.map(
                         (multiresult: any, multiIndex: number) => {
                           return (
@@ -289,41 +293,42 @@ const TreasuryCard = (props: ItreasuryCardType) => {
                               isAddressValid={isAddressValid}
                               rejectTransaction={rejectTransaction}
                               multiIndex={multiIndex}
+                              last={result.dataDecoded.parameters[0].valueDecoded[result.dataDecoded.parameters[0].valueDecoded.length - 1].data === multiresult.data}
                             />
                           );
                         }
                       )
-                  );
-                  //  : (
-                  //   <>
-                  //     <PendingTransactions
-                  //       showExecute={hasUserApproved(index)}
-                  //       amount={"rejection"}
-                  //       recipient={"rejection"}
-                  //       confirmations={
-                  //         result.confirmations && result.confirmations.length
-                  //       }
-                  //       ownerCount={ownerCount}
-                  //       confirmTransaction={confirmTransaction}
-                  //       safeTxHash={result.safeTxHash}
-                  //       isOwner={isOwner}
-                  //       key={index}
-                  //       executeTransactions={executeTransactions}
-                  //       txs={result}
-                  //       tokenAddress={undefined}
-                  //       tokens={props.tokens}
-                  //       isAddressValid={isAddressValid}
-                  //       rejectTransaction={rejectTransaction}
-                  //     />
-                  //   </>
-                  // );
-                })}
-            {props.executedTransactions !== undefined &&
-              props.executedTransactions.results.length >= 1 &&
-              props.executedTransactions.results.map(
-                (result: any, index: any) => {
-                  return result.txType === "ETHEREUM_TRANSACTION" ? (
-                    result.transfers[0] !== undefined &&
+                    );
+                    //  : (
+                    //   <>
+                    //     <PendingTransactions
+                    //       showExecute={hasUserApproved(index)}
+                    //       amount={"rejection"}
+                    //       recipient={"rejection"}
+                    //       confirmations={
+                    //         result.confirmations && result.confirmations.length
+                    //       }
+                    //       ownerCount={ownerCount}
+                    //       confirmTransaction={confirmTransaction}
+                    //       safeTxHash={result.safeTxHash}
+                    //       isOwner={isOwner}
+                    //       key={index}
+                    //       executeTransactions={executeTransactions}
+                    //       txs={result}
+                    //       tokenAddress={undefined}
+                    //       tokens={props.tokens}
+                    //       isAddressValid={isAddressValid}
+                    //       rejectTransaction={rejectTransaction}
+                    //     />
+                    //   </>
+                    // );
+                  })}
+              {props.executedTransactions !== undefined &&
+                props.executedTransactions.results.length >= 1 &&
+                props.executedTransactions.results.map(
+                  (result: any, index: any) => {
+                    return result.txType === "ETHEREUM_TRANSACTION" ? (
+                      result.transfers[0] !== undefined &&
                       result.transfers[0].tokenInfo !== null && (
                         <>
                           <TransactionComplete
@@ -337,59 +342,60 @@ const TreasuryCard = (props: ItreasuryCardType) => {
                             tokenAddress={result.transfers[0].tokenAddress}
                             tokens={props.tokens}
                             multiIndex={undefined}
+
                           />
                         </>
                       )
-                  ) : result.safe &&
-                    result.dataDecoded !== null &&
-                    result.dataDecoded.method !== "multiSend" ? (
-                    <TransactionComplete
-                      credit={false}
-                      amount={result.dataDecoded.parameters[1].value}
-                      recipient={result.dataDecoded.parameters[0].value}
-                      ownerCount={ownerCount}
-                      key={index}
-                      submissionDate={
-                        result.confirmations[result.confirmations.length - 1]
-                          .submissionDate
-                      }
-                      tokenAddress={result.to}
-                      tokens={props.tokens}
-                      multiIndex={undefined}
-                    />
-                  ) : (
-                    result.dataDecoded !== null &&
-                    result.dataDecoded.parameters[0].valueDecoded.map(
-                      (multiresult: any, multiIndex: number) => {
-                        return (
-                          <TransactionComplete
-                            credit={false}
-                            amount={multiresult.dataDecoded.parameters[1].value}
-                            recipient={
-                              multiresult.dataDecoded.parameters[0].value +
-                              "mul "
-                            }
-                            ownerCount={ownerCount}
-                            key={index}
-                            submissionDate={
-                              result.confirmations[
-                                result.confirmations.length - 1
-                              ].submissionDate
-                            }
-                            tokenAddress={multiresult.to}
-                            tokens={props.tokens}
-                            index={index}
-                            multiIndex={multiIndex}
-                          />
-                        );
-                      }
-                    )
-                  );
-                }
-              )}
-          </div>
-        </>
-      )}
+                    ) : result.safe &&
+                      result.dataDecoded !== null &&
+                      result.dataDecoded.method !== "multiSend" ? (
+                      <TransactionComplete
+                        credit={false}
+                        amount={result.dataDecoded.parameters[1].value}
+                        recipient={result.dataDecoded.parameters[0].value}
+                        ownerCount={ownerCount}
+                        key={index}
+                        submissionDate={
+                          result.confirmations[result.confirmations.length - 1]
+                            .submissionDate
+                        }
+                        tokenAddress={result.to}
+                        tokens={props.tokens}
+                        multiIndex={undefined}
+                      />
+                    ) : (
+                      result.dataDecoded !== null &&
+                      result.dataDecoded.parameters[0].valueDecoded.map(
+                        (multiresult: any, multiIndex: number) => {
+                          return (
+                            <TransactionComplete
+                              credit={false}
+                              amount={multiresult.dataDecoded.parameters[1].value}
+                              recipient={
+                                multiresult.dataDecoded.parameters[0].value
+                              }
+                              ownerCount={ownerCount}
+                              key={index}
+                              submissionDate={
+                                result.confirmations[
+                                  result.confirmations.length - 1
+                                ].submissionDate
+                              }
+                              tokenAddress={multiresult.to}
+                              tokens={props.tokens}
+                              index={index}
+                              multiIndex={multiIndex}
+                              last={result.dataDecoded.parameters[0].valueDecoded[result.dataDecoded.parameters[0].valueDecoded.length - 1].data === multiresult.data}
+                            />
+                          );
+                        }
+                      )
+                    );
+                  }
+                )}
+            </div>
+          </>
+        )}
     </div>
   );
 };

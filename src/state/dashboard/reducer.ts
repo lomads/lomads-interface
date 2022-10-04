@@ -1,19 +1,22 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { DAOType } from "types/UItype";
-import { getDao, loadDao, addDaoMember } from "./actions";
+import { getDao, loadDao, addDaoMember, updateDaoMember } from "./actions";
+import { get as _get } from "lodash";
 
 export interface DashboardState {
   DAO: DAOType | null;
   DAOLoading: boolean | null;
   DAOList: Array<DAOType>;
   addMemberLoading: boolean | null;
+  updateMemberLoading: boolean | null;
 }
 
 const initialState: DashboardState = {
   DAO: null,
   DAOLoading: false,
   DAOList: [],
-  addMemberLoading: null
+  addMemberLoading: null,
+  updateMemberLoading: null,
 };
 
 const dashboardSlice = createSlice({
@@ -25,6 +28,9 @@ const dashboardSlice = createSlice({
     },
     resetAddMemberLoader(state) {
       state.addMemberLoading = null
+    },
+    resetUpdateMemberLoader(state) {
+      state.updateMemberLoading = null
     },
     setDAOList(state, action) {
       state.DAOList = action.payload
@@ -50,8 +56,22 @@ const dashboardSlice = createSlice({
     },
     [`${addDaoMember.pending}`]: (state) => {
       state.addMemberLoading = true
+    },
+    [`${updateDaoMember.fulfilled}`]: (state, action) => {
+      state.updateMemberLoading = false
+      state.DAO = {
+        ...(state.DAO ? state.DAO : {}),
+        members: _get(state, 'DAO.members', []).map((member: any) => {
+          if (member.member._id === action.payload._id)
+            return { ...member, member: action.payload };
+          return member;
+        })
+      }
+    },
+    [`${updateDaoMember.pending}`]: (state) => {
+      state.updateMemberLoading = true
     }
-	},
+  },
 });
 
 export const {
