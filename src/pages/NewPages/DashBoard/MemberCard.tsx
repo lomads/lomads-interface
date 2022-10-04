@@ -7,11 +7,14 @@ import membersIcon from "../../../assets/svg/membersIcon.svg";
 import editIcon from '../../../assets/svg/editButton.svg';
 import SafeButton from "UIpack/SafeButton";
 import daoMember2 from "../../../assets/svg/daoMember2.svg";
+import { useAppDispatch } from "state/hooks";
+import { updateDaoMember } from 'state/dashboard/actions'
 
 const MemberCard = (props: any) => {
-
+	const dispatch = useAppDispatch();
 	const { provider, account } = useWeb3React();
 	const { DAO, DAOLoading } = useAppSelector((state) => state.dashboard);
+
 
 	const [membersArray, setMembersArray] = useState<any>([]);
 	let temp = JSON.parse(JSON.stringify(membersArray));
@@ -24,7 +27,7 @@ const MemberCard = (props: any) => {
 	}, [DAO]);
 
 	const handleChangeName = (e: any, pos: any) => {
-		temp[pos].name = e.target.value;
+		temp[pos].member.name = e.target.value;
 	}
 
 	const amIAdmin = useMemo(() => {
@@ -37,6 +40,15 @@ const MemberCard = (props: any) => {
 		return false;
 	}, [account, DAO])
 
+	const _handleKeyDown = (e: any, pos: any) => {
+		if (e.key === 'Enter') {
+			setEditMode(false);
+			setMembersArray(temp);
+			const member = { name: temp[pos].member.name };
+			console.log("member : ", member);
+			dispatch(updateDaoMember({ url: DAO?.url, payload: member }))
+		}
+	}
 
 	const NameAndAvatar = (props: any) => {
 		return (
@@ -46,12 +58,13 @@ const MemberCard = (props: any) => {
 						<div className="avatarAndName">
 							<img src={daoMember2} alt="avatar" />
 							{
-								editMode
+								editMode && props.address.toLowerCase() === account?.toLocaleLowerCase()
 									?
 									<input
 										// value={temp[props.position].name}
 										placeholder={props.name}
 										onChange={(e) => handleChangeName(e, props.position)}
+										onKeyDown={(e) => _handleKeyDown(e, props.position)}
 									/>
 									:
 									<div className="dashboardText">{props.name}</div>
@@ -110,22 +123,6 @@ const MemberCard = (props: any) => {
 						<button onClick={() => setEditMode(true)}>
 							<img src={editIcon} alt="edit-icon" />
 						</button>
-						{/* <SafeButton
-							height={40}
-							width={150}
-							titleColor="#B12F15"
-							title="DONE"
-							bgColor="#FFFFFF"
-							opacity="1"
-							disabled={false}
-							fontweight={400}
-							fontsize={16}
-							onClick={() => {
-								setEditMode(false);
-								setMembersArray(temp);
-								console.log(temp);
-							}}
-						/> */}
 					</div>
 				</div>
 				<div className="membersList">
@@ -142,7 +139,13 @@ const MemberCard = (props: any) => {
 					</div>
 					{membersArray.map((result: any, index: any) => {
 						return (
-							<NameAndAvatar name={_get(result, 'member.name', '')} position={index} joined={_get(result, 'joined')} role={_get(result, 'role', 'MEMBER')} address={_get(result, 'member.wallet', '')} />
+							<NameAndAvatar
+								name={_get(result, 'member.name', '')}
+								position={index}
+								joined={_get(result, 'joined')}
+								role={_get(result, 'role', 'MEMBER')}
+								address={_get(result, 'member.wallet', '')}
+							/>
 						);
 					})}
 				</div>

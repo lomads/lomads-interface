@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { get as _get } from 'lodash';
+import React, { useEffect, useRef, useState, useMemo } from "react";
+import { get as _get, find as _find } from 'lodash';
 import lomadsfulllogo from "../../../assets/svg/lomadsfulllogo.svg";
 import settingIcon from '../../../assets/svg/settings.svg';
 import { useAppSelector } from "state/hooks";
@@ -148,6 +148,16 @@ const Dashboard = () => {
 		setShowNotification(_choice);
 	};
 
+	const amIAdmin = useMemo(() => {
+		if (DAO) {
+			let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'ADMIN')
+			if (user)
+				return true
+			return false
+		}
+		return false;
+	}, [account, DAO])
+
 	return (
 		<>
 			{!DAO || DAOLoading || (daoURL && (DAO && DAO.url !== daoURL)) ?
@@ -171,11 +181,20 @@ const Dashboard = () => {
 					</div>
 					<div className="DAOsettings">
 						<div className="DAOadminPill">
-							<p>You're an&nbsp;<span>Admin</span></p>
+							{
+								amIAdmin
+									?
+									<p>You're an&nbsp;<span>Admin</span></p>
+									:
+									<p>You're a&nbsp;<span>Member</span></p>
+							}
+
 						</div>
-						<button onClick={() => { navigate('/settings') }}>
-							<img src={settingIcon} alt="settings-icon" />
-						</button>
+						{
+							amIAdmin && <button onClick={() => { navigate('/settings') }}>
+								<img src={settingIcon} alt="settings-icon" />
+							</button>
+						}
 					</div>
 					{/* <div
 						className="copyArea"

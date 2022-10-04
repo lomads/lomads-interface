@@ -66,7 +66,7 @@ export interface OutlineButtonType extends ButtonType {
 export interface MemberType {
   _id?: string;
   wallet: string | null;
-  name: string| null;
+  name: string | null;
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string;
@@ -95,12 +95,12 @@ export interface SafeType {
 export interface DAOType {
   _id?: string;
   contractAddress?: string;
-  name: string;
-  url: string;
+  name?: string;
+  url?: string;
   description?: string;
   image?: string;
   createdAt?: string;
   updatedAt?: string;
-  members?: Array<RoleType>;
+  members?: Array<RoleType> | [];
   safe?: SafeType
 }
