@@ -94,7 +94,7 @@ const MemberCard = (props: any) => {
 								{_get(DAO, 'members', []).length} members
 							</div>
 						</div>
-						{/* {amIAdmin && <SafeButton
+						{amIAdmin && <SafeButton
 							height={40}
 							width={150}
 							titleColor="#B12F15"
@@ -105,23 +105,12 @@ const MemberCard = (props: any) => {
 							fontweight={400}
 							fontsize={16}
 							onClick={() => props.toggleShowMember()}
-						/>} */}
-						<SafeButton
-							height={40}
-							width={150}
-							titleColor="#B12F15"
-							title="ADD MEMBER"
-							bgColor="#FFFFFF"
-							opacity="1"
-							disabled={false}
-							fontweight={400}
-							fontsize={16}
-							onClick={() => props.toggleShowMember()}
-						/>
+						/>}
+
 						<button onClick={() => setEditMode(true)}>
 							<img src={editIcon} alt="edit-icon" />
 						</button>
-						<SafeButton
+						{/* <SafeButton
 							height={40}
 							width={150}
 							titleColor="#B12F15"
@@ -136,7 +125,7 @@ const MemberCard = (props: any) => {
 								setMembersArray(temp);
 								console.log(temp);
 							}}
-						/>
+						/> */}
 					</div>
 				</div>
 				<div className="membersList">

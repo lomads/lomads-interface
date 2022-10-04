@@ -10,6 +10,7 @@ import InviteGang from "./NewPages/InviteGang";
 import AddExistingSafe from "./NewPages/AddExistingSafe";
 import AddNewSafe from "./NewPages/AddNewSafe";
 import Dashboard from "./NewPages/DashBoard/Dashboard";
+import Settings from "./NewPages/Settings";
 
 export default function App() {
   const landingPage = useMatch("/");
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="/success" element={<DAOsuccess />} />
         <Route path="/noaccess" element={<DAONoAccess />} />
         <Route path="/:daoURL" element={<Dashboard />} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
     </div>
   );
