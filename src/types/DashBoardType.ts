@@ -53,6 +53,7 @@ export interface IselectTransactionSend {
   toggleAddNewRecipient: () => void;
   addNewRecipient: boolean;
   isLoading: boolean;
+  safeTokens: Array<any>;
 }
 export interface TransactionDataType {
   to: string;
@@ -77,4 +78,5 @@ export interface ItreasuryCardType {
   getPendingTransactions: () => Promise<void>;
   getExecutedTransactions: () => Promise<void>;
   tokens: any;
+  DbData: any;
 }

@@ -41,6 +41,7 @@ const Dashboard = () => {
   const [showNavBar, setShowNavBar] = useState<boolean>(false);
   const currentNonce = useAppSelector((state) => state.flow.currentNonce);
   const [copy, setCopy] = useState<boolean>(false);
+  const [Dbdata, setDbdata] = useState<any>();
   const toggleModal = () => {
     setShowModal(!showModal);
   };
@@ -50,6 +51,16 @@ const Dashboard = () => {
   };
   const showSideBar = (_choice: boolean) => {
     setShowNavBar(_choice);
+  };
+  const fetchDbData = async () => {
+    await axios
+      .get("http://localhost:4000/api/getgnosispending")
+      .then((result) => {
+        setDbdata(result.data.result);
+      })
+      .catch(() => {
+        console.log("some error occured in fetching results from db.");
+      });
   };
   const getPendingTransactions = async () => {
     await (
@@ -71,6 +82,7 @@ const Dashboard = () => {
     dispatch(updateCurrentNonce(nonce));
     console.log("updated nonce:", currentNonce);
     await getTokens(safeAddress);
+    await fetchDbData();
     setShowNotification(true);
   };
 
@@ -109,6 +121,7 @@ const Dashboard = () => {
     getPendingTransactions();
     getExecutedTransactions();
     getTokens(safeAddress);
+    fetchDbData();
   }, [safeAddress]);
 
   if (showModal) {
@@ -172,6 +185,7 @@ const Dashboard = () => {
           getPendingTransactions={getPendingTransactions}
           tokens={safeTokens}
           getExecutedTransactions={getExecutedTransactions}
+          DbData={Dbdata}
         />
         <MemberCard
           totalMembers={totalMembers}

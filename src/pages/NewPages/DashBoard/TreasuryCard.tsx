@@ -10,6 +10,7 @@ import TransactionComplete from "./TreasuryCard/TransactionComplete";
 import { EthSignSignature } from "@gnosis.pm/safe-core-sdk";
 import { SafeTransactionData } from "@gnosis.pm/safe-core-sdk-types/dist/src/types";
 import { Tooltip } from "@chakra-ui/react";
+import axios from "axios";
 
 const TreasuryCard = (props: ItreasuryCardType) => {
   const { provider, account } = useWeb3React();
@@ -135,6 +136,21 @@ const TreasuryCard = (props: ItreasuryCardType) => {
       .confirmTransaction(safeTxHash, signature.data)
       .then(async (result) => {
         console.log("on chain transaction has been confirmed by the signer");
+        await axios
+          .post("http://localhost:4000/api/update", {
+            rejectTxHash: safeTxHash,
+            nonce: _nonce,
+          })
+          .then(() => {
+            console.log(
+              "reject transaction has been successfully updated to db."
+            );
+          })
+          .catch((err) => {
+            console.log(
+              "error occured while updating reject transaction data to db."
+            );
+          });
         await props.getPendingTransactions();
       })
       .catch((err) => {
@@ -243,61 +259,67 @@ const TreasuryCard = (props: ItreasuryCardType) => {
                       tokens={props.tokens}
                       isAddressValid={isAddressValid}
                       rejectTransaction={rejectTransaction}
+                      multiIndex={undefined}
+                      DbData={props.DbData}
                     />
-                  ) : result.dataDecoded !== null ? (
-                    result.dataDecoded.parameters[0].valueDecoded.map(
-                      (multiresult: any, multiIndex: number) => {
-                        return (
-                          <PendingTransactions
-                            showExecute={hasUserApproved(index)}
-                            amount={multiresult.dataDecoded.parameters[1].value}
-                            recipient={
-                              multiresult.dataDecoded.parameters[0].value +
-                              "mul "
-                            }
-                            confirmations={
-                              result.confirmations &&
-                              result.confirmations.length
-                            }
-                            ownerCount={ownerCount}
-                            confirmTransaction={confirmTransaction}
-                            safeTxHash={result.safeTxHash}
-                            isOwner={isOwner}
-                            key={multiIndex}
-                            executeTransactions={executeTransactions}
-                            txs={result}
-                            tokenAddress={multiresult.dataDecoded.to}
-                            tokens={props.tokens}
-                            isAddressValid={isAddressValid}
-                            rejectTransaction={rejectTransaction}
-                            multiIndex={multiIndex}
-                          />
-                        );
-                      }
-                    )
                   ) : (
-                    <>
-                      <PendingTransactions
-                        showExecute={hasUserApproved(index)}
-                        amount={"rejection"}
-                        recipient={"rejection"}
-                        confirmations={
-                          result.confirmations && result.confirmations.length
+                    result.dataDecoded !== null &&
+                      result.dataDecoded.parameters[0].valueDecoded.map(
+                        (multiresult: any, multiIndex: number) => {
+                          return (
+                            <PendingTransactions
+                              showExecute={hasUserApproved(index)}
+                              amount={
+                                multiresult.dataDecoded.parameters[1].value
+                              }
+                              recipient={
+                                multiresult.dataDecoded.parameters[0].value +
+                                "mul "
+                              }
+                              confirmations={
+                                result.confirmations &&
+                                result.confirmations.length
+                              }
+                              ownerCount={ownerCount}
+                              confirmTransaction={confirmTransaction}
+                              safeTxHash={result.safeTxHash}
+                              isOwner={isOwner}
+                              key={multiIndex}
+                              executeTransactions={executeTransactions}
+                              txs={result}
+                              tokenAddress={multiresult.dataDecoded.to}
+                              tokens={props.tokens}
+                              isAddressValid={isAddressValid}
+                              rejectTransaction={rejectTransaction}
+                              multiIndex={multiIndex}
+                            />
+                          );
                         }
-                        ownerCount={ownerCount}
-                        confirmTransaction={confirmTransaction}
-                        safeTxHash={result.safeTxHash}
-                        isOwner={isOwner}
-                        key={index}
-                        executeTransactions={executeTransactions}
-                        txs={result}
-                        tokenAddress={undefined}
-                        tokens={props.tokens}
-                        isAddressValid={isAddressValid}
-                        rejectTransaction={rejectTransaction}
-                      />
-                    </>
+                      )
                   );
+                  //  : (
+                  //   <>
+                  //     <PendingTransactions
+                  //       showExecute={hasUserApproved(index)}
+                  //       amount={"rejection"}
+                  //       recipient={"rejection"}
+                  //       confirmations={
+                  //         result.confirmations && result.confirmations.length
+                  //       }
+                  //       ownerCount={ownerCount}
+                  //       confirmTransaction={confirmTransaction}
+                  //       safeTxHash={result.safeTxHash}
+                  //       isOwner={isOwner}
+                  //       key={index}
+                  //       executeTransactions={executeTransactions}
+                  //       txs={result}
+                  //       tokenAddress={undefined}
+                  //       tokens={props.tokens}
+                  //       isAddressValid={isAddressValid}
+                  //       rejectTransaction={rejectTransaction}
+                  //     />
+                  //   </>
+                  // );
                 })}
             {props.executedTransactions !== undefined &&
               props.executedTransactions.results.length >= 1 &&
@@ -317,6 +339,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
                             tokenSymbol={result.transfers[0].tokenInfo.symbol}
                             tokenAddress={result.transfers[0].tokenAddress}
                             tokens={props.tokens}
+                            multiIndex={undefined}
                           />
                         </>
                       )
@@ -335,11 +358,12 @@ const TreasuryCard = (props: ItreasuryCardType) => {
                       }
                       tokenAddress={result.to}
                       tokens={props.tokens}
+                      multiIndex={undefined}
                     />
                   ) : (
                     result.dataDecoded !== null &&
                     result.dataDecoded.parameters[0].valueDecoded.map(
-                      (multiresult: any, index: number) => {
+                      (multiresult: any, multiIndex: number) => {
                         return (
                           <TransactionComplete
                             credit={false}
@@ -358,6 +382,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
                             tokenAddress={multiresult.to}
                             tokens={props.tokens}
                             index={index}
+                            multiIndex={multiIndex}
                           />
                         );
                       }
