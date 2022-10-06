@@ -7,7 +7,7 @@
     position: relative;
 }
 
-.createPassToken-container .address-dropdown-container{
+.createPassToken-container .address-dropdown-container {
     width: 220px;
     height: 60px;
     border-radius: 30px;
@@ -21,7 +21,7 @@
     right: 1.5rem;
 }
 
-.createPassToken-container .address-dropdown-container .address-dropdown-div1{
+.createPassToken-container .address-dropdown-container .address-dropdown-div1 {
     height: 100%;
     width: 75%;
     display: flex;
@@ -96,7 +96,7 @@
     margin-bottom: 1rem;
 }
 
-.createPassToken-container .createPassToken-body .createPassToken-form-container .optional-div{
+.createPassToken-container .createPassToken-body .createPassToken-form-container .optional-div {
     width: 100%;
     display: flex;
     align-items: center;
@@ -108,7 +108,7 @@
     margin: 0;
 }
 
-.createPassToken-container .createPassToken-body .createPassToken-form-container .optional-div div{
+.createPassToken-container .createPassToken-body .createPassToken-form-container .optional-div div {
     width: 110px;
     height: 25px;
     border-radius: 100px;
@@ -152,6 +152,12 @@
     position: relative;
 }
 
+.createPassToken-container .createPassToken-body .createPassToken-form-container .image-picker-container .selected-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
 .createPassToken-container .createPassToken-body .createPassToken-form-container .image-picker-container p {
     font-style: normal;
     font-weight: 400;
@@ -190,7 +196,7 @@
     justify-content: center;
 }
 
-.createPassToken-container .createPassToken-body .createPassToken-form-container button:hover{
+.createPassToken-container .createPassToken-body .createPassToken-form-container button:hover {
     background: #F24822;
 }
 
@@ -252,7 +258,7 @@
     border-radius: 5px;
 }
 
-.createPassToken-container .createPassToken-body .contact-container h1{
+.createPassToken-container .createPassToken-body .contact-container h1 {
     font-weight: 700;
     font-size: 16px;
     line-height: 18px;
@@ -260,7 +266,7 @@
     margin-bottom: 20px;
 }
 
-.createPassToken-container .createPassToken-body .contact-container p{
+.createPassToken-container .createPassToken-body .contact-container p {
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
@@ -276,7 +282,7 @@
     margin-bottom: 1rem;
 }
 
-.createPassToken-container .createPassToken-body .contact-container .option div{
+.createPassToken-container .createPassToken-body .contact-container .option div {
     display: flex;
     margin-bottom: 0.5rem;
 }
@@ -309,11 +315,11 @@
     justify-content: center;
 }
 
-.createPassToken-container .createPassToken-body .contact-container button:hover{
+.createPassToken-container .createPassToken-body .contact-container button:hover {
     background: #F24822;
 }
 
-.createPassToken-container .createPassToken-body .member-container{
+.createPassToken-container .createPassToken-body .member-container {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -323,7 +329,7 @@
     border-radius: 5px;
 }
 
-.createPassToken-container .createPassToken-body .member-container .member-header{
+.createPassToken-container .createPassToken-body .member-container .member-header {
     width: 100%;
     display: flex;
     align-items: center;
@@ -331,14 +337,14 @@
     margin-bottom: 1rem;
 }
 
-.createPassToken-container .createPassToken-body .member-container .member-header h1{
+.createPassToken-container .createPassToken-body .member-container .member-header h1 {
     font-weight: 700;
     font-size: 16px;
     line-height: 18px;
     color: #76808D;
 }
 
-.createPassToken-container .createPassToken-body .member-container .member-header div{
+.createPassToken-container .createPassToken-body .member-container .member-header div {
     width: 110px;
     height: 25px;
     border-radius: 100px;
@@ -356,14 +362,14 @@
     color: rgba(118, 128, 141, 0.5);
 }
 
-.createPassToken-container .createPassToken-body .member-container .member-body{
+.createPassToken-container .createPassToken-body .member-container .member-body {
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-.createPassToken-container .createPassToken-body .member-container .member-body .input1{
+.createPassToken-container .createPassToken-body .member-container .member-body .input1 {
     width: 144px;
     height: 50px;
     padding: 0 1rem;
@@ -375,7 +381,7 @@
     outline: none;
 }
 
-.createPassToken-container .createPassToken-body .member-container .member-body .input2{
+.createPassToken-container .createPassToken-body .member-container .member-body .input2 {
     width: 250px;
     height: 50px;
     padding: 0 1rem;
@@ -415,11 +421,11 @@
     cursor: pointer;
 }
 
-.createPassToken-container .createPassToken-body .member-list .member-li:last-child{
+.createPassToken-container .createPassToken-body .member-list .member-li:last-child {
     margin-bottom: 0;
 }
 
-.createPassToken-container .createPassToken-body .member-list .member-li .member-img-name{
+.createPassToken-container .createPassToken-body .member-list .member-li .member-img-name {
     width: 50%;
     display: flex;
     align-items: center;
@@ -429,7 +435,7 @@
     margin-right: 15px;
 }
 
-.createPassToken-container .createPassToken-body .member-list .member-li .member-img-name{
+.createPassToken-container .createPassToken-body .member-list .member-li .member-img-name {
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
@@ -439,7 +445,7 @@
 }
 
 
-.createPassToken-container .createPassToken-body .member-list .member-li .member-address{
+.createPassToken-container .createPassToken-body .member-list .member-li .member-address {
     width: 50%;
     display: flex;
     align-items: center;
@@ -464,7 +470,7 @@
     display: block;
 }
 
-.createPassToken-container .createPassToken-body .create{
+.createPassToken-container .createPassToken-body .create {
     width: 250px;
     height: 50px;
     background: #C94B32;

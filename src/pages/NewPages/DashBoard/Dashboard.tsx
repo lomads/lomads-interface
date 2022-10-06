@@ -66,20 +66,20 @@ const Dashboard = () => {
 	};
 
 	useEffect(() => {
-		if(chainId && account)
+		if (chainId && account)
 			dispatch(loadDao({}))
 	}, [chainId, account])
 
 	const hasDAOAccess = useMemo(() => {
-		if(!DAOList || DAOList.length == 0) return false;
+		if (!DAOList || DAOList.length == 0) return false;
 		let hasAccess = _find(DAOList, d => d.url === daoURL)
-		if(hasAccess) return true;
+		if (hasAccess) return true;
 		return false
 	}, [DAOList, daoURL])
-	
+
 	useEffect(() => {
-		if(DAOList && DAOList.length > 0) {
-			if(!hasDAOAccess){
+		if (DAOList && DAOList.length > 0) {
+			if (!hasDAOAccess) {
 				navigate('/noaccess')
 			}
 		}
@@ -150,7 +150,7 @@ const Dashboard = () => {
 	};
 
 	useEffect(() => {
-		if(safeAddress){
+		if (safeAddress) {
 			getPendingTransactions();
 			getExecutedTransactions();
 			getTokens(safeAddress);
