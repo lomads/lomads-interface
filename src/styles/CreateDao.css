@@ -17,7 +17,7 @@
 }
 
 .createDaoLogin .welcomeText1 {
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 22px;
@@ -50,7 +50,7 @@
 }
 
 .createDaoLogin .loginWithoutWallet a{
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 18px;
@@ -101,7 +101,7 @@
 
 
 .reqText {
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 700;
   font-size: 14px;
@@ -113,7 +113,7 @@
 }
 
 .stepBlock .title {
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 600;
   font-size: 22px;
@@ -128,7 +128,7 @@
 }
 
 .stepBlock .description {
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 14px;
@@ -198,7 +198,7 @@
 
 
 .reqText {
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 700;
   font-size: 14px;
@@ -210,7 +210,7 @@
 }
 
 .stepBlockOptional .title {
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 600;
   font-size: 22px;
@@ -225,7 +225,7 @@
 }
 
 .stepBlockOptional .description {
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 14px;
@@ -284,7 +284,7 @@
 }
 
 .pageDescription {
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 14px;
@@ -293,7 +293,7 @@
   color: rgba(118, 128, 141, 0.5);
 }
 .pageItemHeader {
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 700;
   font-size: 16px;
@@ -304,7 +304,7 @@
   color: #76808D;
 }
 .pageSubItemHeader {
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 16px;
@@ -316,7 +316,7 @@
 }
 
 .tileItemHeader {
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   display: flex;
   justify-content: space-between;
@@ -359,7 +359,7 @@
   display: flex;
 }
 .tilePageItemHeader{
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 700;
   font-size: 16px;
@@ -426,7 +426,7 @@
 .fieldDesc {
   width: 486px;
   padding-top: 10px;
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 14px;
@@ -439,7 +439,7 @@
 }
 .fieldsubDesc {
   padding-top: 10px;
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 14px;
@@ -536,7 +536,7 @@
   padding: 10px;
 }
 .template-detail .title {
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 600;
   font-size: 20px;
@@ -547,7 +547,7 @@
   color: rgb(118, 128, 141);
 }
 .template-detail .description {
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 300;
   font-size: 16px;
@@ -616,7 +616,7 @@
   border-radius: 5px;
 }
 .tokenpageDescription {
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 14px;
@@ -625,7 +625,7 @@
   color: rgba(118, 128, 141, 0.5);
 }
 .gotitle {
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 600;
   font-size: 22px;
@@ -640,7 +640,7 @@
 }
 .subItemHeader{
   width: 486px;
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   display: flex;
   justify-content: space-between;
@@ -662,7 +662,7 @@
   /*z-index: 7000;*/
 }
 .message {
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 14px;
@@ -679,7 +679,7 @@
 }
 
 .pageSubItemHeader {
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 16px;
@@ -703,7 +703,7 @@
 }
 .tileItemHeaderToken {
   width: 55%;
-  font-family: 'Open Sans';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   display: flex;
   justify-content: space-between;

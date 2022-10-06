@@ -1,14 +1,32 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useScrollPosition from "@react-hook/window-scroll";
 import { useWeb3React } from "@web3-react/core";
 import { Text } from "rebass";
+import lomadsfulllogo from "../../assets/svg/lomadsfulllogo.svg";
+import { coinbaseWalletConnection, injectedConnection } from "connection";
+import { LeapFrog } from "@uiball/loaders";
 import { CHAIN_INFO } from "constants/chainInfo";
 import { SupportedChainId } from "constants/chains";
 import { useNativeCurrencyBalances } from "state/connection/hooks";
+import { setDAOList } from "state/dashboard/reducer";
 import styled from "styled-components/macro";
 import { isChainAllowed } from "utils/switchChain";
+import { updateSelectedWallet } from "state/user/reducer";
 import Web3Status from "../Web3Status";
-import { useNavigate, useMatch } from "react-router-dom";
+import { useAppDispatch } from "state/hooks";
+import axiosHttp from '../../api';
+import {
+  updatetokenTitle,
+  updatetokenSymbol,
+  updateSupply,
+  updateHolder,
+  updateStepNumber,
+  updatedeployedTokenAddress,
+  updateExplain,
+  updateIconImgPath,
+} from "state/proposal/reducer";
+import { usePrevious } from "hooks/usePrevious";
+import { useNavigate, useMatch, useLocation } from "react-router-dom";
 // import NetworkSelector from './NetworkSelector'
 
 const HeaderFrame = styled.div<{ showBackground: boolean }>`
@@ -17,12 +35,10 @@ const HeaderFrame = styled.div<{ showBackground: boolean }>`
   justify-content: space-between;
   align-items: center;
   flex-direction: row;
-  width: 40%;
-  top: 10;
   position: absolute;
-  right: 20px;
-  padding: 1rem;
-  z-index: 10000;
+  top: 20px;
+  right: 18px;
+  padding: 1rem 0;
   /* Background slide effect on scroll. */
   background-image: ${({ theme }) =>
     `linear-gradient(to bottom, transparent 50%, ${theme.bg0} 50% )}}`};
@@ -31,7 +47,7 @@ const HeaderFrame = styled.div<{ showBackground: boolean }>`
   background-size: 100% 200%;
   box-shadow: 0px 0px 0px 1px
     ${({ theme, showBackground }) =>
-      showBackground ? theme.bg2 : "transparent;"};
+    showBackground ? theme.bg2 : "transparent;"};
   transition: background-position 0.1s, box-shadow 0.1s;
   background-blend-mode: hard-light;
 
@@ -119,8 +135,10 @@ const UniIcon = styled.div`
   position: relative;
 `;
 export default function Header() {
-  const { account, chainId, connector } = useWeb3React();
 
+  const { account, chainId, connector } = useWeb3React();
+  const dispatch = useAppDispatch()
+  const location = useLocation()
   const chainAllowed = chainId && isChainAllowed(connector, chainId);
 
   const userEthBalance = useNativeCurrencyBalances(account ? [account] : [])?.[
@@ -128,13 +146,56 @@ export default function Header() {
   ];
 
   const navigate = useNavigate();
-  const dashboard = useMatch("/dashboard");
+  //const dashboard = useMatch("/dashboard");
 
   useEffect(() => {
-    if (!chainAllowed && !account && !dashboard) {
+    if ((chainId && !chainAllowed && !account) || !localStorage.getItem('__lmds_web3_token')) {
+      sessionStorage.setItem('__lmds_active_dao', location.pathname.substring(1))
       navigate("/");
     }
-  }, [account, chainAllowed, navigate, dashboard]);
+  }, [chainId , account, chainAllowed, navigate]);
+
+
+  const previousAccount = usePrevious(account);
+
+  const clearOnDisconnect = () => {
+    localStorage.removeItem('__lmds_web3_token');
+    dispatch(updatedeployedTokenAddress(""));
+    dispatch(updatetokenTitle(""));
+    dispatch(updatetokenSymbol(""));
+    dispatch(updateHolder(""));
+    dispatch(updateExplain(""));
+    dispatch(updateSupply(0));
+    dispatch(updateIconImgPath(""));
+  };
+
+
+
+  const disconnect = async () => {
+    if (connector.deactivate) {
+      connector.deactivate();
+      // Coinbase Wallet SDK does not emit a disconnect event to the provider,
+      // which is what web3-react uses to reset state. As a workaround we manually
+      // reset state.
+      if (connector === coinbaseWalletConnection.connector) {
+        connector.resetState();
+      }
+    } else {
+      connector.resetState();
+      clearOnDisconnect();
+    }
+    dispatch(updateSelectedWallet({ wallet: undefined }));
+    navigate("/");
+    //openOptions();
+  };
+
+  useEffect(() => {
+    if (previousAccount && account !== previousAccount) {
+      localStorage.removeItem('__lmds_web3_token');
+      sessionStorage.removeItem('__lmds_active_dao')
+      disconnect()
+    }
+  }, [account, previousAccount])
 
   const scrollY = useScrollPosition();
 
@@ -142,6 +203,21 @@ export default function Header() {
     CHAIN_INFO[!chainId || !chainAllowed ? SupportedChainId.MAINNET : chainId];
   const balance = userEthBalance?.toSignificant(3);
   const symbol = nativeCurrency.symbol;
+
+
+  if(chainId === undefined) {
+    return (
+      <div style={{ backgroundColor: '#FFF', height: '100vh', zIndex: 99999, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="logo">
+          <img src={lomadsfulllogo} alt="" />
+        </div>
+        <div style={{ marginTop: 32 }}>
+          <LeapFrog size={50} color="#C94B32" />
+        </div>
+      </div> 
+    )
+  }
+  
   return (
     <HeaderFrame showBackground={scrollY > 45}>
       <Title href=".">

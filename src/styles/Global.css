@@ -17,7 +17,7 @@
     box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
     border-radius: 10px;
     border-width: 0px;
-    font-family: 'Open Sans';
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 400;
     font-size: 16px;
@@ -26,7 +26,7 @@
   }
 
 .inputFieldTitle {
-    font-family: 'Open Sans';
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 700;
     font-size: 16px;

@@ -17,6 +17,8 @@ import daoMember2 from "../../assets/svg/daoMember2.svg";
 import { useWeb3React } from "@web3-react/core";
 import { useEnsAddress } from "react-moralis";
 import OutlineButton from "UIpack/OutlineButton";
+import { addDaoMember } from 'state/dashboard/actions'
+import { resetAddMemberLoader } from 'state/dashboard/reducer';
 
 const AddMember = (props: any) => {
   const dispatch = useAppDispatch();
@@ -25,6 +27,7 @@ const AddMember = (props: any) => {
   const [ownerAddress, setOwnerAddress] = useState<string>("");
   const [errors, setErrors] = useState<any>({});
   const totalMembers = useAppSelector((state) => state.flow.totalMembers);
+  const { DAO, addMemberLoading } = useAppSelector((state) => state.dashboard);
   const { account } = useWeb3React();
 
   const isAddressValid = (holderAddress: string) => {
@@ -43,11 +46,11 @@ const AddMember = (props: any) => {
     if (!check) {
       const creator = [
         ...totalMembers,
-        { name: "creator", address: account as string },
+        { name: "", address: account as string },
       ];
       dispatch(updateInvitedGang(creator));
     }
-  });
+  }, []);
 
   useEffect(() => {
     isAddressValid(ownerAddress);
@@ -57,15 +60,26 @@ const AddMember = (props: any) => {
     isPresent(ownerAddress);
   }, [ownerAddress]);
 
-  const addMember = (_ownerName: string, _ownerAddress: string) => {
-    const member: InviteGangType = { name: _ownerName, address: _ownerAddress };
-    if (!isPresent(member.address)) {
-      const newMember = [...totalMembers, member];
-      dispatch(updateTotalMembers(newMember));
+  useEffect(() => {
+    if(addMemberLoading === false) {
+      dispatch(resetAddMemberLoader())
       setOwnerName("");
       setOwnerAddress("");
       props.toggleShowMember();
     }
+  }, [addMemberLoading])
+
+  const addMember = (_ownerName: string, _ownerAddress: string) => {
+    const member: InviteGangType = { name: _ownerName, address: _ownerAddress };
+    dispatch(addDaoMember({ url: DAO?.url, payload: member }))
+    // if (!isPresent(member.address)) {
+    //   const newMember = [...totalMembers, member];
+    //   dispatch(updateTotalMembers(newMember));
+    //   setOwnerName("");
+    //   setOwnerAddress("");
+    //   props.toggleShowMember();
+    // }
+
   };
 
   const handleClick = (_ownerName: string, _ownerAddress: string) => {

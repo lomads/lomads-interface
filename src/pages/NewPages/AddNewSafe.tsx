@@ -16,6 +16,7 @@ import {
   updatesafeName,
   updateThreshold,
   updateTotalMembers,
+  resetCreateDAOLoader
 } from "state/flow/reducer";
 import daoMember2 from "../../assets/svg/daoMember2.svg";
 import { updateHolder } from "state/proposal/reducer";
@@ -24,6 +25,8 @@ import EthersAdapter from "@gnosis.pm/safe-ethers-lib";
 import { SafeFactory, SafeAccountConfig } from "@gnosis.pm/safe-core-sdk";
 import { ethers } from "ethers";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
+import { createDAO } from '../../state/flow/actions';
+import { loadDao } from '../../state/dashboard/actions';
 
 const AddNewSafe = () => {
   const dispatch = useAppDispatch();
@@ -38,9 +41,13 @@ const AddNewSafe = () => {
   const safeName = useAppSelector((state) => state.flow.safeName);
   const selectedOwners = useAppSelector((state) => state.flow.owners);
   const safeAddress = useAppSelector((state) => state.flow.safeAddress);
+  const createDAOLoading = useAppSelector((state) => state.flow.createDAOLoading);
+  const { DAOList } = useAppSelector((state) => state.dashboard);
+  const flow = useAppSelector((state) => state.flow);
   let Myvalue = useRef<Array<InviteGangType>>([]);
 
-  let thresholdValue = useRef<string>("");
+  //let thresholdValue = useRef<string>("");
+  const [thresholdValue, setThresholdValue] = useState<number>(1);
 
   useEffect(() => {
     const { name, address } = invitedMembers[0];
@@ -52,6 +59,10 @@ const AddNewSafe = () => {
       Myvalue.current.push(creator);
     }
   }, [invitedMembers]);
+
+  useEffect(() => {
+    dispatch(loadDao({}))
+  }, [])
 
   const handleCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
     // const index: number = parseInt(event.target.value);
@@ -69,6 +80,16 @@ const AddNewSafe = () => {
       Myvalue.current.splice(refIndex, 1);
     }
   };
+
+  useEffect(() => {
+    if(createDAOLoading == false){
+      setisLoading(false)
+      resetCreateDAOLoader()
+      return navigate(`/success?dao=${flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, '')}`);
+    }
+    if(createDAOLoading == true)
+      setisLoading(true)
+  }, [createDAOLoading])
 
   const handleSafeName = () => {
     let terrors: any = {};
@@ -97,7 +118,9 @@ const AddNewSafe = () => {
     const owners: any = Myvalue.current.map((result) => {
       return result.address;
     });
-    const threshold: number = parseInt(thresholdValue.current);
+    console.log(owners);
+    const threshold: number = thresholdValue;
+    console.log(threshold);
     const safeAccountConfig: SafeAccountConfig = {
       owners,
       threshold,
@@ -118,8 +141,24 @@ const AddNewSafe = () => {
           return final.concat([current]);
         }, []);
         dispatch(updateTotalMembers(value));
-        setisLoading(false);
-        navigate("/success");
+        //setisLoading(false);
+        const payload: any = {
+          contractAddress: '',
+          name: flow.daoName,
+          url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
+          image: null,
+          members: value.map((m:any) => {
+            return {
+              ...m, creator: m.address.toLowerCase() === account?.toLowerCase()
+            }
+          }),
+          safe: {
+            name: safeName,
+            address: tx.getAddress(),
+            owners: owners,
+          }
+        }
+        dispatch(createDAO(payload))
       })
       .catch((err) => {
         console.log("An error occured while creating safe", err);
@@ -235,9 +274,10 @@ const AddNewSafe = () => {
           id="chain"
           className="dropdown"
           onChange={(event) => {
-            props.threshold.current = event.target.value;
+            //props.threshold.current = event.target.value;
+            setThresholdValue(+event.target.value)
           }}
-          defaultValue={thresholdValue.current}
+          defaultValue={thresholdValue}
         >
           {props.value.current.map((result: any, index: any) => {
             return (
@@ -326,8 +366,9 @@ const AddNewSafe = () => {
               width={228}
               fontsize={20}
               fontweight={400}
-              disabled={true}
+              disabled={false}
               opacity="0.6"
+              onClick={() => navigate('/addsafe')}
             />
           </div>
         </div>

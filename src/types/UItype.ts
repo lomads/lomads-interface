@@ -62,3 +62,45 @@ export interface LoadingButtonType extends ButtonType {
 export interface OutlineButtonType extends ButtonType {
   borderColor: string;
 }
+
+export interface MemberType {
+  _id?: string;
+  wallet: string | null;
+  name: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
+}
+
+export interface RoleType {
+  _id?: string;
+  member?: MemberType | null;
+  role?: string | null;
+}
+
+export interface SafeType {
+  _id: string;
+  name: string;
+  address?: string | null;
+  token?: string | null;
+  balance?: number | string;
+  transactions?: any | null;
+  dao?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
+  owners?: Array<MemberType>;
+}
+
+export interface DAOType {
+  _id?: string;
+  contractAddress?: string;
+  name?: string;
+  url?: string;
+  description?: string;
+  image?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  members?: Array<RoleType> | [];
+  safe?: SafeType
+}

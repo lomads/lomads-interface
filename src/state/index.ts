@@ -4,6 +4,7 @@ import { load, save } from "redux-localstorage-simple";
 import application from "./application/reducer";
 import user from "./user/reducer";
 import connection from "./connection/reducer";
+import contract from "./contract/reducer";
 import transactions from "./transactions/reducer";
 import lists from "./lists/reducer";
 import proposal from "./proposal/reducer";
@@ -11,6 +12,7 @@ import deploy from "./deploy/reducer";
 import multicall from "state/multicall";
 import flow from "./flow/reducer";
 import tempdata from "./tempdata/reducer";
+import dashboard from './dashboard/reducer';
 
 const PERSISTED_KEYS: string[] = ["user", "transactions", "lists"];
 
@@ -23,8 +25,10 @@ const store = configureStore({
     proposal,
     flow,
     tempdata,
+    contract,
     deploy,
     lists,
+    dashboard,
     multicall: multicall.reducer,
   },
   middleware: (getDefaultMiddleware) =>

@@ -9,6 +9,7 @@ import { IselectRecipientType, IsetRecipientType } from "types/DashBoardType";
 import AddRecipient from "./AddRecipient";
 
 const SelectRecipient = (props: IselectRecipientType) => {
+  {console.log(props.totalMembers)}
   const [selectedRecipientCount, setSelectedRecipientCount] =
     useState<number>(0);
   const handleCheck = (event: React.ChangeEvent<HTMLInputElement>) => {

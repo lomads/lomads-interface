@@ -19,7 +19,7 @@
     gap: 10px;
 }
 .inputTitle {
-    font-family: 'Open Sans';
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 700;
     font-size: 16px;
@@ -61,7 +61,7 @@
     width: 30%;
 }
 .text {
-    font-family: 'Open Sans';
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
@@ -70,7 +70,7 @@
     color: #76808D;
 }
 .creatorText {
-    font-family: 'Open Sans';
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
@@ -80,7 +80,7 @@
     margin-right: 28%;
 }
 .nameText {
-    font-family: 'Open Sans';
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
@@ -91,7 +91,7 @@
     text-align: center;
 }
 .infoText {
-    font-family: 'Open Sans';
+    font-family: 'Inter', sans-serif;
     font-style: italic;
     font-weight: 400;
     font-size: 16px;

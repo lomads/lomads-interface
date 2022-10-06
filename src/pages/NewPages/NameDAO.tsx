@@ -1,20 +1,27 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import _ from "lodash";
-import { useNavigate } from "react-router-dom";
+import lomadsfulllogo from "../../assets/svg/lomadsfulllogo.svg";
+import { useNavigate, useLocation } from "react-router-dom";
 import SimpleButton from "UIpack/SimpleButton";
 import SimpleInputField from "UIpack/SimpleInputField";
 import "../../styles/Global.css";
 import "../../styles/pages/NameDAO.css";
 import { useAppSelector } from "state/hooks";
 import { useAppDispatch } from "state/hooks";
+import { setDAOList } from 'state/dashboard/reducer';
 import { updateDaoAddress, updateDaoName } from "state/flow/reducer";
+import { LeapFrog } from "@uiball/loaders";
+import axiosHttp from '../../api'
 
 const NameDAO = () => {
   const dispatch = useAppDispatch();
+  const location = useLocation();
+  const [DAOListLoading, setDAOListLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<any>({});
   const refSafeName = useRef<string>("");
   const daoName = useAppSelector((state) => state.flow.daoName);
   const daoAddress = useAppSelector((state) => state.flow.daoAddress);
+  const { DAOList } = useAppSelector((state) => state.dashboard);
   const navigate = useNavigate();
   const handleClick = () => {
     let terrors: any = {};
@@ -31,6 +38,20 @@ const NameDAO = () => {
     }
   };
 
+  // useEffect(() => {
+  //   if(location.pathname.indexOf('namedao') > -1) {
+  //     if(DAOList.length == 0) {
+  //       setDAOListLoading(true)
+  //       axiosHttp.get("dao").then(res => { 
+  //         setDAOList(res.data) 
+  //         if(res.data.length > 0)
+  //           navigate(`/${_.get(res.data, '[0].url')}`)
+  //       })
+  //       .finally(() => setDAOListLoading(false))
+  //     }
+  //   }
+  // }, [DAOList])
+
   const handleNavigate = () => {
     console.log("esfsffsf");
     daoName.length >= 1 && navigate("/invitegang");
@@ -40,13 +61,23 @@ const NameDAO = () => {
     dispatch(updateDaoName(refSafeName.current.toString()));
     dispatch(
       updateDaoAddress(
-        "https://app.lomads.xyz/" +
+        process.env.REACT_APP_URL + "/" +
           refSafeName.current.replace(/ /g, "-").toLowerCase()
       )
     );
   };
+
+
   return (
     <>
+      { DAOListLoading ? 
+        <div style={{ backgroundColor: '#FFF', height: '100vh', zIndex: 99999, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="logo">
+          <img src={lomadsfulllogo} alt="" />
+        </div>
+        <LeapFrog size={50} color="#C94B32" />
+      </div> : null
+      }
       <div className="NameDAO">
         <div className="headerText">1/3 Name your new DAO</div>
         <div className="centerCard">
