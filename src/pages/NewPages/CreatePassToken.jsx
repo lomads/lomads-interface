@@ -27,6 +27,7 @@ const CreatePassToken = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const { DAO } = useAppSelector((state) => state.dashboard);
+    console.log("DAO data : ", DAO);
     const sbtDeployerContract = useSBTDeployerContract();
     const [tab, setTab] = useState(1);
     const [sbtName, setSbtName] = useState('');
@@ -151,7 +152,7 @@ const CreatePassToken = () => {
                 dispatch(resetCreateContractLoader())
                 setIsLoading(false)
                 // navigate(`/sbt/success/${contractAddr}`);
-                navigate('/settings');
+                navigate(-1);
             }
         }
     }, [createContractLoading, contractAddr])

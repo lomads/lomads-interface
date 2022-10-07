@@ -11,7 +11,7 @@ const Settings = () => {
 
     const navigate = useNavigate();
     const { DAO } = useAppSelector((state) => state.dashboard);
-
+    console.log("DAO data : ", DAO);
     return (
         <div className='settings-page'>
             <div className='settings-left-bar'>
@@ -81,9 +81,9 @@ const Settings = () => {
                 <div className='settings-token'>
                     <h1>Pass Tokens</h1>
                     {
-                        DAO?.sbt
+                        DAO?.sbt?.address
                             ?
-                            <p>SBT : {DAO?.sbt}</p>
+                            <p>SBT : {DAO?.sbt?.address}</p>
                             :
                             <>
                                 <p>The organisation doesn’t have token yet</p>
