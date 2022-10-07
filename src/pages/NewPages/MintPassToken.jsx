@@ -74,7 +74,10 @@ const MintPassToken = () => {
         const userName = document.querySelector("#user-name");
         const userMail = document.querySelector("#user-email");
         const userDiscord = document.querySelector("#user-discord");
-        const userTG = document.querySelector("#user-tg");
+        const userTG = document.querySelector("#user-telegram");
+
+        /// if there is no content into the input
+
 
         if(account && sbtContract){
             setLoading(true);
@@ -98,15 +101,15 @@ const MintPassToken = () => {
                     },
                     {
                         trait_type: "Email",
-                        value: userMail.value
+                        value: userMail != null ? userMail.value : ''
                     },
                     {
                         trait_type: "Discord",
-                        value: userDiscord.value
+                        value: userDiscord != null ? userDiscord.value : ''
                     },
                     {
                         trait_type: "Telegram",
-                        value: userTG.value
+                        value: userTG != null ? userTG.value : ''
                     }],
                     contract: contractAddr
                 }
