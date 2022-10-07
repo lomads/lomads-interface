@@ -30,12 +30,20 @@ import { useDispatch } from "react-redux";
 import { updateCurrentNonce, updateSafeThreshold, updateSafeAddress } from "state/flow/reducer";
 import { Tooltip } from "@chakra-ui/react";
 
+import { useSBTStats } from "hooks/SBT/sbt";
+
 const Dashboard = () => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
-	const { daoURL } = useParams()
-	//sessionStorage.setItem('__lmds_active_dao', `${daoURL}`);
+	const { daoURL } = useParams();
+	const { DAO, DAOList, DAOLoading } = useAppSelector((state) => state.dashboard);
+	console.log("DAO : ", DAO);
+	const [update, setUpdate] = useState(0);
 	const { provider, account, chainId } = useWeb3React();
+	const { balanceOf } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
+	console.log("balance : ", balanceOf);
+	//sessionStorage.setItem('__lmds_active_dao', `${daoURL}`);
+
 	const daoName = useAppSelector((state) => state.flow.daoName);
 	const daoAddress = useAppSelector((state) => state.flow.daoAddress);
 	const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
@@ -52,7 +60,7 @@ const Dashboard = () => {
 	const [showAddMember, setShowAddMember] = useState<boolean>(false);
 	const [showNavBar, setShowNavBar] = useState<boolean>(false);
 	const currentNonce = useAppSelector((state) => state.flow.currentNonce);
-	const { DAO, DAOList, DAOLoading } = useAppSelector((state) => state.dashboard);
+
 	const [copy, setCopy] = useState<boolean>(false);
 	const toggleModal = () => {
 		setShowModal(!showModal);
@@ -64,6 +72,13 @@ const Dashboard = () => {
 	const showSideBar = (_choice: boolean) => {
 		setShowNavBar(_choice);
 	};
+
+	useEffect(() => {
+		console.log("balanceof : ", balanceOf);
+		if (DAO?.sbt && parseInt(balanceOf._hex, 16) === 0) {
+			navigate(`/sbt/mint/${DAO.sbt.address}`);
+		}
+	}, [DAO, balanceOf]);
 
 	useEffect(() => {
 		if (chainId && account)

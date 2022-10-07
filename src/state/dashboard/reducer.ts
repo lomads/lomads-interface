@@ -5,7 +5,8 @@ import { createContract } from "state/contract/actions";
 import { get as _get } from "lodash";
 
 export interface DashboardState {
-  DAO: DAOType | null;
+  // DAO: DAOType | null;
+  DAO: any;
   DAOLoading: boolean | null;
   DAOList: Array<DAOType>;
   addMemberLoading: boolean | null;

@@ -94,6 +94,7 @@ export interface SafeType {
 
 export interface DAOType {
   _id?: string;
+  sbt: any;
   contractAddress?: string;
   name?: string;
   url?: string;
