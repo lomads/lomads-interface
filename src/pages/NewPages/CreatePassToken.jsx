@@ -150,7 +150,8 @@ const CreatePassToken = () => {
                 setContractAddr(null)
                 dispatch(resetCreateContractLoader())
                 setIsLoading(false)
-                navigate(`/sbt/success/${contractAddr}`);
+                // navigate(`/sbt/success/${contractAddr}`);
+                navigate('/settings');
             }
         }
     }, [createContractLoading, contractAddr])
