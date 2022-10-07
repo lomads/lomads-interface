@@ -81,9 +81,9 @@ const Settings = () => {
                 <div className='settings-token'>
                     <h1>Pass Tokens</h1>
                     {
-                        DAO.sbt
+                        DAO?.sbt
                             ?
-                            <p>SBT : {DAO.sbt}</p>
+                            <p>SBT : {DAO?.sbt}</p>
                             :
                             <>
                                 <p>The organisation doesn’t have token yet</p>
