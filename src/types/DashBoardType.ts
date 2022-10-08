@@ -10,7 +10,7 @@ export interface IsideModal {
   tokens: any;
   totalMembers: InviteGangType[];
   safeAddress: string;
-  getPendingTransactions: () => Promise<void>;
+  getPendingTransactions: () => any;
   showNotificationArea: (_choice: boolean) => void;
   toggleShowMember: () => void;
 }
@@ -68,14 +68,16 @@ export interface IsetRecipientType {
   reason: string;
 }
 export interface ItreasuryCardType {
+  innerRef: any,
   safeAddress: string;
+  onChangePendingTransactions: any,
   pendingTransactions: SafeMultisigTransactionListResponse | undefined;
   executedTransactions: AllTransactionsListResponse | undefined;
   ownerCount: number | undefined;
   toggleModal: () => void;
   fiatBalance: string;
   account: string | undefined;
-  getPendingTransactions: () => Promise<void>;
-  getExecutedTransactions: () => Promise<void>;
+  // getPendingTransactions: () => Promise<void>;
+  // getExecutedTransactions: () => Promise<void>;
   tokens: any;
 }

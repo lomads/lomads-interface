@@ -39,6 +39,8 @@ const Dashboard = () => {
 	const { DAO, DAOList, DAOLoading } = useAppSelector((state) => state.dashboard);
 	console.log("DAO : ", DAO);
 	const [update, setUpdate] = useState(0);
+	const treasuryRef = useRef<any>();
+	//sessionStorage.setItem('__lmds_active_dao', `${daoURL}`);
 	const { provider, account, chainId } = useWeb3React();
 	const { balanceOf } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
 	console.log("balance : ", balanceOf);
@@ -110,44 +112,18 @@ const Dashboard = () => {
 			dispatch(updateSafeAddress(_get(DAO, 'safe.address', '')))
 	}, [DAO])
 
-	const getPendingTransactions = async () => {
-		await (
-			await safeService(provider)
-		)
-			.getPendingTransactions(safeAddress)
-			.then((res) => {
-				setPendingTransactions(res);
-				console.log(res.results);
-			})
-			.catch((err) => {
-				console.log("error occoured while fetcging pending transactions:", err);
-			});
-		await ownersCount();
-		console.log("pending", pendingTransactions?.results);
-		// const nonce = pendingTxs.results[0] && pendingTxs.results[0].nonce;
-		const nonce = await (await safeService(provider)).getNextNonce(safeAddress);
+	const prepare = async (_safeAddress:string) => {
+		await ownersCount(_safeAddress);
+		const nonce = await (await safeService(provider)).getNextNonce(_safeAddress);
 		console.log("nonce", nonce);
 		dispatch(updateCurrentNonce(nonce));
 		console.log("updated nonce:", currentNonce);
-		await getTokens(safeAddress);
+		await getTokens(_safeAddress);
 		setShowNotification(true);
 	};
 
-	const getExecutedTransactions = async () => {
-		const options: AllTransactionsOptions = {
-			executed: true,
-			queued: false,
-			trusted: true,
-		};
-		const executedTxs = await (
-			await safeService(provider)
-		).getAllTransactions(safeAddress, options);
-		setExecutedTransactions(executedTxs);
-		console.log("executedTxs:", executedTxs);
-	};
-
-	const ownersCount = async () => {
-		const safeSDK = await ImportSafe(provider, safeAddress);
+	const ownersCount = async (_safeAddress:string) => {
+		const safeSDK = await ImportSafe(provider, _safeAddress);
 		const owners = await safeSDK.getOwners();
 		const threshold = await safeSDK.getThreshold();
 		dispatch(updateSafeThreshold(threshold));
@@ -165,12 +141,11 @@ const Dashboard = () => {
 	};
 
 	useEffect(() => {
-		if (safeAddress) {
-			getPendingTransactions();
-			getExecutedTransactions();
-			getTokens(safeAddress);
+		if(DAO && _get(DAO, 'url') === daoURL){
+			prepare(_get(DAO, 'safe.address'))
+			getTokens(_get(DAO, 'safe.address'));
 		}
-	}, [safeAddress]);
+	}, [DAO, daoURL]);
 
 	if (showModal) {
 		document.body.classList.add("active-modal");
@@ -209,7 +184,7 @@ const Dashboard = () => {
 				}}
 			>
 				<div className="DAOdetails">
-					<div className="DAOname" onClick={getPendingTransactions}>
+					<div className="DAOname">
 						{_get(DAO, 'name', '')}
 					</div>
 					<div className="DAOsettings">
@@ -259,6 +234,7 @@ const Dashboard = () => {
 						/>
 					)}
 				<TreasuryCard
+					innerRef={treasuryRef}
 					safeAddress={safeAddress}
 					pendingTransactions={pendingTransactions}
 					executedTransactions={executedTransactions}
@@ -266,9 +242,8 @@ const Dashboard = () => {
 					toggleModal={toggleModal}
 					fiatBalance={safeTokens.length >= 1 && safeTokens[0].fiatBalance}
 					account={account}
-					getPendingTransactions={getPendingTransactions}
+					onChangePendingTransactions={(tx: any) => setPendingTransactions(tx)}
 					tokens={safeTokens}
-					getExecutedTransactions={getExecutedTransactions}
 				/>
 				<MemberCard
 					totalMembers={totalMembers}
@@ -287,7 +262,7 @@ const Dashboard = () => {
 					tokens={safeTokens}
 					totalMembers={totalMembers}
 					safeAddress={safeAddress}
-					getPendingTransactions={getPendingTransactions}
+					getPendingTransactions={() => { treasuryRef?.current?.reload() }}
 					showNotificationArea={showNotificationArea}
 					toggleShowMember={toggleShowMember}
 				/>
