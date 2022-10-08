@@ -16,6 +16,8 @@ import { InviteGangType } from "types/UItype";
 import daoMember2 from "../../assets/svg/daoMember2.svg";
 import { useWeb3React } from "@web3-react/core";
 import { useEnsAddress } from "react-moralis";
+import { addDaoMember } from 'state/dashboard/actions'
+import { resetAddMemberLoader } from 'state/dashboard/reducer';
 import OutlineButton from "UIpack/OutlineButton";
 
 const AddRecipient = (props: any) => {
@@ -25,6 +27,7 @@ const AddRecipient = (props: any) => {
   const [ownerAddress, setOwnerAddress] = useState<string>("");
   const [errors, setErrors] = useState<any>({});
   const totalMembers = useAppSelector((state) => state.flow.totalMembers);
+  const { DAO, addMemberLoading } = useAppSelector((state) => state.dashboard);
   const { account } = useWeb3React();
 
   const isAddressValid = (holderAddress: string) => {
@@ -33,7 +36,7 @@ const AddRecipient = (props: any) => {
   };
 
   const isPresent = (_address: string) => {
-    const check = totalMembers.some((mem) => mem.address === _address);
+    const check = totalMembers.some((mem) => mem.address.toLowerCase() === _address.toLowerCase());
     return check;
   };
   const isRecipientPresent = (_address: string) => {
@@ -63,16 +66,16 @@ const AddRecipient = (props: any) => {
     isPresent(ownerAddress);
   }, [ownerAddress]);
 
-  const addMember = (_ownerName: string, _ownerAddress: string) => {
-    const member: InviteGangType = { name: _ownerName, address: _ownerAddress };
-    if (!isPresent(member.address)) {
-      const newMember = [...totalMembers, member];
-      dispatch(updateTotalMembers(newMember));
-      setOwnerName("");
-      setOwnerAddress("");
-      props.toggleAddNewRecipient();
-    }
-  };
+  // const addMember = (_ownerName: string, _ownerAddress: string) => {
+  //   const member: InviteGangType = { name: _ownerName, address: _ownerAddress };
+  //   if (!isPresent(member.address)) {
+  //     const newMember = [...totalMembers, member];
+  //     dispatch(updateTotalMembers(newMember));
+  //     setOwnerName("");
+  //     setOwnerAddress("");
+  //     props.toggleAddNewRecipient();
+  //   }
+  // };
 
   const handleClick = (_ownerName: string, _ownerAddress: string) => {
     let terrors: any = {};
@@ -88,6 +91,22 @@ const AddRecipient = (props: any) => {
       setErrors(terrors);
     }
   };
+
+
+  useEffect(() => {
+    if(addMemberLoading === false) {
+      dispatch(resetAddMemberLoader())
+      setOwnerName("");
+      setOwnerAddress("");
+      props.toggleAddNewRecipient();
+    }
+  }, [addMemberLoading])
+
+  const addMember = (_ownerName: string, _ownerAddress: string) => {
+    const member: InviteGangType = { name: _ownerName, address: _ownerAddress };
+    dispatch(addDaoMember({ url: DAO?.url, payload: member }))
+  };
+
   return (
     <>
       <div id="AddNewRecipientComponent">

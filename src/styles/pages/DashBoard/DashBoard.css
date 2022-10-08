@@ -766,9 +766,10 @@ body.active-modal {
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
-    line-height: 16px;
+    line-height: 14px;
+    text-align: center;
     color: #FFFFFF;
-
+    line-height: 18px;
     opacity: 0.9;
 }
 

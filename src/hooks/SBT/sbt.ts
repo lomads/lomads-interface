@@ -15,6 +15,7 @@ export const useSBTStats = (library: any, account: string, refresh: number, cont
     });
     useEffect(() => {
         const fetch = async () => {
+            if(!library || account == "" || contractAddr == "") return;
             const multicall = new MultiCall(library);
             try {
                 const calls = [
@@ -62,7 +63,6 @@ export const useSBTStats = (library: any, account: string, refresh: number, cont
             fetch();
         }
     }, [library, account, refresh, contractAddr])
-    console.log(stats);
     return { ...stats };
 }
 

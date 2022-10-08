@@ -9,6 +9,7 @@ const IconButton = (props: IconButtonType) => {
         id="nextButtonToken"
         className={props.className}
         onClick={props.onClick}
+        disabled={props.disabled}
         style={{
           height: props.height,
           width: props.width,

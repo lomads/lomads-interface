@@ -72,14 +72,6 @@ const AddMember = (props: any) => {
   const addMember = (_ownerName: string, _ownerAddress: string) => {
     const member: InviteGangType = { name: _ownerName, address: _ownerAddress };
     dispatch(addDaoMember({ url: DAO?.url, payload: member }))
-    // if (!isPresent(member.address)) {
-    //   const newMember = [...totalMembers, member];
-    //   dispatch(updateTotalMembers(newMember));
-    //   setOwnerName("");
-    //   setOwnerAddress("");
-    //   props.toggleShowMember();
-    // }
-
   };
 
   const handleClick = (_ownerName: string, _ownerAddress: string) => {

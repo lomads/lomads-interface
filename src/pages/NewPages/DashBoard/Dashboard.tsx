@@ -42,8 +42,6 @@ const Dashboard = () => {
 	const treasuryRef = useRef<any>();
 	//sessionStorage.setItem('__lmds_active_dao', `${daoURL}`);
 	const { provider, account, chainId } = useWeb3React();
-	const { balanceOf } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
-	console.log("balance : ", balanceOf);
 	//sessionStorage.setItem('__lmds_active_dao', `${daoURL}`);
 
 	const daoName = useAppSelector((state) => state.flow.daoName);
@@ -63,6 +61,18 @@ const Dashboard = () => {
 	const [showNavBar, setShowNavBar] = useState<boolean>(false);
 	const currentNonce = useAppSelector((state) => state.flow.currentNonce);
 
+	const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
+
+	const amIAdmin = useMemo(() => {
+		if (DAO) {
+			let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'ADMIN')
+			if (user)
+				return true
+			return false
+		}
+		return false;
+	}, [account, DAO])
+
 	const [copy, setCopy] = useState<boolean>(false);
 	const toggleModal = () => {
 		setShowModal(!showModal);
@@ -76,11 +86,12 @@ const Dashboard = () => {
 	};
 
 	useEffect(() => {
-		console.log("balanceof : ", balanceOf);
-		if (DAO?.sbt && parseInt(balanceOf._hex, 16) === 0) {
-			navigate(`/sbt/mint/${DAO.sbt.address}`);
+		if(contractName !== '' && amIAdmin){
+			if (DAO?.sbt &&  parseInt(balanceOf._hex, 16) === 0) {
+				navigate(`/sbt/mint/${DAO.sbt.address}`);
+			}
 		}
-	}, [DAO, balanceOf]);
+	}, [DAO, balanceOf, contractName, amIAdmin]);
 
 	useEffect(() => {
 		if (chainId && account)
@@ -155,16 +166,6 @@ const Dashboard = () => {
 	const showNotificationArea = (_choice: boolean) => {
 		setShowNotification(_choice);
 	};
-
-	const amIAdmin = useMemo(() => {
-		if (DAO) {
-			let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'ADMIN')
-			if (user)
-				return true
-			return false
-		}
-		return false;
-	}, [account, DAO])
 
 	return (
 		<>

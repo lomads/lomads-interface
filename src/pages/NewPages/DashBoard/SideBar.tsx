@@ -26,11 +26,11 @@ const SideBar = (props: any) => {
 									>
 										<div className="navbarText" style={{ color: '#FFF' }}>
 											{daoName.length === 1
-												? daoName[0].charAt(0)
-												: daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)}
+												? daoName[0].charAt(0).toUpperCase()
+												: daoName[0].charAt(0).toUpperCase() + daoName[daoName.length - 1].charAt(0).toUpperCase()}
 										</div>
 									</div>
-									<div id="createADAOText">{_get(dao, 'name', '')}</div>
+									<div id="createADAOText">{  _get(dao, 'name', '')}</div>
 								</div>
 							)
 						})

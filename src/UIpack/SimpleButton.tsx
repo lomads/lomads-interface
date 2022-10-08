@@ -9,6 +9,7 @@ const SimpleButton = (props: ButtonType) => {
         id="nextButtonToken"
         className={props.className}
         onClick={props.onClick}
+        disabled={props.disabled || undefined}
         style={{
           height: props.height,
           width: props.width,

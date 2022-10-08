@@ -1,5 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axiosHttp from '../../api';
+import { toast } from "react-toastify";
 
 export const getDao = createAsyncThunk(
 	'dao/get',
@@ -24,7 +25,10 @@ export const addDaoMember = createAsyncThunk(
 	async (params: any, thunkApi) => {
 		return axiosHttp.patch(`dao/${params.url}/add-member`, params.payload)
 			.then(res => res.data)
-			.catch(e => thunkApi.rejectWithValue(e))
+			.catch(e => { 
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
 	}
 );
 

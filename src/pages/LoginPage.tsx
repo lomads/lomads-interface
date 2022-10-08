@@ -44,9 +44,7 @@ const LoginPage = (props: any) => {
         else
           return `/${_get(res.data, '[0].url')}`
       } else {
-        const activeDao = sessionStorage.getItem('__lmds_active_dao')
-        if (activeDao)
-          return `/noaccess`
+        sessionStorage.removeItem('__lmds_active_dao')
         return "/namedao"
       }
     })

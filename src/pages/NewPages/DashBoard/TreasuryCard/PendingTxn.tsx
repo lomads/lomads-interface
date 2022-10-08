@@ -1,18 +1,18 @@
 import React, { useMemo } from "react";
-import { get as _get, find as _find } from 'lodash'
+import { get as _get, find as _find, debounce as _debounce } from 'lodash'
 import { useWeb3React } from "@web3-react/core";
 import SimpleInputField from "UIpack/SimpleInputField";
 import sendTokenOutline from "../../../../assets/svg/sendTokenOutline.svg";
 import { beautifyHexToken } from '../../../../utils';
 import { useAppSelector } from "state/hooks";
 import IconButton from "UIpack/IconButton";
-import SimpleButton from "UIpack/SimpleButton";
+import SimpleLoadButton from "UIpack/SimpleLoadButton";
+import { LeapFrog } from "@uiball/loaders";
 import { AiOutlineClose, AiOutlineCheck } from "react-icons/ai";
 
-const PendingTxn = ({ tokens, threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions }: any) => {
-    console.log(threshold)
+const PendingTxn = ({ tokens, threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions, confirmTxLoading, rejectTxLoading, executeTxLoading }: any) => {
     const { provider, account } = useWeb3React();
-
+    console.log("tokens, ", tokens)
     //const threshold = useAppSelector((state) => state.flow.safeThreshold);
 
     const { amount, recipient } = useMemo(() => {
@@ -60,14 +60,18 @@ const PendingTxn = ({ tokens, threshold, transaction, owner, confirmTransaction,
                 </div>
                 { owner && index == 0 ? <div className="confirmIconGrp">
                    { !confirmReached && !hasMyConfirmVote && !rejectReached &&
-                    <IconButton onClick={(e) => confirmTransaction(_get(transaction, 'safeTxHash'))} Icon={ <AiOutlineCheck style={{ color: "#FFFFFF", height: "16px", width: "16px", }} /> } bgColor="#C94B32" height={30} width={30} border="2px solid #C94B32" className="iconButtons" /> }
+                    <IconButton disabled={confirmTxLoading === _get(transaction, 'safeTxHash')} onClick={(e) => confirmTransaction(_get(transaction, 'safeTxHash'))} Icon={ 
+                       confirmTxLoading === _get(transaction, 'safeTxHash') ? <LeapFrog size={10} color="#FFF" /> : <AiOutlineCheck style={{ color: "#FFFFFF", height: "16px", width: "16px", }} /> 
+                    } bgColor="#C94B32" height={30} width={30} border="2px solid #C94B32" className="iconButtons" /> }
                    { !confirmReached && !hasMyConfirmVote && !rejectReached && !transaction.rejectedTxn &&
-                    <IconButton onClick={(e) => rejectTransaction(_get(transaction, 'nonce'))} Icon={ <AiOutlineClose style={{ color: "#FFFFFF", height: "16px", width: "16px", }} /> } bgColor="#C94B32" height={30} width={30} border="2px solid #C94B32" className="iconButtons" /> }
+                    <IconButton disabled={rejectTxLoading === _get(transaction, 'safeTxHash')} onClick={(e) => rejectTransaction(_get(transaction, 'nonce'))} Icon={
+                        rejectTxLoading === _get(transaction, 'safeTxHash') ? <LeapFrog size={10} color="#FFF" /> :  <AiOutlineClose style={{ color: "#FFFFFF", height: "16px", width: "16px", }} /> 
+                    } bgColor="#C94B32" height={30} width={30} border="2px solid #C94B32" className="iconButtons" /> }
                     { confirmReached && 
-                      <SimpleButton onClick={() => executeTransactions(transaction)} width={"100%"} height={30} title="EXECUTE" bgColor={"#C94B32"} className="button" /> 
+                      <SimpleLoadButton condition={executeTxLoading == _get(transaction, 'safeTxHash')} disabled={executeTxLoading} onClick={() => executeTransactions(transaction)} width={"100%"} height={30} title="EXECUTE" bgColor={"#C94B32"} className="button" /> 
                     }
                     { rejectReached && 
-                      <SimpleButton onClick={() => executeTransactions(transaction.rejectedTxn, true)} width={"100%"} height={30} title="REJECT" bgColor={"#C94B32"} className="button" /> 
+                      <SimpleLoadButton condition={executeTxLoading == _get(transaction, 'safeTxHash')} disabled={executeTxLoading} onClick={() => executeTransactions(transaction.rejectedTxn, true)} width={"100%"} height={30} title="REJECT" bgColor={"#C94B32"} className="button" /> 
                     }
                 </div> : <div className="confirmIconGrp">
                     <div className="ex" style={{ position: 'relative' }}>
@@ -134,15 +138,19 @@ const PendingTxn = ({ tokens, threshold, transaction, owner, confirmTransaction,
                     </div>
                     { owner == true ? <div className="confirmIconGrp">
                     { !confirmReached && !hasMyConfirmVote && !rejectReached &&
-                        <IconButton onClick={(e) => confirmTransaction(_get(transaction, 'safeTxHash'))} Icon={ <AiOutlineCheck style={{ color: "#FFFFFF", height: "16px", width: "16px", }} /> } bgColor="#C94B32" height={30} width={30} border="2px solid #C94B32" className="iconButtons" /> }
-                    { !confirmReached && !hasMyConfirmVote && !rejectReached && !transaction.rejectedTxn &&
-                        <IconButton onClick={(e) => rejectTransaction(_get(transaction, 'nonce'))} Icon={ <AiOutlineClose style={{ color: "#FFFFFF", height: "16px", width: "16px", }} /> } bgColor="#C94B32" height={30} width={30} border="2px solid #C94B32" className="iconButtons" /> }
-                        { confirmReached && 
-                        <SimpleButton onClick={() => executeTransactions(transaction)} width={"100%"} height={30} title="EXECUTE" bgColor={"#C94B32"} className="button" /> 
-                        }
-                        { rejectReached && 
-                        <SimpleButton onClick={() => executeTransactions(transaction.rejectedTxn, true)} width={"100%"} height={30} title="REJECT" bgColor={"#C94B32"} className="button" /> 
-                        }
+                    <IconButton disabled={confirmTxLoading === _get(transaction, 'safeTxHash')} onClick={(e) => confirmTransaction(_get(transaction, 'safeTxHash'))} Icon={ 
+                       confirmTxLoading === _get(transaction, 'safeTxHash') ? <LeapFrog size={10} color="#FFF" /> : <AiOutlineCheck style={{ color: "#FFFFFF", height: "16px", width: "16px", }} /> 
+                    } bgColor="#C94B32" height={30} width={30} border="2px solid #C94B32" className="iconButtons" /> }
+                   { !confirmReached && !hasMyConfirmVote && !rejectReached && !transaction.rejectedTxn &&
+                    <IconButton disabled={rejectTxLoading === _get(transaction, 'safeTxHash')} onClick={(e) => rejectTransaction(_get(transaction, 'nonce'))} Icon={
+                        rejectTxLoading === _get(transaction, 'safeTxHash') ? <LeapFrog size={10} color="#FFF" /> :  <AiOutlineClose style={{ color: "#FFFFFF", height: "16px", width: "16px", }} /> 
+                    } bgColor="#C94B32" height={30} width={30} border="2px solid #C94B32" className="iconButtons" /> }
+                    { confirmReached && 
+                      <SimpleLoadButton condition={executeTxLoading == _get(transaction, 'safeTxHash')} disabled={executeTxLoading} onClick={() => executeTransactions(transaction)} width={"100%"} height={30} title="EXECUTE" bgColor={"#C94B32"} className="button" /> 
+                    }
+                    { rejectReached && 
+                      <SimpleLoadButton condition={executeTxLoading == _get(transaction, 'safeTxHash')} onClick={() => executeTransactions(transaction.rejectedTxn, true)} width={"100%"} height={30} title="REJECT" bgColor={"#C94B32"} className="button" /> 
+                    }
                     </div> : <div className="confirmIconGrp"></div> }
                 </div>
                 { threshold && _get(transaction, 'rejectedTxn', null) && !confirmReached && !rejectReached &&

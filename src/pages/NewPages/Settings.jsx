@@ -17,15 +17,17 @@ const Settings = () => {
     const [update, setUpdate] = useState(0);
     const { provider, account } = useWeb3React();
     const { DAO } = useAppSelector((state) => state.dashboard);
-    const { balanceOf } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
+    const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
     console.log("DAO data : ", DAO);
     const daoName = _get(DAO, 'name', '').split(" ");
 
-    useEffect(() => {
-        if (DAO?.sbt && parseInt(balanceOf._hex, 16) === 0) {
-            navigate(`/sbt/mint/${DAO.sbt.address}`);
-        }
-    }, [DAO, balanceOf]);
+	useEffect(() => {
+		if(contractName !== '' ){
+			if (DAO?.sbt &&  parseInt(balanceOf._hex, 16) === 0) {
+				navigate(`/sbt/mint/${DAO.sbt.address}`);
+			}
+		}
+	}, [DAO, balanceOf, contractName]);
 
     return (
         <div className='settings-page'>

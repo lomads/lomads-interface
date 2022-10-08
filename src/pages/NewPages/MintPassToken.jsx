@@ -11,15 +11,17 @@ import { BsDiscord } from "react-icons/bs";
 import { useEffect, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 import { mintSBTtoken, useSBTStats } from "hooks/SBT/sbt";
-import { Navigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useSBTContract } from "hooks/useContract";
 import { APIgetContract, APInewSBTtoken } from "hooks/SBT/sbtAPI";
 import { toast, ToastContainer } from "react-toastify";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
+import { useAppSelector } from "state/hooks";
 
 const MintPassToken = () => {
     /// temporary solution until we don't have specific routes for DAO, contract address will be passed into the url 
     const { contractAddr } = useParams();
+    const navigate = useNavigate();
     /// 1 : no whitelist 
     /// 2 : whitelist user is in
     /// 3 : whitelist user isnt in
@@ -28,6 +30,7 @@ const MintPassToken = () => {
     const [isLoading, setLoading] = useState(false);
     const [contract, setContract] = useState(null)
     const { account, provider } = useWeb3React();
+    const { DAO } = useAppSelector((state) => state.dashboard);
     const { needWhitelist, isWhitelisted, balanceOf, contractName, currentIndex } = useSBTStats(provider, account, update, contractAddr ? contractAddr : '');
     const sbtContract = useSBTContract(contractAddr ? contractAddr : null);
     console.log("sbtContract : ", sbtContract);
@@ -115,7 +118,7 @@ const MintPassToken = () => {
                 if (req) {
                     setLoading(false);
                     toast.success("SBT mint successfuly !");
-                    // navigate()
+                    navigate(`/${DAO.url}`)
                     return;
                 }
                 return;
