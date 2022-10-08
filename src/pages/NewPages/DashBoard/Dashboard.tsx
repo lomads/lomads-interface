@@ -30,12 +30,20 @@ import { useDispatch } from "react-redux";
 import { updateCurrentNonce, updateSafeThreshold, updateSafeAddress } from "state/flow/reducer";
 import { Tooltip } from "@chakra-ui/react";
 
+import { useSBTStats } from "hooks/SBT/sbt";
+
 const Dashboard = () => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
-	const { daoURL } = useParams()
+	const { daoURL } = useParams();
+	const { DAO, DAOList, DAOLoading } = useAppSelector((state) => state.dashboard);
+	console.log("DAO : ", DAO);
+	const [update, setUpdate] = useState(0);
+	const treasuryRef = useRef<any>();
 	//sessionStorage.setItem('__lmds_active_dao', `${daoURL}`);
 	const { provider, account, chainId } = useWeb3React();
+	//sessionStorage.setItem('__lmds_active_dao', `${daoURL}`);
+
 	const daoName = useAppSelector((state) => state.flow.daoName);
 	const daoAddress = useAppSelector((state) => state.flow.daoAddress);
 	const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
@@ -52,7 +60,19 @@ const Dashboard = () => {
 	const [showAddMember, setShowAddMember] = useState<boolean>(false);
 	const [showNavBar, setShowNavBar] = useState<boolean>(false);
 	const currentNonce = useAppSelector((state) => state.flow.currentNonce);
-	const { DAO, DAOList, DAOLoading } = useAppSelector((state) => state.dashboard);
+
+	const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
+
+	const amIAdmin = useMemo(() => {
+		if (DAO) {
+			let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'ADMIN')
+			if (user)
+				return true
+			return false
+		}
+		return false;
+	}, [account, DAO])
+
 	const [copy, setCopy] = useState<boolean>(false);
 	const toggleModal = () => {
 		setShowModal(!showModal);
@@ -66,20 +86,28 @@ const Dashboard = () => {
 	};
 
 	useEffect(() => {
-		if(chainId && account)
+		if(contractName !== '' && amIAdmin){
+			if (DAO?.sbt &&  parseInt(balanceOf._hex, 16) === 0) {
+				navigate(`/sbt/mint/${DAO.sbt.address}`);
+			}
+		}
+	}, [DAO, balanceOf, contractName, amIAdmin]);
+
+	useEffect(() => {
+		if (chainId && account)
 			dispatch(loadDao({}))
 	}, [chainId, account])
 
 	const hasDAOAccess = useMemo(() => {
-		if(!DAOList || DAOList.length == 0) return false;
+		if (!DAOList || DAOList.length == 0) return false;
 		let hasAccess = _find(DAOList, d => d.url === daoURL)
-		if(hasAccess) return true;
+		if (hasAccess) return true;
 		return false
 	}, [DAOList, daoURL])
-	
+
 	useEffect(() => {
-		if(DAOList && DAOList.length > 0) {
-			if(!hasDAOAccess){
+		if (DAOList && DAOList.length > 0) {
+			if (!hasDAOAccess) {
 				navigate('/noaccess')
 			}
 		}
@@ -95,44 +123,18 @@ const Dashboard = () => {
 			dispatch(updateSafeAddress(_get(DAO, 'safe.address', '')))
 	}, [DAO])
 
-	const getPendingTransactions = async () => {
-		await (
-			await safeService(provider)
-		)
-			.getPendingTransactions(safeAddress)
-			.then((res) => {
-				setPendingTransactions(res);
-				console.log(res.results);
-			})
-			.catch((err) => {
-				console.log("error occoured while fetcging pending transactions:", err);
-			});
-		await ownersCount();
-		console.log("pending", pendingTransactions?.results);
-		// const nonce = pendingTxs.results[0] && pendingTxs.results[0].nonce;
-		const nonce = await (await safeService(provider)).getNextNonce(safeAddress);
+	const prepare = async (_safeAddress:string) => {
+		await ownersCount(_safeAddress);
+		const nonce = await (await safeService(provider)).getNextNonce(_safeAddress);
 		console.log("nonce", nonce);
 		dispatch(updateCurrentNonce(nonce));
 		console.log("updated nonce:", currentNonce);
-		await getTokens(safeAddress);
+		await getTokens(_safeAddress);
 		setShowNotification(true);
 	};
 
-	const getExecutedTransactions = async () => {
-		const options: AllTransactionsOptions = {
-			executed: true,
-			queued: false,
-			trusted: true,
-		};
-		const executedTxs = await (
-			await safeService(provider)
-		).getAllTransactions(safeAddress, options);
-		setExecutedTransactions(executedTxs);
-		console.log("executedTxs:", executedTxs);
-	};
-
-	const ownersCount = async () => {
-		const safeSDK = await ImportSafe(provider, safeAddress);
+	const ownersCount = async (_safeAddress:string) => {
+		const safeSDK = await ImportSafe(provider, _safeAddress);
 		const owners = await safeSDK.getOwners();
 		const threshold = await safeSDK.getThreshold();
 		dispatch(updateSafeThreshold(threshold));
@@ -150,12 +152,11 @@ const Dashboard = () => {
 	};
 
 	useEffect(() => {
-		if(safeAddress){
-			getPendingTransactions();
-			getExecutedTransactions();
-			getTokens(safeAddress);
+		if(DAO && _get(DAO, 'url') === daoURL){
+			prepare(_get(DAO, 'safe.address'))
+			getTokens(_get(DAO, 'safe.address'));
 		}
-	}, [safeAddress]);
+	}, [DAO, daoURL]);
 
 	if (showModal) {
 		document.body.classList.add("active-modal");
@@ -165,16 +166,6 @@ const Dashboard = () => {
 	const showNotificationArea = (_choice: boolean) => {
 		setShowNotification(_choice);
 	};
-
-	const amIAdmin = useMemo(() => {
-		if (DAO) {
-			let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'ADMIN')
-			if (user)
-				return true
-			return false
-		}
-		return false;
-	}, [account, DAO])
 
 	return (
 		<>
@@ -194,7 +185,7 @@ const Dashboard = () => {
 				}}
 			>
 				<div className="DAOdetails">
-					<div className="DAOname" onClick={getPendingTransactions}>
+					<div className="DAOname">
 						{_get(DAO, 'name', '')}
 					</div>
 					<div className="DAOsettings">
@@ -244,6 +235,7 @@ const Dashboard = () => {
 						/>
 					)}
 				<TreasuryCard
+					innerRef={treasuryRef}
 					safeAddress={safeAddress}
 					pendingTransactions={pendingTransactions}
 					executedTransactions={executedTransactions}
@@ -251,9 +243,8 @@ const Dashboard = () => {
 					toggleModal={toggleModal}
 					fiatBalance={safeTokens.length >= 1 && safeTokens[0].fiatBalance}
 					account={account}
-					getPendingTransactions={getPendingTransactions}
+					onChangePendingTransactions={(tx: any) => setPendingTransactions(tx)}
 					tokens={safeTokens}
-					getExecutedTransactions={getExecutedTransactions}
 				/>
 				<MemberCard
 					totalMembers={totalMembers}
@@ -272,7 +263,7 @@ const Dashboard = () => {
 					tokens={safeTokens}
 					totalMembers={totalMembers}
 					safeAddress={safeAddress}
-					getPendingTransactions={getPendingTransactions}
+					getPendingTransactions={() => { treasuryRef?.current?.reload() }}
 					showNotificationArea={showNotificationArea}
 					toggleShowMember={toggleShowMember}
 				/>

@@ -1,5 +1,5 @@
 import { Checkbox } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SimpleButton from "UIpack/SimpleButton";
 import daoMember2 from "../../../../assets/svg/daoMember2.svg";
 import SafeButton from "UIpack/SafeButton";
@@ -29,6 +29,11 @@ const SelectRecipient = (props: IselectRecipientType) => {
       props.selectedRecipients.current.splice(refIndex, 1);
     }
   };
+
+  useEffect(() => {
+    console.log(props.selectedRecipients)
+  }, [])
+
   const handleSetRecipient = () => {
     props.selectedRecipients.current.forEach(
       (result: InviteGangType, index: number) => {

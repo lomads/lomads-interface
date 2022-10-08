@@ -62,3 +62,7 @@ export function escapeRegExp(string: string): string {
 export function formattedFeeAmount(feeAmount: FeeAmount): number {
   return feeAmount / 10000
 }
+
+export function beautifyHexToken (token: string): string {
+  return  (token.slice(0, 6) + "..." + token.slice(-4))
+}

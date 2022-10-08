@@ -1,22 +1,24 @@
 .mintPassToken-container {
     width: 100%;
     padding-top: 10vh;
+    height: 100vh;
     background: linear-gradient(180deg, #FDF7F7 0%, #F3F2F2 100%);
     display: flex;
     flex-direction: column;
     position: relative;
+    overflow-y: scroll;
 }
 
 p {
-    font-family : "Insignia", sans-serif;
+    font-family: "Insignia", sans-serif;
 }
 
 @font-face {
     font-family: "Insignia";
     src: url("../fonts/Insignia.ttf") format("truetype"),
-   }
+}
 
-.mintPassToken-container .address-dropdown-container{
+.mintPassToken-container .address-dropdown-container {
     width: 220px;
     height: 60px;
     border-radius: 30px;
@@ -30,7 +32,7 @@ p {
     right: 1.5rem;
 }
 
-.mintPassToken-container .address-dropdown-container .address-dropdown-div1{
+.mintPassToken-container .address-dropdown-container .address-dropdown-div1 {
     height: 100%;
     width: 75%;
     display: flex;
@@ -90,7 +92,7 @@ p {
     margin-right: 10px;
 }
 
-.mintPassToken-container .mintPassToken-body .tokenName-box p{
+.mintPassToken-container .mintPassToken-body .tokenName-box p {
     font-style: normal;
     font-weight: 400;
     font-size: 22px;
@@ -204,7 +206,7 @@ p {
     text-decoration: underline;
 }
 
-.mintPassToken-container .mintPassToken-footer div{
+.mintPassToken-container .mintPassToken-footer div {
     display: flex;
     align-items: center;
 }
@@ -230,15 +232,15 @@ p {
 
 .notAllowedText2 {
     font-style: normal;
-font-weight: 400;
-font-family: "Insignia";
-font-size: 14px;
-line-height: 16px;
-/* or 114% */
-display: flex;
-align-items: center;
-text-align: center;
-margin-top: 20px;
-/* Grey */
-color: #76808D;
+    font-weight: 400;
+    font-family: "Insignia";
+    font-size: 14px;
+    line-height: 16px;
+    /* or 114% */
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin-top: 20px;
+    /* Grey */
+    color: #76808D;
 }

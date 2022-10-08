@@ -50,6 +50,7 @@ const TransactionDetails = (props: ItransactionDetailsType) => {
             className="button"
             height={40}
             width={"12vw"}
+            disabled={!props.selectedToken}
             fontsize={18}
             onClick={() => {
               props.showNavigation(true, false, false);

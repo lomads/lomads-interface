@@ -33,11 +33,11 @@ export default function App() {
         <Route path="/newsafe" element={<AddNewSafe />} />
         <Route path="/success" element={<DAOsuccess />} />
         <Route path="/noaccess" element={<DAONoAccess />} />
-        <Route path="/sbt/create" element={<CreatePassToken />}/>
-			  <Route path="/sbt/mint/:contractAddr" element={<MintPassToken />}/>
+        <Route path="/sbt/create" element={<CreatePassToken />} />
+        <Route path="/sbt/mint/:contractAddr" element={<MintPassToken />} />
         <Route path="/sbt/success/:contractAddr" element={<CreatePassSucess />} />
-        <Route path="/:daoURL" element={<Dashboard />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/:daoURL" element={<Dashboard />} />
       </Routes>
     </div>
   );

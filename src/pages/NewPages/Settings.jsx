@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import './Settings.css';
 import settingIcon from '../../assets/svg/settingsXL.svg';
 import editIcon from '../../assets/svg/editButton.svg';
@@ -5,16 +6,40 @@ import copy from '../../assets/svg/copyIcon.svg';
 import logo from '../../assets/svg/lomadsLogoExpand.svg';
 import { CgClose } from 'react-icons/cg'
 import { useNavigate } from 'react-router-dom';
+import { useAppSelector } from "state/hooks";
+import { useWeb3React } from "@web3-react/core";
+import { useSBTStats } from "hooks/SBT/sbt";
+import { get as _get } from 'lodash'
 
 const Settings = () => {
 
     const navigate = useNavigate();
+    const [update, setUpdate] = useState(0);
+    const { provider, account } = useWeb3React();
+    const { DAO } = useAppSelector((state) => state.dashboard);
+    const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
+    console.log("DAO data : ", DAO);
+    const daoName = _get(DAO, 'name', '').split(" ");
+
+	useEffect(() => {
+		if(contractName !== '' ){
+			if (DAO?.sbt &&  parseInt(balanceOf._hex, 16) === 0) {
+				navigate(`/sbt/mint/${DAO.sbt.address}`);
+			}
+		}
+	}, [DAO, balanceOf, contractName]);
 
     return (
         <div className='settings-page'>
             <div className='settings-left-bar'>
                 <div className='logo-container'>
-                    <p>HG</p>
+                    <p>
+                        {
+                            daoName.length === 1
+                                ? daoName[0].charAt(0)
+                                : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)
+                        }
+                    </p>
                 </div>
                 <img src={settingIcon} />
             </div>
@@ -26,14 +51,16 @@ const Settings = () => {
 
                 <div className='settings-organisation'>
                     <div className='organisation-name'>
-                        <h1>Organisation's Name</h1>
+                        <h1>{_get(DAO, 'name', '')}</h1>
                         <button>
                             <img src={editIcon} alt="edit-icon" />
                         </button>
                     </div>
 
                     <div className='organisation-desc'>
-                        <p>DAO’s description</p>
+                        <p>{
+                            DAO.description ? DAO.description : 'DAO’s description'
+                        }</p>
                     </div>
 
                     <div className='organisation-link'>
@@ -78,8 +105,16 @@ const Settings = () => {
 
                 <div className='settings-token'>
                     <h1>Pass Tokens</h1>
-                    <p>The organisation doesn’t have token yet</p>
-                    <button onClick={() => navigate('/sbt/create')}>configure pass token</button>
+                    {
+                        DAO?.sbt?.address
+                            ?
+                            <p>SBT : {DAO?.sbt?.address}</p>
+                            :
+                            <>
+                                <p>The organisation doesn’t have token yet</p>
+                                <button onClick={() => navigate('/sbt/create')}>configure pass token</button>
+                            </>
+                    }
                 </div>
 
                 <div className='settings-footer'>

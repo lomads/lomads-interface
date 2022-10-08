@@ -21,6 +21,7 @@ export interface ButtonType {
   bgColor?: string;
   className?: string;
   shadow?: string;
+  disabled?: boolean | undefined;
 }
 
 export interface IconButtonType {
@@ -29,6 +30,7 @@ export interface IconButtonType {
   width?: number;
   fontsize?: number;
   fontweight?: number;
+  disabled?:boolean;
   Icon: any;
   bgColor?: string;
   className?: string;
@@ -94,6 +96,7 @@ export interface SafeType {
 
 export interface DAOType {
   _id?: string;
+  sbt: any;
   contractAddress?: string;
   name?: string;
   url?: string;
