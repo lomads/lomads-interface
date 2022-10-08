@@ -6,10 +6,21 @@ import GroupEnjoy from "../../assets/svg/GroupEnjoy.svg";
 import { colors } from "assets/colors";
 import { Colorstype } from "types/UItype";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useAppSelector, useAppDispatch } from "state/hooks";
+import { loadDao } from 'state/dashboard/actions';
+
 const DAOsuccess = () => {
 	const navigate = useNavigate();
+	const dispatch = useAppDispatch();
+
 	const [searchParams, setSearchParams] = useSearchParams();
-	const handleClick = () => {
+	const { DAOList } = useAppSelector((state) => state.dashboard);
+
+	useEffect(() => {
+		dispatch(loadDao({}))
+	}, [])
+
+	const handleClick = async () => {
 		const dao = searchParams.get("dao")
 		navigate(`/${dao}`);
 	};
@@ -18,8 +29,9 @@ const DAOsuccess = () => {
 		setTimeout(() => {
 			const dao = searchParams.get("dao")
 			navigate(`/${dao}`);
-		}, 2000);
+		}, 3000);
 	}, []);
+
 	return (
 		<>
 			<div className="DAOsuccess">

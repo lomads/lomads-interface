@@ -1,403 +1,269 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { get as _get, find as _find } from 'lodash';
-import copyIcon from "../../../assets/svg/copyIcon.svg";
-import coin from "../../../assets/svg/coin.svg";
+import React, { useEffect, useState, useMemo, useImperativeHandle } from "react";
+import { get as _get, sortBy as _sortBy, filter as _filter, map as _map, find as _find } from 'lodash';
+import { useAppSelector } from "state/hooks";
 import SafeButton from "UIpack/SafeButton";
-import { ItreasuryCardType } from "types/DashBoardType";
-import { ImportSafe, safeService } from "connection/SafeCall";
 import { useWeb3React } from "@web3-react/core";
-import PendingTransactions from "./TreasuryCard/PendingTransactions";
-import TransactionComplete from "./TreasuryCard/TransactionComplete";
 import { EthSignSignature } from "@gnosis.pm/safe-core-sdk";
 import { SafeTransactionData } from "@gnosis.pm/safe-core-sdk-types/dist/src/types";
+import copyIcon from "../../../assets/svg/copyIcon.svg";
+import {
+	AllTransactionsListResponse,
+	AllTransactionsOptions,
+	SafeMultisigTransactionListResponse,
+} from "@gnosis.pm/safe-service-client";
+import coin from "../../../assets/svg/coin.svg";
+import { useParams } from "react-router-dom";
+import { ItreasuryCardType } from "types/DashBoardType";
+import { ImportSafe, safeService } from "connection/SafeCall";
 import { Tooltip } from "@chakra-ui/react";
-import { useAppSelector } from "state/hooks";
+import PendingTxn from './TreasuryCard/PendingTxn';
+import CompleteTxn from './TreasuryCard/CompleteTxn';
 
 const TreasuryCard = (props: ItreasuryCardType) => {
-  const { provider, account } = useWeb3React();
-  const ownerCount = props.ownerCount;
-  const [copy, setCopy] = useState<boolean>(false);
-  const [isAddressValid, setisAddressValid] = useState<boolean>(false);
+    const { provider, account } = useWeb3React();
+    const { daoURL } = useParams()
+    const [copy, setCopy] = useState<boolean>(false);
+    const [isAddressValid, setisAddressValid] = useState<boolean>(false);
+    const [owner, setOwner] = useState<boolean>(false);
+    const [threshold, setThreshold] = useState<number>();
 
-  const { DAO } = useAppSelector(store => store.dashboard);
 
-  const amIAdmin = useMemo(() => {
-    if (DAO) {
-      let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'ADMIN')
-      if (user)
-        return true
-      return false
-    }
-    return false;
-  }, [account, DAO])
+	const [pendingTxn, setPendingTxn] = useState<Array<any>>();
+	const [executedTxn, setExecutedTxn] = useState<Array<any>>();
 
-  const isOwner = async () => {
-    const safeSDK = await ImportSafe(provider, props.safeAddress);
-    const condition = await safeSDK.isOwner(account as string);
-    return condition;
-  };
-  const hasUserApproved = (_index: number) => {
-    return (
-      props.pendingTransactions !== undefined &&
-      props.pendingTransactions?.results[_index].confirmations?.some(
-        (signer) => {
-          if (signer.owner === account) {
-            return true;
-          }
-          return false;
-        }
-      )
-    );
-  };
+    const { DAO } = useAppSelector(store => store.dashboard);
 
-  useEffect(() => {
-    (async (_address: string, _safeAddress: string) => {
-      const condition = await isOwner();
-      if (condition) {
-        setisAddressValid(true);
+    useImperativeHandle(props.innerRef, () => ({
+      reload: (event: any) => {
+        loadPendingTxn();
+        loadExecutedTxn();
       }
-    })(account as string, props.safeAddress);
-  }, [account, isOwner, props.safeAddress, provider]);
+    }));
 
-  useEffect(() => {
-    setisAddressValid(false);
-  }, [account as string]);
-
-  const confirmTransaction = async (_safeTxHashs: string) => {
-    const safeSDK = await ImportSafe(provider, props.safeAddress);
-    const isOwner = await safeSDK.isOwner(account as string);
-    if (isOwner) {
-      const senderSignature = await safeSDK.signTransactionHash(_safeTxHashs);
-      await (
-        await safeService(provider)
-      )
-        .confirmTransaction(_safeTxHashs, senderSignature.data)
-        .then(async (success) => {
-          console.log("User confirmed the transaction");
-          await props.getPendingTransactions();
-        })
-        .catch((err) => {
-          console.log("error occured while confirming transaction", err);
-        });
-    } else {
-      console.log("sorry you already approved the transaction");
-    }
-  };
-
-  const checkIsLast = (current: any, next: any) => {
-
-  }
-
-  const executeTransactions = async (_txs: any) => {
-    console.log(_txs);
-    const safeSDK = await ImportSafe(provider, props.safeAddress);
-    const safeTransactionData: SafeTransactionData = {
-      to: _txs.to,
-      value: _txs.value,
-      data: _txs.data !== null ? _txs.data : "0x",
-      operation: _txs.operation,
-      safeTxGas: _txs.safeTxGas,
-      baseGas: _txs.baseGas,
-      gasPrice: _txs.gasPrice,
-      gasToken: _txs.gasToken,
-      refundReceiver: _txs.refundReceiver,
-      nonce: _txs.nonce,
+    const isOwner = async (_safeAddress:string) => {
+        const safeSDK = await ImportSafe(provider,  _safeAddress);
+        const condition = await safeSDK.isOwner(account as string);
+        const threshold = await safeSDK.getThreshold();
+        console.log('condition', condition)
+        setOwner(condition)
+        setThreshold(threshold)
     };
-    const safeTransaction = await safeSDK.createTransaction({
-      safeTransactionData,
-    });
-    _txs.confirmations &&
-      _txs.confirmations.forEach((confirmation: any) => {
-        const signature = new EthSignSignature(
-          confirmation.owner,
-          confirmation.signature
-        );
-        safeTransaction.addSignature(signature);
-      });
-    const executeTxResponse = await safeSDK.executeTransaction(safeTransaction);
-    const receipt =
-      executeTxResponse.transactionResponse &&
-      (await executeTxResponse.transactionResponse.wait());
-    console.log("confirmed", receipt);
-    await props.getPendingTransactions();
-  };
 
-  const rejectTransaction = async (_nonce: number) => {
-    const safeSDK = await ImportSafe(provider, props.safeAddress);
-    const transactionObject = await safeSDK.createRejectionTransaction(_nonce);
-    const safeTxHash = await safeSDK.getTransactionHash(transactionObject);
-    const signature = await safeSDK.signTransactionHash(safeTxHash);
-    const senderAddress = account as string;
-    const safeAddress = props.safeAddress;
-    await (
-      await safeService(provider)
-    )
-      .proposeTransaction({
-        safeAddress,
-        safeTransactionData: transactionObject.data,
-        safeTxHash,
-        senderAddress,
-        senderSignature: signature.data,
-      })
-      .then((result) => {
-        console.log(
-          "on chain rejection transaction has been proposed successfully."
-        );
-      })
-      .catch((err) => {
-        console.log("an error occured while proposing a reject transaction.");
-      });
-    await (
-      await safeService(provider)
-    )
-      .confirmTransaction(safeTxHash, signature.data)
-      .then(async (result) => {
-        console.log("on chain transaction has been confirmed by the signer");
-        await props.getPendingTransactions();
-      })
-      .catch((err) => {
-        console.log("an error occured while confirming a reject transaction.");
-      });
-  };
-  return (
-    <div className="treasuryCard">
-      <div className="treasuryHeader">
-        <div
-          id="treasuryCardTitle"
-          onClick={(e) => {
-            props.getPendingTransactions();
-            props.getExecutedTransactions();
-          }}
-        >
-          Treasury
-        </div>
-        <div className="headerDetails">
-          <div>
-            <hr className="vl" />
-          </div>
-          <div
-            className="copyArea"
-            onClick={() => {
-              setCopy(true);
-            }}
-            onMouseOut={() => {
-              setCopy(false);
-            }}
-          >
-            <Tooltip label={copy ? "copied" : "copy"}>
-              <div
-                className="copyLinkButton"
-                onClick={() => {
-                  navigator.clipboard.writeText(props.safeAddress);
-                }}
-              >
-                <img src={copyIcon} alt="copy" className="safeCopyImage" />
-              </div>
-            </Tooltip>
-            <div className="dashboardText">
-              {props.safeAddress.slice(0, 6) +
-                "..." +
-                props.safeAddress.slice(-4)}
-            </div>
-          </div>
-          <div className="copyArea">
-            <img src={coin} alt="asset" />
-            <div id="safeBalance">
-              $ {props.fiatBalance ? props.fiatBalance : "0.0"}
-            </div>
-            <div className="dashboardText">total balance</div>
-          </div>
-          {isAddressValid && amIAdmin && (
-            <SafeButton
-              height={40}
-              width={150}
-              titleColor="#B12F15"
-              title="SEND TOKEN"
-              bgColor="#FFFFFF"
-              opacity="1"
-              disabled={false}
-              fontweight={400}
-              fontsize={16}
-              onClick={props.toggleModal}
-            />
-          )}
-        </div>
-      </div>
-      {(props.executedTransactions !== undefined ||
-        props.pendingTransactions?.count !== undefined) && (
-          <>
-            <div id="treasuryTransactions">
-              <div className="dashboardText">Last Transactions</div>
-              {props.pendingTransactions !== undefined &&
-                props.pendingTransactions.results.length >= 1 &&
-                props.pendingTransactions.results
-                  .sort((a, b) => {
-                    return a.nonce - b.nonce;
+    const loadPendingTxn = async () => {
+       console.log('Loading for', _get(DAO, 'safe.address', ''));
+         (await safeService(provider))
+        .getPendingTransactions( _get(DAO, 'safe.address', ''))
+        .then(ptx => { props.onChangePendingTransactions(ptx); return ptx })
+        .then(ptx => _get(ptx, 'results', []))
+        .then(ptx => 
+            _map(ptx, (p : any) => {
+                let matchRejTx = _find(ptx, px => px.nonce === p.nonce && px.data === null);
+                if(matchRejTx)
+                    return { ...p,  rejectedTxn: matchRejTx }
+                return p
+            })
+        )
+        .then(ptx => _filter(ptx, p => _get(p, 'dataDecoded.method', '') === 'multiSend' || _get(p, 'dataDecoded.method', '') === 'transfer'))
+        .then(ptx => _sortBy(ptx, 'nonce', 'ASC'))
+        .then(ptx => { console.log(ptx); return ptx })
+        .then(ptx => setPendingTxn(ptx))
+    }
+
+    const loadExecutedTxn = async () => {
+      (await safeService(provider))
+      .getAllTransactions(_get(DAO, 'safe.address', ''), { executed: true, queued: false, trusted: true })
+      .then(etx => _get(etx, 'results', []))
+      .then(etx => _filter(etx, p => _get(p, 'data')))
+      .then(etx => _filter(etx, p => !_get(p, 'dataDecoded') || ( _get(p, 'dataDecoded') && _get(p, 'dataDecoded.method', '') === 'transfer' || _get(p, 'dataDecoded.method', '') === 'multiSend' )))
+      .then(etx => { console.log(etx); return etx })
+      .then(etx =>setExecutedTxn(etx))
+    }
+
+    useEffect(() => {
+        if(DAO && (DAO.url === daoURL)) {
+            isOwner(_get(DAO, 'safe.address', ''))
+            loadPendingTxn()
+            loadExecutedTxn()
+        } else {
+          setPendingTxn(undefined);
+          setExecutedTxn(undefined);
+        }
+    }, [DAO, daoURL])
+
+    const handleConfirmTransaction = async (_safeTxHashs: string) => {
+        const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
+        const isOwner = await safeSDK.isOwner(account as string);
+        if (isOwner) {
+          const senderSignature = await safeSDK.signTransactionHash(_safeTxHashs);
+          await (await safeService(provider))
+            .confirmTransaction(_safeTxHashs, senderSignature.data)
+            .then(async (success) => {
+              await (await safeService(provider)).getTransactionConfirmations(_safeTxHashs)
+              .then(async (res) => {
+                console.log(res)
+                setPendingTxn(prev => {
+                    return prev?.map(tx => {
+                        if(tx.safeTxHash === _safeTxHashs)
+                            return { ...tx, confirmations: res.results }
+                        if(tx.rejectedTxn && tx.rejectedTxn.safeTxHash === _safeTxHashs)
+                            return { ...tx, rejectedTxn: { ...tx.rejectedTxn, confirmations: res.results } }
+                        return tx
+                    })
+                })
+                console.log("User confirmed the transaction");
+              })
+            })
+            .catch((err) => {
+              console.log("error occured while confirming transaction", err);
+            });
+        } else {
+          console.log("sorry you already approved the transaction");
+        }
+      };
+
+      const handleRejectTransaction = async (_nonce: number) => {
+        const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
+        const transactionObject = await safeSDK.createRejectionTransaction(_nonce);
+        const safeTxHash = await safeSDK.getTransactionHash(transactionObject);
+        const signature = await safeSDK.signTransactionHash(safeTxHash);
+        const senderAddress = account as string;
+        const safeAddress =  _get(DAO, 'safe.address', '');
+        await (
+          await safeService(provider)
+        )
+          .proposeTransaction({
+            safeAddress,
+            safeTransactionData: transactionObject.data,
+            safeTxHash,
+            senderAddress,
+            senderSignature: signature.data,
+          })
+          .then((result) => {
+            console.log(result)
+            console.log(
+              "on chain rejection transaction has been proposed successfully."
+            );
+          })
+          .catch((err) => {
+            console.log(err)
+            console.log("an error occured while proposing a reject transaction.");
+          });
+        await (await safeService(provider))
+          .confirmTransaction(safeTxHash, signature.data)
+          .then(async (result) => {
+            console.log("on chain transaction has been confirmed by the signer");
+            await (await safeService(provider)).getTransactionConfirmations(safeTxHash)
+            .then(async (res) => {
+              console.log(res)
+              setPendingTxn(prev => {
+                let succTxn = _find(prev, p => p.nonce === _nonce)
+                  return prev?.map(tx => {
+                        if(tx.safeTxHash === succTxn.safeTxHash)
+                            return { ...succTxn, rejectedTxn: { safeTxHash, data: null, nonce: _nonce, confirmations: res.results } }
+                        return tx
                   })
-                  .map((result: any, index: number) => {
-                    return result.dataDecoded !== null &&
-                      result.dataDecoded.method !== "multiSend" ? (
-                      <PendingTransactions
-                        showExecute={hasUserApproved(index)}
-                        amount={
-                          result.dataDecoded !== null &&
-                          result.dataDecoded.parameters[1].value
-                        }
-                        recipient={
-                          result.dataDecoded !== null &&
-                          result.dataDecoded.parameters[0].value
-                        }
-                        confirmations={
-                          result.confirmations && result.confirmations.length
-                        }
-                        ownerCount={ownerCount}
-                        confirmTransaction={confirmTransaction}
-                        safeTxHash={result.safeTxHash}
-                        isOwner={isOwner}
-                        key={index}
-                        executeTransactions={executeTransactions}
-                        txs={result}
-                        tokenAddress={result.to}
-                        tokens={props.tokens}
-                        isAddressValid={isAddressValid}
-                        rejectTransaction={rejectTransaction}
-                        multiIndex={undefined}
-                      />
-                    ) : (
-                      result.dataDecoded !== null &&
-                      result.dataDecoded.parameters[0].valueDecoded.map(
-                        (multiresult: any, multiIndex: number) => {
-                          return (
-                            <PendingTransactions
-                              showExecute={hasUserApproved(index)}
-                              amount={
-                                multiresult.dataDecoded.parameters[1].value
-                              }
-                              recipient={
-                                multiresult.dataDecoded.parameters[0].value +
-                                "mul "
-                              }
-                              confirmations={
-                                result.confirmations &&
-                                result.confirmations.length
-                              }
-                              ownerCount={ownerCount}
-                              confirmTransaction={confirmTransaction}
-                              safeTxHash={result.safeTxHash}
-                              isOwner={isOwner}
-                              key={multiIndex}
-                              executeTransactions={executeTransactions}
-                              txs={result}
-                              tokenAddress={multiresult.dataDecoded.to}
-                              tokens={props.tokens}
-                              isAddressValid={isAddressValid}
-                              rejectTransaction={rejectTransaction}
-                              multiIndex={multiIndex}
-                              last={result.dataDecoded.parameters[0].valueDecoded[result.dataDecoded.parameters[0].valueDecoded.length - 1].data === multiresult.data}
-                            />
-                          );
-                        }
-                      )
-                    );
-                    //  : (
-                    //   <>
-                    //     <PendingTransactions
-                    //       showExecute={hasUserApproved(index)}
-                    //       amount={"rejection"}
-                    //       recipient={"rejection"}
-                    //       confirmations={
-                    //         result.confirmations && result.confirmations.length
-                    //       }
-                    //       ownerCount={ownerCount}
-                    //       confirmTransaction={confirmTransaction}
-                    //       safeTxHash={result.safeTxHash}
-                    //       isOwner={isOwner}
-                    //       key={index}
-                    //       executeTransactions={executeTransactions}
-                    //       txs={result}
-                    //       tokenAddress={undefined}
-                    //       tokens={props.tokens}
-                    //       isAddressValid={isAddressValid}
-                    //       rejectTransaction={rejectTransaction}
-                    //     />
-                    //   </>
-                    // );
-                  })}
-              {props.executedTransactions !== undefined &&
-                props.executedTransactions.results.length >= 1 &&
-                props.executedTransactions.results.map(
-                  (result: any, index: any) => {
-                    return result.txType === "ETHEREUM_TRANSACTION" ? (
-                      result.transfers[0] !== undefined &&
-                      result.transfers[0].tokenInfo !== null && (
-                        <>
-                          <TransactionComplete
-                            credit={true}
-                            amount={result.transfers[0].value}
-                            recipient={result.transfers[0].to}
-                            ownerCount={ownerCount}
-                            key={index}
-                            submissionDate={result.executionDate}
-                            tokenSymbol={result.transfers[0].tokenInfo.symbol}
-                            tokenAddress={result.transfers[0].tokenAddress}
-                            tokens={props.tokens}
-                            multiIndex={undefined}
+              })
+              console.log("User confirmed the transaction");
+            })
+          })
+          .catch((err) => {
+            console.log("an error occured while confirming a reject transaction.");
+          });
+      };
 
-                          />
-                        </>
-                      )
-                    ) : result.safe &&
-                      result.dataDecoded !== null &&
-                      result.dataDecoded.method !== "multiSend" ? (
-                      <TransactionComplete
-                        credit={false}
-                        amount={result.dataDecoded.parameters[1].value}
-                        recipient={result.dataDecoded.parameters[0].value}
-                        ownerCount={ownerCount}
-                        key={index}
-                        submissionDate={
-                          result.confirmations[result.confirmations.length - 1]
-                            .submissionDate
-                        }
-                        tokenAddress={result.to}
-                        tokens={props.tokens}
-                        multiIndex={undefined}
-                      />
-                    ) : (
-                      result.dataDecoded !== null &&
-                      result.dataDecoded.parameters[0].valueDecoded.map(
-                        (multiresult: any, multiIndex: number) => {
-                          return (
-                            <TransactionComplete
-                              credit={false}
-                              amount={multiresult.dataDecoded.parameters[1].value}
-                              recipient={
-                                multiresult.dataDecoded.parameters[0].value
-                              }
-                              ownerCount={ownerCount}
-                              key={index}
-                              submissionDate={
-                                result.confirmations[
-                                  result.confirmations.length - 1
-                                ].submissionDate
-                              }
-                              tokenAddress={multiresult.to}
-                              tokens={props.tokens}
-                              index={index}
-                              multiIndex={multiIndex}
-                              last={result.dataDecoded.parameters[0].valueDecoded[result.dataDecoded.parameters[0].valueDecoded.length - 1].data === multiresult.data}
-                            />
-                          );
-                        }
-                      )
-                    );
-                  }
-                )}
+
+      const handleExecuteTransactions = async (_txs: any, reject: boolean | undefined) => {
+        console.log(_txs);
+        const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
+        const safeTransactionData: SafeTransactionData = {
+          to: _txs.to,
+          value: _txs.value,
+          data: _txs.data !== null ? _txs.data : "0x",
+          operation: _txs.operation,
+          safeTxGas: _txs.safeTxGas,
+          baseGas: _txs.baseGas,
+          gasPrice: _txs.gasPrice,
+          gasToken: _txs.gasToken,
+          refundReceiver: _txs.refundReceiver,
+          nonce: _txs.nonce,
+        };
+        const safeTransaction = await safeSDK.createTransaction({
+          safeTransactionData,
+        });
+        _txs.confirmations &&
+          _txs.confirmations.forEach((confirmation: any) => {
+            const signature = new EthSignSignature(
+              confirmation.owner,
+              confirmation.signature
+            );
+            safeTransaction.addSignature(signature);
+          });
+        const executeTxResponse = await safeSDK.executeTransaction(safeTransaction);
+        const receipt =
+          executeTxResponse.transactionResponse &&
+          (await executeTxResponse.transactionResponse.wait());
+        console.log("confirmed", receipt);
+        if(reject){
+          setPendingTxn(prev => {
+            let parentTxn = _find(prev, p => p.rejectedTxn.safeTxHash === _txs.safeTxHash)
+            return prev?.filter(tx => tx.safeTxHash !== parentTxn.safeTxHash)
+          })
+        } else {
+          setPendingTxn(prev => {
+            let parentTxn = _find(prev, p => p.safeTxHash === _txs.safeTxHash)
+            return prev?.filter(tx => tx.safeTxHash !== parentTxn.safeTxHash)
+          })
+          await loadExecutedTxn()
+        }
+        //await props.getPendingTransactions();
+      };
+    
+
+    return (
+        <div className="treasuryCard">
+            <div className="treasuryHeader">
+                <div id="treasuryCardTitle" onClick={(e) => {
+                  loadPendingTxn()
+                  loadExecutedTxn()
+              }}>Treasury</div>
+                <div className="headerDetails">
+                    <div><hr className="vl" /></div>
+                    <div className="copyArea" onClick={() => setCopy(true)} onMouseOut={() => setCopy(false)}>
+                        <Tooltip label={copy ? "copied" : "copy"}>
+                            <div className="copyLinkButton" onClick={() => navigator.clipboard.writeText(_get(DAO, 'safe.address', ''))}>
+                                <img src={copyIcon} alt="copy" className="safeCopyImage" />
+                            </div>
+                        </Tooltip>
+                        <div className="dashboardText">{ `${ _get(props, 'safeAddress', '').slice(0, 6) }...${_get(props, 'safeAddress', '').slice(-4) }` }</div>
+                    </div>
+                    <div className="copyArea">
+                        <img src={coin} alt="asset" />
+                        <div id="safeBalance">{ `$${ _get(props, 'fiatBalance', '0.0') }` }</div>
+                        <div className="dashboardText">total balance</div>
+                    </div>
+                    { owner && <SafeButton  onClick={props.toggleModal} height={40} width={150} titleColor="#B12F15" title="SEND TOKEN" bgColor="#FFFFFF" opacity="1" disabled={false} fontweight={400} fontsize={16} /> }
+                </div>
             </div>
-          </>
-        )}
-    </div>
-  );
-};
+            <>
+              {
+                  pendingTxn !== undefined && executedTxn !== undefined &&
+                  <div id="treasuryTransactions">
+                      <div className="dashboardText">Last Transactions</div>
+                      {
+                          pendingTxn.map((ptx, index) => 
+                              <PendingTxn owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} />
+                          )
+                      }
+                      {
+                          executedTxn.map((ptx, index) => 
+                              <CompleteTxn transaction={ptx} tokens={props.tokens} />
+                          )
+                      }
+                  </div>
+              }
+            </>
+        </div>
+    )
+}
 
-export default TreasuryCard;
+export default TreasuryCard
