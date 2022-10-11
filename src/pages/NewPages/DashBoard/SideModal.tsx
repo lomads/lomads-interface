@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { get as _get } from 'lodash';
+import { get as _get, find as _find } from 'lodash';
 import TransactionDetails from "./SideModal/TransactionDetails";
 import {
   IsetRecipientType,
@@ -21,7 +21,9 @@ import IconButton from "UIpack/IconButton";
 import { SafeTransactionOptionalProps } from "@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/types";
 import ethers from "ethers";
 import axios from "axios";
+import { getDao } from "state/dashboard/actions";
 import { updateTotalMembers } from "state/flow/reducer";
+import axiosHttp from '../../../api'
 
 const SideModal = (props: IsideModal) => {
   const dispatch = useAppDispatch();
@@ -33,6 +35,7 @@ const SideModal = (props: IsideModal) => {
     showTransactionSender: false,
     showSuccess: false,
   });
+  const [error, setError] = useState<string | null>(null)
   const [isLoading, setisLoading] = useState<boolean>(false);
   const [safeTokens, setSafeTokens] = useState<Array<any>>([]);
   const totalMembers = useAppSelector((state) => state.flow.totalMembers);
@@ -66,68 +69,89 @@ const SideModal = (props: IsideModal) => {
   };
 
   const createTransaction = async () => {
-    setisLoading(true);
-    const token = await tokenCallSafe(selectedToken);
-    const safeSDK = await ImportSafe(provider, props.safeAddress);
-    const safeTransactionData: SafeTransactionDataPartial[] = await Promise.all(
-      setRecipient.current.map(
-        async (result: IsetRecipientType, index: number) => {
-          const unsignedTransaction = await token.populateTransaction.transfer(
-            result.recipient,
-            BigInt(parseInt(result.amount) * 10 ** 18)
-          );
-          const transactionData = {
-            to: selectedToken,
-            data: unsignedTransaction.data as string,
-            value: "0",
-          };
-          return transactionData;
-        }
+    try {
+      setError(null)
+      let sendTotal = setRecipient.current.reduce((pv:any, cv) => pv + (+cv.amount), 0);
+      let selToken = _find(safeTokens, t => t.tokenAddress === selectedToken)
+      if((_get(selToken, 'balance', 0) / 10 ** 18) < sendTotal)
+        return setError(`Low token balance. Available tokens ${_get(selToken, 'balance', 0) / 10 ** 18} ${selToken.token.symbol}`);
+      setisLoading(true);
+      const token = await tokenCallSafe(selectedToken);
+      const safeSDK = await ImportSafe(provider, props.safeAddress);
+      const safeTransactionData: SafeTransactionDataPartial[] = await Promise.all(
+        setRecipient.current.map(
+          async (result: IsetRecipientType, index: number) => {
+            const unsignedTransaction = await token.populateTransaction.transfer(
+              result.recipient,
+              BigInt(parseInt(result.amount) * 10 ** 18)
+            );
+            const transactionData = {
+              to: selectedToken,
+              data: unsignedTransaction.data as string,
+              value: "0",
+            };
+            return transactionData;
+          }
+        )
+      );
+      const options: SafeTransactionOptionalProps = {
+        nonce: currentNonce,
+      };
+      const safeTransaction = await safeSDK.createTransaction({
+        safeTransactionData,
+        options,
+      });
+      const safeTxHash = await safeSDK.getTransactionHash(safeTransaction);
+      const signature = await safeSDK.signTransactionHash(safeTxHash);
+      const senderAddress = account as string;
+      const safeAddress = props.safeAddress;
+      await (
+        await safeService(provider)
       )
-    );
-    const options: SafeTransactionOptionalProps = {
-      nonce: currentNonce,
-    };
-    const safeTransaction = await safeSDK.createTransaction({
-      safeTransactionData,
-      options,
-    });
-    const safeTxHash = await safeSDK.getTransactionHash(safeTransaction);
-    const signature = await safeSDK.signTransactionHash(safeTxHash);
-    const senderAddress = account as string;
-    const safeAddress = props.safeAddress;
-    await (
-      await safeService(provider)
-    )
-      .proposeTransaction({
-        safeAddress,
-        safeTransactionData: safeTransaction.data,
-        safeTxHash,
-        senderAddress,
-        senderSignature: signature.data,
-      })
-      .then((value) => {
-        console.log("transaction has been proposed");
-      })
-      .catch((error) => {
-        console.log("an error occoured while proposing transaction", error);
-        setisLoading(false);
-      });
-    await (
-      await safeService(provider)
-    )
-      .confirmTransaction(safeTxHash, signature.data)
-      .then(async (success) => {
-        console.log("transaction is successful");
-        console.log("success:", success);
-        await props.getPendingTransactions();
-        showNavigation(false, true, false);
-        setisLoading(false);
-      })
-      .catch((err) => {
-        setisLoading(false);
-        console.log("error occured while confirming transaction", err);
-      });
+        .proposeTransaction({
+          safeAddress,
+          safeTransactionData: safeTransaction.data,
+          safeTxHash,
+          senderAddress,
+          senderSignature: signature.data,
+        })
+        .then((value) => {
+          console.log("transaction has been proposed");
+        })
+        .catch((error) => {
+          console.log("an error occoured while proposing transaction", error);
+          setisLoading(false);
+        });
+      await (
+        await safeService(provider)
+      )
+        .confirmTransaction(safeTxHash, signature.data)
+        .then(async (success) => {
+          console.log("transaction is successful");
+          console.log("success:", success);
+  
+          axiosHttp.post(`transaction`, {
+            safeAddress: safeAddress,
+            safeTxHash: safeTxHash,
+            rejectTxHash: null,
+            data: setRecipient.current,
+            nonce: currentNonce,
+          })
+          .then(async () => {
+            dispatch(getDao(DAO.url))
+            await props.getPendingTransactions();
+            showNavigation(false, true, false);
+            setisLoading(false);
+          })
+        })
+        .catch((err) => {
+          setisLoading(false);
+          console.log("error occured while confirming transaction", err);
+        });
+    } catch(e) {
+      console.log(e)
+      setisLoading(false);
+    }
   };
 
   const getTokens = async (safeAddress: string) => {
@@ -200,6 +224,7 @@ const SideModal = (props: IsideModal) => {
             !modalNavigation.showSuccess &&
             modalNavigation.showTransactionSender && (
               <TransactionSend
+                error={error}
                 showNavigation={showNavigation}
                 selectedRecipients={selectedRecipients}
                 transactionData={transactionData.current}

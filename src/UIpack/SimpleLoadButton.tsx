@@ -8,6 +8,7 @@ const SimpleLoadButton = (props: LoadingButtonType) => {
       <button
         id="nextButtonToken"
         className={"button"}
+        disabled={props.disabled}
         onClick={props.onClick}
         style={{
           height: props.height,

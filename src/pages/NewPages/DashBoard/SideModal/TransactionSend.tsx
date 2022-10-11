@@ -153,6 +153,7 @@ const TransactionSend = (props: IselectTransactionSend) => {
               />
             </div>
           </div>
+          { props.error && <div style={{ fontSize: 14, color: 'red' }}>{ props.error }</div> }
           <div id="transactionSendDivider2"></div>
           <div id="transactionSendButton">
             <SimpleLoadButton
