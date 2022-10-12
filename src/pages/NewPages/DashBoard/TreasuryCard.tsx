@@ -90,144 +90,180 @@ const TreasuryCard = (props: ItreasuryCardType) => {
     }
   }, [DAO, daoURL])
 
-  const handleConfirmTransaction = async (_safeTxHashs: string) => {
-    setConfirmTxLoading(_safeTxHashs);
-    const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
-    const isOwner = await safeSDK.isOwner(account as string);
-    if (isOwner) {
-      const senderSignature = await safeSDK.signTransactionHash(_safeTxHashs);
-      await (await safeService(provider))
-        .confirmTransaction(_safeTxHashs, senderSignature.data)
-        .then(async (success) => {
-          await (await safeService(provider)).getTransactionConfirmations(_safeTxHashs)
-            .then(async (res) => {
-              console.log(res)
-              setPendingTxn(prev => {
-                return prev?.map(tx => {
-                  if (tx.safeTxHash === _safeTxHashs)
-                    return { ...tx, confirmations: res.results }
-                  if (tx.rejectedTxn && tx.rejectedTxn.safeTxHash === _safeTxHashs)
-                    return { ...tx, rejectedTxn: { ...tx.rejectedTxn, confirmations: res.results } }
-                  return tx
-                })
-              })
-              setConfirmTxLoading(null);
-              console.log("User confirmed the transaction");
-            })
-        })
-        .catch((err) => {
-          setConfirmTxLoading(null);
-          console.log("error occured while confirming transaction", err);
-        });
+  useEffect(() => {
+    if (DAO && (DAO.url === daoURL)) {
+      isOwner(_get(DAO, 'safe.address', ''))
+      loadPendingTxn()
+      loadExecutedTxn()
     } else {
+      setPendingTxn(undefined);
+      setExecutedTxn(undefined);
+    }
+  }, [DAO, daoURL])
+
+  const handleConfirmTransaction = async (_safeTxHashs: string) => {
+    try {
+      setConfirmTxLoading(_safeTxHashs);
+      const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
+      const isOwner = await safeSDK.isOwner(account as string);
+      if (isOwner) {
+        const senderSignature = await safeSDK.signTransactionHash(_safeTxHashs);
+        await (await safeService(provider))
+          .confirmTransaction(_safeTxHashs, senderSignature.data)
+          .then(async (success) => {
+            await (await safeService(provider)).getTransactionConfirmations(_safeTxHashs)
+              .then(async (res) => {
+                console.log(res)
+                setPendingTxn(prev => {
+                  return prev?.map(tx => {
+                    if (tx.safeTxHash === _safeTxHashs)
+                      return { ...tx, confirmations: res.results }
+                    if (tx.rejectedTxn && tx.rejectedTxn.safeTxHash === _safeTxHashs)
+                      return { ...tx, rejectedTxn: { ...tx.rejectedTxn, confirmations: res.results } }
+                    return tx
+                  })
+                })
+                setConfirmTxLoading(null);
+                console.log("User confirmed the transaction");
+              })
+          })
+          .catch((err) => {
+            setConfirmTxLoading(null);
+            console.log("error occured while confirming transaction", err);
+          });
+      } else {
+        setConfirmTxLoading(null);
+        console.log("sorry you already approved the transaction");
+      }
+    } catch (e) {
+      console.log(e)
       setConfirmTxLoading(null);
-      console.log("sorry you already approved the transaction");
     }
   };
 
   const handleRejectTransaction = async (_nonce: number) => {
-    const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
-    const transactionObject = await safeSDK.createRejectionTransaction(_nonce);
-    const safeTxHash = await safeSDK.getTransactionHash(transactionObject);
-    setRejectTxLoading(safeTxHash);
-    const signature = await safeSDK.signTransactionHash(safeTxHash);
-    const senderAddress = account as string;
-    const safeAddress = _get(DAO, 'safe.address', '');
-    await (
-      await safeService(provider)
-    )
-      .proposeTransaction({
-        safeAddress,
-        safeTransactionData: transactionObject.data,
-        safeTxHash,
-        senderAddress,
-        senderSignature: signature.data,
-      })
-      .then((result) => {
-        console.log(result)
-        console.log(
-          "on chain rejection transaction has been proposed successfully."
-        );
-      })
-      .catch((err) => {
-        setRejectTxLoading(null);
-        console.log(err)
-        console.log("an error occured while proposing a reject transaction.");
-      });
-    await (await safeService(provider))
-      .confirmTransaction(safeTxHash, signature.data)
-      .then(async (result) => {
-        console.log("on chain transaction has been confirmed by the signer");
-        await (await safeService(provider)).getTransactionConfirmations(safeTxHash)
-          .then(async (res) => {
-            console.log(res)
-            setRejectTxLoading(null);
-            setPendingTxn(prev => {
-              let succTxn = _find(prev, p => p.nonce === _nonce)
-              return prev?.map(tx => {
-                if (tx.safeTxHash === succTxn.safeTxHash)
-                  return { ...succTxn, rejectedTxn: { safeTxHash, data: null, nonce: _nonce, confirmations: res.results } }
-                return tx
+    try {
+      setRejectTxLoading(_nonce);
+      const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
+      const transactionObject = await safeSDK.createRejectionTransaction(_nonce);
+      const safeTxHash = await safeSDK.getTransactionHash(transactionObject);
+      const signature = await safeSDK.signTransactionHash(safeTxHash);
+      const senderAddress = account as string;
+      const safeAddress = _get(DAO, 'safe.address', '');
+      await (
+        await safeService(provider)
+      )
+        .proposeTransaction({
+          safeAddress,
+          safeTransactionData: transactionObject.data,
+          safeTxHash,
+          senderAddress,
+          senderSignature: signature.data,
+        })
+        .then((result) => {
+          console.log(result)
+          console.log(
+            "on chain rejection transaction has been proposed successfully."
+          );
+        })
+        .catch((err) => {
+          setRejectTxLoading(null);
+          console.log(err)
+          console.log("an error occured while proposing a reject transaction.");
+        });
+      await (await safeService(provider))
+        .confirmTransaction(safeTxHash, signature.data)
+        .then(async (result) => {
+          console.log("on chain transaction has been confirmed by the signer");
+          await (await safeService(provider)).getTransactionConfirmations(safeTxHash)
+            .then(async (res) => {
+              console.log(res)
+              setRejectTxLoading(null);
+              setPendingTxn(prev => {
+                let succTxn = _find(prev, p => p.nonce === _nonce)
+                return prev?.map(tx => {
+                  if (tx.safeTxHash === succTxn.safeTxHash)
+                    return { ...succTxn, rejectedTxn: { safeTxHash, data: null, nonce: _nonce, confirmations: res.results } }
+                  return tx
+                })
               })
+              console.log("User confirmed the transaction");
             })
-            console.log("User confirmed the transaction");
-          })
-      })
-      .catch((err) => {
-        setRejectTxLoading(null);
-        console.log("an error occured while confirming a reject transaction.");
-      });
+        })
+        .catch((err) => {
+          setRejectTxLoading(null);
+          console.log("an error occured while confirming a reject transaction.");
+        });
+    } catch (e) {
+      console.log(e)
+      setRejectTxLoading(null);
+    }
   };
 
 
   const handleExecuteTransactions = async (_txs: any, reject: boolean | undefined) => {
-    setExecuteTxLoading(_txs.safeTxHash)
-    console.log(_txs);
-    const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
-    const safeTransactionData: SafeTransactionData = {
-      to: _txs.to,
-      value: _txs.value,
-      data: _txs.data !== null ? _txs.data : "0x",
-      operation: _txs.operation,
-      safeTxGas: _txs.safeTxGas,
-      baseGas: _txs.baseGas,
-      gasPrice: _txs.gasPrice,
-      gasToken: _txs.gasToken,
-      refundReceiver: _txs.refundReceiver,
-      nonce: _txs.nonce,
-    };
-    const safeTransaction = await safeSDK.createTransaction({
-      safeTransactionData,
-    });
-    _txs.confirmations &&
-      _txs.confirmations.forEach((confirmation: any) => {
-        const signature = new EthSignSignature(
-          confirmation.owner,
-          confirmation.signature
-        );
-        safeTransaction.addSignature(signature);
+    try {
+      setExecuteTxLoading(_txs.safeTxHash)
+      console.log(_txs);
+      const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
+      const safeTransactionData: SafeTransactionData = {
+        to: _txs.to,
+        value: _txs.value,
+        data: _txs.data !== null ? _txs.data : "0x",
+        operation: _txs.operation,
+        safeTxGas: _txs.safeTxGas,
+        baseGas: _txs.baseGas,
+        gasPrice: _txs.gasPrice,
+        gasToken: _txs.gasToken,
+        refundReceiver: _txs.refundReceiver,
+        nonce: _txs.nonce,
+      };
+      const safeTransaction = await safeSDK.createTransaction({
+        safeTransactionData,
       });
-    const executeTxResponse = await safeSDK.executeTransaction(safeTransaction);
-    const receipt =
-      executeTxResponse.transactionResponse &&
-      (await executeTxResponse.transactionResponse.wait());
-    console.log("confirmed", receipt);
-    setExecuteTxLoading(null)
-    if (reject) {
-      setPendingTxn(prev => {
-        let parentTxn = _find(prev, p => p.rejectedTxn.safeTxHash === _txs.safeTxHash)
-        return prev?.filter(tx => tx.safeTxHash !== parentTxn.safeTxHash)
-      })
-    } else {
-      setPendingTxn(prev => {
-        let parentTxn = _find(prev, p => p.safeTxHash === _txs.safeTxHash)
-        return prev?.filter(tx => tx.safeTxHash !== parentTxn.safeTxHash)
-      })
-      await loadExecutedTxn()
+      _txs.confirmations &&
+        _txs.confirmations.forEach((confirmation: any) => {
+          const signature = new EthSignSignature(
+            confirmation.owner,
+            confirmation.signature
+          );
+          safeTransaction.addSignature(signature);
+        });
+      const executeTxResponse = await safeSDK.executeTransaction(safeTransaction);
+      const receipt =
+        executeTxResponse.transactionResponse &&
+        (await executeTxResponse.transactionResponse.wait());
+      console.log("confirmed", receipt);
+      setExecuteTxLoading(null)
+      if (reject) {
+        setPendingTxn(prev => {
+          let parentTxn = _find(prev, p => p.rejectedTxn.safeTxHash === _txs.safeTxHash)
+          return prev?.filter(tx => tx.safeTxHash !== parentTxn.safeTxHash)
+        })
+      } else {
+        setPendingTxn(prev => {
+          let parentTxn = _find(prev, p => p.safeTxHash === _txs.safeTxHash)
+          return prev?.filter(tx => tx.safeTxHash !== parentTxn.safeTxHash)
+        })
+        await loadExecutedTxn()
+      }
+      //await props.getPendingTransactions();
+    } catch (e) {
+      console.log(e)
+      setExecuteTxLoading(null)
     }
-    //await props.getPendingTransactions();
   };
 
+  const balance = useMemo(() => {
+    if (props.fiatBalance) {
+      let total = 0;
+      props.fiatBalance.map((t: any) => {
+        total = +t.fiatBalance + total
+      })
+      return total.toFixed(2);
+    }
+    return 0
+  }, [props.fiatBalance]);
 
   return (
     <div className="treasuryCard">
@@ -247,8 +283,10 @@ const TreasuryCard = (props: ItreasuryCardType) => {
             <div className="dashboardText">{`${_get(props, 'safeAddress', '').slice(0, 6)}...${_get(props, 'safeAddress', '').slice(-4)}`}</div>
           </div>
           <div className="copyArea">
-            <img src={coin} alt="asset" />
-            <div id="safeBalance">{`$${_get(props, 'fiatBalance', '0.0')}`}</div>
+            <>
+              <img src={coin} alt="asset" />
+              <div id="safeBalance">{`$ ${balance}`}</div>
+            </>
             <div className="dashboardText">total balance</div>
           </div>
           {owner && <SafeButton onClick={props.toggleModal} height={40} width={150} titleColor="#B12F15" title="SEND TOKEN" bgColor="#FFFFFF" opacity="1" disabled={false} fontweight={400} fontsize={16} />}
@@ -261,12 +299,12 @@ const TreasuryCard = (props: ItreasuryCardType) => {
             <div className="dashboardText">Last Transactions</div>
             {
               pendingTxn.map((ptx, index) =>
-                <PendingTxn owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} />
+                <PendingTxn owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
               )
             }
             {
               executedTxn.map((ptx, index) =>
-                <CompleteTxn transaction={ptx} tokens={props.tokens} />
+                <CompleteTxn owner={owner} transaction={ptx} tokens={props.tokens} />
               )
             }
           </div>
@@ -274,6 +312,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
       </>
     </div>
   )
+
 }
 
 export default TreasuryCard

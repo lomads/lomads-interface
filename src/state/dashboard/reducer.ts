@@ -36,7 +36,21 @@ const dashboardSlice = createSlice({
     },
     setDAOList(state, action) {
       state.DAOList = action.payload
-    }
+    },
+    updateSafeTransaction(state, action) {
+      console.log(action.payload)
+      state.DAO = {
+        ...state.DAO, 
+        safe: {
+          ...state.DAO.safe,
+          transactions: state.DAO.safe.transactions.map((t:any) => {
+            if(t.safeTxHash === action.payload.safeTxHash)
+              return action.payload
+            return t
+          })
+        }
+      }
+    },
   },
   extraReducers: {
     [`${getDao.fulfilled}`]: (state, action) => {
@@ -85,6 +99,7 @@ const dashboardSlice = createSlice({
 export const {
   setDAOList,
   resetCreateDAOLoader,
-  resetAddMemberLoader
+  resetAddMemberLoader,
+  updateSafeTransaction
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

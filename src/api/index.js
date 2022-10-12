@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { get as _get } from 'lodash';
-import axiosRetry from 'axios-retry';
+//import axiosRetry from 'axios-retry';
 
 var axiosConfig = axios.create({
 	baseURL: `${process.env.REACT_APP_NODE_BASE_URL}/v1`,
@@ -32,6 +32,6 @@ const interceptor = axiosConfig.interceptors.response.use(
 );
 
 // Retry for network errors.
-axiosRetry(axiosConfig, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
+//axiosRetry(axiosConfig, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 
 export default axiosConfig;

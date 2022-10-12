@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { useEffect, useState, useCallback } from "react";
-import { get as _get, find as _find, throttle as _throttle } from 'lodash';
+import { get as _get, find as _find, throttle as _throttle, debounce as _debounce } from 'lodash';
 import { useNavigate } from "react-router-dom";
 import lomadsfulllogo from "../assets/svg/lomadsfulllogo.svg";
 import humangroup from "../assets/svg/humangroup.svg";
@@ -21,6 +21,33 @@ import Web3Token from 'web3-token';
 import { LeapFrog } from "@uiball/loaders";
 import axiosHttp from '../api';
 import { getSigner } from 'utils'
+import styled from "styled-components/macro";
+
+const HeaderControls = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-self: flex-end;
+`;
+
+const HeaderElement = styled.div`
+  display: flex;
+  align-items: center;
+
+  &:not(:first-child) {
+    margin-left: 0.5em;
+  }
+
+  /* addresses safaris lack of support for "gap" */
+  & > *:not(:first-child) {
+    margin-left: 8px;
+  }
+
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+    align-items: center;
+  `};
+`;
+
 
 const LoginPage = (props: any) => {
   const dispatch = useAppDispatch();
@@ -93,6 +120,10 @@ const LoginPage = (props: any) => {
     }
   };
 
+  useEffect(() => {
+    console.log('window.ethereum', window.ethereum)
+  }, [window.ethereum])
+
   return (
     <>
       {
@@ -105,6 +136,9 @@ const LoginPage = (props: any) => {
           </div> : null
       }
       <div className={"createDaoLogin"}>
+        { !window.ethereum && <div style={{ position: 'absolute', right: 24, top: 16 }}>
+          <div style={{ opacity: 0.6, fontSize: 14 }}>Metamask not installed</div>
+        </div> }
         <div>
           <div className="logo">
             <img src={lomadsfulllogo} alt="" />

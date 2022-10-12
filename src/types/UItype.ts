@@ -5,10 +5,13 @@ export interface InputFieldType {
   height?: number | string;
   width?: number | string;
   name?: string;
+  onKeyDown?: any;
+  disabled?:any;
   value?: string | number;
   placeholder?: string;
   onchange?: (e: any) => void;
   type?: string;
+  onBlur?: any;
 }
 
 export interface ButtonType {

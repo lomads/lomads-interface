@@ -54,6 +54,7 @@ export interface IselectTransactionSend {
     _showSuccess: boolean,
     _showTransactionSender: boolean
   ) => void;
+  error: string | null;
   selectedRecipients: React.MutableRefObject<InviteGangType[]>;
   transactionData: TransactionDataType[];
   createTransaction: () => void;
@@ -86,7 +87,7 @@ export interface ItreasuryCardType {
   executedTransactions: AllTransactionsListResponse | undefined;
   ownerCount: number | undefined;
   toggleModal: () => void;
-  fiatBalance: string;
+  fiatBalance: any;
   account: string | undefined;
   // getPendingTransactions: () => Promise<void>;
   // getExecutedTransactions: () => Promise<void>;

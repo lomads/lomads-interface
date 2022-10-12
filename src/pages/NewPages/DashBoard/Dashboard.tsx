@@ -243,7 +243,7 @@ const Dashboard = () => {
 					executedTransactions={executedTransactions}
 					ownerCount={ownerCount}
 					toggleModal={toggleModal}
-					fiatBalance={safeTokens.length >= 1 && safeTokens[0].fiatBalance}
+					fiatBalance={safeTokens}
 					account={account}
 					onChangePendingTransactions={(tx: any) => setPendingTransactions(tx)}
 					tokens={safeTokens}

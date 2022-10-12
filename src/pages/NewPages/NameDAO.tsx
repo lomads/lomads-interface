@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
-import _ from "lodash";
+import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import _ from 'lodash';
 import lomadsfulllogo from "../../assets/svg/lomadsfulllogo.svg";
 import { useNavigate, useLocation } from "react-router-dom";
 import SimpleButton from "UIpack/SimpleButton";
@@ -12,16 +12,24 @@ import { setDAOList } from 'state/dashboard/reducer';
 import { updateDaoAddress, updateDaoName } from "state/flow/reducer";
 import { LeapFrog } from "@uiball/loaders";
 import axiosHttp from '../../api'
+const { debounce } = require('throttle-debounce');
 
 const NameDAO = () => {
   const dispatch = useAppDispatch();
   const location = useLocation();
   const [DAOListLoading, setDAOListLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<any>({});
+  const [urlCheckLoading, setUrlCheckLoading] = useState<any>(false);
   const refSafeName = useRef<string>("");
   const daoName = useAppSelector((state) => state.flow.daoName);
   const daoAddress = useAppSelector((state) => state.flow.daoAddress);
   const { DAOList } = useAppSelector((state) => state.dashboard);
+
+  useEffect(() => {
+    dispatch(updateDaoName(""))
+    dispatch(updateDaoAddress(""))
+  }, [])
+
   const navigate = useNavigate();
   const handleClick = () => {
     let terrors: any = {};
@@ -52,6 +60,32 @@ const NameDAO = () => {
   //   }
   // }, [DAOList])
 
+  const checkAvailability = (e: any) => {
+    if(e.target.value && e.target.value !== ""){
+        setUrlCheckLoading(true)
+        axiosHttp.get(`dao/${e.target.value.replace(/ /g, "-").toLowerCase()}`)
+        .then(res => {
+          let rand = Math.floor(1000 + Math.random() * 9000);
+          axiosHttp.get(`dao/${e.target.value.replace(/ /g, "-").toLowerCase() + '-' + rand}`)
+          .then(result => {
+            rand = Math.floor(1000 + Math.random() * 9000);
+            dispatch(updateDaoAddress(process.env.REACT_APP_URL + "/" + e.target.value.replace(/ /g, "-").toLowerCase() + '-' + rand))
+          })
+          .catch(err => {
+            dispatch(updateDaoAddress(process.env.REACT_APP_URL + "/" + e.target.value.replace(/ /g, "-").toLowerCase() + '-' + rand))
+          })
+        })
+        .catch(err => {
+          dispatch(updateDaoAddress(process.env.REACT_APP_URL + "/" + e.target.value.replace(/ /g, "-").toLowerCase()))
+        })
+        .finally(() => setUrlCheckLoading(false))
+    } else {
+      dispatch(updateDaoAddress(""))
+    }
+ }
+
+  const checkAvailabilityAsync = useRef(_.debounce(checkAvailability, 500)).current
+
   const handleNavigate = () => {
     console.log("esfsffsf");
     daoName.length >= 1 && navigate("/invitegang");
@@ -59,14 +93,7 @@ const NameDAO = () => {
   const handleDaoName = (event: any) => {
     refSafeName.current = event.target.value.replace(/[^a-z0-9 ]/gi, "");
     dispatch(updateDaoName(refSafeName.current.toString()));
-    dispatch(
-      updateDaoAddress(
-        process.env.REACT_APP_URL + "/" +
-          refSafeName.current.replace(/ /g, "-").toLowerCase()
-      )
-    );
   };
-
 
   return (
     <>
@@ -91,17 +118,22 @@ const NameDAO = () => {
                 placeholder="Epic DAO"
                 value={daoName}
                 onchange={(event) => {
+                  checkAvailabilityAsync(event)
                   handleDaoName(event);
                 }}
                 isInvalid={errors.daoName}
               />
             </div>
             <div>
-              <div className="inputFieldTitle">DAO address</div>
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                <div className="inputFieldTitle" style={{ marginRight: '16px' }}>DAO address</div>
+                { urlCheckLoading && <LeapFrog size={20} color="#C94B32" /> }
+              </div>
               <SimpleInputField
                 className="inputField"
                 height={50}
                 width={460}
+                disabled
                 value={daoAddress}
                 placeholder="https://app.lomads.xyz/Name_of_the_DAO"
                 onchange={(e) => {
@@ -118,9 +150,10 @@ const NameDAO = () => {
             title="CREATE PUBLIC ADDRESS"
             height={50}
             fontsize={20}
+            disabled={urlCheckLoading}
             fontweight={400}
             onClick={handleClick}
-            bgColor={daoName.length >= 1 ? "#C94B32" : "rgba(27, 43, 65, 0.2)"}
+            bgColor={daoName.length >= 1 || !urlCheckLoading ? "#C94B32" : "rgba(27, 43, 65, 0.2)"}
           />
         </div>
       </div>

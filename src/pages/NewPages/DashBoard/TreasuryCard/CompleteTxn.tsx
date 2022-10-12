@@ -1,33 +1,54 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { get as _get, find as _find } from 'lodash';
 import sendToken from "../../../../assets/svg/sendToken.svg";
 import receiveToken from "../../../../assets/svg/receiveToken.svg";
 import SimpleInputField from "UIpack/SimpleInputField";
 import { beautifyHexToken } from '../../../../utils';
 import { useAppSelector } from "state/hooks";
+import { useAppDispatch } from "state/hooks";
 import moment from "moment";
+import axiosHttp from '../../../../api';
+import { updateSafeTransaction } from "state/dashboard/reducer";
 
-const CompleteTxn = ({ transaction, tokens }:any) => {
+const CompleteTxn = ({ transaction, tokens, owner }:any) => {
 
     const threshold = useAppSelector((state) => state.flow.safeThreshold);
+    const { DAO } = useAppSelector(store => store.dashboard);
+    const [reasonText, setReasonText] = useState(null);
+    const dispatch = useAppDispatch()
 
-    const { isCredit, amount, symbol, recipient, date } = useMemo(() => {
+    const { isCredit, amount, symbol, recipient, date, reason } = useMemo(() => {
         let isCredit = _get(transaction, 'txType', '') === 'ETHEREUM_TRANSACTION'
         let amount = _get(transaction, 'transfers[0].value', '')
         let symbol = _get(transaction, 'transfers[0].tokenInfo.symbol', '')
         let recipient = _get(transaction, 'transfers[0].to', '')
+        let trans = _find(_get(DAO, 'safe.transactions', []), t => t.safeTxHash === transaction.safeTxHash)
+        let reason = null
+        if(trans)
+            reason = _get(_find(trans.data, u => u.recipient.toLowerCase() === recipient.toLowerCase()), 'reason', null)
         let date = moment.utc(
             transaction.txType === 'ETHEREUM_TRANSACTION' ? transaction.executionDate :
             _get(transaction, 'dataDecoded.method', '') === 'multiSend' ? _get(transaction, `confirmations[${ _get(transaction, 'confirmations', []).length -1 }]`) :
             _get(transaction, 'submissionDate', null)
         ).local().format('MM/DD hh:mm')
-        return { isCredit, amount, symbol, recipient, date }
+        return { isCredit, amount, symbol, recipient, date, reason }
     }, [transaction])
+
+    const _handleReasonKeyDown = (safeTxHash:string, recipient:string) => {
+        if(reasonText && reasonText !== '') {
+            axiosHttp.patch('transaction', { reason: reasonText, safeTxHash, recipient })
+            .then(res => dispatch(updateSafeTransaction(res.data)))
+        }
+    }
 
     const renderItem = (item  :any, index: number) => {
         const mulAmount = _get(item, 'dataDecoded.parameters[1].value')
         const mulRecipient = _get(item, 'dataDecoded.parameters[0].value')
         const isLast = _get(transaction, 'dataDecoded.parameters[0].valueDecoded', []).length - 1 === index;
+        let trans = _find(_get(DAO, 'safe.transactions', []), t => t.safeTxHash === transaction.safeTxHash)
+        let mulReason = null
+        if(trans)
+            mulReason = _get(_find(trans.data, u => u.recipient.toLowerCase() === mulRecipient.toLowerCase()), 'reason', null)
         return (
             <div className="transactionRow">
                 <div className="coinText">
@@ -37,7 +58,8 @@ const CompleteTxn = ({ transaction, tokens }:any) => {
                     </div>
                 </div>
                 <div className="transactionName">
-                    <SimpleInputField className="inputField" height={30} width={"100%"} placeholder="Name Transaction" />
+                    { mulReason? <div className="dashboardText">{ mulReason }</div> :
+                        <SimpleInputField disabled={!owner} onchange={(e:any) => { setReasonText(e.target.value) }} onKeyDown={(e:any) => { if(e.key === 'Enter'){ _handleReasonKeyDown(transaction.safeTxHash, mulRecipient) } }} className="inputField" height={30} width={"100%"} placeholder="Reason for transaction" /> }
                 </div>
                 <div className="transactionAddress">
                     <div className="dashboardText">
@@ -73,7 +95,8 @@ const CompleteTxn = ({ transaction, tokens }:any) => {
                 </div>
             </div>
             <div className="transactionName">
-				<SimpleInputField className="inputField" height={30} width={"100%"} placeholder="Name Transaction" />
+                { reason ? <div className="dashboardText"></div> :
+                        <SimpleInputField  disabled={!owner} onchange={(e:any) => { setReasonText(e.target.value) }} onKeyDown={(e:any) => { if(e.key === 'Enter'){ _handleReasonKeyDown(transaction.safeTxHash, recipient) } }} className="inputField" height={30} width={"100%"} placeholder="Reason for transaction" /> }
 			</div>
             <div className="transactionAddress">
                 <div className="dashboardText">
