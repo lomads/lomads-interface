@@ -122,11 +122,10 @@ const Settings = () => {
 
                 <div className='settings-token'>
                     <h1>Pass Tokens</h1>
-
                     {
                         DAO?.sbt?.name
                             ?
-                            <div>
+                            <div className='token-details'>
                                 <button>
                                     <img src={copy} alt="copy" />
                                 </button>

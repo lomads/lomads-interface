@@ -2,7 +2,7 @@
 import "../../styles/pages/MintPassToken.css";
 import { get as _get } from 'lodash'
 import FrameRed from '../../assets/svg/FrameRed.svg';
-import hklogo from '../../assets/svg/hklogo.svg';
+import coin from '../../assets/svg/coin.svg';
 import lomadsLogo from '../../assets/svg/lomadsLogoExpandGray.svg'
 import frame2 from '../../assets/svg/Frame-2.svg'
 import { AiOutlineMail } from 'react-icons/ai';
@@ -156,7 +156,7 @@ const MintPassToken = () => {
 
                             {/* Token img and name */}
                             <div className="tokenName-box">
-                                <img src={hklogo} alt="hk-logo" />
+                                <img src={coin} alt="asset" />
                                 <p>{contractName}</p>
                             </div>
 
