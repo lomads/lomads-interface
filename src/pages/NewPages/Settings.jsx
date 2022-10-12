@@ -124,9 +124,16 @@ const Settings = () => {
                     <h1>Pass Tokens</h1>
 
                     {
-                        DAO?.sbt?.address
+                        DAO?.sbt?.name
                             ?
-                            <p>SBT : <img src={coin} alt="asset" />{DAO?.sbt?.name}</p>
+                            <div>
+                                <button>
+                                    <img src={copy} alt="copy" />
+                                </button>
+                                <img src={coin} alt="asset" />
+                                <p>{DAO?.sbt?.name}</p>
+                            </div>
+
                             :
                             <>
                                 <p>The organisation doesn’t have token yet</p>

@@ -72,6 +72,7 @@ const MyProject = () => {
                                         <ProjectCard
                                             project={item}
                                             daoUrl={DAO?.url}
+                                            tab={tab}
                                         />
                                     </div>
                                 )
@@ -97,6 +98,7 @@ const MyProject = () => {
                                                     <ProjectCard
                                                         project={item}
                                                         daoUrl={DAO?.url}
+                                                        tab={tab}
                                                     />
                                                 </div>
                                             )
