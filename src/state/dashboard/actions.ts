@@ -25,7 +25,7 @@ export const addDaoMember = createAsyncThunk(
 	async (params: any, thunkApi) => {
 		return axiosHttp.patch(`dao/${params.url}/add-member`, params.payload)
 			.then(res => res.data)
-			.catch(e => { 
+			.catch(e => {
 				toast.error(e.response.data.message);
 				return thunkApi.rejectWithValue(e)
 			})
@@ -40,3 +40,12 @@ export const updateDaoMember = createAsyncThunk(
 			.catch(e => thunkApi.rejectWithValue(e))
 	}
 );
+
+export const createProject = createAsyncThunk(
+	'dao/createProject',
+	async (params: any, thunkApi) => {
+		return axiosHttp.post(`project`, params.payload)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+)

@@ -45,7 +45,6 @@ const MemberCard = (props: any) => {
 			setEditMode(false);
 			setMembersArray(temp);
 			const member = { name: temp[pos].member.name };
-			console.log("member : ", member);
 			dispatch(updateDaoMember({ url: DAO?.url, payload: member }))
 		}
 	}

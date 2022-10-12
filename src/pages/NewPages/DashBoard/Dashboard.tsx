@@ -29,6 +29,7 @@ import copyIcon from "../../../assets/svg/copyIcon.svg";
 import { useDispatch } from "react-redux";
 import { updateCurrentNonce, updateSafeThreshold, updateSafeAddress } from "state/flow/reducer";
 import { Tooltip } from "@chakra-ui/react";
+import MyProject from "./MyProject";
 
 import { useSBTStats } from "hooks/SBT/sbt";
 
@@ -86,8 +87,8 @@ const Dashboard = () => {
 	};
 
 	useEffect(() => {
-		if(contractName !== '' && amIAdmin){
-			if (DAO?.sbt &&  parseInt(balanceOf._hex, 16) === 0) {
+		if (contractName !== '' && amIAdmin) {
+			if (DAO?.sbt && parseInt(balanceOf._hex, 16) === 0) {
 				navigate(`/sbt/mint/${DAO.sbt.address}`);
 			}
 		}
@@ -123,17 +124,15 @@ const Dashboard = () => {
 			dispatch(updateSafeAddress(_get(DAO, 'safe.address', '')))
 	}, [DAO])
 
-	const prepare = async (_safeAddress:string) => {
+	const prepare = async (_safeAddress: string) => {
 		await ownersCount(_safeAddress);
 		const nonce = await (await safeService(provider)).getNextNonce(_safeAddress);
-		console.log("nonce", nonce);
 		dispatch(updateCurrentNonce(nonce));
-		console.log("updated nonce:", currentNonce);
 		await getTokens(_safeAddress);
 		setShowNotification(true);
 	};
 
-	const ownersCount = async (_safeAddress:string) => {
+	const ownersCount = async (_safeAddress: string) => {
 		const safeSDK = await ImportSafe(provider, _safeAddress);
 		const owners = await safeSDK.getOwners();
 		const threshold = await safeSDK.getThreshold();
@@ -152,7 +151,7 @@ const Dashboard = () => {
 	};
 
 	useEffect(() => {
-		if(DAO && _get(DAO, 'url') === daoURL){
+		if (DAO && _get(DAO, 'url') === daoURL) {
 			prepare(_get(DAO, 'safe.address'))
 			getTokens(_get(DAO, 'safe.address'));
 		}
@@ -234,6 +233,9 @@ const Dashboard = () => {
 							showNotificationArea={showNotificationArea}
 						/>
 					)}
+
+				<MyProject />
+
 				<TreasuryCard
 					innerRef={treasuryRef}
 					safeAddress={safeAddress}

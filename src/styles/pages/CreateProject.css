@@ -1,0 +1,535 @@
+.createProject-container {
+    width: 100%;
+    height: 100vh;
+    /* padding-top: 20vh; */
+    background: linear-gradient(180deg, #FDF7F7 0%, #F3F2F2 100%);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow-y: scroll;
+}
+
+.createProject-container .createProject-dropdown-container {
+    width: 220px;
+    height: 60px;
+    border-radius: 30px;
+    background-color: #FFF;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+}
+
+.createProject-container .createProject-dropdown-container .createProject-dropdown-div1 {
+    height: 100%;
+    width: 75%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid #F0F0F0;
+}
+
+.createProject-container .createProject-dropdown-container .createProject-dropdown-div1 p {
+    color: #909090;
+    font-size: 14px;
+    font-style: italic;
+    margin-left: 10px;
+}
+
+.createProject-container .createProject-dropdown-container .createProject-dropdown-div2 {
+    height: 100%;
+    width: 25%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.createProject-container .createProject-dropdown-container .createProject-dropdown-div2 span {
+    transform: translateX(-5px);
+    cursor: pointer;
+}
+
+.createProject-container .createProject-body {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20vh;
+}
+
+.createProject-container .createProject-body .heading-text {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 33px;
+    color: #C94B32;
+    margin: 1.5rem 0;
+}
+
+.createProject-container .createProject-body .createProject-form-container {
+    background-color: #FFF;
+    border-radius: 5px;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 30px 22px;
+}
+
+.createProject-container .createProject-body .createProject-form-container .input-div {
+    display: flex;
+    flex-direction: column;
+}
+
+.createProject-container .createProject-body .createProject-form-container label {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
+    color: #76808D;
+    margin-bottom: 0.5rem;
+}
+
+.createProject-container .createProject-body .createProject-form-container .text-input {
+    width: 350px;
+    height: 50px;
+    border-radius: 10px;
+    background: #F5F5F5;
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    padding: 0 1rem;
+    outline: none;
+    margin-bottom: 1rem;
+}
+
+.createProject-container .createProject-body .createProject-form-container .text-area {
+    width: 350px;
+    border-radius: 10px;
+    background: #F5F5F5;
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    padding: 1rem;
+    outline: none;
+    margin-bottom: 1rem;
+    resize: none;
+}
+
+.createProject-container .createProject-body .createProject-form-container button {
+    width: 350px;
+    height: 40px;
+    border-radius: 5px;
+    color: #FFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.createProject-container .createProject-body .projectName-container {
+    width: 400px;
+    background: #FFFFFF;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    padding: 30px 22px;
+}
+
+.createProject-container .createProject-body .projectName-container .projectName-box {
+    width: 85%;
+    height: 100%;
+    /* padding-right: 25px; */
+    display: flex;
+    flex-direction: column;
+}
+
+.createProject-container .createProject-body .projectName-container .projectName-box p {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 25px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+    margin-bottom: 0.5rem;
+}
+
+.createProject-container .createProject-body .projectName-container .projectName-box span {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    /* identical to box height, or 114% */
+
+    /* DARK */
+    color: #1B2B41;
+}
+
+.createProject-container .createProject-body .projectName-container .projectName-btn {
+    width: 15%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    cursor: pointer;
+}
+
+.createProject-container .createProject-body .divider {
+    width: 200px;
+    border: 2px solid #EA6447;
+    margin: 35px 0;
+}
+
+.createProject-container .createProject-body .project-members {
+    width: 480px;
+    background: #FFFFFF;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    padding: 26px 22px;
+}
+
+.createProject-container .createProject-body .project-members .project-members-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.createProject-container .createProject-body .project-members .project-members-header p {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+
+.createProject-container .createProject-body .project-members .project-members-header button {
+    width: 200px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    /* Color-drop */
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    text-transform: uppercase;
+    color: #76808D;
+}
+
+.createProject-container .createProject-body .project-members .member-list {
+    width: 100%;
+}
+
+.createProject-container .createProject-body .project-members .member-list .member-li {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    cursor: pointer;
+}
+
+.createProject-container .createProject-body .project-members .member-list .member-li:last-child {
+    margin-bottom: 0;
+}
+
+.createProject-container .createProject-body .project-members .member-list .member-li .member-img-name {
+    width: 40%;
+    display: flex;
+    align-items: center;
+}
+
+.createProject-container .createProject-body .project-members .member-list .member-li .member-img-name img {
+    margin-right: 15px;
+}
+
+.createProject-container .createProject-body .project-members .member-list .member-li .member-img-name p {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+
+
+.createProject-container .createProject-body .project-members .member-list .member-li .member-address {
+    width: 60%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.createProject-container .createProject-body .project-members .member-list .member-li .member-address p {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+
+/* For showing list of already added members */
+.createProject-container .createProject-body .project-members2 {
+    width: 480px;
+    background: #FFFFFF;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    padding: 26px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.createProject-container .createProject-body .project-members2 p {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    /* identical to box height, or 112% */
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+}
+
+.createProject-container .createProject-body .transparent-list {
+    background: rgba(118, 128, 141, 0.05);
+    /* SMALL-inputs */
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    padding: 26px 22px;
+}
+
+
+.createProject-container .createProject-body .transparent-list .member-li {
+    width: 100%;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    cursor: pointer;
+}
+
+.createProject-container .createProject-body .transparent-list .member-li:last-child {
+    margin-bottom: 0;
+}
+
+.createProject-container .createProject-body .transparent-list .member-li .member-img-name {
+    width: 40%;
+    display: flex;
+    align-items: center;
+}
+
+.createProject-container .createProject-body .transparent-list .member-li .member-img-name img {
+    margin-right: 15px;
+}
+
+.createProject-container .createProject-body .transparent-list .member-li .member-img-name span {
+    margin-right: 15px;
+}
+
+.createProject-container .createProject-body .transparent-list .member-li .member-img-name {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+
+
+.createProject-container .createProject-body .transparent-list .member-li .member-address {
+    width: 60%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.createProject-container .createProject-body .transparent-list .member-li .member-address p {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+
+.createProject-container .createProject-body .transparent-list .member-li .member-address button {
+    display: none;
+    color: #a1a1a1;
+}
+
+.createProject-container .createProject-body .transparent-list .member-li:hover .member-address button {
+    display: block;
+}
+
+
+.createProject-container .createProject-body .project-buttons {
+    display: flex;
+    margin: 35px 0;
+}
+
+.createProject-container .createProject-body .project-buttons button {
+    height: 50px;
+    width: 255px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.createProject-container .createProject-body .resource-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 26px 22px;
+    background: #FFFFFF;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+}
+
+.createProject-container .createProject-body .resource-container .resource-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.createProject-container .createProject-body .resource-container .resource-header h1 {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
+    color: #76808D;
+}
+
+.createProject-container .createProject-body .resource-container .resource-header div {
+    width: 110px;
+    height: 25px;
+    border-radius: 100px;
+    background: rgba(118, 128, 141, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.createProject-container .createProject-body .resource-container .resource-header div p {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 16px;
+    color: rgba(118, 128, 141, 0.5);
+}
+
+.createProject-container .createProject-body .resource-container .resource-body {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.createProject-container .createProject-body .resource-container .resource-body .input1 {
+    width: 144px;
+    height: 50px;
+    padding: 0 1rem;
+    background: #F5F5F5;
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 10px;
+    margin-right: 12px;
+    font-size: 14px;
+    outline: none;
+}
+
+.createProject-container .createProject-body .resource-container .resource-body .input2 {
+    width: 250px;
+    height: 50px;
+    padding: 0 1rem;
+    background: #F5F5F5;
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    margin-right: 40px;
+}
+
+.createProject-container .createProject-body .resource-container .resource-body button {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(27, 43, 65, 0.2);
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.createProject-container .createProject-body .resource-container .resource-footer {
+    width: 100%;
+    margin-top: 1rem;
+    display: flex;
+}
+
+.createProject-container .createProject-body .resource-container .resource-footer input {
+    width: 25px;
+    height: 25px;
+    margin-right: 1rem;
+}
+
+.createProject-container .createProject-body .resource-container .resource-footer p {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    text-transform: uppercase;
+    color: #76808D;
+}
+
+.createProject-container .createProject-body .resource-container .resource-footer span {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    color: rgba(118, 128, 141, 0.5);
+}
+
+.createProject-container .createProject-body .create-project-button {
+    margin-top: 35px;
+    margin-bottom: 10vh;
+    width: 255px;
+    height: 50px;
+    background: #C94B32;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #F0F0F0;
+}
+
+.createProject-container .createProject-success {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.createProject-container .createProject-success p {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 33px;
+    color: #C94B32;
+    margin: 1.5rem 0;
+}
+
+.createProject-container .createProject-success span {
+    color: #76808D;
+    font-style: italic;
+}
