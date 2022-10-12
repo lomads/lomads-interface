@@ -10,7 +10,6 @@ const ProjectCard = ({ project }) => {
     const navigate = useNavigate();
 
     let arr = { 'notion.com': 0, 'discord.com': 0, 'more': 0 };
-
     project.links.forEach((item) => {
         let link = new URL(item.link);
         if (link.hostname === 'notion.com') {
@@ -33,13 +32,13 @@ const ProjectCard = ({ project }) => {
                         {
                             arr['notion.com'] > 0 && <div className='icon-container'>
                                 <SiNotion color='#FFF' size={20} />
-                                <p>+{arr['notion.com']}</p>
+                                {/* <p>+{arr['notion.com']}</p> */}
                             </div>
                         }
                         {
                             arr['discord.com'] > 0 && <div className='icon-container'>
                                 <BsDiscord color='#FFF' size={20} />
-                                <p>+{arr['discord.com']}</p>
+                                {/* <p>+{arr['discord.com']}</p> */}
                             </div>
                         }
                         {

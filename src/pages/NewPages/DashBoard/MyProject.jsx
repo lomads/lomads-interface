@@ -29,7 +29,7 @@ const MyProject = () => {
                 </div>
                 <div className="myproject-buttons">
                     <div style={{ marginRight: '20px' }}>
-                        <SafeButton
+                        {/* <SafeButton
                             height={40}
                             width={150}
                             titleColor="#C94B32"
@@ -40,7 +40,7 @@ const MyProject = () => {
                             fontweight={400}
                             fontsize={16}
                             onClick={() => console.log("Button")}
-                        />
+                        /> */}
                     </div>
                     <div>
                         <SafeButton

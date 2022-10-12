@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { get as _get, find as _find } from 'lodash';
 import SideBar from "./DashBoard/SideBar";
 import SafeButton from "UIpack/SafeButton";
 import '../../styles/pages/ProjectDetails.css';
@@ -9,16 +10,21 @@ import editToken from '../../assets/svg/editToken.svg';
 import memberIcon from '../../assets/svg/memberIcon.svg';
 import lock from '../../assets/svg/lock.svg';
 
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAppSelector } from "state/hooks";
 
 import { SiNotion } from "react-icons/si";
 import { BsDiscord, BsGoogle, BsGithub, BsLink } from "react-icons/bs";
 
 const ProjectDetails = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const projectData = location.state.project;
     console.log("project : ", projectData);
     const [showNavBar, setShowNavBar] = useState(false);
+    const { DAO } = useAppSelector((state) => state.dashboard);
+    console.log("DAO : ", DAO)
+    const daoName = _get(DAO, 'name', '');
 
     const showSideBar = (_choice) => {
         setShowNavBar(_choice);
@@ -55,16 +61,16 @@ const ProjectDetails = () => {
                     <div className="projectDetails-left">
                         <div className="projectDetails-name">
                             <div>
-                                <h1>Project /&nbsp;<span>{projectData.name}</span></h1>
+                                <h1 onClick={() => navigate(-1)}>Project /&nbsp;<span onClick={(e) => e.stopPropagation()}>{projectData.name}</span></h1>
                                 <p>{projectData.description}</p>
                             </div>
                             <div>
                                 <p>You're an Admin</p>
                             </div>
                             <div>
-                                <button>
+                                {/* <button>
                                     <img src={editToken} alt="hk-logo" />
-                                </button>
+                                </button> */}
                             </div>
                         </div>
                         <div className="projectDetails-members">
@@ -89,9 +95,9 @@ const ProjectDetails = () => {
                                         console.log("Add members");
                                     }}
                                 />
-                                <button>
+                                {/* <button>
                                     <img src={editToken} alt="hk-logo" />
-                                </button>
+                                </button> */}
                             </div>
                             <div className="members-list">
                                 <div className="members-list-head">
@@ -143,9 +149,9 @@ const ProjectDetails = () => {
                                     console.log("Add members");
                                 }}
                             />
-                            <button>
+                            {/* <button>
                                 <img src={editToken} alt="hk-logo" />
-                            </button>
+                            </button> */}
                         </div>
                         {
                             projectData.links.length > 0
@@ -190,7 +196,7 @@ const ProjectDetails = () => {
                 </div>
             </div>
             <SideBar
-                name={'Sample Dao'}
+                name={daoName}
                 showSideBar={showSideBar}
                 showNavBar={showNavBar}
             />

@@ -28,7 +28,7 @@
     border-radius: 5px;
     margin-bottom: 20px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
 }
 
@@ -46,10 +46,12 @@
     letter-spacing: -0.011em;
     color: #76808D;
     margin-bottom: 1rem;
+    cursor: pointer;
 }
 
 .projectDetails-container .projectDetails-body .projectDetails-left .projectDetails-name div:first-child span {
     color: #B12F15;
+    cursor: default;
 }
 
 .projectDetails-container .projectDetails-body .projectDetails-left .projectDetails-name div:first-child p {
