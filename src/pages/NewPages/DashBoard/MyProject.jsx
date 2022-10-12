@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "state/hooks";
 
 import { ProjectContext } from 'context/ProjectContext';
-import ProjectCard from './ProjectCard';
+import ProjectCard from './Project/ProjectCard';
 
 const MyProject = () => {
     const navigate = useNavigate();
@@ -69,7 +69,10 @@ const MyProject = () => {
                             projects && projects.map((item, index) => {
                                 return (
                                     <div key={index}>
-                                        <ProjectCard project={item} />
+                                        <ProjectCard
+                                            project={item}
+                                            daoUrl={DAO?.url}
+                                        />
                                     </div>
                                 )
                             })
@@ -91,7 +94,10 @@ const MyProject = () => {
                                         DAO?.projects.map((item, index) => {
                                             return (
                                                 <div key={index}>
-                                                    <ProjectCard project={item} />
+                                                    <ProjectCard
+                                                        project={item}
+                                                        daoUrl={DAO?.url}
+                                                    />
                                                 </div>
                                             )
                                         })

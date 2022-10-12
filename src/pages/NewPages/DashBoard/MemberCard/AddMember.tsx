@@ -17,7 +17,7 @@ import daoMember2 from "../../assets/svg/daoMember2.svg";
 import { useWeb3React } from "@web3-react/core";
 import { useEnsAddress } from "react-moralis";
 import OutlineButton from "UIpack/OutlineButton";
-import { addDaoMember } from 'state/dashboard/actions'
+import { addDaoMember, addProjectMember } from 'state/dashboard/actions'
 import { resetAddMemberLoader } from 'state/dashboard/reducer';
 
 const AddMember = (props: any) => {
@@ -106,7 +106,12 @@ const AddMember = (props: any) => {
 			}
 		}
 		if (!isPresent(member.address) && isRightAddress(member.address)) {
-			dispatch(addDaoMember({ url: DAO?.url, payload: member }))
+			if (props.projectId) {
+				dispatch(addProjectMember({ projectId: props.projectId, daoUrl: props.daoUrl, payload: member }))
+			}
+			else {
+				dispatch(addDaoMember({ url: DAO?.url, payload: member }))
+			}
 		}
 	};
 

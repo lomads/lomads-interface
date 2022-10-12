@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { get as _get, find as _find } from 'lodash';
 import SideBar from "./DashBoard/SideBar";
 import SafeButton from "UIpack/SafeButton";
 import '../../styles/pages/ProjectDetails.css';
+import { LeapFrog } from "@uiball/loaders";
+import lomadsfulllogo from "../../assets/svg/lomadsfulllogo.svg";
 
 import membersGroup from '../../assets/svg/membersGroup.svg'
 
@@ -10,21 +12,31 @@ import editToken from '../../assets/svg/editToken.svg';
 import memberIcon from '../../assets/svg/memberIcon.svg';
 import lock from '../../assets/svg/lock.svg';
 
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useAppSelector } from "state/hooks";
+import { useNavigate, useParams } from 'react-router-dom';
+import { useAppSelector, useAppDispatch } from "state/hooks";
 
 import { SiNotion } from "react-icons/si";
 import { BsDiscord, BsGoogle, BsGithub, BsLink } from "react-icons/bs";
+import AddMember from "./DashBoard/MemberCard/AddMember";
+
+import { getProject } from "state/dashboard/actions";
+import AddLink from "./DashBoard/Project/AddLink";
 
 const ProjectDetails = () => {
-    const location = useLocation();
+    const dispatch = useAppDispatch();
+    const { projectId, daoURL } = useParams();
     const navigate = useNavigate();
-    const projectData = location.state.project;
-    console.log("project : ", projectData);
     const [showNavBar, setShowNavBar] = useState(false);
-    const { DAO } = useAppSelector((state) => state.dashboard);
-    console.log("DAO : ", DAO)
+    const [showAddMember, setShowAddMember] = useState(false);
+    const [showAddLink, setShowAddLink] = useState(false);
+    const { DAO, Project, ProjectLoading } = useAppSelector((state) => state.dashboard);
+    console.log("project : ", Project);
     const daoName = _get(DAO, 'name', '');
+
+    useEffect(() => {
+        if (projectId && (!Project || (Project && Project._id !== projectId)))
+            dispatch(getProject(projectId));
+    }, [projectId])
 
     const showSideBar = (_choice) => {
         setShowNavBar(_choice);
@@ -49,20 +61,57 @@ const ProjectDetails = () => {
         }
     }
 
+    const toggleShowMember = () => {
+        setShowAddMember(!showAddMember);
+    };
+
+    const toggleShowLink = () => {
+        setShowAddLink(!showAddLink);
+    };
+
     return (
         <>
+            {
+                !Project || ProjectLoading || (projectId && (Project && Project._id !== projectId))
+                    ?
+                    <div style={{ backgroundColor: '#FFF', height: '100vh', zIndex: 99999, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                        <div className="logo">
+                            <img src={lomadsfulllogo} alt="" />
+                        </div>
+                        <div style={{ marginTop: 32 }}>
+                            <LeapFrog size={50} color="#C94B32" />
+                        </div>
+                    </div>
+                    :
+                    null
+            }
             <div
                 className='projectDetails-container'
                 onMouseEnter={() => {
                     showSideBar(false);
                 }}
             >
+                {showAddMember &&
+                    <AddMember
+                        toggleShowMember={toggleShowMember}
+                        projectId={projectId}
+                        daoUrl={daoURL}
+                    />
+                }
+                {
+                    showAddLink &&
+                    <AddLink
+                        toggleShowLink={toggleShowLink}
+                        projectId={projectId}
+                        daoUrl={daoURL}
+                    />
+                }
                 <div className="projectDetails-body">
                     <div className="projectDetails-left">
                         <div className="projectDetails-name">
                             <div>
-                                <h1 onClick={() => navigate(-1)}>Project /&nbsp;<span onClick={(e) => e.stopPropagation()}>{projectData.name}</span></h1>
-                                <p>{projectData.description}</p>
+                                <h1 onClick={() => navigate(-1)}>Project /&nbsp;<span onClick={(e) => e.stopPropagation()}>{Project?.name}</span></h1>
+                                <p>{Project?.description}</p>
                             </div>
                             <div>
                                 <p>You're an Admin</p>
@@ -79,7 +128,7 @@ const ProjectDetails = () => {
                                 <div className="divider"></div>
                                 <div className="member-count">
                                     <img src={membersGroup} alt="membersGroup" />
-                                    <p>{projectData.members.length} members</p>
+                                    <p>{Project?.members.length} members</p>
                                 </div>
                                 <SafeButton
                                     height={40}
@@ -91,9 +140,7 @@ const ProjectDetails = () => {
                                     disabled={false}
                                     fontweight={400}
                                     fontsize={16}
-                                    onClick={() => {
-                                        console.log("Add members");
-                                    }}
+                                    onClick={toggleShowMember}
                                 />
                                 {/* <button>
                                     <img src={editToken} alt="hk-logo" />
@@ -110,7 +157,7 @@ const ProjectDetails = () => {
                                 </div>
                                 <div className="members-list-body">
                                     {
-                                        projectData.members.map((item, index) => (
+                                        Project?.members.map((item, index) => (
                                             <div className="members-row" key={index}>
                                                 <div className="members-row-name">
                                                     <div>
@@ -145,16 +192,14 @@ const ProjectDetails = () => {
                                 disabled={false}
                                 fontweight={400}
                                 fontsize={16}
-                                onClick={() => {
-                                    console.log("Add members");
-                                }}
+                                onClick={toggleShowLink}
                             />
                             {/* <button>
                                 <img src={editToken} alt="hk-logo" />
                             </button> */}
                         </div>
                         {
-                            projectData.links.length > 0
+                            Project?.links.length > 0
                                 ?
                                 <div className="link-locked-section">
                                     <div>
@@ -162,7 +207,7 @@ const ProjectDetails = () => {
                                         <p>Links to unlock:</p>
                                     </div>
                                     {
-                                        projectData.links.map((item, index) => (
+                                        Project?.links.map((item, index) => (
                                             <div className="link-button" key={index}>
                                                 {handleParseUrl(item.link)}
                                                 <p>{item.title}</p>
@@ -177,11 +222,11 @@ const ProjectDetails = () => {
                         {/* unlocked section */}
 
                         {
-                            projectData.links.length > 0
+                            Project?.links.length > 0
                                 ?
                                 <div className="link-unlocked-section">
                                     {
-                                        projectData.links.map((item, index) => (
+                                        Project?.links.map((item, index) => (
                                             <div className="link-button" key={index}>
                                                 {handleParseUrl(item.link)}
                                                 <p>{item.title}</p>

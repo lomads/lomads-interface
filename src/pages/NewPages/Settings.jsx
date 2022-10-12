@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from "state/hooks";
 import { useWeb3React } from "@web3-react/core";
 import { useSBTStats } from "hooks/SBT/sbt";
+import coin from '../../assets/svg/coin.svg';
 
 const Settings = () => {
 
@@ -121,10 +122,11 @@ const Settings = () => {
 
                 <div className='settings-token'>
                     <h1>Pass Tokens</h1>
+
                     {
                         DAO?.sbt?.address
                             ?
-                            <p>SBT : {DAO?.sbt?.name}</p>
+                            <p>SBT : <img src={coin} alt="asset" />{DAO?.sbt?.name}</p>
                             :
                             <>
                                 <p>The organisation doesn’t have token yet</p>

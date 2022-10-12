@@ -49,3 +49,36 @@ export const createProject = createAsyncThunk(
 			.catch(e => thunkApi.rejectWithValue(e))
 	}
 )
+
+export const getProject = createAsyncThunk(
+	'dao/getProject',
+	async (params: any, thunkApi) => {
+		return axiosHttp.get(`project/${params}`)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+);
+
+export const addProjectMember = createAsyncThunk(
+	'dao/addProjectMember',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`project/${params.projectId}/add-member?daoUrl=${params.daoUrl}`, params.payload)
+			.then(res => res.data)
+			.catch(e => {
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
+	}
+);
+
+export const addProjectLinks = createAsyncThunk(
+	'dao/addProjectLinks',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`project/${params.projectId}/add-links?daoUrl=${params.daoUrl}`, params.payload)
+			.then(res => res.data)
+			.catch(e => {
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
+	}
+);

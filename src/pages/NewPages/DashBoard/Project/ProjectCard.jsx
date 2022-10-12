@@ -6,7 +6,7 @@ import { MdKeyboardArrowRight } from 'react-icons/md';
 import { BsDiscord } from 'react-icons/bs';
 import { SiNotion } from 'react-icons/si';
 
-const ProjectCard = ({ project }) => {
+const ProjectCard = ({ project, daoUrl }) => {
     const navigate = useNavigate();
 
     let arr = { 'notion.com': 0, 'discord.com': 0, 'more': 0 };
@@ -24,7 +24,7 @@ const ProjectCard = ({ project }) => {
     });
 
     return (
-        <div className='myproject-card' onClick={() => navigate('/projectDetails', { state: { project } })}>
+        <div className='myproject-card' onClick={() => navigate(`/${daoUrl}/project/${project._id}`, { state: { project } })}>
             {
                 project.links.length > 0
                     ?

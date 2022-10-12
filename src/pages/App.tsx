@@ -43,7 +43,7 @@ export default function App() {
 					<Route path="/sbt/mint/:contractAddr" element={<MintPassToken />} />
 					<Route path="/sbt/success/:contractAddr" element={<CreatePassSucess />} />
 					<Route path="/createProject" element={<CreateProject />} />
-					<Route path="/projectDetails" element={<ProjectDetails />} />
+					<Route path="/:daoURL/project/:projectId" element={<ProjectDetails />} />
 					<Route path="/settings" element={<Settings />} />
 					<Route path="/:daoURL" element={<Dashboard />} />
 				</Routes>

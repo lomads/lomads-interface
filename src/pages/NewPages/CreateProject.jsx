@@ -81,12 +81,12 @@ const CreateProject = () => {
         }
     }
 
-    const handleAddToMembersList = (member) => {
-        let memberOb = {};
-        memberOb.name = member.name;
-        memberOb.wallet = member.address;
-        setMemberList([...memberList, { member: memberOb }]);
-    }
+    // const handleAddToMembersList = (member) => {
+    //     let memberOb = {};
+    //     memberOb.name = member.name;
+    //     memberOb.wallet = member.address;
+    //     setMemberList([...memberList, { member: memberOb }]);
+    // }
 
     const handleAddMember = (member) => {
         console.log("member : ", member);
@@ -158,7 +158,6 @@ const CreateProject = () => {
                 {showAddMember &&
                     <AddMember
                         toggleShowMember={toggleShowMember}
-                        addToMembersList={(value) => handleAddToMembersList(value)}
                     />
                 }
                 {
