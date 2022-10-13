@@ -16,12 +16,14 @@ import { useSBTContract } from "hooks/useContract";
 import { APIgetContract, APInewSBTtoken } from "hooks/SBT/sbtAPI";
 import { toast, ToastContainer } from "react-toastify";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
-import { useAppSelector } from "state/hooks";
+import { useAppSelector, useAppDispatch } from "state/hooks";
+import { setDAO } from "state/dashboard/reducer";
 
 const MintPassToken = () => {
     /// temporary solution until we don't have specific routes for DAO, contract address will be passed into the url 
     const { contractAddr } = useParams();
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
     /// 1 : no whitelist 
     /// 2 : whitelist user is in
     /// 3 : whitelist user isnt in
@@ -92,6 +94,7 @@ const MintPassToken = () => {
             else {
                 const metadataJSON = {
                     id: sbtId,
+                    daoUrl: DAO.url,
                     description: "SBT TOKEN",
                     name: userName.value,
                     image: 'url',
@@ -118,6 +121,7 @@ const MintPassToken = () => {
                 if (req) {
                     setLoading(false);
                     toast.success("SBT mint successfuly !");
+                    dispatch(setDAO(req.data));
                     navigate(`/${DAO.url}`)
                     return;
                 }

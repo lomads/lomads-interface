@@ -13,6 +13,7 @@ export interface DashboardState {
 	updateMemberLoading: boolean | null;
 	Project: any;
 	ProjectLoading: boolean | null;
+	addProjectMemberLoading: boolean | null;
 	addProjectLinksLoading: boolean | null;
 }
 
@@ -24,6 +25,7 @@ const initialState: DashboardState = {
 	updateMemberLoading: null,
 	Project: null,
 	ProjectLoading: null,
+	addProjectMemberLoading: null,
 	addProjectLinksLoading: null,
 };
 
@@ -40,11 +42,17 @@ const dashboardSlice = createSlice({
 		resetUpdateMemberLoader(state) {
 			state.updateMemberLoading = null
 		},
+		resetAddProjectMemberLoader(state) {
+			state.addProjectMemberLoading = null
+		},
 		resetAddProjectLinksLoader(state) {
 			state.addProjectLinksLoading = null
 		},
 		setDAOList(state, action) {
 			state.DAOList = action.payload
+		},
+		setDAO(state, action) {
+			state.DAO = action.payload
 		},
 		updateSafeTransaction(state, action) {
 			console.log(action.payload)
@@ -111,8 +119,12 @@ const dashboardSlice = createSlice({
 			state.ProjectLoading = true;
 		},
 		[`${addProjectMember.fulfilled}`]: (state, action) => {
+			state.addProjectMemberLoading = false;
 			state.Project = action.payload.project;
 			state.DAO = action.payload.dao;
+		},
+		[`${addProjectMember.pending}`]: (state) => {
+			state.addProjectMemberLoading = true;
 		},
 		[`${addProjectLinks.fulfilled}`]: (state, action) => {
 			state.addProjectLinksLoading = false;
@@ -127,8 +139,10 @@ const dashboardSlice = createSlice({
 
 export const {
 	setDAOList,
+	setDAO,
 	resetCreateDAOLoader,
 	resetAddMemberLoader,
+	resetAddProjectMemberLoader,
 	resetAddProjectLinksLoader,
 	updateSafeTransaction
 } = dashboardSlice.actions;

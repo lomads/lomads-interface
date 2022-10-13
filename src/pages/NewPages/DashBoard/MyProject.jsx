@@ -1,5 +1,6 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import './MyProject.css';
+import { get as _get, find as _find } from 'lodash';
 
 import SafeButton from "UIpack/SafeButton";
 
@@ -8,21 +9,50 @@ import { useAppSelector } from "state/hooks";
 
 import { ProjectContext } from 'context/ProjectContext';
 import ProjectCard from './Project/ProjectCard';
+import { useWeb3React } from "@web3-react/core";
 
 const MyProject = () => {
     const navigate = useNavigate();
-    const { DAO, DAOList, DAOLoading } = useAppSelector((state) => state.dashboard);
-    const { projects } = useContext(ProjectContext);
-    const [tab, setTab] = useState(projects.length > 0 ? 1 : 2);
+    const { DAO } = useAppSelector((state) => state.dashboard);
+    const { account } = useWeb3React();
+    const [tab, setTab] = useState(2);
+    const [myProjects, setMyProjects] = useState([]);
+    const [otherProjects, setOtherProjects] = useState([]);
+    const [initialCheck, setInitialCheck] = useState(false);
+
+    useEffect(() => {
+        if (DAO) {
+            setMyProjects(DAO.projects.filter(project => _find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase())))
+            setOtherProjects(DAO.projects.filter(project => !_find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase())))
+        }
+    }, [DAO, tab]);
+
+    useEffect(() => {
+        if (!initialCheck) {
+            if (myProjects.length > 0) {
+                setInitialCheck(true)
+                setTab(1);
+            }
+        }
+    }, [myProjects, initialCheck]);
 
     return (
         <div className="myproject-container">
             <div className="myproject-header">
                 <div className="myproject-title">
-                    <button className={tab === 1 ? 'active' : null} onClick={() => setTab(1)} disabled={projects.length > 0 ? false : true}>
-                        My projects
-                    </button>
-                    <div className="divider"></div>
+                    {
+                        myProjects.length > 0
+                            ?
+                            <>
+                                <button className={tab === 1 ? 'active' : null} onClick={() => setTab(1)}>
+                                    My projects
+                                </button>
+                                <div className="divider"></div>
+                            </>
+                            :
+                            null
+                    }
+
                     <button className={tab === 2 ? 'active' : null} onClick={() => setTab(2)}>
                         All projects
                     </button>
@@ -66,7 +96,7 @@ const MyProject = () => {
                     ?
                     <div className='myproject-body'>
                         {
-                            projects && projects.map((item, index) => {
+                            myProjects.length > 0 && myProjects.map((item, index) => {
                                 return (
                                     <div key={index}>
                                         <ProjectCard
@@ -88,11 +118,11 @@ const MyProject = () => {
                     ?
                     <>
                         {
-                            DAO?.projects.length > 0
+                            otherProjects.length > 0
                                 ?
                                 <div className='myproject-body-fixed' style={DAO?.projects.length > 9 ? { overflow: 'scroll', height: '375px' } : null}>
                                     {
-                                        DAO?.projects.map((item, index) => {
+                                        otherProjects.map((item, index) => {
                                             return (
                                                 <div key={index}>
                                                     <ProjectCard

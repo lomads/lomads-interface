@@ -18,7 +18,7 @@ import { useWeb3React } from "@web3-react/core";
 import { useEnsAddress } from "react-moralis";
 import OutlineButton from "UIpack/OutlineButton";
 import { addDaoMember, addProjectMember } from 'state/dashboard/actions'
-import { resetAddMemberLoader } from 'state/dashboard/reducer';
+import { resetAddMemberLoader, resetAddProjectMemberLoader } from 'state/dashboard/reducer';
 
 const AddMember = (props: any) => {
 	const dispatch = useAppDispatch();
@@ -28,7 +28,7 @@ const AddMember = (props: any) => {
 	const [ownerAddress, setOwnerAddress] = useState<string>("");
 	const [errors, setErrors] = useState<any>({});
 	const totalMembers = useAppSelector((state) => state.flow.totalMembers);
-	const { DAO, addMemberLoading } = useAppSelector((state) => state.dashboard);
+	const { DAO, addMemberLoading, addProjectMemberLoading } = useAppSelector((state) => state.dashboard);
 	const { account, provider } = useWeb3React();
 
 	const isAddressValid = (holderAddress: string) => {
@@ -72,13 +72,14 @@ const AddMember = (props: any) => {
 	}, [ownerAddress]);
 
 	useEffect(() => {
-		if (addMemberLoading === false) {
-			dispatch(resetAddMemberLoader())
+		if (addMemberLoading === false || addProjectMemberLoading === false) {
+			dispatch(resetAddMemberLoader());
+			dispatch(resetAddProjectMemberLoader());
 			setOwnerName("");
 			setOwnerAddress("");
 			props.toggleShowMember();
 		}
-	}, [addMemberLoading])
+	}, [addMemberLoading, addProjectMemberLoading])
 
 	const addMember = async (_ownerName: string, _ownerAddress: string) => {
 		const member: InviteGangType = { name: _ownerName, address: _ownerAddress };
