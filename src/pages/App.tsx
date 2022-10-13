@@ -11,6 +11,7 @@ import AddExistingSafe from "./NewPages/AddExistingSafe";
 import AddNewSafe from "./NewPages/AddNewSafe";
 import Dashboard from "./NewPages/DashBoard/Dashboard";
 import Settings from "./NewPages/Settings";
+import DCAuth from './NewPages/DCAuth';
 
 // New page added
 import CreatePassToken from "./NewPages/CreatePassToken";
@@ -37,6 +38,7 @@ export default function App() {
         <Route path="/sbt/mint/:contractAddr" element={<MintPassToken />} />
         <Route path="/sbt/success/:contractAddr" element={<CreatePassSucess />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/dcauth" element={<DCAuth />} />
         <Route path="/:daoURL" element={<Dashboard />} />
       </Routes>
     </div>

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
+import { usePrevious } from "@chakra-ui/react"
 import { get as _get, find as _find } from 'lodash';
 import lomadsfulllogo from "../../../assets/svg/lomadsfulllogo.svg";
 import settingIcon from '../../../assets/svg/settings.svg';
@@ -10,6 +11,10 @@ import MemberCard from "./MemberCard";
 import { LeapFrog } from "@uiball/loaders";
 import TreasuryCard from "./TreasuryCard";
 import { ImportSafe, safeService } from "connection/SafeCall";
+import useDCAuthWithCallback from '../../../hooks/useDCAuthWithCallback';
+import usePopupWindow from '../../../hooks/usePopupWindow';
+import useUsersServers from "hooks/useUsersServers"
+import useServerData from "hooks/useServerData";
 import { useWeb3React } from "@web3-react/core";
 import {
 	AllTransactionsListResponse,
@@ -29,6 +34,7 @@ import copyIcon from "../../../assets/svg/copyIcon.svg";
 import { useDispatch } from "react-redux";
 import { updateCurrentNonce, updateSafeThreshold, updateSafeAddress } from "state/flow/reducer";
 import { Tooltip } from "@chakra-ui/react";
+import useDCAuth from "hooks/useDCAuth";
 
 import { useSBTStats } from "hooks/SBT/sbt";
 
@@ -62,6 +68,54 @@ const Dashboard = () => {
 	const currentNonce = useAppSelector((state) => state.flow.currentNonce);
 
 	const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
+
+	const { callbackWithDCAuth, isAuthenticating, authorization } =
+    useDCAuthWithCallback("guilds", () => ``)
+
+	//const { authorization = undefined } = useDCAuth("guilds")
+	const { servers, isValidating } = useUsersServers(authorization)
+
+	const canAddGuild = useMemo(() => {
+		if(authorization && servers && servers.length > 0) {
+			console.log(servers)
+			let connectableServer = _find(servers, server => server.id === "1029692084225060874" && server.owner)
+			console.log("connectableServer", connectableServer)
+			if(connectableServer)
+				return true
+			return false;
+		}
+		return false;
+	}, [servers])
+	
+
+	const { onOpen: openAddBotPopup, windowInstance: activeAddBotPopup } =
+    usePopupWindow(
+      `https://discord.com/api/oauth2/authorize?client_id=${`868172385000509460`}&id=${'1029692241377239040'}&guild_id=${'1029692084225060874'}&permissions=2147483647&scope=bot%20applications.commands`
+    )
+
+	// const {
+	// 	data: { isAdmin, channels, serverId },
+	//   } = useServerData("1029692084225060874", {
+	// 	refreshInterval: !!activeAddBotPopup ? 2000 : 0,
+	// 	refreshWhenHidden: true,
+	//   })
+
+	//   console.log('channels', channels)
+	
+	//   const prevActiveAddBotPopup = usePrevious(activeAddBotPopup)
+	
+	//   useEffect(() => {
+	// 	if (!!prevActiveAddBotPopup && !activeAddBotPopup && isAdmin) {
+	// 	  //onSelect(serverData.id)
+	// 	}
+	//   }, [prevActiveAddBotPopup, activeAddBotPopup, isAdmin])
+	
+	//   useEffect(() => {
+	// 	if (channels && channels?.length > 0 && activeAddBotPopup) {
+	// 	  activeAddBotPopup.close()
+	// 	}
+	//   }, [channels, activeAddBotPopup])
+	
 
 	const amIAdmin = useMemo(() => {
 		if (DAO) {
@@ -144,7 +198,10 @@ const Dashboard = () => {
 	const getTokens = async (safeAddress: string) => {
 		await axios
 			.get(
-				`https://safe-transaction.goerli.gnosis.io/api/v1/safes/${safeAddress}/balances/usd/`
+				`https://safe-transaction.goerli.gnosis.io/api/v1/safes/${safeAddress}/balances/usd/`,
+				{
+					withCredentials: false
+				}
 			)
 			.then((tokens: any) => {
 				setSafeTokens(tokens.data);
@@ -226,6 +283,9 @@ const Dashboard = () => {
 						</Tooltip>
 					</div> */}
 				</div>
+				{ canAddGuild && authorization ?
+				<div onClick={openAddBotPopup}>Add guild bot</div> :
+				<div onClick={callbackWithDCAuth}>Connect Discord</div> }
 				{pendingTransactions !== undefined &&
 					pendingTransactions?.count >= 1 &&
 					showNotification && (
@@ -256,6 +316,7 @@ const Dashboard = () => {
             <img src={dashboardfooterlogo} alt="footer logo" id="footerImage" />
           </div>
         </div> */}
+
 			</div>
 			{showModal && (
 				<SideModal
