@@ -135,6 +135,9 @@ const CreatePassToken = () => {
         if (sbtName === '') {
             return toast.error("Please enter token name");
         }
+        else if (tokenQuantity === '') {
+            return toast.error("Please enter supply");
+        }
         else {
             setSBTConstructor({
                 name: sbtName,
@@ -172,6 +175,7 @@ const CreatePassToken = () => {
                 const contractAddr = await getContractById(sbtDeployerContract, counter);
                 setContractAddr(contractAddr);
                 const contractJSON = {
+                    name: sbtName,
                     address: contractAddr,
                     admin: account,
                     contactDetail: selectedOptions,
@@ -240,9 +244,9 @@ const CreatePassToken = () => {
                                     </div>
                                     <div className="optional-div">
                                         <label>Supply</label>
-                                        <div>
+                                        {/* <div>
                                             <p>Optional</p>
-                                        </div>
+                                        </div> */}
                                     </div>
                                     <input
                                         id="token-supply"

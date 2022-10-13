@@ -2,24 +2,24 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { Contract } from 'ethers';
 
 type SBTContructor = {
-    name : String, 
-    supply : String,
-    url : any
+    name: String,
+    supply: String,
+    url: any
 };
 
 type Member = {
-    name : string,
-    address : string
+    name: string,
+    address: string
 }
 
 
-export const getCurrentId = async (sbtDeployerContract : Contract) => {
-    if(sbtDeployerContract.signer){
+export const getCurrentId = async (sbtDeployerContract: Contract) => {
+    if (sbtDeployerContract.signer) {
         try {
-            const sbtId : BigNumber = await sbtDeployerContract.counter();
+            const sbtId: BigNumber = await sbtDeployerContract.counter();
             return sbtId;
         }
-        catch (e){
+        catch (e) {
             console.log(e);
             return false;
         }
@@ -27,20 +27,21 @@ export const getCurrentId = async (sbtDeployerContract : Contract) => {
     return false;
 }
 
-export const createNewSBT = async (sbtDeployerContract : Contract, SBTConstructor : SBTContructor, newWhitelistedMembers : Array<Member>) => {
+export const createNewSBT = async (sbtDeployerContract: Contract, SBTConstructor: SBTContructor, newWhitelistedMembers: Array<Member>) => {
+    console.log("31 : ", sbtDeployerContract, SBTConstructor, newWhitelistedMembers);
     const needWhitelist = newWhitelistedMembers.length > 0 ? true : false;
-    let memberAddr : Array<string> = [];
-    if(needWhitelist){
-        for(let i=0;i<newWhitelistedMembers.length; i++){
+    let memberAddr: Array<string> = [];
+    if (needWhitelist) {
+        for (let i = 0; i < newWhitelistedMembers.length; i++) {
             memberAddr.push(newWhitelistedMembers[i].address);
         }
     }
-    if(sbtDeployerContract.signer){
+    if (sbtDeployerContract.signer) {
         try {
             const tx = await sbtDeployerContract.deployNewSBT(SBTConstructor.name, "SBT", SBTConstructor.supply, process.env.REACT_APP_NODE_BASE_URL, needWhitelist, memberAddr);
             return await tx.wait();
         }
-        catch (e){
+        catch (e) {
             console.log(e);
             return false;
         }
@@ -48,13 +49,13 @@ export const createNewSBT = async (sbtDeployerContract : Contract, SBTConstructo
     return false
 }
 
-export const getContractById = async (sbtDeployerContract : Contract, id : BigNumber) => {
-    if(sbtDeployerContract.signer || sbtDeployerContract.provider){
+export const getContractById = async (sbtDeployerContract: Contract, id: BigNumber) => {
+    if (sbtDeployerContract.signer || sbtDeployerContract.provider) {
         try {
             const contractAddr = await sbtDeployerContract.getContractByIndex(parseInt(id.toString()));
             return contractAddr;
         }
-        catch (e){
+        catch (e) {
             console.log(e);
             return false;
         }
