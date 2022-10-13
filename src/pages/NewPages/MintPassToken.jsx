@@ -2,7 +2,7 @@
 import "../../styles/pages/MintPassToken.css";
 import { get as _get } from 'lodash'
 import FrameRed from '../../assets/svg/FrameRed.svg';
-import hklogo from '../../assets/svg/hklogo.svg';
+import coin from '../../assets/svg/coin.svg';
 import lomadsLogo from '../../assets/svg/lomadsLogoExpandGray.svg'
 import frame2 from '../../assets/svg/Frame-2.svg'
 import { AiOutlineMail } from 'react-icons/ai';
@@ -16,12 +16,14 @@ import { useSBTContract } from "hooks/useContract";
 import { APIgetContract, APInewSBTtoken } from "hooks/SBT/sbtAPI";
 import { toast, ToastContainer } from "react-toastify";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
-import { useAppSelector } from "state/hooks";
+import { useAppSelector, useAppDispatch } from "state/hooks";
+import { setDAO } from "state/dashboard/reducer";
 
 const MintPassToken = () => {
     /// temporary solution until we don't have specific routes for DAO, contract address will be passed into the url 
     const { contractAddr } = useParams();
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
     /// 1 : no whitelist 
     /// 2 : whitelist user is in
     /// 3 : whitelist user isnt in
@@ -92,6 +94,7 @@ const MintPassToken = () => {
             else {
                 const metadataJSON = {
                     id: sbtId,
+                    daoUrl: DAO.url,
                     description: "SBT TOKEN",
                     name: userName.value,
                     image: 'url',
@@ -118,6 +121,7 @@ const MintPassToken = () => {
                 if (req) {
                     setLoading(false);
                     toast.success("SBT mint successfuly !");
+                    dispatch(setDAO(req.data));
                     navigate(`/${DAO.url}`)
                     return;
                 }
@@ -156,7 +160,7 @@ const MintPassToken = () => {
 
                             {/* Token img and name */}
                             <div className="tokenName-box">
-                                <img src={hklogo} alt="hk-logo" />
+                                <img src={coin} alt="asset" />
                                 <p>{contractName}</p>
                             </div>
 

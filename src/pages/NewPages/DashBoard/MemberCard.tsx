@@ -45,7 +45,6 @@ const MemberCard = (props: any) => {
 			setEditMode(false);
 			setMembersArray(temp);
 			const member = { name: temp[pos].member.name };
-			console.log("member : ", member);
 			dispatch(updateDaoMember({ url: DAO?.url, payload: member }))
 		}
 	}
@@ -65,6 +64,7 @@ const MemberCard = (props: any) => {
 										placeholder={props.name}
 										onChange={(e) => handleChangeName(e, props.position)}
 										onKeyDown={(e) => _handleKeyDown(e, props.position)}
+										style={{ border: '1px solid gray', padding: '0 5px' }}
 									/>
 									:
 									<div className="dashboardText">{props.name}</div>
@@ -104,7 +104,13 @@ const MemberCard = (props: any) => {
 								style={{ height: 35, width: 35 }}
 							/>
 							<div className="dashboardText">
-								{_get(DAO, 'members', []).length} members
+								{
+									_get(DAO, 'members', []).length > 1
+										?
+										`${_get(DAO, 'members', []).length} members`
+										:
+										`${_get(DAO, 'members', []).length} member`
+								}
 							</div>
 						</div>
 						{amIAdmin && <SafeButton

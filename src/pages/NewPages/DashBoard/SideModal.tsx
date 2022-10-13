@@ -8,7 +8,7 @@ import {
 } from "types/DashBoardType";
 import { InviteGangType } from "types/UItype";
 import SelectRecipient from "./SideModal/SelectRecipient";
-import { useAppSelector,useAppDispatch } from "state/hooks";
+import { useAppSelector, useAppDispatch } from "state/hooks";
 import TransactionSend from "./SideModal/TransactionSend";
 import { tokenCallSafe } from "connection/DaoTokenCall";
 import { ImportSafe, safeService } from "connection/SafeCall";
@@ -41,7 +41,6 @@ const SideModal = (props: IsideModal) => {
   const totalMembers = useAppSelector((state) => state.flow.totalMembers);
   const selectToken = (_tokenAddress: string) => {
     setSelectedToken(_tokenAddress);
-    console.log(selectedToken);
   };
 
   const selectedRecipients = useRef<InviteGangType[]>([]);
@@ -166,12 +165,12 @@ const SideModal = (props: IsideModal) => {
 
   useEffect(() => {
     getTokens(props.safeAddress);
-    return () => {};
+    return () => { };
   }, [props.safeAddress]);
 
   useEffect(() => {
-    if(DAO)
-      dispatch(updateTotalMembers(_get(DAO, 'members', []).map((m:any) => { return { name: m.member.name, address: m.member.wallet } })))
+    if (DAO)
+      dispatch(updateTotalMembers(_get(DAO, 'members', []).map((m: any) => { return { name: m.member.name, address: m.member.wallet } })))
   }, [DAO])
 
   return (

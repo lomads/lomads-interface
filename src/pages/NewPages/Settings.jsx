@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import './Settings.css';
+import { get as _get, find as _find } from 'lodash';
 import settingIcon from '../../assets/svg/settingsXL.svg';
 import editIcon from '../../assets/svg/editButton.svg';
 import copy from '../../assets/svg/copyIcon.svg';
@@ -9,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from "state/hooks";
 import { useWeb3React } from "@web3-react/core";
 import { useSBTStats } from "hooks/SBT/sbt";
-import { get as _get } from 'lodash'
+import coin from '../../assets/svg/coin.svg';
 
 const Settings = () => {
 
@@ -21,13 +22,23 @@ const Settings = () => {
     console.log("DAO data : ", DAO);
     const daoName = _get(DAO, 'name', '').split(" ");
 
-	useEffect(() => {
-		if(contractName !== '' ){
-			if (DAO?.sbt &&  parseInt(balanceOf._hex, 16) === 0) {
-				navigate(`/sbt/mint/${DAO.sbt.address}`);
-			}
-		}
-	}, [DAO, balanceOf, contractName]);
+    useEffect(() => {
+        if (contractName !== '') {
+            if (DAO?.sbt && parseInt(balanceOf._hex, 16) === 0) {
+                navigate(`/sbt/mint/${DAO.sbt.address}`);
+            }
+        }
+    }, [DAO, balanceOf, contractName]);
+
+    const amIAdmin = useMemo(() => {
+        if (DAO) {
+            let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'ADMIN')
+            if (user)
+                return true
+            return false
+        }
+        return false;
+    }, [account, DAO])
 
     return (
         <div className='settings-page'>
@@ -46,15 +57,21 @@ const Settings = () => {
             <div className='settings-center'>
                 <div className='settings-header'>
                     <h1>Settings</h1>
-                    <p>You're an&nbsp;<span>Admin</span></p>
+                    {
+                        amIAdmin
+                            ?
+                            <p>You're an&nbsp;<span>Admin</span></p>
+                            :
+                            <p>You're a&nbsp;<span>Member</span></p>
+                    }
                 </div>
 
                 <div className='settings-organisation'>
                     <div className='organisation-name'>
                         <h1>{_get(DAO, 'name', '')}</h1>
-                        <button>
+                        {/* <button>
                             <img src={editIcon} alt="edit-icon" />
-                        </button>
+                        </button> */}
                     </div>
 
                     <div className='organisation-desc'>
@@ -82,9 +99,9 @@ const Settings = () => {
                 <div className='settings-links'>
                     <div className='links-header'>
                         <h1>Links</h1>
-                        <button>
+                        {/* <button>
                             <img src={editIcon} alt="edit-icon" />
-                        </button>
+                        </button> */}
                     </div>
                     <span>Will display on the top of the dashboard</span>
                     <div className='link-body'>
@@ -106,9 +123,16 @@ const Settings = () => {
                 <div className='settings-token'>
                     <h1>Pass Tokens</h1>
                     {
-                        DAO?.sbt?.address
+                        DAO?.sbt?.name
                             ?
-                            <p>SBT : {DAO?.sbt?.address}</p>
+                            <div className='token-details'>
+                                <button>
+                                    <img src={copy} alt="copy" />
+                                </button>
+                                <img src={coin} alt="asset" />
+                                <p>{DAO?.sbt?.name}</p>
+                            </div>
+
                             :
                             <>
                                 <p>The organisation doesn’t have token yet</p>

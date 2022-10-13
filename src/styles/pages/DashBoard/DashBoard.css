@@ -84,7 +84,7 @@ body.active-modal {
     height: 158.8px;
     background: rgba(118, 128, 141, 0.05);
     border-radius: 40px;
-    margin: 20px 0px 0px 0px;
+    margin: 20px 0px;
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
@@ -395,7 +395,7 @@ body.active-modal {
 }
 
 .avatarAndName {
-    gap: 20px;
+    gap: 10px;
     margin-right: 35px;
 }
 
