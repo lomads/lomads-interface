@@ -22,8 +22,8 @@ const MyProject = () => {
 
     useEffect(() => {
         if (DAO) {
-            setMyProjects(DAO.projects.filter(project => _find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase())))
-            setOtherProjects(DAO.projects.filter(project => !_find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase())))
+            setMyProjects(_get(DAO, 'projects', []).filter(project => _find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase())))
+            setOtherProjects(_get(DAO, 'projects', []).filter(project => !_find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase())))
         }
     }, [DAO, tab]);
 
