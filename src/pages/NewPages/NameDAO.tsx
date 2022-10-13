@@ -65,15 +65,19 @@ const NameDAO = () => {
         setUrlCheckLoading(true)
         axiosHttp.get(`dao/${e.target.value.replace(/ /g, "-").toLowerCase()}`)
         .then(res => {
-          let rand = Math.floor(1000 + Math.random() * 9000);
-          axiosHttp.get(`dao/${e.target.value.replace(/ /g, "-").toLowerCase() + '-' + rand}`)
-          .then(result => {
-            rand = Math.floor(1000 + Math.random() * 9000);
-            dispatch(updateDaoAddress(process.env.REACT_APP_URL + "/" + e.target.value.replace(/ /g, "-").toLowerCase() + '-' + rand))
-          })
-          .catch(err => {
-            dispatch(updateDaoAddress(process.env.REACT_APP_URL + "/" + e.target.value.replace(/ /g, "-").toLowerCase() + '-' + rand))
-          })
+          if(!res.data){
+            dispatch(updateDaoAddress(process.env.REACT_APP_URL + "/" + e.target.value.replace(/ /g, "-").toLowerCase()))
+          } else {
+            let rand = Math.floor(1000 + Math.random() * 9000);
+            axiosHttp.get(`dao/${e.target.value.replace(/ /g, "-").toLowerCase() + '-' + rand}`)
+            .then(result => {
+              rand = Math.floor(1000 + Math.random() * 9000);
+              dispatch(updateDaoAddress(process.env.REACT_APP_URL + "/" + e.target.value.replace(/ /g, "-").toLowerCase() + '-' + rand))
+            })
+            .catch(err => {
+              dispatch(updateDaoAddress(process.env.REACT_APP_URL + "/" + e.target.value.replace(/ /g, "-").toLowerCase() + '-' + rand))
+            })
+          }
         })
         .catch(err => {
           dispatch(updateDaoAddress(process.env.REACT_APP_URL + "/" + e.target.value.replace(/ /g, "-").toLowerCase()))
