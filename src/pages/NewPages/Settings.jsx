@@ -87,13 +87,13 @@ const Settings = () => {
                         <p>https://...daoname</p>
                     </div>
 
-                    <div className='organisation-policy'>
+                    {/* <div className='organisation-policy'>
                         <p>Membership policy :</p>
                         <div>
                             <input type='checkbox' />
                             <span>WHITELISTED</span>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
 
                 <div className='settings-links'>

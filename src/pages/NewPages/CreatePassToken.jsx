@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Frame from '../../assets/svg/frame.svg';
 import uploadIcon from '../../assets/svg/ico-upload.svg';
 import hklogo from '../../assets/svg/hklogo.svg';
+import coin from '../../assets/svg/coin.svg';
 import editToken from '../../assets/svg/editToken.svg';
 import memberIcon from '../../assets/svg/memberIcon.svg';
 import { AiOutlinePlus } from "react-icons/ai";
@@ -31,7 +32,10 @@ const CreatePassToken = () => {
     const sbtDeployerContract = useSBTDeployerContract();
     const [tab, setTab] = useState(1);
     const [sbtName, setSbtName] = useState('');
+    const [error, setError] = useState('');
+    const [nameError, setNameError] = useState(false);
     const [tokenQuantity, setTokenQuantity] = useState('');
+    const [supplyError, setSupplyError] = useState(false)
     const [contractAddr, setContractAddr] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState([]);
@@ -131,12 +135,33 @@ const CreatePassToken = () => {
         setMemberList(memberList.filter((_, index) => index !== position));
     }
 
+    const handleSBTname = (e) => {
+        setSbtName(e.target.value);
+        setError('');
+        setNameError(false);
+    }
+
+    const handleSBTSupply = (e) => {
+        setTokenQuantity(e.target.value);
+        setError('');
+        setSupplyError(false);
+    }
+
     const addSBTConstructor = () => {
         if (sbtName === '') {
-            return toast.error("Please enter token name");
+            setNameError(true);
+            setError("Please enter token name");
+            return;
         }
         else if (tokenQuantity === '') {
-            return toast.error("Please enter supply");
+            setSupplyError(true);
+            setError("Please enter supply");
+            return;
+        }
+        else if (parseInt(tokenQuantity) > 250) {
+            setSupplyError(true);
+            setError("Supply cannot be more than 250");
+            return;
         }
         else {
             setSBTConstructor({
@@ -219,8 +244,11 @@ const CreatePassToken = () => {
                                         className="text-input"
                                         placeholder="Enter token name"
                                         value={sbtName}
-                                        onChange={(e) => setSbtName(e.target.value)}
+                                        onChange={(e) => handleSBTname(e)}
                                     />
+                                    {
+                                        nameError && <p className="error">{error}</p>
+                                    }
                                     <div className="optional-div">
                                         <label>Pass Token Icon</label>
                                         <div>
@@ -253,8 +281,20 @@ const CreatePassToken = () => {
                                         className="text-input"
                                         placeholder="Number of existing tokens"
                                         value={tokenQuantity}
-                                        onChange={(e) => setTokenQuantity(e.target.value)}
+                                        onChange={(e) => handleSBTSupply(e)}
                                     />
+                                    {
+                                        supplyError && <p className="error">{error}</p>
+                                    }
+
+                                    <div className='organisation-policy'>
+                                        <p>Membership policy :</p>
+                                        <div>
+                                            <input type='checkbox' />
+                                            <span>WHITELISTED</span>
+                                        </div>
+                                    </div>
+
                                     <button onClick={addSBTConstructor}>NEXT</button>
                                 </div>
                             </>
@@ -269,9 +309,10 @@ const CreatePassToken = () => {
                             <>
                                 <div className="tokenName-container">
                                     <div className="tokenName-box">
-                                        <img src={hklogo} alt="hk-logo" />
+                                        <img src={coin} alt="asset" />
+                                        {/* <img src={hklogo} alt="hk-logo" /> */}
                                         <p style={{ marginLeft: "5px" }}>{SBTConstructor.name}</p>
-                                        <p style={{ marginLeft: "auto", marginRight: "20px" }}>x{SBTConstructor.supply}</p>
+                                        <p style={{ marginLeft: "auto", marginRight: "20px" }}>x {SBTConstructor.supply}</p>
                                     </div>
                                     <div className="tokenName-btn">
                                         <img onClick={() => setTab(1)} src={editToken} alt="hk-logo" />
@@ -323,15 +364,26 @@ const CreatePassToken = () => {
                                         </div>
                                         <span>Please select if you intend to use access-controlled Telegram groups.</span>
                                     </div>
-                                    {
+                                    {/* {
                                         selectedOptions.length > 0 && !showMembers
                                             ?
                                             <button onClick={() => setShowMembers(true)}>NEXT</button>
                                             :
                                             null
-                                    }
+                                    } */}
                                 </div>
-                                {
+                                <div style={{ height: '20px' }}></div>
+                                <SimpleLoadButton
+                                    title="CREATE PASS"
+                                    height={50}
+                                    width={160}
+                                    fontsize={20}
+                                    fontweight={400}
+                                    onClick={deploySBTContract}
+                                    bgColor={"#C94B32"}
+                                    condition={isLoading}
+                                />
+                                {/* {
                                     showMembers
                                         ?
                                         <>
@@ -368,7 +420,6 @@ const CreatePassToken = () => {
                                                     </button>
                                                 </div>
                                             </div>
-                                            {/* If members list array's length is greater than zero then render the list */}
                                             {
                                                 memberList.length > 0
                                                     ?
@@ -407,7 +458,7 @@ const CreatePassToken = () => {
                                         </>
                                         :
                                         null
-                                }
+                                } */}
                             </>
                             :
                             null

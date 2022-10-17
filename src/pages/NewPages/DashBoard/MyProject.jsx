@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import './MyProject.css';
 import { get as _get, find as _find } from 'lodash';
 
@@ -7,7 +7,6 @@ import SafeButton from "UIpack/SafeButton";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "state/hooks";
 
-import { ProjectContext } from 'context/ProjectContext';
 import ProjectCard from './Project/ProjectCard';
 import { useWeb3React } from "@web3-react/core";
 
@@ -35,6 +34,16 @@ const MyProject = () => {
             }
         }
     }, [myProjects, initialCheck]);
+
+    const amIAdmin = useMemo(() => {
+        if (DAO) {
+            let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'ADMIN')
+            if (user)
+                return true
+            return false
+        }
+        return false;
+    }, [account, DAO])
 
     return (
         <div className="myproject-container">
@@ -72,22 +81,24 @@ const MyProject = () => {
                             onClick={() => console.log("Button")}
                         /> */}
                     </div>
-                    <div>
-                        <SafeButton
-                            height={40}
-                            width={150}
-                            titleColor="#C94B32"
-                            title="CREATE"
-                            bgColor="#FFFFFF"
-                            opacity="1"
-                            disabled={false}
-                            fontweight={400}
-                            fontsize={16}
-                            onClick={() => {
-                                navigate("/createProject");
-                            }}
-                        />
-                    </div>
+                    {
+                        amIAdmin && <div>
+                            <SafeButton
+                                height={40}
+                                width={150}
+                                titleColor="#C94B32"
+                                title="CREATE"
+                                bgColor="#FFFFFF"
+                                opacity="1"
+                                disabled={false}
+                                fontweight={400}
+                                fontsize={16}
+                                onClick={() => {
+                                    navigate("/createProject");
+                                }}
+                            />
+                        </div>
+                    }
                 </div>
             </div>
 

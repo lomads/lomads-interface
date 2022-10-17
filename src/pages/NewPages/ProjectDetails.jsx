@@ -207,12 +207,16 @@ const ProjectDetails = () => {
                                         <p>Links to unlock:</p>
                                     </div>
                                     {
-                                        Project?.links.map((item, index) => (
-                                            <div className="link-button" key={index}>
-                                                {handleParseUrl(item.link)}
-                                                <p>{item.title}</p>
-                                            </div>
-                                        ))
+                                        Project?.links.map((item, index) => {
+                                            if (item.lock) {
+                                                return (
+                                                    <div className="link-button" key={index}>
+                                                        {handleParseUrl(item.link)}
+                                                        <p>{item.title}</p>
+                                                    </div>
+                                                )
+                                            }
+                                        })
                                     }
                                 </div>
                                 :
@@ -226,12 +230,16 @@ const ProjectDetails = () => {
                                 ?
                                 <div className="link-unlocked-section">
                                     {
-                                        Project?.links.map((item, index) => (
-                                            <div className="link-button" key={index}>
-                                                {handleParseUrl(item.link)}
-                                                <p>{item.title}</p>
-                                            </div>
-                                        ))
+                                        Project?.links.map((item, index) => {
+                                            if (!item.lock) {
+                                                return (
+                                                    <div className="link-button" key={index}>
+                                                        {handleParseUrl(item.link)}
+                                                        <p>{item.title}</p>
+                                                    </div>
+                                                )
+                                            }
+                                        })
                                     }
                                 </div>
                                 :

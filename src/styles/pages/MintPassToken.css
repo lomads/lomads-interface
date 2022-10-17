@@ -9,7 +9,14 @@
     overflow-y: scroll;
 }
 
-p {
+.error {
+    font-size: 13px;
+    margin-bottom: 1rem;
+    color: #C84A32;
+}
+
+p,
+label {
     font-family: "Insignia", sans-serif;
 }
 
@@ -114,7 +121,7 @@ p {
 .mintPassToken-container .mintPassToken-body .userName-box label {
     font-style: normal;
     font-weight: 700;
-    font-family: "Insignia";
+    /* font-family: "Insignia"; */
     font-size: 16px;
     line-height: 18px;
     color: #76808D;
@@ -162,15 +169,19 @@ p {
     margin-bottom: 0;
 }
 
-.mintPassToken-container .mintPassToken-body .contact-box .contact-li input {
+.mintPassToken-container .mintPassToken-body .contact-box .contact-li div {
     width: 320px;
+    height: 50px;
+}
+
+.mintPassToken-container .mintPassToken-body .contact-box .contact-li div input {
+    width: 100%;
     height: 50px;
     border-radius: 10px;
     background: #F5F5F5;
     box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
     padding: 0 1rem;
     outline: none;
-    margin-left: 20px;
 }
 
 .mintPassToken-container .mintPassToken-body button {

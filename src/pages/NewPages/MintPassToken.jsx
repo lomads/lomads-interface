@@ -30,12 +30,15 @@ const MintPassToken = () => {
     const [tab, setTab] = useState(3);
     const [update, setUpdate] = useState(0);
     const [isLoading, setLoading] = useState(false);
-    const [contract, setContract] = useState(null)
+    const [contract, setContract] = useState(null);
+    const [nameError, setNameError] = useState(false);
+    const [discordError, setDiscordError] = useState(false);
+    const [emailError, setEmailError] = useState(false);
+    const [telegramError, setTelegramError] = useState(false);
     const { account, provider } = useWeb3React();
     const { DAO } = useAppSelector((state) => state.dashboard);
     const { needWhitelist, isWhitelisted, balanceOf, contractName, currentIndex } = useSBTStats(provider, account, update, contractAddr ? contractAddr : '');
     const sbtContract = useSBTContract(contractAddr ? contractAddr : null);
-    console.log("sbtContract : ", sbtContract);
     useEffect(() => {
 
         if (needWhitelist) {
@@ -65,7 +68,6 @@ const MintPassToken = () => {
     const renderSocialLogo = (item) => {
 
         if (item == "email") {
-            console.log("match")
             return <AiOutlineMail color="#C94B32" size={32} />
         }
         else if (item == "discord") {
@@ -74,63 +76,91 @@ const MintPassToken = () => {
         return <FaTelegramPlane color="#C94B32" size={32} />
     }
 
+    const handleResetError = (item) => {
+        if (item === 'email') {
+            setEmailError(false);
+        }
+        else if (item === 'discord') {
+            setDiscordError(false);
+        }
+        else {
+            setTelegramError(false);
+        }
+    }
+
 
     const mintSBT = async () => {
         const userName = document.querySelector("#user-name");
         const userMail = document.querySelector("#user-email");
         const userDiscord = document.querySelector("#user-discord");
-        const userTG = document.querySelector("#user-tg");
+        const userTG = document.querySelector("#user-telegram");
 
-        if (account && sbtContract) {
-            setLoading(true);
-            const sbtId = currentIndex.toString();
-            const tx = await mintSBTtoken(sbtContract, account);
-            console.log()
-            if (tx.error) {
-                setLoading(false);
-                toast.error(`${tx.error.message}`);
-                return;
-            }
-            else {
-                const metadataJSON = {
-                    id: sbtId,
-                    daoUrl: DAO.url,
-                    description: "SBT TOKEN",
-                    name: userName.value,
-                    image: 'url',
-                    attributes: [{
-                        trait_type: "Wallet Address/ENS Domain",
-                        value: account
-                    },
-                    {
-                        trait_type: "Email",
-                        value: _get(userMail, 'value', '')
-                    },
-                    {
-                        trait_type: "Discord",
-                        value: _get(userDiscord, 'value', '')
-                    },
-                    {
-                        trait_type: "Telegram",
-                        value: _get(userTG, 'value', '')
-                    }],
-                    contract: contractAddr,
-                }
-
-                const req = await APInewSBTtoken(metadataJSON);
-                if (req) {
+        if (userName.value === '') {
+            setNameError(true);
+            return;
+        }
+        else if (contract.contactDetail.includes('email') && userMail.value === '') {
+            setEmailError(true);
+            return;
+        }
+        else if (contract.contactDetail.includes('discord') && userDiscord.value === '') {
+            setDiscordError(true);
+            return;
+        }
+        else if (contract.contactDetail.includes('telegram') && userTG.value === '') {
+            setTelegramError(true);
+            return;
+        }
+        else {
+            if (account && sbtContract) {
+                setLoading(true);
+                const sbtId = currentIndex.toString();
+                const tx = await mintSBTtoken(sbtContract, account);
+                if (tx.error) {
                     setLoading(false);
-                    toast.success("SBT mint successfuly !");
-                    dispatch(setDAO(req.data));
-                    navigate(`/${DAO.url}`)
+                    toast.error(`${tx.error.message}`);
                     return;
                 }
-                return;
-            }
-        }
-        toast.error("Please connect your account before !")
-        return;
+                else {
+                    const metadataJSON = {
+                        id: sbtId,
+                        daoUrl: DAO.url,
+                        description: "SBT TOKEN",
+                        name: userName.value,
+                        image: 'url',
+                        attributes: [{
+                            trait_type: "Wallet Address/ENS Domain",
+                            value: account
+                        },
+                        {
+                            trait_type: "Email",
+                            value: _get(userMail, 'value', '')
+                        },
+                        {
+                            trait_type: "Discord",
+                            value: _get(userDiscord, 'value', '')
+                        },
+                        {
+                            trait_type: "Telegram",
+                            value: _get(userTG, 'value', '')
+                        }],
+                        contract: contractAddr,
+                    }
 
+                    const req = await APInewSBTtoken(metadataJSON);
+                    if (req) {
+                        setLoading(false);
+                        toast.success("SBT mint successfuly !");
+                        dispatch(setDAO(req.data));
+                        navigate(`/${DAO.url}`)
+                        return;
+                    }
+                    return;
+                }
+            }
+            toast.error("Please connect your account before !")
+            return;
+        }
     }
     return (
         <>
@@ -170,7 +200,13 @@ const MintPassToken = () => {
                                     ?
                                     <div className="userName-box">
                                         <label>Your name</label>
-                                        <input className="text-input" id="user-name" placeholder="Enter your name" />
+                                        <input
+                                            className="text-input"
+                                            id="user-name"
+                                            placeholder="Enter your name"
+                                            onChange={() => setNameError(false)}
+                                        />
+                                        {nameError && <p className="error">Please enter your name</p>}
                                     </div>
                                     :
                                     null
@@ -178,21 +214,34 @@ const MintPassToken = () => {
 
                             <div className="contact-box">
                                 <label>Contact details</label>
-
                                 {
                                     contract ? (
                                         contract.contactDetail.map((item, index) => {
                                             return (
                                                 <div className="contact-li" key={index}>
                                                     {renderSocialLogo(item)}
-                                                    <input type="text" id={`user-${item}`} placeholder={`Enter your ${item}`} />
+                                                    <div>
+                                                        <input
+                                                            type="text"
+                                                            id={`user-${item}`}
+                                                            placeholder={`Enter your ${item}`}
+                                                            onChange={() => handleResetError(item)}
+                                                        />
+                                                        {
+                                                            emailError && item === 'email' && <p className="error">Please enter your email</p>
+                                                        }
+                                                        {
+                                                            discordError && item === 'discord' && <p className="error">Please enter your discord handle</p>
+                                                        }
+                                                        {
+                                                            telegramError && item === 'telegram' && <p className="error">Please enter your telegram handle</p>
+                                                        }
+                                                    </div>
                                                 </div>
                                             )
                                         })
                                     )
-
                                         : (null)
-
                                 }
                             </div>
 
