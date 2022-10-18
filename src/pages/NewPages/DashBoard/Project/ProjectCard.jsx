@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import { get as _get } from 'lodash'
 import { useNavigate } from "react-router-dom";
 
 import { MdKeyboardArrowRight } from 'react-icons/md';
@@ -10,7 +10,7 @@ const ProjectCard = ({ project, daoUrl, tab }) => {
     const navigate = useNavigate();
 
     let arr = { 'notion.com': 0, 'discord.com': 0, 'more': 0 };
-    project.links.forEach((item) => {
+    _get(project,'links', []).forEach((item) => {
         let link = new URL(item.link);
         if (link.hostname === 'notion.com') {
             arr[link.hostname] += 1;

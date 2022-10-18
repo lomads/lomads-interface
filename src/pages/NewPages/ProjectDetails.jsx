@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { get as _get, find as _find } from 'lodash';
 import SideBar from "./DashBoard/SideBar";
 import SafeButton from "UIpack/SafeButton";
@@ -22,8 +22,14 @@ import AddMember from "./DashBoard/MemberCard/AddMember";
 import { getProject } from "state/dashboard/actions";
 import AddLink from "./DashBoard/Project/AddLink";
 
+import { useWeb3React } from "@web3-react/core";
+import { guild, role, user, setProjectName } from "@guildxyz/sdk";
+import { getSigner } from 'utils'
+
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
+    const { provider, account, chainId } = useWeb3React();
+    const signerFunction = useCallback((signableMessage) => getSigner(provider, account).signMessage(signableMessage), [provider, account]);
     const { projectId, daoURL } = useParams();
     const navigate = useNavigate();
     const [showNavBar, setShowNavBar] = useState(false);
@@ -68,6 +74,30 @@ const ProjectDetails = () => {
     const toggleShowLink = () => {
         setShowAddLink(!showAddLink);
     };
+
+    const unlock = async (guildId, link) => {
+        console.log(guildId) 
+        let access = await guild.getUserAccess(guildId, account)
+        access = access?.some?.(({ access }) => access)
+        console.log(access)
+        if(access){
+            const membership = await guild.getUserMemberships(guildId, account);
+            if(!membership.access) {
+               const success = await user.join(guildId, account, signerFunction)
+               if(success){
+                window.open(link, '_blank')
+               }
+            }
+        }
+        // const membership = await guild.getUserMemberships(guildId, account);
+        // console.log(membership)
+        // if(!membership.access) {
+        //     await user.join(guildId, account, signerFunction)
+        // }
+        // const membership = await user.getMemberships(account)
+        // console.log(membership)
+    }
+    
 
     return (
         <>
@@ -208,7 +238,7 @@ const ProjectDetails = () => {
                                     </div>
                                     {
                                         Project?.links.map((item, index) => (
-                                            <div className="link-button" key={index}>
+                                            <div onClick={() => unlock(item.guildId, item.link)} className="link-button" key={index}>
                                                 {handleParseUrl(item.link)}
                                                 <p>{item.title}</p>
                                             </div>

@@ -43,6 +43,7 @@ type Auth = {
   
     return response.json()
   }
+
   
   const useDCAuth = (scope = "identify") => {
     //const router = useRouter()
@@ -59,9 +60,7 @@ type Auth = {
       `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
   
     // prettier-ignore
-    const { onOpen, windowInstance } = usePopupWindow(
-      `https://discord.com/api/oauth2/authorize?client_id=${`868172385000509460`}&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&state=${encodeURIComponent(state)}`
-    )
+    const { onOpen, windowInstance } = usePopupWindow()
     const [error, setError] = useState<any>(null)
     const [auth, setAuth] = useLocalStorage<Partial<Auth>>(`dc_auth_${scope}`, {})
 
@@ -136,9 +135,9 @@ type Auth = {
       authorization,
       authData,
       error,
-      onOpen: () => {
+      onOpen: (url: string = `https://discord.com/api/oauth2/authorize?client_id=${`868172385000509460`}&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&state=${encodeURIComponent(state)}`) => {
         setError(null)
-        onOpen()
+        onOpen(url)
       },
       isAuthenticating: !!windowInstance && !windowInstance.closed,
     }

@@ -13,6 +13,7 @@
     "@gnosis.pm/safe-ethers-lib": "^1.5.0",
     "@gnosis.pm/safe-react-gateway-sdk": "^3.4.0",
     "@gnosis.pm/safe-service-client": "^1.2.0",
+    "@guildxyz/sdk": "^1.1.1",
     "@indexed-finance/multicall": "^2.0.0",
     "@lingui/macro": "^3.14.0",
     "@lingui/react": "^3.14.0",

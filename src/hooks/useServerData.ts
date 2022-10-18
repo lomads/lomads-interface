@@ -1,47 +1,74 @@
-import { fetcherWithDCAuth } from "../hooks/useDCAuth";
-import useSWR from "swr"
-import useToast from "./useToast"
+import useSWR, { SWRConfiguration } from "swr"
 
-const fetchUsersServers = async (_:any, authorization: string) =>
-  fetcherWithDCAuth(authorization, "https://discord.com/api/users/@me/guilds").then(
-    (res: any[]) => {
-      if (!Array.isArray(res)) return []
-      return res
-        .filter(
-          ({ owner, permissions }) => owner || (permissions & (1 << 3)) === 1 << 3
-        )
-        .map((value:any) => {
-            console.log(".map((value:any) ", value)
-        return {
-          img: value.icon
-            ? `https://cdn.discordapp.com/icons/${value.id}/${value.icon}.png`
-            : "/default_discord_icon.png",
-          id: value.id,
-          name: value.name,
-          owner: value.owner,
-        }})
-    }
-  )
+export type Channel = { id: string; name: string; roles: string[] }
 
-const useUsersServers = (authorization: any) => {
-  const toast = useToast()
-  const { data: servers, ...rest } = useSWR(
-    authorization ? ["usersServers", authorization] : null,
-    fetchUsersServers,
-    {
-      onError: (error: any) => {
-        toast({
-          status: "error",
-          title: error?.error || "Discord error",
-          description:
-            error?.errorDescription ||
-            error?.message ||
-            "Failed to fetch Discord data. If you're using some tracking blocker extension, please try turning that off",
-        })
-      },
-    }
-  )
-  return { servers, ...rest }
+export type Category = {
+  id: string
+  name: string
+  channels: Channel[]
 }
 
-export default useUsersServers
+export type Role = {
+  guild: string
+  icon: string
+  unicodeEmoji: string
+  id: string
+  name: string
+  color: number
+  hoist: boolean
+  rawPosition: number
+  permissions: string
+  managed: boolean
+  mentionable: boolean
+  createdTimestamp: number
+}
+
+type ServerData = {
+  serverIcon: string
+  membersWithoutRole: number
+  serverName: string
+  serverId: string
+  categories: Category[]
+  isAdmin: boolean
+  channels?: any[]
+  roles: Role[]
+}
+
+const fallbackData = {
+  serverIcon: null,
+  membersWithoutRole: 0,
+  serverName: "",
+  serverId: "",
+  categories: [],
+  isAdmin: undefined,
+  channels: [],
+  roles: [],
+}
+
+const useServerData = (serverId: string, swrOptions?: SWRConfiguration) => {
+  const shouldFetch = serverId?.length >= 0
+  console.log('serverId', shouldFetch)
+  console.log(`https://api.guild.xyz/v1/discord/server/${serverId}`)
+  const { data, isValidating, error, mutate } = useSWR<ServerData>(
+    shouldFetch ? [`https://api.guild.xyz/v1/discord/server/${serverId}`, { method: "POST" }] : null,
+    {
+      fallbackData,
+      revalidateOnFocus: false,
+      ...swrOptions,
+    }
+  )
+
+  console.log(data, isValidating, error)
+
+  return {
+    data: {
+      ...data,
+      channels: data?.categories?.map((category) => category.channels)?.flat(),
+    },
+    isLoading: isValidating,
+    error,
+    mutate,
+  }
+}
+
+export default useServerData

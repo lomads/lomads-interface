@@ -1,5 +1,5 @@
-import { useState, useContext, useEffect } from 'react';
-
+import { useState, useContext, useEffect, useCallback } from 'react';
+import { find as _find, get as _get, debounce as _debounce } from 'lodash';
 import '../../styles/pages/CreateProject.css';
 
 import AddMember from "./DashBoard/MemberCard/AddMember";
@@ -17,25 +17,43 @@ import { useAppSelector, useAppDispatch } from "state/hooks";
 import { createProject } from 'state/dashboard/actions'
 import { isValidUrl } from 'utils';
 import { resetCreateProjectLoading } from 'state/dashboard/reducer';
+import useDCAuthWithCallback from 'hooks/useDCAuthWithCallback';
+import usePopupWindow from 'hooks/usePopupWindow';
+import axios from 'axios';
+import { usePrevious } from 'hooks/usePrevious';
+import useLocalStorage from "hooks/useLocalStorage";
+import useServerData from "hooks/useServerData";
+import useInterval from "hooks/useInterval";
+import { guild } from "@guildxyz/sdk";
+import { useWeb3React } from "@web3-react/core";
+import { getSigner } from 'utils'
 
 const CreateProject = () => {
+
+    const { provider, account, chainId } = useWeb3React();
+    const signerFunction = useCallback((signableMessage) => getSigner(provider, account).signMessage(signableMessage), [provider, account]);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const { projects, setProjects } = useContext(ProjectContext);
     const { DAO, createProjectLoading } = useAppSelector((state) => state.dashboard);
+
+    const { callbackWithDCAuth, isAuthenticating, authorization } = useDCAuthWithCallback("guilds", () => ``)
+    const [auth, setAuth] = useLocalStorage(`dc_auth_guilds`, {})
+    const [serverId, setServerId] = useState(null);
+    const [channels, setChannels] = useState(null);
+    const [poll, setPoll] = useState(null);
     console.log("21 DAO : ", DAO);
     const [name, setName] = useState('');
     const [desc, setDesc] = useState('');
     const [next, setNext] = useState(false);
     const [showAddMember, setShowAddMember] = useState(false);
     const [memberList, setMemberList] = useState(DAO?.members);
-
     const [selectedMembers, setSelectedMembers] = useState([]);
     const [resourceList, setResourceList] = useState([]);
-
     const [showMore, setShowMore] = useState(false);
     const [success, setSuccess] = useState(false);
     const [link, setLink] = useState('');
+    const [accessControl, setAccessControl] = useState(false);
     const [title, setTitle] = useState('');
 
     useEffect(() => {
@@ -112,7 +130,115 @@ const CreateProject = () => {
         setSelectedMembers(selectedMembers.filter((_, index) => index !== position));
     }
 
-    const handleAddResource = () => {
+    const { onOpen: openAddBotPopup, windowInstance: activeAddBotPopup } =
+    usePopupWindow()
+
+    const getDiscordServers = async () => {
+        return axios.get('https://discord.com/api/users/@me/guilds', { headers: { Authorization: authorization } })
+        .then(res => res.data)
+        .catch(e => {
+            if(e.response.status === 401){
+                console.log(e)
+                setAuth({})
+                return callbackWithDCAuth()
+            }
+            return null;
+        })
+    }
+
+    const prevAuth = usePrevious(authorization)
+
+    useEffect(() => {
+        if(!prevAuth && authorization && link){
+            handleAddResource()
+        }
+    }, [prevAuth, authorization])
+
+    useInterval(async () => {
+        axios.post(`https://api.guild.xyz/v1/discord/server/${poll}`)
+        .then(res => setChannels(res.data.channels))
+    }, poll ? 2000 : null)
+    
+    console.log('activeAddBotPopup', activeAddBotPopup)
+
+    // const {
+    //     data: { isAdmin, channels },
+    //   } = useServerData(serverId, {
+    //     refreshInterval: !!activeAddBotPopup ? 3000 : 0,
+    //     refreshWhenHidden: true,
+    //   })
+
+    const prevActiveAddBotPopup = usePrevious(activeAddBotPopup)
+
+    useEffect(() => {
+        if (!!prevActiveAddBotPopup && !activeAddBotPopup) {
+       // onSelect(serverData.id)
+        }
+    }, [prevActiveAddBotPopup, activeAddBotPopup])
+
+    useEffect(() => {
+        if (channels?.length > 0 && activeAddBotPopup) {
+            setPoll(null)
+            activeAddBotPopup.close()
+            onGuildBotAddedDelayed()
+        }
+    }, [channels, activeAddBotPopup])
+
+    const onGuildBotAdded = useCallback(async () => {
+        const url = new URL(link)
+        const inviteId = url.pathname.replace('/', '');
+        const inviteDetails = await axios.get(`https://discord.com/api/v8/invites/${inviteId}`).then(res => res.data)
+        await guild.create(account, signerFunction, {
+            name: _get(inviteDetails, 'guild.name', ''),
+            description: "Guild create from API",
+            guildPlatforms: [                           
+                {
+                    platformName: "DISCORD",
+                    platformGuildId: serverId,
+                    platformGuildData: {inviteChannel: inviteId}
+                },
+            ],
+            roles: [
+                {
+                    imageUrl : "/guildLogos/46.svg",
+                    logic: 'AND',
+                    name: 'Member',
+                    requirements: [
+                        { type: 'FREE' }
+                    ]
+                    // name: "Member",
+                    // logic : "AND",
+                    // requirements: [{
+                    //     type: "ERC20",
+                    //     chain: "GOERLI",
+                    //     address: _get(DAO, 'sbt.address', null),
+                    //     data : {
+                    //         minAmount: 1,
+                    //         // "attribute" : {
+                    //         //     "trait_type": "Access Level",
+                    //         //     "value" : "advisor"
+                    //         // }
+
+                    //     }
+                    // }]
+                }
+            ]})
+            .then(e=> console.log("GUILD =>", e))
+            .catch(e=> {
+                let resource = {};
+                resource.title = title;
+                resource.link = link;
+                resource.accessControl = accessControl;
+                resource.guildId = 13496;
+                setResourceList([...resourceList, resource]);
+                setTitle('');
+                setLink('');
+            })
+    }, [serverId, link])
+
+    const onGuildBotAddedDelayed = useCallback(_debounce(onGuildBotAdded, 1000), [onGuildBotAdded])
+
+    const handleAddResource = async () => {
         if (title === '') {
             return toast.error("Please enter title");
         }
@@ -123,13 +249,31 @@ const CreateProject = () => {
             return toast.error("Please enter a valid link");
         }
         else {
-            let resource = {};
-            resource.title = title;
-            resource.link = link;
-
-            setResourceList([...resourceList, resource]);
-            setTitle('');
-            setLink('');
+            if(accessControl){
+                if(!authorization) 
+                    return callbackWithDCAuth()
+                const url = new URL(link)
+                const inviteId = url.pathname.replace('/', '');
+                const inviteDetails = await axios.get(`https://discord.com/api/v8/invites/${inviteId}`).then(res => res.data).catch(e => null)
+                if(!inviteDetails)
+                    return toast.error("Invalid discord invite link");
+                const dcserverid = _get(inviteDetails, 'guild.id', null)
+                console.log('dcserverid', dcserverid)
+                // const url = new URL(link)
+                // const dcserverid = url.pathname.split('/')[2]
+                const dcServers = await getDiscordServers();
+                if(dcServers && dcServers.length) {
+                    let validServer = _find(dcServers, s => s.id.toString() === dcserverid.toString() && s.owner)
+                    const redirectUri =
+                    typeof window !== "undefined" &&
+                    `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
+                    if(validServer){
+                        setPoll(dcserverid)
+                        setServerId(dcserverid)
+                        openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=${`868172385000509460`}&guild_id=${dcserverid}&permissions=2147483647&scope=bot%20applications.commands&redirect_uri=${encodeURIComponent(redirectUri)}`)
+                    }
+                }
+            }
         }
     }
 
@@ -348,7 +492,7 @@ const CreateProject = () => {
                                                             </button>
                                                         </div>
                                                         <div className='resource-footer'>
-                                                            <input type="checkbox" />
+                                                            <input type="checkbox" value={accessControl} onChange={e => setAccessControl(prev => !prev)} />
                                                             <div>
                                                                 <p>ACCESS CONTROL</p>
                                                                 <span>Currently available for Notion and Discord only</span>

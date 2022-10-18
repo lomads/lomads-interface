@@ -18,12 +18,11 @@ const defaultWindowFeatures = {
 }
 
 const usePopupWindow = (
-  uri: string,
   windowFeatures: WindowFeatures = defaultWindowFeatures
 ) => {
   const [windowInstance, setWindowInstance] = useState<Window | null>(null)
 
-  const onOpen = () => {
+  const onOpen = (uri:string) => {
     const dualScreenLeft = window.screenLeft ?? window.screenX
     const dualScreenTop = window.screenTop ?? window.screenY
     //eslint-disable-next-line

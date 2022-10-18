@@ -70,54 +70,6 @@ const Dashboard = () => {
 
 	const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
 
-	const { callbackWithDCAuth, isAuthenticating, authorization } =
-    useDCAuthWithCallback("guilds", () => ``)
-
-	//const { authorization = undefined } = useDCAuth("guilds")
-	const { servers, isValidating } = useUsersServers(authorization)
-
-	const canAddGuild = useMemo(() => {
-		if(authorization && servers && servers.length > 0) {
-			console.log(servers)
-			let connectableServer = _find(servers, server => server.id === "1029692084225060874" && server.owner)
-			console.log("connectableServer", connectableServer)
-			if(connectableServer)
-				return true
-			return false;
-		}
-		return false;
-	}, [servers])
-	
-
-	const { onOpen: openAddBotPopup, windowInstance: activeAddBotPopup } =
-    usePopupWindow(
-      `https://discord.com/api/oauth2/authorize?client_id=${`868172385000509460`}&id=${'1029692241377239040'}&guild_id=${'1029692084225060874'}&permissions=2147483647&scope=bot%20applications.commands`
-    )
-
-	// const {
-	// 	data: { isAdmin, channels, serverId },
-	//   } = useServerData("1029692084225060874", {
-	// 	refreshInterval: !!activeAddBotPopup ? 2000 : 0,
-	// 	refreshWhenHidden: true,
-	//   })
-
-	//   console.log('channels', channels)
-	
-	//   const prevActiveAddBotPopup = usePrevious(activeAddBotPopup)
-	
-	//   useEffect(() => {
-	// 	if (!!prevActiveAddBotPopup && !activeAddBotPopup && isAdmin) {
-	// 	  //onSelect(serverData.id)
-	// 	}
-	//   }, [prevActiveAddBotPopup, activeAddBotPopup, isAdmin])
-	
-	//   useEffect(() => {
-	// 	if (channels && channels?.length > 0 && activeAddBotPopup) {
-	// 	  activeAddBotPopup.close()
-	// 	}
-	//   }, [channels, activeAddBotPopup])
-	
-
 	const amIAdmin = useMemo(() => {
 		if (DAO) {
 			let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'ADMIN')
@@ -141,12 +93,12 @@ const Dashboard = () => {
 	};
 
 	useEffect(() => {
-		if (contractName !== '' && amIAdmin) {
+		if (contractName !== '') {
 			if (DAO?.sbt && parseInt(balanceOf._hex, 16) === 0) {
 				navigate(`/sbt/mint/${DAO.sbt.address}`);
 			}
 		}
-	}, [DAO, balanceOf, contractName, amIAdmin]);
+	}, [DAO, balanceOf, contractName]);
 
 	useEffect(() => {
 		if (chainId && account)
@@ -282,9 +234,6 @@ const Dashboard = () => {
 						</Tooltip>
 					</div> */}
 				</div>
-				{ canAddGuild && authorization ?
-				<div onClick={openAddBotPopup}>Add guild bot</div> :
-				<div onClick={callbackWithDCAuth}>Connect Discord</div> }
 				{pendingTransactions !== undefined &&
 					pendingTransactions?.count >= 1 &&
 					showNotification && (
