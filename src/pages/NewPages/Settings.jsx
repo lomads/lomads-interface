@@ -85,7 +85,7 @@ const Settings = () => {
                         <button>
                             <img src={copy} alt="copy" />
                         </button>
-                        <p>https://...daoname</p>
+                        <p>{process.env.REACT_APP_URL + "/" + _get(DAO, 'url', '')}</p>
                     </div>
 
                     {/* <div className='organisation-policy'>
