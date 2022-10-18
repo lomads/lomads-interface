@@ -1,7 +1,6 @@
 import { useState, useContext, useEffect, useCallback } from 'react';
 import { find as _find, get as _get, debounce as _debounce } from 'lodash';
 import '../../styles/pages/CreateProject.css';
-
 import AddMember from "./DashBoard/MemberCard/AddMember";
 import createProjectSvg from '../../assets/svg/createProject.svg';
 import editToken from '../../assets/svg/editToken.svg';
@@ -34,7 +33,6 @@ const CreateProject = () => {
     const signerFunction = useCallback((signableMessage) => getSigner(provider, account).signMessage(signableMessage), [provider, account]);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const { projects, setProjects } = useContext(ProjectContext);
     const { DAO, createProjectLoading } = useAppSelector((state) => state.dashboard);
 
     const { callbackWithDCAuth, isAuthenticating, authorization } = useDCAuthWithCallback("guilds", () => ``)
@@ -56,6 +54,9 @@ const CreateProject = () => {
     const [accessControl, setAccessControl] = useState(false);
     const [title, setTitle] = useState('');
 
+    // for link access control
+    const [lock, setLock] = useState(false);
+
     useEffect(() => {
         setMemberList(DAO.members);
     }, [DAO])
@@ -69,6 +70,29 @@ const CreateProject = () => {
     //         }, 2000);
     //     }
     // }, [createProjectLoading])
+
+    useEffect(() => {
+        const memberList = DAO?.members;
+        if (memberList.length > 0 && selectedMembers.length === 0) {
+            for (let i = 0; i < memberList.length; i++) {
+                if (memberList[i].member.wallet.toLowerCase() === account.toLowerCase()) {
+                    let memberOb = {};
+                    memberOb.name = memberList[i].member.name;
+                    memberOb.address = memberList[i].member.wallet;
+                    setSelectedMembers([...selectedMembers, memberOb]);
+                }
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        if (link.length > 8) {
+            const url = new URL(link);
+            if (url.hostname === 'discord.com') {
+                document.getElementById('accessControl').disabled = false;
+            }
+        }
+    }, [link]);
 
     const handleNext = () => {
         if (name !== '' && desc !== '') {
@@ -233,6 +257,7 @@ const CreateProject = () => {
                 setResourceList([...resourceList, resource]);
                 setTitle('');
                 setLink('');
+                setAccessControl('');
             })
     }, [serverId, link])
 
@@ -282,17 +307,18 @@ const CreateProject = () => {
     }
 
     const handleCreateProject = () => {
-        let project = {};
-        project.name = name;
-        project.description = desc;
-        project.members = selectedMembers;
-        project.links = resourceList;
-        project.daoId = DAO?._id;
-        dispatch(createProject({ payload: project }))
-        setSuccess(true);
-        setTimeout(() => {
-            navigate(-1);
-        }, 2000);
+        // let project = {};
+        // project.name = name;
+        // project.description = desc;
+        // project.members = selectedMembers;
+        // project.links = resourceList;
+        // project.daoId = DAO?._id;
+        // dispatch(createProject({ payload: project }))
+        // setSuccess(true);
+        // setTimeout(() => {
+        //     navigate(-1);
+        // }, 2000);
+        console.log("Selected Members : ", selectedMembers);
     }
 
     return (
@@ -375,24 +401,27 @@ const CreateProject = () => {
                                                     <div className="member-list">
                                                         {
                                                             memberList.map((item, index) => {
-                                                                return (
-                                                                    <div className="member-li" key={index}>
-                                                                        <div className="member-img-name">
-                                                                            <img src={memberIcon} alt="member-icon" />
-                                                                            <p>{item.member.name}</p>
+                                                                const ob = { name: item.member.name, address: item.member.wallet }
+                                                                if (item.member.wallet.toLowerCase() !== account.toLowerCase()) {
+                                                                    return (
+                                                                        <div className="member-li" key={index}>
+                                                                            <div className="member-img-name">
+                                                                                <img src={memberIcon} alt="member-icon" />
+                                                                                <p>{item.member.name}</p>
+                                                                            </div>
+                                                                            <div className="member-address">
+                                                                                <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
+                                                                                {
+                                                                                    selectedMembers.indexOf(ob) === -1
+                                                                                        ?
+                                                                                        <input type="checkbox" onChange={() => handleAddMember(item.member)} />
+                                                                                        :
+                                                                                        <input type="checkbox" onChange={() => handleAddMember(item.member)} checked />
+                                                                                }
+                                                                            </div>
                                                                         </div>
-                                                                        <div className="member-address">
-                                                                            <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
-                                                                            {
-                                                                                selectedMembers.indexOf(item) === -1
-                                                                                    ?
-                                                                                    <input type="checkbox" onChange={() => handleAddMember(item.member)} />
-                                                                                    :
-                                                                                    <input type="checkbox" onChange={() => handleAddMember(item.member)} checked />
-                                                                            }
-                                                                        </div>
-                                                                    </div>
-                                                                )
+                                                                    )
+                                                                }
                                                             })
                                                         }
                                                     </div>
@@ -411,18 +440,35 @@ const CreateProject = () => {
                                                             <div className='transparent-list' style={{ width: '420px' }}>
                                                                 {
                                                                     selectedMembers.map((item, index) => {
-                                                                        return (
-                                                                            <div className="member-li" key={index}>
-                                                                                <div className="member-img-name">
-                                                                                    <img src={memberIcon} alt="member-icon" />
-                                                                                    <p>{item.name}</p>
+                                                                        if (item.address.toLowerCase() === account.toLowerCase()) {
+                                                                            return (
+                                                                                <div className="member-li" key={index}>
+                                                                                    <div className="member-img-name">
+                                                                                        <img src={memberIcon} alt="member-icon" />
+                                                                                        <p>{item.name}</p>
+                                                                                    </div>
+                                                                                    <div className="member-address">
+                                                                                        <p>{item.address.slice(0, 6) + "..." + item.address.slice(-4)}</p>
+                                                                                        {/* <button onClick={() => handleRemoveMember(index)}>X</button> */}
+                                                                                    </div>
                                                                                 </div>
-                                                                                <div className="member-address">
-                                                                                    <p>{item.address.slice(0, 6) + "..." + item.address.slice(-4)}</p>
-                                                                                    <button onClick={() => handleRemoveMember(index)}>X</button>
+                                                                            )
+                                                                        }
+                                                                        else {
+                                                                            return (
+                                                                                <div className="member-li" key={index}>
+                                                                                    <div className="member-img-name">
+                                                                                        <img src={memberIcon} alt="member-icon" />
+                                                                                        <p>{item.name}</p>
+                                                                                    </div>
+                                                                                    <div className="member-address">
+                                                                                        <p>{item.address.slice(0, 6) + "..." + item.address.slice(-4)}</p>
+                                                                                        <button onClick={() => handleRemoveMember(index)}>X</button>
+                                                                                    </div>
                                                                                 </div>
-                                                                            </div>
-                                                                        )
+                                                                            )
+                                                                        }
+
                                                                     })
                                                                 }
                                                             </div>
@@ -492,10 +538,10 @@ const CreateProject = () => {
                                                             </button>
                                                         </div>
                                                         <div className='resource-footer'>
-                                                            <input type="checkbox" value={accessControl} onChange={e => setAccessControl(prev => !prev)} />
+                                                            <input name="accessControl" type="checkbox" value={accessControl} disabled={true} onChange={e => setAccessControl(prev => !prev)} />
                                                             <div>
                                                                 <p>ACCESS CONTROL</p>
-                                                                <span>Currently available for Notion and Discord only</span>
+                                                                <span>Currently available for discord only</span>
                                                             </div>
                                                         </div>
                                                     </div>

@@ -59,10 +59,15 @@
     width: 100%;
     height: 160px;
     padding: 0 22px;
-    background: #FFFFFF;
+    background: #FFF;
     border-radius: 5px;
     display: flex;
     align-items: center;
+    overflow-x: scroll;
+}
+
+.myproject-container .myproject-body::-webkit-scrollbar {
+    display: none;
 }
 
 .myproject-container .myproject-body-fixed {

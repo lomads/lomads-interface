@@ -38,6 +38,7 @@ import useDCAuth from "hooks/useDCAuth";
 import MyProject from "./MyProject";
 
 import { useSBTStats } from "hooks/SBT/sbt";
+import Footer from "components/Footer";
 
 const Dashboard = () => {
 	const dispatch = useAppDispatch();
@@ -261,13 +262,7 @@ const Dashboard = () => {
 					totalMembers={totalMembers}
 					toggleShowMember={toggleShowMember}
 				/>
-				{/* <div className="appLogoArea">
-          <div className="dashboardText">powered by Gnosis Safe</div>
-          <div>
-            <img src={dashboardfooterlogo} alt="footer logo" id="footerImage" />
-          </div>
-        </div> */}
-
+				<Footer theme="dark" />
 			</div>
 			{showModal && (
 				<SideModal

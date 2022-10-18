@@ -17,18 +17,30 @@ const AddLink = (props) => {
 
     const [title, setTitle] = useState('');
     const [link, setLink] = useState("");
+    // for link access control
+    const [lock, setLock] = useState(false);
 
     useEffect(() => {
         if (addProjectLinksLoading === false) {
             dispatch(resetAddProjectLinksLoader())
             setTitle("");
             setLink("");
+            setLock(false);
             props.toggleShowLink();
         }
     }, [addProjectLinksLoading])
 
+    useEffect(() => {
+        if (link.length > 8) {
+            const url = new URL(link);
+            if (url.hostname === 'discord.com') {
+                document.getElementById('accessControl').disabled = false;
+            }
+        }
+    }, [link]);
+
     const handleAddLink = () => {
-        const resource = { title: title, link: link };
+        const resource = { title: title, link: link, lock: lock };
         dispatch(addProjectLinks({ projectId: props.projectId, daoUrl: props.daoUrl, payload: resource }))
     };
 
@@ -60,6 +72,13 @@ const AddLink = (props) => {
                                 value={link}
                                 onchange={(e) => setLink(e.target.value)}
                             />
+                        </div>
+                    </div>
+                    <div className='resource-footer'>
+                        <input id="accessControl" type="checkbox" checked={lock} onChange={() => setLock(!lock)} disabled={true} />
+                        <div>
+                            <p>ACCESS CONTROL</p>
+                            <span>Currently available for discord only</span>
                         </div>
                     </div>
                     <div id="addMemberButtonArea">

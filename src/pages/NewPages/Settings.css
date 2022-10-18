@@ -317,27 +317,6 @@
     margin-left: 10px;
 }
 
-.settings-page .settings-center .settings-footer {
-    width: 100%;
-    padding: 30px 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.settings-page .settings-center .settings-footer p {
-    font-style: italic;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 18px;
-    color: #F5F5F5;
-}
-
-.settings-page .settings-center .settings-footer p span {
-    text-decoration: underline;
-    cursor: pointer;
-}
-
 .settings-page .settings-right-bar {
     padding: 40px 3rem;
     height: 100%;
