@@ -25,7 +25,7 @@ const CreatePassSucess = () => {
           <div className="congrats">Well done!</div>
           <div className="header">Your SBT token is live</div>
           <div className="redirectText" onClick={() => handleClick()}>
-            you will be redirected to the mint page in a few seconds
+            We will now redirect you to a page where you can mint a Pass Token for yourself!
           </div>
           <img src={GroupEnjoy} alt="Congrats" className="groupenjoy" />
         </div>

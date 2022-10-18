@@ -243,7 +243,7 @@ const ProjectDetails = () => {
                                     {
                                         openLinks.map((item, index) => {
                                             return (
-                                                <div className="link-button" key={index}>
+                                                <div onClick={() => window.open(item.link, '_blank')} className="link-button" key={index}>
                                                     {handleParseUrl(item.link)}
                                                     <p>{item.title}</p>
                                                 </div>

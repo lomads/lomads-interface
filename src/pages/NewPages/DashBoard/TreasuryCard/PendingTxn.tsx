@@ -81,7 +81,7 @@ const PendingTxn = ({ tokens, threshold, transaction, owner, confirmTransaction,
                     </div>
                     <div id="voteArea">
                         {threshold && index == 0 && <div className="dashboardTextBold">
-                            {rejectReached ? `${_get(transaction, 'rejectedTxn.confirmations', []).length}/${threshold} vote` : `${_get(transaction, 'confirmations', []).length}/${threshold} vote`}
+                            {rejectReached ? `${_get(transaction, 'rejectedTxn.confirmations', []).length}/${threshold} sign` : `${_get(transaction, 'confirmations', []).length}/${threshold} sign`}
                         </div>}
                     </div>
                     {owner && index == 0 ? <div className="confirmIconGrp">
@@ -171,7 +171,7 @@ const PendingTxn = ({ tokens, threshold, transaction, owner, confirmTransaction,
                         </div>
                         <div id="voteArea">
                             {threshold && <div className="dashboardTextBold">
-                                {rejectReached ? `${_get(transaction, 'rejectedTxn.confirmations', []).length}/${threshold} vote` : `${_get(transaction, 'confirmations', []).length}/${threshold} vote`}
+                                {rejectReached ? `${_get(transaction, 'rejectedTxn.confirmations', []).length}/${threshold} sign` : `${_get(transaction, 'confirmations', []).length}/${threshold} sign`}
                             </div>}
                         </div>
                         {owner == true ? <div className="confirmIconGrp">
