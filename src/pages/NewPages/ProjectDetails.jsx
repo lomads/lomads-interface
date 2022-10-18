@@ -21,6 +21,7 @@ import AddMember from "./DashBoard/MemberCard/AddMember";
 
 import { getProject } from "state/dashboard/actions";
 import AddLink from "./DashBoard/Project/AddLink";
+import Footer from "components/Footer";
 
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
@@ -33,10 +34,20 @@ const ProjectDetails = () => {
     console.log("project : ", Project);
     const daoName = _get(DAO, 'name', '');
 
+    const [lockedLinks, setLockedLinks] = useState([]);
+    const [openLinks, setOpenLinks] = useState([]);
+
     useEffect(() => {
         if (projectId && (!Project || (Project && Project._id !== projectId)))
             dispatch(getProject(projectId));
     }, [projectId])
+
+    useEffect(() => {
+        if (Project) {
+            setLockedLinks(_get(Project, 'links', []).filter(link => link.lock === true))
+            setOpenLinks(_get(Project, 'links', []).filter(link => link.lock === false))
+        }
+    }, [Project]);
 
     const showSideBar = (_choice) => {
         setShowNavBar(_choice);
@@ -199,7 +210,7 @@ const ProjectDetails = () => {
                             </button> */}
                         </div>
                         {
-                            Project?.links.length > 0
+                            lockedLinks.length > 0
                                 ?
                                 <div className="link-locked-section">
                                     <div>
@@ -207,12 +218,16 @@ const ProjectDetails = () => {
                                         <p>Links to unlock:</p>
                                     </div>
                                     {
-                                        Project?.links.map((item, index) => (
-                                            <div className="link-button" key={index}>
-                                                {handleParseUrl(item.link)}
-                                                <p>{item.title}</p>
-                                            </div>
-                                        ))
+                                        lockedLinks.map((item, index) => {
+                                            if (item.lock) {
+                                                return (
+                                                    <div className="link-button" key={index}>
+                                                        {handleParseUrl(item.link)}
+                                                        <p>{item.title}</p>
+                                                    </div>
+                                                )
+                                            }
+                                        })
                                     }
                                 </div>
                                 :
@@ -222,22 +237,27 @@ const ProjectDetails = () => {
                         {/* unlocked section */}
 
                         {
-                            Project?.links.length > 0
+                            openLinks.length > 0
                                 ?
                                 <div className="link-unlocked-section">
                                     {
-                                        Project?.links.map((item, index) => (
-                                            <div className="link-button" key={index}>
-                                                {handleParseUrl(item.link)}
-                                                <p>{item.title}</p>
-                                            </div>
-                                        ))
+                                        openLinks.map((item, index) => {
+                                            return (
+                                                <div className="link-button" key={index}>
+                                                    {handleParseUrl(item.link)}
+                                                    <p>{item.title}</p>
+                                                </div>
+                                            )
+                                        })
                                     }
                                 </div>
                                 :
                                 null
                         }
                     </div>
+                </div>
+                <div style={{ width: '80%' }}>
+                    <Footer theme="dark" />
                 </div>
             </div>
             <SideBar

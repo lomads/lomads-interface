@@ -173,7 +173,6 @@ body.active-modal {
     line-height: 25px;
     letter-spacing: -0.011em;
     color: #76808D;
-    text-decoration: underline;
 }
 
 #treasuryCardTitle:hover {
@@ -263,7 +262,7 @@ body.active-modal {
     width: 100%;
     /* gap: 18px; */
     min-height: fit-content;
-    /* max-height: 450px; */
+    max-height: 344px;
     background: #FFFFFF;
     border-radius: 5px;
     margin-top: 2px;
@@ -289,6 +288,7 @@ body.active-modal {
     width: 100%;
     height: 50px;
     overflow-y: visible;
+    padding: 6px 0;
     /* margin-bottom: 10px; */
 }
 

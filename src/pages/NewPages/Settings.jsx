@@ -11,6 +11,7 @@ import { useAppSelector } from "state/hooks";
 import { useWeb3React } from "@web3-react/core";
 import { useSBTStats } from "hooks/SBT/sbt";
 import coin from '../../assets/svg/coin.svg';
+import Footer from 'components/Footer';
 
 const Settings = () => {
 
@@ -87,13 +88,13 @@ const Settings = () => {
                         <p>https://...daoname</p>
                     </div>
 
-                    <div className='organisation-policy'>
+                    {/* <div className='organisation-policy'>
                         <p>Membership policy :</p>
                         <div>
                             <input type='checkbox' />
                             <span>WHITELISTED</span>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
 
                 <div className='settings-links'>
@@ -141,10 +142,7 @@ const Settings = () => {
                     }
                 </div>
 
-                <div className='settings-footer'>
-                    <p>Powered by <span>Gnosis Safe</span></p>
-                    <img src={logo} alt="logo" />
-                </div>
+                <Footer theme="light" />
             </div>
             <div className='settings-right-bar'>
                 <button onClick={() => navigate(-1)}>
