@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { DAOType } from "types/UItype";
-import { getDao, loadDao, addDaoMember, updateDaoMember, createProject, addProjectMember, getProject, addProjectLinks } from "./actions";
+import { getDao, loadDao, addDaoMember, updateDaoMember, createProject, addProjectMember, updateProjectLink, getProject, addProjectLinks } from "./actions";
 import { createContract } from "state/contract/actions";
 import { get as _get } from "lodash";
 
@@ -133,6 +133,13 @@ const dashboardSlice = createSlice({
 		},
 		[`${addProjectLinks.pending}`]: (state) => {
 			state.addProjectLinksLoading = true;
+		},
+		[`${updateProjectLink.fulfilled}`]: (state, action) => {
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
+		},
+		[`${updateProjectLink.pending}`]: (state) => {
+			
 		},
 	},
 });

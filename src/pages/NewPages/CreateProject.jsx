@@ -16,7 +16,7 @@ import { useAppSelector, useAppDispatch } from "state/hooks";
 import { createProject } from 'state/dashboard/actions'
 import { isValidUrl } from 'utils';
 import { resetCreateProjectLoading } from 'state/dashboard/reducer';
-import useDCAuthWithCallback from 'hooks/useDCAuthWithCallback';
+import useDCAuth from 'hooks/useDCAuth';
 import usePopupWindow from 'hooks/usePopupWindow';
 import axios from 'axios';
 import { usePrevious } from 'hooks/usePrevious';
@@ -26,21 +26,16 @@ import useInterval from "hooks/useInterval";
 import { guild } from "@guildxyz/sdk";
 import { useWeb3React } from "@web3-react/core";
 import { getSigner } from 'utils'
+import AddDiscordLink from 'components/AddDiscordLink';
+import { nanoid } from '@reduxjs/toolkit';
 
 const CreateProject = () => {
 
     const { provider, account, chainId } = useWeb3React();
-    const signerFunction = useCallback((signableMessage) => getSigner(provider, account).signMessage(signableMessage), [provider, account]);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const { DAO, createProjectLoading } = useAppSelector((state) => state.dashboard);
 
-    const { callbackWithDCAuth, isAuthenticating, authorization } = useDCAuthWithCallback("guilds", () => ``)
-    const [auth, setAuth] = useLocalStorage(`dc_auth_guilds`, {})
-    const [serverId, setServerId] = useState(null);
-    const [channels, setChannels] = useState(null);
-    const [poll, setPoll] = useState(null);
-    console.log("21 DAO : ", DAO);
     const [name, setName] = useState('');
     const [desc, setDesc] = useState('');
     const [next, setNext] = useState(false);
@@ -54,12 +49,7 @@ const CreateProject = () => {
     const [accessControl, setAccessControl] = useState(false);
     const [title, setTitle] = useState('');
 
-    // for link access control
-    const [lock, setLock] = useState(false);
-
-    useEffect(() => {
-        setMemberList(DAO.members);
-    }, [DAO])
+    useEffect(() => setMemberList(DAO.members), [DAO])
 
     // useEffect(() => {
     //     if (createProjectLoading === false) {
@@ -87,9 +77,14 @@ const CreateProject = () => {
 
     useEffect(() => {
         if (link.length > 8) {
-            const url = new URL(link);
-            if (url.hostname === 'discord.com' || url.hostname === 'discord.gg') {
-                document.getElementById('accessControl').disabled = false;
+            try {
+                const url = new URL(link);
+                if (url.hostname === 'discord.com' || url.hostname === 'discord.gg')
+                    document.getElementById('accessControl').disabled = false;
+                else
+                    document.getElementById('accessControl').disabled = true;
+            } catch (e) {
+                console.log(e)
             }
         }
     }, [link]);
@@ -123,15 +118,8 @@ const CreateProject = () => {
         }
     }
 
-    // const handleAddToMembersList = (member) => {
-    //     let memberOb = {};
-    //     memberOb.name = member.name;
-    //     memberOb.wallet = member.address;
-    //     setMemberList([...memberList, { member: memberOb }]);
-    // }
 
     const handleAddMember = (member) => {
-        console.log("member : ", member);
         let found = false;
         for (let i = 0; i < selectedMembers.length; i++) {
             if (selectedMembers[i].name === member.name) {
@@ -154,116 +142,8 @@ const CreateProject = () => {
         setSelectedMembers(selectedMembers.filter((_, index) => index !== position));
     }
 
-    const { onOpen: openAddBotPopup, windowInstance: activeAddBotPopup } =
-    usePopupWindow()
 
-    const getDiscordServers = async () => {
-        return axios.get('https://discord.com/api/users/@me/guilds', { headers: { Authorization: authorization } })
-        .then(res => res.data)
-        .catch(e => {
-            if(e.response.status === 401){
-                console.log(e)
-                setAuth({})
-                return callbackWithDCAuth()
-            }
-            return null;
-        })
-    }
-
-    const prevAuth = usePrevious(authorization)
-
-    useEffect(() => {
-        if(!prevAuth && authorization && link){
-            handleAddResource()
-        }
-    }, [prevAuth, authorization])
-
-    useInterval(async () => {
-        axios.post(`https://api.guild.xyz/v1/discord/server/${poll}`)
-        .then(res => setChannels(res.data.channels))
-    }, poll ? 2000 : null)
-    
-    console.log('activeAddBotPopup', activeAddBotPopup)
-
-    // const {
-    //     data: { isAdmin, channels },
-    //   } = useServerData(serverId, {
-    //     refreshInterval: !!activeAddBotPopup ? 3000 : 0,
-    //     refreshWhenHidden: true,
-    //   })
-
-    const prevActiveAddBotPopup = usePrevious(activeAddBotPopup)
-
-    useEffect(() => {
-        if (!!prevActiveAddBotPopup && !activeAddBotPopup) {
-       // onSelect(serverData.id)
-        }
-    }, [prevActiveAddBotPopup, activeAddBotPopup])
-
-    useEffect(() => {
-        if (channels?.length > 0 && activeAddBotPopup) {
-            setPoll(null)
-            activeAddBotPopup.close()
-            onGuildBotAddedDelayed()
-        }
-    }, [channels, activeAddBotPopup])
-
-    const onGuildBotAdded = useCallback(async () => {
-        const url = new URL(link)
-        const inviteId = url.pathname.replace('/', '');
-        const inviteDetails = await axios.get(`https://discord.com/api/v8/invites/${inviteId}`).then(res => res.data)
-        await guild.create(account, signerFunction, {
-            name: _get(inviteDetails, 'guild.name', ''),
-            description: "Guild create from API",
-            guildPlatforms: [                           
-                {
-                    platformName: "DISCORD",
-                    platformGuildId: serverId,
-                    platformGuildData: {inviteChannel: inviteId}
-                },
-            ],
-            roles: [
-                {
-                    imageUrl : "/guildLogos/46.svg",
-                    logic: 'AND',
-                    name: 'Member',
-                    requirements: [
-                        { type: 'FREE' }
-                    ]
-                    // name: "Member",
-                    // logic : "AND",
-                    // requirements: [{
-                    //     type: "ERC20",
-                    //     chain: "GOERLI",
-                    //     address: _get(DAO, 'sbt.address', null),
-                    //     data : {
-                    //         minAmount: 1,
-                    //         // "attribute" : {
-                    //         //     "trait_type": "Access Level",
-                    //         //     "value" : "advisor"
-                    //         // }
-
-                    //     }
-                    // }]
-                }
-            ]})
-            .then(e=> console.log("GUILD =>", e))
-            .catch(e=> {
-                let resource = {};
-                resource.title = title;
-                resource.link = link;
-                resource.accessControl = accessControl;
-                resource.guildId = 13509;
-                setResourceList([...resourceList, resource]);
-                setTitle('');
-                setLink('');
-                setAccessControl('');
-            })
-    }, [serverId, link])
-
-    const onGuildBotAddedDelayed = useCallback(_debounce(onGuildBotAdded, 1000), [onGuildBotAdded])
-
-    const handleAddResource = async () => {
+    const handleAddResource = async (guildId = undefined) => {
         if (title === '') {
             return toast.error("Please enter title");
         }
@@ -274,31 +154,17 @@ const CreateProject = () => {
             return toast.error("Please enter a valid link");
         }
         else {
-            if(accessControl){
-                if(!authorization) 
-                    return callbackWithDCAuth()
-                const url = new URL(link)
-                const inviteId = url.pathname.replace('/', '');
-                const inviteDetails = await axios.get(`https://discord.com/api/v8/invites/${inviteId}`).then(res => res.data).catch(e => null)
-                if(!inviteDetails)
-                    return toast.error("Invalid discord invite link");
-                const dcserverid = _get(inviteDetails, 'guild.id', null)
-                console.log('dcserverid', dcserverid)
-                // const url = new URL(link)
-                // const dcserverid = url.pathname.split('/')[2]
-                const dcServers = await getDiscordServers();
-                if(dcServers && dcServers.length) {
-                    let validServer = _find(dcServers, s => s.id.toString() === dcserverid.toString() && s.owner)
-                    const redirectUri =
-                    typeof window !== "undefined" &&
-                    `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
-                    if(validServer){
-                        setPoll(dcserverid)
-                        setServerId(dcserverid)
-                        openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=${`868172385000509460`}&guild_id=${dcserverid}&permissions=2147483647&scope=bot%20applications.commands&redirect_uri=${encodeURIComponent(redirectUri)}`)
-                    }
-                }
-            }
+            let resource = {};
+            resource.id = nanoid(16);
+            resource.title = title;
+            resource.link = link;
+            resource.accessControl = accessControl;
+            if(guildId)
+                resource.guildId = guildId;
+            setResourceList([...resourceList, resource]);
+            setTitle('');
+            setLink('');
+            setAccessControl(false);
         }
     }
 
@@ -318,7 +184,6 @@ const CreateProject = () => {
         setTimeout(() => {
             navigate(-1);
         }, 2000);
-        console.log("Selected Members : ", selectedMembers);
     }
 
     return (
@@ -530,12 +395,15 @@ const CreateProject = () => {
                                                                 value={link}
                                                                 onChange={(e) => setLink(e.target.value)}
                                                             />
+                                                            { link && link.indexOf('discord.com') > -1 ?
+                                                                                                                        <AddDiscordLink onGuildCreateSuccess={handleAddResource} title={title} link={link} accessControl={accessControl} /> :
                                                             <button
                                                                 style={link !== '' && title !== '' ? { background: '#C84A32' } : null}
                                                                 onClick={handleAddResource}
                                                             >
                                                                 <AiOutlinePlus color="#FFF" size={25} />
-                                                            </button>
+                                                            </button> 
+                                                            }
                                                         </div>
                                                         <div className='resource-footer'>
                                                             <input id="accessControl" type="checkbox" value={accessControl} disabled={true} onChange={e => setAccessControl(prev => !prev)} />

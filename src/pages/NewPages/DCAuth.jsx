@@ -1,16 +1,14 @@
 import useLocalStorage from "hooks/useLocalStorage"
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom";
 
-type OAuthState = {
-  url: string
-  csrfToken: string
-}
 
 const FALLBACK_EXPIRITY = 604800
 
 const DCAuth = () => {
-  const [isUnsupported, setIsUnsupported] = useState<any>(false)
-  const [csrfTokenFromLocalStorage, setCsrfToken] = useLocalStorage<any>(
+  const navigate = useNavigate();
+  const [isUnsupported, setIsUnsupported] = useState(false)
+  const [csrfTokenFromLocalStorage, setCsrfToken] = useLocalStorage(
     "dc_auth_csrf_token",
     ""
   )
@@ -27,7 +25,7 @@ const DCAuth = () => {
 
     // We navigate to the index page if the dcauth page is used incorrectly
     // For example if someone just manually goes to /dcauth
-    //if (!window.location.hash)  window.location.href = '/' //router.push("/")
+    // if (!window.location.hash) router.push("/")
     const fragment = new URLSearchParams(window.location.hash.slice(1))
 
     if (
@@ -35,7 +33,7 @@ const DCAuth = () => {
       ((!fragment.has("access_token") || !fragment.has("token_type")) &&
         (!fragment.has("error") || !fragment.has("error_description")))
     )
-    window.location.href = '/'
+      navigate('/')
 
     const [accessToken, tokenType, error, errorDescription, state, expiresIn] = [
       fragment.get("access_token"),
@@ -43,14 +41,12 @@ const DCAuth = () => {
       fragment.get("error"),
       fragment.get("error_description"),
       fragment.get("state"),
-      fragment.get("expires_in"),
+      +fragment.get("expires_in"),
     ]
 
-    const { url, csrfToken }: OAuthState = JSON.parse(state || '')
+    const { url, csrfToken } = JSON.parse(state)
 
     const target = `${window.location.origin}${url}`
-
-    alert(error)
 
     if (error) {
       window.opener.postMessage(
@@ -80,20 +76,18 @@ const DCAuth = () => {
       setCsrfToken(undefined)
     }
 
-    alert(accessToken)
-
     window.opener.postMessage(
       {
         type: "DC_AUTH_SUCCESS",
         data: {
           tokenType,
           accessToken,
-          expires: Date.now() + (FALLBACK_EXPIRITY) * 1000,
+          expires: Date.now() + (expiresIn || FALLBACK_EXPIRITY) * 1000,
         },
       },
       target
     )
-  }, [csrfTokenFromLocalStorage])
+  }, [navigate, csrfTokenFromLocalStorage])
 
   return isUnsupported ? <div>Unsupported</div> : <div>Closing the authentication window and taking you back to the site...</div>
 }

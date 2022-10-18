@@ -19,7 +19,7 @@ import { SiNotion } from "react-icons/si";
 import { BsDiscord, BsGoogle, BsGithub, BsLink } from "react-icons/bs";
 import AddMember from "./DashBoard/MemberCard/AddMember";
 
-import { getProject } from "state/dashboard/actions";
+import { getProject, updateProjectLink, getDao } from "state/dashboard/actions";
 import AddLink from "./DashBoard/Project/AddLink";
 import Footer from "components/Footer";
 
@@ -33,15 +33,20 @@ const ProjectDetails = () => {
     const signerFunction = useCallback((signableMessage) => getSigner(provider, account).signMessage(signableMessage), [provider, account]);
     const { projectId, daoURL } = useParams();
     const navigate = useNavigate();
+    const [unlockLoading, setUnlockLoading] = useState(null);
     const [showNavBar, setShowNavBar] = useState(false);
     const [showAddMember, setShowAddMember] = useState(false);
     const [showAddLink, setShowAddLink] = useState(false);
     const { DAO, Project, ProjectLoading } = useAppSelector((state) => state.dashboard);
-    console.log("project : ", Project);
     const daoName = _get(DAO, 'name', '');
 
     const [lockedLinks, setLockedLinks] = useState([]);
     const [openLinks, setOpenLinks] = useState([]);
+
+    useEffect(() => {
+		if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
+			dispatch(getDao(daoURL))
+	}, [DAO, daoURL])
 
     useEffect(() => {
         if (projectId && (!Project || (Project && Project._id !== projectId)))
@@ -50,8 +55,8 @@ const ProjectDetails = () => {
 
     useEffect(() => {
         if (Project) {
-            setLockedLinks(_get(Project, 'links', []).filter(link => link.accessControl === true))
-            setOpenLinks(_get(Project, 'links', []).filter(link => link.accessControl === false))
+            setLockedLinks(_get(Project, 'links', []).filter(link => link.accessControl && _get(link, 'unlocked', []).indexOf(account.toLowerCase()) == -1))
+            setOpenLinks(_get(Project, 'links', []).filter(link => ((!link.accessControl) || (_get(link, 'accessControl', null) && _get(link, 'unlocked', []).indexOf(account.toLowerCase()) > -1))))
         }
     }, [Project]);
 
@@ -86,31 +91,44 @@ const ProjectDetails = () => {
         setShowAddLink(!showAddLink);
     };
 
-    const unlock = async (guildId) => {
-        const g = await guild.get(guildId)
-        let inviteLink = _get(_find(_get(g, 'guildPlatforms'), gp => gp.platformId == 1), 'invite', null)
-        if(!inviteLink) return;
+    const unlockLink = (link) => {
+        dispatch(updateProjectLink({
+            projectId, daoUrl: _get(DAO, 'url', ''), payload: { id: link.id }
+        }))
+    }
 
-        let access = await guild.getUserAccess(guildId, account)
-        access = access?.some?.(({ access }) => access)
-        if(access){
-            const membership = await guild.getUserMemberships(guildId, account);
-            if(!membership?.some?.(({ access }) => access)) {
-               const success = await user.join(guildId, account, signerFunction)
-               if(success){
-                  window.open(inviteLink, '_blank')
-               }
+    const unlock = async (link, update = true) => {
+        if(unlockLoading) return;
+        try {
+            setUnlockLoading(link.id)
+            const g = await guild.get(link.guildId)
+            let inviteLink = _get(_find(_get(g, 'guildPlatforms'), gp => gp.platformId == 1), 'invite', null)
+            if(!inviteLink) return setUnlockLoading(null);
+    
+            let access = await guild.getUserAccess(link.guildId, account)
+            access = access?.some?.(({ access }) => access)
+            if(access){
+                const membership = await guild.getUserMemberships(link.guildId, account);
+                if(!membership?.some?.(({ access }) => access)) {
+                   const success = await user.join(link.guildId, account, signerFunction)
+                   if(success){
+                      if(update)
+                        unlockLink(link)
+                    setUnlockLoading(null)
+                     window.open(inviteLink, '_blank')
+                   }
+                } else {
+                    if(update)
+                        unlockLink(link)
+                    setUnlockLoading(null)
+                    window.open(inviteLink, '_blank')
+                }
             } else {
-                window.open(inviteLink, '_blank')
+                unlockLoading(null)
             }
+        } catch (e) {
+            unlockLoading(null)
         }
-        // const membership = await guild.getUserMemberships(guildId, account);
-        // console.log(membership)
-        // if(!membership.access) {
-        //     await user.join(guildId, account, signerFunction)
-        // }
-        // const membership = await user.getMemberships(account)
-        // console.log(membership)
     }
     
 
@@ -255,9 +273,14 @@ const ProjectDetails = () => {
                                         lockedLinks.map((item, index) => {
                                             if (item.accessControl) {
                                                 return (
-                                                    <div onClick={() => unlock(item.guildId)} className="link-button" key={index}>
+                                                    <div onClick={() => unlock(item)} className="link-button" style={{ position: 'relative' }} key={index}>
                                                         {handleParseUrl(item.link)}
-                                                        <p>{item.title}</p>
+                                                        <p style={{ flexGrow: 1 }}>{item.title}</p>
+                                                        { unlockLoading === item.id ? 
+                                                            <div style={{ position: 'absolute', top: 10, right: 20 }}>
+                                                                <LeapFrog size={20} color="#B12F15" />
+                                                            </div> : null
+                                                        }
                                                     </div>
                                                 )
                                             }
@@ -277,9 +300,19 @@ const ProjectDetails = () => {
                                     {
                                         openLinks.map((item, index) => {
                                             return (
-                                                <div onClick={() => window.open(item.link, '_blank')} className="link-button" key={index}>
+                                                <div onClick={() => { 
+                                                    if(!item.accessControl)
+                                                        window.open(item.link, '_blank') 
+                                                    else
+                                                        unlock(item, false)
+                                                }} className="link-button" style={{ position: 'relative' }} key={index}>
                                                     {handleParseUrl(item.link)}
                                                     <p>{item.title}</p>
+                                                    { unlockLoading === item.id ? 
+                                                        <div style={{ position: 'absolute', top: 10, right: 20 }}>
+                                                            <LeapFrog size={20} color="#B12F15" />
+                                                        </div> : null
+                                                    }
                                                 </div>
                                             )
                                         })

@@ -53,7 +53,7 @@ type Auth = {
       nanoid(16),
       true
     )
-    const state = JSON.stringify({ csrfToken, url: '/sample' })
+    const state = JSON.stringify({ csrfToken, url: '/' })
   
     const redirectUri =
       typeof window !== "undefined" &&
@@ -135,9 +135,12 @@ type Auth = {
       authorization,
       authData,
       error,
-      onOpen: (url: string = `https://discord.com/api/oauth2/authorize?client_id=${`868172385000509460`}&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&state=${encodeURIComponent(state)}`) => {
+      onOpen: (url: string = `https://discord.com/api/oauth2/authorize?client_id=${`868172385000509460`}&response_type=token&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`) => {
         setError(null)
         onOpen(url)
+      },
+      onResetAuth: () => {
+        setAuth({})
       },
       isAuthenticating: !!windowInstance && !windowInstance.closed,
     }

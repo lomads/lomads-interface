@@ -2,10 +2,11 @@ import { useEffect, useState } from "react"
 import useDCAuth from "./useDCAuth"
 
 const useDCAuthWithCallback = (scope: string, callback: () => void) => {
-  const { authorization, onOpen, ...rest } = useDCAuth(scope)
+  const { authorization, onOpen, onResetAuth, ...rest } = useDCAuth(scope)
   const [hasClickedAuth, setHasClickedAuth] = useState(false)
 
   const handleClick = () => {
+    console.log("useDCAuthWithCallback", authorization)
     if (authorization) callback()
     else {
       onOpen()
@@ -22,6 +23,7 @@ const useDCAuthWithCallback = (scope: string, callback: () => void) => {
   return {
     callbackWithDCAuth: handleClick,
     authorization,
+    onResetAuth,
     ...rest,
   }
 }
