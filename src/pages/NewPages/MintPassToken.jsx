@@ -18,6 +18,7 @@ import { toast, ToastContainer } from "react-toastify";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import { setDAO } from "state/dashboard/reducer";
+import Footer from "components/Footer";
 
 const MintPassToken = () => {
     /// temporary solution until we don't have specific routes for DAO, contract address will be passed into the url 
@@ -263,13 +264,16 @@ const MintPassToken = () => {
                             <span className="notAllowedText2">Please contact the admin through email or other social channels.</span>
                         </div>
                 }
-                <div className="mintPassToken-footer">
+                <div style={{ width: '80%' }}>
+                    <Footer theme="dark" />
+                </div>
+                {/* <div className="mintPassToken-footer">
                     <p style={{ fontStyle: 'italic' }}>Powered by <span>Gnosis Safe</span></p>
                     <div>
                         <p>Made possible by</p>
                         <img src={lomadsLogo} />
                     </div>
-                </div>
+                </div> */}
             </div>
             <ToastContainer
                 position="bottom-right"

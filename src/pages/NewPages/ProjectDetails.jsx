@@ -21,6 +21,7 @@ import AddMember from "./DashBoard/MemberCard/AddMember";
 
 import { getProject } from "state/dashboard/actions";
 import AddLink from "./DashBoard/Project/AddLink";
+import Footer from "components/Footer";
 
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
@@ -246,6 +247,9 @@ const ProjectDetails = () => {
                                 null
                         }
                     </div>
+                </div>
+                <div style={{ width: '80%' }}>
+                    <Footer theme="dark" />
                 </div>
             </div>
             <SideBar

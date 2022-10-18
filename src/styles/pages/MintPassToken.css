@@ -5,6 +5,8 @@
     background: linear-gradient(180deg, #FDF7F7 0%, #F3F2F2 100%);
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
     position: relative;
     overflow-y: scroll;
 }
@@ -73,7 +75,7 @@ label {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 20vh;
+    /* margin-bottom: 20vh; */
 }
 
 .mintPassToken-container .mintPassToken-body .heading-text {
@@ -193,37 +195,6 @@ label {
     background: rgba(27, 43, 65, 0.2);
     border-radius: 5px;
     color: #FFF;
-}
-
-.mintPassToken-container .mintPassToken-footer {
-    width: 100%;
-    padding: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.mintPassToken-container .mintPassToken-footer p {
-    font-weight: 400;
-    font-size: 14px;
-    font-family: "Insignia";
-    line-height: 18px;
-    text-align: center;
-    letter-spacing: -0.011em;
-    color: #76808D;
-}
-
-.mintPassToken-container .mintPassToken-footer p span {
-    text-decoration: underline;
-}
-
-.mintPassToken-container .mintPassToken-footer div {
-    display: flex;
-    align-items: center;
-}
-
-.mintPassToken-container .mintPassToken-footer div img {
-    margin-left: 10px;
 }
 
 .notAllowedText {

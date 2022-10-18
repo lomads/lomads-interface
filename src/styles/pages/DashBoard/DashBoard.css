@@ -262,7 +262,7 @@ body.active-modal {
     width: 100%;
     /* gap: 18px; */
     min-height: fit-content;
-    /* max-height: 450px; */
+    max-height: 350px;
     background: #FFFFFF;
     border-radius: 5px;
     margin-top: 2px;
