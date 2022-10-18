@@ -75,18 +75,22 @@ const ProjectDetails = () => {
         setShowAddLink(!showAddLink);
     };
 
-    const unlock = async (guildId, link) => {
-        console.log(guildId) 
+    const unlock = async (guildId) => {
+        const g = await guild.get(guildId)
+        let inviteLink = _get(_find(_get(g, 'guildPlatforms'), gp => gp.platformId == 1), 'invite', null)
+        if(!inviteLink) return;
+
         let access = await guild.getUserAccess(guildId, account)
         access = access?.some?.(({ access }) => access)
-        console.log(access)
         if(access){
             const membership = await guild.getUserMemberships(guildId, account);
-            if(!membership.access) {
+            if(!membership?.some?.(({ access }) => access)) {
                const success = await user.join(guildId, account, signerFunction)
                if(success){
-                window.open(link, '_blank')
+                  window.open(inviteLink, '_blank')
                }
+            } else {
+                window.open(inviteLink, '_blank')
             }
         }
         // const membership = await guild.getUserMemberships(guildId, account);
@@ -238,7 +242,7 @@ const ProjectDetails = () => {
                                     </div>
                                     {
                                         Project?.links.map((item, index) => (
-                                            <div onClick={() => unlock(item.guildId, item.link)} className="link-button" key={index}>
+                                            <div onClick={() => unlock(item.guildId)} className="link-button" key={index}>
                                                 {handleParseUrl(item.link)}
                                                 <p>{item.title}</p>
                                             </div>
