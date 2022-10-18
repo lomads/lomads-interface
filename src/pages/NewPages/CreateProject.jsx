@@ -261,7 +261,6 @@ const CreateProject = () => {
                                                         {
                                                             memberList.map((item, index) => {
                                                                 const ob = { name: item.member.name, address: item.member.wallet }
-                                                                console.log("ob : ", ob)
                                                                 if (item.member.wallet.toLowerCase() !== account.toLowerCase()) {
                                                                     return (
                                                                         <div className="member-li" key={index}>
