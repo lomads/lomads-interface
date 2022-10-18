@@ -25,6 +25,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
 }
 
 .settings-page .settings-left-bar .logo-container p {
@@ -36,6 +37,7 @@
     letter-spacing: -0.011em;
     color: #C94B32;
     transform: rotate(-45deg);
+    cursor: pointer;
 }
 
 .settings-page .settings-left-bar img {

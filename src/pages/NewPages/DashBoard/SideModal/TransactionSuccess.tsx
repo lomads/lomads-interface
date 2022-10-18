@@ -10,9 +10,7 @@ const TransactionSuccess = () => {
         </div>
         <div className="transactionDetails">Success!</div>
         <div className="dashboardText">
-          The transaction is now submited for voting.
-          <br />
-          You will be redirected in a few seconds.
+          Your transaction is now submitted for signing by other members, if applicable
         </div>
       </div>
     </>

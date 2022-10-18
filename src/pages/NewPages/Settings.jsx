@@ -10,6 +10,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from "state/hooks";
 import { useWeb3React } from "@web3-react/core";
 import { useSBTStats } from "hooks/SBT/sbt";
+import { Tooltip } from "@chakra-ui/react";
+import copyIcon from "../../assets/svg/copyIcon.svg";
 import coin from '../../assets/svg/coin.svg';
 import Footer from 'components/Footer';
 
@@ -22,6 +24,7 @@ const Settings = () => {
     const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
     console.log("DAO data : ", DAO);
     const daoName = _get(DAO, 'name', '').split(" ");
+    const [copy, setCopy] = useState(false);
 
     useEffect(() => {
         if (contractName !== '') {
@@ -44,7 +47,7 @@ const Settings = () => {
     return (
         <div className='settings-page'>
             <div className='settings-left-bar'>
-                <div className='logo-container'>
+                <div onClick={() => navigate(-1)} className='logo-container'>
                     <p>
                         {
                             daoName.length === 1
@@ -77,16 +80,40 @@ const Settings = () => {
 
                     <div className='organisation-desc'>
                         <p>{
-                            DAO.description ? DAO.description : 'DAO’s description'
+                            DAO.description ? DAO.description : ''
                         }</p>
                     </div>
 
                     <div className='organisation-link'>
+                        <div
+                            className="copyArea"
+                            onClick={() => {
+                                setCopy(true);
+                            }}
+                            onMouseOut={() => {
+                                setCopy(false);
+                            }}
+                        >
+                            <Tooltip label={copy ? "copied" : "copy"}>
+                                <div
+                                    className="copyLinkButton"
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(`${process.env.REACT_APP_URL + "/" + _get(DAO, 'url', '')}`);
+                                    }}
+                                >
+                                    <img src={copyIcon} alt="copy" className="safeCopyImage" />
+                                </div>
+                            </Tooltip>
+                            <p>{process.env.REACT_APP_URL + "/" + _get(DAO, 'url', '')}</p>
+                        </div>
+                    </div>
+
+                    {/* <div className='organisation-link'>
                         <button>
                             <img src={copy} alt="copy" />
                         </button>
                         <p>{process.env.REACT_APP_URL + "/" + _get(DAO, 'url', '')}</p>
-                    </div>
+                    </div> */}
 
                     {/* <div className='organisation-policy'>
                         <p>Membership policy :</p>
@@ -97,12 +124,12 @@ const Settings = () => {
                     </div> */}
                 </div>
 
-                <div className='settings-links'>
+                {/* <div className='settings-links'>
                     <div className='links-header'>
                         <h1>Links</h1>
-                        {/* <button>
+                         <button>
                             <img src={editIcon} alt="edit-icon" />
-                        </button> */}
+                        </button>
                     </div>
                     <span>Will display on the top of the dashboard</span>
                     <div className='link-body'>
@@ -119,21 +146,43 @@ const Settings = () => {
                             <p>https://linkname</p>
                         </div>
                     </div>
-                </div>
+                </div> */}
 
                 <div className='settings-token'>
                     <h1>Pass Tokens</h1>
                     {
                         DAO?.sbt?.name
                             ?
+                            // <div className='token-details'>
+                            //     <button>
+                            //         <img src={copy} alt="copy" />
+                            //     </button>
+                            //     <img src={coin} alt="asset" />
+                            //     <p>{DAO?.sbt?.name}</p>
+                            // </div>
                             <div className='token-details'>
-                                <button>
-                                    <img src={copy} alt="copy" />
-                                </button>
-                                <img src={coin} alt="asset" />
-                                <p>{DAO?.sbt?.name}</p>
+                                <div
+                                    className="copyArea"
+                                    onClick={() => {
+                                        setCopy(true);
+                                    }}
+                                    onMouseOut={() => {
+                                        setCopy(false);
+                                    }}
+                                >
+                                    <Tooltip label={copy ? "copied" : "copy"}>
+                                        <div
+                                            className="copyLinkButton"
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(`${DAO?.sbt?.address}`);
+                                            }}
+                                        >
+                                            <img src={copyIcon} alt="copy" className="safeCopyImage" />
+                                        </div>
+                                    </Tooltip>
+                                    <p>{DAO?.sbt?.name}</p>
+                                </div>
                             </div>
-
                             :
                             <>
                                 <p>The organisation doesn’t have token yet</p>

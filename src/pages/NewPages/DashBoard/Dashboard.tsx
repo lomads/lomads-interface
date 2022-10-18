@@ -194,8 +194,28 @@ const Dashboard = () => {
 				}}
 			>
 				<div className="DAOdetails">
+					<div
+						className="copyArea"
+						onClick={() => {
+							setCopy(true);
+						}}
+						onMouseOut={() => {
+							setCopy(false);
+						}}
+					>
 					<div className="DAOname">
 						{_get(DAO, 'name', '')}
+					</div>
+						<Tooltip label={copy ? "copied" : "copy"}>
+							<div
+								className="copyLinkButton"
+								onClick={() => {
+									navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/${_get(DAO, 'url', '')}`);
+								}}
+							>
+								<img src={copyIcon} alt="copy" className="safeCopyImage" />
+							</div>
+						</Tooltip>
 					</div>
 					<div className="DAOsettings">
 						<div className="DAOadminPill">
@@ -214,26 +234,6 @@ const Dashboard = () => {
 							</button>
 						}
 					</div>
-					{/* <div
-						className="copyArea"
-						onClick={() => {
-							setCopy(true);
-						}}
-						onMouseOut={() => {
-							setCopy(false);
-						}}
-					>
-						<Tooltip label={copy ? "copied" : "copy"}>
-							<div
-								className="copyLinkButton"
-								onClick={() => {
-									navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/${_get(DAO, 'url', '')}`);
-								}}
-							>
-								<img src={copyIcon} alt="copy" className="safeCopyImage" />
-							</div>
-						</Tooltip>
-					</div> */}
 				</div>
 				{pendingTransactions !== undefined &&
 					pendingTransactions?.count >= 1 &&

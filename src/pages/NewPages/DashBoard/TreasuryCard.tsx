@@ -265,6 +265,8 @@ const TreasuryCard = (props: ItreasuryCardType) => {
     return 0
   }, [props.fiatBalance]);
 
+  console.log(props.tokens)
+
   return (
     <div className="treasuryCard">
       <div className="treasuryHeader">
