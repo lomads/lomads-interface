@@ -1,4 +1,4 @@
-.StartSafe{
+.StartSafe {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -6,11 +6,13 @@
     height: fit-content;
     padding: 20vh 0vh 10vh 0vh;
 }
+
 .centerText {
     font-size: 20px;
     font-weight: 400;
     color: #C94B32;
 }
+
 .buttonArea {
     display: flex;
     width: 500px;
@@ -18,6 +20,7 @@
     align-items: center;
     padding-bottom: 35px;
 }
+
 hr {
     width: 210px;
     border: 2px solid #C94B32;
@@ -25,6 +28,7 @@ hr {
     order: 2;
     flex-grow: 0;
 }
+
 .centerCard {
     display: flex;
     flex-direction: column;
@@ -39,8 +43,9 @@ hr {
     margin-top: 35px;
     margin-bottom: 35px;
 }
+
 .dropdown {
-    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%) ;
+    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
     border-radius: 10px;
     width: 109px;
     height: 50px;
@@ -55,6 +60,7 @@ hr {
     margin-top: 10px;
     margin-right: 25px;
 }
+
 .inputArea {
     display: flex;
     justify-content: space-around;
@@ -62,9 +68,11 @@ hr {
     width: 100%;
 
 }
+
 .findSafe {
     margin: 25px 0px 15px 0px
 }
+
 .continueButton {
     margin-top: 25px;
 }
@@ -83,9 +91,11 @@ hr {
     margin-top: 35px;
     margin-bottom: 35px;
 }
+
 .ownerArea {
     width: 100%;
 }
+
 .owner {
     width: 100%;
     display: flex;
@@ -94,12 +104,14 @@ hr {
     align-items: center;
     margin: 2vh 0vh 2vh 0vh;
 }
+
 .avatarName {
     display: flex;
     justify-content: flex-start;
     align-items: center;
     width: 30%;
 }
+
 .text {
     font-family: 'Inter', sans-serif;
     font-style: normal;
@@ -109,6 +121,7 @@ hr {
     letter-spacing: -0.011em;
     color: #76808D;
 }
+
 .nameText {
     font-family: 'Inter', sans-serif;
     font-style: normal;
@@ -120,6 +133,7 @@ hr {
     margin-left: 16px;
     text-align: center;
 }
+
 .addressText {
     font-family: 'Inter', sans-serif;
     font-style: normal;
@@ -130,6 +144,7 @@ hr {
     color: #76808D;
     text-align: center;
 }
+
 .cardButton {
     margin-top: 25px;
     width: 100%;
@@ -137,6 +152,7 @@ hr {
     justify-content: center;
     align-items: center;
 }
+
 .thresholdText {
     font-family: 'Inter', sans-serif;
     font-style: normal;
@@ -146,14 +162,16 @@ hr {
     letter-spacing: -0.011em;
     color: #76808D;
 }
+
 .selectionArea {
     width: 100%;
     display: flex;
-    flex-direction: row; 
+    flex-direction: row;
     justify-content: flex-start;
     align-items: center;
     text-align: center;
 }
+
 .thresholdCount {
     font-family: 'Inter', sans-serif;
     font-style: normal;
@@ -163,7 +181,8 @@ hr {
     letter-spacing: -0.011em;
     color: #76808D;
 }
-.footer {
+
+.safe-footer {
     font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 400;
@@ -175,9 +194,11 @@ hr {
     text-align: center;
     margin-bottom: 9px;
 }
+
 .boldText {
     font-weight: 800;
 }
+
 .createButton {
     margin-top: 35px;
 }
