@@ -166,17 +166,17 @@ const CreateProject = () => {
     }
 
     const handleCreateProject = () => {
-        // let project = {};
-        // project.name = name;
-        // project.description = desc;
-        // project.members = selectedMembers;
-        // project.links = resourceList;
-        // project.daoId = DAO?._id;
-        // dispatch(createProject({ payload: project }))
-        // setSuccess(true);
-        // setTimeout(() => {
-        //     navigate(-1);
-        // }, 2000);
+        let project = {};
+        project.name = name;
+        project.description = desc;
+        project.members = selectedMembers;
+        project.links = resourceList;
+        project.daoId = DAO?._id;
+        dispatch(createProject({ payload: project }))
+        setSuccess(true);
+        setTimeout(() => {
+            navigate(-1);
+        }, 2000);
         console.log("Selected Members : ", selectedMembers);
     }
 
