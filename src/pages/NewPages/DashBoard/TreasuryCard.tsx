@@ -296,7 +296,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
         {
           pendingTxn !== undefined && executedTxn !== undefined &&
           <div id="treasuryTransactions">
-            <div className="dashboardText">Last Transactions</div>
+            <div className="dashboardText" style={{ marginBottom: '6px' }}>Last Transactions</div>
             {
               pendingTxn.map((ptx, index) =>
                 <PendingTxn owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
