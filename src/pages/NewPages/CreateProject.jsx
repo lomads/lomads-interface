@@ -88,7 +88,7 @@ const CreateProject = () => {
     useEffect(() => {
         if (link.length > 8) {
             const url = new URL(link);
-            if (url.hostname === 'discord.com') {
+            if (url.hostname === 'discord.com' || url.hostname === 'discord.gg') {
                 document.getElementById('accessControl').disabled = false;
             }
         }
@@ -109,7 +109,7 @@ const CreateProject = () => {
         if (link.hostname === 'notion.com') {
             return <span><SiNotion size={20} /></span>
         }
-        else if (link.hostname === 'discord.com') {
+        else if (link.hostname === 'discord.com' || link.hostname === 'discord.gg') {
             return <span><BsDiscord size={20} /></span>
         }
         else if (link.hostname === 'github.com') {
@@ -253,7 +253,7 @@ const CreateProject = () => {
                 resource.title = title;
                 resource.link = link;
                 resource.accessControl = accessControl;
-                resource.guildId = 13496;
+                resource.guildId = 13509;
                 setResourceList([...resourceList, resource]);
                 setTitle('');
                 setLink('');
@@ -538,7 +538,7 @@ const CreateProject = () => {
                                                             </button>
                                                         </div>
                                                         <div className='resource-footer'>
-                                                            <input name="accessControl" type="checkbox" value={accessControl} disabled={true} onChange={e => setAccessControl(prev => !prev)} />
+                                                            <input id="accessControl" type="checkbox" value={accessControl} disabled={true} onChange={e => setAccessControl(prev => !prev)} />
                                                             <div>
                                                                 <p>ACCESS CONTROL</p>
                                                                 <span>Currently available for discord only</span>
