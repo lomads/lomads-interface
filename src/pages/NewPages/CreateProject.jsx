@@ -1,8 +1,6 @@
-import { useState, useContext, useEffect } from 'react';
-
+import { useState, useContext, useEffect, useCallback } from 'react';
+import { find as _find, get as _get, debounce as _debounce } from 'lodash';
 import '../../styles/pages/CreateProject.css';
-import { get as _get, find as _find } from 'lodash';
-
 import AddMember from "./DashBoard/MemberCard/AddMember";
 import createProjectSvg from '../../assets/svg/createProject.svg';
 import editToken from '../../assets/svg/editToken.svg';
@@ -16,15 +14,28 @@ import { ProjectContext } from "context/ProjectContext";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import { createProject } from 'state/dashboard/actions'
-import { useWeb3React } from "@web3-react/core";
 import { isValidUrl } from 'utils';
 import { resetCreateProjectLoading } from 'state/dashboard/reducer';
+import useDCAuth from 'hooks/useDCAuth';
+import usePopupWindow from 'hooks/usePopupWindow';
+import axios from 'axios';
+import { usePrevious } from 'hooks/usePrevious';
+import useLocalStorage from "hooks/useLocalStorage";
+import useServerData from "hooks/useServerData";
+import useInterval from "hooks/useInterval";
+import { guild } from "@guildxyz/sdk";
+import { useWeb3React } from "@web3-react/core";
+import { getSigner } from 'utils'
+import AddDiscordLink from 'components/AddDiscordLink';
+import { nanoid } from '@reduxjs/toolkit';
 
 const CreateProject = () => {
+
+    const { provider, account, chainId } = useWeb3React();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const { account } = useWeb3React();
     const { DAO, createProjectLoading } = useAppSelector((state) => state.dashboard);
+
     const [name, setName] = useState('');
     const [desc, setDesc] = useState('');
     const [next, setNext] = useState(false);
@@ -32,18 +43,13 @@ const CreateProject = () => {
     const [memberList, setMemberList] = useState(DAO?.members);
     const [selectedMembers, setSelectedMembers] = useState([]);
     const [resourceList, setResourceList] = useState([]);
-
     const [showMore, setShowMore] = useState(false);
     const [success, setSuccess] = useState(false);
     const [link, setLink] = useState('');
+    const [accessControl, setAccessControl] = useState(false);
     const [title, setTitle] = useState('');
 
-    // for link access control
-    const [lock, setLock] = useState(false);
-
-    useEffect(() => {
-        setMemberList(DAO.members);
-    }, [DAO])
+    useEffect(() => setMemberList(DAO.members), [DAO])
 
     // useEffect(() => {
     //     if (createProjectLoading === false) {
@@ -71,9 +77,14 @@ const CreateProject = () => {
 
     useEffect(() => {
         if (link.length > 8) {
-            const url = new URL(link);
-            if (url.hostname === 'discord.com') {
-                document.getElementById('accessControl').disabled = false;
+            try {
+                const url = new URL(link);
+                if (url.hostname === 'discord.com' || url.hostname === 'discord.gg')
+                    document.getElementById('accessControl').disabled = false;
+                else
+                    document.getElementById('accessControl').disabled = true;
+            } catch (e) {
+                console.log(e)
             }
         }
     }, [link]);
@@ -93,7 +104,7 @@ const CreateProject = () => {
         if (link.hostname === 'notion.com') {
             return <span><SiNotion size={20} /></span>
         }
-        else if (link.hostname === 'discord.com') {
+        else if (link.hostname === 'discord.com' || link.hostname === 'discord.gg') {
             return <span><BsDiscord size={20} /></span>
         }
         else if (link.hostname === 'github.com') {
@@ -107,15 +118,8 @@ const CreateProject = () => {
         }
     }
 
-    // const handleAddToMembersList = (member) => {
-    //     let memberOb = {};
-    //     memberOb.name = member.name;
-    //     memberOb.wallet = member.address;
-    //     setMemberList([...memberList, { member: memberOb }]);
-    // }
 
     const handleAddMember = (member) => {
-        console.log("member : ", member);
         let found = false;
         for (let i = 0; i < selectedMembers.length; i++) {
             if (selectedMembers[i].name === member.name) {
@@ -138,7 +142,8 @@ const CreateProject = () => {
         setSelectedMembers(selectedMembers.filter((_, index) => index !== position));
     }
 
-    const handleAddResource = () => {
+
+    const handleAddResource = async (guildId = undefined) => {
         if (title === '') {
             return toast.error("Please enter title");
         }
@@ -150,14 +155,16 @@ const CreateProject = () => {
         }
         else {
             let resource = {};
+            resource.id = nanoid(16);
             resource.title = title;
             resource.link = link;
-            resource.lock = lock;
-
+            resource.accessControl = accessControl;
+            if(guildId)
+                resource.guildId = guildId;
             setResourceList([...resourceList, resource]);
             setTitle('');
             setLink('');
-            setLock(false);
+            setAccessControl(false);
         }
     }
 
@@ -177,7 +184,6 @@ const CreateProject = () => {
         setTimeout(() => {
             navigate(-1);
         }, 2000);
-        console.log("Selected Members : ", selectedMembers);
     }
 
     return (
@@ -389,15 +395,18 @@ const CreateProject = () => {
                                                                 value={link}
                                                                 onChange={(e) => setLink(e.target.value)}
                                                             />
+                                                            { link && link.indexOf('discord.com') > -1 ?
+                                                                                                                        <AddDiscordLink onGuildCreateSuccess={handleAddResource} title={title} link={link} accessControl={accessControl} /> :
                                                             <button
                                                                 style={link !== '' && title !== '' ? { background: '#C84A32' } : null}
                                                                 onClick={handleAddResource}
                                                             >
                                                                 <AiOutlinePlus color="#FFF" size={25} />
-                                                            </button>
+                                                            </button> 
+                                                            }
                                                         </div>
                                                         <div className='resource-footer'>
-                                                            <input id="accessControl" type="checkbox" checked={lock} onChange={() => setLock(!lock)} disabled={true} />
+                                                            <input id="accessControl" type="checkbox" value={accessControl} disabled={true} onChange={e => setAccessControl(prev => !prev)} />
                                                             <div>
                                                                 <p>ACCESS CONTROL</p>
                                                                 <span>Currently available for discord only</span>

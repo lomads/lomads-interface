@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
+import { usePrevious } from "@chakra-ui/react"
 import { get as _get, find as _find } from 'lodash';
 import lomadsfulllogo from "../../../assets/svg/lomadsfulllogo.svg";
 import settingIcon from '../../../assets/svg/settings.svg';
@@ -10,6 +11,10 @@ import MemberCard from "./MemberCard";
 import { LeapFrog } from "@uiball/loaders";
 import TreasuryCard from "./TreasuryCard";
 import { ImportSafe, safeService } from "connection/SafeCall";
+import useDCAuthWithCallback from '../../../hooks/useDCAuthWithCallback';
+import usePopupWindow from '../../../hooks/usePopupWindow';
+import useUsersServers from "hooks/useUsersServers"
+import useServerData from "hooks/useServerData";
 import { useWeb3React } from "@web3-react/core";
 import {
 	AllTransactionsListResponse,
@@ -29,6 +34,7 @@ import copyIcon from "../../../assets/svg/copyIcon.svg";
 import { useDispatch } from "react-redux";
 import { updateCurrentNonce, updateSafeThreshold, updateSafeAddress } from "state/flow/reducer";
 import { Tooltip } from "@chakra-ui/react";
+import useDCAuth from "hooks/useDCAuth";
 import MyProject from "./MyProject";
 
 import { useSBTStats } from "hooks/SBT/sbt";
@@ -89,12 +95,12 @@ const Dashboard = () => {
 	};
 
 	useEffect(() => {
-		if (contractName !== '' && amIAdmin) {
+		if (contractName !== '') {
 			if (DAO?.sbt && parseInt(balanceOf._hex, 16) === 0) {
 				navigate(`/sbt/mint/${DAO.sbt.address}`);
 			}
 		}
-	}, [DAO, balanceOf, contractName, amIAdmin]);
+	}, [DAO, balanceOf, contractName]);
 
 	useEffect(() => {
 		if (chainId && account)
@@ -145,7 +151,10 @@ const Dashboard = () => {
 	const getTokens = async (safeAddress: string) => {
 		await axios
 			.get(
-				`https://safe-transaction.goerli.gnosis.io/api/v1/safes/${safeAddress}/balances/usd/`
+				`https://safe-transaction.goerli.gnosis.io/api/v1/safes/${safeAddress}/balances/usd/`,
+				{
+					withCredentials: false
+				}
 			)
 			.then((tokens: any) => {
 				setSafeTokens(tokens.data);
