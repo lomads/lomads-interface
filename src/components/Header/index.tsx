@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { find as _find } from 'lodash';
 import useScrollPosition from "@react-hook/window-scroll";
 import { useWeb3React } from "@web3-react/core";
 import { Text } from "rebass";
@@ -27,6 +28,8 @@ import {
 } from "state/proposal/reducer";
 import { usePrevious } from "hooks/usePrevious";
 import { useNavigate, useMatch, useLocation } from "react-router-dom";
+import { matchPath } from "react-router";
+import routes from "routes";
 // import NetworkSelector from './NetworkSelector'
 
 const HeaderFrame = styled.div<{ showBackground: boolean }>`
@@ -150,7 +153,11 @@ export default function Header() {
 
   useEffect(() => {
     if ((chainId && !chainAllowed && !account) || !localStorage.getItem('__lmds_web3_token')) {
-      sessionStorage.setItem('__lmds_active_dao', location.pathname.substring(1))
+      const match = matchPath({ path: "/:daoURL" }, location.pathname);
+      if(match && !_find(routes, r => r.path === location.pathname)){
+          console.log('storing...', location.pathname)
+          sessionStorage.setItem('__lmds_active_dao', location.pathname.substring(1))
+       }
       navigate("/");
     }
   }, [chainId , account, chainAllowed, navigate]);

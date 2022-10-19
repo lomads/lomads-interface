@@ -43,6 +43,9 @@ const flowSlice = createSlice({
     updateInvitedGang(state, action) {
       state.invitedGang = action.payload;
     },
+    appendInviteMembers(state, action) {
+      state.invitedGang = [...state.invitedGang, ...action.payload];
+    },
     updateOwners(state, action) {
       state.owners = action.payload;
     },
@@ -82,6 +85,7 @@ export const {
   updateDaoName,
   updateDaoAddress,
   updateInvitedGang,
+  appendInviteMembers,
   updateOwners,
   updatesafeName,
   updateSafeAddress,

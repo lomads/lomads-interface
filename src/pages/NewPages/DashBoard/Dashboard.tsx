@@ -64,7 +64,7 @@ const Dashboard = () => {
 	const [showModal, setShowModal] = useState<boolean>(false);
 	const [ownerCount, setOwnerCount] = useState<number>();
 	const [safeTokens, setSafeTokens] = useState<Array<any>>([]);
-	const [showNotification, setShowNotification] = useState<boolean>(true);
+	const [showNotification, setShowNotification] = useState<boolean>(false);
 	const [showAddMember, setShowAddMember] = useState<boolean>(false);
 	const [showNavBar, setShowNavBar] = useState<boolean>(false);
 	const currentNonce = useAppSelector((state) => state.flow.currentNonce);
@@ -136,7 +136,6 @@ const Dashboard = () => {
 		const nonce = await (await safeService(provider)).getNextNonce(_safeAddress);
 		dispatch(updateCurrentNonce(nonce));
 		await getTokens(_safeAddress);
-		setShowNotification(true);
 	};
 
 	const ownersCount = async (_safeAddress: string) => {
@@ -175,6 +174,38 @@ const Dashboard = () => {
 	const showNotificationArea = (_choice: boolean) => {
 		setShowNotification(_choice);
 	};
+
+	useEffect(() => {
+		if(DAO){
+			const prevShow = localStorage.getItem(`lmds_notification_count_${DAO._id}_show`)
+			if(!prevShow || (prevShow && prevShow === '1'))
+				return setShowNotification(true)
+			if(prevShow === '0') {
+				if(pendingTransactions?.count) {
+					const prevCount = localStorage.getItem(`lmds_notification_count_${DAO._id}`)
+					
+					if(!prevCount) {
+						localStorage.setItem(`lmds_notification_count_${DAO._id}`, `${pendingTransactions?.count}`)
+						localStorage.setItem(`lmds_notification_count_${DAO._id}_show`, '1')
+						return setShowNotification(true)
+					}
+					console.log('prevCount', prevCount && prevCount.toString() === pendingTransactions?.count.toString())
+					if(prevCount && prevCount.toString() === pendingTransactions?.count.toString())
+						setShowNotification(false)
+					else {
+						localStorage.removeItem(`lmds_notification_count_${DAO._id}_show`)
+						localStorage.removeItem(`lmds_notification_count_${DAO._id}`)
+						setShowNotification(true)
+					}
+				} else {
+					if(pendingTransactions && pendingTransactions.count === 0) {
+						localStorage.removeItem(`lmds_notification_count_${DAO._id}_show`)
+						localStorage.removeItem(`lmds_notification_count_${DAO._id}`)
+					}
+				}
+			}
+		}
+	}, [DAO, pendingTransactions])
 
 	return (
 		<>
@@ -235,10 +266,11 @@ const Dashboard = () => {
 						}
 					</div>
 				</div>
-				{pendingTransactions !== undefined &&
+				{ pendingTransactions !== undefined &&
 					pendingTransactions?.count >= 1 &&
 					showNotification && (
 						<NotificationArea
+							daoId={DAO._id}
 							pendingTransactionCount={pendingTransactions?.count}
 							showNotificationArea={showNotificationArea}
 						/>

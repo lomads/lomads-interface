@@ -93,7 +93,8 @@
     "typescript": "^4.4.2",
     "ua-parser-js": "^1.0.2",
     "web-vitals": "^2.1.0",
-    "web3-token": "^1.0.2"
+    "web3-token": "^1.0.2",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.18.12/xlsx-0.18.12.tgz"
   },
   "scripts": {
     "contracts:compile:abi": "typechain --target ethers-v5 --out-dir src/abis/types \"./src/abis/**/*.json\"",

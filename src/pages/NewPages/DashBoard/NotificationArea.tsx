@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import IconButton from "UIpack/IconButton";
 import sendreceive from "../../../assets/svg/sendreceive.svg";
@@ -29,6 +29,7 @@ const NotificationArea = (props: any) => {
                   width={25}
                   className="sideModalCloseButton"
                   onClick={(e) => {
+                    localStorage.setItem(`lmds_notification_count_${props.daoId}_show`, '0')
                     props.showNotificationArea(false);
                   }}
                 />
