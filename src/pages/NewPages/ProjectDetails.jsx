@@ -19,7 +19,8 @@ import { SiNotion } from "react-icons/si";
 import { BsDiscord, BsGoogle, BsGithub, BsLink } from "react-icons/bs";
 import AddMember from "./DashBoard/MemberCard/AddMember";
 
-import { getProject, updateProjectLink, getDao } from "state/dashboard/actions";
+import { getProject, updateProjectLink, getDao, updateProjectMember } from "state/dashboard/actions";
+import { resetUpdateProjectMemberLoader } from 'state/dashboard/reducer';
 import AddLink from "./DashBoard/Project/AddLink";
 import Footer from "components/Footer";
 
@@ -36,17 +37,21 @@ const ProjectDetails = () => {
     const [unlockLoading, setUnlockLoading] = useState(null);
     const [showNavBar, setShowNavBar] = useState(false);
     const [showAddMember, setShowAddMember] = useState(false);
+    const [showList, setShowList] = useState(false);
     const [showAddLink, setShowAddLink] = useState(false);
-    const { DAO, Project, ProjectLoading } = useAppSelector((state) => state.dashboard);
+    const { DAO, Project, ProjectLoading, updateProjectMemberLoading } = useAppSelector((state) => state.dashboard);
+    console.log("Project : ", Project)
     const daoName = _get(DAO, 'name', '');
 
     const [lockedLinks, setLockedLinks] = useState([]);
     const [openLinks, setOpenLinks] = useState([]);
 
+    const [extraMembers, setExtraMembers] = useState([]);
+
     useEffect(() => {
-		if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
-			dispatch(getDao(daoURL))
-	}, [DAO, daoURL])
+        if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
+            dispatch(getDao(daoURL))
+    }, [DAO, daoURL])
 
     useEffect(() => {
         if (projectId && (!Project || (Project && Project._id !== projectId)))
@@ -59,6 +64,14 @@ const ProjectDetails = () => {
             setOpenLinks(_get(Project, 'links', []).filter(link => ((!link.accessControl) || (_get(link, 'accessControl', null) && _get(link, 'unlocked', []).indexOf(account.toLowerCase()) > -1))))
         }
     }, [Project]);
+
+    useEffect(() => {
+        if (updateProjectMemberLoading === false) {
+            dispatch(resetUpdateProjectMemberLoader());
+            setExtraMembers([]);
+            setShowList(false);
+        }
+    }, [updateProjectMemberLoading]);
 
     const showSideBar = (_choice) => {
         setShowNavBar(_choice);
@@ -83,7 +96,13 @@ const ProjectDetails = () => {
         }
     }
 
+    const toggleMemberList = () => {
+        setExtraMembers([]);
+        setShowList(!showList);
+    };
+
     const toggleShowMember = () => {
+        setShowList(false);
         setShowAddMember(!showAddMember);
     };
 
@@ -98,27 +117,27 @@ const ProjectDetails = () => {
     }
 
     const unlock = async (link, update = true) => {
-        if(unlockLoading) return;
+        if (unlockLoading) return;
         try {
             setUnlockLoading(link.id)
             const g = await guild.get(link.guildId)
             let inviteLink = _get(_find(_get(g, 'guildPlatforms'), gp => gp.platformId == 1), 'invite', null)
-            if(!inviteLink) return setUnlockLoading(null);
-    
+            if (!inviteLink) return setUnlockLoading(null);
+
             let access = await guild.getUserAccess(link.guildId, account)
             access = access?.some?.(({ access }) => access)
-            if(access){
+            if (access) {
                 const membership = await guild.getUserMemberships(link.guildId, account);
-                if(!membership?.some?.(({ access }) => access)) {
-                   const success = await user.join(link.guildId, account, signerFunction)
-                   if(success){
-                      if(update)
-                        unlockLink(link)
-                    setUnlockLoading(null)
-                     window.open(inviteLink, '_blank')
-                   }
+                if (!membership?.some?.(({ access }) => access)) {
+                    const success = await user.join(link.guildId, account, signerFunction)
+                    if (success) {
+                        if (update)
+                            unlockLink(link)
+                        setUnlockLoading(null)
+                        window.open(inviteLink, '_blank')
+                    }
                 } else {
-                    if(update)
+                    if (update)
                         unlockLink(link)
                     setUnlockLoading(null)
                     window.open(inviteLink, '_blank')
@@ -130,7 +149,36 @@ const ProjectDetails = () => {
             unlockLoading(null)
         }
     }
-    
+
+    const handleAddMember = (user) => {
+        setExtraMembers([...extraMembers, user.member._id]);
+    }
+
+    const handleUsers = (item, index) => {
+        if (Project.members.some(m => m.wallet === item.member.wallet) === false) {
+            return (
+                <div className="member-li" key={index}>
+                    <div className="member-img-name">
+                        <img src={memberIcon} alt="member-icon" />
+                        <p>{item.member.name}</p>
+                    </div>
+                    <div className="member-address">
+                        <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
+                        <input type="checkbox" onChange={() => handleAddMember(item)} />
+                    </div>
+                </div>
+            )
+        }
+    }
+
+    const handleRenderRole = (item) => {
+        const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === item.wallet.toLowerCase());
+        return user.role;
+    }
+
+    const handleSubmit = () => {
+        dispatch(updateProjectMember({ projectId, payload: { memberList: extraMembers } }));
+    }
 
     return (
         <>
@@ -154,12 +202,53 @@ const ProjectDetails = () => {
                     showSideBar(false);
                 }}
             >
-                {showAddMember &&
-                    <AddMember
-                        toggleShowMember={toggleShowMember}
-                        projectId={projectId}
-                        daoUrl={daoURL}
-                    />
+                {
+                    showList
+                        ?
+                        <div className="addMemberOverlay">
+                            <div className='project-members'>
+                                <div className='project-members-header'>
+                                    <p>Invite members</p>
+                                    <button onClick={toggleShowMember}>ADD NEW MEMBER</button>
+                                </div>
+                                <div className="member-list">
+                                    {
+                                        DAO && DAO.members.map((item, index) => handleUsers(item, index))
+                                    }
+                                </div>
+
+                                <div className='project-buttons'>
+                                    <button
+                                        style={{ marginRight: '35px', background: '#FFF', color: '#C94B32' }}
+                                        onClick={toggleMemberList}
+                                    >
+                                        CANCEL
+                                    </button>
+                                    <button
+                                        style={{ background: '#C94B32', color: '#FFF' }}
+                                        onClick={handleSubmit}
+                                    >
+                                        ADD
+                                    </button>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        :
+                        <>
+                            {
+                                showAddMember
+                                    ?
+                                    <AddMember
+                                        toggleShowMember={toggleShowMember}
+                                        projectId={projectId}
+                                        daoUrl={daoURL}
+                                    />
+                                    :
+                                    null
+                            }
+                        </>
                 }
                 {
                     showAddLink &&
@@ -203,7 +292,7 @@ const ProjectDetails = () => {
                                     disabled={false}
                                     fontweight={400}
                                     fontsize={16}
-                                    onClick={toggleShowMember}
+                                    onClick={toggleMemberList}
                                 />
                                 {/* <button>
                                     <img src={editToken} alt="hk-logo" />
@@ -227,13 +316,13 @@ const ProjectDetails = () => {
                                                         <img src={memberIcon} alt="memberIcon" />
                                                         <p>{item.name}</p>
                                                     </div>
-                                                    <span>{item.address}</span>
+                                                    <span>{item.wallet.slice(0, 6) + "..." + item.wallet.slice(-4)}</span>
                                                 </div>
                                                 <div className="members-row-date">
                                                     <p>10/10/2023 </p>
                                                 </div>
                                                 <div className="members-row-status">
-                                                    <span>active contributor</span>
+                                                    <span>{handleRenderRole(item)}</span>
                                                 </div>
                                             </div>
                                         ))
@@ -276,7 +365,7 @@ const ProjectDetails = () => {
                                                     <div onClick={() => unlock(item)} className="link-button" style={{ position: 'relative' }} key={index}>
                                                         {handleParseUrl(item.link)}
                                                         <p style={{ flexGrow: 1 }}>{item.title}</p>
-                                                        { unlockLoading === item.id ? 
+                                                        {unlockLoading === item.id ?
                                                             <div style={{ position: 'absolute', top: 10, right: 20 }}>
                                                                 <LeapFrog size={20} color="#B12F15" />
                                                             </div> : null
@@ -300,15 +389,15 @@ const ProjectDetails = () => {
                                     {
                                         openLinks.map((item, index) => {
                                             return (
-                                                <div onClick={() => { 
-                                                    if(!item.accessControl)
-                                                        window.open(item.link, '_blank') 
+                                                <div onClick={() => {
+                                                    if (!item.accessControl)
+                                                        window.open(item.link, '_blank')
                                                     else
                                                         unlock(item, false)
                                                 }} className="link-button" style={{ position: 'relative' }} key={index}>
                                                     {handleParseUrl(item.link)}
                                                     <p>{item.title}</p>
-                                                    { unlockLoading === item.id ? 
+                                                    {unlockLoading === item.id ?
                                                         <div style={{ position: 'absolute', top: 10, right: 20 }}>
                                                             <LeapFrog size={20} color="#B12F15" />
                                                         </div> : null

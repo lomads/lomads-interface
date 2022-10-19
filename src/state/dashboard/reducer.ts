@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { DAOType } from "types/UItype";
-import { getDao, loadDao, addDaoMember, updateDaoMember, createProject, addProjectMember, updateProjectLink, getProject, addProjectLinks } from "./actions";
+import { getDao, loadDao, addDaoMember, updateDaoMember, createProject, addProjectMember, updateProjectMember, updateProjectLink, getProject, addProjectLinks } from "./actions";
 import { createContract } from "state/contract/actions";
 import { get as _get } from "lodash";
 
@@ -14,6 +14,7 @@ export interface DashboardState {
 	Project: any;
 	ProjectLoading: boolean | null;
 	addProjectMemberLoading: boolean | null;
+	updateProjectMemberLoading: boolean | null;
 	addProjectLinksLoading: boolean | null;
 }
 
@@ -26,6 +27,7 @@ const initialState: DashboardState = {
 	Project: null,
 	ProjectLoading: null,
 	addProjectMemberLoading: null,
+	updateProjectMemberLoading: null,
 	addProjectLinksLoading: null,
 };
 
@@ -44,6 +46,9 @@ const dashboardSlice = createSlice({
 		},
 		resetAddProjectMemberLoader(state) {
 			state.addProjectMemberLoading = null
+		},
+		resetUpdateProjectMemberLoader(state) {
+			state.updateProjectMemberLoading = null
 		},
 		resetAddProjectLinksLoader(state) {
 			state.addProjectLinksLoading = null
@@ -118,6 +123,7 @@ const dashboardSlice = createSlice({
 		[`${getProject.pending}`]: (state) => {
 			state.ProjectLoading = true;
 		},
+		// add project members
 		[`${addProjectMember.fulfilled}`]: (state, action) => {
 			state.addProjectMemberLoading = false;
 			state.Project = action.payload.project;
@@ -126,6 +132,15 @@ const dashboardSlice = createSlice({
 		[`${addProjectMember.pending}`]: (state) => {
 			state.addProjectMemberLoading = true;
 		},
+		// update project members
+		[`${updateProjectMember.fulfilled}`]: (state, action) => {
+			state.updateProjectMemberLoading = false;
+			state.Project = action.payload;
+		},
+		[`${updateProjectMember.pending}`]: (state) => {
+			state.updateProjectMemberLoading = true;
+		},
+		// add project links
 		[`${addProjectLinks.fulfilled}`]: (state, action) => {
 			state.addProjectLinksLoading = false;
 			state.Project = action.payload.project;
@@ -139,7 +154,7 @@ const dashboardSlice = createSlice({
 			state.DAO = action.payload.dao;
 		},
 		[`${updateProjectLink.pending}`]: (state) => {
-			
+
 		},
 	},
 });
@@ -150,6 +165,7 @@ export const {
 	resetCreateDAOLoader,
 	resetAddMemberLoader,
 	resetAddProjectMemberLoader,
+	resetUpdateProjectMemberLoader,
 	resetAddProjectLinksLoader,
 	updateSafeTransaction
 } = dashboardSlice.actions;

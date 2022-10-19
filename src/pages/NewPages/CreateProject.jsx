@@ -159,7 +159,7 @@ const CreateProject = () => {
             resource.title = title;
             resource.link = link;
             resource.accessControl = accessControl;
-            if(guildId)
+            if (guildId)
                 resource.guildId = guildId;
             setResourceList([...resourceList, resource]);
             setTitle('');
@@ -277,7 +277,7 @@ const CreateProject = () => {
                                                                             <div className="member-address">
                                                                                 <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
                                                                                 {
-                                                                                    selectedMembers.indexOf(ob) === -1
+                                                                                    selectedMembers.some((m) => m.address === item.member.wallet) === false
                                                                                         ?
                                                                                         <input type="checkbox" onChange={() => handleAddMember(item.member)} />
                                                                                         :
@@ -395,14 +395,14 @@ const CreateProject = () => {
                                                                 value={link}
                                                                 onChange={(e) => setLink(e.target.value)}
                                                             />
-                                                            { link && link.indexOf('discord.com') > -1 ?
-                                                                                                                        <AddDiscordLink onGuildCreateSuccess={handleAddResource} title={title} link={link} accessControl={accessControl} /> :
-                                                            <button
-                                                                style={link !== '' && title !== '' ? { background: '#C84A32' } : null}
-                                                                onClick={handleAddResource}
-                                                            >
-                                                                <AiOutlinePlus color="#FFF" size={25} />
-                                                            </button> 
+                                                            {link && link.indexOf('discord.com') > -1 ?
+                                                                <AddDiscordLink onGuildCreateSuccess={handleAddResource} title={title} link={link} accessControl={accessControl} /> :
+                                                                <button
+                                                                    style={link !== '' && title !== '' ? { background: '#C84A32' } : null}
+                                                                    onClick={handleAddResource}
+                                                                >
+                                                                    <AiOutlinePlus color="#FFF" size={25} />
+                                                                </button>
                                                             }
                                                         </div>
                                                         <div className='resource-footer'>

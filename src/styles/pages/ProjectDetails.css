@@ -10,6 +10,137 @@
     overflow-y: scroll;
 }
 
+/* Add new member overlay */
+.projectDetails-container .addMemberOverlay {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(27, 43, 65, 0.25);
+    z-index: 999999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Member list */
+
+.projectDetails-container .addMemberOverlay .project-members {
+    width: 480px;
+    background: #FFFFFF;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    padding: 26px 22px;
+    opacity: 1;
+}
+
+.projectDetails-container .addMemberOverlay .project-members .project-members-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.projectDetails-container .addMemberOverlay .project-members .project-members-header p {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+
+.projectDetails-container .addMemberOverlay .project-members .project-members-header button {
+    width: 200px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    /* Color-drop */
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    text-transform: uppercase;
+    color: #76808D;
+}
+
+.projectDetails-container .addMemberOverlay .project-members .member-list {
+    width: 100%;
+}
+
+.projectDetails-container .addMemberOverlay .project-members .member-list .member-li {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    cursor: pointer;
+}
+
+.projectDetails-container .addMemberOverlay .project-members .member-list .member-li:last-child {
+    margin-bottom: 0;
+}
+
+.projectDetails-container .addMemberOverlay .project-members .member-list .member-li .member-img-name {
+    width: 40%;
+    display: flex;
+    align-items: center;
+}
+
+.projectDetails-container .addMemberOverlay .project-members .member-list .member-li .member-img-name img {
+    margin-right: 15px;
+}
+
+.projectDetails-container .addMemberOverlay .project-members .member-list .member-li .member-img-name p {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+
+
+.projectDetails-container .addMemberOverlay .project-members .member-list .member-li .member-address {
+    width: 60%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.projectDetails-container .addMemberOverlay .project-members .member-list .member-li .member-address p {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+
+.projectDetails-container .addMemberOverlay .project-members .project-buttons {
+    display: flex;
+    margin-top: 20px;
+}
+
+.projectDetails-container .addMemberOverlay .project-members .project-buttons button {
+    height: 50px;
+    width: 50%;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+}
+
+
+
 .projectDetails-container .projectDetails-body {
     width: 80%;
     display: flex;

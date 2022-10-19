@@ -190,7 +190,6 @@ const Settings = () => {
                             </>
                     }
                 </div>
-
                 <Footer theme="light" />
             </div>
             <div className='settings-right-bar'>

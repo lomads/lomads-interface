@@ -71,6 +71,18 @@ export const addProjectMember = createAsyncThunk(
 	}
 );
 
+export const updateProjectMember = createAsyncThunk(
+	'dao/updateProjectMember',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`project/${params.projectId}/update-member`, params.payload)
+			.then(res => res.data)
+			.catch(e => {
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
+	}
+);
+
 export const addProjectLinks = createAsyncThunk(
 	'dao/addProjectLinks',
 	async (params: any, thunkApi) => {
