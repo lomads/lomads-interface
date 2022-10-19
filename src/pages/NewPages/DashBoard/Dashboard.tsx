@@ -33,6 +33,7 @@ import MyProject from "./MyProject";
 
 import { useSBTStats } from "hooks/SBT/sbt";
 import Footer from "components/Footer";
+import Tasks from "./Tasks";
 
 const Dashboard = () => {
 	const dispatch = useAppDispatch();
@@ -194,9 +195,9 @@ const Dashboard = () => {
 							setCopy(false);
 						}}
 					>
-					<div className="DAOname">
-						{_get(DAO, 'name', '')}
-					</div>
+						<div className="DAOname">
+							{_get(DAO, 'name', '')}
+						</div>
 						<Tooltip label={copy ? "copied" : "copy"}>
 							<div
 								className="copyLinkButton"
@@ -234,6 +235,8 @@ const Dashboard = () => {
 							showNotificationArea={showNotificationArea}
 						/>
 					)}
+
+				<Tasks />
 
 				<MyProject />
 
