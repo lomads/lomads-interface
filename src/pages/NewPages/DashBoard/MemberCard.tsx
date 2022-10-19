@@ -76,7 +76,7 @@ const MemberCard = (props: any) => {
 						<div style={{ marginLeft: 12 }} className="memberdivider">
 							<hr />
 						</div>
-						<div className="dashboardText">{moment(props.joined).local().format('MM/DD/YYYY')}</div>
+						<div className="dashboardText">{moment.utc(props.joined).local().format('MM/DD/YYYY')}</div>
 						<div className="memberdivider">
 							<hr />
 						</div>

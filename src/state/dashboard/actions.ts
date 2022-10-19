@@ -82,3 +82,15 @@ export const addProjectLinks = createAsyncThunk(
 			})
 	}
 );
+
+export const updateProjectLink = createAsyncThunk(
+	'dao/updateProjectLinks',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`project/${params.projectId}/update-link?daoUrl=${params.daoUrl}`, params.payload)
+			.then(res => res.data)
+			.catch(e => {
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
+	}
+);
