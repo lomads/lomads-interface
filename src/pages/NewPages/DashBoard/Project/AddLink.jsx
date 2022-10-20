@@ -47,7 +47,7 @@ const AddLink = (props) => {
     }, [link]);
 
     const handleAddLink = (guildId = undefined) => {
-        const resource = { id: nanoid(16), title, link, accessControl, guildId };
+        const resource = { id: nanoid(16), title, link, accessControl, ...(guildId ? { guildId } : {}) };
         dispatch(addProjectLinks({ projectId: props.projectId, daoUrl: props.daoUrl, payload: resource }))
     };
 

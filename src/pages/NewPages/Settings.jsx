@@ -12,19 +12,26 @@ import { useWeb3React } from "@web3-react/core";
 import { useSBTStats } from "hooks/SBT/sbt";
 import { Tooltip } from "@chakra-ui/react";
 import copyIcon from "../../assets/svg/copyIcon.svg";
+import { isChainAllowed } from "utils/switchChain";
 import coin from '../../assets/svg/coin.svg';
 import Footer from 'components/Footer';
 
 const Settings = () => {
-
     const navigate = useNavigate();
     const [update, setUpdate] = useState(0);
-    const { provider, account } = useWeb3React();
+    const { provider, chainId, account, connector } = useWeb3React();
     const { DAO } = useAppSelector((state) => state.dashboard);
     const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
     console.log("DAO data : ", DAO);
     const daoName = _get(DAO, 'name', '').split(" ");
     const [copy, setCopy] = useState(false);
+    const chainAllowed = chainId && isChainAllowed(connector, chainId);
+
+    useEffect(() => {
+        if (chainId && !chainAllowed && !account) {
+            navigate('/')
+        }
+    }, [chainId , account, chainAllowed, navigate]);
 
     useEffect(() => {
         if (contractName !== '') {
@@ -80,7 +87,7 @@ const Settings = () => {
 
                     <div className='organisation-desc'>
                         <p>{
-                            DAO.description ? DAO.description : ''
+                            _get(DAO, 'description', '')
                         }</p>
                     </div>
 

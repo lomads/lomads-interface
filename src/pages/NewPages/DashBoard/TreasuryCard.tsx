@@ -275,72 +275,61 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		return 0
 	}, [props.fiatBalance]);
 
-	console.log(props.tokens)
+  console.log("TOKENS", props.tokens)
 
-	return (
-		<div className="treasuryCard">
-			<div className="treasuryHeader">
-				<div id="treasuryCardTitle" onClick={(e) => {
-					loadPendingTxn()
-					loadExecutedTxn()
-				}}>Treasury</div>
-				<div className="headerDetails">
-					<div><hr className="vl" /></div>
-					<div className="copyArea" onClick={() => setCopy(true)} onMouseOut={() => setCopy(false)}>
-						<Tooltip label={copy ? "copied" : "copy"}>
-							<div className="copyLinkButton" onClick={() => navigator.clipboard.writeText(_get(DAO, 'safe.address', ''))}>
-								<img src={copyIcon} alt="copy" className="safeCopyImage" />
-							</div>
-						</Tooltip>
-						<div className="dashboardText">{`${_get(props, 'safeAddress', '').slice(0, 6)}...${_get(props, 'safeAddress', '').slice(-4)}`}</div>
-					</div>
-					<div className="copyArea">
-						<>
-							<img src={coin} alt="asset" />
-							<div id="safeBalance">{`$ ${balance}`}</div>
-						</>
-						<div className="dashboardText">total balance</div>
-					</div>
-					{owner && <SafeButton onClick={props.toggleModal} height={40} width={150} titleColor="#B12F15" title="SEND TOKEN" bgColor="#FFFFFF" opacity="1" disabled={false} fontweight={400} fontsize={16} />}
-				</div>
-			</div>
-			<>
-				{
-					pendingTxn !== undefined && executedTxn !== undefined &&
-					<div id="treasuryTransactions">
-						<div className="dashboardText" style={{ marginBottom: '6px' }}>Last Transactions</div>
-						{
-							pendingTxn.map((ptx, index) =>
-								<PendingTxn
-									owner={owner}
-									threshold={threshold}
-									executeTransactions={handleExecuteTransactions}
-									confirmTransaction={handleConfirmTransaction}
-									rejectTransaction={handleRejectTransaction}
-									tokens={props.tokens}
-									transaction={ptx}
-									confirmTxLoading={confirmTxLoading}
-									rejectTxLoading={rejectTxLoading}
-									executeTxLoading={executeTxLoading}
-									isAdmin={amIAdmin}
-								/>
-							)
-						}
-						{
-							executedTxn.map((ptx, index) =>
-								<CompleteTxn
-									owner={owner}
-									transaction={ptx}
-									tokens={props.tokens}
-									isAdmin={amIAdmin}
-								/>
-							)
-						}
-					</div>
-				}
-			</>
-		</div>
-	)
+  return (
+    <div className="treasuryCard">
+      <div className="treasuryHeader">
+        <div id="treasuryCardTitle" onClick={(e) => {
+          loadPendingTxn()
+          loadExecutedTxn()
+        }}>Treasury</div>
+        <div className="headerDetails">
+          <div><hr className="vl" /></div>
+          <div className="copyArea" onClick={() => setCopy(true)} onMouseOut={() => setCopy(false)}>
+            <Tooltip label={copy ? "copied" : "copy"}>
+              <div className="copyLinkButton" onClick={() => navigator.clipboard.writeText(_get(DAO, 'safe.address', ''))}>
+                <img src={copyIcon} alt="copy" className="safeCopyImage" />
+              </div>
+            </Tooltip>
+            <div className="dashboardText">{`${_get(props, 'safeAddress', '').slice(0, 6)}...${_get(props, 'safeAddress', '').slice(-4)}`}</div>
+          </div>
+          <div className="copyArea">
+            {
+              props.tokens.map((token:any) => {
+                if(token.tokenAddress)
+                  return ( <>
+                  <img src={coin} alt="asset" />
+                  <div id="safeBalance">{`${_get(token, 'balance', 0) / 10 ** 18} ${_get(token, 'token.symbol')}`}</div>
+                </> )
+                return null
+              })
+            }
+            <div className="dashboardText">total balance</div>
+          </div>
+          {owner && <SafeButton onClick={props.toggleModal} height={40} width={150} titleColor="#B12F15" title="SEND TOKEN" bgColor="#FFFFFF" opacity="1" disabled={false} fontweight={400} fontsize={16} />}
+        </div>
+      </div>
+      <>
+        {
+          pendingTxn !== undefined && executedTxn !== undefined &&
+          <div id="treasuryTransactions">
+            <div className="dashboardText" style={{ marginBottom: '6px' }}>Last Transactions</div>
+            {
+              pendingTxn.map((ptx, index) =>
+                <PendingTxn owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
+              )
+            }
+            {
+              executedTxn.map((ptx, index) =>
+                <CompleteTxn owner={owner} transaction={ptx} tokens={props.tokens} />
+              )
+            }
+          </div>
+        }
+      </>
+    </div>
+  )
 
 }
 
