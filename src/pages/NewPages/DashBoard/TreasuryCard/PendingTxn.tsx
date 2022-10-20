@@ -12,10 +12,11 @@ import axiosHttp from '../../../../api';
 import { updateSafeTransaction } from "state/dashboard/reducer";
 import { AiOutlineClose, AiOutlineCheck } from "react-icons/ai";
 
-const PendingTxn = ({ tokens, threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions, confirmTxLoading, rejectTxLoading, executeTxLoading }: any) => {
+const PendingTxn = ({ tokens, threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions, confirmTxLoading, rejectTxLoading, executeTxLoading, isAdmin }: any) => {
     const { provider, account } = useWeb3React();
     const { DAO } = useAppSelector(store => store.dashboard);
-    const [reasonText, setReasonText] = useState(null);
+    const [reasonText, setReasonText] = useState('');
+    const [editMode, setEditMode] = useState(false);
     const dispatch = useAppDispatch()
     //const threshold = useAppSelector((state) => state.flow.safeThreshold);
 
@@ -49,6 +50,16 @@ const PendingTxn = ({ tokens, threshold, transaction, owner, confirmTransaction,
             axiosHttp.patch('transaction', { reason: reasonText, safeTxHash, recipient })
                 .then(res => dispatch(updateSafeTransaction(res.data)))
         }
+        if (editMode) {
+            setEditMode(false);
+        }
+    }
+
+    const handleEnableEditMode = (text: any) => {
+        if (isAdmin) {
+            setReasonText(text);
+            setEditMode(true);
+        }
     }
 
     const renderItem = (item: any, index: any) => {
@@ -57,7 +68,7 @@ const PendingTxn = ({ tokens, threshold, transaction, owner, confirmTransaction,
         const isLast = _get(transaction, 'dataDecoded.parameters[0].valueDecoded', []).length - 1 === index;
         const token = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', '')
         let trans = _find(_get(DAO, 'safe.transactions', []), t => t.safeTxHash === transaction.safeTxHash)
-        let mulReason = null
+        let mulReason = '';
         if (trans)
             mulReason = _get(_find(trans.data, u => u.recipient.toLowerCase() === mulRecipient.toLowerCase()), 'reason', null)
         return (
@@ -70,8 +81,28 @@ const PendingTxn = ({ tokens, threshold, transaction, owner, confirmTransaction,
                         </div>
                     </div>
                     <div className="transactionName">
-                        {mulReason ? <div className="dashboardText">{mulReason}</div> :
-                            <SimpleInputField disabled={!owner} onchange={e => setReasonText(e.target.value)} onKeyDown={(e: any) => { console.log(e.key); if (e.key === 'Enter') { _handleReasonKeyDown(transaction.safeTxHash, mulRecipient) } }} className="inputField" height={30} width={"100%"} placeholder="Reason for transaction" />
+                        {
+                            mulReason
+                                ?
+                                <div className="dashboardText">{mulReason}</div>
+                                :
+                                <>
+                                    {
+                                        isAdmin
+                                            ?
+                                            <SimpleInputField
+                                                disabled={!owner}
+                                                onchange={e => setReasonText(e.target.value)}
+                                                onKeyDown={(e: any) => { console.log(e.key); if (e.key === 'Enter') { _handleReasonKeyDown(transaction.safeTxHash, mulRecipient) } }}
+                                                className="inputField"
+                                                height={30}
+                                                width={"100%"}
+                                                placeholder="Reason for transaction"
+                                            />
+                                            :
+                                            null
+                                    }
+                                </>
                         }
                     </div>
                     <div className="transactionAddress">
@@ -161,8 +192,45 @@ const PendingTxn = ({ tokens, threshold, transaction, owner, confirmTransaction,
                             </div>
                         </div>
                         <div className="transactionName">
-                            {reason ? <div className="dashboardText">{reason}</div> :
-                                <SimpleInputField disabled={!owner} onchange={(e: any) => { setReasonText(e.target.value) }} onKeyDown={(e: any) => { if (e.key === 'Enter') { _handleReasonKeyDown(transaction.safeTxHash, recipient) } }} className="inputField" height={30} width={"100%"} placeholder="Reason for transaction" />}
+                            {
+                                reason
+                                    ?
+                                    <>
+                                        {
+                                            editMode
+                                                ?
+                                                <SimpleInputField
+                                                    disabled={!owner}
+                                                    value={reasonText}
+                                                    onchange={(e: any) => { setReasonText(e.target.value) }}
+                                                    onKeyDown={(e: any) => { if (e.key === 'Enter') { _handleReasonKeyDown(transaction.safeTxHash, recipient) } }}
+                                                    className="inputField"
+                                                    height={30}
+                                                    width={"100%"}
+                                                    placeholder="Reason for transaction"
+                                                />
+                                                :
+                                                <div className="dashboardText" onClick={() => handleEnableEditMode(reason)}>{reason}</div>
+                                        }
+                                    </>
+                                    :
+                                    <>
+                                        {
+                                            isAdmin
+                                                ?
+                                                <SimpleInputField
+                                                    disabled={!owner}
+                                                    onchange={(e: any) => { setReasonText(e.target.value) }} onKeyDown={(e: any) => { if (e.key === 'Enter') { _handleReasonKeyDown(transaction.safeTxHash, recipient) } }}
+                                                    className="inputField"
+                                                    height={30}
+                                                    width={"100%"}
+                                                    placeholder="Reason for transaction"
+                                                />
+                                                :
+                                                null
+                                        }
+                                    </>
+                            }
                         </div>
                         <div className="transactionAddress">
                             <div className="dashboardText">

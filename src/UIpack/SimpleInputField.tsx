@@ -13,6 +13,7 @@ const SimpleInputField = (props: InputFieldType) => {
         value={props.value}
         placeholder={props.placeholder}
         onChange={props.onchange}
+        onClick={props.onClick}
         onBlur={props.onBlur}
         disabled={props.disabled}
         onKeyDown={props.onKeyDown}

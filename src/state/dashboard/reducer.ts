@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { DAOType } from "types/UItype";
 import { getDao, loadDao, addDaoMember, updateDaoMember, createProject, addProjectMember, updateProjectMember, updateProjectLink, getProject, addProjectLinks } from "./actions";
 import { createContract } from "state/contract/actions";
-import { get as _get } from "lodash";
+import { get as _get, find as _find } from "lodash";
 
 export interface DashboardState {
 	// DAO: DAOType | null;
@@ -13,6 +13,7 @@ export interface DashboardState {
 	updateMemberLoading: boolean | null;
 	Project: any;
 	ProjectLoading: boolean | null;
+	createProjectLoading: boolean | null;
 	addProjectMemberLoading: boolean | null;
 	updateProjectMemberLoading: boolean | null;
 	addProjectLinksLoading: boolean | null;
@@ -26,6 +27,7 @@ const initialState: DashboardState = {
 	updateMemberLoading: null,
 	Project: null,
 	ProjectLoading: null,
+	createProjectLoading: null,
 	addProjectMemberLoading: null,
 	updateProjectMemberLoading: null,
 	addProjectLinksLoading: null,
@@ -44,6 +46,9 @@ const dashboardSlice = createSlice({
 		resetUpdateMemberLoader(state) {
 			state.updateMemberLoading = null
 		},
+		resetCreateProjectLoader(state) {
+			state.createProjectLoading = null
+		},
 		resetAddProjectMemberLoader(state) {
 			state.addProjectMemberLoading = null
 		},
@@ -61,15 +66,27 @@ const dashboardSlice = createSlice({
 		},
 		updateSafeTransaction(state, action) {
 			console.log(action.payload)
-			state.DAO = {
-				...state.DAO,
-				safe: {
-					...state.DAO.safe,
-					transactions: state.DAO.safe.transactions.map((t: any) => {
-						if (t.safeTxHash === action.payload.safeTxHash)
-							return action.payload
-						return t
-					})
+			const tx = _find(state.DAO.safe.transactions, t => t.safeTxHash === action.payload.safeTxHash);
+			if (tx) {
+				state.DAO = {
+					...state.DAO,
+					safe: {
+						...state.DAO.safe,
+						transactions: state.DAO.safe.transactions.map((t: any) => {
+							if (t.safeTxHash === action.payload.safeTxHash)
+								return action.payload
+							return t
+						})
+					}
+				}
+			}
+			else {
+				state.DAO = {
+					...state.DAO,
+					safe: {
+						...state.DAO.safe,
+						transactions: [...state.DAO.safe.transactions, action.payload]
+					}
 				}
 			}
 		},
@@ -114,7 +131,11 @@ const dashboardSlice = createSlice({
 		},
 		// project related
 		[`${createProject.fulfilled}`]: (state, action) => {
-			state.DAO = action.payload
+			state.createProjectLoading = false;
+			state.DAO = action.payload;
+		},
+		[`${createProject.pending}`]: (state, action) => {
+			state.createProjectLoading = true;
 		},
 		[`${getProject.fulfilled}`]: (state, action) => {
 			state.ProjectLoading = false;
@@ -164,6 +185,7 @@ export const {
 	setDAO,
 	resetCreateDAOLoader,
 	resetAddMemberLoader,
+	resetCreateProjectLoader,
 	resetAddProjectMemberLoader,
 	resetUpdateProjectMemberLoader,
 	resetAddProjectLinksLoader,

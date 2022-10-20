@@ -9,6 +9,7 @@ import lomadsfulllogo from "../../assets/svg/lomadsfulllogo.svg";
 import membersGroup from '../../assets/svg/membersGroup.svg'
 
 import editToken from '../../assets/svg/editToken.svg';
+import deleteIcon from '../../assets/svg/deleteIcon.svg';
 import memberIcon from '../../assets/svg/memberIcon.svg';
 import lock from '../../assets/svg/lock.svg';
 
@@ -35,18 +36,18 @@ const ProjectDetails = () => {
     const { projectId, daoURL } = useParams();
     const navigate = useNavigate();
     const [unlockLoading, setUnlockLoading] = useState(null);
-    const [showNavBar, setShowNavBar] = useState(false);
     const [showAddMember, setShowAddMember] = useState(false);
     const [showList, setShowList] = useState(false);
     const [showAddLink, setShowAddLink] = useState(false);
     const { DAO, Project, ProjectLoading, updateProjectMemberLoading } = useAppSelector((state) => state.dashboard);
     console.log("Project : ", Project)
-    const daoName = _get(DAO, 'name', '');
+    const daoName = _get(DAO, 'name', '').split(" ");
 
     const [lockedLinks, setLockedLinks] = useState([]);
     const [openLinks, setOpenLinks] = useState([]);
 
     const [extraMembers, setExtraMembers] = useState([]);
+    const [newAddress, setNewAddress] = useState('');
 
     useEffect(() => {
         if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
@@ -73,9 +74,12 @@ const ProjectDetails = () => {
         }
     }, [updateProjectMemberLoading]);
 
-    const showSideBar = (_choice) => {
-        setShowNavBar(_choice);
-    };
+    useEffect(() => {
+        if (newAddress !== '') {
+            const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === newAddress.toLowerCase());
+            setExtraMembers([...extraMembers, user.member._id])
+        }
+    }, [DAO]);
 
     const handleParseUrl = (url) => {
         const link = new URL(url);
@@ -102,7 +106,7 @@ const ProjectDetails = () => {
     };
 
     const toggleShowMember = () => {
-        setShowList(false);
+        setShowList(!showList);
         setShowAddMember(!showAddMember);
     };
 
@@ -151,7 +155,13 @@ const ProjectDetails = () => {
     }
 
     const handleAddMember = (user) => {
-        setExtraMembers([...extraMembers, user.member._id]);
+        if (extraMembers.includes(user.member._id)) {
+            setExtraMembers(extraMembers.filter((m) => m !== user.member._id));
+        }
+        else {
+            setExtraMembers([...extraMembers, user.member._id]);
+        }
+
     }
 
     const handleUsers = (item, index) => {
@@ -164,7 +174,13 @@ const ProjectDetails = () => {
                     </div>
                     <div className="member-address">
                         <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
-                        <input type="checkbox" onChange={() => handleAddMember(item)} />
+                        {
+                            extraMembers.some((m) => m === item.member._id) === false
+                                ?
+                                <input type="checkbox" onChange={() => handleAddMember(item)} />
+                                :
+                                <input type="checkbox" onChange={() => handleAddMember(item)} checked />
+                        }
                     </div>
                 </div>
             )
@@ -173,6 +189,9 @@ const ProjectDetails = () => {
 
     const handleRenderRole = (item) => {
         const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === item.wallet.toLowerCase());
+        if (user.role === 'CORE_CONTRIBUTOR') {
+            return 'core contributor';
+        }
         return user.role;
     }
 
@@ -198,9 +217,6 @@ const ProjectDetails = () => {
             }
             <div
                 className='projectDetails-container'
-                onMouseEnter={() => {
-                    showSideBar(false);
-                }}
             >
                 {
                     showList
@@ -242,8 +258,7 @@ const ProjectDetails = () => {
                                     ?
                                     <AddMember
                                         toggleShowMember={toggleShowMember}
-                                        projectId={projectId}
-                                        daoUrl={daoURL}
+                                        addToList={(address) => setNewAddress(address)}
                                     />
                                     :
                                     null
@@ -256,22 +271,36 @@ const ProjectDetails = () => {
                         toggleShowLink={toggleShowLink}
                         projectId={projectId}
                         daoUrl={daoURL}
+                        sbt={DAO?.sbt}
                     />
                 }
+
+                <div className="home-btn" onClick={() => navigate(-1)}>
+                    <div className="invertedBox">
+                        <div className="navbarText">
+                            {
+                                daoName.length === 1
+                                    ? daoName[0].charAt(0)
+                                    : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)
+                            }
+                        </div>
+                    </div>
+                </div>
+
                 <div className="projectDetails-body">
                     <div className="projectDetails-left">
                         <div className="projectDetails-name">
                             <div>
-                                <h1 onClick={() => navigate(-1)}>Project /&nbsp;<span onClick={(e) => e.stopPropagation()}>{Project?.name}</span></h1>
+                                <h1>Project /&nbsp;<span onClick={(e) => e.stopPropagation()}>{Project?.name}</span></h1>
                                 <p>{Project?.description}</p>
                             </div>
                             <div>
-                                <p>You're an Admin</p>
-                            </div>
-                            <div>
-                                {/* <button>
+                                <button>
+                                    <img src={deleteIcon} alt="hk-logo" />
+                                </button>
+                                <button>
                                     <img src={editToken} alt="hk-logo" />
-                                </button> */}
+                                </button>
                             </div>
                         </div>
                         <div className="projectDetails-members">
@@ -416,11 +445,6 @@ const ProjectDetails = () => {
                     <Footer theme="dark" />
                 </div>
             </div>
-            <SideBar
-                name={daoName}
-                showSideBar={showSideBar}
-                showNavBar={showNavBar}
-            />
         </>
     )
 }

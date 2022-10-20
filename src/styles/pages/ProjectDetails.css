@@ -10,6 +10,20 @@
     overflow-y: scroll;
 }
 
+.projectDetails-container .home-btn {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(178.31deg, #C94B32 0.74%, #A54536 63.87%);
+    border-radius: 0px 0px 30px 0px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
 /* Add new member overlay */
 .projectDetails-container .addMemberOverlay {
     width: 100%;
@@ -204,6 +218,10 @@
     color: #76808D;
 }
 
+.projectDetails-container .projectDetails-body .projectDetails-left .projectDetails-name div button:first-child {
+    margin-right: 22px;
+}
+
 .projectDetails-container .projectDetails-body .projectDetails-left .projectDetails-members {
     width: 100%;
 }
@@ -340,15 +358,13 @@
     align-items: center;
 }
 
-.projectDetails-container .projectDetails-body .projectDetails-left .projectDetails-members .members-list .members-list-body .members-row .members-row-status p {
+.projectDetails-container .projectDetails-body .projectDetails-left .projectDetails-members .members-list .members-list-body .members-row .members-row-status span {
     font-style: normal;
-    font-weight: 400;
+    font-weight: 700;
     font-size: 14px;
     line-height: 16px;
-    display: flex;
-    align-items: flex-end;
-    text-align: right;
     color: #76808D;
+    text-transform: lowercase;
 }
 
 

@@ -107,11 +107,9 @@ const AddMember = (props: any) => {
 			}
 		}
 		if (!isPresent(member.address) && isRightAddress(member.address)) {
-			if (props.projectId) {
-				dispatch(addProjectMember({ projectId: props.projectId, daoUrl: props.daoUrl, payload: member }))
-			}
-			else {
-				dispatch(addDaoMember({ url: DAO?.url, payload: member }))
+			dispatch(addDaoMember({ url: DAO?.url, payload: member }))
+			if (props.addToList) {
+				props.addToList(member.address);
 			}
 		}
 	};
