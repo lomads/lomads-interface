@@ -29,6 +29,7 @@ const NotificationArea = (props: any) => {
                   width={25}
                   className="sideModalCloseButton"
                   onClick={(e) => {
+                    localStorage.setItem(`lmds_notification_count_${props.daoId}`, `${props.pendingTransactionCount}`)
                     localStorage.setItem(`lmds_notification_count_${props.daoId}_show`, '0')
                     props.showNotificationArea(false);
                   }}

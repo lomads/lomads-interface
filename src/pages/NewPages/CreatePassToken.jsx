@@ -1,14 +1,12 @@
 
 import "../../styles/pages/CreatePassToken.css";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import Frame from '../../assets/svg/frame.svg';
 import uploadIcon from '../../assets/svg/ico-upload.svg';
-import hklogo from '../../assets/svg/hklogo.svg';
 import coin from '../../assets/svg/coin.svg';
 import editToken from '../../assets/svg/editToken.svg';
-import memberIcon from '../../assets/svg/memberIcon.svg';
-import { AiOutlinePlus } from "react-icons/ai";
 import { useState } from "react";
+import { nanoid } from "@reduxjs/toolkit";
 import { useWeb3React } from "@web3-react/core";
 import { useSBTDeployerContract } from "hooks/useContract";
 import { createNewSBT, getCurrentId, getContractById } from "hooks/SBT/sbtDeployer";
@@ -20,8 +18,13 @@ import trimAddress from "utils/sliceAddr";
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import { createContract } from '../../state/contract/actions';
 import { resetCreateContractLoader } from '../../state/contract/reducer';
-
+import { useDropzone } from 'react-dropzone'
+import ReactS3Uploader from 'components/ReactS3Uploader';
 import { ethers } from "ethers";
+import { LeapFrog } from "@uiball/loaders";
+import axiosHttp from '../../api'
+import imageToBase64 from "utils/imageToBase64";
+
 
 const CreatePassToken = () => {
     const { account, provider } = useWeb3React();
@@ -44,6 +47,9 @@ const CreatePassToken = () => {
     const [name, setName] = useState('');
     const [address, setAddress] = useState('');
     const [image, setImage] = useState(null);
+    const [whitelisted, setWhitelisted] = useState(false);
+    const [uploadLoading, setUploadLoading] = useState(false);
+
 
     const { createContractLoading } = useAppSelector(store => store.contract)
     /*
@@ -147,7 +153,7 @@ const CreatePassToken = () => {
         setSupplyError(false);
     }
 
-    const addSBTConstructor = () => {
+    const addSBTConstructor = async () => {
         if (sbtName === '') {
             setNameError(true);
             setError("Please enter token name");
@@ -164,10 +170,12 @@ const CreatePassToken = () => {
             return;
         }
         else {
+            const b64 = await imageToBase64(image)
+            console.log(b64);
             setSBTConstructor({
                 name: sbtName,
-                supply: tokenQuantity,
-                img: null /// need to be save in base64 format when DB is ready
+                supply: +(tokenQuantity || 250),
+                img: b64
             });
             setTab(2);
         }
@@ -201,8 +209,11 @@ const CreatePassToken = () => {
                 setContractAddr(contractAddr);
                 const contractJSON = {
                     name: sbtName,
+                    image,
+                    tokenSupply: tokenQuantity,
                     address: contractAddr,
                     admin: account,
+                    whitelisted,
                     contactDetail: selectedOptions,
                     metadata: [],
                     membersList: memberList,
@@ -222,9 +233,32 @@ const CreatePassToken = () => {
         // return;
     }
 
-    const handleSelectImage = (event) => {
-        setImage(URL.createObjectURL(event.target.files[0]))
+    const [droppedfiles, setDroppedfiles] = useState([])
+
+    const onDrop = useCallback(acceptedFiles => { setDroppedfiles(acceptedFiles) }, [])
+
+    const { getRootProps, getInputProps } = useDropzone({onDrop, multiple: false })
+
+	const getSignedUploadUrl = (file, callback) => { 
+        console.log(file)
+        const filename = `SBT/${nanoid(32)}.${file.type.split('/')[1]}`
+        return axiosHttp.post(`utility/upload-url`, { key: filename, mime: file.type }).then(res => callback(res.data))
     }
+
+	const onUploadProgress = (progress, message, file) => { }
+
+	const onUploadError = error => { setDroppedfiles([]); setUploadLoading(false) }
+
+	const onUploadStart = (file, next) => {	setUploadLoading(true); return next(file); }
+
+	const onFinish = finish => { 
+        setDroppedfiles([])
+        setUploadLoading(false);  
+        var arr = finish.signedUrl.split('?');
+        console.log(arr)
+        setImage(arr[0])
+    }
+
 
     return (
         <>
@@ -256,20 +290,47 @@ const CreatePassToken = () => {
                                         </div>
                                     </div>
                                     <span>Suggested dimensions and format : <br /> 800x800, .svg or .png</span>
+
                                     <div className="image-picker-container">
                                         {
-                                            image
-                                                ?
+                                            image ? 
+                                            <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                                                <div onClick={() => setImage(null)} style={{ cursor: 'pointer' }}>
+                                                    <img style={{ width: 18, height: 18, position: 'absolute', right: 8, top: 8, opacity: 0.7 }} src={require('../../assets/images/close.png')} />
+                                                </div>
                                                 <img src={image} alt="selected-token-icon" className="selected-img" />
-                                                :
-                                                <>
-                                                    <img src={uploadIcon} alt="upload-icon" />
-                                                    <p>Choose <br /> or drag an image</p>
-                                                    <span>maximum size 2mb</span>
-                                                    <input type="file" onChange={handleSelectImage} />
-                                                </>
+                                            </div>
+                                             :
+                                            <div {...getRootProps()}>
+                                                <ReactS3Uploader
+                                                    droppedfiles={droppedfiles}
+                                                    getSignedUrl={getSignedUploadUrl}
+                                                    accept="image/*"
+                                                    className={{ display: 'none' }}
+                                                    onProgress={onUploadProgress}
+                                                    onError={onUploadError}
+                                                    preprocess={onUploadStart}
+                                                    onFinish={onFinish}
+                                                    multiple
+                                                    uploadRequestHeaders={{
+                                                    }}
+                                                    contentDisposition="auto"
+                                                />
+                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                                    { uploadLoading ?
+                                                    <LeapFrog size={24} color="#C94B32" /> :
+                                                    <>
+                                                        <img src={uploadIcon} alt="upload-icon" />
+                                                        <p>Choose <br /> or drag an image</p>
+                                                        <span>maximum size 2mb</span>
+                                                    </> 
+                                                    }
+                                                </div>
+                                                <input {...getInputProps()} />
+                                            </div>
                                         }
                                     </div>
+
                                     <div className="optional-div">
                                         <label>Supply</label>
                                         {/* <div>
@@ -290,7 +351,7 @@ const CreatePassToken = () => {
                                     <div className='organisation-policy'>
                                         <p>Membership policy :</p>
                                         <div>
-                                            <input type='checkbox' />
+                                            <input type='checkbox' value={whitelisted} onChange={e => setWhitelisted(prev => !prev)} />
                                             <span>WHITELISTED</span>
                                         </div>
                                     </div>
