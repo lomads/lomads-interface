@@ -9,6 +9,20 @@
     overflow-y: scroll;
 }
 
+.createProject-container .home-btn {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(178.31deg, #C94B32 0.74%, #A54536 63.87%);
+    border-radius: 0px 0px 30px 0px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
 .createProject-container .createProject-dropdown-container {
     width: 220px;
     height: 60px;

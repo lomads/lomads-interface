@@ -81,13 +81,19 @@ const AddLink = (props) => {
                             />
                         </div>
                     </div>
-                    <div className='resource-footer'>
-                        <input id="accessControl" type="checkbox" value={accessControl} onChange={() => setAccessControl(prev => !prev)} disabled={true} />
-                        <div>
-                            <p>ACCESS CONTROL</p>
-                            <span>Currently available for discord only</span>
-                        </div>
-                    </div>
+                    {
+                        props.sbt
+                            ?
+                            <div className='resource-footer'>
+                                <input id="accessControl" type="checkbox" value={accessControl} onChange={() => setAccessControl(prev => !prev)} disabled={true} />
+                                <div>
+                                    <p>ACCESS CONTROL</p>
+                                    <span>Currently available for discord only</span>
+                                </div>
+                            </div>
+                            :
+                            null
+                    }
                     <div id="addMemberButtonArea">
                         <div>
                             <OutlineButton
@@ -104,9 +110,9 @@ const AddLink = (props) => {
                         </div>
                         <div>
                             {
-                                link && link.indexOf('discord.com') > -1 ? 
-                                <AddDiscordLink onGuildCreateSuccess={handleAddLink} okButton title={title} link={link} accessControl={accessControl}/> : 
-                                <SimpleButton title="OK" bgColor="#C94B32" className="button" fontsize={16} fontweight={400} height={40} width={129} onClick={() => handleAddLink()} />
+                                link && link.indexOf('discord.com') > -1 ?
+                                    <AddDiscordLink onGuildCreateSuccess={handleAddLink} okButton title={title} link={link} accessControl={accessControl} /> :
+                                    <SimpleButton title="OK" bgColor="#C94B32" className="button" fontsize={16} fontweight={400} height={40} width={129} onClick={() => handleAddLink()} />
                             }
                         </div>
                     </div>

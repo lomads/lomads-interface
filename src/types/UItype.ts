@@ -6,7 +6,8 @@ export interface InputFieldType {
   width?: number | string;
   name?: string;
   onKeyDown?: any;
-  disabled?:any;
+  onClick?: any;
+  disabled?: any;
   value?: string | number;
   placeholder?: string;
   onchange?: (e: any) => void;
@@ -33,7 +34,7 @@ export interface IconButtonType {
   width?: number;
   fontsize?: number;
   fontweight?: number;
-  disabled?:boolean;
+  disabled?: boolean;
   Icon: any;
   bgColor?: string;
   className?: string;

@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import { createProject } from 'state/dashboard/actions'
 import { isValidUrl } from 'utils';
-import { resetCreateProjectLoading } from 'state/dashboard/reducer';
+import { resetCreateProjectLoader } from 'state/dashboard/reducer';
 import useDCAuth from 'hooks/useDCAuth';
 import usePopupWindow from 'hooks/usePopupWindow';
 import axios from 'axios';
@@ -48,18 +48,21 @@ const CreateProject = () => {
     const [link, setLink] = useState('');
     const [accessControl, setAccessControl] = useState(false);
     const [title, setTitle] = useState('');
+    const [newAddress, setNewAddress] = useState('');
+
+    const daoName = _get(DAO, 'name', '').split(" ");
 
     useEffect(() => setMemberList(DAO.members), [DAO])
 
-    // useEffect(() => {
-    //     if (createProjectLoading === false) {
-    //         dispatch(resetCreateProjectLoading());
-    //         setSuccess(true);
-    //         setTimeout(() => {
-    //             navigate('/dashboard')
-    //         }, 2000);
-    //     }
-    // }, [createProjectLoading])
+    useEffect(() => {
+        if (createProjectLoading === false) {
+            dispatch(resetCreateProjectLoader());
+            setSuccess(true);
+            setTimeout(() => {
+                navigate(-1);
+            }, 2000);
+        }
+    }, [createProjectLoading])
 
     useEffect(() => {
         const memberList = DAO?.members;
@@ -76,18 +79,31 @@ const CreateProject = () => {
     }, []);
 
     useEffect(() => {
-        if (link.length > 8) {
+        let accessControlElement = document.getElementById('accessControl');
+        if (link.length > 8 && accessControlElement) {
             try {
                 const url = new URL(link);
                 if (url.hostname === 'discord.com' || url.hostname === 'discord.gg')
-                    document.getElementById('accessControl').disabled = false;
+                    accessControlElement.disabled = false;
                 else
-                    document.getElementById('accessControl').disabled = true;
+                    accessControlElement.disabled = true;
             } catch (e) {
                 console.log(e)
             }
         }
     }, [link]);
+
+    useEffect(() => {
+        if (newAddress !== '') {
+
+            const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === newAddress.toLowerCase());
+            let memberOb = {};
+            memberOb.name = user.member.name;
+            memberOb.address = user.member.wallet;
+            console.log("new member ob : ", memberOb);
+            setSelectedMembers([...selectedMembers, memberOb]);
+        }
+    }, [DAO]);
 
     const handleNext = () => {
         if (name !== '' && desc !== '') {
@@ -159,7 +175,7 @@ const CreateProject = () => {
             resource.title = title;
             resource.link = link;
             resource.accessControl = accessControl;
-            if(guildId)
+            if (guildId)
                 resource.guildId = guildId;
             setResourceList([...resourceList, resource]);
             setTitle('');
@@ -180,19 +196,27 @@ const CreateProject = () => {
         project.links = resourceList;
         project.daoId = DAO?._id;
         dispatch(createProject({ payload: project }))
-        setSuccess(true);
-        setTimeout(() => {
-            navigate(-1);
-        }, 2000);
     }
 
     return (
         <>
 
             <div className="createProject-container">
+                <div className="home-btn" onClick={() => navigate(-1)}>
+                    <div className="invertedBox">
+                        <div className="navbarText">
+                            {
+                                daoName.length === 1
+                                    ? daoName[0].charAt(0)
+                                    : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)
+                            }
+                        </div>
+                    </div>
+                </div>
                 {showAddMember &&
                     <AddMember
                         toggleShowMember={toggleShowMember}
+                        addToList={(address) => setNewAddress(address)}
                     />
                 }
                 {
@@ -266,7 +290,6 @@ const CreateProject = () => {
                                                     <div className="member-list">
                                                         {
                                                             memberList.map((item, index) => {
-                                                                const ob = { name: item.member.name, address: item.member.wallet }
                                                                 if (item.member.wallet.toLowerCase() !== account.toLowerCase()) {
                                                                     return (
                                                                         <div className="member-li" key={index}>
@@ -277,7 +300,7 @@ const CreateProject = () => {
                                                                             <div className="member-address">
                                                                                 <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
                                                                                 {
-                                                                                    selectedMembers.indexOf(ob) === -1
+                                                                                    selectedMembers.some((m) => m.address === item.member.wallet) === false
                                                                                         ?
                                                                                         <input type="checkbox" onChange={() => handleAddMember(item.member)} />
                                                                                         :
@@ -395,23 +418,32 @@ const CreateProject = () => {
                                                                 value={link}
                                                                 onChange={(e) => setLink(e.target.value)}
                                                             />
-                                                            { link && link.indexOf('discord.com') > -1 ?
-                                                                                                                        <AddDiscordLink onGuildCreateSuccess={handleAddResource} title={title} link={link} accessControl={accessControl} /> :
-                                                            <button
-                                                                style={link !== '' && title !== '' ? { background: '#C84A32' } : null}
-                                                                onClick={handleAddResource}
-                                                            >
-                                                                <AiOutlinePlus color="#FFF" size={25} />
-                                                            </button> 
+                                                            {
+                                                                link && link.indexOf('discord.com') > -1
+                                                                    ?
+                                                                    <AddDiscordLink onGuildCreateSuccess={handleAddResource} title={title} link={link} accessControl={accessControl} />
+                                                                    :
+                                                                    <button
+                                                                        style={link !== '' && title !== '' ? { background: '#C84A32' } : null}
+                                                                        onClick={handleAddResource}
+                                                                    >
+                                                                        <AiOutlinePlus color="#FFF" size={25} />
+                                                                    </button>
                                                             }
                                                         </div>
-                                                        <div className='resource-footer'>
-                                                            <input id="accessControl" type="checkbox" value={accessControl} disabled={true} onChange={e => setAccessControl(prev => !prev)} />
-                                                            <div>
-                                                                <p>ACCESS CONTROL</p>
-                                                                <span>Currently available for discord only</span>
-                                                            </div>
-                                                        </div>
+                                                        {
+                                                            DAO?.sbt
+                                                                ?
+                                                                <div className='resource-footer'>
+                                                                    <input id="accessControl" type="checkbox" value={accessControl} disabled={true} onChange={e => setAccessControl(prev => !prev)} />
+                                                                    <div>
+                                                                        <p>ACCESS CONTROL</p>
+                                                                        <span>Currently available for discord only</span>
+                                                                    </div>
+                                                                </div>
+                                                                :
+                                                                null
+                                                        }
                                                     </div>
                                                     {
                                                         resourceList.length > 0
@@ -426,7 +458,7 @@ const CreateProject = () => {
                                                                                     <p>{item.title}</p>
                                                                                 </div>
                                                                                 <div className="member-address">
-                                                                                    <p>{item.link}</p>
+                                                                                    <p>{item.link.length > 30 ? item.link.slice(0, 30) + "..." : item.link}</p>
                                                                                     <button onClick={() => handleRemoveResource(index)}>X</button>
                                                                                 </div>
                                                                             </div>

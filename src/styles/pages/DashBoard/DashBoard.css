@@ -223,12 +223,18 @@ body.active-modal {
 
 .dashboardText {
     font-family: 'Inter', sans-serif;
-    font-style: italic;
     font-weight: 400;
     font-size: 16px;
     line-height: 16px;
     display: flex;
     align-items: center;
+    color: #76808D;
+}
+
+.roleText {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
     color: #76808D;
 }
 
@@ -396,7 +402,18 @@ body.active-modal {
 
 .avatarAndName {
     gap: 10px;
-    margin-right: 35px;
+}
+
+.avatarAndName input {
+    background: #f5f5f5;
+    box-shadow: inset 1px 0px 4px rgb(27 43 65 / 10%);
+    padding: 0 5px;
+    width: 100%;
+    border-radius: 5px;
+    color: #76808D;
+    height: 30px;
+    border: 1px solid;
+    border-color: inherit;
 }
 
 .Joined {

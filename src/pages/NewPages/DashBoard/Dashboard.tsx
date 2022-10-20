@@ -234,9 +234,9 @@ const Dashboard = () => {
 							setCopy(false);
 						}}
 					>
-					<div className="DAOname">
-						{_get(DAO, 'name', '')}
-					</div>
+						<div className="DAOname">
+							{_get(DAO, 'name', '')}
+						</div>
 						<Tooltip label={copy ? "copied" : "copy"}>
 							<div
 								className="copyLinkButton"
