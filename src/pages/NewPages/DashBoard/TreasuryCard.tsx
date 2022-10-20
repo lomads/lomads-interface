@@ -317,12 +317,12 @@ const TreasuryCard = (props: ItreasuryCardType) => {
             <div className="dashboardText" style={{ marginBottom: '6px' }}>Last Transactions</div>
             {
               pendingTxn.map((ptx, index) =>
-                <PendingTxn owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
+                <PendingTxn isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
               )
             }
             {
               executedTxn.map((ptx, index) =>
-                <CompleteTxn owner={owner} transaction={ptx} tokens={props.tokens} />
+                <CompleteTxn isAdmin={amIAdmin} owner={owner} transaction={ptx} tokens={props.tokens} />
               )
             }
           </div>
