@@ -22,6 +22,8 @@ import ProjectDetails from "./NewPages/ProjectDetails";
 
 import { ProjectContext } from "context/ProjectContext";
 
+import routes from '../routes';
+
 export default function App() {
 	const landingPage = useMatch("/");
 	const [projects, setProjects] = useState([]);
@@ -31,7 +33,10 @@ export default function App() {
 			{!landingPage && <Header />}
 			<ProjectContext.Provider value={{ projects, setProjects }}>
 				<Routes>
-					<Route path="/" element={[<LoginPage />]} />
+					{
+						routes.map(route => <Route path={route.path} element={<route.component/>} />)
+					}
+					{/* <Route path="/" element={[<LoginPage />]} />
 					<Route path="/namedao" element={<NameDAO />} />
 					<Route path="/createdao" element={<NameDAO />} />
 					<Route path="/invitegang" element={<InviteGang />} />
@@ -47,7 +52,7 @@ export default function App() {
 					<Route path="/dcauth" element={<DCAuth />} />
 					<Route path="/:daoURL/project/:projectId" element={<ProjectDetails />} />
 					<Route path="/settings" element={<Settings />} />
-					<Route path="/:daoURL" element={<Dashboard />} />
+					<Route path="/:daoURL" element={<Dashboard />} /> */}
 				</Routes>
 			</ProjectContext.Provider>
 		</div>

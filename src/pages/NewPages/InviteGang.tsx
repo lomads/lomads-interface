@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import _ from "lodash";
 import IconButton from "UIpack/IconButton";
 import SimpleButton from "UIpack/SimpleButton";
@@ -9,17 +9,20 @@ import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import AddressInputField from "UIpack/AddressInputField";
 import { useAppSelector } from "state/hooks";
+import { LeapFrog } from "@uiball/loaders";
 import { useAppDispatch } from "state/hooks";
-import { updateInvitedGang } from "state/flow/reducer";
+import { updateInvitedGang, appendInviteMembers } from "state/flow/reducer";
 import { ethers } from "ethers";
 import { InviteGangType } from "types/UItype";
 import daoMember2 from "../../assets/svg/daoMember2.svg";
 import { useWeb3React } from "@web3-react/core";
 import { useEnsAddress } from "react-moralis";
+import Uploader from 'components/XlsxUploader';
 
 const InviteGang = () => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
+	const [uploadLoading, setUploadLoading] = useState<boolean>(false);
 	const [ownerName, setOwnerName] = useState<string>("");
 	const [ownerAddress, setOwnerAddress] = useState<string>("");
 	const [errors, setErrors] = useState<any>({});
@@ -50,13 +53,14 @@ const InviteGang = () => {
 			(member) => member.address === (account as string)
 		);
 		if (!check) {
-			const creator = [
+			let creator = [
 				...invitedMembers,
 				{ name: "", address: account as string },
 			];
+			creator = creator.filter(c => c.address !== undefined)
 			dispatch(updateInvitedGang(creator));
 		}
-	});
+	}, []);
 
 	useEffect(() => {
 		isAddressValid(ownerAddress);
@@ -66,40 +70,44 @@ const InviteGang = () => {
 		isPresent(ownerAddress);
 	}, [ownerAddress]);
 
-	const addMember = async (_ownerName: string, _ownerAddress: string) => {
-		const member: InviteGangType = { name: _ownerName, address: _ownerAddress };
-		if (_ownerAddress.slice(-4) === ".eth") {
-			const resolver = await provider?.getResolver(_ownerAddress);
-			const EnsAddress = await resolver?.getAddress();
-			console.log("74 ensAddress : ", EnsAddress);
-			if (EnsAddress !== undefined) {
-				member.address = EnsAddress as string;
-				member.name = _ownerName !== '' ? _ownerName : _ownerAddress;
-				const present = isPresent(member.address);
-				present && setErrors({ ownerAddress: " * address already exists." });
+	const addMember = useCallback((_ownerName: string, _ownerAddress: string) => {
+		return new Promise(async (resolve, reject) => {
+			const member: InviteGangType = { name: _ownerName, address: _ownerAddress };
+			if (_ownerAddress.slice(-4) === ".eth") {
+				const resolver = await provider?.getResolver(_ownerAddress);
+				const EnsAddress = await resolver?.getAddress();
+				console.log("74 ensAddress : ", EnsAddress);
+				if (EnsAddress !== undefined) {
+					member.address = EnsAddress as string;
+					member.name = _ownerName !== '' ? _ownerName : _ownerAddress;
+					const present = isPresent(member.address);
+					present && setErrors({ ownerAddress: " * address already exists." });
+				}
+				else {
+					setErrors({ ownerAddress: " * address is not correct." });
+					member.address = _ownerAddress;
+				}
 			}
 			else {
-				setErrors({ ownerAddress: " * address is not correct." });
-				member.address = _ownerAddress;
+				const ENSname = await provider?.lookupAddress(_ownerAddress);
+				console.log("88 ensName : ", ENSname);
+				if (ENSname) {
+					member.name = _ownerName !== '' ? _ownerName : ENSname;
+				}
+				else {
+					member.name = _ownerName;
+				}
 			}
-		}
-		else {
-			const ENSname = await provider?.lookupAddress(_ownerAddress);
-			console.log("88 ensName : ", ENSname);
-			if (ENSname) {
-				member.name = _ownerName !== '' ? _ownerName : ENSname;
+			if (!isPresent(member.address) && isRightAddress(member.address)) {
+				console.log(invitedMembers)
+				const newMember = [...invitedMembers, member];
+				dispatch(updateInvitedGang(newMember));
+				setOwnerName("");
+				setOwnerAddress("");
 			}
-			else {
-				member.name = _ownerName;
-			}
-		}
-		if (!isPresent(member.address) && isRightAddress(member.address)) {
-			const newMember = [...invitedMembers, member];
-			dispatch(updateInvitedGang(newMember));
-			setOwnerName("");
-			setOwnerAddress("");
-		}
-	};
+			resolve(true);
+		})
+	}, [invitedMembers]);
 
 	const handleClick = (_ownerName: string, _ownerAddress: string) => {
 		let terrors: any = {};
@@ -135,13 +143,47 @@ const InviteGang = () => {
 		}
 	};
 
+	const handleInsertWallets = useCallback(async (data: Array<{ name: string, address: string }>) => {
+		try {
+			setUploadLoading(true)
+			let validMembers = [];
+			for (let index = 0; index < data.length; index++) {
+				let member = data[index];
+				if(isAddressValid(member.address) && !isPresent(member.address)) {
+					if (member.address.slice(-4) === ".eth") {
+						const resolver = await provider?.getResolver(member.address);
+						const EnsAddress = await resolver?.getAddress();
+						if (EnsAddress){
+							member.name = member.name ? member.name : member.address;
+							member.address = EnsAddress as string;
+						}	
+					} else {
+						const ENSname = await provider?.lookupAddress(member.address);
+						if(ENSname)
+							member.name = member.name ? member.name : ENSname
+					}
+					if(!_.find(validMembers, m => m.address.toLowerCase() === member.address.toLowerCase()) &&
+					   !_.find(invitedMembers, m => m.address.toLowerCase() === member.address.toLowerCase())
+					) { 
+						validMembers.push(member);
+					}
+				}
+			}
+			dispatch(appendInviteMembers(validMembers))
+			setUploadLoading(false)
+		} catch (e){
+			setUploadLoading(false)
+		}
+	}, [invitedMembers])
+
 	return (
 		<>
 			<div className="InviteGang">
 				<div className="headerText">2/3 Original Gang</div>
 				<div className="centerInputCard">
-					<div>
+					<div style={{ width: '100%', marginBottom: 8, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
 						<div className="inputTitle">Add member :</div>
+						{ uploadLoading ? <LeapFrog size={24} color="#C94B32" /> : <Uploader onComplete={handleInsertWallets} /> }
 					</div>
 					<div className="inputArea">
 						<div>

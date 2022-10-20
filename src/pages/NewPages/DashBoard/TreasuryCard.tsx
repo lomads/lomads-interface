@@ -265,7 +265,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
     return 0
   }, [props.fiatBalance]);
 
-  console.log(props.tokens)
+  console.log("TOKENS", props.tokens)
 
   return (
     <div className="treasuryCard">
@@ -285,10 +285,16 @@ const TreasuryCard = (props: ItreasuryCardType) => {
             <div className="dashboardText">{`${_get(props, 'safeAddress', '').slice(0, 6)}...${_get(props, 'safeAddress', '').slice(-4)}`}</div>
           </div>
           <div className="copyArea">
-            <>
-              <img src={coin} alt="asset" />
-              <div id="safeBalance">{`$ ${balance}`}</div>
-            </>
+            {
+              props.tokens.map((token:any) => {
+                if(token.tokenAddress)
+                  return ( <>
+                  <img src={coin} alt="asset" />
+                  <div id="safeBalance">{`${_get(token, 'balance', 0) / 10 ** 18} ${_get(token, 'token.symbol')}`}</div>
+                </> )
+                return null
+              })
+            }
             <div className="dashboardText">total balance</div>
           </div>
           {owner && <SafeButton onClick={props.toggleModal} height={40} width={150} titleColor="#B12F15" title="SEND TOKEN" bgColor="#FFFFFF" opacity="1" disabled={false} fontweight={400} fontsize={16} />}

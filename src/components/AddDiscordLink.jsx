@@ -28,6 +28,7 @@ export default ({ title, desc, link, accessControl, okButton, onGuildCreateSucce
     const [channels, setChannels] = useState(null);
     const [poll, setPoll] = useState(null);
     const [addLinkLoading, setAddLinkLoading] = useState(null);
+    const [hasClickedAuth, setHasClickedAuth] = useState(false)
 
     const getDiscordServers = useCallback(async () => {
         console.log("getDiscordServers", authorization)
@@ -44,11 +45,12 @@ export default ({ title, desc, link, accessControl, okButton, onGuildCreateSucce
     }, [authorization, onOpen])
 
     const prevAuth = usePrevious(authorization)
-
+    console.log("prevAuth", prevAuth)
     useEffect(() => {
-        if(!prevAuth && authorization && link)
-            handleAddResource()
-    }, [prevAuth, authorization])
+        if(!prevAuth && authorization && link && hasClickedAuth){
+            handleAddResource() 
+        }
+    }, [prevAuth, authorization, hasClickedAuth])
 
     useInterval(async () => {
         axios.post(`https://api.guild.xyz/v1/discord/server/${poll}`)
@@ -91,7 +93,7 @@ export default ({ title, desc, link, accessControl, okButton, onGuildCreateSucce
             guildPlatforms: [                           
                 {
                     platformName: "DISCORD",
-                    platformGuildId: server.id || url.pathname.split('/')[2],
+                    platformGuildId: server?.id || url.pathname.split('/')[2],
                     platformGuildData: {inviteChannel: invId}
                 },
             ],
@@ -121,9 +123,13 @@ export default ({ title, desc, link, accessControl, okButton, onGuildCreateSucce
                 onGuildCreateSuccess(result.id)
             })
             .catch(e=> {
-                console.log(_get(e, 'errors[0].msg'))
+                console.log(e)
                 setAddLinkLoading(null);
-                toast.error(_get(e, 'errors[0].msg'));
+                if(_get(e, 'errors[0].msg').indexOf('create another guild for the same platform!') > -1){
+                    toast.error('Server is already token gated. Please choose another server');
+                } else {
+                    toast.error(_get(e, 'errors[0].msg'));
+                }
             })
 
         } catch (e){
@@ -146,10 +152,12 @@ export default ({ title, desc, link, accessControl, okButton, onGuildCreateSucce
         }
         else {
             if(accessControl){
+                setHasClickedAuth(true)
                 try {
                     setAddLinkLoading(true);
                     if(!authorization) 
                         return onOpen()
+                    setHasClickedAuth(false)
                     const url = new URL(link)
                     const dcserverid = url.pathname.split('/')[2]
                     const dcServers = await getDiscordServers();
@@ -157,7 +165,7 @@ export default ({ title, desc, link, accessControl, okButton, onGuildCreateSucce
                         let validServer = _find(dcServers, s => s.id.toString() === dcserverid.toString() && s.owner)   
                         if(validServer){  
                             setServer(validServer)
-                             // check if bot already added
+                             // check if bot already added 
                             const guildChannels = await axios.post(`https://api.guild.xyz/v1/discord/server/${validServer.id}`).then(res => res.data.channels);  
                             if(guildChannels.length == 0){
                                 const redirectUri = typeof window !== "undefined" && `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
@@ -168,16 +176,20 @@ export default ({ title, desc, link, accessControl, okButton, onGuildCreateSucce
                             }
                         } else {
                             setAddLinkLoading(null);
-                            onResetAuth()
-                            setTimeout(() => onOpen(), 1000) 
+                            toast.error("Invalid discord server");
+                            // onResetAuth()
+                            // setTimeout(() => onOpen(), 1000) 
                         }
                     } else {
                         setAddLinkLoading(null);
+                        toast.error("Invalid discord server");
                     }
                 } catch (e) {
                     console.log(e)
                     setAddLinkLoading(null);
                 }
+            } else {
+                onGuildCreateSuccess()
             }
         }
     }
