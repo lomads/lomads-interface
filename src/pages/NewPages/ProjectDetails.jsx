@@ -450,9 +450,9 @@ const ProjectDetails = () => {
                                 <h1>{Project?.name}</h1>
                             </div>
                             <div>
-                                <button>
+                                {/* <button>
                                     <img src={editToken} alt="hk-logo" />
-                                </button>
+                                </button> */}
                                 <button onClick={() => setDeletePrompt(true)}>
                                     <img src={deleteIcon} alt="hk-logo" />
                                 </button>

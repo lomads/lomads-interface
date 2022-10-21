@@ -39,9 +39,9 @@ const ArchiveProjects = () => {
             <div className="archive-body">
                 {
                     DAO?.projects.map((item, index) => {
-                        if (item.archivedAt !== null) {
+                        if (item.archivedAt !== null && item.deletedAt === null) {
                             return (
-                                <div key={index}>
+                                <div key={index} style={{ marginBottom: '25px' }}>
                                     <ProjectCard
                                         project={item}
                                         daoUrl={DAO?.url}
