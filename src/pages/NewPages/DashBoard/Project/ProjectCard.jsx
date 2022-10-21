@@ -54,7 +54,13 @@ const ProjectCard = ({ project, daoUrl, tab }) => {
                 <p>{project.name}</p>
                 <span>{project.description.length > 25 ? project.description.substring(0, 25) + "..." : project.description}</span>
             </div>
-            <MdKeyboardArrowRight color='#B12F15' size={24} />
+            {
+                project.archivedAt
+                    ?
+                    null
+                    :
+                    <MdKeyboardArrowRight color='#B12F15' size={24} />
+            }
         </div>
     )
 }
