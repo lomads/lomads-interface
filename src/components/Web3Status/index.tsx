@@ -106,7 +106,6 @@ function Sock() {
 
 function Web3StatusInner() {
 	const { account, connector, chainId, ENSName } = useWeb3React();
-	console.log("chainId", chainId)
 	const connectionType = getConnection(connector).type;
 
 	const error = useAppSelector(

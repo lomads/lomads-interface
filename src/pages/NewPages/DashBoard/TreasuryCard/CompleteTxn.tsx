@@ -104,9 +104,9 @@ const CompleteTxn = ({ transaction, tokens, owner, isAdmin }: any) => {
                     </div>
                 </div>
                 <div id="voteArea">
-                    {threshold && index == 0 && <div className="dashboardTextBold">
+                    {/* {threshold && index == 0 && <div className="dashboardTextBold">
                         {_get(transaction, 'confirmations', null) ? `${_get(transaction, 'confirmations', []).length}/${threshold} sign` : ''}
-                    </div>}
+                    </div>} */}
                 </div>
                 <div className="confirmIconGrp">
                     <div className="ex" style={{ position: 'relative' }}>
@@ -179,9 +179,9 @@ const CompleteTxn = ({ transaction, tokens, owner, isAdmin }: any) => {
                         </div>
                     </div>
                     <div id="voteArea">
-                        {threshold && <div className="dashboardTextBold">
+                        {/* {threshold && <div className="dashboardTextBold">
                             {_get(transaction, 'confirmations', null) ? `${_get(transaction, 'confirmations', []).length}/${threshold} sign` : ''}
-                        </div>}
+                        </div>} */}
                     </div>
                     <div className="confirmIconGrp">
                         <div className="ex">

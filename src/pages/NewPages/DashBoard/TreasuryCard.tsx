@@ -29,6 +29,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	const [confirmTxLoading, setConfirmTxLoading] = useState<any>(null);
 	const [rejectTxLoading, setRejectTxLoading] = useState<any>(null);
 	const [executeTxLoading, setExecuteTxLoading] = useState<any>(null);
+	const [executeFirst, setExecuteFirst]= useState<any>(null);
 
 	const [pendingTxn, setPendingTxn] = useState<Array<any>>();
 	const [executedTxn, setExecutedTxn] = useState<Array<any>>();
@@ -90,15 +91,26 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	}
 
 	useEffect(() => {
-		if (DAO && (DAO.url === daoURL)) {
-			isOwner(_get(DAO, 'safe.address', ''))
-			loadPendingTxn()
-			loadExecutedTxn()
-		} else {
-			setPendingTxn(undefined);
-			setExecutedTxn(undefined);
+		if(pendingTxn) {
+			pendingTxn.map((tx, i) => {
+				if(i === 0)
+					setExecuteFirst(tx.nonce)
+			})
 		}
-	}, [DAO, daoURL])
+	}, [pendingTxn])
+
+	useEffect(() => {
+		if(threshold){
+			if (DAO && (DAO.url === daoURL)) {
+				isOwner(_get(DAO, 'safe.address', ''))
+				loadPendingTxn()
+				loadExecutedTxn()
+			} else {
+				setPendingTxn(undefined);
+				setExecutedTxn(undefined);
+			}
+		}
+	}, [DAO, daoURL, threshold])
 
 	useEffect(() => {
 		if (DAO && (DAO.url === daoURL)) {
@@ -305,7 +317,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
                 return null
               })
             }
-            <div className="dashboardText">total balance</div>
+            {/* <div className="dashboardText">total balance</div> */}
           </div>
           {owner && <SafeButton onClick={props.toggleModal} height={40} width={150} titleColor="#B12F15" title="SEND TOKEN" bgColor="#FFFFFF" opacity="1" disabled={false} fontweight={400} fontsize={16} />}
         </div>
@@ -317,7 +329,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
             <div className="dashboardText" style={{ marginBottom: '6px' }}>Last Transactions</div>
             {
               pendingTxn.map((ptx, index) =>
-                <PendingTxn isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
+                <PendingTxn executeFirst={executeFirst} isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
               )
             }
             {

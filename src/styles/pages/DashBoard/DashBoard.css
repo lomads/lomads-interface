@@ -315,7 +315,7 @@ body.active-modal {
 }
 
 .confirmIconGrp .ex {
-    height: 100%;
+    height: calc(100% + 12px);
     display: flex;
     flex-direction: column;
     align-items: center;

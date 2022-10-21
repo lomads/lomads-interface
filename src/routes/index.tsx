@@ -15,6 +15,7 @@ import MintPassToken from "../pages/NewPages/MintPassToken";
 import CreatePassSucess from "../pages/NewPages/CreatePassSucess";
 import CreateProject from "../pages/NewPages/CreateProject";
 import ProjectDetails from "../pages/NewPages/ProjectDetails";
+import OnlyWhitelisted from "pages/NewPages/OnlyWhitelisted";
 
 export default [
     {
@@ -56,6 +57,10 @@ export default [
     {
         path: '/noaccess',
         component: DAONoAccess
+    },
+    {
+        path: '/only-whitelisted',
+        component: OnlyWhitelisted
     },
     {
         path: '/sbt/create',

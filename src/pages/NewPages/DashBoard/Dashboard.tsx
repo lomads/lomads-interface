@@ -122,7 +122,7 @@ const Dashboard = () => {
 					if(parseInt(balanceOf._hex, 16) === 0)
 						navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
 				} else {
-					navigate('/noaccess')
+					navigate('/only-whitelisted')
 				}
 			} else if (!DAO?.sbt?.whitelisted) {
 				if(_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {

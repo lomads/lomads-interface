@@ -187,6 +187,7 @@ const Settings = () => {
                                             <img src={copyIcon} alt="copy" className="safeCopyImage" />
                                         </div>
                                     </Tooltip>
+                                    { DAO?.sbt?.image ? <img style={{ width: 24, height: 24 }} src={DAO?.sbt?.image} alt="asset" /> : <img src={coin} alt="asset" /> }
                                     <p>{DAO?.sbt?.name}</p>
                                 </div>
                             </div>

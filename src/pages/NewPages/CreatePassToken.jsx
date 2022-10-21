@@ -370,7 +370,10 @@ const CreatePassToken = () => {
                             <>
                                 <div className="tokenName-container">
                                     <div className="tokenName-box">
+                                        { image ? 
+                                        <img style={{ width: 20, height: 20, marginRight: 6 }} src={image} /> :
                                         <img src={coin} alt="asset" />
+                                        }
                                         {/* <img src={hklogo} alt="hk-logo" /> */}
                                         <p style={{ marginLeft: "5px" }}>{SBTConstructor.name}</p>
                                         <p style={{ marginLeft: "auto", marginRight: "20px" }}>x {SBTConstructor.supply}</p>
