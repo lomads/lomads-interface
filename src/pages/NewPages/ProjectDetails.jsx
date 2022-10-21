@@ -99,6 +99,7 @@ const ProjectDetails = () => {
         if (archiveProjectLoading === false) {
             dispatch(resetArchiveProjectLoader());
             setClosePrompt(false);
+            navigate(-1);
         }
     }, [archiveProjectLoading]);
 
@@ -107,7 +108,7 @@ const ProjectDetails = () => {
         if (deleteProjectLoading === false) {
             dispatch(resetDeleteProjectLoader());
             setDeletePrompt(false);
-            navigate(-1)
+            navigate(-1);
         }
     }, [deleteProjectLoading]);
 
