@@ -116,21 +116,26 @@ const CreateProject = () => {
     };
 
     const handleParseUrl = (url) => {
-        const link = new URL(url);
-        if (link.hostname === 'notion.com') {
-            return <span><SiNotion size={20} /></span>
+        try {
+            const link = new URL(url);
+            if (link.hostname === 'notion.com') {
+                return <span><SiNotion size={20} /></span>
+            }
+            else if (link.hostname === 'discord.com' || link.hostname === 'discord.gg') {
+                return <span><BsDiscord size={20} /></span>
+            }
+            else if (link.hostname === 'github.com') {
+                return <span><BsGithub size={20} /></span>
+            }
+            else if (link.hostname === 'google.com') {
+                return <span><BsGoogle size={20} /></span>
+            }
+            else {
+                return <span><BsLink size={20} /></span>
+            }
         }
-        else if (link.hostname === 'discord.com' || link.hostname === 'discord.gg') {
-            return <span><BsDiscord size={20} /></span>
-        }
-        else if (link.hostname === 'github.com') {
-            return <span><BsGithub size={20} /></span>
-        }
-        else if (link.hostname === 'google.com') {
-            return <span><BsGoogle size={20} /></span>
-        }
-        else {
-            return <span><BsLink size={20} /></span>
+        catch (e) {
+            console.error(e);
         }
     }
 

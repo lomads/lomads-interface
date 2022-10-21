@@ -1,6 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { DAOType } from "types/UItype";
-import { getDao, loadDao, addDaoMember, updateDaoMember, createProject, addProjectMember, updateProjectMember, updateProjectLink, getProject, addProjectLinks } from "./actions";
+import {
+	getDao,
+	loadDao,
+	addDaoMember,
+	updateDaoMember,
+	createProject,
+	addProjectMember,
+	updateProjectMember,
+	deleteProjectMember,
+	archiveProject,
+	deleteProject,
+	updateProjectLink,
+	getProject,
+	addProjectLinks
+} from "./actions";
 import { createContract } from "state/contract/actions";
 import { get as _get, find as _find } from "lodash";
 
@@ -16,6 +30,9 @@ export interface DashboardState {
 	createProjectLoading: boolean | null;
 	addProjectMemberLoading: boolean | null;
 	updateProjectMemberLoading: boolean | null;
+	deleteProjectMemberLoading: boolean | null;
+	archiveProjectLoading: boolean | null;
+	deleteProjectLoading: boolean | null;
 	addProjectLinksLoading: boolean | null;
 }
 
@@ -30,6 +47,9 @@ const initialState: DashboardState = {
 	createProjectLoading: null,
 	addProjectMemberLoading: null,
 	updateProjectMemberLoading: null,
+	deleteProjectMemberLoading: null,
+	archiveProjectLoading: null,
+	deleteProjectLoading: null,
 	addProjectLinksLoading: null,
 };
 
@@ -54,6 +74,15 @@ const dashboardSlice = createSlice({
 		},
 		resetUpdateProjectMemberLoader(state) {
 			state.updateProjectMemberLoading = null
+		},
+		resetDeleteProjectMemberLoader(state) {
+			state.deleteProjectMemberLoading = null
+		},
+		resetArchiveProjectLoader(state) {
+			state.archiveProjectLoading = null
+		},
+		resetDeleteProjectLoader(state) {
+			state.deleteProjectLoading = null
 		},
 		resetAddProjectLinksLoader(state) {
 			state.addProjectLinksLoading = null
@@ -161,6 +190,32 @@ const dashboardSlice = createSlice({
 		[`${updateProjectMember.pending}`]: (state) => {
 			state.updateProjectMemberLoading = true;
 		},
+		// delete Project members
+		[`${deleteProjectMember.fulfilled}`]: (state, action) => {
+			state.deleteProjectMemberLoading = false;
+			state.Project = action.payload;
+		},
+		[`${deleteProjectMember.pending}`]: (state) => {
+			state.deleteProjectMemberLoading = true;
+		},
+		// archive Project
+		[`${archiveProject.fulfilled}`]: (state, action) => {
+			state.archiveProjectLoading = false;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
+		},
+		[`${archiveProject.pending}`]: (state) => {
+			state.archiveProjectLoading = true;
+		},
+		// Delete project
+		[`${deleteProject.fulfilled}`]: (state, action) => {
+			state.deleteProjectLoading = false;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
+		},
+		[`${deleteProject.pending}`]: (state) => {
+			state.deleteProjectLoading = true;
+		},
 		// add project links
 		[`${addProjectLinks.fulfilled}`]: (state, action) => {
 			state.addProjectLinksLoading = false;
@@ -188,6 +243,9 @@ export const {
 	resetCreateProjectLoader,
 	resetAddProjectMemberLoader,
 	resetUpdateProjectMemberLoader,
+	resetDeleteProjectMemberLoader,
+	resetArchiveProjectLoader,
+	resetDeleteProjectLoader,
 	resetAddProjectLinksLoader,
 	updateSafeTransaction
 } = dashboardSlice.actions;
