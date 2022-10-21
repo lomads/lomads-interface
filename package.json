@@ -18,7 +18,7 @@
     "@lingui/macro": "^3.14.0",
     "@lingui/react": "^3.14.0",
     "@metamask/jazzicon": "^2.0.0",
-    "@popperjs/core": "^2.11.5",
+    "@popperjs/core": "^2.11.6",
     "@reach/dialog": "^0.17.0",
     "@reach/portal": "^0.17.0",
     "@react-hook/window-scroll": "^1.3.0",

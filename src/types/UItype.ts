@@ -16,6 +16,7 @@ export interface InputFieldType {
 }
 
 export interface ButtonType {
+  ref?: any;
   title: string;
   onClick?: (e?: any) => void;
   height?: number | string;

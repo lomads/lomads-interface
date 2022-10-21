@@ -196,7 +196,7 @@ const ProjectDetails = () => {
     }
 
     const handleSubmit = () => {
-        dispatch(updateProjectMember({ projectId, payload: { memberList: extraMembers } }));
+        dispatch(updateProjectMember({ projectId, payload: { daoId: DAO._id, memberList: extraMembers } }));
     }
 
     return (

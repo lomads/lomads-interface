@@ -18,11 +18,13 @@ import { toast, ToastContainer } from "react-toastify";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import { setDAO } from "state/dashboard/reducer";
+import { getDao } from "state/dashboard/actions";
 import Footer from "components/Footer";
+import { addDaoMember } from 'state/dashboard/actions'
 
 const MintPassToken = () => {
     /// temporary solution until we don't have specific routes for DAO, contract address will be passed into the url 
-    const { contractAddr } = useParams();
+    const { contractAddr, daoURL } = useParams();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     /// 1 : no whitelist 
@@ -37,11 +39,16 @@ const MintPassToken = () => {
     const [emailError, setEmailError] = useState(false);
     const [telegramError, setTelegramError] = useState(false);
     const { account, provider } = useWeb3React();
-    const { DAO } = useAppSelector((state) => state.dashboard);
+    const { DAO, DAOLoading } = useAppSelector((state) => state.dashboard);
     const { needWhitelist, isWhitelisted, balanceOf, contractName, currentIndex } = useSBTStats(provider, account, update, contractAddr ? contractAddr : '');
     const sbtContract = useSBTContract(contractAddr ? contractAddr : null);
-    useEffect(() => {
 
+    useEffect(() => {
+        if((!DAO || (DAO && DAO.url !== daoURL)) && !DAOLoading) 
+            dispatch(getDao(daoURL))
+    }, [daoURL, DAO, DAOLoading])
+
+    useEffect(() => {
         if (needWhitelist) {
             if (isWhitelisted) {
                 setTab(2);
@@ -114,49 +121,60 @@ const MintPassToken = () => {
         }
         else {
             if (account && sbtContract) {
-                setLoading(true);
-                const sbtId = currentIndex.toString();
-                const tx = await mintSBTtoken(sbtContract, account);
-                if (tx.error) {
-                    setLoading(false);
-                    toast.error(`${tx.error.message}`);
-                    return;
-                }
-                else {
-                    const metadataJSON = {
-                        id: sbtId,
-                        daoUrl: DAO.url,
-                        description: "SBT TOKEN",
-                        name: userName.value,
-                        image: 'url',
-                        attributes: [{
-                            trait_type: "Wallet Address/ENS Domain",
-                            value: account
-                        },
-                        {
-                            trait_type: "Email",
-                            value: _get(userMail, 'value', '')
-                        },
-                        {
-                            trait_type: "Discord",
-                            value: _get(userDiscord, 'value', '')
-                        },
-                        {
-                            trait_type: "Telegram",
-                            value: _get(userTG, 'value', '')
-                        }],
-                        contract: contractAddr,
-                    }
-
-                    const req = await APInewSBTtoken(metadataJSON);
-                    if (req) {
+                try {
+                    setLoading(true);
+                    const sbtId = currentIndex.toString();
+                    const tx = await mintSBTtoken(sbtContract, account);
+                    console.log(tx)
+                    if (tx.error) {
                         setLoading(false);
-                        toast.success("SBT mint successfuly !");
-                        dispatch(setDAO(req.data));
-                        navigate(`/${DAO.url}`)
+                        console.log(`${tx.error.message}`)
+                        //toast.error(`${tx.error.message}`);
+                        toast.error(`Something went wrong. Please try again`);
                         return;
                     }
-                    return;
+                    else {
+                        const metadataJSON = {
+                            id: sbtId,
+                            daoUrl: DAO.url,
+                            description: "SBT TOKEN",
+                            name: userName.value,
+                            image: 'url',
+                            attributes: [{
+                                trait_type: "Wallet Address/ENS Domain",
+                                value: account
+                            },
+                            {
+                                trait_type: "Email",
+                                value: _get(userMail, 'value', '')
+                            },
+                            {
+                                trait_type: "Discord",
+                                value: _get(userDiscord, 'value', '')
+                            },
+                            {
+                                trait_type: "Telegram",
+                                value: _get(userTG, 'value', '')
+                            }],
+                            contract: contractAddr,
+                        }
+    
+                        const req = await APInewSBTtoken(metadataJSON);
+                        if (req) {
+                            dispatch(addDaoMember({ url: DAO?.url, payload: { name: '', address: account } }))
+                            setLoading(false);
+                            toast.success("SBT mint successfuly !");
+                            dispatch(setDAO(req.data));
+                            setTimeout(() => {
+                                navigate(`/${DAO.url}`)
+                            }, 1000);
+                            return;
+                        }
+                        return;
+                    }
+                } catch (e) {
+                    console.log(e)
+                    setLoading(false);
                 }
             }
             toast.error("Please connect your account before !")

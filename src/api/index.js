@@ -27,6 +27,10 @@ const interceptor = axiosConfig.interceptors.response.use(
 				if (_get(error, 'response.status', 500) !== 401) {
 						return Promise.reject(error);
 				} 
+				if (_get(error, 'response.status', 500) == 401) {
+					localStorage.clear()
+					window.location.href = '/login'
+				} 
 				axiosConfig.interceptors.response.eject(interceptor);
 		}
 );

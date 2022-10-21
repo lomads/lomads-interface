@@ -106,6 +106,7 @@ function Sock() {
 
 function Web3StatusInner() {
 	const { account, connector, chainId, ENSName } = useWeb3React();
+	console.log("chainId", chainId)
 	const connectionType = getConnection(connector).type;
 
 	const error = useAppSelector(
@@ -133,22 +134,11 @@ function Web3StatusInner() {
 	const navigate = useNavigate();
 
 
-	const navigateTo = async () => {
-		return axiosHttp.get('dao').then(res => {
-			if (res.data && res.data.length > 0) {
-				const activeDao = sessionStorage.getItem('__lmds_active_dao')
-				if (activeDao) {
-					return `/${activeDao}`
-				}
-				else
-					return `/${_get(res.data, '[0].url')}`
-			} else {
-				const activeDao = sessionStorage.getItem('__lmds_active_dao')
-				if (activeDao)
-					return `/noaccess`
-				return "/namedao"
-			}
-		})
+	const navigateTo = () => {
+		const activeDao = sessionStorage.getItem('__lmds_active_dao')
+		if (activeDao)
+			return `/${activeDao}`
+		return '/'
 	}
 
 
@@ -161,7 +151,7 @@ function Web3StatusInner() {
 				onClick={() => {
 					switchChain(connector, SupportedChainId.GOERLI)
 						.then(async () => {
-							navigate(await navigateTo())
+							//navigate(navigateTo())
 						})
 						.catch((err) => {
 							console.log("Error occurred while switching");

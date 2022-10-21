@@ -7,6 +7,7 @@ const SimpleLoadButton = (props: LoadingButtonType) => {
     <>
       <button
         id="nextButtonToken"
+        ref={props.ref}
         className={"button"}
         disabled={props.disabled}
         onClick={props.onClick}

@@ -158,7 +158,7 @@ export default function Header() {
           console.log('storing...', location.pathname)
           sessionStorage.setItem('__lmds_active_dao', location.pathname.substring(1))
        }
-      navigate("/");
+      navigate("/login");
     }
   }, [chainId , account, chainAllowed, navigate]);
 
@@ -192,7 +192,7 @@ export default function Header() {
       clearOnDisconnect();
     }
     dispatch(updateSelectedWallet({ wallet: undefined }));
-    navigate("/");
+    window.location.href = '/login'
     //openOptions();
   };
 

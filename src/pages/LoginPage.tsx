@@ -63,19 +63,23 @@ const LoginPage = (props: any) => {
   console.log(chainAllowed, chainId);
 
   const navigateTo = async () => {
-    return axiosHttp.get('dao').then(res => {
-      if (res.data && res.data.length > 0) {
-        const activeDao = sessionStorage.getItem('__lmds_active_dao')
-        if (activeDao)
-            return `/${activeDao}`
-        else
-          return `/${_get(res.data, '[0].url')}`
-      } else {
-        sessionStorage.removeItem('__lmds_active_dao')
-        return "/namedao"
-      }
-    })
-      .finally(() => setCheckLoading(false))
+    const activeDao = sessionStorage.getItem('__lmds_active_dao')
+    if (activeDao)
+      return `/${activeDao}`
+    return "/"
+    // return axiosHttp.get('dao').then(res => {
+    //   if (res.data && res.data.length > 0) {
+    //     const activeDao = sessionStorage.getItem('__lmds_active_dao')
+    //     if (activeDao)
+    //         return `/${activeDao}`
+    //     else
+    //       return `/${_get(res.data, '[0].url')}`
+    //   } else {
+    //     sessionStorage.removeItem('__lmds_active_dao')
+    //     return "/namedao"
+    //   }
+    // })
+    //   .finally(() => setCheckLoading(false))
   }
 
   const generateToken = useCallback(_throttle(async () => {

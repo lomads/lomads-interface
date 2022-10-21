@@ -180,7 +180,7 @@ const CompleteTxn = ({ transaction, tokens, owner, isAdmin }: any) => {
                     </div>
                     <div id="voteArea">
                         {threshold && <div className="dashboardTextBold">
-                            {_get(transaction, 'confirmations', null) ? `${_get(transaction, 'confirmations', []).length}/${threshold} vote` : ''}
+                            {_get(transaction, 'confirmations', null) ? `${_get(transaction, 'confirmations', []).length}/${threshold} sign` : ''}
                         </div>}
                     </div>
                     <div className="confirmIconGrp">

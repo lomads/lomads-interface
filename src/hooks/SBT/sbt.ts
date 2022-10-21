@@ -74,7 +74,7 @@ export const mintSBTtoken = async (sbtContract: Contract, account: string) => {
             return await tx.wait();
         }
         catch (e) {
-            return e;
+            return { error: e };
         }
     }
     return false;

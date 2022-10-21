@@ -48,13 +48,7 @@ const Dashboard = () => {
 	console.log("DAO : ", DAO);
 	const [update, setUpdate] = useState(0);
 	const treasuryRef = useRef<any>();
-	//sessionStorage.setItem('__lmds_active_dao', `${daoURL}`);
 	const { provider, account, chainId } = useWeb3React();
-	//sessionStorage.setItem('__lmds_active_dao', `${daoURL}`);
-
-	const daoName = useAppSelector((state) => state.flow.daoName);
-	const daoAddress = useAppSelector((state) => state.flow.daoAddress);
-	const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
 	const safeAddress = useAppSelector((state) => state.flow.safeAddress);
 	const totalMembers = useAppSelector((state) => state.flow.totalMembers);
 	const [pendingTransactions, setPendingTransactions] =
@@ -67,6 +61,7 @@ const Dashboard = () => {
 	const [showNotification, setShowNotification] = useState<boolean>(false);
 	const [showAddMember, setShowAddMember] = useState<boolean>(false);
 	const [showNavBar, setShowNavBar] = useState<boolean>(false);
+	const [checkLoading, setCheckLoading] = useState<boolean>(true);
 	const currentNonce = useAppSelector((state) => state.flow.currentNonce);
 
 	const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
@@ -94,37 +89,87 @@ const Dashboard = () => {
 	};
 
 	useEffect(() => {
-		if (contractName !== '') {
-			if (DAO?.sbt && parseInt(balanceOf._hex, 16) === 0) {
-				navigate(`/sbt/mint/${DAO.sbt.address}`);
-			}
-		}
-	}, [DAO, balanceOf, contractName]);
-
-	useEffect(() => {
-		if (chainId && account)
-			dispatch(loadDao({}))
+		if(chainId && !account)
+			window.location.href = '/login'
 	}, [chainId, account])
 
-	const hasDAOAccess = useMemo(() => {
-		if (!DAOList || DAOList.length == 0) return false;
-		let hasAccess = _find(DAOList, d => d.url === daoURL)
-		if (hasAccess) return true;
-		return false
-	}, [DAOList, daoURL])
-
 	useEffect(() => {
-		if (DAOList && DAOList.length > 0) {
-			if (!hasDAOAccess) {
-				navigate('/noaccess')
+		if(chainId && account) {
+			if(!DAOList)
+				dispatch(loadDao({}))
+			else {
+				if(DAOList && DAOList.length == 0){
+					if(!daoURL)
+						navigate(`/namedao`)
+					else {
+						if (!DAO || (DAO && DAO.url !== daoURL))
+							dispatch(getDao(daoURL))
+					}
+				} else if(DAOList && DAOList.length > 0) {
+					if(!daoURL)
+						navigate(`/${DAOList[0].url}`)
+					else if (!DAO || (DAO && DAO.url !== daoURL))
+						dispatch(getDao(daoURL))
+				}
 			}
 		}
-	}, [DAOList, hasDAOAccess])
+	}, [chainId, account, DAOList, daoURL])
 
 	useEffect(() => {
-		if (hasDAOAccess && chainId && account && daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
-			dispatch(getDao(daoURL))
-	}, [hasDAOAccess, DAOList, daoURL, chainId, account])
+		if (contractName !== '' && DAO && DAO.sbt &&  DAO.sbt && account) {
+			if (DAO?.sbt?.whitelisted) {
+				if(_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
+					if(parseInt(balanceOf._hex, 16) === 0)
+						navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
+				} else {
+					navigate('/noaccess')
+				}
+			} else if (!DAO?.sbt?.whitelisted) {
+				if(_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
+					if(parseInt(balanceOf._hex, 16) === 0)
+						navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
+				} else {
+					//add to DAO
+					if(parseInt(balanceOf._hex, 16) === 0)
+						navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
+				}
+			}
+		}
+	}, [DAO, balanceOf, contractName, account]);
+
+	useEffect(() => {
+		if(DAO && account) {
+			if(!DAO.sbt){
+				if(!_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase()))
+					navigate('/noaccess')
+			}
+		}
+	}, [DAO, account]);
+
+	// useEffect(() => {
+	// 	if (chainId && account)
+	// 		dispatch(loadDao({}))
+	// }, [chainId, account])
+
+	// const hasDAOAccess = useMemo(() => {
+	// 	if (!DAOList || DAOList.length == 0) return false;
+	// 	let hasAccess = _find(DAOList, d => d.url === daoURL)
+	// 	if (hasAccess) return true;
+	// 	return false
+	// }, [DAOList, daoURL])
+
+	// useEffect(() => {
+	// 	if (DAOList && DAOList.length > 0) {
+	// 		if (!hasDAOAccess) {
+	// 			navigate('/noaccess')
+	// 		}
+	// 	}
+	// }, [DAOList, hasDAOAccess])
+
+	// useEffect(() => {
+	// 	if (hasDAOAccess && chainId && account && daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
+	// 		dispatch(getDao(daoURL))
+	// }, [hasDAOAccess, DAOList, daoURL, chainId, account])
 
 	useEffect(() => {
 		if (DAO)
@@ -210,7 +255,7 @@ const Dashboard = () => {
 	return (
 		<>
 			{!DAO || DAOLoading || (daoURL && (DAO && DAO.url !== daoURL)) ?
-				<div style={{ backgroundColor: '#FFF', height: '100vh', zIndex: 99999, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+				<div style={{ backgroundColor: '#FFF', height: '100vh', zIndex: 99999, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
 					<div className="logo">
 						<img src={lomadsfulllogo} alt="" />
 					</div>
