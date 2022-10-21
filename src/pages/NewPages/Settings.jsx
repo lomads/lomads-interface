@@ -36,7 +36,7 @@ const Settings = () => {
     useEffect(() => {
         if (contractName !== '') {
             if (DAO?.sbt && parseInt(balanceOf._hex, 16) === 0) {
-                navigate(`/sbt/mint/${DAO.sbt.address}`);
+                navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
             }
         }
     }, [DAO, balanceOf, contractName]);

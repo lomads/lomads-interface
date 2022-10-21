@@ -22,7 +22,7 @@ export interface DashboardState {
 	// DAO: DAOType | null;
 	DAO: any;
 	DAOLoading: boolean | null;
-	DAOList: Array<DAOType>;
+	DAOList: Array<DAOType> | null;
 	addMemberLoading: boolean | null;
 	updateMemberLoading: boolean | null;
 	Project: any;
@@ -39,7 +39,7 @@ export interface DashboardState {
 const initialState: DashboardState = {
 	DAO: null,
 	DAOLoading: false,
-	DAOList: [],
+	DAOList: null,
 	addMemberLoading: null,
 	updateMemberLoading: null,
 	Project: null,

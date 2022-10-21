@@ -14,7 +14,7 @@ const SideBar = (props: any) => {
 			<>
 				<div className="sideBarStrip">
 					{
-						DAOList.map(dao => {
+						DAOList && DAOList.map(dao => {
 							const daoName = _get(dao, 'name', '').split(" ");
 							return (
 								<div className="sideBarStripItem">

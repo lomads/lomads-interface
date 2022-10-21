@@ -11,6 +11,7 @@ import { LeapFrog } from "@uiball/loaders";
 import axiosHttp from '../../../../api';
 import { updateSafeTransaction } from "state/dashboard/reducer";
 import { AiOutlineClose, AiOutlineCheck } from "react-icons/ai";
+import { usePopper } from 'react-popper';
 
 const PendingTxn = ({ tokens, threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions, confirmTxLoading, rejectTxLoading, executeTxLoading, isAdmin }: any) => {
     const { provider, account } = useWeb3React();

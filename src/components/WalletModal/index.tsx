@@ -164,21 +164,11 @@ export default function WalletModal({
     }
   }, [pendingConnector, walletView]);
 
-  const navigateTo = async () => {
-    return axiosHttp.get('dao').then(res => {
-      if(res.data && res.data.length > 0) {
+  const navigateTo = () => {
         const activeDao = sessionStorage.getItem('__lmds_active_dao')
         if(activeDao)
             return `/${activeDao}`
-        else
-          return `/${_get(res.data, '[0].url')}`
-      } else {
-        const activeDao = sessionStorage.getItem('__lmds_active_dao')
-        if(activeDao) 
-          return `/noaccess`
-        return "/namedao"
-      }
-    })
+        return '/'
   }
 
   const tryActivation = useCallback(
@@ -197,7 +187,7 @@ export default function WalletModal({
 
         await connector.activate();
         dispatch(updateSelectedWallet({ wallet: connectionType }));
-        navigate(await navigateTo())
+        navigate(navigateTo())
       } catch (error: any) {
         console.debug(`web3-react connection error: ${error}`);
         dispatch(

@@ -25,7 +25,7 @@ import { ProjectContext } from "context/ProjectContext";
 import routes from '../routes';
 
 export default function App() {
-	const landingPage = useMatch("/");
+	const landingPage = useMatch("/login");
 	const [projects, setProjects] = useState([]);
 
 	return (
@@ -36,23 +36,6 @@ export default function App() {
 					{
 						routes.map(route => <Route path={route.path} element={<route.component/>} />)
 					}
-					{/* <Route path="/" element={[<LoginPage />]} />
-					<Route path="/namedao" element={<NameDAO />} />
-					<Route path="/createdao" element={<NameDAO />} />
-					<Route path="/invitegang" element={<InviteGang />} />
-					<Route path="/startsafe" element={<StartSafe />} />
-					<Route path="/addsafe" element={<AddExistingSafe />} />
-					<Route path="/newsafe" element={<AddNewSafe />} />
-					<Route path="/success" element={<DAOsuccess />} />
-					<Route path="/noaccess" element={<DAONoAccess />} />
-					<Route path="/sbt/create" element={<CreatePassToken />} />
-					<Route path="/sbt/mint/:contractAddr" element={<MintPassToken />} />
-					<Route path="/sbt/success/:contractAddr" element={<CreatePassSucess />} />
-					<Route path="/createProject" element={<CreateProject />} />
-					<Route path="/dcauth" element={<DCAuth />} />
-					<Route path="/:daoURL/project/:projectId" element={<ProjectDetails />} />
-					<Route path="/settings" element={<Settings />} />
-					<Route path="/:daoURL" element={<Dashboard />} /> */}
 				</Routes>
 			</ProjectContext.Provider>
 		</div>

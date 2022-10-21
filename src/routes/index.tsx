@@ -19,6 +19,10 @@ import ProjectDetails from "../pages/NewPages/ProjectDetails";
 export default [
     {
         path: '/',
+        component: Dashboard
+    },
+    {
+        path: '/login',
         component: LoginPage
     },
     {
@@ -58,7 +62,7 @@ export default [
         component: CreatePassToken
     },
     {
-        path: '/sbt/mint/:contractAddr',
+        path: '/:daoURL/sbt/mint/:contractAddr',
         component: MintPassToken
     },
     {
