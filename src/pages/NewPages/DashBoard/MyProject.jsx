@@ -10,6 +10,8 @@ import { useAppSelector } from "state/hooks";
 import ProjectCard from './Project/ProjectCard';
 import { useWeb3React } from "@web3-react/core";
 
+import archiveIcon from '../../../assets/svg/archiveIcon.svg';
+
 const MyProject = () => {
     const navigate = useNavigate();
     const { DAO } = useAppSelector((state) => state.dashboard);
@@ -68,18 +70,9 @@ const MyProject = () => {
                 </div>
                 <div className="myproject-buttons">
                     <div style={{ marginRight: '20px' }}>
-                        {/* <SafeButton
-                            height={40}
-                            width={150}
-                            titleColor="#C94B32"
-                            title="ARCHIVES"
-                            bgColor="#FBF4F2"
-                            opacity="1"
-                            disabled={false}
-                            fontweight={400}
-                            fontsize={16}
-                            onClick={() => console.log("Button")}
-                        /> */}
+                        <button className='archive-btn'>
+                            <img src={archiveIcon} alt="archive-icon" />
+                        </button>
                     </div>
                     {
                         amIAdmin && <div>
@@ -108,15 +101,17 @@ const MyProject = () => {
                     <div className='myproject-body'>
                         {
                             myProjects.length > 0 && myProjects.map((item, index) => {
-                                return (
-                                    <div key={index}>
-                                        <ProjectCard
-                                            project={item}
-                                            daoUrl={DAO?.url}
-                                            tab={tab}
-                                        />
-                                    </div>
-                                )
+                                if (item.deletedAt === null) {
+                                    return (
+                                        <div key={index}>
+                                            <ProjectCard
+                                                project={item}
+                                                daoUrl={DAO?.url}
+                                                tab={tab}
+                                            />
+                                        </div>
+                                    )
+                                }
                             })
                         }
                     </div>
@@ -134,15 +129,17 @@ const MyProject = () => {
                                 <div className='myproject-body-fixed' style={DAO?.projects.length > 9 ? { overflow: 'scroll', height: '375px' } : null}>
                                     {
                                         otherProjects.map((item, index) => {
-                                            return (
-                                                <div key={index}>
-                                                    <ProjectCard
-                                                        project={item}
-                                                        daoUrl={DAO?.url}
-                                                        tab={tab}
-                                                    />
-                                                </div>
-                                            )
+                                            if (item.deletedAt === null) {
+                                                return (
+                                                    <div key={index}>
+                                                        <ProjectCard
+                                                            project={item}
+                                                            daoUrl={DAO?.url}
+                                                            tab={tab}
+                                                        />
+                                                    </div>
+                                                )
+                                            }
                                         })
                                     }
                                 </div>
