@@ -126,14 +126,10 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
                                 rejectTxLoading === _get(transaction, 'nonce', '') ? <LeapFrog size={10} color="#FFF" /> : <AiOutlineClose style={{ color: "#FFFFFF", height: "16px", width: "16px", }} />
                             } bgColor="#C94B32" height={30} width={30} border="2px solid #C94B32" className="iconButtons" />}
                         {confirmReached &&
-                            <Tooltip label={"test"}>
                                 <SimpleLoadButton condition={executeTxLoading === _get(transaction, 'safeTxHash')} disabled={ executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={() => executeTransactions(transaction)} width={"100%"} height={30} title="EXECUTE" bgColor={executeFirst === transaction.nonce ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
-                            </Tooltip>
                         }
                         {rejectReached &&
-                            <Tooltip label={"test"}>
                                 <SimpleLoadButton condition={executeTxLoading === _get(transaction, 'rejectedTxn.safeTxHash', _get(transaction, 'safeTxHash', ''))} disabled={executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={() => executeTransactions(transaction.rejectedTxn, true)} width={"100%"} height={30} title="REJECT" bgColor={executeFirst === transaction.nonce ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
-                            </Tooltip>
                         }
                         {
                             (!(!confirmReached && !hasMyConfirmVote && !rejectReached) && !(!confirmReached && !hasMyConfirmVote && !rejectReached && !transaction.rejectedTxn) && !(confirmReached) && !(rejectReached)) &&
@@ -257,15 +253,11 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
                                     rejectTxLoading === _get(transaction, 'nonce') ? <LeapFrog size={10} color="#FFF" /> : <AiOutlineClose style={{ color: "#FFFFFF", height: "16px", width: "16px", }} />
                                 } bgColor="#C94B32" height={30} width={30} border="2px solid #C94B32" className="iconButtons" />}
                             {confirmReached &&
-                            <Tooltip label={"test"}>
                                 <SimpleLoadButton condition={executeTxLoading == _get(transaction, 'safeTxHash')} disabled={executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={() => executeTransactions(transaction)} width={"100%"} height={30} title="EXECUTE" bgColor={executeFirst === transaction.nonce ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
-                            </Tooltip>
                                 
                             }
                             {rejectReached &&
-                                <Tooltip label={"test"}>
-                                    <SimpleLoadButton  condition={executeTxLoading === _get(transaction, 'rejectedTxn.safeTxHash', _get(transaction, 'safeTxHash', ''))} disabled={executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={() => executeTransactions(transaction.rejectedTxn, true)} width={"100%"} height={30} title="REJECT" bgColor={executeFirst === transaction.nonce ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
-                                </Tooltip>
+                                <SimpleLoadButton  condition={executeTxLoading === _get(transaction, 'rejectedTxn.safeTxHash', _get(transaction, 'safeTxHash', ''))} disabled={executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={() => executeTransactions(transaction.rejectedTxn, true)} width={"100%"} height={30} title="REJECT" bgColor={executeFirst === transaction.nonce ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
                             }
                         </div> : <div className="confirmIconGrp"></div>}
                     </div>
