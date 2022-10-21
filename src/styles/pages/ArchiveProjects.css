@@ -1,0 +1,80 @@
+.archive-container {
+    width: 100%;
+    height: 100vh;
+    /* padding-top: 20vh; */
+    background: linear-gradient(180deg, #FDF7F7 0%, #F3F2F2 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow-y: scroll;
+}
+
+.archive-container .home-btn {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(178.31deg, #C94B32 0.74%, #A54536 63.87%);
+    border-radius: 0px 0px 30px 0px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.archive-container .archive-header {
+    width: 100%;
+    height: 100px;
+    display: flex;
+    align-items: flex-end;
+}
+
+.archive-container .archive-header .archive-heading-box {
+    width: 100%;
+    margin-left: 150px;
+    display: flex;
+    align-items: flex-end;
+}
+
+.archive-container .archive-header .archive-heading-box .left {
+    width: 50px;
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    border-radius: 5px;
+    margin-right: 0.2rem;
+    cursor: pointer;
+}
+
+.archive-container .archive-header .archive-heading-box .right {
+    width: 340px;
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    border-radius: 5px;
+}
+
+.archive-container .archive-header .archive-heading-box .right p {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    color: #76808D;
+}
+
+.archive-container .archive-header .archive-heading-box .right span {
+    font-weight: 700;
+}
+
+.archive-container .archive-body {
+    width: 80%;
+    height: 200px;
+    margin-top: 60px;
+    display: flex;
+    flex-wrap: wrap;
+}

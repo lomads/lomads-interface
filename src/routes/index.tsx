@@ -15,6 +15,7 @@ import MintPassToken from "../pages/NewPages/MintPassToken";
 import CreatePassSucess from "../pages/NewPages/CreatePassSucess";
 import CreateProject from "../pages/NewPages/CreateProject";
 import ProjectDetails from "../pages/NewPages/ProjectDetails";
+import ArchiveProjects from "../pages/NewPages/ArchiveProjects";
 
 export default [
     {
@@ -84,6 +85,10 @@ export default [
     {
         path: '/settings',
         component: Settings
+    },
+    {
+        path: '/archives',
+        component: ArchiveProjects
     },
     {
         path: '/:daoURL',

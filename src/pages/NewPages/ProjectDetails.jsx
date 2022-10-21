@@ -99,6 +99,7 @@ const ProjectDetails = () => {
         if (archiveProjectLoading === false) {
             dispatch(resetArchiveProjectLoader());
             setClosePrompt(false);
+            navigate(-1);
         }
     }, [archiveProjectLoading]);
 
@@ -107,7 +108,7 @@ const ProjectDetails = () => {
         if (deleteProjectLoading === false) {
             dispatch(resetDeleteProjectLoader());
             setDeletePrompt(false);
-            navigate(-1)
+            navigate(-1);
         }
     }, [deleteProjectLoading]);
 
@@ -450,24 +451,30 @@ const ProjectDetails = () => {
                                 <h1>{Project?.name}</h1>
                             </div>
                             <div>
-                                <button>
+                                {/* <button>
                                     <img src={editToken} alt="hk-logo" />
-                                </button>
+                                </button> */}
                                 <button onClick={() => setDeletePrompt(true)}>
                                     <img src={deleteIcon} alt="hk-logo" />
                                 </button>
-                                <SafeButton
-                                    height={40}
-                                    width={150}
-                                    titleColor="#C94B32"
-                                    title="CLOSE PROJECT"
-                                    bgColor="#FFFFFF"
-                                    opacity="1"
-                                    disabled={false}
-                                    fontweight={400}
-                                    fontsize={16}
-                                    onClick={() => setClosePrompt(true)}
-                                />
+                                {
+                                    Project?.archivedAt === null
+                                        ?
+                                        <SafeButton
+                                            height={40}
+                                            width={150}
+                                            titleColor="#C94B32"
+                                            title="CLOSE PROJECT"
+                                            bgColor="#FFFFFF"
+                                            opacity="1"
+                                            disabled={false}
+                                            fontweight={400}
+                                            fontsize={16}
+                                            onClick={() => setClosePrompt(true)}
+                                        />
+                                        :
+                                        null
+                                }
                             </div>
                         </div>
                         <div className="projectDetails-description">

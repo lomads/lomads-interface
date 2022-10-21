@@ -70,7 +70,7 @@ const MyProject = () => {
                 </div>
                 <div className="myproject-buttons">
                     <div style={{ marginRight: '20px' }}>
-                        <button className='archive-btn'>
+                        <button className='archive-btn' onClick={() => navigate('/archives')}>
                             <img src={archiveIcon} alt="archive-icon" />
                         </button>
                     </div>
@@ -101,7 +101,7 @@ const MyProject = () => {
                     <div className='myproject-body'>
                         {
                             myProjects.length > 0 && myProjects.map((item, index) => {
-                                if (item.deletedAt === null) {
+                                if (item.deletedAt === null && item.archivedAt === null) {
                                     return (
                                         <div key={index}>
                                             <ProjectCard
@@ -129,7 +129,7 @@ const MyProject = () => {
                                 <div className='myproject-body-fixed' style={DAO?.projects.length > 9 ? { overflow: 'scroll', height: '375px' } : null}>
                                     {
                                         otherProjects.map((item, index) => {
-                                            if (item.deletedAt === null) {
+                                            if (item.deletedAt === null && item.archivedAt === null) {
                                                 return (
                                                     <div key={index}>
                                                         <ProjectCard
