@@ -250,7 +250,7 @@ const ProjectDetails = () => {
     }
 
     const handleDeleteMembers = () => {
-        dispatch(deleteProjectMember({ projectId, payload: { memberList: deleteMembers } }));
+        dispatch(deleteProjectMember({ projectId, payload: { daoId: _get(DAO, '_id', null), memberList: deleteMembers } }));
     }
 
     const handleCloseProject = () => {
