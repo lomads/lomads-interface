@@ -16,6 +16,7 @@ import CreatePassSucess from "../pages/NewPages/CreatePassSucess";
 import CreateProject from "../pages/NewPages/CreateProject";
 import ProjectDetails from "../pages/NewPages/ProjectDetails";
 import OnlyWhitelisted from "pages/NewPages/OnlyWhitelisted";
+import ArchiveProjects from "../pages/NewPages/ArchiveProjects";
 
 export default [
     {
@@ -89,6 +90,10 @@ export default [
     {
         path: '/settings',
         component: Settings
+    },
+    {
+        path: '/archives',
+        component: ArchiveProjects
     },
     {
         path: '/:daoURL',
