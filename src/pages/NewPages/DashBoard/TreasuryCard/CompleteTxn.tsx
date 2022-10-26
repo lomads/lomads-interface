@@ -132,7 +132,7 @@ const CompleteTxn = ({ transaction, tokens, owner, isAdmin }: any) => {
                     <div className="ex" style={{ position: 'relative' }}>
                         {index == 0 && <div className="dashboardText">{date}</div>}
                         {index !== 0 && <div>
-                            <div style={{ height: 1, backgroundColor: '#76808d', width: 100 }}></div>
+                            <div style={{ height: 1, backgroundColor: '#76808d', width: '120px', position: 'absolute', right: 0  }}></div>
                             <div style={{ height: isLast ? '50%' : '100%', backgroundColor: '#76808d', width: 1, position: 'absolute', right: 0, top: 0 }}></div>
                         </div>}
                     </div>

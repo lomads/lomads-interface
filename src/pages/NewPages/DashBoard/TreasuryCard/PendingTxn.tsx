@@ -12,6 +12,8 @@ import { Tooltip } from "@chakra-ui/react";
 import axiosHttp from '../../../../api';
 import { updateSafeTransaction } from "state/dashboard/reducer";
 import { AiOutlineClose, AiOutlineCheck } from "react-icons/ai";
+import CloseBtn from '../../../../assets/svg/close-btn.svg'
+import CheckBtn from '../../../../assets/svg/check-btn.svg'
 
 const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions, confirmTxLoading, rejectTxLoading, executeTxLoading, isAdmin }: any) => {
     const { provider, account } = useWeb3React();
@@ -133,16 +135,32 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
                         </div>
                     </div>
                     <div id="voteArea">
-                        {threshold && index == 0 && <div className="dashboardTextBold">
-                            {rejectReached ? `${_get(transaction, 'rejectedTxn.confirmations', []).length}/${threshold} sign` : `${_get(transaction, 'confirmations', []).length}/${threshold} sign`}
-                        </div>}
+                        {
+                        threshold && index == 0 && <div className="dashboardTextBold">
+                            {/* {rejectReached ? `${_get(transaction, 'rejectedTxn.confirmations', []).length}/${threshold} sign` : `${_get(transaction, 'confirmations', []).length}/${threshold} sign`} */}
+                            {
+                                threshold && _get(transaction, 'rejectedTxn', null) && !confirmReached && !rejectReached ?
+                                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                    <div className="vote-view reject">
+                                        <img src={CloseBtn} /> {_get(transaction, 'rejectedTxn.confirmations', []).length}/{threshold} sign
+                                    </div>
+                                    <div className="vote-view accept">
+                                        <img src={CheckBtn} /> {_get(transaction, 'confirmations', []).length}/{threshold} sign
+                                    </div>
+                                </div> : 
+                                <>
+                                    {rejectReached ? `${_get(transaction, 'rejectedTxn.confirmations', []).length}/${threshold} sign` : `${_get(transaction, 'confirmations', []).length}/${threshold} sign`}
+                                </>
+                            }
+                        </div> 
+                        }
                     </div>
                     {owner && index == 0 ? <div className="confirmIconGrp">
                         {!confirmReached && !hasMyConfirmVote && !rejectReached &&
                             <IconButton disabled={confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={(e) => confirmTransaction(_get(transaction, 'safeTxHash'))} Icon={
                                 confirmTxLoading === _get(transaction, 'safeTxHash') ? <LeapFrog size={10} color="#FFF" /> : <AiOutlineCheck style={{ color: "#FFFFFF", height: "16px", width: "16px", }} />
                             } bgColor="#C94B32" height={30} width={30} border="2px solid #C94B32" className="iconButtons" />}
-                        {!confirmReached && !hasMyConfirmVote && !rejectReached && !transaction.rejectedTxn &&
+                        {!confirmReached && !hasMyRejectVote && !rejectReached &&
                             <IconButton disabled={confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={(e) => rejectTransaction(_get(transaction, 'nonce'))} Icon={
                                 rejectTxLoading === _get(transaction, 'nonce', '') ? <LeapFrog size={10} color="#FFF" /> : <AiOutlineClose style={{ color: "#FFFFFF", height: "16px", width: "16px", }} />
                             } bgColor="#C94B32" height={30} width={30} border="2px solid #C94B32" className="iconButtons" />}
@@ -153,10 +171,10 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
                                 <SimpleLoadButton condition={executeTxLoading === _get(transaction, 'rejectedTxn.safeTxHash', _get(transaction, 'safeTxHash', ''))} disabled={executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={() => executeTransactions(transaction.rejectedTxn, true)} width={"100%"} height={30} title="REJECT" bgColor={executeFirst === transaction.nonce ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
                         }
                         {
-                            (!(!confirmReached && !hasMyConfirmVote && !rejectReached) && !(!confirmReached && !hasMyConfirmVote && !rejectReached && !transaction.rejectedTxn) && !(confirmReached) && !(rejectReached)) &&
+                            (!(!confirmReached && !hasMyConfirmVote && !rejectReached) && !(!confirmReached && !hasMyRejectVote && !rejectReached) && !(confirmReached) && !(rejectReached)) &&
                             <div className="ex" style={{ position: 'relative' }}>
                                 <div>
-                                    <div style={{ height: 1, backgroundColor: '#76808d', width: 100 }}></div>
+                                    <div style={{ height: 1, backgroundColor: '#76808d', width: '120px', position: 'absolute', right: 0  }}></div>
                                     <div style={{ height: '50%', backgroundColor: '#76808d', width: 1, position: 'absolute', right: 0, bottom: 0 }}></div>
                                 </div>
                             </div>
@@ -166,14 +184,14 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
                             {
                                 index !== 0 ?
                                     <div>
-                                        <div style={{ height: 1, backgroundColor: '#76808d', width: 100 }}></div>
+                                     <div style={{ height: 1, backgroundColor: '#76808d', width: '120px', position: 'absolute', right: 0  }}></div>
                                         <div style={{ height: isLast ? '50%' : '100%', backgroundColor: '#76808d', width: 1, position: 'absolute', right: 0, top: 0 }}></div>
                                     </div> : null
                             }
                         </div>
                     </div>}
                 </div>
-                {threshold && _get(transaction, 'rejectedTxn', null) && !confirmReached && !rejectReached && isLast &&
+                {/* {threshold && _get(transaction, 'rejectedTxn', null) && !confirmReached && !rejectReached && isLast &&
                     <div className="transactionRow rejected">
                         <div className="coinText">
                             <div className="dashboardTextBold">
@@ -197,7 +215,7 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
                                 } bgColor="#C94B32" height={30} width={30} border="2px solid #C94B32" className="iconButtons" />}
                         </div>}
                     </div>
-                }
+                } */}
             </>
         )
     }
@@ -250,16 +268,32 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
                             </div>
                         </div>
                         <div id="voteArea">
-                            {threshold && <div className="dashboardTextBold">
-                                {rejectReached ? `${_get(transaction, 'rejectedTxn.confirmations', []).length}/${threshold} sign` : `${_get(transaction, 'confirmations', []).length}/${threshold} sign`}
-                            </div>}
+                        {
+                            threshold && <div className="dashboardTextBold">
+                                {/* {rejectReached ? `${_get(transaction, 'rejectedTxn.confirmations', []).length}/${threshold} sign` : `${_get(transaction, 'confirmations', []).length}/${threshold} sign`} */}
+                                {
+                                    threshold && _get(transaction, 'rejectedTxn', null) && !confirmReached && !rejectReached ?
+                                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                        <div className="vote-view reject">
+                                            <img src={CloseBtn} /> {_get(transaction, 'rejectedTxn.confirmations', []).length}/{threshold} sign
+                                        </div>
+                                        <div className="vote-view accept">
+                                            <img src={CheckBtn} /> {_get(transaction, 'confirmations', []).length}/{threshold} sign
+                                        </div>
+                                    </div> : 
+                                    <>
+                                        {rejectReached ? `${_get(transaction, 'rejectedTxn.confirmations', []).length}/${threshold} sign` : `${_get(transaction, 'confirmations', []).length}/${threshold} sign`}
+                                    </>
+                                }
+                            </div> 
+                            }
                         </div>
                         {owner == true ? <div className="confirmIconGrp">
                             {!confirmReached && !hasMyConfirmVote && !rejectReached &&
                                 <IconButton disabled={confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={(e) => confirmTransaction(_get(transaction, 'safeTxHash'))} Icon={
                                     confirmTxLoading === _get(transaction, 'safeTxHash') ? <LeapFrog size={10} color="#FFF" /> : <AiOutlineCheck style={{ color: "#FFFFFF", height: "16px", width: "16px", }} />
                                 } bgColor="#C94B32" height={30} width={30} border="2px solid #C94B32" className="iconButtons" />}
-                            {!confirmReached && !hasMyConfirmVote && !rejectReached && !transaction.rejectedTxn &&
+                            {!confirmReached && !hasMyRejectVote && !rejectReached &&
                                 <IconButton disabled={confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={(e) => rejectTransaction(_get(transaction, 'nonce'))} Icon={
                                     rejectTxLoading === _get(transaction, 'nonce') ? <LeapFrog size={10} color="#FFF" /> : <AiOutlineClose style={{ color: "#FFFFFF", height: "16px", width: "16px", }} />
                                 } bgColor="#C94B32" height={30} width={30} border="2px solid #C94B32" className="iconButtons" />}
@@ -272,7 +306,7 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
                             }
                         </div> : <div className="confirmIconGrp"></div>}
                     </div>
-                    {threshold && _get(transaction, 'rejectedTxn', null) && !confirmReached && !rejectReached &&
+                    {/* {threshold && _get(transaction, 'rejectedTxn', null) && !confirmReached && !rejectReached &&
                         <div className="transactionRow rejected">
                             <div className="coinText">
                                 <div className="dashboardTextBold">
@@ -294,7 +328,7 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
                                     <IconButton disabled={confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={(e) => confirmTransaction(_get(transaction, 'rejectedTxn.safeTxHash'))} Icon={<AiOutlineClose style={{ color: "#FFFFFF", height: "16px", width: "16px", }} />} bgColor="#C94B32" height={30} width={30} border="2px solid #C94B32" className="iconButtons" />}
                             </div>}
                         </div>
-                    }
+                    } */}
                 </> :
                 <>
                     {_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []).map(renderItem)}

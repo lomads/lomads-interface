@@ -333,6 +333,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
       <>
         {
           pendingTxn !== undefined && executedTxn !== undefined &&
+		  ( pendingTxn && executedTxn && pendingTxn.length !== 0 && executedTxn.length !== 0 ) &&
           <div id="treasuryTransactions">
             <div className="dashboardText" style={{ marginBottom: '6px' }}>Last Transactions</div>
             {

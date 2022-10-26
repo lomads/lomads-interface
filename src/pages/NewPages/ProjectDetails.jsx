@@ -450,32 +450,34 @@ const ProjectDetails = () => {
                             <div>
                                 <h1>{Project?.name}</h1>
                             </div>
-                            <div>
-                                {/* <button>
-                                    <img src={editToken} alt="hk-logo" />
-                                </button> */}
-                                <button onClick={() => setDeletePrompt(true)}>
-                                    <img src={deleteIcon} alt="hk-logo" />
-                                </button>
-                                {
-                                    Project?.archivedAt === null
-                                        ?
-                                        <SafeButton
-                                            height={40}
-                                            width={150}
-                                            titleColor="#C94B32"
-                                            title="CLOSE PROJECT"
-                                            bgColor="#FFFFFF"
-                                            opacity="1"
-                                            disabled={false}
-                                            fontweight={400}
-                                            fontsize={16}
-                                            onClick={() => setClosePrompt(true)}
-                                        />
-                                        :
-                                        null
-                                }
-                            </div>
+                            {
+                                <div>
+                                    {/* <button>
+                                        <img src={editToken} alt="hk-logo" />
+                                    </button> */}
+                                    <button onClick={() => setDeletePrompt(true)}>
+                                        <img src={deleteIcon} alt="hk-logo" />
+                                    </button>
+                                    {
+                                        Project?.archivedAt === null
+                                            ?
+                                            <SafeButton
+                                                height={40}
+                                                width={150}
+                                                titleColor="#C94B32"
+                                                title="CLOSE PROJECT"
+                                                bgColor="#FFFFFF"
+                                                opacity="1"
+                                                disabled={false}
+                                                fontweight={400}
+                                                fontsize={16}
+                                                onClick={() => setClosePrompt(true)}
+                                            />
+                                            :
+                                            null
+                                    }
+                                </div>
+                            }
                         </div>
                         <div className="projectDetails-description">
                             <p>{Project?.description}</p>
