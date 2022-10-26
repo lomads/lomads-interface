@@ -1,0 +1,151 @@
+/* edit member overlay */
+.editDaoMemberOverlay {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(27, 43, 65, 0.25);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.editDaoMemberOverlay .editDaoMemberContainer {
+    height: 100%;
+    width: 768px;
+    background-color: #FFF;
+    border-radius: 20px 0px 0px 20px;
+    padding: 65px 65px 0 65px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.editDaoMemberOverlay .editDaoMemberContainer .editDaoMember-header {
+    width: 100%;
+    margin-bottom: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.editDaoMemberOverlay .editDaoMemberContainer .editDaoMember-header p {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
+    color: #76808D;
+}
+
+.editDaoMemberOverlay .editDaoMemberContainer .editDaoMember-header button {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
+    border-radius: 3px;
+}
+
+.editDaoMemberOverlay .editDaoMemberContainer .editDaoMember-body {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    margin-bottom: 100px;
+}
+
+.editDaoMemberOverlay .editDaoMemberContainer .editDaoMember-body .editDaoMember-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.editDaoMemberOverlay .editDaoMemberContainer .editDaoMember-body .editDaoMember-row .row-overcast {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.5);
+    position: absolute;
+    z-index: 998;
+}
+
+.editDaoMemberOverlay .editDaoMemberContainer .editDaoMember-body .editDaoMember-row div {
+    display: flex;
+    align-items: center;
+}
+
+.editDaoMemberOverlay .editDaoMemberContainer .editDaoMember-body .editDaoMember-row div img {
+    margin-right: 10px;
+}
+
+.editDaoMemberOverlay .editDaoMemberContainer .editDaoMember-body .editDaoMember-row div p {
+    width: 135px;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    color: #76808D;
+}
+
+.editDaoMemberOverlay .editDaoMemberContainer .editDaoMember-body .editDaoMember-row span {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    color: #76808D;
+    margin: 0 20px;
+}
+
+.editDaoMemberOverlay .editDaoMemberContainer .editDaoMember-body .editDaoMember-row button {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
+    border-radius: 3px;
+    z-index: 999;
+}
+
+.editDaoMemberOverlay .editDaoMemberContainer .editDaoMember-body .editDaoMember-row button.selected {
+    background: #B12F15;
+}
+
+.editDaoMemberOverlay .editDaoMemberContainer .editDaoMember-footer {
+    width: 768px;
+    height: 100px;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.editDaoMemberOverlay .editDaoMemberContainer .editDaoMember-footer button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    height: 40px;
+}
+
+.editDaoMemberOverlay .editDaoMemberContainer .editDaoMember-footer button:first-child {
+    background: #FFFFFF;
+    border: 1px solid #C94B32;
+    color: #C94B32;
+    width: 130px;
+    margin-right: 20px;
+}
+
+.editDaoMemberOverlay .editDaoMemberContainer .editDaoMember-footer button:last-child {
+    background: #C94B32;
+    color: #FFF;
+    width: 210px;
+}

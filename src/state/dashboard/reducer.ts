@@ -5,6 +5,7 @@ import {
 	loadDao,
 	addDaoMember,
 	updateDaoMember,
+	deleteDaoMember,
 	createProject,
 	addProjectMember,
 	updateProjectMember,
@@ -27,6 +28,7 @@ export interface DashboardState {
 	DAOList: Array<DAOType> | null;
 	addMemberLoading: boolean | null;
 	updateMemberLoading: boolean | null;
+	deleteMemberLoading: boolean | null;
 	Project: any;
 	ProjectLoading: boolean | null;
 	createProjectLoading: boolean | null;
@@ -45,6 +47,7 @@ const initialState: DashboardState = {
 	DAOList: null,
 	addMemberLoading: null,
 	updateMemberLoading: null,
+	deleteMemberLoading: null,
 	Project: null,
 	ProjectLoading: null,
 	createProjectLoading: null,
@@ -71,6 +74,9 @@ const dashboardSlice = createSlice({
 		},
 		resetUpdateMemberLoader(state) {
 			state.updateMemberLoading = null
+		},
+		resetDeleteMemberLoader(state) {
+			state.deleteMemberLoading = null
 		},
 		resetCreateProjectLoader(state) {
 			state.createProjectLoading = null
@@ -151,6 +157,7 @@ const dashboardSlice = createSlice({
 		[`${loadDao.pending}`]: (state) => {
 
 		},
+		// add dao members
 		[`${addDaoMember.fulfilled}`]: (state, action) => {
 			state.addMemberLoading = false
 			state.DAO = action.payload
@@ -158,6 +165,7 @@ const dashboardSlice = createSlice({
 		[`${addDaoMember.pending}`]: (state) => {
 			state.addMemberLoading = true
 		},
+		// update dao members
 		[`${updateDaoMember.fulfilled}`]: (state, action) => {
 			state.updateMemberLoading = false
 			state.DAO = {
@@ -172,6 +180,16 @@ const dashboardSlice = createSlice({
 		[`${updateDaoMember.pending}`]: (state) => {
 			state.updateMemberLoading = true
 		},
+		// delete dao members
+		[`${deleteDaoMember.fulfilled}`]: (state, action) => {
+			state.deleteMemberLoading = false
+			state.DAO = action.payload
+		},
+		[`${deleteDaoMember.pending}`]: (state) => {
+			state.deleteMemberLoading = true
+		},
+
+		// create contract
 		[`${createContract.fulfilled}`]: (state, action) => {
 			state.DAO = action.payload
 		},
@@ -258,6 +276,8 @@ export const {
 	setUser,
 	resetCreateDAOLoader,
 	resetAddMemberLoader,
+	resetUpdateMemberLoader,
+	resetDeleteMemberLoader,
 	resetCreateProjectLoader,
 	resetAddProjectMemberLoader,
 	resetUpdateProjectMemberLoader,

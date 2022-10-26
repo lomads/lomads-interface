@@ -39,6 +39,7 @@ import MyProject from "./MyProject";
 
 import { useSBTStats } from "hooks/SBT/sbt";
 import Footer from "components/Footer";
+import EditMember from "./MemberCard/EditMember";
 
 const Dashboard = () => {
 	const dispatch = useAppDispatch();
@@ -60,6 +61,7 @@ const Dashboard = () => {
 	const [safeTokens, setSafeTokens] = useState<Array<any>>([]);
 	const [showNotification, setShowNotification] = useState<boolean>(false);
 	const [showAddMember, setShowAddMember] = useState<boolean>(false);
+	const [showEditMember, setShowEditMember] = useState<boolean>(false);
 	const [showNavBar, setShowNavBar] = useState<boolean>(false);
 	const [checkLoading, setCheckLoading] = useState<boolean>(true);
 	const currentNonce = useAppSelector((state) => state.flow.currentNonce);
@@ -84,18 +86,23 @@ const Dashboard = () => {
 	const toggleShowMember = () => {
 		setShowAddMember(!showAddMember);
 	};
+
+	const toggleShowEditMember = () => {
+		setShowEditMember(!showEditMember);
+	};
+
 	const showSideBar = (_choice: boolean) => {
 		setShowNavBar(_choice);
 	};
 
 	useEffect(() => {
-		if(chainId && !account)
+		if (chainId && !account)
 			window.location.href = '/login'
 	}, [chainId, account])
 
 	useEffect(() => {
-		if(chainId && account) {
-			if(!DAOList)
+		if (chainId && account) {
+			if (!DAOList)
 				dispatch(loadDao({}))
 			else {
 				if(DAOList && DAOList.length == 0){
@@ -105,8 +112,8 @@ const Dashboard = () => {
 						if (!DAO || (DAO && DAO.url !== daoURL))
 							dispatch(getDao(daoURL))
 					}
-				} else if(DAOList && DAOList.length > 0) {
-					if(!daoURL)
+				} else if (DAOList && DAOList.length > 0) {
+					if (!daoURL)
 						navigate(`/${DAOList[0].url}`)
 					else if (!DAO || (DAO && DAO.url !== daoURL))
 						dispatch(getDao(daoURL))
@@ -116,21 +123,21 @@ const Dashboard = () => {
 	}, [chainId, account, DAOList, daoURL])
 
 	useEffect(() => {
-		if (contractName !== '' && DAO && DAO.sbt &&  DAO.sbt && account) {
+		if (contractName !== '' && DAO && DAO.sbt && DAO.sbt && account) {
 			if (DAO?.sbt?.whitelisted) {
-				if(_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
-					if(parseInt(balanceOf._hex, 16) === 0)
+				if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
+					if (parseInt(balanceOf._hex, 16) === 0)
 						navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
 				} else {
 					navigate('/only-whitelisted')
 				}
 			} else if (!DAO?.sbt?.whitelisted) {
-				if(_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
-					if(parseInt(balanceOf._hex, 16) === 0)
+				if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
+					if (parseInt(balanceOf._hex, 16) === 0)
 						navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
 				} else {
 					//add to DAO
-					if(parseInt(balanceOf._hex, 16) === 0)
+					if (parseInt(balanceOf._hex, 16) === 0)
 						navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
 				}
 			}
@@ -344,6 +351,7 @@ const Dashboard = () => {
 				<MemberCard
 					totalMembers={totalMembers}
 					toggleShowMember={toggleShowMember}
+					toggleShowEditMember={toggleShowEditMember}
 				/>
 				<Footer theme="dark" />
 			</div>
@@ -364,6 +372,7 @@ const Dashboard = () => {
 				showNavBar={showNavBar}
 			/>
 			{showAddMember && <AddMember toggleShowMember={toggleShowMember} />}
+			{showEditMember && <EditMember toggleShowEditMember={toggleShowEditMember} DAO={DAO} amIAdmin={amIAdmin} account={account} />}
 		</>
 	);
 };
