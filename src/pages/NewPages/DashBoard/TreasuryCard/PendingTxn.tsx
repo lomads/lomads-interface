@@ -16,8 +16,8 @@ import { AiOutlineClose, AiOutlineCheck } from "react-icons/ai";
 const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions, confirmTxLoading, rejectTxLoading, executeTxLoading, isAdmin }: any) => {
     const { provider, account } = useWeb3React();
     const { DAO } = useAppSelector(store => store.dashboard);
-    const [reasonText, setReasonText] = useState('');
-    const [editMode, setEditMode] = useState(false);
+    const [reasonText, setReasonText] = useState({});
+    const [editMode, setEditMode] = useState(null);
     const dispatch = useAppDispatch()
     //const threshold = useAppSelector((state) => state.flow.safeThreshold);
 
@@ -46,20 +46,33 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
         return { confirmReached, hasMyConfirmVote, rejectReached, hasMyRejectVote }
     }, [threshold, transaction])
 
-    const _handleReasonKeyDown = (safeTxHash: string, recipient: string) => {
+    const _handleReasonKeyDown = (safeTxHash: string, recipient: string, reasonText: string) => {
         if (reasonText && reasonText !== '') {
             axiosHttp.patch('transaction', { reason: reasonText, safeTxHash, recipient })
-                .then(res => dispatch(updateSafeTransaction(res.data)))
-        }
-        if (editMode) {
-            setEditMode(false);
+                .then(res => { 
+                    dispatch(updateSafeTransaction(res.data))
+                    if (editMode && editMode === `${safeTxHash}-${recipient}`) {
+                        setEditMode(null);
+                        setReasonText(prev => {
+                            return {
+                                ...prev,
+                                [`${safeTxHash}-${recipient}`] : undefined
+                            }
+                        })
+                    }
+                })
         }
     }
 
-    const handleEnableEditMode = (text: any) => {
+    const handleEnableEditMode = (text: any, reason: string) => {
         if (isAdmin) {
-            setReasonText(text);
-            setEditMode(true);
+            setEditMode(text);
+            setReasonText(prev => {
+                return {
+                    ...prev,
+                    [text] : reason
+                }
+            })
         }
     }
 
@@ -83,9 +96,9 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
                     </div>
                     <div className="transactionName">
                         {
-                            mulReason
+                             mulReason && (!editMode || (editMode && editMode !== `${transaction.safeTxHash}-${mulRecipient}`))
                                 ?
-                                <div className="dashboardText">{mulReason}</div>
+                                <div className="dashboardText" onClick={() => handleEnableEditMode(`${transaction.safeTxHash}-${mulRecipient}`, mulReason)}>{mulReason}</div>
                                 :
                                 <>
                                     {
@@ -93,8 +106,16 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
                                             ?
                                             <SimpleInputField
                                                 disabled={!owner}
-                                                onchange={e => setReasonText(e.target.value)}
-                                                onKeyDown={(e: any) => { console.log(e.key); if (e.key === 'Enter') { _handleReasonKeyDown(transaction.safeTxHash, mulRecipient) } }}
+                                                value={_get(reasonText, `${transaction.safeTxHash}-${mulRecipient}`, null)}
+                                                onchange={e => {
+                                                    setReasonText(prev => {
+                                                        return {
+                                                            ...prev,
+                                                            [`${transaction.safeTxHash}-${mulRecipient}`]: e.target.value
+                                                        }
+                                                    })
+                                                }}
+                                                onKeyDown={(e: any) => { console.log(e.target); if (e.key === 'Enter') { _handleReasonKeyDown(transaction.safeTxHash, mulRecipient, e.target.value) } }}
                                                 className="inputField"
                                                 height={30}
                                                 width={"100%"}
@@ -194,34 +215,24 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
                         </div>
                         <div className="transactionName">
                             {
-                                reason
-                                    ?
-                                    <>
-                                        {
-                                            editMode
-                                                ?
-                                                <SimpleInputField
-                                                    disabled={!owner}
-                                                    value={reasonText}
-                                                    onchange={(e: any) => { setReasonText(e.target.value) }}
-                                                    onKeyDown={(e: any) => { if (e.key === 'Enter') { _handleReasonKeyDown(transaction.safeTxHash, recipient) } }}
-                                                    className="inputField"
-                                                    height={30}
-                                                    width={"100%"}
-                                                    placeholder="Reason for transaction"
-                                                />
-                                                :
-                                                <div className="dashboardText" onClick={() => handleEnableEditMode(reason)}>{reason}</div>
-                                        }
-                                    </>
-                                    :
-                                    <>
+                                reason && (!editMode || (editMode && editMode !== `${transaction.safeTxHash}-${recipient}`)) ?
+                                <div className="dashboardText" onClick={() => handleEnableEditMode(`${transaction.safeTxHash}-${recipient}`, reason)}>{reason}</div> :
+                                 <>
                                         {
                                             isAdmin
                                                 ?
                                                 <SimpleInputField
                                                     disabled={!owner}
-                                                    onchange={(e: any) => { setReasonText(e.target.value) }} onKeyDown={(e: any) => { if (e.key === 'Enter') { _handleReasonKeyDown(transaction.safeTxHash, recipient) } }}
+                                                    value={_get(reasonText, `${transaction.safeTxHash}-${recipient}`, null)}
+                                                    onchange={e => {
+                                                        setReasonText(prev => {
+                                                            return {
+                                                                ...prev,
+                                                                [`${transaction.safeTxHash}-${recipient}`]: e.target.value
+                                                            }
+                                                        })
+                                                    }}
+                                                    onKeyDown={(e: any) => {  console.log(e); if (e.key === 'Enter') { _handleReasonKeyDown(transaction.safeTxHash, recipient, e.target.value) } }}
                                                     className="inputField"
                                                     height={30}
                                                     width={"100%"}

@@ -13,13 +13,15 @@ import {
 	deleteProject,
 	updateProjectLink,
 	getProject,
-	addProjectLinks
+	addProjectLinks,
+	getCurrentUser,
+	updateCurrentUser
 } from "./actions";
 import { createContract } from "state/contract/actions";
 import { get as _get, find as _find } from "lodash";
 
 export interface DashboardState {
-	// DAO: DAOType | null;
+	user: any;
 	DAO: any;
 	DAOLoading: boolean | null;
 	DAOList: Array<DAOType> | null;
@@ -37,6 +39,7 @@ export interface DashboardState {
 }
 
 const initialState: DashboardState = {
+	user: null,
 	DAO: null,
 	DAOLoading: false,
 	DAOList: null,
@@ -57,6 +60,9 @@ const dashboardSlice = createSlice({
 	name: "dashboard",
 	initialState,
 	reducers: {
+		setUser(state, action) {
+			state.user = action.payload
+		},
 		resetCreateDAOLoader(state) {
 			state.DAOLoading = null
 		},
@@ -121,6 +127,17 @@ const dashboardSlice = createSlice({
 		},
 	},
 	extraReducers: {
+		[`${updateCurrentUser.fulfilled}`]: (state, action) => {
+			state.user = action.payload;
+			state.DAO = state.DAO.members.map((m:any) => {
+				if(m.member._id === action.payload._id)
+					return { ...m, member: action.payload }
+				return m
+			})
+		},
+		[`${getCurrentUser.fulfilled}`]: (state, action) => {
+			state.user = action.payload;
+		},
 		[`${getDao.fulfilled}`]: (state, action) => {
 			state.DAOLoading = false;
 			state.DAO = action.payload
@@ -238,6 +255,7 @@ const dashboardSlice = createSlice({
 export const {
 	setDAOList,
 	setDAO,
+	setUser,
 	resetCreateDAOLoader,
 	resetAddMemberLoader,
 	resetCreateProjectLoader,
