@@ -12,10 +12,16 @@ import { Tooltip } from "@chakra-ui/react";
 import axiosHttp from '../../../../api';
 import { updateSafeTransaction } from "state/dashboard/reducer";
 import { AiOutlineClose, AiOutlineCheck } from "react-icons/ai";
-import CloseBtn from '../../../../assets/svg/close-btn.svg'
-import CheckBtn from '../../../../assets/svg/check-btn.svg'
+import CloseBtn from '../../../../assets/svg/close-btn.svg';
+import CheckBtn from '../../../../assets/svg/check-btn.svg';
 
-const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions, confirmTxLoading, rejectTxLoading, executeTxLoading, isAdmin }: any) => {
+const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
+      <div style={{ flex : 1}} ref={ref} {...rest}>
+        {children}
+      </div>
+  ))
+
+const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions, confirmTxLoading, rejectTxLoading, executeTxLoading, isAdmin }) => {
     const { provider, account } = useWeb3React();
     const { DAO } = useAppSelector(store => store.dashboard);
     const [reasonText, setReasonText] = useState({});
@@ -48,7 +54,7 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
         return { confirmReached, hasMyConfirmVote, rejectReached, hasMyRejectVote }
     }, [threshold, transaction])
 
-    const _handleReasonKeyDown = (safeTxHash: string, recipient: string, reasonText: string) => {
+    const _handleReasonKeyDown = (safeTxHash, recipient, reasonText) => {
         if (reasonText && reasonText !== '') {
             axiosHttp.patch('transaction', { reason: reasonText, safeTxHash, recipient })
                 .then(res => { 
@@ -66,7 +72,7 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
         }
     }
 
-    const handleEnableEditMode = (text: any, reason: string) => {
+    const handleEnableEditMode = (text, reason) => {
         if (isAdmin) {
             setEditMode(text);
             setReasonText(prev => {
@@ -78,7 +84,7 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
         }
     }
 
-    const renderItem = (item: any, index: any) => {
+    const renderItem = (item, index) => {
         const mulAmount = _get(item, 'dataDecoded.parameters[1].value')
         const mulRecipient = _get(item, 'dataDecoded.parameters[0].value')
         const isLast = _get(transaction, 'dataDecoded.parameters[0].valueDecoded', []).length - 1 === index;
@@ -117,7 +123,7 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
                                                         }
                                                     })
                                                 }}
-                                                onKeyDown={(e: any) => { console.log(e.target); if (e.key === 'Enter') { _handleReasonKeyDown(transaction.safeTxHash, mulRecipient, e.target.value) } }}
+                                                onKeyDown={(e) => { console.log(e.target); if (e.key === 'Enter') { _handleReasonKeyDown(transaction.safeTxHash, mulRecipient, e.target.value) } }}
                                                 className="inputField"
                                                 height={30}
                                                 width={"100%"}
@@ -165,10 +171,18 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
                                 rejectTxLoading === _get(transaction, 'nonce', '') ? <LeapFrog size={10} color="#FFF" /> : <AiOutlineClose style={{ color: "#FFFFFF", height: "16px", width: "16px", }} />
                             } bgColor="#C94B32" height={30} width={30} border="2px solid #C94B32" className="iconButtons" />}
                         {confirmReached &&
-                                <SimpleLoadButton condition={executeTxLoading === _get(transaction, 'safeTxHash')} disabled={ executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={() => executeTransactions(transaction)} width={"100%"} height={30} title="EXECUTE" bgColor={executeFirst === transaction.nonce ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
+                            <Tooltip placement='top' isDisabled={executeFirst === transaction.nonce} label={`Transaction with nonce ${executeFirst} needs to be executed first`}>
+                                <ToolTopContainer>
+                                    <SimpleLoadButton condition={executeTxLoading === _get(transaction, 'safeTxHash')} disabled={ executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={() => executeTransactions(transaction)} width={"100%"} height={30} title="EXECUTE" bgColor={executeFirst === transaction.nonce ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
+                                </ToolTopContainer>
+                            </Tooltip>
                         }
                         {rejectReached &&
-                                <SimpleLoadButton condition={executeTxLoading === _get(transaction, 'rejectedTxn.safeTxHash', _get(transaction, 'safeTxHash', ''))} disabled={executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={() => executeTransactions(transaction.rejectedTxn, true)} width={"100%"} height={30} title="REJECT" bgColor={executeFirst === transaction.nonce ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
+                            <Tooltip placement='top' isDisabled={executeFirst === transaction.nonce} label={`Transaction with nonce ${executeFirst} needs to be executed first`}>
+                                <ToolTopContainer>
+                                    <SimpleLoadButton condition={executeTxLoading === _get(transaction, 'rejectedTxn.safeTxHash', _get(transaction, 'safeTxHash', ''))} disabled={executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={() => executeTransactions(transaction.rejectedTxn, true)} width={"100%"} height={30} title="REJECT" bgColor={executeFirst === transaction.nonce ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
+                                </ToolTopContainer>
+                            </Tooltip>
                         }
                         {
                             (!(!confirmReached && !hasMyConfirmVote && !rejectReached) && !(!confirmReached && !hasMyRejectVote && !rejectReached) && !(confirmReached) && !(rejectReached)) &&
@@ -250,7 +264,7 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
                                                             }
                                                         })
                                                     }}
-                                                    onKeyDown={(e: any) => {  console.log(e); if (e.key === 'Enter') { _handleReasonKeyDown(transaction.safeTxHash, recipient, e.target.value) } }}
+                                                    onKeyDown={(e) => {  console.log(e); if (e.key === 'Enter') { _handleReasonKeyDown(transaction.safeTxHash, recipient, e.target.value) } }}
                                                     className="inputField"
                                                     height={30}
                                                     width={"100%"}
@@ -298,11 +312,18 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
                                     rejectTxLoading === _get(transaction, 'nonce') ? <LeapFrog size={10} color="#FFF" /> : <AiOutlineClose style={{ color: "#FFFFFF", height: "16px", width: "16px", }} />
                                 } bgColor="#C94B32" height={30} width={30} border="2px solid #C94B32" className="iconButtons" />}
                             {confirmReached &&
-                                <SimpleLoadButton condition={executeTxLoading == _get(transaction, 'safeTxHash')} disabled={executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={() => executeTransactions(transaction)} width={"100%"} height={30} title="EXECUTE" bgColor={executeFirst === transaction.nonce ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
-                                
+                                <Tooltip placement='top' isDisabled={executeFirst === transaction.nonce} label={`Transaction with nonce ${executeFirst} needs to be executed first`}>
+                                    <ToolTopContainer>
+                                        <SimpleLoadButton condition={executeTxLoading == _get(transaction, 'safeTxHash')} disabled={executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={() => executeTransactions(transaction)} width={"100%"} height={30} title="EXECUTE" bgColor={executeFirst === transaction.nonce ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
+                                    </ToolTopContainer>
+                                </Tooltip>
                             }
                             {rejectReached &&
-                                <SimpleLoadButton  condition={executeTxLoading === _get(transaction, 'rejectedTxn.safeTxHash', _get(transaction, 'safeTxHash', ''))} disabled={executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={() => executeTransactions(transaction.rejectedTxn, true)} width={"100%"} height={30} title="REJECT" bgColor={executeFirst === transaction.nonce ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
+                            <Tooltip placement='top' isDisabled={executeFirst === transaction.nonce} label={`Transaction with nonce ${executeFirst} needs to be executed first`}>
+                                <ToolTopContainer>
+                                    <SimpleLoadButton  condition={executeTxLoading === _get(transaction, 'rejectedTxn.safeTxHash', _get(transaction, 'safeTxHash', ''))} disabled={executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={() => executeTransactions(transaction.rejectedTxn, true)} width={"100%"} height={30} title="REJECT" bgColor={executeFirst === transaction.nonce ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
+                                </ToolTopContainer>
+                            </Tooltip>
                             }
                         </div> : <div className="confirmIconGrp"></div>}
                     </div>
