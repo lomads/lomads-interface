@@ -148,6 +148,12 @@ const MemberCard = (props: any) => {
 								}
 							</div>
 						</div>
+						<button
+							// onClick={handleActivateEditMode} 
+							onClick={() => props.toggleShowEditMember()}
+						>
+							<img src={editIcon} alt="edit-icon" />
+						</button>
 						{amIAdmin && <SafeButton
 							height={40}
 							width={150}
@@ -161,9 +167,7 @@ const MemberCard = (props: any) => {
 							onClick={() => props.toggleShowMember()}
 						/>}
 
-						<button onClick={handleActivateEditMode}>
-							<img src={editIcon} alt="edit-icon" />
-						</button>
+
 					</div>
 				</div>
 				<div className="membersList" onClick={() => { setEditMode(false); setEditRoles(false) }}>
