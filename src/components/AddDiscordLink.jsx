@@ -99,7 +99,7 @@ export default ({ title, desc, link, accessControl, okButton, onGuildCreateSucce
             ],
             roles: [
                 {
-                    name: "Member",
+                    name: "Tiger",
                     logic : "AND",
                     requirements: [{
                         type: "ERC721",

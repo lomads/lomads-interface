@@ -305,11 +305,10 @@ body.active-modal {
 .confirmIconGrp {
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
+    justify-content: flex-start;
     align-items: center;
     gap: 10px;
     min-width: 10%;
-    width: 10%;
     height: 100%;
     overflow-y: visible;
 }
@@ -321,6 +320,7 @@ body.active-modal {
     align-items: center;
     justify-content: center;
     position: relative;
+    width: 100%;
 }
 
 .confirmIconGrp .ex .line {
@@ -333,11 +333,12 @@ body.active-modal {
 }
 
 .transactionName {
-    width: 50%;
+    flex-grow: 1;
+    min-width: 30%;
 }
 
 .transactionAddress {
-    width: 15%;
+    min-width: 10%;
 }
 
 .memberCard {
@@ -865,7 +866,28 @@ body.active-modal {
 }
 
 #voteArea {
-    width: 10%;
+    min-width: 10%;
+}
+
+#voteArea .vote-view {
+    width: 120px;
+    color: #76808D;
+    font-size: 14px;
+    font-weight: 700;
+    height: 30px;
+    background: #F0F0F0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0px 15px 0px 5px;
+}
+
+#voteArea .vote-view.reject {
+    border-radius: 50px 0px 0px 50px;
+}
+
+#voteArea .vote-view.accept {
+    border-left: 1px solid rgba(27, 43, 65, 0.2);
 }
 
 #transactionDetailsPage {

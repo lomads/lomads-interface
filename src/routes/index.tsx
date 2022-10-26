@@ -28,7 +28,7 @@ export default [
         component: LoginPage
     },
     {
-        path: '/namedao',
+        path: '/createorg',
         component: NameDAO
     },
     {

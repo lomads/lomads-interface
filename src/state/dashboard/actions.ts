@@ -2,6 +2,24 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axiosHttp from '../../api';
 import { toast } from "react-toastify";
 
+export const getCurrentUser = createAsyncThunk(
+	'auth/me',
+	async (params: any, thunkApi) => {
+		return axiosHttp.get(`auth/me`)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+);
+
+export const updateCurrentUser = createAsyncThunk(
+	'auth/me/update',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`auth/me`, params)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+);
+
 export const getDao = createAsyncThunk(
 	'dao/get',
 	async (params: any, thunkApi) => {

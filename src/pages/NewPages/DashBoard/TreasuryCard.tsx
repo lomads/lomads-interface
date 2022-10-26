@@ -289,6 +289,14 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
   console.log("TOKENS", props.tokens)
 
+  const hasValidToken = useMemo(() => {
+	if(props.tokens && props.tokens.length > 0) {
+		let valid = props.tokens.some((t:any) => t.token)
+		return valid
+	}
+	return false
+  }, [props.tokens])
+
   return (
     <div className="treasuryCard">
       <div className="treasuryHeader">
@@ -319,12 +327,13 @@ const TreasuryCard = (props: ItreasuryCardType) => {
             }
             {/* <div className="dashboardText">total balance</div> */}
           </div>
-          {owner && <SafeButton onClick={props.toggleModal} height={40} width={150} titleColor="#B12F15" title="SEND TOKEN" bgColor="#FFFFFF" opacity="1" disabled={false} fontweight={400} fontsize={16} />}
+          {owner && <SafeButton onClick={props.toggleModal} height={40} width={150} titleColor="#B12F15" title="SEND TOKEN" bgColor={!hasValidToken ? "#f0f2f6" : "#FFFFFF"} opacity={!hasValidToken ? "0.4" : "1"} disabled={!hasValidToken} fontweight={400} fontsize={16} />}
         </div>
       </div>
       <>
         {
           pendingTxn !== undefined && executedTxn !== undefined &&
+		  ( pendingTxn && executedTxn && pendingTxn.length !== 0 && executedTxn.length !== 0 ) &&
           <div id="treasuryTransactions">
             <div className="dashboardText" style={{ marginBottom: '6px' }}>Last Transactions</div>
             {
