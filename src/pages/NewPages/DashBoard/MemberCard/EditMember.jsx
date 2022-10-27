@@ -25,6 +25,9 @@ const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
     useEffect(() => {
         if (manageMemberLoading === false) {
             dispatch(resetManageMemberLoader());
+            setDeleteMembers([]);
+            setUpdateMembers([]);
+            setEditableName('');
             toggleShowEditMember();
         }
     }, [manageMemberLoading]);
