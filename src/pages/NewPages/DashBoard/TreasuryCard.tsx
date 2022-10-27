@@ -18,6 +18,7 @@ import { ImportSafe, safeService } from "connection/SafeCall";
 import { Tooltip } from "@chakra-ui/react";
 import PendingTxn from './TreasuryCard/PendingTxn';
 import CompleteTxn from './TreasuryCard/CompleteTxn';
+import useRole from "hooks/useRole";
 
 const TreasuryCard = (props: ItreasuryCardType) => {
 	const { provider, account } = useWeb3React();
@@ -35,6 +36,8 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	const [executedTxn, setExecutedTxn] = useState<Array<any>>();
 
 	const { DAO } = useAppSelector(store => store.dashboard);
+
+	const { myRole, can } = useRole(DAO, account);
 
 	useImperativeHandle(props.innerRef, () => ({
 		reload: (event: any) => {
@@ -327,7 +330,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
             }
             {/* <div className="dashboardText">total balance</div> */}
           </div>
-          {owner && <SafeButton onClick={props.toggleModal} height={40} width={150} titleColor="#B12F15" title="SEND TOKEN" bgColor={!hasValidToken ? "#f0f2f6" : "#FFFFFF"} opacity={!hasValidToken ? "0.4" : "1"} disabled={!hasValidToken} fontweight={400} fontsize={16} />}
+          {owner && can(myRole, 'transaction.send') && <SafeButton onClick={props.toggleModal} height={40} width={150} titleColor="#B12F15" title="SEND TOKEN" bgColor={!hasValidToken ? "#f0f2f6" : "#FFFFFF"} opacity={!hasValidToken ? "0.4" : "1"} disabled={!hasValidToken} fontweight={400} fontsize={16} />}
         </div>
       </div>
       <>

@@ -32,6 +32,7 @@ import Footer from "components/Footer";
 import { useWeb3React } from "@web3-react/core";
 import { guild, role, user, setProjectName } from "@guildxyz/sdk";
 import { getSigner } from 'utils'
+import useRole from "hooks/useRole";
 
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
@@ -46,6 +47,9 @@ const ProjectDetails = () => {
     const { DAO, Project, ProjectLoading, updateProjectMemberLoading, deleteProjectMemberLoading, archiveProjectLoading, deleteProjectLoading } = useAppSelector((state) => state.dashboard);
     console.log("Project : ", Project)
     const daoName = _get(DAO, 'name', '').split(" ");
+    const { myRole, can } = useRole(DAO, account);
+
+    console.log("myRole", myRole)
 
     const [lockedLinks, setLockedLinks] = useState([]);
     const [openLinks, setOpenLinks] = useState([]);
@@ -75,6 +79,20 @@ const ProjectDetails = () => {
             setOpenLinks(_get(Project, 'links', []).filter(link => ((!link.accessControl) || (_get(link, 'accessControl', null) && _get(link, 'unlocked', []).indexOf(account.toLowerCase()) > -1))))
         }
     }, [Project]);
+
+    const canMyrole = useCallback((permission) => {
+        if(!Project) return false;
+        let creator = _get(Project, 'creator', '').toLowerCase() === account.toLowerCase();
+        let inProject = _find(Project.members, m => m.wallet.toLowerCase() === account.toLowerCase())
+
+        if(myRole === 'ADMIN' || myRole === "CONTRIBUTOR")
+            return can(myRole, permission)
+        if(myRole === 'CORE_CONTRIBUTOR')
+            return inProject && can(myRole, permission)
+        if(myRole === 'ACTIVE_CONTRIBUTOR')
+            return creator && can(myRole, permission)
+    }, [Project])
+
 
     // Runs after adding new members in project
     useEffect(() => {
@@ -458,10 +476,11 @@ const ProjectDetails = () => {
                                     {/* <button>
                                         <img src={editToken} alt="hk-logo" />
                                     </button> */}
-                                    <button onClick={() => setDeletePrompt(true)}>
+                                    
+                                    { canMyrole('project.delete') && <button onClick={() => setDeletePrompt(true)}>
                                         <img src={deleteIcon} alt="hk-logo" />
-                                    </button>
-                                    {
+                                    </button> }
+                                    { canMyrole('project.archive') &&
                                         Project?.archivedAt === null
                                             ?
                                             <SafeButton
@@ -498,13 +517,15 @@ const ProjectDetails = () => {
                                         <p>{Project?.members.length} members</p>
                                     </div>
                                     <div>
+                                        { canMyrole('project.member.edit') &&
                                         <button onClick={() => setEditMember(true)}>
                                             <img src={editToken} alt="hk-logo" />
-                                        </button>
+                                        </button> }
+                                        { canMyrole('project.member.add') &&
                                         <button onClick={toggleMemberList}>
                                             <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
                                             MEMBER
-                                        </button>
+                                        </button> }
                                     </div>
                                 </div>
                                 <div className="members-list">
@@ -547,10 +568,11 @@ const ProjectDetails = () => {
                                     {/* <button>
                                         <img src={editPen} alt="hk-logo" />
                                     </button> */}
+                                    { canMyrole('project.link.add') &&
                                     <button onClick={toggleShowLink}>
                                         <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
                                         LINK
-                                    </button>
+                                    </button> }
 
                                 </div>
                             </div>

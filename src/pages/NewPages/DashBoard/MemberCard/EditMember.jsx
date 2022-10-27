@@ -13,6 +13,7 @@ import { resetManageMemberLoader } from 'state/dashboard/reducer';
 import { useAppSelector, useAppDispatch } from "state/hooks";
 
 import { get as _get, find as _find } from 'lodash';
+import useRole from 'hooks/useRole';
 
 const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
 
@@ -21,6 +22,8 @@ const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
     const [deleteMembers, setDeleteMembers] = useState([]);
     const [updateMembers, setUpdateMembers] = useState([]);
     const [editableName, setEditableName] = useState();
+
+    const { myRole, can } = useRole(DAO, account)
 
     useEffect(() => {
         if (manageMemberLoading === false) {
@@ -134,7 +137,7 @@ const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
                                     <option value="ACTIVE_CONTRIBUTOR">Active Contributor</option>
                                     <option value="CONTRIBUTOR">Contributor</option>
                                 </select>
-                                <button className={deleteMembers.includes(item.member._id) ? 'selected' : null} onClick={() => handleDeleteMembers(item.member._id)}>
+                                { can(myRole, 'members.delete') && <button className={deleteMembers.includes(item.member._id) ? 'selected' : null} onClick={() => handleDeleteMembers(item.member._id)}>
                                     {
                                         deleteMembers.includes(item.member._id)
                                             ?
@@ -142,7 +145,7 @@ const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
                                             :
                                             <img src={binRed} alt="bin-red" />
                                     }
-                                </button>
+                                </button> }
                             </div>
                         ))
                     }

@@ -64,7 +64,7 @@ const InviteGang = () => {
 		if (!check) {
 			let creator = [
 				...invitedMembers,
-				{ name: "", address: account as string },
+				{ name: "", address: account as string, role: 'ADMIN' },
 			];
 			creator = creator.filter(c => c.address !== undefined)
 			dispatch(updateInvitedGang(creator));
