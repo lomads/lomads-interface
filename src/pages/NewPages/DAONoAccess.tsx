@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "../../styles/pages/DAOSuccess.css";
 import "../../styles/Global.css";
 import frameicon from "../../assets/svg/frame.svg";
@@ -6,12 +6,22 @@ import GroupEnjoy from "../../assets/svg/GroupEnjoy.svg";
 import { colors } from "assets/colors";
 import { Colorstype } from "types/UItype";
 import { useNavigate } from "react-router-dom";
-const DAONoAccess = () => {
-  const navigate = useNavigate();
+import { loadDao } from 'state/dashboard/actions';
+import SideBar from "../NewPages/DashBoard/SideBar";
+import { useAppDispatch } from "state/hooks";
 
+const DAONoAccess = () => {
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate();
+  const [showNavBar, setShowNavBar] = useState<boolean>(false);
   useEffect(() => {
+    dispatch(loadDao({}))
     sessionStorage.removeItem('__lmds_active_dao')
   }, [])
+
+  const showSideBar = (_choice: boolean) => {
+		setShowNavBar(_choice);
+	};
 
   return (
     <>
@@ -24,6 +34,11 @@ const DAONoAccess = () => {
           <div className="message-subtext">Please contact the admin through email or other social channels</div>
         </div>
       </div>
+      <SideBar
+				name={""}
+				showSideBar={showSideBar}
+				showNavBar={showNavBar}
+			/>
     </>
   );
 };

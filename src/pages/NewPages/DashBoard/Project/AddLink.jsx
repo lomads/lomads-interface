@@ -19,6 +19,7 @@ const AddLink = (props) => {
 
     const [title, setTitle] = useState('');
     const [link, setLink] = useState("");
+    const [roleName, setRoleName] = useState(null);
     // for link access control
     const [accessControl, setAccessControl] = useState(false);
 
@@ -27,6 +28,7 @@ const AddLink = (props) => {
             dispatch(resetAddProjectLinksLoader())
             setTitle("");
             setLink("");
+            setRoleName(null)
             setAccessControl(false);
             props.toggleShowLink();
         }
@@ -47,7 +49,10 @@ const AddLink = (props) => {
     }, [link]);
 
     const handleAddLink = (guildId = undefined) => {
-        const resource = { id: nanoid(16), title, link, accessControl, ...(guildId ? { guildId } : {}) };
+        let dcserverid = undefined;
+        if(guildId)
+            dcserverid = new URL(link).pathname.split('/')[2]
+        const resource = { id: nanoid(16), title, link, platformId: dcserverid, accessControl, ...(guildId ? { guildId } : {}) };
         dispatch(addProjectLinks({ projectId: props.projectId, daoUrl: props.daoUrl, payload: resource }))
     };
 
@@ -81,6 +86,16 @@ const AddLink = (props) => {
                             />
                         </div>
                     </div>
+                    { accessControl && <div className='resource-footer'>
+                        <AddressInputField
+                            className="inputField"
+                            height={50}
+                            width={251}
+                            placeholder="Role name"
+                            value={roleName}
+                            onchange={(e) => setRoleName(e.target.value)}
+                        />
+                    </div> }
                     {
                         props.sbt
                             ?
@@ -111,7 +126,7 @@ const AddLink = (props) => {
                         <div>
                             {
                                 link && link.indexOf('discord.com') > -1 ?
-                                    <AddDiscordLink onGuildCreateSuccess={handleAddLink} okButton title={title} link={link} accessControl={accessControl} /> :
+                                    <AddDiscordLink onGuildCreateSuccess={handleAddLink} okButton title={title} link={link} roleName={roleName} accessControl={accessControl} /> :
                                     <SimpleButton title="OK" bgColor="#C94B32" className="button" fontsize={16} fontweight={400} height={40} width={129} onClick={() => handleAddLink()} />
                             }
                         </div>

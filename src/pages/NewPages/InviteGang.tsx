@@ -18,6 +18,10 @@ import daoMember2 from "../../assets/svg/daoMember2.svg";
 import { useWeb3React } from "@web3-react/core";
 import { useEnsAddress } from "react-moralis";
 import Uploader from 'components/XlsxUploader';
+import createProjectSvg from '../../assets/svg/createProject.svg';
+import memberIcon from '../../assets/svg/memberIcon.svg';
+import binRed from '../../assets/svg/bin-red.svg';
+import binWhite from '../../assets/svg/bin-white.svg';
 
 const InviteGang = () => {
 	const dispatch = useAppDispatch();
@@ -25,9 +29,14 @@ const InviteGang = () => {
 	const [uploadLoading, setUploadLoading] = useState<boolean>(false);
 	const [ownerName, setOwnerName] = useState<string>("");
 	const [ownerAddress, setOwnerAddress] = useState<string>("");
+	const [ownerRole, setOwnerRole] = useState<string>("CONTRIBUTOR");
 	const [errors, setErrors] = useState<any>({});
 	const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
 	const { account, provider } = useWeb3React();
+
+	const [showModal, setShowModal] = useState(false);
+	const [deleteMembers, setDeleteMembers] = useState<string[]>([]);
+	const [validMembers, setValidMembers] = useState<{ address: string; name: string, role: string }[]>([]);
 
 	const isAddressValid = (holderAddress: string) => {
 		const ENSdomain = holderAddress.slice(-4);
@@ -55,7 +64,7 @@ const InviteGang = () => {
 		if (!check) {
 			let creator = [
 				...invitedMembers,
-				{ name: "", address: account as string },
+				{ name: "", address: account as string, role: 'ADMIN' },
 			];
 			creator = creator.filter(c => c.address !== undefined)
 			dispatch(updateInvitedGang(creator));
@@ -70,9 +79,9 @@ const InviteGang = () => {
 		isPresent(ownerAddress);
 	}, [ownerAddress]);
 
-	const addMember = useCallback((_ownerName: string, _ownerAddress: string) => {
+	const addMember = useCallback((_ownerName: string, _ownerAddress: string, _ownerRole: string) => {
 		return new Promise(async (resolve, reject) => {
-			const member: InviteGangType = { name: _ownerName, address: _ownerAddress };
+			const member = { name: _ownerName, address: _ownerAddress, role: _ownerRole };
 			if (_ownerAddress.slice(-4) === ".eth") {
 				const resolver = await provider?.getResolver(_ownerAddress);
 				const EnsAddress = await resolver?.getAddress();
@@ -109,7 +118,7 @@ const InviteGang = () => {
 		})
 	}, [invitedMembers]);
 
-	const handleClick = (_ownerName: string, _ownerAddress: string) => {
+	const handleClick = (_ownerName: string, _ownerAddress: string, _ownerRole: string) => {
 		let terrors: any = {};
 		if (!isAddressValid(ownerAddress)) {
 			terrors.ownerAddress = " * address is not correct.";
@@ -118,7 +127,7 @@ const InviteGang = () => {
 			terrors.ownerAddress = " * address already exists.";
 		}
 		if (_.isEmpty(terrors)) {
-			addMember(_ownerName, _ownerAddress);
+			addMember(_ownerName, _ownerAddress, _ownerRole);
 		}
 		else {
 			setErrors(terrors);
@@ -149,32 +158,82 @@ const InviteGang = () => {
 			let validMembers = [];
 			for (let index = 0; index < data.length; index++) {
 				let member = data[index];
-				if(isAddressValid(member.address) && !isPresent(member.address)) {
+				if (isAddressValid(member.address) && !isPresent(member.address)) {
 					if (member.address.slice(-4) === ".eth") {
 						const resolver = await provider?.getResolver(member.address);
 						const EnsAddress = await resolver?.getAddress();
-						if (EnsAddress){
+						if (EnsAddress) {
 							member.name = member.name ? member.name : member.address;
 							member.address = EnsAddress as string;
-						}	
+						}
 					} else {
 						const ENSname = await provider?.lookupAddress(member.address);
-						if(ENSname)
+						if (ENSname)
 							member.name = member.name ? member.name : ENSname
 					}
-					if(!_.find(validMembers, m => m.address.toLowerCase() === member.address.toLowerCase()) &&
-					   !_.find(invitedMembers, m => m.address.toLowerCase() === member.address.toLowerCase())
-					) { 
-						validMembers.push(member);
+					if (!_.find(validMembers, m => m.address.toLowerCase() === member.address.toLowerCase()) &&
+						!_.find(invitedMembers, m => m.address.toLowerCase() === member.address.toLowerCase())
+					) {
+						validMembers.push({ ...member, role: 'CONTRIBUTOR' });
 					}
 				}
 			}
-			dispatch(appendInviteMembers(validMembers))
+
+			setValidMembers(validMembers);
 			setUploadLoading(false)
-		} catch (e){
+			setShowModal(true);
+		} catch (e) {
 			setUploadLoading(false)
 		}
-	}, [invitedMembers])
+	}, [invitedMembers]);
+
+	const handleCloseModal = () => {
+		setValidMembers([]);
+		setDeleteMembers([]);
+		setShowModal(false);
+	}
+
+	const handleChangeState = (e: any, index: any) => {
+		const newArray = validMembers.map((item, i) => {
+			if (index === i) {
+				return { ...item, [e.target.name]: e.target.value };
+			}
+			else {
+				return item;
+			}
+		});
+		setValidMembers(newArray);
+	}
+
+	const handleDeleteUser = (address: any) => {
+		if (deleteMembers.includes(address)) {
+			setDeleteMembers(deleteMembers.filter((m) => m !== address));
+		}
+		else {
+			setDeleteMembers([...deleteMembers, address]);
+		}
+	}
+
+	const handleAppendUploadedMembers = () => {
+		try {
+			let tempArray = [];
+			for (var i = 0; i < validMembers.length; i++) {
+				if (deleteMembers.includes(validMembers[i].address) === false) {
+					tempArray.push(validMembers[i]);
+				}
+			}
+			dispatch(appendInviteMembers(tempArray));
+			setShowModal(false);
+		}
+		catch (e) {
+			console.log(e)
+			setShowModal(false);
+		}
+		finally {
+			setDeleteMembers([]);
+			setValidMembers([]);
+		}
+	}
 
 	return (
 		<>
@@ -183,10 +242,10 @@ const InviteGang = () => {
 				<div className="centerInputCard">
 					<div style={{ width: '100%', marginBottom: 8, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
 						<div className="inputTitle">Add member :</div>
-						{ uploadLoading ? <LeapFrog size={24} color="#C94B32" /> : <Uploader onComplete={handleInsertWallets} /> }
+						{uploadLoading ? <LeapFrog size={24} color="#C94B32" /> : <Uploader onComplete={handleInsertWallets} />}
 					</div>
 					<div className="inputArea">
-						<div>
+						<div style={{ marginRight: '10px' }}>
 							<SimpleInputField
 								className="inputField"
 								height={50}
@@ -198,7 +257,7 @@ const InviteGang = () => {
 								}}
 							/>
 						</div>
-						<div>
+						<div style={{ marginRight: '10px' }}>
 							<AddressInputField
 								className="inputField"
 								height={50}
@@ -212,6 +271,20 @@ const InviteGang = () => {
 								isInvalid={errors.ownerAddress}
 							/>
 						</div>
+						<div style={{ marginRight: '10px' }}>
+							<select
+								name="role"
+								className="tokenDropdown"
+								defaultValue={ownerRole}
+								onChange={(e) => setOwnerRole(e.target.value)}
+								style={{ margin: '0' }}
+							>
+								<option value="ADMIN">Admin</option>
+								<option value="CORE_CONTRIBUTOR">Core Contributor</option>
+								<option value="ACTIVE_CONTRIBUTOR">Active Contributor</option>
+								<option value="CONTRIBUTOR">Contributor</option>
+							</select>
+						</div>
 						<div>
 							<IconButton
 								className="addButton"
@@ -219,7 +292,7 @@ const InviteGang = () => {
 								height={50}
 								width={50}
 								onClick={(e) => {
-									handleClick(ownerName, ownerAddress);
+									handleClick(ownerName, ownerAddress, ownerRole);
 								}}
 								bgColor={
 									isAddressValid(ownerAddress)
@@ -240,32 +313,39 @@ const InviteGang = () => {
 											<img src={daoMember2} alt={result.address} />
 											<p className="nameText">{result.name}</p>
 										</div>
-										{result.address !== undefined &&
-											result.address !== account ? (
+										<div className="avatarAddress">
 											<p className="text">
 												{result.address &&
 													result.address.slice(0, 6) +
 													"..." +
 													result.address.slice(-4)}
 											</p>
-										) : (
-											<p className="creatorText">
-												{result.address &&
-													result.address.slice(0, 6) +
-													"..." +
-													result.address.slice(-4)}
+										</div>
+										<div className="avatarRole">
+											<p className="text">
+												{
+													result.address !== undefined && result.address === account
+														?
+														`ADMIN`
+														:
+														result.role?.replaceAll('_', ' ')
+												}
 											</p>
-										)}
-										{result.address !== account && (
-											<div
-												className="deleteButton"
-												onClick={() => {
-													deleteMember(result.address);
-												}}
-											>
-												<AiOutlineClose style={{ height: 15, width: 15 }} />
-											</div>
-										)}
+										</div>
+
+										<div className="avatarBtn">
+											{result.address !== account && (
+												<button
+													className="deleteButton"
+													onClick={() => {
+														deleteMember(result.address);
+													}}
+												>
+													<AiOutlineClose style={{ height: 15, width: 15 }} />
+												</button>
+											)}
+										</div>
+
 									</div>
 								);
 							})}
@@ -294,6 +374,88 @@ const InviteGang = () => {
 				>
 					skip
 				</div>
+
+
+				{/* Dsiplay modal for uploaded users */}
+				{
+					showModal &&
+					<div className="membersModal">
+						<div className="membersModal-header">
+							<img src={createProjectSvg} alt="create-project-svg" />
+							<h1>Add Members</h1>
+						</div>
+						<div className="membersModal-body">
+							{
+								validMembers.length > 0
+									?
+									<>
+										{
+											validMembers.map((item, index) => (
+												<div className="membersModal-row" key={index}>
+													{
+														deleteMembers.includes(item.address)
+															?
+															<div className='row-overcast'></div>
+															:
+															null
+													}
+													<div>
+														<img src={memberIcon} alt="memberIcon" />
+														<SimpleInputField
+															className="inputField"
+															id="nameInput"
+															height={50}
+															width={135}
+															placeholder="Name"
+															value={item.name}
+															name="name"
+															onchange={(e) => handleChangeState(e, index)}
+														/>
+													</div>
+													<span>{item.address.slice(0, 6) + "..." + item.address.slice(-4)}</span>
+													<select
+														name="role"
+														className="tokenDropdown"
+														defaultValue={item.role}
+														onChange={(e) => handleChangeState(e, index)}
+													>
+														<option value="ADMIN">Admin</option>
+														<option value="CORE_CONTRIBUTOR">Core Contributor</option>
+														<option value="ACTIVE_CONTRIBUTOR">Active Contributor</option>
+														<option value="CONTRIBUTOR">Contributor</option>
+													</select>
+													{
+														deleteMembers.includes(item.address)
+															?
+															<button onClick={() => handleDeleteUser(item.address)} className="selected">
+																<img src={binWhite} alt="bin-white" />
+															</button>
+															:
+															<button onClick={() => handleDeleteUser(item.address)}>
+																<img src={binRed} alt="bin-red" />
+															</button>
+													}
+
+												</div>
+											))
+										}
+									</>
+									:
+									<p>All the users have been already added</p>
+							}
+						</div>
+						<div className="membersModal-footer">
+							<button onClick={handleCloseModal} className="cancel-btn">
+								CANCEL
+							</button>
+							{
+								validMembers.length > 0 && <button onClick={handleAppendUploadedMembers} className="confirm-btn">
+									ADD MEMBERS
+								</button>
+							}
+						</div>
+					</div>
+				}
 			</div>
 		</>
 	);

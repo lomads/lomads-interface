@@ -46,6 +46,7 @@ const CreateProject = () => {
     const [showMore, setShowMore] = useState(false);
     const [success, setSuccess] = useState(false);
     const [link, setLink] = useState('');
+    const [roleName, setRoleName] = useState(null);
     const [accessControl, setAccessControl] = useState(false);
     const [title, setTitle] = useState('');
     const [newAddress, setNewAddress] = useState('');
@@ -179,12 +180,17 @@ const CreateProject = () => {
             resource.id = nanoid(16);
             resource.title = title;
             resource.link = link;
+            let dcserverid = undefined;
+            if(guildId)
+                dcserverid = new URL(link).pathname.split('/')[2]
+            resource.platformId = dcserverid;
             resource.accessControl = accessControl;
             if (guildId)
                 resource.guildId = guildId;
             setResourceList([...resourceList, resource]);
             setTitle('');
             setLink('');
+            setRoleName(null)
             setAccessControl(false);
         }
     }
@@ -426,7 +432,7 @@ const CreateProject = () => {
                                                             {
                                                                 link && link.indexOf('discord.com') > -1
                                                                     ?
-                                                                    <AddDiscordLink onGuildCreateSuccess={handleAddResource} title={title} link={link} accessControl={accessControl} />
+                                                                    <AddDiscordLink onGuildCreateSuccess={handleAddResource} title={title} link={link} roleName={roleName} accessControl={accessControl} />
                                                                     :
                                                                     <button
                                                                         style={link !== '' && title !== '' ? { background: '#C84A32' } : null}
@@ -436,6 +442,17 @@ const CreateProject = () => {
                                                                     </button>
                                                             }
                                                         </div>
+                                                        { accessControl ? <div className='resource-body'>
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Role name"
+                                                                className="input2"
+                                                                style={{ marginTop: 16 }}
+                                                                name="rolename"
+                                                                value={roleName}
+                                                                onChange={(e) => setRoleName(e.target.value)}
+                                                            />
+                                                            </div> : null }
                                                         {
                                                             DAO?.sbt
                                                                 ?

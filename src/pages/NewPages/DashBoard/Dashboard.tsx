@@ -40,6 +40,7 @@ import MyProject from "./MyProject";
 import { useSBTStats } from "hooks/SBT/sbt";
 import Footer from "components/Footer";
 import EditMember from "./MemberCard/EditMember";
+import useRole from "hooks/useRole";
 
 const Dashboard = () => {
 	const dispatch = useAppDispatch();
@@ -65,6 +66,9 @@ const Dashboard = () => {
 	const [showNavBar, setShowNavBar] = useState<boolean>(false);
 	const [checkLoading, setCheckLoading] = useState<boolean>(true);
 	const currentNonce = useAppSelector((state) => state.flow.currentNonce);
+	const { myRole, displayRole, permissions, can } = useRole(DAO, account);
+
+	console.log("role", myRole)
 
 	const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
 
@@ -308,17 +312,10 @@ const Dashboard = () => {
 					</div>
 					<div className="DAOsettings">
 						<div className="DAOadminPill">
-							{
-								amIAdmin
-									?
-									<p>You're an&nbsp;<span>Admin</span></p>
-									:
-									<p>You're a&nbsp;<span>Core contributor</span></p>
-							}
-
+							<p>You're an&nbsp;<span>{ displayRole }</span></p>
 						</div>
 						{
-							amIAdmin && <button onClick={() => { navigate('/settings') }}>
+							can(myRole, 'settings') && <button onClick={() => { navigate('/settings') }}>
 								<img src={settingIcon} alt="settings-icon" />
 							</button>
 						}
@@ -333,9 +330,8 @@ const Dashboard = () => {
 							showNotificationArea={showNotificationArea}
 						/>
 					)}
-
 				<MyProject />
-
+				{ can(myRole, 'transaction.view') &&
 				<TreasuryCard
 					innerRef={treasuryRef}
 					safeAddress={safeAddress}
@@ -347,12 +343,15 @@ const Dashboard = () => {
 					account={account}
 					onChangePendingTransactions={(tx: any) => setPendingTransactions(tx)}
 					tokens={safeTokens}
-				/>
+				/> 
+				}
+				{ can(myRole, 'members.view') &&
 				<MemberCard
 					totalMembers={totalMembers}
 					toggleShowMember={toggleShowMember}
 					toggleShowEditMember={toggleShowEditMember}
 				/>
+				}
 				<Footer theme="dark" />
 			</div>
 			{showModal && (

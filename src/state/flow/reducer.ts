@@ -73,12 +73,12 @@ const flowSlice = createSlice({
   },
   extraReducers: {
     [`${createDAO.fulfilled}`]: (state) => {
-       state.createDAOLoading = false
+      state.createDAOLoading = false
     },
     [`${createDAO.pending}`]: (state) => {
       state.createDAOLoading = true
-   }
-	},
+    }
+  },
 });
 
 export const {

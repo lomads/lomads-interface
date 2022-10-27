@@ -8,25 +8,32 @@ import SimpleInputField from "UIpack/SimpleInputField";
 import binRed from '../../../../assets/svg/bin-red.svg';
 import binWhite from '../../../../assets/svg/bin-white.svg';
 
-import { deleteDaoMember, updateDaoMember } from 'state/dashboard/actions';
-import { resetDeleteMemberLoader } from 'state/dashboard/reducer';
+import { manageDaoMember, updateDaoMember } from 'state/dashboard/actions';
+import { resetManageMemberLoader } from 'state/dashboard/reducer';
 import { useAppSelector, useAppDispatch } from "state/hooks";
 
 import { get as _get, find as _find } from 'lodash';
+import useRole from 'hooks/useRole';
 
 const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
 
     const dispatch = useAppDispatch();
-    const { deleteMemberLoading } = useAppSelector((state) => state.dashboard);
+    const { manageMemberLoading } = useAppSelector((state) => state.dashboard);
     const [deleteMembers, setDeleteMembers] = useState([]);
+    const [updateMembers, setUpdateMembers] = useState([]);
     const [editableName, setEditableName] = useState();
 
+    const { myRole, can } = useRole(DAO, account)
+
     useEffect(() => {
-        if (deleteMemberLoading === false) {
-            dispatch(resetDeleteMemberLoader());
+        if (manageMemberLoading === false) {
+            dispatch(resetManageMemberLoader());
+            setDeleteMembers([]);
+            setUpdateMembers([]);
+            setEditableName('');
             toggleShowEditMember();
         }
-    }, [deleteMemberLoading]);
+    }, [manageMemberLoading]);
 
     useEffect(() => {
         let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
@@ -56,15 +63,23 @@ const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
     }
 
     const handleChangeRoles = (userId, role) => {
-        console.log(userId, role);
+        let temp = updateMembers;
+        const index = temp.map(object => object.id).indexOf(userId);
+        if (index === -1) {
+            setUpdateMembers([...updateMembers, { id: userId, role }])
+        }
+        else {
+            temp[index] = { id: userId, role }
+            setUpdateMembers(temp);
+        }
     }
 
     const handleSubmit = () => {
-        if (deleteMembers.length > 0) {
-            dispatch(deleteDaoMember({ url: DAO?.url, payload: { memberList: deleteMembers } }));
+        if (deleteMembers.length > 0 || updateMembers.length > 0) {
+            dispatch(manageDaoMember({ url: DAO?.url, payload: { deleteList: deleteMembers, updateList: updateMembers } }));
         }
         else {
-            console.log("SAVE CHANGES")
+            toggleShowEditMember();
         }
     }
 
@@ -119,8 +134,10 @@ const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
                                 >
                                     <option value="ADMIN">Admin</option>
                                     <option value="CORE_CONTRIBUTOR">Core Contributor</option>
+                                    <option value="ACTIVE_CONTRIBUTOR">Active Contributor</option>
+                                    <option value="CONTRIBUTOR">Contributor</option>
                                 </select>
-                                <button className={deleteMembers.includes(item.member._id) ? 'selected' : null} onClick={() => handleDeleteMembers(item.member._id)}>
+                                { can(myRole, 'members.delete') && <button className={deleteMembers.includes(item.member._id) ? 'selected' : null} onClick={() => handleDeleteMembers(item.member._id)}>
                                     {
                                         deleteMembers.includes(item.member._id)
                                             ?
@@ -128,7 +145,7 @@ const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
                                             :
                                             <img src={binRed} alt="bin-red" />
                                     }
-                                </button>
+                                </button> }
                             </div>
                         ))
                     }
