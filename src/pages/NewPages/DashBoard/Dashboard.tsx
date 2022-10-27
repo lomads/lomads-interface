@@ -28,7 +28,7 @@ import NotificationArea from "./NotificationArea";
 import AddMember from "./MemberCard/AddMember";
 import dashboardfooterlogo from "../../../assets/svg/dashboardfooterlogo.svg";
 import { useAppDispatch } from "state/hooks";
-import { getDao } from "state/dashboard/actions";
+import { getCurrentUser, getDao } from "state/dashboard/actions";
 import { loadDao } from 'state/dashboard/actions';
 import copyIcon from "../../../assets/svg/copyIcon.svg";
 import { useDispatch } from "react-redux";
@@ -45,7 +45,7 @@ const Dashboard = () => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const { daoURL } = useParams();
-	const { DAO, DAOList, DAOLoading } = useAppSelector((state) => state.dashboard);
+	const { user, DAO, DAOList, DAOLoading } = useAppSelector((state) => state.dashboard);
 	console.log("DAO : ", DAO);
 	const [update, setUpdate] = useState(0);
 	const treasuryRef = useRef<any>();
@@ -105,9 +105,9 @@ const Dashboard = () => {
 			if (!DAOList)
 				dispatch(loadDao({}))
 			else {
-				if (DAOList && DAOList.length == 0) {
-					if (!daoURL)
-						navigate(`/namedao`)
+				if(DAOList && DAOList.length == 0){
+					if(!daoURL)
+						navigate(`/createorg`)
 					else {
 						if (!DAO || (DAO && DAO.url !== daoURL))
 							dispatch(getDao(daoURL))
@@ -145,9 +145,15 @@ const Dashboard = () => {
 	}, [DAO, balanceOf, contractName, account]);
 
 	useEffect(() => {
-		if (DAO && account) {
-			if (!DAO.sbt) {
-				if (!_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase()))
+		if(account && chainId && ( !user || ( user && user.wallet.toLowerCase() !== account.toLowerCase() ) )) {
+			dispatch(getCurrentUser({}))
+		}
+	}, [account, chainId, user])
+
+	useEffect(() => {
+		if(DAO && account) {
+			if(!DAO.sbt){
+				if(!_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase()))
 					navigate('/noaccess')
 			}
 		}

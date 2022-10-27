@@ -23,12 +23,13 @@ const MyProject = () => {
 
     useEffect(() => {
         if (DAO) {
-            setMyProjects(_get(DAO, 'projects', []).filter(project => _find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase())))
-            setOtherProjects(_get(DAO, 'projects', []).filter(project => !_find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase())))
+            setMyProjects(_get(DAO, 'projects', []).filter(project => !project.deletedAt && !project.archivedAt && _find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase())))
+            setOtherProjects(_get(DAO, 'projects', []).filter(project => !project.deletedAt && !project.archivedAt && !_find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase())))
         }
     }, [DAO, tab]);
 
     useEffect(() => {
+        console.log("myProjects", myProjects)
         if (!initialCheck) {
             if (myProjects.length > 0) {
                 setInitialCheck(true)
@@ -126,7 +127,7 @@ const MyProject = () => {
                         {
                             otherProjects.length > 0
                                 ?
-                                <div className='myproject-body-fixed' style={DAO?.projects.length > 9 ? { overflow: 'scroll', height: '375px' } : null}>
+                                <div className='myproject-body-fixed' style={otherProjects.length > 9 ? { overflow: 'scroll', height: '375px' } : { height: 'auto'}}>
                                     {
                                         otherProjects.map((item, index) => {
                                             if (item.deletedAt === null && item.archivedAt === null) {
@@ -143,10 +144,10 @@ const MyProject = () => {
                                         })
                                     }
                                 </div>
-                                :
-                                <div className='myproject-body-nocontent'>
-                                    <p>No projects</p>
-                                </div>
+                                : null
+                                // <div className='myproject-body-nocontent'>
+                                //     <p>No projects</p>
+                                // </div>
                         }
                     </>
                     :

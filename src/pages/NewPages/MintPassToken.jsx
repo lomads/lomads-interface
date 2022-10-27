@@ -18,7 +18,7 @@ import { toast, ToastContainer } from "react-toastify";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import { setDAO } from "state/dashboard/reducer";
-import { getDao } from "state/dashboard/actions";
+import { getCurrentUser, getDao, updateCurrentUser } from "state/dashboard/actions";
 import Footer from "components/Footer";
 import { addDaoMember } from 'state/dashboard/actions'
 
@@ -38,10 +38,16 @@ const MintPassToken = () => {
     const [discordError, setDiscordError] = useState(false);
     const [emailError, setEmailError] = useState(false);
     const [telegramError, setTelegramError] = useState(false);
-    const { account, provider } = useWeb3React();
-    const { DAO, DAOLoading } = useAppSelector((state) => state.dashboard);
+    const { account, chainId, provider } = useWeb3React();
+    const { user, DAO, DAOLoading } = useAppSelector((state) => state.dashboard);
     const { needWhitelist, isWhitelisted, balanceOf, contractName, currentIndex } = useSBTStats(provider, account, update, contractAddr ? contractAddr : '');
     const sbtContract = useSBTContract(contractAddr ? contractAddr : null);
+
+    useEffect(() => {
+		if(account && chainId && ( !user || ( user && user.wallet.toLowerCase() !== account.toLowerCase() ) )) {
+			dispatch(getCurrentUser({}))
+		}
+	}, [account, chainId, user])
 
     useEffect(() => {
         if((!DAO || (DAO && DAO.url !== daoURL)) && !DAOLoading) 
@@ -161,6 +167,7 @@ const MintPassToken = () => {
     
                         const req = await APInewSBTtoken(metadataJSON);
                         if (req) {
+                            dispatch(updateCurrentUser({ name: userName.value }))
                             dispatch(addDaoMember({ url: DAO?.url, payload: { name: '', address: account } }))
                             setLoading(false);
                             toast.success("SBT mint successfuly !");
@@ -222,6 +229,7 @@ const MintPassToken = () => {
                                         <input
                                             className="text-input"
                                             id="user-name"
+                                            defaultValue={_get(user, 'name', null)}
                                             placeholder="Enter your name"
                                             onChange={() => setNameError(false)}
                                         />
