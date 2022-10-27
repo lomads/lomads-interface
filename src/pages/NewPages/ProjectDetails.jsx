@@ -239,11 +239,16 @@ const ProjectDetails = () => {
     }
 
     const handleRenderRole = (item) => {
-        const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === item.wallet.toLowerCase());
-        if (user.role === 'CORE_CONTRIBUTOR' || user.role === 'MEMBER') {
-            return 'core contributor';
+        try {
+            const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === item.wallet.toLowerCase());
+            if (user.role === 'CORE_CONTRIBUTOR' || user.role === 'MEMBER') {
+                return 'core contributor';
+            }
+            return user.role;
         }
-        return user.role;
+        catch (e) {
+            console.error(e)
+        }
     }
 
     const handleSubmit = () => {
@@ -399,7 +404,7 @@ const ProjectDetails = () => {
                                         <CgClose size={20} color="#C94B32" />
                                     </button>
                                     <img src={iconSvg} alt="frame-icon" />
-                                    <h1>Close { Project?.name }</h1>
+                                    <h1>Close {Project?.name}</h1>
                                     <p>This action <span>is irreversible</span> for now.<br />You will find closed projects in the archives.</p>
                                     <div>
                                         <button onClick={() => setClosePrompt(false)}>NO</button>
@@ -421,7 +426,7 @@ const ProjectDetails = () => {
                                         <CgClose size={20} color="#C94B32" />
                                     </button>
                                     <img src={iconSvg} alt="frame-icon" />
-                                    <h1>Delete { Project?.name }</h1>
+                                    <h1>Delete {Project?.name}</h1>
                                     <p>This action <span>is irreversible</span>.</p>
                                     <div>
                                         <button onClick={() => setDeletePrompt(false)}>NO</button>
