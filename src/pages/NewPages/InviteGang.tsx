@@ -281,6 +281,7 @@ const InviteGang = () => {
 							>
 								<option value="ADMIN">Admin</option>
 								<option value="CORE_CONTRIBUTOR">Core Contributor</option>
+								<option value="ACTIVE_CONTRIBUTOR">Active Contributor</option>
 								<option value="CONTRIBUTOR">Contributor</option>
 							</select>
 						</div>
@@ -420,6 +421,7 @@ const InviteGang = () => {
 													>
 														<option value="ADMIN">Admin</option>
 														<option value="CORE_CONTRIBUTOR">Core Contributor</option>
+														<option value="ACTIVE_CONTRIBUTOR">Active Contributor</option>
 														<option value="CONTRIBUTOR">Contributor</option>
 													</select>
 													{

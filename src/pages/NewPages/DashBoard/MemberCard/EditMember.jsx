@@ -131,6 +131,8 @@ const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
                                 >
                                     <option value="ADMIN">Admin</option>
                                     <option value="CORE_CONTRIBUTOR">Core Contributor</option>
+                                    <option value="ACTIVE_CONTRIBUTOR">Active Contributor</option>
+                                    <option value="CONTRIBUTOR">Contributor</option>
                                 </select>
                                 <button className={deleteMembers.includes(item.member._id) ? 'selected' : null} onClick={() => handleDeleteMembers(item.member._id)}>
                                     {
