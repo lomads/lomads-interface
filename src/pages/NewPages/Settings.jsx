@@ -31,7 +31,7 @@ const Settings = () => {
         if (chainId && !chainAllowed && !account) {
             navigate('/')
         }
-    }, [chainId , account, chainAllowed, navigate]);
+    }, [chainId, account, chainAllowed, navigate]);
 
     useEffect(() => {
         if (contractName !== '') {
@@ -86,9 +86,16 @@ const Settings = () => {
                     </div>
 
                     <div className='organisation-desc'>
-                        <p>{
+                        {/* <p>{
                             _get(DAO, 'description', '')
-                        }</p>
+                        }</p> */}
+                        {
+                            DAO?.description
+                                ?
+                                <p>{DAO?.description}</p>
+                                :
+                                <p>Description</p>
+                        }
                     </div>
 
                     <div className='organisation-link'>
@@ -131,10 +138,10 @@ const Settings = () => {
                     </div> */}
                 </div>
 
-                {/* <div className='settings-links'>
+                <div className='settings-links'>
                     <div className='links-header'>
                         <h1>Links</h1>
-                         <button>
+                        <button>
                             <img src={editIcon} alt="edit-icon" />
                         </button>
                     </div>
@@ -153,7 +160,7 @@ const Settings = () => {
                             <p>https://linkname</p>
                         </div>
                     </div>
-                </div> */}
+                </div>
 
                 <div className='settings-token'>
                     <h1>Pass Tokens</h1>
@@ -187,7 +194,7 @@ const Settings = () => {
                                             <img src={copyIcon} alt="copy" className="safeCopyImage" />
                                         </div>
                                     </Tooltip>
-                                    { DAO?.sbt?.image ? <img style={{ width: 24, height: 24 }} src={DAO?.sbt?.image} alt="asset" /> : <img src={coin} alt="asset" /> }
+                                    {DAO?.sbt?.image ? <img style={{ width: 24, height: 24 }} src={DAO?.sbt?.image} alt="asset" /> : <img src={coin} alt="asset" />}
                                     <p>{DAO?.sbt?.name}</p>
                                 </div>
                             </div>

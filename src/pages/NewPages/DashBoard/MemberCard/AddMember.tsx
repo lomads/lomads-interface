@@ -20,12 +20,17 @@ import OutlineButton from "UIpack/OutlineButton";
 import { addDaoMember, addProjectMember } from 'state/dashboard/actions'
 import { resetAddMemberLoader, resetAddProjectMemberLoader } from 'state/dashboard/reducer';
 
+import Uploader from 'components/XlsxUploader';
+import { LeapFrog } from "@uiball/loaders";
+
 const AddMember = (props: any) => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 
+	const [uploadLoading, setUploadLoading] = useState<boolean>(false);
 	const [ownerName, setOwnerName] = useState<string>("");
 	const [ownerAddress, setOwnerAddress] = useState<string>("");
+	const [ownerRole, setOwnerRole] = useState<string>("CONTRIBUTOR");
 	const [errors, setErrors] = useState<any>({});
 	const totalMembers = useAppSelector((state) => state.flow.totalMembers);
 	const { DAO, addMemberLoading, addProjectMemberLoading } = useAppSelector((state) => state.dashboard);
@@ -81,8 +86,8 @@ const AddMember = (props: any) => {
 		}
 	}, [addMemberLoading, addProjectMemberLoading])
 
-	const addMember = async (_ownerName: string, _ownerAddress: string) => {
-		const member: InviteGangType = { name: _ownerName, address: _ownerAddress };
+	const addMember = async (_ownerName: string, _ownerAddress: string, _ownerRole: string) => {
+		const member = { name: _ownerName, address: _ownerAddress, role: _ownerRole };
 		if (_ownerAddress.slice(-4) === ".eth") {
 			const resolver = await provider?.getResolver(_ownerAddress);
 			const EnsAddress = await resolver?.getAddress();
@@ -114,7 +119,7 @@ const AddMember = (props: any) => {
 		}
 	};
 
-	const handleClick = (_ownerName: string, _ownerAddress: string) => {
+	const handleClick = (_ownerName: string, _ownerAddress: string, _ownerRole: string) => {
 		let terrors: any = {};
 		if (!isAddressValid(ownerAddress)) {
 			terrors.ownerAddress = " * address is not correct.";
@@ -123,7 +128,7 @@ const AddMember = (props: any) => {
 			terrors.ownerAddress = " * address already exists.";
 		}
 		if (_.isEmpty(terrors)) {
-			addMember(_ownerName, _ownerAddress);
+			addMember(_ownerName, _ownerAddress, _ownerRole);
 		} else {
 			setErrors(terrors);
 		}
@@ -133,11 +138,12 @@ const AddMember = (props: any) => {
 			<div id="AddNewMemberComponent">
 				<div onClick={props.toggleModal} id="AddNewMemberOverlay"></div>
 				<div id="AddNewMember">
-					<div>
+					<div style={{ width: '100%', marginBottom: 8, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
 						<div className="inputTitle">Add member :</div>
+						{uploadLoading ? <LeapFrog size={24} color="#C94B32" /> : <Uploader onComplete={() => console.log("complete")} />}
 					</div>
 					<div className="inputArea">
-						<div>
+						<div style={{ marginRight: '10px' }}>
 							<SimpleInputField
 								className="inputField"
 								height={50}
@@ -149,7 +155,7 @@ const AddMember = (props: any) => {
 								}}
 							/>
 						</div>
-						<div>
+						<div style={{ marginRight: '10px' }}>
 							<AddressInputField
 								className="inputField"
 								height={50}
@@ -162,6 +168,19 @@ const AddMember = (props: any) => {
 								}}
 								isInvalid={errors.ownerAddress}
 							/>
+						</div>
+						<div style={{ marginRight: '10px' }}>
+							<select
+								name="role"
+								className="tokenDropdown"
+								defaultValue={ownerRole}
+								onChange={(e) => setOwnerRole(e.target.value)}
+								style={{ margin: '0' }}
+							>
+								<option value="ADMIN">Admin</option>
+								<option value="CORE_CONTRIBUTOR">Core Contributor</option>
+								<option value="CONTRIBUTOR">Contributor</option>
+							</select>
 						</div>
 					</div>
 					<div id="addMemberButtonArea">
@@ -188,7 +207,7 @@ const AddMember = (props: any) => {
 								height={40}
 								width={129}
 								onClick={() => {
-									handleClick(ownerName, ownerAddress);
+									handleClick(ownerName, ownerAddress, ownerRole);
 								}}
 							/>
 						</div>
