@@ -167,6 +167,9 @@ const ProjectDetails = () => {
         if (unlockLoading) return;
         try {
             setUnlockLoading(link.id)
+            let memberExists = _find(Project.members, member => member.wallet.toLowerCase() === account.toLowerCase())
+            if(!memberExists)
+                return setUnlockLoading(null);
             const g = await guild.get(link.guildId)
             let inviteLink = _get(_find(_get(g, 'guildPlatforms'), gp => gp.platformId == 1), 'invite', null)
             if (!inviteLink) return setUnlockLoading(null);
@@ -239,16 +242,11 @@ const ProjectDetails = () => {
     }
 
     const handleRenderRole = (item) => {
-        try {
-            const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === item.wallet.toLowerCase());
-            if (user.role === 'CORE_CONTRIBUTOR' || user.role === 'MEMBER') {
-                return 'core contributor';
-            }
-            return user.role;
+        const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === item.wallet.toLowerCase());
+        if (_get(user, 'role', '') === 'CORE_CONTRIBUTOR' || _get(user, 'role', '') === 'MEMBER') {
+            return 'core contributor';
         }
-        catch (e) {
-            console.error(e)
-        }
+        return _get(user, 'role', '');
     }
 
     const handleSubmit = () => {
