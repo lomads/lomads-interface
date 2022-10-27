@@ -402,7 +402,7 @@ const ProjectDetails = () => {
                                         <CgClose size={20} color="#C94B32" />
                                     </button>
                                     <img src={iconSvg} alt="frame-icon" />
-                                    <h1>Close { Project?.name }</h1>
+                                    <h1>Close {Project?.name}</h1>
                                     <p>This action <span>is irreversible</span> for now.<br />You will find closed projects in the archives.</p>
                                     <div>
                                         <button onClick={() => setClosePrompt(false)}>NO</button>
@@ -424,7 +424,7 @@ const ProjectDetails = () => {
                                         <CgClose size={20} color="#C94B32" />
                                     </button>
                                     <img src={iconSvg} alt="frame-icon" />
-                                    <h1>Delete { Project?.name }</h1>
+                                    <h1>Delete {Project?.name}</h1>
                                     <p>This action <span>is irreversible</span>.</p>
                                     <div>
                                         <button onClick={() => setDeletePrompt(false)}>NO</button>
