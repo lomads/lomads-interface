@@ -60,7 +60,7 @@ const LoginPage = (props: any) => {
   console.log('chainId', chainId, connector, account)
 
   const chainAllowed = chainId && isChainAllowed(connector, chainId);
-  console.log(chainAllowed, chainId);
+  console.log("chainAllowed", chainAllowed, chainId);
 
   const navigateTo = async () => {
     const activeDao = sessionStorage.getItem('__lmds_active_dao')

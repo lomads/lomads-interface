@@ -123,7 +123,7 @@ const Dashboard = () => {
 	}, [chainId, account, DAOList, daoURL])
 
 	useEffect(() => {
-		if (contractName !== '' && DAO && DAO.sbt && DAO.sbt && account) {
+		if (contractName !== '' && DAO && DAO.sbt && DAO.sbt && account && balanceOf) {
 			if (DAO?.sbt?.whitelisted) {
 				if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
 					if (parseInt(balanceOf._hex, 16) === 0)
