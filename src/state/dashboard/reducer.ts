@@ -5,7 +5,7 @@ import {
 	loadDao,
 	addDaoMember,
 	updateDaoMember,
-	deleteDaoMember,
+	manageDaoMember,
 	createProject,
 	addProjectMember,
 	updateProjectMember,
@@ -26,7 +26,7 @@ export interface DashboardState {
 	DAOList: Array<DAOType> | null;
 	addMemberLoading: boolean | null;
 	updateMemberLoading: boolean | null;
-	deleteMemberLoading: boolean | null;
+	manageMemberLoading: boolean | null;
 	Project: any;
 	ProjectLoading: boolean | null;
 	createProjectLoading: boolean | null;
@@ -44,7 +44,7 @@ const initialState: DashboardState = {
 	DAOList: null,
 	addMemberLoading: null,
 	updateMemberLoading: null,
-	deleteMemberLoading: null,
+	manageMemberLoading: null,
 	Project: null,
 	ProjectLoading: null,
 	createProjectLoading: null,
@@ -69,8 +69,8 @@ const dashboardSlice = createSlice({
 		resetUpdateMemberLoader(state) {
 			state.updateMemberLoading = null
 		},
-		resetDeleteMemberLoader(state) {
-			state.deleteMemberLoading = null
+		resetManageMemberLoader(state) {
+			state.manageMemberLoading = null
 		},
 		resetCreateProjectLoader(state) {
 			state.createProjectLoading = null
@@ -164,12 +164,12 @@ const dashboardSlice = createSlice({
 			state.updateMemberLoading = true
 		},
 		// delete dao members
-		[`${deleteDaoMember.fulfilled}`]: (state, action) => {
-			state.deleteMemberLoading = false
+		[`${manageDaoMember.fulfilled}`]: (state, action) => {
+			state.manageMemberLoading = false
 			state.DAO = action.payload
 		},
-		[`${deleteDaoMember.pending}`]: (state) => {
-			state.deleteMemberLoading = true
+		[`${manageDaoMember.pending}`]: (state) => {
+			state.manageMemberLoading = true
 		},
 
 		// create contract
@@ -259,7 +259,7 @@ export const {
 	resetCreateDAOLoader,
 	resetAddMemberLoader,
 	resetUpdateMemberLoader,
-	resetDeleteMemberLoader,
+	resetManageMemberLoader,
 	resetCreateProjectLoader,
 	resetAddProjectMemberLoader,
 	resetUpdateProjectMemberLoader,

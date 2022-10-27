@@ -32,10 +32,10 @@ export const addDaoMember = createAsyncThunk(
 	}
 );
 
-export const deleteDaoMember = createAsyncThunk(
-	'dao/deletemember',
+export const manageDaoMember = createAsyncThunk(
+	'dao/managemember',
 	async (params: any, thunkApi) => {
-		return axiosHttp.patch(`dao/${params.url}/delete-member`, params.payload)
+		return axiosHttp.patch(`dao/${params.url}/manage-member`, params.payload)
 			.then(res => res.data)
 			.catch(e => {
 				toast.error(e.response.data.message);
