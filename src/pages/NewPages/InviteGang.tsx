@@ -322,7 +322,13 @@ const InviteGang = () => {
 										</div>
 										<div className="avatarRole">
 											<p className="text">
-												{result.role}
+												{
+													result.address !== undefined && result.address === account
+														?
+														`ADMIN`
+														:
+														result.role?.replaceAll('_', ' ')
+												}
 											</p>
 										</div>
 
