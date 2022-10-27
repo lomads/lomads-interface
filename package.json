@@ -76,6 +76,7 @@
     "react-icons": "^4.4.0",
     "react-loader-spinner": "^5.1.7-beta.1",
     "react-moralis": "1.4.0",
+    "react-popover-portal": "^0.3.5",
     "react-popper": "^2.3.0",
     "react-pro-sidebar": "^0.7.1",
     "react-redux": "^8.0.2",
