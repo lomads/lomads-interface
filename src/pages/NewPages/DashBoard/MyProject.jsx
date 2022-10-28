@@ -9,20 +9,24 @@ import { useAppSelector } from "state/hooks";
 
 import ProjectCard from './Project/ProjectCard';
 import { useWeb3React } from "@web3-react/core";
-
+import { useParams } from 'react-router-dom';
 import archiveIcon from '../../../assets/svg/archiveIcon.svg';
+
+import useRole from 'hooks/useRole';
 
 const MyProject = () => {
     const navigate = useNavigate();
+    const { daoURL } = useParams();
     const { DAO } = useAppSelector((state) => state.dashboard);
     const { account } = useWeb3React();
     const [tab, setTab] = useState(2);
     const [myProjects, setMyProjects] = useState([]);
     const [otherProjects, setOtherProjects] = useState([]);
     const [initialCheck, setInitialCheck] = useState(false);
+    const { myRole, can } = useRole(DAO, account)
 
     useEffect(() => {
-        if (DAO) {
+        if (DAO && DAO.url === daoURL) {
             setMyProjects(_get(DAO, 'projects', []).filter(project => !project.deletedAt && !project.archivedAt && _find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase())))
             setOtherProjects(_get(DAO, 'projects', []).filter(project => !project.deletedAt && !project.archivedAt && !_find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase())))
         }
@@ -34,6 +38,8 @@ const MyProject = () => {
             if (myProjects.length > 0) {
                 setInitialCheck(true)
                 setTab(1);
+            } else {
+                setTab(2)
             }
         }
     }, [myProjects, initialCheck]);
@@ -53,30 +59,31 @@ const MyProject = () => {
             <div className="myproject-header">
                 <div className="myproject-title">
                     {
-                        myProjects.length > 0
+                        myProjects.length > 0 && can(myRole, 'project.view.own')
                             ?
                             <>
                                 <button className={tab === 1 ? 'active' : null} onClick={() => setTab(1)}>
                                     My projects
                                 </button>
-                                <div className="divider"></div>
+                                { can(myRole, 'project.view.all') && <div className="divider"></div> }
                             </>
                             :
                             null
                     }
-
+                    { can(myRole, 'project.view.all') &&
                     <button className={tab === 2 ? 'active' : null} onClick={() => setTab(2)}>
                         All projects
                     </button>
+                    }
                 </div>
                 <div className="myproject-buttons">
-                    <div style={{ marginRight: '20px' }}>
+                   { can(myRole, 'project.view.archives') && <div style={{ marginRight: '20px' }}>
                         <button className='archive-btn' onClick={() => navigate('/archives')}>
                             <img src={archiveIcon} alt="archive-icon" />
                         </button>
-                    </div>
+                    </div> }
                     {
-                        amIAdmin && <div>
+                        can(myRole, 'project.create') && <div>
                             <SafeButton
                                 height={40}
                                 width={150}
@@ -97,7 +104,7 @@ const MyProject = () => {
             </div>
 
             {
-                tab === 1
+                tab === 1 && can(myRole, 'project.view.own')
                     ?
                     <div className='myproject-body'>
                         {
@@ -121,7 +128,7 @@ const MyProject = () => {
             }
 
             {
-                tab === 2
+                tab === 2 && can(myRole, 'project.view.all')
                     ?
                     <>
                         {

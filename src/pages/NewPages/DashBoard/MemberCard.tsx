@@ -10,12 +10,14 @@ import daoMember2 from "../../../assets/svg/daoMember2.svg";
 import { useAppDispatch } from "state/hooks";
 import { updateDaoMember } from 'state/dashboard/actions'
 import SimpleInputField from "UIpack/SimpleInputField";
+import useRole from "hooks/useRole";
 
 const MemberCard = (props: any) => {
 	const dispatch = useAppDispatch();
 	const { provider, account } = useWeb3React();
 	const { DAO, DAOLoading } = useAppSelector((state) => state.dashboard);
 
+	const { myRole, can } = useRole(DAO, account);
 
 	const [membersArray, setMembersArray] = useState<any>([]);
 
@@ -34,6 +36,10 @@ const MemberCard = (props: any) => {
 		}
 		return false;
 	}, [account, DAO])
+
+	const capitalizeFirstLetter = (string: string) => {
+		return string.charAt(0).toUpperCase() + string.slice(1);
+	}
 
 	const NameAndAvatar = (props: any) => {
 		return (
@@ -56,7 +62,7 @@ const MemberCard = (props: any) => {
 						</div>
 						<div className="roleText">
 							{
-								props.role.replaceAll('_', ' ').toLowerCase()
+								props.role === 'ADMIN' ? props.creator ? 'Admin (Creator)' : 'Admin' : capitalizeFirstLetter((props.role).replace('_', ' ').toLowerCase())
 							}
 						</div>
 					</div>
@@ -89,12 +95,13 @@ const MemberCard = (props: any) => {
 								}
 							</div>
 						</div>
-						<button
+						{can(myRole, 'members.edit') && <button
+							// onClick={handleActivateEditMode} 
 							onClick={() => props.toggleShowEditMember()}
 						>
 							<img src={editIcon} alt="edit-icon" />
-						</button>
-						{amIAdmin && <SafeButton
+						</button>}
+						{can(myRole, 'members.add') && <SafeButton
 							height={40}
 							width={150}
 							titleColor="#B12F15"
@@ -128,7 +135,8 @@ const MemberCard = (props: any) => {
 								name={_get(result, 'member.name', '')}
 								position={index}
 								joined={_get(result, 'joined')}
-								role={_get(result, 'role', 'CORE_CONTRIBUTOR')}
+								creator={_get(result, 'creator', false)}
+								role={_get(result, 'role', 'CONTRIBUTOR')}
 								address={_get(result, 'member.wallet', '')}
 							/>
 						);

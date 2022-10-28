@@ -41,6 +41,7 @@ import { useSBTStats } from "hooks/SBT/sbt";
 import Footer from "components/Footer";
 import EditMember from "./MemberCard/EditMember";
 import LinksArea from "./LinksArea";
+import useRole from "hooks/useRole";
 
 const Dashboard = () => {
 	const dispatch = useAppDispatch();
@@ -66,6 +67,9 @@ const Dashboard = () => {
 	const [showNavBar, setShowNavBar] = useState<boolean>(false);
 	const [checkLoading, setCheckLoading] = useState<boolean>(true);
 	const currentNonce = useAppSelector((state) => state.flow.currentNonce);
+	const { myRole, displayRole, permissions, can } = useRole(DAO, account);
+
+	console.log("role", myRole)
 
 	const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
 
@@ -314,17 +318,10 @@ const Dashboard = () => {
 					</div>
 					<div className="DAOsettings">
 						<div className="DAOadminPill">
-							{
-								amIAdmin
-									?
-									<p>You're an&nbsp;<span>Admin</span></p>
-									:
-									<p>You're &nbsp;<span>{handleRenderRole()}</span></p>
-							}
-
+							<p>You're an&nbsp;<span>{displayRole}</span></p>
 						</div>
 						{
-							amIAdmin && <button onClick={() => { navigate('/settings') }}>
+							can(myRole, 'settings') && <button onClick={() => { navigate('/settings') }}>
 								<img src={settingIcon} alt="settings-icon" />
 							</button>
 						}
@@ -335,33 +332,35 @@ const Dashboard = () => {
 
 				{pendingTransactions !== undefined &&
 					pendingTransactions?.count >= 1 &&
-					showNotification && (
+					showNotification && can(myRole, 'notification.view') && (
 						<NotificationArea
 							daoId={DAO._id}
 							pendingTransactionCount={pendingTransactions?.count}
 							showNotificationArea={showNotificationArea}
 						/>
 					)}
-
 				<MyProject />
-
-				<TreasuryCard
-					innerRef={treasuryRef}
-					safeAddress={safeAddress}
-					pendingTransactions={pendingTransactions}
-					executedTransactions={executedTransactions}
-					ownerCount={ownerCount}
-					toggleModal={toggleModal}
-					fiatBalance={safeTokens}
-					account={account}
-					onChangePendingTransactions={(tx: any) => setPendingTransactions(tx)}
-					tokens={safeTokens}
-				/>
-				<MemberCard
-					totalMembers={totalMembers}
-					toggleShowMember={toggleShowMember}
-					toggleShowEditMember={toggleShowEditMember}
-				/>
+				{can(myRole, 'transaction.view') &&
+					<TreasuryCard
+						innerRef={treasuryRef}
+						safeAddress={safeAddress}
+						pendingTransactions={pendingTransactions}
+						executedTransactions={executedTransactions}
+						ownerCount={ownerCount}
+						toggleModal={toggleModal}
+						fiatBalance={safeTokens}
+						account={account}
+						onChangePendingTransactions={(tx: any) => setPendingTransactions(tx)}
+						tokens={safeTokens}
+					/>
+				}
+				{can(myRole, 'members.view') &&
+					<MemberCard
+						totalMembers={totalMembers}
+						toggleShowMember={toggleShowMember}
+						toggleShowEditMember={toggleShowEditMember}
+					/>
+				}
 				<Footer theme="dark" />
 			</div>
 			{showModal && (
