@@ -40,6 +40,7 @@ import MyProject from "./MyProject";
 import { useSBTStats } from "hooks/SBT/sbt";
 import Footer from "components/Footer";
 import EditMember from "./MemberCard/EditMember";
+import LinksArea from "./LinksArea";
 import useRole from "hooks/useRole";
 
 const Dashboard = () => {
@@ -82,6 +83,11 @@ const Dashboard = () => {
 		return false;
 	}, [account, DAO])
 
+	const handleRenderRole = () => {
+		const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase());
+		return _get(user, 'role', '').replaceAll('_', ' ').toLowerCase();
+	}
+
 	const [copy, setCopy] = useState<boolean>(false);
 	const toggleModal = () => {
 		setShowModal(!showModal);
@@ -109,8 +115,8 @@ const Dashboard = () => {
 			if (!DAOList)
 				dispatch(loadDao({}))
 			else {
-				if(DAOList && DAOList.length == 0){
-					if(!daoURL)
+				if (DAOList && DAOList.length == 0) {
+					if (!daoURL)
 						navigate(`/createorg`)
 					else {
 						if (!DAO || (DAO && DAO.url !== daoURL))
@@ -149,15 +155,15 @@ const Dashboard = () => {
 	}, [DAO, balanceOf, contractName, account]);
 
 	useEffect(() => {
-		if(account && chainId && ( !user || ( user && user.wallet.toLowerCase() !== account.toLowerCase() ) )) {
+		if (account && chainId && (!user || (user && user.wallet.toLowerCase() !== account.toLowerCase()))) {
 			dispatch(getCurrentUser({}))
 		}
 	}, [account, chainId, user])
 
 	useEffect(() => {
-		if(DAO && account) {
-			if(!DAO.sbt){
-				if(!_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase()))
+		if (DAO && account) {
+			if (!DAO.sbt) {
+				if (!_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase()))
 					navigate('/noaccess')
 			}
 		}
@@ -312,7 +318,7 @@ const Dashboard = () => {
 					</div>
 					<div className="DAOsettings">
 						<div className="DAOadminPill">
-							<p>You're an&nbsp;<span>{ displayRole }</span></p>
+							<p>You're an&nbsp;<span>{displayRole}</span></p>
 						</div>
 						{
 							can(myRole, 'settings') && <button onClick={() => { navigate('/settings') }}>
@@ -321,6 +327,9 @@ const Dashboard = () => {
 						}
 					</div>
 				</div>
+
+				{_get(DAO, 'links', []).length > 0 && <LinksArea links={_get(DAO, 'links', [])} />}
+
 				{pendingTransactions !== undefined &&
 					pendingTransactions?.count >= 1 &&
 					showNotification && can(myRole, 'notification.view') && (
@@ -331,26 +340,26 @@ const Dashboard = () => {
 						/>
 					)}
 				<MyProject />
-				{ can(myRole, 'transaction.view') &&
-				<TreasuryCard
-					innerRef={treasuryRef}
-					safeAddress={safeAddress}
-					pendingTransactions={pendingTransactions}
-					executedTransactions={executedTransactions}
-					ownerCount={ownerCount}
-					toggleModal={toggleModal}
-					fiatBalance={safeTokens}
-					account={account}
-					onChangePendingTransactions={(tx: any) => setPendingTransactions(tx)}
-					tokens={safeTokens}
-				/> 
+				{can(myRole, 'transaction.view') &&
+					<TreasuryCard
+						innerRef={treasuryRef}
+						safeAddress={safeAddress}
+						pendingTransactions={pendingTransactions}
+						executedTransactions={executedTransactions}
+						ownerCount={ownerCount}
+						toggleModal={toggleModal}
+						fiatBalance={safeTokens}
+						account={account}
+						onChangePendingTransactions={(tx: any) => setPendingTransactions(tx)}
+						tokens={safeTokens}
+					/>
 				}
-				{ can(myRole, 'members.view') &&
-				<MemberCard
-					totalMembers={totalMembers}
-					toggleShowMember={toggleShowMember}
-					toggleShowEditMember={toggleShowEditMember}
-				/>
+				{can(myRole, 'members.view') &&
+					<MemberCard
+						totalMembers={totalMembers}
+						toggleShowMember={toggleShowMember}
+						toggleShowEditMember={toggleShowEditMember}
+					/>
 				}
 				<Footer theme="dark" />
 			</div>

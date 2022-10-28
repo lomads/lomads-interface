@@ -326,9 +326,9 @@ const InviteGang = () => {
 												{
 													result.address !== undefined && result.address === account
 														?
-														`ADMIN`
+														`admin`
 														:
-														result.role?.replaceAll('_', ' ')
+														result.role?.replaceAll('_', ' ').toLowerCase()
 												}
 											</p>
 										</div>

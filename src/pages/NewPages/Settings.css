@@ -198,6 +198,36 @@
     margin-bottom: 10px;
 }
 
+.settings-page .settings-center .settings-links .links-header div {
+    display: flex;
+    align-items: center;
+}
+
+.settings-page .settings-center .settings-links .links-header div .addLink-btn {
+    margin-left: 22px;
+    width: 140px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    font-style: normal;
+    /* font-weight: 400; */
+    font-size: 16px;
+    line-height: 18px;
+    /* or 112% */
+    display: flex;
+    align-items: center;
+    text-align: center;
+    letter-spacing: -0.011em;
+    text-transform: uppercase;
+
+    /* RED */
+    color: #C94B32;
+}
+
 .settings-page .settings-center .settings-links .links-header h1 {
     font-style: normal;
     font-weight: 400;
@@ -233,7 +263,8 @@
 
 .settings-page .settings-center .settings-links .link-body div button {
     height: 40px;
-    width: 145px;
+    width: 150px;
+    padding: 0 20px;
     filter: drop-shadow(0px 3px 3px rgba(27, 43, 65, 0.1)) drop-shadow(-1px -2px 3px rgba(201, 75, 50, 0.05));
     border-radius: 5px;
     background: #FFFFFF;
@@ -243,6 +274,13 @@
     text-transform: capitalize;
     color: #B12F15;
     margin-right: 10px;
+}
+
+.settings-page .settings-center .settings-links .link-body div button span {
+    color: #B12F15;
+    margin: 0;
+    margin-left: 5px;
+    font-style: normal;
 }
 
 .settings-page .settings-center .settings-links .link-body div p {

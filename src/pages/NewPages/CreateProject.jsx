@@ -46,9 +46,11 @@ const CreateProject = () => {
     const [showMore, setShowMore] = useState(false);
     const [success, setSuccess] = useState(false);
     const [link, setLink] = useState('');
+    const [linkError, setLinkError] = useState(null);
     const [roleName, setRoleName] = useState(null);
     const [accessControl, setAccessControl] = useState(false);
     const [title, setTitle] = useState('');
+    const [titleError, setTitleError] = useState(null);
     const [newAddress, setNewAddress] = useState('');
 
     const daoName = _get(DAO, 'name', '').split(" ");
@@ -119,17 +121,17 @@ const CreateProject = () => {
     const handleParseUrl = (url) => {
         try {
             const link = new URL(url);
-            if (link.hostname === 'notion.com') {
-                return <span><SiNotion size={20} /></span>
+            if (link.hostname === 'notion.com' || link.hostname === 'www.notion.com') {
+                return <SiNotion color='#B12F15' size={20} />
             }
-            else if (link.hostname === 'discord.com' || link.hostname === 'discord.gg') {
-                return <span><BsDiscord size={20} /></span>
+            else if (link.hostname === 'discord.com' || link.hostname === 'www.discord.com') {
+                return <BsDiscord color='#B12F15' size={20} />
             }
-            else if (link.hostname === 'github.com') {
-                return <span><BsGithub size={20} /></span>
+            else if (link.hostname === 'github.com' || link.hostname === 'www.github.com') {
+                return <BsGithub color='#B12F15' size={20} />
             }
-            else if (link.hostname === 'google.com') {
-                return <span><BsGoogle size={20} /></span>
+            else if (link.hostname === 'google.com' || link.hostname === 'www.google.com') {
+                return <BsGoogle color='#B12F15' size={20} />
             }
             else {
                 return <span><BsLink size={20} /></span>
@@ -167,22 +169,32 @@ const CreateProject = () => {
 
     const handleAddResource = async (guildId = undefined) => {
         if (title === '') {
-            return toast.error("Please enter title");
+            setTitleError('Please enter a title')
+            return;
         }
         else if (link === '') {
-            return toast.error("Please enter link");
+            setLinkError("Please enter a link")
+            return;
         }
         else if (!isValidUrl(link)) {
-            return toast.error("Please enter a valid link");
+            setLinkError("Please enter a valid link")
+            return;
         }
+        // else if (!link.match(/^(http(s)?:\/\/)[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/)) {
+        //     return toast.error("Please enter a valid link");
+        // }
         else {
+            let tempLink = link;
+            if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
+                tempLink = 'https://' + tempLink;
+            }
             let resource = {};
             resource.id = nanoid(16);
             resource.title = title;
-            resource.link = link;
+            resource.link = tempLink;
             let dcserverid = undefined;
-            if(guildId)
-                dcserverid = new URL(link).pathname.split('/')[2]
+            if (guildId)
+                dcserverid = new URL(tempLink).pathname.split('/')[2]
             resource.platformId = dcserverid;
             resource.accessControl = accessControl;
             if (guildId)
@@ -413,22 +425,28 @@ const CreateProject = () => {
                                                             </div>
                                                         </div>
                                                         <div className="resource-body">
-                                                            <input
-                                                                type="text"
-                                                                placeholder="Title"
-                                                                className="input1"
-                                                                name="title"
-                                                                value={title}
-                                                                onChange={(e) => setTitle(e.target.value)}
-                                                            />
-                                                            <input
-                                                                type="text"
-                                                                placeholder="Link"
-                                                                className="input2"
-                                                                name="link"
-                                                                value={link}
-                                                                onChange={(e) => setLink(e.target.value)}
-                                                            />
+                                                            <div>
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="Title"
+                                                                    className="input1"
+                                                                    name="title"
+                                                                    value={title}
+                                                                    onChange={(e) => { setTitle(e.target.value); setTitleError(null) }}
+                                                                />
+                                                                <span style={{ fontSize: '13px', color: '#C84A32' }}>{titleError}</span>
+                                                            </div>
+                                                            <div>
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="Link"
+                                                                    className="input2"
+                                                                    name="link"
+                                                                    value={link}
+                                                                    onChange={(e) => { setLink(e.target.value); setLinkError(null) }}
+                                                                />
+                                                                <span style={{ fontSize: '13px', color: '#C84A32' }}>{linkError}</span>
+                                                            </div>
                                                             {
                                                                 link && link.indexOf('discord.com') > -1
                                                                     ?
@@ -442,7 +460,7 @@ const CreateProject = () => {
                                                                     </button>
                                                             }
                                                         </div>
-                                                        { accessControl ? <div className='resource-body'>
+                                                        {accessControl ? <div className='resource-body'>
                                                             <input
                                                                 type="text"
                                                                 placeholder="Role name"
@@ -452,7 +470,7 @@ const CreateProject = () => {
                                                                 value={roleName}
                                                                 onChange={(e) => setRoleName(e.target.value)}
                                                             />
-                                                            </div> : null }
+                                                        </div> : null}
                                                         {
                                                             DAO?.sbt
                                                                 ?
@@ -477,7 +495,7 @@ const CreateProject = () => {
                                                                             <div className="member-li" key={index}>
                                                                                 <div className="member-img-name">
                                                                                     {handleParseUrl(item.link)}
-                                                                                    <p>{item.title}</p>
+                                                                                    <p style={{ marginLeft: '5px' }}>{item.title}</p>
                                                                                 </div>
                                                                                 <div className="member-address">
                                                                                     <p>{item.link.length > 30 ? item.link.slice(0, 30) + "..." : item.link}</p>
