@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import moment from 'moment';
-import { get as _get, find as _find } from 'lodash';
+import { get as _get, find as _find, uniqBy as _uniqBy } from 'lodash';
 import { useWeb3React } from "@web3-react/core";
 import { useAppSelector } from "state/hooks";
 import membersIcon from "../../../assets/svg/membersIcon.svg";
@@ -188,7 +188,7 @@ const MemberCard = (props: any) => {
 							<div className="dashboardText"></div>
 						</div>
 					</div>
-					{membersArray.map((result: any, index: any) => {
+					{ _uniqBy(membersArray, (m: any) => m.member.wallet.toLowerCase()).map((result: any, index: any) => {
 						return (
 							<NameAndAvatar
 								name={_get(result, 'member.name', '')}
