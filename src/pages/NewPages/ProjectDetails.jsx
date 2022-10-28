@@ -579,34 +579,36 @@ const ProjectDetails = () => {
                             {
                                 lockedLinks.length > 0
                                     ?
-                                    <div className="link-locked-section">
-                                        <div>
-                                            <img src={lock} alt="lock-icon" />
-                                            <p>Links to unlock:</p>
+                                    <div>
+                                        <div className="link-unlocked-section">
+                                            <div className="locked">
+                                                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                                                    <img src={lock} alt="lock-icon" />
+                                                    <p style={{ marginLeft: "6px", fontStyle: "normal", fontSize: "16px",  color: "#FFFFFF" }}>Links to unlock:</p>
+                                                </div>
+                                                <div className="container">
+                                                    {
+                                                        lockedLinks.map((item, index) => {
+                                                            return (
+                                                                <div onClick={() => unlock(item)} className="link-button" style={{ position: 'relative' }} key={index}>
+                                                                {handleParseUrl(item.link)}
+                                                                <p>{item.title.length > 8 ? item.title.slice(0, 8) + "..." : item.title}</p>
+                                                                {unlockLoading === item.id ?
+                                                                    <div style={{ position: 'absolute', top: 10, right: 20 }}>
+                                                                        <LeapFrog size={20} color="#B12F15" />
+                                                                    </div> : null
+                                                                }
+                                                                </div>
+                                                            )
+                                                        })
+                                                    }
+                                                </div>
+                                            </div>
                                         </div>
-                                        {
-                                            lockedLinks.map((item, index) => {
-                                                if (item.accessControl) {
-                                                    return (
-                                                        <div onClick={() => unlock(item)} className="link-button" style={{ position: 'relative' }} key={index}>
-                                                            {handleParseUrl(item.link)}
-                                                            <p style={{ flexGrow: 1 }}>{item.title}</p>
-                                                            {unlockLoading === item.id ?
-                                                                <div style={{ position: 'absolute', top: 10, right: 20 }}>
-                                                                    <LeapFrog size={20} color="#B12F15" />
-                                                                </div> : null
-                                                            }
-                                                        </div>
-                                                    )
-                                                }
-                                            })
-                                        }
                                     </div>
                                     :
                                     null
                             }
-
-                            {/* unlocked section */}
 
                             {
                                 openLinks.length > 0
