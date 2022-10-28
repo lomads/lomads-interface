@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { get as _get, find as _find } from 'lodash';
+import { get as _get, find as _find, uniqBy as _uniqBy } from 'lodash';
 import SideBar from "./DashBoard/SideBar";
 import SafeButton from "UIpack/SafeButton";
 import '../../styles/pages/ProjectDetails.css';
@@ -83,7 +83,7 @@ const ProjectDetails = () => {
     const canMyrole = useCallback((permission) => {
         if (!Project) return false;
         let creator = _get(Project, 'creator', '').toLowerCase() === account.toLowerCase();
-        let inProject = _find(Project.members, m => m.wallet.toLowerCase() === account.toLowerCase())
+        let inProject = _find(_uniqBy(Project?.members, '_id'), m => m.wallet.toLowerCase() === account.toLowerCase())
         console.log(creator)
         if (myRole === 'ADMIN' || myRole === "CONTRIBUTOR")
             return can(myRole, permission)
@@ -188,7 +188,7 @@ const ProjectDetails = () => {
         if (unlockLoading) return;
         try {
             setUnlockLoading(link.id)
-            let memberExists = _find(Project.members, member => member.wallet.toLowerCase() === account.toLowerCase())
+            let memberExists = _find(_uniqBy(Project?.members, '_id'), member => member.wallet.toLowerCase() === account.toLowerCase())
             if (!memberExists)
                 return setUnlockLoading(null);
             const g = await guild.get(link.guildId)
@@ -240,7 +240,7 @@ const ProjectDetails = () => {
     }
 
     const handleUsers = (item, index) => {
-        if (Project.members.some(m => m.wallet === item.member.wallet) === false) {
+        if (_uniqBy(Project?.members, '_id').some(m => m.wallet === item.member.wallet) === false) {
             return (
                 <div className="member-li" key={index}>
                     <div className="member-img-name">
@@ -377,7 +377,7 @@ const ProjectDetails = () => {
                                     </div>
                                     <div className="editMember-body">
                                         {
-                                            Project?.members.map((item, index) => (
+                                            _uniqBy(Project?.members, '_id').map((item, index) => (
                                                 <div className="editMember-row" key={index}>
                                                     <div>
                                                         <img src={memberIcon} alt="memberIcon" />
@@ -514,7 +514,7 @@ const ProjectDetails = () => {
                                     <div className="divider"></div>
                                     <div className="member-count">
                                         <img src={membersGroup} alt="membersGroup" />
-                                        <p>{Project?.members.length} members</p>
+                                        <p>{_uniqBy(Project?.members, '_id').length} members</p>
                                     </div>
                                     <div>
                                         {canMyrole('project.member.edit') &&
@@ -539,7 +539,7 @@ const ProjectDetails = () => {
                                     </div>
                                     <div className="members-list-body">
                                         {
-                                            Project?.members.map((item, index) => (
+                                            _uniqBy(Project?.members, '_id').map((item, index) => (
                                                 <div className="members-row" key={index}>
                                                     <div className="members-row-name">
                                                         <div>

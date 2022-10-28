@@ -351,7 +351,7 @@ const Settings = () => {
                                 _get(DAO, 'links', []).map((item, index) => {
                                     return (
                                         <div>
-                                            <button>
+                                            <button onClick={() => window.open(item.link, '_blank')}>
                                                 {handleParseUrl(item.link)}
                                                 <span>{item.title.length > 6 ? item.title.substring(0, 6) + "..." : item.title}</span>
                                             </button>

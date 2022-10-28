@@ -27,11 +27,11 @@ import createProjectSvg from '../../../../assets/svg/createProject.svg';
 import memberIcon from '../../../../assets/svg/memberIcon.svg';
 import binRed from '../../../../assets/svg/bin-red.svg';
 import binWhite from '../../../../assets/svg/bin-white.svg';
+import { SupportedChainId } from "constants/chains";
 
 const AddMember = (props: any) => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
-
 	const [uploadLoading, setUploadLoading] = useState<boolean>(false);
 	const [ownerName, setOwnerName] = useState<string>("");
 	const [ownerAddress, setOwnerAddress] = useState<string>("");
@@ -39,7 +39,7 @@ const AddMember = (props: any) => {
 	const [errors, setErrors] = useState<any>({});
 	const totalMembers = useAppSelector((state) => state.flow.totalMembers);
 	const { DAO, addMemberLoading, addProjectMemberLoading, addMemberListLoading } = useAppSelector((state) => state.dashboard);
-	const { account, provider } = useWeb3React();
+	const { account, provider, chainId } = useWeb3React();
 
 	const [showModal, setShowModal] = useState(false)
 	const [deleteMembers, setDeleteMembers] = useState<string[]>([]);
@@ -61,7 +61,7 @@ const AddMember = (props: any) => {
 	};
 
 	const isPresent = (_address: string) => {
-		const check = totalMembers.some((mem) => mem.address === _address);
+		const check = _.get(DAO, 'members', []).some((mem: any) => mem.member.wallet.toLowerCase() === _address.toLowerCase());
 		return check;
 	};
 	useEffect(() => {
@@ -120,7 +120,9 @@ const AddMember = (props: any) => {
 			}
 		}
 		else {
-			const ENSname = await provider?.lookupAddress(_ownerAddress);
+			let ENSname = null;
+			if(chainId !== SupportedChainId.POLYGON)
+				ENSname = await provider?.lookupAddress(_ownerAddress);
 			if (ENSname) {
 				member.name = _ownerName !== '' ? _ownerName : ENSname;
 			}
@@ -166,7 +168,9 @@ const AddMember = (props: any) => {
 							member.address = EnsAddress as string;
 						}
 					} else {
-						const ENSname = await provider?.lookupAddress(member.address);
+						let ENSname = null;
+						if(chainId !== SupportedChainId.POLYGON)
+							ENSname = await provider?.lookupAddress(member.address);
 						if (ENSname)
 							member.name = member.name ? member.name : ENSname
 					}
@@ -241,7 +245,7 @@ const AddMember = (props: any) => {
 				<div id="AddNewMember">
 					<div style={{ width: '100%', marginBottom: 8, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
 						<div className="inputTitle">Add member</div>
-						{uploadLoading ? <LeapFrog size={24} color="#C94B32" /> : <Uploader onComplete={handleInsertWallets} />}
+						{/* {uploadLoading ? <LeapFrog size={24} color="#C94B32" /> : <Uploader onComplete={handleInsertWallets} />} */}
 					</div>
 					<div className="inputArea">
 						<div style={{ marginRight: '10px' }}>

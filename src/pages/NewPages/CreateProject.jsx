@@ -55,7 +55,10 @@ const CreateProject = () => {
 
     const daoName = _get(DAO, 'name', '').split(" ");
 
-    useEffect(() => setMemberList(DAO.members), [DAO])
+    useEffect(() => { 
+        if(DAO)
+            setMemberList(DAO.members) 
+    }, [DAO])
 
     useEffect(() => {
         if (createProjectLoading === false) {
@@ -145,21 +148,21 @@ const CreateProject = () => {
 
 
     const handleAddMember = (member) => {
-        let found = false;
-        for (let i = 0; i < selectedMembers.length; i++) {
-            if (selectedMembers[i].name === member.name) {
-                found = true;
-                break;
-            }
-        }
-        if (found) {
-            setSelectedMembers(selectedMembers.filter((item) => item.name !== member.name));
-        }
+        // let found = false;
+        // for (let i = 0; i < selectedMembers.length; i++) {
+        //     if (selectedMembers[i].name === member.name) {
+        //         found = true;
+        //         break;
+        //     }
+        // }
+        const memberExists = _find(selectedMembers, m => m.address.toLowerCase() === member.wallet.toLowerCase())
+        if (memberExists)
+            setSelectedMembers(prev => prev.filter((item) => item.address.toLowerCase() !== member.wallet.toLowerCase()));
         else {
             let memberOb = {};
             memberOb.name = member.name;
             memberOb.address = member.wallet;
-            setSelectedMembers([...selectedMembers, memberOb]);
+            setSelectedMembers(prev => [...prev, memberOb]);
         }
     }
 
@@ -219,6 +222,7 @@ const CreateProject = () => {
         project.members = selectedMembers;
         project.links = resourceList;
         project.daoId = DAO?._id;
+        console.log(project)
         dispatch(createProject({ payload: project }))
     }
 
@@ -324,7 +328,7 @@ const CreateProject = () => {
                                                                             <div className="member-address">
                                                                                 <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
                                                                                 {
-                                                                                    selectedMembers.some((m) => m.address === item.member.wallet) === false
+                                                                                    selectedMembers.some((m) => m.address.toLowerCase() === item.member.wallet.toLowerCase()) === false
                                                                                         ?
                                                                                         <input type="checkbox" onChange={() => handleAddMember(item.member)} />
                                                                                         :
