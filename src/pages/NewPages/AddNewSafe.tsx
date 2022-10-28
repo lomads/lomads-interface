@@ -114,6 +114,42 @@ const AddNewSafe = () => {
 		}
 	};
 
+
+	const runAfterCreation = async (addr:string, owners: any) => {
+		dispatch(updateSafeAddress(addr as string));
+		const totalAddresses = [...invitedMembers, ...Myvalue.current];
+		const value = totalAddresses.reduce((final: any, current: any) => {
+			let object = final.find(
+				(item: any) => item.address === current.address
+			);
+			if (object) {
+				return final;
+			}
+			return final.concat([current]);
+		}, []);
+		dispatch(updateTotalMembers(value));
+		//setisLoading(false);
+		const payload: any = {
+			contractAddress: '',
+			chainId,
+			name: flow.daoName,
+			url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
+			image: null,
+			members: value.map((m: any) => {
+				return {
+					...m, creator: m.address.toLowerCase() === account?.toLowerCase()
+				}
+			}),
+			safe: {
+				name: safeName,
+				address: addr,
+				owners: owners,
+			}
+		}
+		dispatch(createDAO(payload))
+		setisLoading(false);
+	}
+
 	const deployNewSafe = async () => {
 		setisLoading(true);
 		dispatch(updateOwners(Myvalue.current));
@@ -136,6 +172,12 @@ const AddNewSafe = () => {
 			owners,
 			threshold,
 		};
+
+		let currentSafes: Array<string> = []
+		if(chainId === SupportedChainId.POLYGON)
+			currentSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
+		
+		console.log("currentSafes", currentSafes)
 
 		await safeFactory
 			.deploySafe({ safeAccountConfig })
@@ -172,9 +214,16 @@ const AddNewSafe = () => {
 				}
 				dispatch(createDAO(payload))
 			})
-			.catch((err) => {
+			.catch(async (err) => {
 				console.log("An error occured while creating safe", err);
-				setisLoading(false);
+				if(chainId === SupportedChainId.POLYGON) {
+					const latestSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
+					console.log("latestSafes", latestSafes)
+					let newSafeAddr = _.find(latestSafes, ls => currentSafes.indexOf(ls) === -1)
+					runAfterCreation(newSafeAddr, owners)
+				} else {
+					setisLoading(false);
+				}
 			});
 	};
 	const AddOwners = () => {

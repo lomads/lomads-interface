@@ -1,12 +1,16 @@
 import { Checkbox } from "@chakra-ui/react";
+import { get as _get } from 'lodash';
 import React, { useEffect, useRef, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import IconButton from "UIpack/IconButton";
 import SimpleButton from "UIpack/SimpleButton";
 import doubleEuro from "../../../../assets/svg/doubleEuro.svg";
 import { ItransactionDetailsType } from "types/DashBoardType";
+import { SupportedChainId } from "constants/chains";
+import { useWeb3React } from "@web3-react/core";
 
 const TransactionDetails = (props: ItransactionDetailsType) => {
+  const { chainId } = useWeb3React();
   return (
     <>
       <div id="transactionDetailsPage">
@@ -22,6 +26,7 @@ const TransactionDetails = (props: ItransactionDetailsType) => {
               id="chain"
               className="tokenDropdown"
               onChange={(e) => {
+                console.log(e.target.value)
                 props.selectToken(e.target.value);
               }}
               defaultValue={props.selectedToken}
@@ -31,10 +36,10 @@ const TransactionDetails = (props: ItransactionDetailsType) => {
               </option>
               {props.tokens.map((result: any, index: any) => {
                 return (
-                  result.tokenAddress !== null && (
+                  (
                     <>
-                      <option value={result.tokenAddress} key={index}>
-                        {result.token.symbol}
+                      <option value={result.tokenAddress ? result.tokenAddress : chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS} key={index}>
+                      { _get(result, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR') }
                       </option>
                     </>
                   )

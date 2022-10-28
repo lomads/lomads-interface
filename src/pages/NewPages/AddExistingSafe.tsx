@@ -25,6 +25,7 @@ import OutlineButton from "UIpack/OutlineButton";
 import { InviteGangType } from "types/UItype";
 import { createDAO } from '../../state/flow/actions';
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
+import { SupportedChainId, SUPPORTED_CHAIN_IDS, CHAIN_IDS_TO_NAMES } from 'constants/chains'
 
 const AddExistingSafe = () => {
   const dispatch = useAppDispatch();
@@ -315,17 +316,16 @@ const AddExistingSafe = () => {
 				) : (
 					<>
 						<div className="centerCard">
-							<div className="chainDetails">
+							{/* <div className="chainDetails">
 								<div>
 									<div className="inputFieldTitle">
 										Select the network on which the Safe was created
 									</div>
 								</div>
 								<select name="chain" id="chain" className="drop">
-									{/* <option value="polygon">Polygon Mumbai</option> */}
-									<option value="goerli">Goerli</option>
+									{ SUPPORTED_CHAIN_IDS.map(chain => <option value={+chain}>{CHAIN_IDS_TO_NAMES[chain]}</option>) }
 								</select>
-							</div>
+							</div> */}
 							<div className="inputArea">
 								<div>
 									<div>

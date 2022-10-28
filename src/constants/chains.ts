@@ -91,7 +91,7 @@ export type SupportedL2ChainId = typeof L2_CHAIN_IDS[number]
 
 export const GNOSIS_SAFE_BASE_URLS:any = {
   [SupportedChainId.GOERLI]: 'https://safe-transaction.goerli.gnosis.io',
-  [SupportedChainId.POLYGON]: 'https://safe-transaction.polygon.gnosis.io'
+  [SupportedChainId.POLYGON]: 'https://safe-transaction-polygon.safe.global'
 }
 
 export const CHAIN_GAS_STATION :any = {
@@ -99,5 +99,5 @@ export const CHAIN_GAS_STATION :any = {
     url: 'https://gasstation-mainnet.matic.network/v2',
     symbol: 'GWei'
   },
-  [SupportedChainId.GOERLI]: 'https://safe-transaction.polygon.gnosis.io'
+  [SupportedChainId.GOERLI]: ''
 }

@@ -43,6 +43,7 @@ import EditMember from "./MemberCard/EditMember";
 import useRole from "hooks/useRole";
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains';
 import { switchChain } from "utils/switchChain";
+import { SupportedChainId, SUPPORTED_CHAIN_IDS, CHAIN_IDS_TO_NAMES } from 'constants/chains'
 
 const Dashboard = () => {
 	const dispatch = useAppDispatch();
@@ -101,6 +102,14 @@ const Dashboard = () => {
 	const showSideBar = (_choice: boolean) => {
 		setShowNavBar(_choice);
 	};
+
+	const handleSwitchChain = async (chain:number) => {
+		switchChain(connector, chain)
+		.then(res => { 
+			sessionStorage.clear()
+			window.location.href = '/'
+		})
+	}
 
 	useEffect(() => {
 		if (chainId && !account)
@@ -322,6 +331,11 @@ const Dashboard = () => {
 								<img src={settingIcon} alt="settings-icon" />
 							</button>
 						}
+						<select name="chain" id="chain" value={chainId} onChange={e => handleSwitchChain(+e.target.value)} className="drop" style={{ width: 150 }}>
+						{
+							SUPPORTED_CHAIN_IDS.map(chain => <option value={+chain}>{CHAIN_IDS_TO_NAMES[chain]}</option>)
+						}
+						</select>
 					</div>
 				</div>
 				{pendingTransactions !== undefined &&

@@ -22,6 +22,7 @@ import createProjectSvg from '../../assets/svg/createProject.svg';
 import memberIcon from '../../assets/svg/memberIcon.svg';
 import binRed from '../../assets/svg/bin-red.svg';
 import binWhite from '../../assets/svg/bin-white.svg';
+import { SupportedChainId } from "constants/chains";
 
 const InviteGang = () => {
 	const dispatch = useAppDispatch();
@@ -32,7 +33,7 @@ const InviteGang = () => {
 	const [ownerRole, setOwnerRole] = useState<string>("CONTRIBUTOR");
 	const [errors, setErrors] = useState<any>({});
 	const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
-	const { account, provider } = useWeb3React();
+	const { account, provider, chainId } = useWeb3React();
 
 	const [showModal, setShowModal] = useState(false);
 	const [deleteMembers, setDeleteMembers] = useState<string[]>([]);
@@ -98,8 +99,9 @@ const InviteGang = () => {
 				}
 			}
 			else {
-				const ENSname = await provider?.lookupAddress(_ownerAddress);
-				console.log("88 ensName : ", ENSname);
+				let ENSname = null;
+				if(chainId !== SupportedChainId.POLYGON)
+					ENSname = await provider?.lookupAddress(_ownerAddress);
 				if (ENSname) {
 					member.name = _ownerName !== '' ? _ownerName : ENSname;
 				}
@@ -167,7 +169,9 @@ const InviteGang = () => {
 							member.address = EnsAddress as string;
 						}
 					} else {
-						const ENSname = await provider?.lookupAddress(member.address);
+						let ENSname = null;
+						if(chainId !== SupportedChainId.POLYGON)
+							ENSname = await provider?.lookupAddress(member.address);
 						if (ENSname)
 							member.name = member.name ? member.name : ENSname
 					}
