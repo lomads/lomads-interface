@@ -32,7 +32,7 @@ export const getDao = createAsyncThunk(
 export const loadDao = createAsyncThunk(
 	'dao/load',
 	async (params: any, thunkApi) => {
-		return axiosHttp.get(`dao`)
+		return axiosHttp.get(`dao?chainId=${params.chainId}`)
 			.then(res => res.data)
 			.catch(e => thunkApi.rejectWithValue(e))
 	}

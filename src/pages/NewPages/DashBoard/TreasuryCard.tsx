@@ -21,7 +21,7 @@ import CompleteTxn from './TreasuryCard/CompleteTxn';
 import useRole from "hooks/useRole";
 
 const TreasuryCard = (props: ItreasuryCardType) => {
-	const { provider, account } = useWeb3React();
+	const { provider, account, chainId } = useWeb3React();
 	const { daoURL } = useParams()
 	const [copy, setCopy] = useState<boolean>(false);
 	const [isAddressValid, setisAddressValid] = useState<boolean>(false);
@@ -65,7 +65,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	};
 
 	const loadPendingTxn = async () => {
-		(await safeService(provider))
+		(await safeService(provider, `${chainId}`))
 			.getPendingTransactions(_get(DAO, 'safe.address', ''))
 			.then(ptx => { props.onChangePendingTransactions(ptx); return ptx })
 			.then(ptx => _get(ptx, 'results', []))
@@ -84,7 +84,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	}
 
 	const loadExecutedTxn = async () => {
-		(await safeService(provider))
+		(await safeService(provider, `${chainId}`))
 			.getAllTransactions(_get(DAO, 'safe.address', ''), { executed: true, queued: false, trusted: true })
 			.then(etx => _get(etx, 'results', []))
 			.then(etx => _filter(etx, p => _get(p, 'data')))
@@ -116,15 +116,17 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	}, [DAO, daoURL, threshold])
 
 	useEffect(() => {
-		if (DAO && (DAO.url === daoURL)) {
-			isOwner(_get(DAO, 'safe.address', ''))
-			loadPendingTxn()
-			loadExecutedTxn()
-		} else {
-			setPendingTxn(undefined);
-			setExecutedTxn(undefined);
+		if(chainId) {
+			if (DAO && (DAO.url === daoURL)) {
+				isOwner(_get(DAO, 'safe.address', ''))
+				loadPendingTxn()
+				loadExecutedTxn()
+			} else {
+				setPendingTxn(undefined);
+				setExecutedTxn(undefined);
+			}
 		}
-	}, [DAO, daoURL])
+	}, [DAO, daoURL, chainId])
 
 	const handleConfirmTransaction = async (_safeTxHashs: string) => {
 		try {
@@ -133,10 +135,10 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 			const isOwner = await safeSDK.isOwner(account as string);
 			if (isOwner) {
 				const senderSignature = await safeSDK.signTransactionHash(_safeTxHashs);
-				await (await safeService(provider))
+				await (await safeService(provider, `${chainId}`))
 					.confirmTransaction(_safeTxHashs, senderSignature.data)
 					.then(async (success) => {
-						await (await safeService(provider)).getTransactionConfirmations(_safeTxHashs)
+						await (await safeService(provider, `${chainId}`)).getTransactionConfirmations(_safeTxHashs)
 							.then(async (res) => {
 								console.log(res)
 								setPendingTxn(prev => {
@@ -176,7 +178,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 			const senderAddress = account as string;
 			const safeAddress = _get(DAO, 'safe.address', '');
 			await (
-				await safeService(provider)
+				await safeService(provider, `${chainId}`)
 			)
 				.proposeTransaction({
 					safeAddress,
@@ -196,11 +198,11 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 					console.log(err)
 					console.log("an error occured while proposing a reject transaction.");
 				});
-			await (await safeService(provider))
+			await (await safeService(provider, `${chainId}`))
 				.confirmTransaction(safeTxHash, signature.data)
 				.then(async (result) => {
 					console.log("on chain transaction has been confirmed by the signer");
-					await (await safeService(provider)).getTransactionConfirmations(safeTxHash)
+					await (await safeService(provider, `${chainId}`)).getTransactionConfirmations(safeTxHash)
 						.then(async (res) => {
 							console.log(res)
 							setRejectTxLoading(null);

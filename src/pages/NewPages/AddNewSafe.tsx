@@ -27,11 +27,13 @@ import { ethers } from "ethers";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import { createDAO } from '../../state/flow/actions';
 import { loadDao } from '../../state/dashboard/actions';
+import { CHAIN_GAS_STATION, SupportedChainId } from "constants/chains";
+import axios from "axios";
 
 const AddNewSafe = () => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
-	const { provider, account } = useWeb3React();
+	const { provider, account, chainId } = useWeb3React();
 	const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
 	const [myowers, setMyOwers] = useState<InviteGangType[]>(invitedMembers);
 	const [showContinue, setshowContinue] = useState<boolean>(true);
@@ -45,6 +47,7 @@ const AddNewSafe = () => {
 	const { DAOList } = useAppSelector((state) => state.dashboard);
 	const flow = useAppSelector((state) => state.flow);
 	let Myvalue = useRef<Array<InviteGangType>>([]);
+	const [polygonGasEstimate, setPolygonGasEstimate] = useState<any>(null)
 
 	//let thresholdValue = useRef<string>("");
 	const [thresholdValue, setThresholdValue] = useState<number>(1);
@@ -61,8 +64,16 @@ const AddNewSafe = () => {
 	}, [invitedMembers]);
 
 	useEffect(() => {
-		dispatch(loadDao({}))
-	}, [])
+		if(chainId && +chainId === SupportedChainId.POLYGON){
+			axios.get(CHAIN_GAS_STATION[`${chainId}`].url)
+			.then(res => setPolygonGasEstimate(res.data))
+		}
+	}, [chainId])
+
+	useEffect(() => {
+		if(chainId)
+			dispatch(loadDao({ chainId }))
+	}, [chainId])
 
 	const handleCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
 		// const index: number = parseInt(event.target.value);
@@ -144,6 +155,7 @@ const AddNewSafe = () => {
 				//setisLoading(false);
 				const payload: any = {
 					contractAddress: '',
+					chainId,
 					name: flow.daoName,
 					url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
 					image: null,
@@ -320,7 +332,7 @@ const AddNewSafe = () => {
 					You’re about to create a new safe and will have to confirm a
 					transaction with your curentry connected wallet.
 					<span className="boldText">
-						The creation will cost approximately 0.01256 GOR.
+						{ chainId && +chainId === SupportedChainId.POLYGON && polygonGasEstimate ? `The creation will cost approximately ${polygonGasEstimate?.standard?.maxFee} GWei.` : `The creation will cost approximately 0.01256 GOR.` }
 					</span>
 					The exact amount will be determinated by your wallet.
 				</div>

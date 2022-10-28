@@ -22,10 +22,11 @@ import Safe from "@gnosis.pm/safe-core-sdk";
 import axios from "axios";
 import { LeapFrog } from "@uiball/loaders";
 import { ImportSafe } from "connection/SafeCall";
+import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
 
 const CreateNewSafe = () => {
   useStepRouter(4);
-
+	const { account, chainId } = useWeb3React();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const holder = useAppSelector((state) => state.proposal.holder);
@@ -92,9 +93,10 @@ const CreateNewSafe = () => {
   };
 
   const getTokens = async (safeAddress: string) => {
+    chainId &&
     axios
       .get(
-        `https://safe-transaction.goerli.gnosis.io/api/v1/safes/${safeAddress}/balances/`
+        `${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/`
       )
       .then((tokens: any) => {
         settokens(tokens.data);

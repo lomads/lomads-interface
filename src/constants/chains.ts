@@ -25,7 +25,7 @@ export const CHAIN_IDS_TO_NAMES = {
   [SupportedChainId.GOERLI]: 'goerli',
   [SupportedChainId.KOVAN]: 'kovan',
   [SupportedChainId.POLYGON]: 'polygon',
-  [SupportedChainId.POLYGON_MUMBAI]: 'polygon_mumbai',
+  [SupportedChainId.POLYGON_MUMBAI]: 'polygon mumbai',
   [SupportedChainId.ARBITRUM_ONE]: 'arbitrum',
   [SupportedChainId.ARBITRUM_RINKEBY]: 'arbitrum_rinkeby',
   [SupportedChainId.OPTIMISM]: 'optimism',
@@ -41,7 +41,7 @@ export const ALL_SUPPORTED_CHAIN_IDS: SupportedChainId[] = Object.values(Support
 
 export const SUPPORTED_CHAIN_IDS: SupportedChainId[] = [
   // SupportedChainId.MAINNET,
-  SupportedChainId.POLYGON_MUMBAI,
+  SupportedChainId.POLYGON,
   SupportedChainId.GOERLI,
 ]
 
@@ -88,3 +88,16 @@ export const L2_CHAIN_IDS = [
 ] as const
 
 export type SupportedL2ChainId = typeof L2_CHAIN_IDS[number]
+
+export const GNOSIS_SAFE_BASE_URLS:any = {
+  [SupportedChainId.GOERLI]: 'https://safe-transaction.goerli.gnosis.io',
+  [SupportedChainId.POLYGON]: 'https://safe-transaction.polygon.gnosis.io'
+}
+
+export const CHAIN_GAS_STATION :any = {
+  [SupportedChainId.POLYGON]: {
+    url: 'https://gasstation-mainnet.matic.network/v2',
+    symbol: 'GWei'
+  },
+  [SupportedChainId.GOERLI]: 'https://safe-transaction.polygon.gnosis.io'
+}

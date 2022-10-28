@@ -24,10 +24,11 @@ import axios from "axios";
 import { getDao } from "state/dashboard/actions";
 import { updateTotalMembers } from "state/flow/reducer";
 import axiosHttp from '../../../api'
+import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
 
 const SideModal = (props: IsideModal) => {
 	const dispatch = useAppDispatch();
-	const { provider, account } = useWeb3React();
+	const { provider, account, chainId } = useWeb3React();
 	const [selectedToken, setSelectedToken] = useState<string>("");
 	const [addNewRecipient, setAddNewRecipient] = useState<boolean>(false);
 	const [modalNavigation, setModalNavigation] = useState({
@@ -105,7 +106,7 @@ const SideModal = (props: IsideModal) => {
 			const senderAddress = account as string;
 			const safeAddress = props.safeAddress;
 			await (
-				await safeService(provider)
+				await safeService(provider, `${chainId}`)
 			)
 				.proposeTransaction({
 					safeAddress,
@@ -122,7 +123,7 @@ const SideModal = (props: IsideModal) => {
 					setisLoading(false);
 				});
 			await (
-				await safeService(provider)
+				await safeService(provider, `${chainId}`)
 			)
 				.confirmTransaction(safeTxHash, signature.data)
 				.then(async (success) => {
@@ -154,9 +155,10 @@ const SideModal = (props: IsideModal) => {
 	};
 
 	const getTokens = async (safeAddress: string) => {
+		chainId &&
 		await axios
 			.get(
-				`https://safe-transaction.goerli.gnosis.io/api/v1/safes/${safeAddress}/balances/usd/`
+				`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`
 			)
 			.then((tokens: any) => {
 				setSafeTokens(tokens.data);
