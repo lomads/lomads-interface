@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import moment from 'moment';
-import { get as _get, find as _find } from 'lodash';
+import { get as _get, find as _find, uniqBy as _uniqBy } from 'lodash';
 import { useWeb3React } from "@web3-react/core";
 import { useAppSelector } from "state/hooks";
 import membersIcon from "../../../assets/svg/membersIcon.svg";
@@ -20,19 +20,12 @@ const MemberCard = (props: any) => {
 	const { myRole, can } = useRole(DAO, account);
 
 	const [membersArray, setMembersArray] = useState<any>([]);
-	const [editMode, setEditMode] = useState(false);
-	const [editRoles, setEditRoles] = useState(false);
-	const [editableName, setEditableName] = useState();
 
 	useEffect(() => {
 		if (DAO) {
 			setMembersArray(_get(DAO, 'members', []));
 		}
 	}, [DAO]);
-
-	const handleChangeName = (e: any) => {
-		setEditableName(e.target.value);
-	}
 
 	const amIAdmin = useMemo(() => {
 		if (DAO) {
@@ -43,23 +36,6 @@ const MemberCard = (props: any) => {
 		}
 		return false;
 	}, [account, DAO])
-
-	const handleActivateEditMode = () => {
-		let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
-		setEditableName(user.member.name)
-		setEditMode(true);
-		if (amIAdmin) {
-			setEditRoles(true);
-		}
-	}
-
-	const _handleKeyDown = (e: any) => {
-		if (e.key === 'Enter') {
-			setEditMode(false);
-			const member = { name: editableName };
-			dispatch(updateDaoMember({ url: DAO?.url, payload: member }))
-		}
-	}
 
 	const capitalizeFirstLetter = (string: string) => {
 		return string.charAt(0).toUpperCase() + string.slice(1);
@@ -72,19 +48,7 @@ const MemberCard = (props: any) => {
 					<div className="memberRow">
 						<div className="avatarAndName">
 							<img src={daoMember2} alt="avatar" />
-							{
-								editMode && props.address.toLowerCase() === account?.toLowerCase()
-									?
-									<input
-										value={editableName}
-										onClick={(e) => e.stopPropagation()}
-										onChange={(e) => handleChangeName(e)}
-										onKeyDown={(e) => _handleKeyDown(e)}
-										autoFocus
-									/>
-									:
-									<div className="dashboardText">{props.name}</div>
-							}
+							<div className="dashboardText">{props.name}</div>
 						</div>
 						<div id="memberAddressText">
 							{props.address.slice(0, 6) + "..." + props.address.slice(-4)}
@@ -98,30 +62,7 @@ const MemberCard = (props: any) => {
 						</div>
 						<div className="roleText">
 							{
-								editRoles
-									?
-									<select onClick={(e) => e.stopPropagation()} onChange={(e) => console.log("Selected Role : ", e.target.value)}>
-										{
-											props.role === 'ADMIN'
-												?
-												<option value="ADMIN" selected disabled>Admin</option>
-												:
-												<option value="ADMIN">Admin</option>
-										}
-										{
-											props.role === 'CORE_CONTRIBUTOR' || props.role === 'MEMBER'
-												?
-												<option value="CORE_CONTRIBUTOR" selected disabled>Core Contributor</option>
-												:
-												<option value="CORE_CONTRIBUTOR">Core Contributor</option>
-										}
-									</select>
-									:
-									<>
-										{
-											props.role === 'ADMIN' ? props.creator ? 'Admin (Creator)' : 'Admin' : capitalizeFirstLetter((props.role).replace('_', ' ').toLowerCase())
-										}
-									</>
+								props.role === 'ADMIN' ? props.creator ? 'Admin (Creator)' : 'Admin' : capitalizeFirstLetter((props.role).replace('_', ' ').toLowerCase())
 							}
 						</div>
 					</div>
@@ -154,12 +95,12 @@ const MemberCard = (props: any) => {
 								}
 							</div>
 						</div>
-						{ can(myRole, 'members.edit') && <button
+						{can(myRole, 'members.edit') && <button
 							// onClick={handleActivateEditMode} 
 							onClick={() => props.toggleShowEditMember()}
 						>
 							<img src={editIcon} alt="edit-icon" />
-						</button> }
+						</button>}
 						{can(myRole, 'members.add') && <SafeButton
 							height={40}
 							width={150}
@@ -176,7 +117,7 @@ const MemberCard = (props: any) => {
 
 					</div>
 				</div>
-				<div className="membersList" onClick={() => { setEditMode(false); setEditRoles(false) }}>
+				<div className="membersList">
 					<div className="NameAndAvatar">
 						<div className="memberRow">
 							<div className="avatarAndName">
@@ -188,7 +129,7 @@ const MemberCard = (props: any) => {
 							<div className="dashboardText"></div>
 						</div>
 					</div>
-					{membersArray.map((result: any, index: any) => {
+					{ _uniqBy(membersArray, (m: any) => m.member.wallet.toLowerCase()).map((result: any, index: any) => {
 						return (
 							<NameAndAvatar
 								name={_get(result, 'member.name', '')}

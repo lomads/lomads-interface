@@ -9,13 +9,14 @@ import { useAppSelector } from "state/hooks";
 
 import ProjectCard from './Project/ProjectCard';
 import { useWeb3React } from "@web3-react/core";
-
+import { useParams } from 'react-router-dom';
 import archiveIcon from '../../../assets/svg/archiveIcon.svg';
 
 import useRole from 'hooks/useRole';
 
 const MyProject = () => {
     const navigate = useNavigate();
+    const { daoURL } = useParams();
     const { DAO } = useAppSelector((state) => state.dashboard);
     const { account } = useWeb3React();
     const [tab, setTab] = useState(2);
@@ -25,7 +26,7 @@ const MyProject = () => {
     const { myRole, can } = useRole(DAO, account)
 
     useEffect(() => {
-        if (DAO) {
+        if (DAO && DAO.url === daoURL) {
             setMyProjects(_get(DAO, 'projects', []).filter(project => !project.deletedAt && !project.archivedAt && _find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase())))
             setOtherProjects(_get(DAO, 'projects', []).filter(project => !project.deletedAt && !project.archivedAt && !_find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase())))
         }
@@ -37,6 +38,8 @@ const MyProject = () => {
             if (myProjects.length > 0) {
                 setInitialCheck(true)
                 setTab(1);
+            } else {
+                setTab(2)
             }
         }
     }, [myProjects, initialCheck]);
