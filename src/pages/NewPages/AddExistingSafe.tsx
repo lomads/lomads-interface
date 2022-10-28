@@ -24,6 +24,8 @@ import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import OutlineButton from "UIpack/OutlineButton";
 import { InviteGangType } from "types/UItype";
 import { createDAO } from '../../state/flow/actions';
+import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
+import { SupportedChainId, SUPPORTED_CHAIN_IDS, CHAIN_IDS_TO_NAMES } from 'constants/chains'
 
 const AddExistingSafe = () => {
   const dispatch = useAppDispatch();
@@ -43,7 +45,7 @@ const AddExistingSafe = () => {
   const flow = useAppSelector((state) => state.flow);
   const createDAOLoading = useAppSelector((state) => state.flow.createDAOLoading);
 
-	const { provider, account } = useWeb3React();
+	const { provider, account, chainId } = useWeb3React();
 
 	const UseExistingSafe = async () => {
 		owners.current = [];
@@ -68,9 +70,10 @@ const AddExistingSafe = () => {
 	}, [])
 
 	const getTokens = async (safeAddress: string) => {
+		chainId &&
 		axios
 			.get(
-				`https://safe-transaction.goerli.gnosis.io/api/v1/safes/${safeAddress}/balances/usd/`
+				`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`
 			)
 			.then((tokens: any) => {
 				setTokens(tokens.data);
@@ -107,6 +110,7 @@ const AddExistingSafe = () => {
     }, []);
     dispatch(updateTotalMembers(value));
     const payload: any = {
+	  chainId,
       contractAddress: '',
       name: flow.daoName,
       url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
@@ -312,17 +316,16 @@ const AddExistingSafe = () => {
 				) : (
 					<>
 						<div className="centerCard">
-							<div className="chainDetails">
+							{/* <div className="chainDetails">
 								<div>
 									<div className="inputFieldTitle">
 										Select the network on which the Safe was created
 									</div>
 								</div>
 								<select name="chain" id="chain" className="drop">
-									{/* <option value="polygon">Polygon Mumbai</option> */}
-									<option value="goerli">Goerli</option>
+									{ SUPPORTED_CHAIN_IDS.map(chain => <option value={+chain}>{CHAIN_IDS_TO_NAMES[chain]}</option>) }
 								</select>
-							</div>
+							</div> */}
 							<div className="inputArea">
 								<div>
 									<div>

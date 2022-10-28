@@ -13,7 +13,7 @@ import { updateSelectedWallet } from "state/user/reducer";
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import { injectedConnection, walletConnectConnection } from "connection";
 import { getConnection } from "connection/utils";
-import { SupportedChainId } from 'constants/chains'
+import { SupportedChainId, SUPPORTED_CHAIN_IDS, CHAIN_IDS_TO_NAMES } from 'constants/chains'
 import { updateConnectionError } from "state/connection/reducer";
 import { isChainAllowed, switchChain } from "utils/switchChain";
 import { ethers } from "ethers";
@@ -55,12 +55,19 @@ const LoginPage = (props: any) => {
   const selectedWallet = useAppSelector((state) => state.user.selectedWallet);
   const [checkLoading, setCheckLoading] = useState<boolean>(false)
   const { chainId, connector, account, provider } = useWeb3React();
+  const [preferredChain, setPreferredChain] = useState<number>(SupportedChainId?.GOERLI);
 
 
   console.log('chainId', chainId, connector, account)
 
-  const chainAllowed = chainId && isChainAllowed(connector, chainId);
-  console.log(chainAllowed, chainId);
+  const chainAllowed = chainId && isChainAllowed(connector, chainId) && chainId === +preferredChain;
+  console.log("chainAllowed", chainAllowed, chainId);
+
+  useEffect(() => {
+    if(chainId) {
+      setPreferredChain(chainId ? SUPPORTED_CHAIN_IDS.indexOf(+chainId) > -1 ? +chainId : SupportedChainId?.GOERLI : SupportedChainId?.GOERLI)
+    }
+  }, [chainId])
 
   const navigateTo = async () => {
     const activeDao = sessionStorage.getItem('__lmds_active_dao')
@@ -103,26 +110,28 @@ const LoginPage = (props: any) => {
       generateToken()
   }, [selectedWallet, account, chainAllowed]);
   
-  const nextLogin = async (connector: Connector) => {
+  const nextLogin = useCallback(async (connector: Connector) => {
     localStorage.removeItem('__lmds_web3_token')
     const connectionType = getConnection(connector).type;
     try {
       dispatch(updateConnectionError({ connectionType, error: undefined }));
+      console.log("chainAllowed", chainAllowed)
       if(chainAllowed && !account){
         await connector.activate()
       } else if (!chainAllowed) {
-        await switchChain(connector, SupportedChainId.GOERLI)
+        switchChain(connector, +preferredChain)
         .then(async () => {
           if(!account)
             await connector.activate()
         })
+        .catch(e => { console.log(e) })
       }
       dispatch(updateSelectedWallet({ wallet: connectionType }));
     } catch (error: any) {
       console.debug(`web3-react connection error: ${error}`);
       dispatch(updateConnectionError({ connectionType, error: error.message }));
     }
-  };
+  }, [chainAllowed, preferredChain]);
 
   useEffect(() => {
     console.log('window.ethereum', window.ethereum)
@@ -150,6 +159,14 @@ const LoginPage = (props: any) => {
           <div className="welcomeText1">Hello there!</div>
           <div className="welcomeText2">Connect Your Wallet</div>
         </div>
+        {/* <div>
+          <div className="inputFieldTitle">Preferred chain</div>
+        </div> */}
+        <select name="chain" id="chain" value={preferredChain} onChange={e => setPreferredChain(+e.target.value)} className="drop" style={{ width: 250, marginBottom: 16 }}>
+          {
+            SUPPORTED_CHAIN_IDS.map(chain => <option value={+chain}>{CHAIN_IDS_TO_NAMES[chain]}</option>)
+          }
+        </select>
         <div className={"modalbuttons"}>
           <button
             key="metamask"

@@ -27,11 +27,13 @@ import { ethers } from "ethers";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import { createDAO } from '../../state/flow/actions';
 import { loadDao } from '../../state/dashboard/actions';
+import { CHAIN_GAS_STATION, SupportedChainId } from "constants/chains";
+import axios from "axios";
 
 const AddNewSafe = () => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
-	const { provider, account } = useWeb3React();
+	const { provider, account, chainId } = useWeb3React();
 	const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
 	const [myowers, setMyOwers] = useState<InviteGangType[]>(invitedMembers);
 	const [showContinue, setshowContinue] = useState<boolean>(true);
@@ -45,6 +47,7 @@ const AddNewSafe = () => {
 	const { DAOList } = useAppSelector((state) => state.dashboard);
 	const flow = useAppSelector((state) => state.flow);
 	let Myvalue = useRef<Array<InviteGangType>>([]);
+	const [polygonGasEstimate, setPolygonGasEstimate] = useState<any>(null)
 
 	//let thresholdValue = useRef<string>("");
 	const [thresholdValue, setThresholdValue] = useState<number>(1);
@@ -61,8 +64,16 @@ const AddNewSafe = () => {
 	}, [invitedMembers]);
 
 	useEffect(() => {
-		dispatch(loadDao({}))
-	}, [])
+		if(chainId && +chainId === SupportedChainId.POLYGON){
+			axios.get(CHAIN_GAS_STATION[`${chainId}`].url)
+			.then(res => setPolygonGasEstimate(res.data))
+		}
+	}, [chainId])
+
+	useEffect(() => {
+		if(chainId)
+			dispatch(loadDao({ chainId }))
+	}, [chainId])
 
 	const handleCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
 		// const index: number = parseInt(event.target.value);
@@ -103,6 +114,42 @@ const AddNewSafe = () => {
 		}
 	};
 
+
+	const runAfterCreation = async (addr:string, owners: any) => {
+		dispatch(updateSafeAddress(addr as string));
+		const totalAddresses = [...invitedMembers, ...Myvalue.current];
+		const value = totalAddresses.reduce((final: any, current: any) => {
+			let object = final.find(
+				(item: any) => item.address === current.address
+			);
+			if (object) {
+				return final;
+			}
+			return final.concat([current]);
+		}, []);
+		dispatch(updateTotalMembers(value));
+		//setisLoading(false);
+		const payload: any = {
+			contractAddress: '',
+			chainId,
+			name: flow.daoName,
+			url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
+			image: null,
+			members: value.map((m: any) => {
+				return {
+					...m, creator: m.address.toLowerCase() === account?.toLowerCase()
+				}
+			}),
+			safe: {
+				name: safeName,
+				address: addr,
+				owners: owners,
+			}
+		}
+		dispatch(createDAO(payload))
+		setisLoading(false);
+	}
+
 	const deployNewSafe = async () => {
 		setisLoading(true);
 		dispatch(updateOwners(Myvalue.current));
@@ -126,6 +173,12 @@ const AddNewSafe = () => {
 			threshold,
 		};
 
+		let currentSafes: Array<string> = []
+		if(chainId === SupportedChainId.POLYGON)
+			currentSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
+		
+		console.log("currentSafes", currentSafes)
+
 		await safeFactory
 			.deploySafe({ safeAccountConfig })
 			.then(async (tx) => {
@@ -144,6 +197,7 @@ const AddNewSafe = () => {
 				//setisLoading(false);
 				const payload: any = {
 					contractAddress: '',
+					chainId,
 					name: flow.daoName,
 					url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
 					image: null,
@@ -160,9 +214,16 @@ const AddNewSafe = () => {
 				}
 				dispatch(createDAO(payload))
 			})
-			.catch((err) => {
+			.catch(async (err) => {
 				console.log("An error occured while creating safe", err);
-				setisLoading(false);
+				if(chainId === SupportedChainId.POLYGON) {
+					const latestSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
+					console.log("latestSafes", latestSafes)
+					let newSafeAddr = _.find(latestSafes, ls => currentSafes.indexOf(ls) === -1)
+					runAfterCreation(newSafeAddr, owners)
+				} else {
+					setisLoading(false);
+				}
 			});
 	};
 	const AddOwners = () => {
@@ -320,7 +381,7 @@ const AddNewSafe = () => {
 					You’re about to create a new safe and will have to confirm a
 					transaction with your curentry connected wallet.
 					<span className="boldText">
-						The creation will cost approximately 0.01256 GOR.
+						{ chainId && +chainId === SupportedChainId.POLYGON && polygonGasEstimate ? `The creation will cost approximately ${polygonGasEstimate?.standard?.maxFee} GWei.` : `The creation will cost approximately 0.01256 GOR.` }
 					</span>
 					The exact amount will be determinated by your wallet.
 				</div>

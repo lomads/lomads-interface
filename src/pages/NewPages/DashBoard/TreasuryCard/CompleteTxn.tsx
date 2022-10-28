@@ -6,12 +6,14 @@ import SimpleInputField from "UIpack/SimpleInputField";
 import { beautifyHexToken } from '../../../../utils';
 import { useAppSelector } from "state/hooks";
 import { useAppDispatch } from "state/hooks";
+import { useWeb3React } from "@web3-react/core";
 import moment from "moment";
 import axiosHttp from '../../../../api';
 import { updateSafeTransaction } from "state/dashboard/reducer";
+import { SupportedChainId } from "constants/chains";
 
 const CompleteTxn = ({ transaction, tokens, owner, isAdmin }: any) => {
-
+	const { chainId } = useWeb3React();
     const threshold = useAppSelector((state) => state.flow.safeThreshold);
     const { DAO } = useAppSelector(store => store.dashboard);
     const [reasonText, setReasonText] = useState({});
@@ -21,7 +23,7 @@ const CompleteTxn = ({ transaction, tokens, owner, isAdmin }: any) => {
     const { isCredit, amount, symbol, recipient, date, reason } = useMemo(() => {
         let isCredit = _get(transaction, 'txType', '') === 'ETHEREUM_TRANSACTION'
         let amount = _get(transaction, 'transfers[0].value', '')
-        let symbol = _get(transaction, 'transfers[0].tokenInfo.symbol', '')
+        let symbol = _get(transaction, 'transfers[0].tokenInfo.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')
         let recipient = _get(transaction, 'transfers[0].to', '')
         let trans = _find(_get(DAO, 'safe.transactions', []), t => t.safeTxHash === _get(transaction, 'safeTxHash', _get(transaction, 'txHash', '')))
 

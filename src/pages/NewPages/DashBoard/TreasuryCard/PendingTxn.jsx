@@ -14,6 +14,7 @@ import { updateSafeTransaction } from "state/dashboard/reducer";
 import { AiOutlineClose, AiOutlineCheck } from "react-icons/ai";
 import CloseBtn from '../../../../assets/svg/close-btn.svg';
 import CheckBtn from '../../../../assets/svg/check-btn.svg';
+import { SupportedChainId } from "constants/chains";
 
 const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
       <div style={{ flex : 1}} ref={ref} {...rest}>
@@ -22,7 +23,7 @@ const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
   ))
 
 const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions, confirmTxLoading, rejectTxLoading, executeTxLoading, isAdmin }) => {
-    const { provider, account } = useWeb3React();
+    const { provider, account, chainId } = useWeb3React();
     const { DAO } = useAppSelector(store => store.dashboard);
     const [reasonText, setReasonText] = useState({});
     const [editMode, setEditMode] = useState(null);
@@ -30,8 +31,8 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
     //const threshold = useAppSelector((state) => state.flow.safeThreshold);
 
     const { amount, recipient, reason } = useMemo(() => {
-        let amount = _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'value'), 'value', 0)
-        let recipient = _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'to'), 'value', '')
+        let amount = _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'value'), 'value', _get(transaction, 'value', 0))
+        let recipient = _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'to'), 'value', _get(transaction, 'to', ''))
         let trans = _find(_get(DAO, 'safe.transactions', []), t => t.safeTxHash === transaction.safeTxHash)
         let reason = null
 
@@ -88,7 +89,7 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
         const mulAmount = _get(item, 'dataDecoded.parameters[1].value')
         const mulRecipient = _get(item, 'dataDecoded.parameters[0].value')
         const isLast = _get(transaction, 'dataDecoded.parameters[0].valueDecoded', []).length - 1 === index;
-        const token = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', '')
+        const token = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')
         let trans = _find(_get(DAO, 'safe.transactions', []), t => t.safeTxHash === transaction.safeTxHash)
         let mulReason = '';
         if (trans)
@@ -242,7 +243,7 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
                         <div className="coinText">
                             <img src={sendTokenOutline} alt="" />
                             <div className="dashboardTextBold">
-                                {`${amount / 10 ** 18} ${_get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', '')}`}
+                                {`${amount / 10 ** 18} ${_get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}`}
                             </div>
                         </div>
                         <div className="transactionName">

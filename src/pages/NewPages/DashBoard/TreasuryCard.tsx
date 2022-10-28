@@ -19,9 +19,11 @@ import { Tooltip } from "@chakra-ui/react";
 import PendingTxn from './TreasuryCard/PendingTxn';
 import CompleteTxn from './TreasuryCard/CompleteTxn';
 import useRole from "hooks/useRole";
+import { SupportedChainId } from "constants/chains";
 
 const TreasuryCard = (props: ItreasuryCardType) => {
-	const { provider, account } = useWeb3React();
+	const { provider, account, chainId, ...rest } = useWeb3React();
+	console.log("useWeb3React", chainId, rest)
 	const { daoURL } = useParams()
 	const [copy, setCopy] = useState<boolean>(false);
 	const [isAddressValid, setisAddressValid] = useState<boolean>(false);
@@ -65,7 +67,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	};
 
 	const loadPendingTxn = async () => {
-		(await safeService(provider))
+		(await safeService(provider, `${chainId}`))
 			.getPendingTransactions(_get(DAO, 'safe.address', ''))
 			.then(ptx => { props.onChangePendingTransactions(ptx); return ptx })
 			.then(ptx => _get(ptx, 'results', []))
@@ -77,19 +79,19 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 					return p
 				})
 			)
-			.then(ptx => _filter(ptx, p => _get(p, 'dataDecoded.method', '') === 'multiSend' || _get(p, 'dataDecoded.method', '') === 'transfer'))
+			.then(ptx => _filter(ptx, p =>  !p.dataDecoded || (_get(p, 'dataDecoded.method', '') === 'multiSend' || _get(p, 'dataDecoded.method', '') === 'transfer')))
 			.then(ptx => _sortBy(ptx, 'nonce', 'ASC'))
-			.then(ptx => { console.log(ptx); return ptx })
+			.then(ptx => { console.log("loadPendingTxn", ptx); return ptx })
 			.then(ptx => setPendingTxn(ptx))
 	}
 
 	const loadExecutedTxn = async () => {
-		(await safeService(provider))
+		(await safeService(provider, `${chainId}`))
 			.getAllTransactions(_get(DAO, 'safe.address', ''), { executed: true, queued: false, trusted: true })
 			.then(etx => _get(etx, 'results', []))
-			.then(etx => _filter(etx, p => _get(p, 'data')))
+			//.then(etx => _filter(etx, p => _get(p, 'data')))
 			.then(etx => _filter(etx, p => !_get(p, 'dataDecoded') || (_get(p, 'dataDecoded') && _get(p, 'dataDecoded.method', '') === 'transfer' || _get(p, 'dataDecoded.method', '') === 'multiSend')))
-			.then(etx => { console.log(etx); return etx })
+			.then(etx => { console.log("loadExecutedTxn",etx); return etx })
 			.then(etx => setExecutedTxn(etx))
 	}
 
@@ -116,15 +118,17 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	}, [DAO, daoURL, threshold])
 
 	useEffect(() => {
-		if (DAO && (DAO.url === daoURL)) {
-			isOwner(_get(DAO, 'safe.address', ''))
-			loadPendingTxn()
-			loadExecutedTxn()
-		} else {
-			setPendingTxn(undefined);
-			setExecutedTxn(undefined);
+		if(chainId) {
+			if (DAO && (DAO.url === daoURL)) {
+				isOwner(_get(DAO, 'safe.address', ''))
+				loadPendingTxn()
+				loadExecutedTxn()
+			} else {
+				setPendingTxn(undefined);
+				setExecutedTxn(undefined);
+			}
 		}
-	}, [DAO, daoURL])
+	}, [DAO, daoURL, chainId])
 
 	const handleConfirmTransaction = async (_safeTxHashs: string) => {
 		try {
@@ -133,10 +137,10 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 			const isOwner = await safeSDK.isOwner(account as string);
 			if (isOwner) {
 				const senderSignature = await safeSDK.signTransactionHash(_safeTxHashs);
-				await (await safeService(provider))
+				await (await safeService(provider, `${chainId}`))
 					.confirmTransaction(_safeTxHashs, senderSignature.data)
 					.then(async (success) => {
-						await (await safeService(provider)).getTransactionConfirmations(_safeTxHashs)
+						await (await safeService(provider, `${chainId}`)).getTransactionConfirmations(_safeTxHashs)
 							.then(async (res) => {
 								console.log(res)
 								setPendingTxn(prev => {
@@ -176,7 +180,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 			const senderAddress = account as string;
 			const safeAddress = _get(DAO, 'safe.address', '');
 			await (
-				await safeService(provider)
+				await safeService(provider, `${chainId}`)
 			)
 				.proposeTransaction({
 					safeAddress,
@@ -196,11 +200,11 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 					console.log(err)
 					console.log("an error occured while proposing a reject transaction.");
 				});
-			await (await safeService(provider))
+			await (await safeService(provider, `${chainId}`))
 				.confirmTransaction(safeTxHash, signature.data)
 				.then(async (result) => {
 					console.log("on chain transaction has been confirmed by the signer");
-					await (await safeService(provider)).getTransactionConfirmations(safeTxHash)
+					await (await safeService(provider, `${chainId}`)).getTransactionConfirmations(safeTxHash)
 						.then(async (res) => {
 							console.log(res)
 							setRejectTxLoading(null);
@@ -294,7 +298,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
   const hasValidToken = useMemo(() => {
 	if(props.tokens && props.tokens.length > 0) {
-		let valid = props.tokens.some((t:any) => t.token)
+		let valid = props.tokens.some((t:any) => +t.balance > 0)
 		return valid
 	}
 	return false
@@ -320,12 +324,10 @@ const TreasuryCard = (props: ItreasuryCardType) => {
           <div className="copyArea">
             {
               props.tokens.map((token:any) => {
-                if(token.tokenAddress)
                   return ( <>
                   <img src={coin} alt="asset" />
-                  <div id="safeBalance">{`${_get(token, 'balance', 0) / 10 ** 18} ${_get(token, 'token.symbol')}`}</div>
+                  <div id="safeBalance">{`${_get(token, 'balance', 0) / 10 ** 18} ${_get(token, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}`}</div>
                 </> )
-                return null
               })
             }
             {/* <div className="dashboardText">total balance</div> */}
@@ -336,7 +338,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
       <>
         {
           pendingTxn !== undefined && executedTxn !== undefined &&
-		  ( pendingTxn && executedTxn && pendingTxn.length !== 0 && executedTxn.length !== 0 ) &&
+		  ( pendingTxn && executedTxn && (pendingTxn.length !== 0 || executedTxn.length !== 0) ) &&
           <div id="treasuryTransactions">
             <div className="dashboardText" style={{ marginBottom: '6px' }}>Last Transactions</div>
             {
