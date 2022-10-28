@@ -159,9 +159,9 @@ const LoginPage = (props: any) => {
           <div className="welcomeText1">Hello there!</div>
           <div className="welcomeText2">Connect Your Wallet</div>
         </div>
-        <div>
+        {/* <div>
           <div className="inputFieldTitle">Preferred chain</div>
-        </div>
+        </div> */}
         <select name="chain" id="chain" value={preferredChain} onChange={e => setPreferredChain(+e.target.value)} className="drop" style={{ width: 250, marginBottom: 16 }}>
           {
             SUPPORTED_CHAIN_IDS.map(chain => <option value={+chain}>{CHAIN_IDS_TO_NAMES[chain]}</option>)
