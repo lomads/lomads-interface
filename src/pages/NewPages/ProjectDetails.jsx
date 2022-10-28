@@ -55,7 +55,7 @@ const ProjectDetails = () => {
     const [openLinks, setOpenLinks] = useState([]);
 
     const [extraMembers, setExtraMembers] = useState([]);
-    const [newAddress, setNewAddress] = useState('');
+    const [newAddress, setNewAddress] = useState([]);
 
     const [editMember, setEditMember] = useState(false);
 
@@ -81,15 +81,15 @@ const ProjectDetails = () => {
     }, [Project]);
 
     const canMyrole = useCallback((permission) => {
-        if(!Project) return false;
+        if (!Project) return false;
         let creator = _get(Project, 'creator', '').toLowerCase() === account.toLowerCase();
         let inProject = _find(Project.members, m => m.wallet.toLowerCase() === account.toLowerCase())
         console.log(creator)
-        if(myRole === 'ADMIN' || myRole === "CONTRIBUTOR")
+        if (myRole === 'ADMIN' || myRole === "CONTRIBUTOR")
             return can(myRole, permission)
-        if(myRole === 'CORE_CONTRIBUTOR')
+        if (myRole === 'CORE_CONTRIBUTOR')
             return inProject && can(myRole, permission)
-        if(myRole === 'ACTIVE_CONTRIBUTOR')
+        if (myRole === 'ACTIVE_CONTRIBUTOR')
             return creator && can(myRole, permission)
     }, [Project])
 
@@ -131,9 +131,12 @@ const ProjectDetails = () => {
     }, [deleteProjectLoading]);
 
     useEffect(() => {
-        if (newAddress !== '') {
-            const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === newAddress.toLowerCase());
-            setExtraMembers([...extraMembers, user.member._id])
+        console.log("new address : ", newAddress);
+        if (newAddress.length > 0) {
+            newAddress.map((value) => {
+                const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === value.toLowerCase());
+                setExtraMembers((oldValue) => [...oldValue, user.member._id]);
+            })
         }
     }, [DAO]);
 
@@ -340,7 +343,7 @@ const ProjectDetails = () => {
                                         ?
                                         <AddMember
                                             toggleShowMember={toggleShowMember}
-                                            addToList={(address) => setNewAddress(address)}
+                                            addToList={(addressArr) => setNewAddress(addressArr)}
                                         />
                                         :
                                         null
@@ -473,27 +476,27 @@ const ProjectDetails = () => {
                                     {/* <button>
                                         <img src={editToken} alt="hk-logo" />
                                     </button> */}
-                                    
-                                    { canMyrole('project.delete') && <button onClick={() => setDeletePrompt(true)}>
+
+                                    {canMyrole('project.delete') && <button onClick={() => setDeletePrompt(true)}>
                                         <img src={deleteIcon} alt="hk-logo" />
-                                    </button> }
-                                    { canMyrole('project.archive') &&
+                                    </button>}
+                                    {canMyrole('project.archive') &&
                                         Project?.archivedAt === null
-                                            ?
-                                            <SafeButton
-                                                height={40}
-                                                width={150}
-                                                titleColor="#C94B32"
-                                                title="CLOSE PROJECT"
-                                                bgColor="#FFFFFF"
-                                                opacity="1"
-                                                disabled={false}
-                                                fontweight={400}
-                                                fontsize={16}
-                                                onClick={() => setClosePrompt(true)}
-                                            />
-                                            :
-                                            null
+                                        ?
+                                        <SafeButton
+                                            height={40}
+                                            width={150}
+                                            titleColor="#C94B32"
+                                            title="CLOSE PROJECT"
+                                            bgColor="#FFFFFF"
+                                            opacity="1"
+                                            disabled={false}
+                                            fontweight={400}
+                                            fontsize={16}
+                                            onClick={() => setClosePrompt(true)}
+                                        />
+                                        :
+                                        null
                                     }
                                 </div>
                             }
@@ -514,15 +517,15 @@ const ProjectDetails = () => {
                                         <p>{Project?.members.length} members</p>
                                     </div>
                                     <div>
-                                        { canMyrole('project.member.edit') &&
-                                        <button onClick={() => setEditMember(true)}>
-                                            <img src={editToken} alt="hk-logo" />
-                                        </button> }
-                                        { canMyrole('project.member.add') &&
-                                        <button onClick={toggleMemberList}>
-                                            <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
-                                            MEMBER
-                                        </button> }
+                                        {canMyrole('project.member.edit') &&
+                                            <button onClick={() => setEditMember(true)}>
+                                                <img src={editToken} alt="hk-logo" />
+                                            </button>}
+                                        {canMyrole('project.member.add') &&
+                                            <button onClick={toggleMemberList}>
+                                                <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
+                                                MEMBER
+                                            </button>}
                                     </div>
                                 </div>
                                 <div className="members-list">
@@ -565,11 +568,11 @@ const ProjectDetails = () => {
                                     {/* <button>
                                         <img src={editPen} alt="hk-logo" />
                                     </button> */}
-                                    { canMyrole('project.link.add') &&
-                                    <button onClick={toggleShowLink}>
-                                        <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
-                                        LINK
-                                    </button> }
+                                    {canMyrole('project.link.add') &&
+                                        <button onClick={toggleShowLink}>
+                                            <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
+                                            LINK
+                                        </button>}
 
                                 </div>
                             </div>
@@ -581,20 +584,20 @@ const ProjectDetails = () => {
                                             <div className="locked">
                                                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
                                                     <img src={lock} alt="lock-icon" />
-                                                    <p style={{ marginLeft: "6px", fontStyle: "normal", fontSize: "16px",  color: "#FFFFFF" }}>Links to unlock:</p>
+                                                    <p style={{ marginLeft: "6px", fontStyle: "normal", fontSize: "16px", color: "#FFFFFF" }}>Links to unlock:</p>
                                                 </div>
                                                 <div className="container">
                                                     {
                                                         lockedLinks.map((item, index) => {
                                                             return (
                                                                 <div onClick={() => unlock(item)} className="link-button" style={{ position: 'relative' }} key={index}>
-                                                                {handleParseUrl(item.link)}
-                                                                <p>{item.title.length > 8 ? item.title.slice(0, 8) + "..." : item.title}</p>
-                                                                {unlockLoading === item.id ?
-                                                                    <div style={{ position: 'absolute', top: 10, right: 20 }}>
-                                                                        <LeapFrog size={20} color="#B12F15" />
-                                                                    </div> : null
-                                                                }
+                                                                    {handleParseUrl(item.link)}
+                                                                    <p>{item.title.length > 8 ? item.title.slice(0, 8) + "..." : item.title}</p>
+                                                                    {unlockLoading === item.id ?
+                                                                        <div style={{ position: 'absolute', top: 10, right: 20 }}>
+                                                                            <LeapFrog size={20} color="#B12F15" />
+                                                                        </div> : null
+                                                                    }
                                                                 </div>
                                                             )
                                                         })

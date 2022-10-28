@@ -58,6 +58,10 @@ const Settings = () => {
     }, [DAO, balanceOf, contractName]);
 
     useEffect(() => {
+        setDaoLinks(_get(DAO, 'links', []));
+    }, [DAO])
+
+    useEffect(() => {
         if (updateDaoLoading === false) {
             dispatch(resetUpdateDAOLoader());
             setEditMode(false);

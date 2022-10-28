@@ -51,7 +51,7 @@ const CreateProject = () => {
     const [accessControl, setAccessControl] = useState(false);
     const [title, setTitle] = useState('');
     const [titleError, setTitleError] = useState(null);
-    const [newAddress, setNewAddress] = useState('');
+    const [newAddress, setNewAddress] = useState([]);
 
     const daoName = _get(DAO, 'name', '').split(" ");
 
@@ -97,14 +97,15 @@ const CreateProject = () => {
     }, [link]);
 
     useEffect(() => {
-        if (newAddress !== '') {
-
-            const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === newAddress.toLowerCase());
-            let memberOb = {};
-            memberOb.name = user.member.name;
-            memberOb.address = user.member.wallet;
-            console.log("new member ob : ", memberOb);
-            setSelectedMembers([...selectedMembers, memberOb]);
+        console.log("new address : ", newAddress);
+        if (newAddress.length > 0) {
+            newAddress.map((value) => {
+                const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === value.toLowerCase());
+                let memberOb = {};
+                memberOb.name = user.member.name;
+                memberOb.address = user.member.wallet;
+                setSelectedMembers((oldValue) => [...oldValue, memberOb]);
+            })
         }
     }, [DAO]);
 
@@ -239,7 +240,7 @@ const CreateProject = () => {
                 {showAddMember &&
                     <AddMember
                         toggleShowMember={toggleShowMember}
-                        addToList={(address) => setNewAddress(address)}
+                        addToList={(addressArr) => setNewAddress(addressArr)}
                     />
                 }
                 {

@@ -131,7 +131,7 @@ const AddMember = (props: any) => {
 		if (!isPresent(member.address) && isRightAddress(member.address)) {
 			dispatch(addDaoMember({ url: DAO?.url, payload: member }))
 			if (props.addToList) {
-				props.addToList(member.address);
+				props.addToList([member.address]);
 			}
 		}
 	};
@@ -170,7 +170,8 @@ const AddMember = (props: any) => {
 						if (ENSname)
 							member.name = member.name ? member.name : ENSname
 					}
-					if (!_.find(validMembers, m => m.address.toLowerCase() === member.address.toLowerCase())) {
+					if (!_.find(validMembers, m => m.address.toLowerCase() === member.address.toLowerCase()) &&
+						!_.find(_.get(DAO, 'members', []), m => m.member.wallet.toLowerCase() === member.address.toLowerCase())) {
 						validMembers.push({ ...member, role: 'CONTRIBUTOR' });
 					}
 				}
@@ -214,12 +215,17 @@ const AddMember = (props: any) => {
 	const handleAddMembers = () => {
 		try {
 			let tempArray = [];
+			let newArray = [];
 			for (var i = 0; i < validMembers.length; i++) {
 				if (deleteMembers.includes(validMembers[i].address) === false) {
 					tempArray.push(validMembers[i]);
+					newArray.push(validMembers[i].address);
 				}
 			}
 			dispatch(addDaoMemberList({ url: DAO?.url, payload: { list: tempArray } }))
+			if (props.addToList) {
+				props.addToList(newArray);
+			}
 		}
 		catch (e) {
 			console.log(e)
