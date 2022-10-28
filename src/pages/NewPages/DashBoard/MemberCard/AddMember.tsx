@@ -17,8 +17,8 @@ import daoMember2 from "../../assets/svg/daoMember2.svg";
 import { useWeb3React } from "@web3-react/core";
 import { useEnsAddress } from "react-moralis";
 import OutlineButton from "UIpack/OutlineButton";
-import { addDaoMember, addProjectMember } from 'state/dashboard/actions'
-import { resetAddMemberLoader, resetAddProjectMemberLoader } from 'state/dashboard/reducer';
+import { addDaoMember, addProjectMember, addDaoMemberList } from 'state/dashboard/actions'
+import { resetAddMemberLoader, resetAddProjectMemberLoader, resetAddMemberListLoader } from 'state/dashboard/reducer';
 
 import Uploader from 'components/XlsxUploader';
 import { LeapFrog } from "@uiball/loaders";
@@ -38,7 +38,7 @@ const AddMember = (props: any) => {
 	const [ownerRole, setOwnerRole] = useState<string>("CONTRIBUTOR");
 	const [errors, setErrors] = useState<any>({});
 	const totalMembers = useAppSelector((state) => state.flow.totalMembers);
-	const { DAO, addMemberLoading, addProjectMemberLoading } = useAppSelector((state) => state.dashboard);
+	const { DAO, addMemberLoading, addProjectMemberLoading, addMemberListLoading } = useAppSelector((state) => state.dashboard);
 	const { account, provider } = useWeb3React();
 
 	const [showModal, setShowModal] = useState(false)
@@ -94,6 +94,14 @@ const AddMember = (props: any) => {
 			props.toggleShowMember();
 		}
 	}, [addMemberLoading, addProjectMemberLoading])
+
+	useEffect(() => {
+		if (addMemberListLoading === false) {
+			dispatch(resetAddMemberListLoader());
+			setShowModal(false);
+			props.toggleShowMember();
+		}
+	}, [addMemberListLoading])
 
 	const addMember = async (_ownerName: string, _ownerAddress: string, _ownerRole: string) => {
 		const member = { name: _ownerName, address: _ownerAddress, role: _ownerRole };
@@ -204,7 +212,6 @@ const AddMember = (props: any) => {
 	}
 
 	const handleAddMembers = () => {
-		console.log("valid members : ", validMembers);
 		try {
 			let tempArray = [];
 			for (var i = 0; i < validMembers.length; i++) {
@@ -212,19 +219,12 @@ const AddMember = (props: any) => {
 					tempArray.push(validMembers[i]);
 				}
 			}
-			console.log("final array : ", tempArray);
-			// dispatch(appendInviteMembers(tempArray));
-			setShowModal(false);
-			props.toggleShowMember();
+			dispatch(addDaoMemberList({ url: DAO?.url, payload: { list: tempArray } }))
 		}
 		catch (e) {
 			console.log(e)
 			setShowModal(false);
 			props.toggleShowMember();
-		}
-		finally {
-			setDeleteMembers([]);
-			setValidMembers([]);
 		}
 	}
 
@@ -235,7 +235,7 @@ const AddMember = (props: any) => {
 				<div id="AddNewMember">
 					<div style={{ width: '100%', marginBottom: 8, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
 						<div className="inputTitle">Add member</div>
-						{/* {uploadLoading ? <LeapFrog size={24} color="#C94B32" /> : <Uploader onComplete={handleInsertWallets} />} */}
+						{uploadLoading ? <LeapFrog size={24} color="#C94B32" /> : <Uploader onComplete={handleInsertWallets} />}
 					</div>
 					<div className="inputArea">
 						<div style={{ marginRight: '10px' }}>

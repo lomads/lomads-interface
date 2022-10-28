@@ -59,6 +59,18 @@ export const addDaoMember = createAsyncThunk(
 	}
 );
 
+export const addDaoMemberList = createAsyncThunk(
+	'dao/addmemberList',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`dao/${params.url}/add-member-list`, params.payload)
+			.then(res => res.data)
+			.catch(e => {
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
+	}
+);
+
 export const manageDaoMember = createAsyncThunk(
 	'dao/managemember',
 	async (params: any, thunkApi) => {
@@ -84,6 +96,18 @@ export const addDaoLinks = createAsyncThunk(
 	'dao/addDaoLinks',
 	async (params: any, thunkApi) => {
 		return axiosHttp.patch(`dao/${params.url}/add-links`, params.payload)
+			.then(res => res.data)
+			.catch(e => {
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
+	}
+);
+
+export const updateDaoLinks = createAsyncThunk(
+	'dao/updateDaoLinks',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`dao/${params.url}/update-links`, params.payload)
 			.then(res => res.data)
 			.catch(e => {
 				toast.error(e.response.data.message);
