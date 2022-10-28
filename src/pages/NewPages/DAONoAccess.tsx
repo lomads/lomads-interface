@@ -9,15 +9,17 @@ import { useNavigate } from "react-router-dom";
 import { loadDao } from 'state/dashboard/actions';
 import SideBar from "../NewPages/DashBoard/SideBar";
 import { useAppDispatch } from "state/hooks";
+import { useWeb3React } from "@web3-react/core";
 
 const DAONoAccess = () => {
+  const { chainId } = useWeb3React();
   const dispatch = useAppDispatch()
   const navigate = useNavigate();
   const [showNavBar, setShowNavBar] = useState<boolean>(false);
   useEffect(() => {
-    dispatch(loadDao({}))
+    dispatch(loadDao({ chainId }))
     sessionStorage.removeItem('__lmds_active_dao')
-  }, [])
+  }, [chainId])
 
   const showSideBar = (_choice: boolean) => {
 		setShowNavBar(_choice);

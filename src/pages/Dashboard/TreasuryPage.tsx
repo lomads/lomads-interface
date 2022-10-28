@@ -22,7 +22,7 @@ const Dashboard = () => {
   const [tokenSymbol, setTokenSymbol] = useState("");
   const [tokenAddress, setTokenAddress] = useState("");
   const [supply, setSupply] = useState(0);
-  const { provider, account } = useWeb3React();
+  const { provider, account, chainId } = useWeb3React();
   const [recipient, setRecipient] = useState("");
   const [amount, setamount] = useState("");
   const [isLoading, setisLoading] = useState(false);
@@ -67,7 +67,7 @@ const Dashboard = () => {
     setSafeTxhashs(safeTxHash);
     const senderSignature = await safeSDK.signTransactionHash(safeTxHash);
     const senderAddress = account as string;
-    (await safeService(provider))
+    (await safeService(provider, `${chainId}`))
       .proposeTransaction({
         safeAddress,
         safeTransactionData: safeTransaction.data,
@@ -84,7 +84,7 @@ const Dashboard = () => {
         setisLoading(false);
       });
     await (
-      await safeService(provider)
+      await safeService(provider, `${chainId}`)
     )
       .confirmTransaction(safeTxHash, senderSignature.data)
       .then((success) => {
@@ -101,7 +101,7 @@ const Dashboard = () => {
   const getPendingTransactions = async () => {
     console.log(tokens);
     const pendingTxs = await (
-      await safeService(provider)
+      await safeService(provider, `${chainId}`)
     ).getPendingTransactions(safeAddress);
     setPendingTransactions(pendingTxs.results);
     console.log(pendingTxs);
@@ -113,13 +113,13 @@ const Dashboard = () => {
   }, [safeAddress, provider]);
 
   const getTokens = async () => {
-    const tokens = await (await safeService(provider)).getBalances(safeAddress);
+    const tokens = await (await safeService(provider, `${chainId}`)).getBalances(safeAddress);
     settokens(tokens);
   };
 
   const getTransactions = async () => {
     const Txs = await (
-      await safeService(provider)
+      await safeService(provider, `${chainId}`)
     ).getAllTransactions(safeAddress);
     setTransactions(Txs.results);
     console.log(Txs.results);
@@ -128,7 +128,7 @@ const Dashboard = () => {
   const hasUserApproved = async (_safeTxHashs: string) => {
     let approved: boolean = false;
     const Txs = await (
-      await safeService(provider)
+      await safeService(provider, `${chainId}`)
     ).getTransactionConfirmations(_safeTxHashs);
     Txs.results.map((result: any) => {
       if (result.owner === account) {
@@ -145,7 +145,7 @@ const Dashboard = () => {
     if (isOwner && !approvedOrNot) {
       const senderSignature = await safeSDK.signTransactionHash(_safeTxHashs);
       await (
-        await safeService(provider)
+        await safeService(provider, `${chainId}`)
       )
         .confirmTransaction(_safeTxHashs, senderSignature.data)
         .then((success) => {
@@ -165,7 +165,7 @@ const Dashboard = () => {
     const hash = (await safeSDK.signTransaction(transaction)).data;
 
     await (
-      await safeService(provider)
+      await safeService(provider, `${chainId}`)
     )
       .confirmTransaction(_safeTxHashs, hash.data)
       .then((success) => {

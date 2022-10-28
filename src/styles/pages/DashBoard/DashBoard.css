@@ -37,6 +37,7 @@ body.active-modal {
 .DAOdetails .DAOsettings {
     display: flex;
     align-items: center;
+    flex-direction: row;
 }
 
 .DAOdetails .DAOsettings div {

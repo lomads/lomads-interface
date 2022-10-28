@@ -48,7 +48,7 @@ const Settings = () => {
     }, [chainId, account, chainAllowed, navigate]);
 
     useEffect(() => {
-        if (contractName !== '') {
+        if (contractName !== '' && balanceOf) {
             if (DAO?.sbt && parseInt(balanceOf._hex, 16) === 0) {
                 navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
             }

@@ -32,7 +32,7 @@ function getRpcUrls(chainId: SupportedChainId): [string] {
     case SupportedChainId.POLYGON:
       return ['https://polygon-rpc.com/']
     case SupportedChainId.POLYGON_MUMBAI:
-      return ['https://rpc-endpoints.superfluid.dev/mumbai']
+      return ['https://rpc-mumbai.matic.today']
     default:
   }
   // Our API-keyed URLs will fail security checks when used with external wallets.
@@ -47,7 +47,7 @@ export function isChainAllowed(connector: Connector, chainId: number) {
     case walletConnectConnection.connector:
     case networkConnection.connector:
     case gnosisSafeConnection.connector:
-      return SUPPORTED_CHAIN_IDS.includes(chainId)
+      return SUPPORTED_CHAIN_IDS.indexOf(chainId) > -1
     default:
       return false
   }

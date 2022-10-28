@@ -1,4 +1,5 @@
 import { Checkbox } from "@chakra-ui/react";
+import { get as _get } from 'lodash';
 import React, { useEffect, useRef, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import IconButton from "UIpack/IconButton";
@@ -15,8 +16,13 @@ import AddRecipient from "./AddRecipient";
 import NumberInputStepper from "UIpack/NumberInputStepper";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import { ImportSafe } from "connection/SafeCall";
+import { SupportedChainId } from "constants/chains";
+import { useWeb3React } from "@web3-react/core";
+
 
 const TransactionSend = (props: IselectTransactionSend) => {
+	console.log(props.selectedToken)
+	const { chainId } = useWeb3React();
 	const managePreviousNavigation = () => {
 		const length = props.setRecipient.current.length;
 		props.setRecipient.current.splice(0, length);
@@ -58,12 +64,12 @@ const TransactionSend = (props: IselectTransactionSend) => {
 						>
 							{props.tokens.map((result: any, index: any) => {
 								return (
-									result.tokenAddress !== null && (
-										<>
-											<option value={result.tokenAddress} key={index}>
-												{result.token.symbol}
-											</option>
-										</>
+									(
+									<>
+										<option value={result?.tokenAddress ? result.tokenAddress : chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS} key={index}>
+										{ _get(result, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR') }
+										</option>
+									</>
 									)
 								);
 							})}
