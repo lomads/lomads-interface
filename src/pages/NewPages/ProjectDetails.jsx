@@ -140,16 +140,16 @@ const ProjectDetails = () => {
     const handleParseUrl = (url) => {
         try {
             const link = new URL(url);
-            if (link.hostname === 'notion.com') {
+            if (link.hostname === 'notion.com' || link.hostname === 'www.notion.com') {
                 return <SiNotion color='#B12F15' size={20} />
             }
-            else if (link.hostname === 'discord.com') {
+            else if (link.hostname === 'discord.com' || link.hostname === 'www.discord.com') {
                 return <BsDiscord color='#B12F15' size={20} />
             }
-            else if (link.hostname === 'github.com') {
+            else if (link.hostname === 'github.com' || link.hostname === 'www.github.com') {
                 return <BsGithub color='#B12F15' size={20} />
             }
-            else if (link.hostname === 'google.com') {
+            else if (link.hostname === 'google.com' || link.hostname === 'www.google.com') {
                 return <BsGoogle color='#B12F15' size={20} />
             }
             else {
@@ -186,7 +186,7 @@ const ProjectDetails = () => {
         try {
             setUnlockLoading(link.id)
             let memberExists = _find(Project.members, member => member.wallet.toLowerCase() === account.toLowerCase())
-            if(!memberExists)
+            if (!memberExists)
                 return setUnlockLoading(null);
             const g = await guild.get(link.guildId)
             let inviteLink = _get(_find(_get(g, 'guildPlatforms'), gp => gp.platformId == 1), 'invite', null)
@@ -261,10 +261,7 @@ const ProjectDetails = () => {
 
     const handleRenderRole = (item) => {
         const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === item.wallet.toLowerCase());
-        if (_get(user, 'role', '') === 'CORE_CONTRIBUTOR' || _get(user, 'role', '') === 'MEMBER') {
-            return 'core contributor';
-        }
-        return _get(user, 'role', '');
+        return _get(user, 'role', '').replaceAll('_', ' ').toLowerCase();
     }
 
     const handleSubmit = () => {

@@ -1,0 +1,33 @@
+.links-container {
+    width: 100%;
+    padding: 20px 22px;
+    background: #FFFFFF;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    overflow: scroll;
+}
+
+.links-container .link-pill {
+    background: #FFFFFF;
+    height: 40px;
+    border-radius: 100px;
+    filter: drop-shadow(3px 5px 4px rgba(27, 43, 65, 0.05)) drop-shadow(-3px -3px 8px rgba(201, 75, 50, 0.1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #B12F15;
+    min-width: 150px;
+    margin-right: 20px;
+    padding: 0 20px;
+    cursor: pointer;
+}
+
+.links-container .link-pill span {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    text-transform: uppercase;
+    margin-left: 10px;
+}
