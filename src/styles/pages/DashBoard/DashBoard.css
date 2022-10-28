@@ -348,6 +348,7 @@ body.active-modal {
     width: 54%;
     height: fit-content;
     margin-bottom: 20px;
+    margin-top: 20px;
 }
 
 .memberHeaderDetails {

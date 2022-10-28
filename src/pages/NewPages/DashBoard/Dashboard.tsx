@@ -323,7 +323,7 @@ const Dashboard = () => {
 				</div>
 				{pendingTransactions !== undefined &&
 					pendingTransactions?.count >= 1 &&
-					showNotification && (
+					showNotification && can(myRole, 'notification.view') && (
 						<NotificationArea
 							daoId={DAO._id}
 							pendingTransactionCount={pendingTransactions?.count}

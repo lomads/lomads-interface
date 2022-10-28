@@ -84,7 +84,7 @@ const ProjectDetails = () => {
         if(!Project) return false;
         let creator = _get(Project, 'creator', '').toLowerCase() === account.toLowerCase();
         let inProject = _find(Project.members, m => m.wallet.toLowerCase() === account.toLowerCase())
-
+        console.log(creator)
         if(myRole === 'ADMIN' || myRole === "CONTRIBUTOR")
             return can(myRole, permission)
         if(myRole === 'CORE_CONTRIBUTOR')
