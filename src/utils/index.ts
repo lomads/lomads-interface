@@ -23,7 +23,7 @@ export const isValidUrl = (urlString: string) => {
   return !!urlPattern.test(urlString);
 }
 
-export const formatAddress = (address: string ) => {
+export const formatAddress = (address: string) => {
   return address.slice(0, 8) + '...' + address.slice(-6);
 }
 
@@ -63,6 +63,6 @@ export function formattedFeeAmount(feeAmount: FeeAmount): number {
   return feeAmount / 10000
 }
 
-export function beautifyHexToken (token: string): string {
-  return  (token.slice(0, 6) + "..." + token.slice(-4))
+export function beautifyHexToken(token: string): string {
+  return (token.slice(0, 6) + "..." + token.slice(-4))
 }

@@ -38,6 +38,15 @@ export const loadDao = createAsyncThunk(
 	}
 );
 
+export const updateDao = createAsyncThunk(
+	'dao/updateDao',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`dao/${params.url}/update-details`, params.payload)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+);
+
 export const addDaoMember = createAsyncThunk(
 	'dao/addmember',
 	async (params: any, thunkApi) => {
@@ -68,6 +77,18 @@ export const updateDaoMember = createAsyncThunk(
 		return axiosHttp.patch(`member`, params.payload)
 			.then(res => res.data)
 			.catch(e => thunkApi.rejectWithValue(e))
+	}
+);
+
+export const addDaoLinks = createAsyncThunk(
+	'dao/addDaoLinks',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`dao/${params.url}/add-links`, params.payload)
+			.then(res => res.data)
+			.catch(e => {
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
 	}
 );
 

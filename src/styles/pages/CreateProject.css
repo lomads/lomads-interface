@@ -448,7 +448,13 @@
     justify-content: space-between;
 }
 
-.createProject-container .createProject-body .resource-container .resource-body .input1 {
+.createProject-container .createProject-body .resource-container .resource-body div {
+    display: flex;
+    flex-direction: column;
+    height: 70px;
+}
+
+.createProject-container .createProject-body .resource-container .resource-body div .input1 {
     width: 144px;
     height: 50px;
     padding: 0 1rem;
@@ -460,7 +466,7 @@
     outline: none;
 }
 
-.createProject-container .createProject-body .resource-container .resource-body .input2 {
+.createProject-container .createProject-body .resource-container .resource-body div .input2 {
     width: 250px;
     height: 50px;
     padding: 0 1rem;

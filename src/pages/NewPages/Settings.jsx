@@ -5,9 +5,8 @@ import settingIcon from '../../assets/svg/settingsXL.svg';
 import editIcon from '../../assets/svg/editButton.svg';
 import copy from '../../assets/svg/copyIcon.svg';
 import logo from '../../assets/svg/lomadsLogoExpand.svg';
-import { CgClose } from 'react-icons/cg'
 import { useNavigate } from 'react-router-dom';
-import { useAppSelector } from "state/hooks";
+import { useAppSelector, useAppDispatch } from "state/hooks";
 import { useWeb3React } from "@web3-react/core";
 import { useSBTStats } from "hooks/SBT/sbt";
 import { Tooltip } from "@chakra-ui/react";
@@ -15,16 +14,31 @@ import copyIcon from "../../assets/svg/copyIcon.svg";
 import { isChainAllowed } from "utils/switchChain";
 import coin from '../../assets/svg/coin.svg';
 import Footer from 'components/Footer';
+import { SiNotion } from "react-icons/si";
+import { HiOutlinePlus } from "react-icons/hi";
+import { CgClose } from 'react-icons/cg'
+import { BsDiscord, BsGoogle, BsGithub, BsLink } from "react-icons/bs";
+import AddDaoLink from './DashBoard/Settings/AddDaoLink';
+import SimpleInputField from "UIpack/SimpleInputField";
+import { updateDao } from 'state/dashboard/actions';
+import { resetUpdateDAOLoader } from 'state/dashboard/reducer';
 
 const Settings = () => {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
     const [update, setUpdate] = useState(0);
     const { provider, chainId, account, connector } = useWeb3React();
-    const { DAO } = useAppSelector((state) => state.dashboard);
+    const { DAO, updateDaoLoading } = useAppSelector((state) => state.dashboard);
     const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
     console.log("DAO data : ", DAO);
     const daoName = _get(DAO, 'name', '').split(" ");
     const [copy, setCopy] = useState(false);
+    const [showAddLink, setShowAddLink] = useState(false);
+    const [editMode, setEditMode] = useState(false);
+    const [editLink, setEditLink] = useState(false);
+    const [name, setName] = useState(_get(DAO, 'name', ''));
+    const [description, setDescription] = useState(_get(DAO, 'description', ''));
+    const [daoLinks, setDaoLinks] = useState(_get(DAO, 'links', []));
     const chainAllowed = chainId && isChainAllowed(connector, chainId);
 
     useEffect(() => {
@@ -41,6 +55,13 @@ const Settings = () => {
         }
     }, [DAO, balanceOf, contractName]);
 
+    useEffect(() => {
+        if (updateDaoLoading === false) {
+            dispatch(resetUpdateDAOLoader());
+            setEditMode(false);
+        }
+    }, [updateDaoLoading]);
+
     const amIAdmin = useMemo(() => {
         if (DAO) {
             let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'ADMIN')
@@ -51,8 +72,49 @@ const Settings = () => {
         return false;
     }, [account, DAO])
 
+    const toggleShowLink = () => {
+        setShowAddLink(!showAddLink);
+    };
+
+    const handleParseUrl = (url) => {
+        try {
+            const link = new URL(url);
+            if (link.hostname === 'notion.com' || link.hostname === 'www.notion.com') {
+                return <SiNotion color='#B12F15' size={20} />
+            }
+            else if (link.hostname === 'discord.com' || link.hostname === 'www.discord.com') {
+                return <BsDiscord color='#B12F15' size={20} />
+            }
+            else if (link.hostname === 'github.com' || link.hostname === 'www.github.com') {
+                return <BsGithub color='#B12F15' size={20} />
+            }
+            else if (link.hostname === 'google.com' || link.hostname === 'www.google.com') {
+                return <BsGoogle color='#B12F15' size={20} />
+            }
+            else {
+                return <BsLink color='#B12F15' size={20} />
+            }
+        }
+        catch (e) {
+            console.error(e);
+        }
+    }
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            dispatch(updateDao({ url: DAO?.url, payload: { name, description } }))
+        }
+    }
+
     return (
         <div className='settings-page'>
+            {
+                showAddLink &&
+                <AddDaoLink
+                    toggleShowLink={toggleShowLink}
+                    daoUrl={_get(DAO, 'url', '')}
+                />
+            }
             <div className='settings-left-bar'>
                 <div onClick={() => navigate(-1)} className='logo-container'>
                     <p>
@@ -79,23 +141,51 @@ const Settings = () => {
 
                 <div className='settings-organisation'>
                     <div className='organisation-name'>
-                        <h1>{_get(DAO, 'name', '')}</h1>
-                        {/* <button>
+                        {
+                            editMode
+                                ?
+                                <SimpleInputField
+                                    className="inputField"
+                                    height={50}
+                                    width={144}
+                                    placeholder="DAO name"
+                                    value={name}
+                                    onchange={(e) => { setName(e.target.value) }}
+                                    onKeyDown={(e) => handleKeyDown(e)}
+                                />
+                                :
+                                <h1>{name ? name : 'DAO Name'}</h1>
+                        }
+                        <button onClick={() => setEditMode(true)}>
                             <img src={editIcon} alt="edit-icon" />
-                        </button> */}
+                        </button>
                     </div>
 
                     <div className='organisation-desc'>
-                        {/* <p>{
-                            _get(DAO, 'description', '')
-                        }</p> */}
                         {
-                            DAO?.description
+                            editMode
                                 ?
-                                <p>{DAO?.description}</p>
+                                <SimpleInputField
+                                    className="inputField"
+                                    height={50}
+                                    width={'100%'}
+                                    placeholder="DAO description"
+                                    value={description}
+                                    onchange={(e) => { setDescription(e.target.value) }}
+                                    onKeyDown={(e) => handleKeyDown(e)}
+                                />
                                 :
-                                <p>Description</p>
+                                <>
+                                    {
+                                        description
+                                            ?
+                                            <p>{description}</p>
+                                            :
+                                            <p>Description</p>
+                                    }
+                                </>
                         }
+
                     </div>
 
                     <div className='organisation-link'>
@@ -141,24 +231,31 @@ const Settings = () => {
                 <div className='settings-links'>
                     <div className='links-header'>
                         <h1>Links</h1>
-                        <button>
-                            <img src={editIcon} alt="edit-icon" />
-                        </button>
+                        <div>
+                            <button>
+                                <img src={editIcon} alt="edit-icon" />
+                            </button>
+                            <button onClick={toggleShowLink} className="addLink-btn">
+                                <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
+                                LINK
+                            </button>
+                        </div>
                     </div>
                     <span>Will display on the top of the dashboard</span>
                     <div className='link-body'>
-                        <div>
-                            <button>
-                                LINK NAME
-                            </button>
-                            <p>https://linkname</p>
-                        </div>
-                        <div>
-                            <button>
-                                LINK NAME
-                            </button>
-                            <p>https://linkname</p>
-                        </div>
+                        {
+                            _get(DAO, 'links', []).map((item, index) => {
+                                return (
+                                    <div>
+                                        <button>
+                                            {handleParseUrl(item.link)}
+                                            <span>{item.title.length > 6 ? item.title.substring(0, 6) + "..." : item.title}</span>
+                                        </button>
+                                        <p>{item.link}</p>
+                                    </div>
+                                )
+                            })
+                        }
                     </div>
                 </div>
 

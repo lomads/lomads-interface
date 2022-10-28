@@ -8,50 +8,32 @@ import AddressInputField from "UIpack/AddressInputField";
 import { useAppSelector } from "state/hooks";
 import { useAppDispatch } from "state/hooks";
 import OutlineButton from "UIpack/OutlineButton";
-import { addProjectLinks } from 'state/dashboard/actions'
-import { resetAddProjectLinksLoader } from 'state/dashboard/reducer';
-import AddDiscordLink from "components/AddDiscordLink";
-import { nanoid } from "@reduxjs/toolkit";
+import { addDaoLinks } from 'state/dashboard/actions'
+import { resetAddDaoLinksLoader } from 'state/dashboard/reducer';
 import { isValidUrl } from 'utils';
 
-const AddLink = (props) => {
+const AddDaoLink = (props) => {
     const dispatch = useAppDispatch();
-    const { addProjectLinksLoading } = useAppSelector((state) => state.dashboard);
+    const { addDaoLinksLoading } = useAppSelector((state) => state.dashboard);
 
     const [title, setTitle] = useState('');
     const [titleError, setTitleError] = useState(null);
-    const [link, setLink] = useState("");
+    const [link, setLink] = useState('');
     const [linkError, setLinkError] = useState(null);
-    const [roleName, setRoleName] = useState(null);
-    // for link access control
-    const [accessControl, setAccessControl] = useState(false);
 
     useEffect(() => {
-        if (addProjectLinksLoading === false) {
-            dispatch(resetAddProjectLinksLoader())
+        if (addDaoLinksLoading === false) {
+            dispatch(resetAddDaoLinksLoader())
             setTitle("");
             setLink("");
-            setRoleName(null)
-            setAccessControl(false);
+            setLinkError(null);
+            setTitleError(null);
             props.toggleShowLink();
         }
-    }, [addProjectLinksLoading])
+    }, [addDaoLinksLoading])
 
-    useEffect(() => {
-        if (link.length > 8) {
-            try {
-                const url = new URL(link);
-                if (url.hostname === 'discord.com' || url.hostname === 'discord.gg')
-                    document.getElementById('accessControl').disabled = false;
-                else
-                    document.getElementById('accessControl').disabled = true;
-            } catch (e) {
-                console.log(e)
-            }
-        }
-    }, [link]);
 
-    const handleAddLink = (guildId = undefined) => {
+    const handleAddLink = () => {
         if (title === '') {
             setTitleError('Please enter a title')
             return;
@@ -64,16 +46,16 @@ const AddLink = (props) => {
             setLinkError("Please enter a valid link")
             return;
         }
+        // else if (!link.match(/^(http(s)?:\/\/)[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/)) {
+        //     setLinkError("Please enter a valid link")
+        //     return;
+        // }
         else {
             let tempLink = link;
             if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
                 tempLink = 'https://' + tempLink;
             }
-            let dcserverid = undefined;
-            if (guildId)
-                dcserverid = new URL(tempLink).pathname.split('/')[2]
-            const resource = { id: nanoid(16), title, link: tempLink, platformId: dcserverid, accessControl, ...(guildId ? { guildId } : {}) };
-            dispatch(addProjectLinks({ projectId: props.projectId, daoUrl: props.daoUrl, payload: resource }))
+            dispatch(addDaoLinks({ url: props.daoUrl, payload: { title, link: tempLink } }))
         }
     };
 
@@ -109,29 +91,6 @@ const AddLink = (props) => {
                             <span style={{ fontSize: '13px', color: '#C84A32' }}>{linkError}</span>
                         </div>
                     </div>
-                    {accessControl && <div className='resource-footer'>
-                        <AddressInputField
-                            className="inputField"
-                            height={50}
-                            width={251}
-                            placeholder="Role name"
-                            value={roleName}
-                            onchange={(e) => setRoleName(e.target.value)}
-                        />
-                    </div>}
-                    {
-                        props.sbt
-                            ?
-                            <div className='resource-footer'>
-                                <input id="accessControl" type="checkbox" value={accessControl} onChange={() => setAccessControl(prev => !prev)} disabled={true} />
-                                <div>
-                                    <p>ACCESS CONTROL</p>
-                                    <span>Currently available for discord only</span>
-                                </div>
-                            </div>
-                            :
-                            null
-                    }
                     <div id="addMemberButtonArea">
                         <div>
                             <OutlineButton
@@ -147,11 +106,16 @@ const AddLink = (props) => {
                             />
                         </div>
                         <div>
-                            {
-                                link && link.indexOf('discord.com') > -1 ?
-                                    <AddDiscordLink onGuildCreateSuccess={handleAddLink} okButton title={title} link={link} roleName={roleName} accessControl={accessControl} /> :
-                                    <SimpleButton title="OK" bgColor="#C94B32" className="button" fontsize={16} fontweight={400} height={40} width={129} onClick={() => handleAddLink()} />
-                            }
+                            <SimpleButton
+                                title="OK"
+                                bgColor="#C94B32"
+                                className="button"
+                                fontsize={16}
+                                fontweight={400}
+                                height={40}
+                                width={129}
+                                onClick={() => handleAddLink()}
+                            />
                         </div>
                     </div>
                 </div>
@@ -160,4 +124,4 @@ const AddLink = (props) => {
     );
 };
 
-export default AddLink;
+export default AddDaoLink;

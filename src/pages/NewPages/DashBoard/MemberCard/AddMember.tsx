@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import _ from "lodash";
 import IconButton from "UIpack/IconButton";
 import SimpleButton from "UIpack/SimpleButton";
@@ -23,6 +23,11 @@ import { resetAddMemberLoader, resetAddProjectMemberLoader } from 'state/dashboa
 import Uploader from 'components/XlsxUploader';
 import { LeapFrog } from "@uiball/loaders";
 
+import createProjectSvg from '../../../../assets/svg/createProject.svg';
+import memberIcon from '../../../../assets/svg/memberIcon.svg';
+import binRed from '../../../../assets/svg/bin-red.svg';
+import binWhite from '../../../../assets/svg/bin-white.svg';
+
 const AddMember = (props: any) => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
@@ -35,6 +40,10 @@ const AddMember = (props: any) => {
 	const totalMembers = useAppSelector((state) => state.flow.totalMembers);
 	const { DAO, addMemberLoading, addProjectMemberLoading } = useAppSelector((state) => state.dashboard);
 	const { account, provider } = useWeb3React();
+
+	const [showModal, setShowModal] = useState(false)
+	const [deleteMembers, setDeleteMembers] = useState<string[]>([]);
+	const [validMembers, setValidMembers] = useState<{ address: string; name: string, role: string }[]>([]);
 
 	const isAddressValid = (holderAddress: string) => {
 		const ENSdomain = holderAddress.slice(-4);
@@ -133,14 +142,100 @@ const AddMember = (props: any) => {
 			setErrors(terrors);
 		}
 	};
+
+	const handleInsertWallets = useCallback(async (data: Array<{ name: string, address: string }>) => {
+		try {
+			setUploadLoading(true)
+			let validMembers = [];
+			for (let index = 0; index < data.length; index++) {
+				let member = data[index];
+				if (isAddressValid(member.address) && !isPresent(member.address)) {
+					if (member.address.slice(-4) === ".eth") {
+						const resolver = await provider?.getResolver(member.address);
+						const EnsAddress = await resolver?.getAddress();
+						if (EnsAddress) {
+							member.name = member.name ? member.name : member.address;
+							member.address = EnsAddress as string;
+						}
+					} else {
+						const ENSname = await provider?.lookupAddress(member.address);
+						if (ENSname)
+							member.name = member.name ? member.name : ENSname
+					}
+					if (!_.find(validMembers, m => m.address.toLowerCase() === member.address.toLowerCase())) {
+						validMembers.push({ ...member, role: 'CONTRIBUTOR' });
+					}
+				}
+			}
+
+			setValidMembers(validMembers);
+			setUploadLoading(false)
+			setShowModal(true);
+		} catch (e) {
+			setUploadLoading(false)
+		}
+	}, []);
+
+	const handleChangeState = (e: any, index: any) => {
+		const newArray = validMembers.map((item, i) => {
+			if (index === i) {
+				return { ...item, [e.target.name]: e.target.value };
+			}
+			else {
+				return item;
+			}
+		});
+		setValidMembers(newArray);
+	}
+
+	const handleDeleteUser = (address: any) => {
+		if (deleteMembers.includes(address)) {
+			setDeleteMembers(deleteMembers.filter((m) => m !== address));
+		}
+		else {
+			setDeleteMembers([...deleteMembers, address]);
+		}
+	}
+
+	const handleCloseModal = () => {
+		setValidMembers([]);
+		setDeleteMembers([]);
+		setShowModal(false);
+	}
+
+	const handleAddMembers = () => {
+		console.log("valid members : ", validMembers);
+		try {
+			let tempArray = [];
+			for (var i = 0; i < validMembers.length; i++) {
+				if (deleteMembers.includes(validMembers[i].address) === false) {
+					tempArray.push(validMembers[i]);
+				}
+			}
+			console.log("final array : ", tempArray);
+			// dispatch(appendInviteMembers(tempArray));
+			setShowModal(false);
+			props.toggleShowMember();
+		}
+		catch (e) {
+			console.log(e)
+			setShowModal(false);
+			props.toggleShowMember();
+		}
+		finally {
+			setDeleteMembers([]);
+			setValidMembers([]);
+		}
+	}
+
 	return (
 		<>
 			<div id="AddNewMemberComponent">
 				<div onClick={props.toggleModal} id="AddNewMemberOverlay"></div>
 				<div id="AddNewMember">
 					<div style={{ width: '100%', marginBottom: 8, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-						<div className="inputTitle">Add member :</div>
-						{uploadLoading ? <LeapFrog size={24} color="#C94B32" /> : <Uploader onComplete={() => console.log("complete")} />}
+						<div className="inputTitle">Add member</div>
+						{/* {uploadLoading ? <LeapFrog size={24} color="#C94B32" /> : <Uploader onComplete={handleInsertWallets} />} */}
 					</div>
 					<div className="inputArea">
 						<div style={{ marginRight: '10px' }}>
@@ -179,6 +274,7 @@ const AddMember = (props: any) => {
 							>
 								<option value="ADMIN">Admin</option>
 								<option value="CORE_CONTRIBUTOR">Core Contributor</option>
+								<option value="ACTIVE_CONTRIBUTOR">Active Contributor</option>
 								<option value="CONTRIBUTOR">Contributor</option>
 							</select>
 						</div>
@@ -213,6 +309,88 @@ const AddMember = (props: any) => {
 						</div>
 					</div>
 				</div>
+
+
+				{/* Uploaded user modal */}
+				{
+					showModal &&
+					<div className="membersModal">
+						<div className="membersModal-header">
+							<img src={createProjectSvg} alt="create-project-svg" />
+							<h1>Add Members</h1>
+						</div>
+						<div className="membersModal-body">
+							{
+								validMembers.length > 0
+									?
+									<>
+										{
+											validMembers.map((item, index) => (
+												<div className="membersModal-row" key={index}>
+													{
+														deleteMembers.includes(item.address)
+															?
+															<div className='row-overcast'></div>
+															:
+															null
+													}
+													<div>
+														<img src={memberIcon} alt="memberIcon" />
+														<SimpleInputField
+															className="inputField"
+															id="nameInput"
+															height={50}
+															width={135}
+															placeholder="Name"
+															value={item.name}
+															name="name"
+															onchange={(e) => handleChangeState(e, index)}
+														/>
+													</div>
+													<span>{item.address.slice(0, 6) + "..." + item.address.slice(-4)}</span>
+													<select
+														name="role"
+														className="tokenDropdown"
+														defaultValue={item.role}
+														onChange={(e) => handleChangeState(e, index)}
+													>
+														<option value="ADMIN">Admin</option>
+														<option value="CORE_CONTRIBUTOR">Core Contributor</option>
+														<option value="ACTIVE_CONTRIBUTOR">Active Contributor</option>
+														<option value="CONTRIBUTOR">Contributor</option>
+													</select>
+													{
+														deleteMembers.includes(item.address)
+															?
+															<button onClick={() => handleDeleteUser(item.address)} className="selected">
+																<img src={binWhite} alt="bin-white" />
+															</button>
+															:
+															<button onClick={() => handleDeleteUser(item.address)}>
+																<img src={binRed} alt="bin-red" />
+															</button>
+													}
+
+												</div>
+											))
+										}
+									</>
+									:
+									<p>All the users have been already added</p>
+							}
+						</div>
+						<div className="membersModal-footer">
+							<button onClick={handleCloseModal} className="cancel-btn">
+								CANCEL
+							</button>
+							{
+								validMembers.length > 0 && <button onClick={handleAddMembers} className="confirm-btn">
+									ADD MEMBERS
+								</button>
+							}
+						</div>
+					</div>
+				}
 			</div>
 		</>
 	);
