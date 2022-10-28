@@ -6,6 +6,11 @@
     display: flex;
     align-items: center;
     overflow: scroll;
+    margin-bottom: 10px;
+}
+
+.links-container::-webkit-scrollbar {
+    display: none;
 }
 
 .links-container .link-pill {

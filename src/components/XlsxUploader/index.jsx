@@ -2,6 +2,14 @@ import React, { useRef, useCallback, useEffect, useState } from "react";
 import { read, utils, writeFileXLSX } from 'xlsx';
 import uploadIcon from '../../assets/svg/uploadIcon.svg';
 import SimpleButton from "UIpack/SimpleButton";
+import { Tooltip } from "@chakra-ui/react";
+
+const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
+  <div className="uploadBtn" ref={ref} {...rest}>
+    {children}
+  </div>
+))
+
 
 export default ({ onComplete, ...props }) => {
 
@@ -28,10 +36,14 @@ export default ({ onComplete, ...props }) => {
 
   return (
     <>
-      <button className="uploadBtn" onClick={handleClick}>
-        <img src={uploadIcon} alt="uploadIcon" />
-        OR UPLOAD FILE
-      </button>
+     <Tooltip placement='top' label={`Please upload .xlsx file with columns containing member name and wallet address`}>
+        <ToolTopContainer>
+        <button className="uploadBtn" onClick={handleClick}>
+          <img src={uploadIcon} alt="uploadIcon" />
+          OR UPLOAD FILE
+        </button>
+        </ToolTopContainer>
+      </Tooltip>
       {/* <SimpleButton className="inviteButton" title="Upload" height={30} width={100} fontsize={14} fontweight={400} bgColor="#C94B32" onClick={handleClick} /> */}
       <input type="file" ref={hiddenFileInput} onChange={handleChange} style={{ display: 'none' }} />
     </>

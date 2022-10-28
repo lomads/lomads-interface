@@ -24,10 +24,11 @@ import { ethers } from "ethers";
 import { LeapFrog } from "@uiball/loaders";
 import axiosHttp from '../../api'
 import imageToBase64 from "utils/imageToBase64";
+import { SupportedChainId } from "constants/chains";
 
 
 const CreatePassToken = () => {
-    const { account, provider } = useWeb3React();
+    const { account, provider, chainId } = useWeb3React();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const { DAO } = useAppSelector((state) => state.dashboard);
@@ -110,7 +111,9 @@ const CreatePassToken = () => {
             }
         }
         else {
-            const ENSname = await provider?.lookupAddress(_ownerAddress);
+			let ENSname = null;
+			if(chainId !== SupportedChainId.POLYGON)
+				ENSname = await provider?.lookupAddress(_ownerAddress);
             if (ENSname) {
                 member.name = _ownerName !== '' ? _ownerName : ENSname;
             }

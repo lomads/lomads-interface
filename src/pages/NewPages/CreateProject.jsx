@@ -51,11 +51,14 @@ const CreateProject = () => {
     const [accessControl, setAccessControl] = useState(false);
     const [title, setTitle] = useState('');
     const [titleError, setTitleError] = useState(null);
-    const [newAddress, setNewAddress] = useState('');
+    const [newAddress, setNewAddress] = useState([]);
 
     const daoName = _get(DAO, 'name', '').split(" ");
 
-    useEffect(() => setMemberList(DAO.members), [DAO])
+    useEffect(() => { 
+        if(DAO)
+            setMemberList(DAO.members) 
+    }, [DAO])
 
     useEffect(() => {
         if (createProjectLoading === false) {
@@ -97,14 +100,15 @@ const CreateProject = () => {
     }, [link]);
 
     useEffect(() => {
-        if (newAddress !== '') {
-
-            const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === newAddress.toLowerCase());
-            let memberOb = {};
-            memberOb.name = user.member.name;
-            memberOb.address = user.member.wallet;
-            console.log("new member ob : ", memberOb);
-            setSelectedMembers([...selectedMembers, memberOb]);
+        console.log("new address : ", newAddress);
+        if (newAddress.length > 0) {
+            newAddress.map((value) => {
+                const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === value.toLowerCase());
+                let memberOb = {};
+                memberOb.name = user.member.name;
+                memberOb.address = user.member.wallet;
+                setSelectedMembers((oldValue) => [...oldValue, memberOb]);
+            })
         }
     }, [DAO]);
 
@@ -144,21 +148,21 @@ const CreateProject = () => {
 
 
     const handleAddMember = (member) => {
-        let found = false;
-        for (let i = 0; i < selectedMembers.length; i++) {
-            if (selectedMembers[i].name === member.name) {
-                found = true;
-                break;
-            }
-        }
-        if (found) {
-            setSelectedMembers(selectedMembers.filter((item) => item.name !== member.name));
-        }
+        // let found = false;
+        // for (let i = 0; i < selectedMembers.length; i++) {
+        //     if (selectedMembers[i].name === member.name) {
+        //         found = true;
+        //         break;
+        //     }
+        // }
+        const memberExists = _find(selectedMembers, m => m.address.toLowerCase() === member.wallet.toLowerCase())
+        if (memberExists)
+            setSelectedMembers(prev => prev.filter((item) => item.address.toLowerCase() !== member.wallet.toLowerCase()));
         else {
             let memberOb = {};
             memberOb.name = member.name;
             memberOb.address = member.wallet;
-            setSelectedMembers([...selectedMembers, memberOb]);
+            setSelectedMembers(prev => [...prev, memberOb]);
         }
     }
 
@@ -218,6 +222,7 @@ const CreateProject = () => {
         project.members = selectedMembers;
         project.links = resourceList;
         project.daoId = DAO?._id;
+        console.log(project)
         dispatch(createProject({ payload: project }))
     }
 
@@ -239,7 +244,7 @@ const CreateProject = () => {
                 {showAddMember &&
                     <AddMember
                         toggleShowMember={toggleShowMember}
-                        addToList={(address) => setNewAddress(address)}
+                        addToList={(addressArr) => setNewAddress(addressArr)}
                     />
                 }
                 {
@@ -323,7 +328,7 @@ const CreateProject = () => {
                                                                             <div className="member-address">
                                                                                 <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
                                                                                 {
-                                                                                    selectedMembers.some((m) => m.address === item.member.wallet) === false
+                                                                                    selectedMembers.some((m) => m.address.toLowerCase() === item.member.wallet.toLowerCase()) === false
                                                                                         ?
                                                                                         <input type="checkbox" onChange={() => handleAddMember(item.member)} />
                                                                                         :

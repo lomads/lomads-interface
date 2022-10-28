@@ -5,9 +5,11 @@ import {
 	loadDao,
 	updateDao,
 	addDaoMember,
+	addDaoMemberList,
 	updateDaoMember,
 	manageDaoMember,
 	addDaoLinks,
+	updateDaoLinks,
 	createProject,
 	addProjectMember,
 	updateProjectMember,
@@ -30,9 +32,11 @@ export interface DashboardState {
 	DAOList: Array<DAOType> | null;
 	updateDaoLoading: boolean | null;
 	addMemberLoading: boolean | null;
+	addMemberListLoading: boolean | null;
 	updateMemberLoading: boolean | null;
 	manageMemberLoading: boolean | null;
 	addDaoLinksLoading: boolean | null;
+	updateDaoLinksLoading: boolean | null;
 	Project: any;
 	ProjectLoading: boolean | null;
 	createProjectLoading: boolean | null;
@@ -51,9 +55,11 @@ const initialState: DashboardState = {
 	DAOList: null,
 	updateDaoLoading: null,
 	addMemberLoading: null,
+	addMemberListLoading: null,
 	updateMemberLoading: null,
 	manageMemberLoading: null,
 	addDaoLinksLoading: null,
+	updateDaoLinksLoading: null,
 	Project: null,
 	ProjectLoading: null,
 	createProjectLoading: null,
@@ -81,6 +87,9 @@ const dashboardSlice = createSlice({
 		resetAddMemberLoader(state) {
 			state.addMemberLoading = null
 		},
+		resetAddMemberListLoader(state) {
+			state.addMemberListLoading = null
+		},
 		resetUpdateMemberLoader(state) {
 			state.updateMemberLoading = null
 		},
@@ -89,6 +98,9 @@ const dashboardSlice = createSlice({
 		},
 		resetAddDaoLinksLoader(state) {
 			state.addDaoLinksLoading = null
+		},
+		resetUpdateDaoLinksLoader(state) {
+			state.updateDaoLinksLoading = null
 		},
 		resetCreateProjectLoader(state) {
 			state.createProjectLoading = null
@@ -185,6 +197,16 @@ const dashboardSlice = createSlice({
 		[`${addDaoMember.pending}`]: (state) => {
 			state.addMemberLoading = true
 		},
+
+		// add dao members list
+		[`${addDaoMemberList.fulfilled}`]: (state, action) => {
+			state.addMemberListLoading = false
+			state.DAO = action.payload
+		},
+		[`${addDaoMemberList.pending}`]: (state) => {
+			state.addMemberListLoading = true
+		},
+
 		// update dao members
 		[`${updateDaoMember.fulfilled}`]: (state, action) => {
 			state.updateMemberLoading = false
@@ -215,6 +237,15 @@ const dashboardSlice = createSlice({
 		},
 		[`${addDaoLinks.pending}`]: (state) => {
 			state.addDaoLinksLoading = true;
+		},
+
+		// udpate dao links
+		[`${updateDaoLinks.fulfilled}`]: (state, action) => {
+			state.updateDaoLinksLoading = false;
+			state.DAO = action.payload;
+		},
+		[`${updateDaoLinks.pending}`]: (state) => {
+			state.updateDaoLinksLoading = true;
 		},
 
 		// create contract
@@ -305,9 +336,11 @@ export const {
 	resetCreateDAOLoader,
 	resetUpdateDAOLoader,
 	resetAddMemberLoader,
+	resetAddMemberListLoader,
 	resetUpdateMemberLoader,
 	resetManageMemberLoader,
 	resetAddDaoLinksLoader,
+	resetUpdateDaoLinksLoader,
 	resetCreateProjectLoader,
 	resetAddProjectMemberLoader,
 	resetUpdateProjectMemberLoader,

@@ -158,34 +158,53 @@ const InviteGang = () => {
 		try {
 			setUploadLoading(true)
 			let validMembers = [];
-			for (let index = 0; index < data.length; index++) {
-				let member = data[index];
-				if (isAddressValid(member.address) && !isPresent(member.address)) {
-					if (member.address.slice(-4) === ".eth") {
-						const resolver = await provider?.getResolver(member.address);
-						const EnsAddress = await resolver?.getAddress();
-						if (EnsAddress) {
-							member.name = member.name ? member.name : member.address;
-							member.address = EnsAddress as string;
+			let mem: any = {}
+			if(data.length > 0){
+				Object.keys(data[0]).map((key:any) => {
+					if(isAddressValid(key))
+						mem.address = key
+					else
+						mem.name = key
+				})
+				let newData = data;
+				if(Object.keys(mem).length > 0)
+					newData = [ ...newData, mem ]
+				for (let index = 0; index < newData.length; index++) {
+					let preParseMember: any = newData[index];
+					let member: any = {}
+					Object.keys(preParseMember).map((key:any) => {
+						if(isAddressValid(preParseMember[key]))
+							member.address = preParseMember[key]
+						else
+							member.name = preParseMember[key]
+					})
+					if (isAddressValid(member.address) && !isPresent(member.address)) {
+						if (member.address.slice(-4) === ".eth") {
+							const resolver = await provider?.getResolver(member.address);
+							const EnsAddress = await resolver?.getAddress();
+							if (EnsAddress) {
+								member.name = member.name ? member.name : member.address;
+								member.address = EnsAddress as string;
+							}
+						} else {
+							let ENSname = null;
+							if(chainId !== SupportedChainId.POLYGON)
+								ENSname = await provider?.lookupAddress(member.address);
+							if (ENSname)
+								member.name = member.name ? member.name : ENSname
 						}
-					} else {
-						let ENSname = null;
-						if(chainId !== SupportedChainId.POLYGON)
-							ENSname = await provider?.lookupAddress(member.address);
-						if (ENSname)
-							member.name = member.name ? member.name : ENSname
-					}
-					if (!_.find(validMembers, m => m.address.toLowerCase() === member.address.toLowerCase()) &&
-						!_.find(invitedMembers, m => m.address.toLowerCase() === member.address.toLowerCase())
-					) {
-						validMembers.push({ ...member, role: 'CONTRIBUTOR' });
+						if (!_.find(validMembers, m => m.address.toLowerCase() === member.address.toLowerCase()) &&
+							!_.find(invitedMembers, m => m.address.toLowerCase() === member.address.toLowerCase())
+						) {
+							validMembers.push({ ...member, role: 'CONTRIBUTOR' });
+						}
 					}
 				}
+	
+				setValidMembers(validMembers);
+				setUploadLoading(false)
+				setShowModal(true);
 			}
-
-			setValidMembers(validMembers);
-			setUploadLoading(false)
-			setShowModal(true);
 		} catch (e) {
 			setUploadLoading(false)
 		}

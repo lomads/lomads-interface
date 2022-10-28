@@ -17,8 +17,8 @@ import daoMember2 from "../../assets/svg/daoMember2.svg";
 import { useWeb3React } from "@web3-react/core";
 import { useEnsAddress } from "react-moralis";
 import OutlineButton from "UIpack/OutlineButton";
-import { addDaoMember, addProjectMember } from 'state/dashboard/actions'
-import { resetAddMemberLoader, resetAddProjectMemberLoader } from 'state/dashboard/reducer';
+import { addDaoMember, addProjectMember, addDaoMemberList } from 'state/dashboard/actions'
+import { resetAddMemberLoader, resetAddProjectMemberLoader, resetAddMemberListLoader } from 'state/dashboard/reducer';
 
 import Uploader from 'components/XlsxUploader';
 import { LeapFrog } from "@uiball/loaders";
@@ -27,19 +27,19 @@ import createProjectSvg from '../../../../assets/svg/createProject.svg';
 import memberIcon from '../../../../assets/svg/memberIcon.svg';
 import binRed from '../../../../assets/svg/bin-red.svg';
 import binWhite from '../../../../assets/svg/bin-white.svg';
+import { SupportedChainId } from "constants/chains";
 
 const AddMember = (props: any) => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
-
 	const [uploadLoading, setUploadLoading] = useState<boolean>(false);
 	const [ownerName, setOwnerName] = useState<string>("");
 	const [ownerAddress, setOwnerAddress] = useState<string>("");
 	const [ownerRole, setOwnerRole] = useState<string>("CONTRIBUTOR");
 	const [errors, setErrors] = useState<any>({});
 	const totalMembers = useAppSelector((state) => state.flow.totalMembers);
-	const { DAO, addMemberLoading, addProjectMemberLoading } = useAppSelector((state) => state.dashboard);
-	const { account, provider } = useWeb3React();
+	const { DAO, addMemberLoading, addProjectMemberLoading, addMemberListLoading } = useAppSelector((state) => state.dashboard);
+	const { account, provider, chainId } = useWeb3React();
 
 	const [showModal, setShowModal] = useState(false)
 	const [deleteMembers, setDeleteMembers] = useState<string[]>([]);
@@ -61,7 +61,7 @@ const AddMember = (props: any) => {
 	};
 
 	const isPresent = (_address: string) => {
-		const check = totalMembers.some((mem) => mem.address === _address);
+		const check = _.get(DAO, 'members', []).some((mem: any) => mem.member.wallet.toLowerCase() === _address.toLowerCase());
 		return check;
 	};
 	useEffect(() => {
@@ -95,6 +95,14 @@ const AddMember = (props: any) => {
 		}
 	}, [addMemberLoading, addProjectMemberLoading])
 
+	useEffect(() => {
+		if (addMemberListLoading === false) {
+			dispatch(resetAddMemberListLoader());
+			setShowModal(false);
+			props.toggleShowMember();
+		}
+	}, [addMemberListLoading])
+
 	const addMember = async (_ownerName: string, _ownerAddress: string, _ownerRole: string) => {
 		const member = { name: _ownerName, address: _ownerAddress, role: _ownerRole };
 		if (_ownerAddress.slice(-4) === ".eth") {
@@ -112,7 +120,9 @@ const AddMember = (props: any) => {
 			}
 		}
 		else {
-			const ENSname = await provider?.lookupAddress(_ownerAddress);
+			let ENSname = null;
+			if(chainId !== SupportedChainId.POLYGON)
+				ENSname = await provider?.lookupAddress(_ownerAddress);
 			if (ENSname) {
 				member.name = _ownerName !== '' ? _ownerName : ENSname;
 			}
@@ -123,7 +133,7 @@ const AddMember = (props: any) => {
 		if (!isPresent(member.address) && isRightAddress(member.address)) {
 			dispatch(addDaoMember({ url: DAO?.url, payload: member }))
 			if (props.addToList) {
-				props.addToList(member.address);
+				props.addToList([member.address]);
 			}
 		}
 	};
@@ -158,11 +168,14 @@ const AddMember = (props: any) => {
 							member.address = EnsAddress as string;
 						}
 					} else {
-						const ENSname = await provider?.lookupAddress(member.address);
+						let ENSname = null;
+						if(chainId !== SupportedChainId.POLYGON)
+							ENSname = await provider?.lookupAddress(member.address);
 						if (ENSname)
 							member.name = member.name ? member.name : ENSname
 					}
-					if (!_.find(validMembers, m => m.address.toLowerCase() === member.address.toLowerCase())) {
+					if (!_.find(validMembers, m => m.address.toLowerCase() === member.address.toLowerCase()) &&
+						!_.find(_.get(DAO, 'members', []), m => m.member.wallet.toLowerCase() === member.address.toLowerCase())) {
 						validMembers.push({ ...member, role: 'CONTRIBUTOR' });
 					}
 				}
@@ -204,27 +217,24 @@ const AddMember = (props: any) => {
 	}
 
 	const handleAddMembers = () => {
-		console.log("valid members : ", validMembers);
 		try {
 			let tempArray = [];
+			let newArray = [];
 			for (var i = 0; i < validMembers.length; i++) {
 				if (deleteMembers.includes(validMembers[i].address) === false) {
 					tempArray.push(validMembers[i]);
+					newArray.push(validMembers[i].address);
 				}
 			}
-			console.log("final array : ", tempArray);
-			// dispatch(appendInviteMembers(tempArray));
-			setShowModal(false);
-			props.toggleShowMember();
+			dispatch(addDaoMemberList({ url: DAO?.url, payload: { list: tempArray } }))
+			if (props.addToList) {
+				props.addToList(newArray);
+			}
 		}
 		catch (e) {
 			console.log(e)
 			setShowModal(false);
 			props.toggleShowMember();
-		}
-		finally {
-			setDeleteMembers([]);
-			setValidMembers([]);
 		}
 	}
 

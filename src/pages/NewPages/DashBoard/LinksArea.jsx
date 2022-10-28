@@ -31,7 +31,7 @@ const LinksArea = ({ links }) => {
 
     const renderLinks = (item) => {
         return (
-            <div className='link-pill'>
+            <div onClick={() => window.open(item.link, '_blank')} className='link-pill'>
                 {handleParseUrl(item.link)}
                 <span>{item.title.length > 6 ? item.title.substring(0, 6) + "..." : item.title}</span>
             </div>

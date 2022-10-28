@@ -14,21 +14,23 @@ import copyIcon from "../../assets/svg/copyIcon.svg";
 import { isChainAllowed } from "utils/switchChain";
 import coin from '../../assets/svg/coin.svg';
 import Footer from 'components/Footer';
+import { AiOutlineClose } from "react-icons/ai";
 import { SiNotion } from "react-icons/si";
 import { HiOutlinePlus } from "react-icons/hi";
 import { CgClose } from 'react-icons/cg'
 import { BsDiscord, BsGoogle, BsGithub, BsLink } from "react-icons/bs";
 import AddDaoLink from './DashBoard/Settings/AddDaoLink';
 import SimpleInputField from "UIpack/SimpleInputField";
-import { updateDao } from 'state/dashboard/actions';
-import { resetUpdateDAOLoader } from 'state/dashboard/reducer';
+import { updateDao, updateDaoLinks } from 'state/dashboard/actions';
+import { resetUpdateDAOLoader, resetUpdateDaoLinksLoader } from 'state/dashboard/reducer';
+import { isValidUrl } from 'utils';
 
 const Settings = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const [update, setUpdate] = useState(0);
     const { provider, chainId, account, connector } = useWeb3React();
-    const { DAO, updateDaoLoading } = useAppSelector((state) => state.dashboard);
+    const { DAO, updateDaoLoading, updateDaoLinksLoading } = useAppSelector((state) => state.dashboard);
     const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
     console.log("DAO data : ", DAO);
     const daoName = _get(DAO, 'name', '').split(" ");
@@ -56,11 +58,22 @@ const Settings = () => {
     }, [DAO, balanceOf, contractName]);
 
     useEffect(() => {
+        setDaoLinks(_get(DAO, 'links', []));
+    }, [DAO])
+
+    useEffect(() => {
         if (updateDaoLoading === false) {
             dispatch(resetUpdateDAOLoader());
             setEditMode(false);
         }
     }, [updateDaoLoading]);
+
+    useEffect(() => {
+        if (updateDaoLinksLoading === false) {
+            dispatch(resetUpdateDaoLinksLoader());
+            setEditLink(false);
+        }
+    }, [updateDaoLinksLoading]);
 
     const amIAdmin = useMemo(() => {
         if (DAO) {
@@ -103,6 +116,54 @@ const Settings = () => {
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {
             dispatch(updateDao({ url: DAO?.url, payload: { name, description } }))
+        }
+    }
+
+    const handleChangeState = (e, index) => {
+        const newArray = daoLinks.map((item, i) => {
+            if (index === i) {
+                if (e.target.name === 'title') {
+                    document.getElementById(`title${index}`).innerHTML = '';
+                }
+                else if (e.target.name === 'link') {
+                    document.getElementById(`link${index}`).innerHTML = '';
+                }
+                return { ...item, [e.target.name]: e.target.value };
+            }
+            else {
+                return item;
+            }
+        });
+        setDaoLinks(newArray);
+    }
+
+    const deleteLink = (item) => {
+
+    }
+
+    const handleKeyDown2 = (e) => {
+        if (e.key === 'Enter') {
+            let errorCount = 0;
+            for (var i = 0; i < daoLinks.length; i++) {
+                const title = daoLinks[i].title;
+                const link = daoLinks[i].link;
+                if (title === '') {
+                    errorCount += 1;
+                    document.getElementById(`title${i}`).innerHTML = 'Please enter title'
+                }
+                else if (link === '') {
+                    errorCount += 1;
+                    document.getElementById(`link${i}`).innerHTML = 'Please enter link'
+                }
+                else if (!isValidUrl(link)) {
+                    errorCount += 1;
+                    document.getElementById(`link${i}`).innerHTML = 'Please enter a valid link'
+                }
+            }
+            if (errorCount === 0) {
+                console.log("DAo links : ", daoLinks);
+                dispatch(updateDaoLinks({ url: DAO?.url, payload: { links: daoLinks } }))
+            }
         }
     }
 
@@ -232,7 +293,7 @@ const Settings = () => {
                     <div className='links-header'>
                         <h1>Links</h1>
                         <div>
-                            <button>
+                            <button onClick={() => setEditLink(true)}>
                                 <img src={editIcon} alt="edit-icon" />
                             </button>
                             <button onClick={toggleShowLink} className="addLink-btn">
@@ -244,17 +305,60 @@ const Settings = () => {
                     <span>Will display on the top of the dashboard</span>
                     <div className='link-body'>
                         {
-                            _get(DAO, 'links', []).map((item, index) => {
-                                return (
-                                    <div>
-                                        <button>
-                                            {handleParseUrl(item.link)}
-                                            <span>{item.title.length > 6 ? item.title.substring(0, 6) + "..." : item.title}</span>
-                                        </button>
-                                        <p>{item.link}</p>
-                                    </div>
-                                )
-                            })
+                            editLink
+                                ?
+                                daoLinks.map((item, index) => {
+                                    return (
+                                        <div className='editLinkSection' key={index} id={`row${index}`}>
+                                            <div className='editLinkCol'>
+                                                <SimpleInputField
+                                                    className="inputField"
+                                                    height={50}
+                                                    width={150}
+                                                    placeholder="Title"
+                                                    value={item.title}
+                                                    name="title"
+                                                    onchange={(e) => handleChangeState(e, index)}
+                                                    onKeyDown={(e) => handleKeyDown2(e)}
+                                                />
+                                                <span id={`title${index}`}></span>
+                                            </div>
+                                            <div className='editLinkCol'>
+                                                <SimpleInputField
+                                                    className="inputField"
+                                                    height={50}
+                                                    width={250}
+                                                    placeholder="Link"
+                                                    value={item.link}
+                                                    name="link"
+                                                    onchange={(e) => handleChangeState(e, index)}
+                                                    onKeyDown={(e) => handleKeyDown2(e)}
+                                                />
+                                                <span id={`link${index}`}></span>
+                                            </div>
+                                            {/* <button
+                                                className="linkDeleteBtn"
+                                                onClick={() => {
+                                                    deleteLink(item);
+                                                }}
+                                            >
+                                                <AiOutlineClose style={{ height: 15, width: 15 }} />
+                                            </button> */}
+                                        </div>
+                                    )
+                                })
+                                :
+                                _get(DAO, 'links', []).map((item, index) => {
+                                    return (
+                                        <div>
+                                            <button onClick={() => window.open(item.link, '_blank')}>
+                                                {handleParseUrl(item.link)}
+                                                <span>{item.title.length > 6 ? item.title.substring(0, 6) + "..." : item.title}</span>
+                                            </button>
+                                            <p>{item.link}</p>
+                                        </div>
+                                    )
+                                })
                         }
                     </div>
                 </div>
