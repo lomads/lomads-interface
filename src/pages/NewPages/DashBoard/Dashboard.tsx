@@ -29,6 +29,7 @@ import AddMember from "./MemberCard/AddMember";
 import dashboardfooterlogo from "../../../assets/svg/dashboardfooterlogo.svg";
 import { useAppDispatch } from "state/hooks";
 import { getCurrentUser, getDao } from "state/dashboard/actions";
+import { setDAO, setDAOList } from "state/dashboard/reducer";
 import { loadDao } from 'state/dashboard/actions';
 import copyIcon from "../../../assets/svg/copyIcon.svg";
 import { useDispatch } from "react-redux";
@@ -113,6 +114,8 @@ const Dashboard = () => {
 		switchChain(connector, chain)
 		.then(res => { 
 			sessionStorage.clear()
+			dispatch(setDAOList([]))
+			dispatch(setDAO(null))
 			window.location.href = '/'
 		})
 	}
