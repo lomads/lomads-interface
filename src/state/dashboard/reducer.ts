@@ -159,11 +159,14 @@ const dashboardSlice = createSlice({
 	extraReducers: {
 		[`${updateCurrentUser.fulfilled}`]: (state, action) => {
 			state.user = action.payload;
-			state.DAO = state.DAO.members.map((m: any) => {
-				if (m.member._id === action.payload._id)
-					return { ...m, member: action.payload }
-				return m
-			})
+			state.DAO = {
+				...state.DAO,
+				members: state.DAO.members.map((m: any) => {
+					if (m.member._id === action.payload._id)
+						return { ...m, member: action.payload }
+					return m
+				})
+			}
 		},
 		[`${getCurrentUser.fulfilled}`]: (state, action) => {
 			state.user = action.payload;

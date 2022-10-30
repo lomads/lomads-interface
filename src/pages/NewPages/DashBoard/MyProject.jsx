@@ -59,7 +59,7 @@ const MyProject = () => {
             <div className="myproject-header">
                 <div className="myproject-title">
                     {
-                        myProjects.length > 0 && can(myRole, 'project.view.own')
+                       can(myRole, 'project.view.own')
                             ?
                             <>
                                 <button className={tab === 1 ? 'active' : null} onClick={() => setTab(1)}>

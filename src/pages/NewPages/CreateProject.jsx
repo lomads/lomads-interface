@@ -125,16 +125,17 @@ const CreateProject = () => {
     const handleParseUrl = (url) => {
         try {
             const link = new URL(url);
-            if (link.hostname === 'notion.com' || link.hostname === 'www.notion.com') {
+            console.log("lnk", link)
+            if (link.hostname.indexOf('notion.') > -1) {
                 return <SiNotion color='#B12F15' size={20} />
             }
-            else if (link.hostname === 'discord.com' || link.hostname === 'www.discord.com') {
+            else if (link.hostname.indexOf('discord.') > -1) {
                 return <BsDiscord color='#B12F15' size={20} />
             }
-            else if (link.hostname === 'github.com' || link.hostname === 'www.github.com') {
+            else if (link.hostname.indexOf('github.') > -1) {
                 return <BsGithub color='#B12F15' size={20} />
             }
-            else if (link.hostname === 'google.com' || link.hostname === 'www.google.com') {
+            else if (link.hostname.indexOf('google.') > -1) {
                 return <BsGoogle color='#B12F15' size={20} />
             }
             else {
@@ -223,7 +224,7 @@ const CreateProject = () => {
         project.links = resourceList;
         project.daoId = DAO?._id;
         console.log(project)
-        dispatch(createProject({ payload: project }))
+       dispatch(createProject({ payload: project }))
     }
 
     return (
@@ -406,7 +407,7 @@ const CreateProject = () => {
                                                     </button>
                                                     <button
                                                         style={{ background: '#C94B32', color: '#FFF' }}
-                                                        onClick={handleCreateProject}
+                                                        onClick={() => handleCreateProject()}
                                                     >
                                                         CREATE PROJECT
                                                     </button>
@@ -459,7 +460,7 @@ const CreateProject = () => {
                                                                     :
                                                                     <button
                                                                         style={link !== '' && title !== '' ? { background: '#C84A32' } : null}
-                                                                        onClick={handleAddResource}
+                                                                        onClick={() => handleAddResource()}
                                                                     >
                                                                         <AiOutlinePlus color="#FFF" size={25} />
                                                                     </button>

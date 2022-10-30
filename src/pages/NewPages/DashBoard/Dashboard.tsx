@@ -71,7 +71,7 @@ const Dashboard = () => {
 	const [showNavBar, setShowNavBar] = useState<boolean>(false);
 	const [checkLoading, setCheckLoading] = useState<boolean>(true);
 	const currentNonce = useAppSelector((state) => state.flow.currentNonce);
-	const { myRole, displayRole, permissions, can } = useRole(DAO, account);
+	const { myRole, displayRole, permissions, can, isSafeOwner } = useRole(DAO, account);
 
 	console.log("role", myRole)
 
@@ -326,19 +326,24 @@ const Dashboard = () => {
 							setCopy(false);
 						}}
 					>
-						<div className="DAOname">
-							{_get(DAO, 'name', '')}
-						</div>
-						<Tooltip label={copy ? "copied" : "copy"}>
-							<div
-								className="copyLinkButton"
-								onClick={() => {
-									navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/${_get(DAO, 'url', '')}`);
-								}}
-							>
-								<img src={copyIcon} alt="copy" className="safeCopyImage" />
+						<div>
+							<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+								<div className="DAOname">
+									{_get(DAO, 'name', '')}
+								</div>
+								<Tooltip label={copy ? "copied" : "copy"}>
+									<div
+										className="copyLinkButton"
+										onClick={() => {
+											navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/${_get(DAO, 'url', '')}`);
+										}}
+									>
+										<img src={copyIcon} alt="copy" className="safeCopyImage" />
+									</div>
+								</Tooltip>
 							</div>
-						</Tooltip>
+						<div className="DAODescription">{ _get(DAO, 'description', '') }</div>
+						</div>
 					</div>
 					<div className="DAOsettings">
 						<div className="DAOadminPill">
@@ -369,7 +374,7 @@ const Dashboard = () => {
 						/>
 					)}
 				<MyProject />
-				{can(myRole, 'transaction.view') &&
+				{(can(myRole, 'transaction.view') || isSafeOwner) &&
 					<TreasuryCard
 						innerRef={treasuryRef}
 						safeAddress={safeAddress}

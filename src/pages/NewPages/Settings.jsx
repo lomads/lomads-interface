@@ -92,20 +92,20 @@ const Settings = () => {
     const handleParseUrl = (url) => {
         try {
             const link = new URL(url);
-            if (link.hostname === 'notion.com' || link.hostname === 'www.notion.com') {
+            if (link.hostname.indexOf('notion.') > -1) {
                 return <SiNotion color='#B12F15' size={20} />
             }
-            else if (link.hostname === 'discord.com' || link.hostname === 'www.discord.com') {
+            else if (link.hostname.indexOf('discord.') > -1) {
                 return <BsDiscord color='#B12F15' size={20} />
             }
-            else if (link.hostname === 'github.com' || link.hostname === 'www.github.com') {
+            else if (link.hostname.indexOf('github.') > -1) {
                 return <BsGithub color='#B12F15' size={20} />
             }
-            else if (link.hostname === 'google.com' || link.hostname === 'www.google.com') {
+            else if (link.hostname.indexOf('google.') > -1) {
                 return <BsGoogle color='#B12F15' size={20} />
             }
             else {
-                return <BsLink color='#B12F15' size={20} />
+                return <span><BsLink size={20} /></span>
             }
         }
         catch (e) {
@@ -302,7 +302,7 @@ const Settings = () => {
                             </button>
                         </div>
                     </div>
-                    <span>Will display on the top of the dashboard</span>
+                    <span>Please add links for your organisation</span>
                     <div className='link-body'>
                         {
                             editLink
