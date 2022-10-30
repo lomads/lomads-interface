@@ -35,6 +35,7 @@ const TransactionDetails = (props: ItransactionDetailsType) => {
                 select a token
               </option>
               {props.tokens.map((result: any, index: any) => {
+                console.log("tokens_RESULT", result)
                 return (
                   (
                     <>

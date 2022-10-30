@@ -79,6 +79,10 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 					return p
 				})
 			)
+			.then(ptx => _filter(ptx, p => {
+				let matchRejTx = _find(ptx, px => px.nonce === p.nonce && px.data === null);
+				return matchRejTx.safeTxHash !== p.safeTxHash
+			}))
 			.then(ptx => _filter(ptx, p =>  !p.dataDecoded || (_get(p, 'dataDecoded.method', '') === 'multiSend' || _get(p, 'dataDecoded.method', '') === 'transfer')))
 			.then(ptx => _sortBy(ptx, 'nonce', 'ASC'))
 			.then(ptx => { console.log("loadPendingTxn", ptx); return ptx })

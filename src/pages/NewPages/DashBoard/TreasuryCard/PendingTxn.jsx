@@ -185,7 +185,7 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
                                 </ToolTopContainer>
                             </Tooltip>
                         }
-                        {
+                        {/* {
                             (!(!confirmReached && !hasMyConfirmVote && !rejectReached) && !(!confirmReached && !hasMyRejectVote && !rejectReached) && !(confirmReached) && !(rejectReached)) &&
                             <div className="ex" style={{ position: 'relative' }}>
                                 <div>
@@ -193,7 +193,7 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
                                     <div style={{ height: '50%', backgroundColor: '#76808d', width: 1, position: 'absolute', right: 0, bottom: 0 }}></div>
                                 </div>
                             </div>
-                        }
+                        } */}
                     </div> : <div className="confirmIconGrp">
                         <div className="ex" style={{ position: 'relative' }}>
                             {
