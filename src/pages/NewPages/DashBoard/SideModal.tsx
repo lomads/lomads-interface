@@ -81,7 +81,7 @@ const SideModal = (props: IsideModal) => {
 				//return setError(`Low token balance. Available tokens ${_get(selToken, 'balance', 0) / 10 ** 18} ${selToken.token.symbol}`);
 				return setError(`Low token balance. Available tokens ${_get(selToken, 'balance', 0) / 10 ** 18} ${_get(selToken, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}`);
 			setisLoading(true);
-			console.log(selectedToken)
+			console.log(selectedToken, props.safeAddress)
 			const token = await tokenCallSafe(selectedToken);
 			const safeSDK = await ImportSafe(provider, props.safeAddress);
 			const safeTransactionData: SafeTransactionDataPartial[] = await Promise.all(
