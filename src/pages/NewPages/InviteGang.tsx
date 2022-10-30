@@ -160,12 +160,15 @@ const InviteGang = () => {
 			let validMembers = [];
 			let mem: any = {}
 			if(data.length > 0){
-				Object.keys(data[0]).map((key:any) => {
-					if(isAddressValid(key))
-						mem.address = key
-					else
-						mem.name = key
-				})
+				const noHeader = _.find(Object.keys(data[0]), key => isAddressValid(key))
+				if(noHeader) {
+					Object.keys(data[0]).map((key:any) => {
+						if(isAddressValid(key))
+							mem.address = key
+						else
+							mem.name = key
+					})
+				}
 				let newData = data;
 				if(Object.keys(mem).length > 0)
 					newData = [ ...newData, mem ]
@@ -178,7 +181,7 @@ const InviteGang = () => {
 						else
 							member.name = preParseMember[key]
 					})
-					if (isAddressValid(member.address) && !isPresent(member.address)) {
+					if (member.address && isAddressValid(member.address) && !isPresent(member.address)) {
 						if (member.address.slice(-4) === ".eth") {
 							const resolver = await provider?.getResolver(member.address);
 							const EnsAddress = await resolver?.getAddress();

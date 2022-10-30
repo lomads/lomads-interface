@@ -20,6 +20,7 @@ export default ({ onComplete, ...props }) => {
     let wb = read(d);
     const ws = wb.Sheets[wb.SheetNames[0]];
     const data = utils.sheet_to_json(ws);
+    console.log(data)
     onComplete(data)
   }
 
