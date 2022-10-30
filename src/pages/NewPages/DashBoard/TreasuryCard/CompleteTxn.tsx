@@ -43,7 +43,7 @@ const CompleteTxn = ({ transaction, tokens, owner, isAdmin }: any) => {
 
     const _handleReasonKeyDown = (safeTxHash: string, recipient: string, reasonText: string) => {
         if (reasonText && reasonText !== '') {
-            axiosHttp.patch('transaction', { reason: reasonText, safeTxHash: safeTxHash ? safeTxHash : transaction.txHash, recipient, txType: transaction.txType, safeAddress: DAO.safe.address })
+            axiosHttp.patch('transaction', { chainId, reason: reasonText, safeTxHash: safeTxHash ? safeTxHash : transaction.txHash, recipient, txType: transaction.txType, safeAddress: DAO.safe.address })
                 .then(res => { 
                     dispatch(updateSafeTransaction(res.data))
                     if (editMode && editMode === `${safeTxHash}-${recipient}`) {
@@ -60,7 +60,7 @@ const CompleteTxn = ({ transaction, tokens, owner, isAdmin }: any) => {
     }
 
     const handleEnableEditMode = (text: any, reason: string) => {
-        if (isAdmin) {
+        if (isAdmin || owner) {
             setEditMode(text);
             setReasonText(prev => {
                 return {
@@ -95,7 +95,7 @@ const CompleteTxn = ({ transaction, tokens, owner, isAdmin }: any) => {
                                 :
                                 <>
                                     {
-                                        isAdmin
+                                        isAdmin || owner
                                             ?
                                             <SimpleInputField
                                                 disabled={!owner}
@@ -159,7 +159,7 @@ const CompleteTxn = ({ transaction, tokens, owner, isAdmin }: any) => {
                                 <div className="dashboardText" onClick={() => handleEnableEditMode(`${transaction.safeTxHash}-${recipient}`, reason)}>{reason}</div> :
                                  <>
                                         {
-                                            isAdmin
+                                            isAdmin || owner
                                                 ?
                                                 <SimpleInputField
                                                     disabled={!owner}

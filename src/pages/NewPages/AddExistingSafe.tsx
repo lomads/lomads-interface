@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import _ from "lodash";
 import "../../styles/pages/AddExistingSafe.css";
 import "../../styles/Global.css";
@@ -26,6 +26,7 @@ import { InviteGangType } from "types/UItype";
 import { createDAO } from '../../state/flow/actions';
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
 import { SupportedChainId, SUPPORTED_CHAIN_IDS, CHAIN_IDS_TO_NAMES } from 'constants/chains'
+import { usePrevious } from "hooks/usePrevious";
 
 const AddExistingSafe = () => {
   const dispatch = useAppDispatch();
@@ -47,27 +48,46 @@ const AddExistingSafe = () => {
 
 	const { provider, account, chainId } = useWeb3React();
 
-	const UseExistingSafe = async () => {
-		owners.current = [];
-		setisLoading(true);
-		const safeSDK = await ImportSafe(provider, safeAddress);
-		dispatch(updateHolder(safeSDK.getAddress() as string));
-		const safeowners: string[] = await safeSDK.getOwners();
-		safeowners.map((ownerAddress: string, index: number) => {
-			let obj: InviteGangType = { name: "", address: "" };
-			obj["address"] = ownerAddress;
-			owners.current.push(obj);
-		});
-		const bal = await safeSDK.getBalance();
-		setBalance(bal.toString());
-		await getTokens(safeAddress);
-		setShowSafeDetails(true);
-		setisLoading(false);
-	};
 
 	useEffect(() => {
-		dispatch(updateSafeAddress(''))
+		dispatch(updateSafeAddress(""));
+		dispatch(updateTotalMembers([]))
 	}, [])
+
+	const UseExistingSafe = useCallback(async () => {
+		if(isLoading) return;
+		if(chainId){
+			owners.current = [];
+			setisLoading(true);
+			ImportSafe(provider, safeAddress)
+			.then(async safeSDK => {
+				dispatch(updateHolder(safeSDK.getAddress() as string));
+				const safeowners: string[] = await safeSDK.getOwners();
+				safeowners.map((ownerAddress: string, index: number) => {
+					let obj: InviteGangType = { name: "", address: "" };
+					obj["address"] = ownerAddress;
+					if(!_.find(owners.current, (w:any) => w.address.toLowerCase() === obj.address.toLowerCase()))
+						owners.current.push(obj);
+				});
+				const bal = await safeSDK.getBalance();
+				setBalance(bal.toString());
+				await getTokens(safeAddress);
+				setShowSafeDetails(true);
+				setisLoading(false);
+			})
+			.catch(e => {
+				setisLoading(false);
+				console.log(e)
+				if(e.message === "SafeProxy contract is not deployed on the current network"){
+					if(chainId) {
+						const chain = chainId || 137;
+						setErrors({ issafeAddress: `This safe is not on ${CHAIN_IDS_TO_NAMES[chain]}` });
+					}
+				}
+			})
+		}
+	}, [chainId, safeAddress]);
+
 
 	const getTokens = async (safeAddress: string) => {
 		chainId &&
@@ -99,7 +119,7 @@ const AddExistingSafe = () => {
       setisLoading(true)
   }, [createDAOLoading])
 
-  const handleAddSafe = () => {
+  const handleAddSafe = useCallback(() => {
     const totalAddresses = [...invitedMembers, ...owners.current];
     const value = totalAddresses.reduce((final: any, current: any) => {
       let object = final.find((item: any) => item.address === current.address);
@@ -125,8 +145,10 @@ const AddExistingSafe = () => {
       }
     }
     dispatch(createDAO(payload))
-  };
-	const handleClick = () => {
+  }, [chainId, safeAddress]);
+
+	const handleClick = useCallback(() => {
+		console.log("clicked")
 		let terrors: any = {};
 		if (!isAddressValid(safeAddress)) {
 			terrors.issafeAddress = " * Safe Address is not valid.";
@@ -137,7 +159,9 @@ const AddExistingSafe = () => {
 		else {
 			setErrors(terrors);
 		}
-	};
+	}, [safeAddress]);
+
+	const handleClickDelayed = useCallback(_.debounce(handleClick, 1000), [handleClick, safeAddress])
 
 	return (
 		<>
@@ -370,7 +394,7 @@ const AddExistingSafe = () => {
 								width={160}
 								fontsize={20}
 								fontweight={400}
-								onClick={handleClick}
+								onClick={handleClickDelayed}
 								bgColor={
 									isAddressValid(safeAddress)
 										? "#C94B32"

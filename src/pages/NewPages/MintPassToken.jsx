@@ -145,7 +145,7 @@ const MintPassToken = () => {
                             daoUrl: DAO.url,
                             description: "SBT TOKEN",
                             name: userName.value,
-                            image: 'url',
+                            image: _get(DAO, 'sbt.image', ''),
                             attributes: [{
                                 trait_type: "Wallet Address/ENS Domain",
                                 value: account

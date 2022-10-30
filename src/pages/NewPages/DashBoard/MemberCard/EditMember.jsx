@@ -11,6 +11,7 @@ import binWhite from '../../../../assets/svg/bin-white.svg';
 import { manageDaoMember, updateDaoMember } from 'state/dashboard/actions';
 import { resetManageMemberLoader } from 'state/dashboard/reducer';
 import { useAppSelector, useAppDispatch } from "state/hooks";
+import { updateCurrentUser } from 'state/dashboard/actions';
 
 import { get as _get, find as _find } from 'lodash';
 import useRole from 'hooks/useRole';
@@ -75,6 +76,8 @@ const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
     }
 
     const handleSubmit = () => {
+        if(editableName && editableName.length > 0)
+            dispatch(updateCurrentUser({ name: editableName }))
         if (deleteMembers.length > 0 || updateMembers.length > 0) {
             dispatch(manageDaoMember({ url: DAO?.url, payload: { deleteList: deleteMembers, updateList: updateMembers } }));
         }

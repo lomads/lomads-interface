@@ -57,7 +57,7 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
 
     const _handleReasonKeyDown = (safeTxHash, recipient, reasonText) => {
         if (reasonText && reasonText !== '') {
-            axiosHttp.patch('transaction', { reason: reasonText, safeTxHash, recipient })
+            axiosHttp.patch('transaction', { chainId, reason: reasonText, safeTxHash, recipient })
                 .then(res => { 
                     dispatch(updateSafeTransaction(res.data))
                     if (editMode && editMode === `${safeTxHash}-${recipient}`) {

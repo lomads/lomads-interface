@@ -34,6 +34,17 @@ body.active-modal {
     margin-right: 20px;
 }
 
+.DAODescription {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    color: #1B2B41;
+    margin-top: 6px;
+}
+
+
 .DAOdetails .DAOsettings {
     display: flex;
     align-items: center;
