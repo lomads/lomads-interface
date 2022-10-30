@@ -29,7 +29,7 @@ const CompleteTxn = ({ transaction, tokens, owner, isAdmin }: any) => {
 
         let reason = null
         if (trans) {
-            reason = _get(_find(trans.data, u => u.recipient.toLowerCase() === recipient.toLowerCase() || u.recipient.toLowerCase() === DAO.safe.address.toLowerCase()), 'reason', null)
+            reason = _get(_find(trans.data, u => u.recipient.toLowerCase() === recipient.toLowerCase() || u.recipient.toLowerCase() === DAO.safe.address.toLowerCase()), 'reason', "")
         }
 
         let date = moment.utc(
@@ -73,12 +73,12 @@ const CompleteTxn = ({ transaction, tokens, owner, isAdmin }: any) => {
 
     const renderItem = (item: any, index: number) => {
         const mulAmount = _get(item, 'dataDecoded.parameters[1].value')
-        const mulRecipient = _get(item, 'dataDecoded.parameters[0].value')
+        const mulRecipient = _get(item, 'dataDecoded.parameters[0].value', "")
         const isLast = _get(transaction, 'dataDecoded.parameters[0].valueDecoded', []).length - 1 === index;
         let trans = _find(_get(DAO, 'safe.transactions', []), t => t.safeTxHash === transaction.safeTxHash)
         let mulReason = '';
         if (trans)
-            mulReason = _get(_find(trans.data, u => u.recipient.toLowerCase() === mulRecipient.toLowerCase()), 'reason', null)
+            mulReason = _get(_find(trans.data, u => u.recipient.toLowerCase() === mulRecipient.toLowerCase()), 'reason', "")
         return (
             <div className="transactionRow">
                 <div className="coinText">

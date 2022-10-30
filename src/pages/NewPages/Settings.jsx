@@ -24,6 +24,7 @@ import SimpleInputField from "UIpack/SimpleInputField";
 import { updateDao, updateDaoLinks } from 'state/dashboard/actions';
 import { resetUpdateDAOLoader, resetUpdateDaoLinksLoader } from 'state/dashboard/reducer';
 import { isValidUrl } from 'utils';
+import useRole from "hooks/useRole";
 
 const Settings = () => {
     const navigate = useNavigate();
@@ -42,6 +43,7 @@ const Settings = () => {
     const [description, setDescription] = useState(_get(DAO, 'description', ''));
     const [daoLinks, setDaoLinks] = useState(_get(DAO, 'links', []));
     const chainAllowed = chainId && isChainAllowed(connector, chainId);
+    const { displayRole } = useRole(DAO, account);
 
     useEffect(() => {
         if (chainId && !chainAllowed && !account) {
@@ -191,13 +193,7 @@ const Settings = () => {
             <div className='settings-center'>
                 <div className='settings-header'>
                     <h1>Settings</h1>
-                    {
-                        amIAdmin
-                            ?
-                            <p>You're an&nbsp;<span>Admin</span></p>
-                            :
-                            <p>You're a&nbsp;<span>Member</span></p>
-                    }
+                    <p>You're an&nbsp;<span>{displayRole}</span></p>
                 </div>
 
                 <div className='settings-organisation'>
