@@ -46,6 +46,7 @@ import useRole from "hooks/useRole";
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains';
 import { switchChain } from "utils/switchChain";
 import { SupportedChainId, SUPPORTED_CHAIN_IDS, CHAIN_IDS_TO_NAMES } from 'constants/chains'
+import Tasks from "./Tasks";
 
 const Dashboard = () => {
 	const dispatch = useAppDispatch();
@@ -110,14 +111,14 @@ const Dashboard = () => {
 		setShowNavBar(_choice);
 	};
 
-	const handleSwitchChain = async (chain:number) => {
+	const handleSwitchChain = async (chain: number) => {
 		switchChain(connector, chain)
-		.then(res => { 
-			sessionStorage.clear()
-			dispatch(setDAOList([]))
-			dispatch(setDAO(null))
-			window.location.href = '/'
-		})
+			.then(res => {
+				sessionStorage.clear()
+				dispatch(setDAOList([]))
+				dispatch(setDAO(null))
+				window.location.href = '/'
+			})
 	}
 
 	useEffect(() => {
@@ -148,9 +149,9 @@ const Dashboard = () => {
 	}, [chainId, account, DAOList, daoURL])
 
 	useEffect(() => {
-		if(chainId) {
+		if (chainId) {
 			if (contractName !== '' && DAO && DAO.sbt && DAO.sbt && account && balanceOf) {
-				if(chainId === DAO.chainId){
+				if (chainId === DAO.chainId) {
 					if (DAO?.sbt?.whitelisted) {
 						if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
 							if (parseInt(balanceOf._hex, 16) === 0)
@@ -180,24 +181,24 @@ const Dashboard = () => {
 			dispatch(getCurrentUser({}))
 		}
 	}, [account, chainId, user])
-	
+
 
 	useEffect(() => {
-		if(DAO && chainId) {
-			if(DAO.chainId !== chainId) {
+		if (DAO && chainId) {
+			if (DAO.chainId !== chainId) {
 				setValidDaoChain(false)
 				switchChain(connector, DAO.chainId)
 			}
-			else 
+			else
 				setValidDaoChain(true)
 		}
 	}, [DAO, chainId]);
 
 	useEffect(() => {
-		if(DAO && account && chainId) {
-			if(chainId === DAO.chainId) {
-				if(!DAO.sbt){
-					if(!_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase()))
+		if (DAO && account && chainId) {
+			if (chainId === DAO.chainId) {
+				if (!DAO.sbt) {
+					if (!_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase()))
 						navigate('/noaccess')
 				}
 			}
@@ -205,10 +206,10 @@ const Dashboard = () => {
 	}, [DAO, account, chainId]);
 
 	useEffect(() => {
-		if(DAO && account && chainId) {
-			if(chainId === DAO.chainId) {
-				if(!DAO.sbt){
-					if(!_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase()))
+		if (DAO && account && chainId) {
+			if (chainId === DAO.chainId) {
+				if (!DAO.sbt) {
+					if (!_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase()))
 						navigate('/noaccess')
 				}
 			}
@@ -222,7 +223,7 @@ const Dashboard = () => {
 	}, [DAO, chainId])
 
 	const prepare = async (_safeAddress: string) => {
-		if(chainId) {
+		if (chainId) {
 			await ownersCount(_safeAddress);
 			const nonce = await (await safeService(provider, `${chainId}`)).getNextNonce(_safeAddress);
 			dispatch(updateCurrentNonce(nonce));
@@ -240,20 +241,20 @@ const Dashboard = () => {
 
 	const getTokens = async (safeAddress: string) => {
 		chainId &&
-		await axios
-			.get(
-				`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`,
-				{
-					withCredentials: false
-				}
-			)
-			.then((tokens: any) => {
-				setSafeTokens(tokens.data);
-			});
+			await axios
+				.get(
+					`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`,
+					{
+						withCredentials: false
+					}
+				)
+				.then((tokens: any) => {
+					setSafeTokens(tokens.data);
+				});
 	};
 
 	useEffect(() => {
-		if(chainId && DAO && DAO.chainId === chainId){
+		if (chainId && DAO && DAO.chainId === chainId) {
 			if (DAO && _get(DAO, 'url') === daoURL) {
 				prepare(_get(DAO, 'safe.address'))
 				getTokens(_get(DAO, 'safe.address'));
@@ -345,7 +346,7 @@ const Dashboard = () => {
 									</div>
 								</Tooltip>
 							</div>
-						<div className="DAODescription">{ _get(DAO, 'description', '') }</div>
+							<div className="DAODescription">{_get(DAO, 'description', '')}</div>
 						</div>
 					</div>
 					<div className="DAOsettings">
@@ -358,9 +359,9 @@ const Dashboard = () => {
 							</button>
 						}
 						<select name="chain" id="chain" value={chainId} onChange={e => handleSwitchChain(+e.target.value)} className="drop" style={{ width: 150 }}>
-						{
-							SUPPORTED_CHAIN_IDS.map(chain => <option value={+chain}>{CHAIN_IDS_TO_NAMES[chain]}</option>)
-						}
+							{
+								SUPPORTED_CHAIN_IDS.map(chain => <option value={+chain}>{CHAIN_IDS_TO_NAMES[chain]}</option>)
+							}
 						</select>
 					</div>
 				</div>
@@ -376,6 +377,8 @@ const Dashboard = () => {
 							showNotificationArea={showNotificationArea}
 						/>
 					)}
+
+				<Tasks />
 				<MyProject />
 				{(can(myRole, 'transaction.view') || isSafeOwner) &&
 					<TreasuryCard
