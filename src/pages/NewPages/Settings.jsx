@@ -18,13 +18,14 @@ import { AiOutlineClose } from "react-icons/ai";
 import { SiNotion } from "react-icons/si";
 import { HiOutlinePlus } from "react-icons/hi";
 import { CgClose } from 'react-icons/cg'
-import { BsDiscord, BsGoogle, BsGithub, BsLink } from "react-icons/bs";
+import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe } from "react-icons/bs";
 import AddDaoLink from './DashBoard/Settings/AddDaoLink';
 import SimpleInputField from "UIpack/SimpleInputField";
 import { updateDao, updateDaoLinks } from 'state/dashboard/actions';
 import { resetUpdateDAOLoader, resetUpdateDaoLinksLoader } from 'state/dashboard/reducer';
 import { isValidUrl } from 'utils';
 import useRole from "hooks/useRole";
+import binRed from '../../assets/svg/bin-red.svg'
 import { SupportedChainId } from 'constants/chains';
 
 const Settings = () => {
@@ -107,8 +108,11 @@ const Settings = () => {
             else if (link.hostname.indexOf('google.') > -1) {
                 return <BsGoogle color='#B12F15' size={20} />
             }
+            else if (link.hostname.indexOf('twitter.') > -1) {
+                return <BsTwitter color='#B12F15' size={20} />
+            }
             else {
-                return <span><BsLink size={20} /></span>
+                return <span><BsGlobe size={20} /></span>
             }
         }
         catch (e) {
@@ -141,7 +145,9 @@ const Settings = () => {
     }
 
     const deleteLink = (item) => {
-
+        let links = _get(DAO, 'links', []);
+        links = links.filter(l => !(l.title === item.title && l.link === item.link))
+        dispatch(updateDao({ url: DAO?.url, payload: { links } }))
     }
 
     const handleKeyDown2 = (e) => {
@@ -333,14 +339,9 @@ const Settings = () => {
                                                 />
                                                 <span id={`link${index}`}></span>
                                             </div>
-                                            {/* <button
-                                                className="linkDeleteBtn"
-                                                onClick={() => {
-                                                    deleteLink(item);
-                                                }}
-                                            >
-                                                <AiOutlineClose style={{ height: 15, width: 15 }} />
-                                            </button> */}
+                                            <button className='linkDeleteBtn' onClick={() => deleteLink(item)}>
+												<img src={binRed} alt="bin-red" />
+											</button>
                                         </div>
                                     )
                                 })
@@ -352,7 +353,7 @@ const Settings = () => {
                                                 {handleParseUrl(item.link)}
                                                 <span>{item.title.length > 6 ? item.title.substring(0, 6) + "..." : item.title}</span>
                                             </button>
-                                            <p>{item.link}</p>
+                                            <p>{item.link.length > 6 ? item.link.substring(0, 40) + "..." : item.link}</p>
                                         </div>
                                     )
                                 })

@@ -21,7 +21,7 @@ import { useAppSelector, useAppDispatch } from "state/hooks";
 import { SiNotion } from "react-icons/si";
 import { HiOutlinePlus } from "react-icons/hi";
 import { CgClose } from 'react-icons/cg'
-import { BsDiscord, BsGoogle, BsGithub, BsLink } from "react-icons/bs";
+import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe } from "react-icons/bs";
 import AddMember from "./DashBoard/MemberCard/AddMember";
 
 import { getProject, updateProjectLink, getDao, updateProjectMember, deleteProjectMember, archiveProject, deleteProject } from "state/dashboard/actions";
@@ -155,8 +155,11 @@ const ProjectDetails = () => {
             else if (link.hostname.indexOf('google.') > -1) {
                 return <BsGoogle color='#B12F15' size={20} />
             }
+            else if (link.hostname.indexOf('twitter.') > -1) {
+                return <BsTwitter color='#B12F15' size={20} />
+            }
             else {
-                return <span><BsLink size={20} /></span>
+                return <span><BsGlobe size={20} /></span>
             }
         }
         catch (e) {
@@ -310,7 +313,7 @@ const ProjectDetails = () => {
                                 <div className='project-members'>
                                     <div className='project-members-header'>
                                         <p>Invite members</p>
-                                        <button onClick={toggleShowMember}>ADD NEW MEMBER</button>
+                                        {/* <button onClick={toggleShowMember}>ADD NEW MEMBER</button> */}
                                     </div>
                                     <div className="member-list">
                                         {

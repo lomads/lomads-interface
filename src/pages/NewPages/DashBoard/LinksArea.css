@@ -20,11 +20,11 @@
     filter: drop-shadow(3px 5px 4px rgba(27, 43, 65, 0.05)) drop-shadow(-3px -3px 8px rgba(201, 75, 50, 0.1));
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     color: #B12F15;
     min-width: 150px;
     margin-right: 20px;
-    padding: 0 20px;
+    padding: 0 12px;
     cursor: pointer;
 }
 

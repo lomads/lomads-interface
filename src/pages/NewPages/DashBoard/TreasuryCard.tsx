@@ -222,20 +222,22 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				.confirmTransaction(safeTxHash, signature.data)
 				.then(async (result) => {
 					console.log("on chain transaction has been confirmed by the signer");
-					await (await safeService(provider, `${chainId}`)).getTransactionConfirmations(safeTxHash)
-						.then(async (res) => {
-							console.log(res)
-							setRejectTxLoading(null);
-							setPendingTxn(prev => {
-								let succTxn = _find(prev, p => p.nonce === _nonce)
-								return prev?.map(tx => {
-									if (tx.safeTxHash === succTxn.safeTxHash)
-										return { ...succTxn, rejectedTxn: { safeTxHash, data: null, nonce: _nonce, confirmations: res.results } }
-									return tx
-								})
-							})
-							console.log("User confirmed the transaction");
-						})
+					await loadPendingTxn()
+					setRejectTxLoading(null);
+					// await (await safeService(provider, `${chainId}`)).getTransactionConfirmations(safeTxHash)
+					// 	.then(async (res) => {
+					// 		console.log(res)
+					// 		setRejectTxLoading(null);
+					// 		setPendingTxn(prev => {
+					// 			let succTxn = _find(prev, p => p.nonce === _nonce)
+					// 			return prev?.map(tx => {
+					// 				if (tx.safeTxHash === succTxn.safeTxHash)
+					// 					return { ...succTxn, rejectedTxn: { safeTxHash, data: null, nonce: _nonce, confirmations: res.results } }
+					// 				return tx
+					// 			})
+					// 		})
+					// 		console.log("User confirmed the transaction");
+					// 	})
 				})
 				.catch((err) => {
 					setRejectTxLoading(null);
@@ -265,6 +267,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				refundReceiver: _txs.refundReceiver,
 				nonce: _txs.nonce,
 			};
+			console.log(safeTransactionData)
 			const safeTransaction = await safeSDK.createTransaction({
 				safeTransactionData,
 			});
@@ -282,18 +285,21 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				(await executeTxResponse.transactionResponse.wait());
 			console.log("confirmed", receipt);
 			setExecuteTxLoading(null)
-			if (reject) {
-				setPendingTxn(prev => {
-					let parentTxn = _find(prev, p => p.rejectedTxn.safeTxHash === _txs.safeTxHash)
-					return prev?.filter(tx => tx.safeTxHash !== parentTxn.safeTxHash)
-				})
-			} else {
-				setPendingTxn(prev => {
-					let parentTxn = _find(prev, p => p.safeTxHash === _txs.safeTxHash)
-					return prev?.filter(tx => tx.safeTxHash !== parentTxn.safeTxHash)
-				})
-				await loadExecutedTxn()
-			}
+			await loadPendingTxn()
+			await loadExecutedTxn()
+			// if (reject) {
+			// 	setPendingTxn(prev => {
+			// 		let parentTxn = _find(prev, p => p.rejectedTxn.safeTxHash === _txs.safeTxHash)
+			// 		return prev?.filter(tx => tx.safeTxHash !== parentTxn.safeTxHash)
+			// 	})
+			// 	await loadExecutedTxn();
+			// } else {
+			// 	setPendingTxn(prev => {
+			// 		let parentTxn = _find(prev, p => p.safeTxHash === _txs.safeTxHash)
+			// 		return prev?.filter(tx => tx.safeTxHash !== parentTxn.safeTxHash)
+			// 	})
+			// 	await loadExecutedTxn()
+			// }
 			//await props.getPendingTransactions();
 		} catch (e) {
 			console.log(e)
