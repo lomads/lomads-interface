@@ -473,9 +473,9 @@ const ProjectDetails = () => {
                             </div>
                             {
                                 <div>
-                                    {/* <button>
+                                    <button>
                                         <img src={editToken} alt="hk-logo" />
-                                    </button> */}
+                                    </button>
 
                                     {canMyrole('project.delete') && <button onClick={() => setDeletePrompt(true)}>
                                         <img src={deleteIcon} alt="hk-logo" />
