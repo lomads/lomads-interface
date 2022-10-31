@@ -118,6 +118,7 @@ const AddNewSafe = () => {
 
 	const runAfterCreation = async (addr:string, owners: any) => {
 		console.log("runAfterCreation", "safe addr", addr)
+		if(!addr) return;
 		dispatch(updateSafeAddress(addr as string));
 		const totalAddresses = [...invitedMembers, ...Myvalue.current];
 		const value = totalAddresses.reduce((final: any, current: any) => {
