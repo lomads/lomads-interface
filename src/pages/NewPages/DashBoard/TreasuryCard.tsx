@@ -83,7 +83,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 			)
 			.then(ptx => _filter(ptx, p => {
 				let matchRejTx = _find(ptx, px => px.nonce === p.nonce && px.data === null);
-				return matchRejTx.safeTxHash !== p.safeTxHash
+				if(matchRejTx)
+					return matchRejTx.safeTxHash !== p.safeTxHash
+				return true
 			}))
 			.then(ptx => _filter(ptx, p => !p.dataDecoded || (_get(p, 'dataDecoded.method', '') === 'multiSend' || _get(p, 'dataDecoded.method', '') === 'transfer')))
 			.then(ptx => _sortBy(ptx, 'nonce', 'ASC'))

@@ -378,7 +378,7 @@ const Dashboard = () => {
 						/>
 					)}
 
-				<Tasks />
+				{/* <Tasks /> */}
 				<MyProject />
 				{(can(myRole, 'transaction.view') || isSafeOwner) &&
 					<TreasuryCard
