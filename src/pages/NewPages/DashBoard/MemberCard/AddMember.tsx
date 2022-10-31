@@ -121,7 +121,7 @@ const AddMember = (props: any) => {
 		}
 		else {
 			let ENSname = null;
-			if(chainId !== SupportedChainId.POLYGON)
+			if (chainId !== SupportedChainId.POLYGON)
 				ENSname = await provider?.lookupAddress(_ownerAddress);
 			if (ENSname) {
 				member.name = _ownerName !== '' ? _ownerName : ENSname;
@@ -158,24 +158,24 @@ const AddMember = (props: any) => {
 			setUploadLoading(true)
 			let validMembers = [];
 			let mem: any = {}
-			if(data.length > 0){
+			if (data.length > 0) {
 				const noHeader = _.find(Object.keys(data[0]), key => isAddressValid(key))
-				if(noHeader) {
-					Object.keys(data[0]).map((key:any) => {
-						if(isAddressValid(key))
+				if (noHeader) {
+					Object.keys(data[0]).map((key: any) => {
+						if (isAddressValid(key))
 							mem.address = key
 						else
 							mem.name = key
 					})
 				}
 				let newData = data;
-				if(Object.keys(mem).length > 0)
-					newData = [ ...newData, mem ]
+				if (Object.keys(mem).length > 0)
+					newData = [...newData, mem]
 				for (let index = 0; index < newData.length; index++) {
 					let preParseMember: any = newData[index];
 					let member: any = {}
-					Object.keys(preParseMember).map((key:any) => {
-						if(isAddressValid(preParseMember[key]))
+					Object.keys(preParseMember).map((key: any) => {
+						if (isAddressValid(preParseMember[key]))
 							member.address = preParseMember[key]
 						else
 							member.name = preParseMember[key]
@@ -190,7 +190,7 @@ const AddMember = (props: any) => {
 							}
 						} else {
 							let ENSname = null;
-							if(chainId !== SupportedChainId.POLYGON)
+							if (chainId !== SupportedChainId.POLYGON)
 								ENSname = await provider?.lookupAddress(member.address);
 							if (ENSname)
 								member.name = member.name ? member.name : ENSname
@@ -201,7 +201,7 @@ const AddMember = (props: any) => {
 						}
 					}
 				}
-	
+
 				setValidMembers(validMembers);
 				setUploadLoading(false)
 				setShowModal(true);
@@ -267,7 +267,7 @@ const AddMember = (props: any) => {
 				<div id="AddNewMember">
 					<div style={{ width: '100%', marginBottom: 8, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
 						<div className="inputTitle">Add member</div>
-						{/* {uploadLoading ? <LeapFrog size={24} color="#C94B32" /> : <Uploader onComplete={handleInsertWallets} />} */}
+						{uploadLoading ? <LeapFrog size={24} color="#C94B32" /> : <Uploader onComplete={handleInsertWallets} />}
 					</div>
 					<div className="inputArea">
 						<div style={{ marginRight: '10px' }}>

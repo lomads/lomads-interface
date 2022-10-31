@@ -271,6 +271,66 @@ body.active-modal {
     color: #188C7C;
 }
 
+.treasuryTokens {
+    width: 100%;
+    background: #FFFFFF;
+    border-radius: 5px;
+    padding: 26px 22px;
+    margin: 2px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.treasuryTokens .treasuryTokens-left {
+    display: flex;
+    align-items: center;
+}
+
+.treasuryTokens .treasuryTokens-left span {
+    margin: 0 15px;
+    color: #188C7C;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
+}
+
+.treasuryTokens .treasuryTokens-right {
+    display: flex;
+    align-items: center;
+}
+
+.treasuryTokens .treasuryTokens-right .tokenDiv {
+    display: flex;
+    align-items: center;
+    margin-right: 28px;
+}
+
+.treasuryTokens .treasuryTokens-right .tokenDiv:last-child {
+    margin: 0;
+}
+
+.treasuryTokens .treasuryTokens-right .tokenDiv span {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
+    color: #76808D;
+}
+
+.treasuryTokens .treasuryTokens-right .tokenDiv h1 {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
+    display: flex;
+    align-items: center;
+    letter-spacing: -0.011em;
+    color: rgba(118, 128, 141, 0.5);
+    margin-left: 5px;
+}
+
 #treasuryTransactions {
     display: flex;
     flex-direction: column;
@@ -283,7 +343,7 @@ body.active-modal {
     max-height: 344px;
     background: #FFFFFF;
     border-radius: 5px;
-    margin-top: 2px;
+    /* margin-top: 2px; */
     overflow-y: scroll;
 }
 
