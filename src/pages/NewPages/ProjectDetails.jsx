@@ -24,8 +24,8 @@ import { CgClose } from 'react-icons/cg'
 import { BsDiscord, BsGoogle, BsGithub, BsLink } from "react-icons/bs";
 import AddMember from "./DashBoard/MemberCard/AddMember";
 
-import { getProject, updateProjectLink, getDao, updateProjectMember, deleteProjectMember, archiveProject, deleteProject } from "state/dashboard/actions";
-import { resetUpdateProjectMemberLoader, resetDeleteProjectMemberLoader, resetArchiveProjectLoader, resetDeleteProjectLoader } from 'state/dashboard/reducer';
+import { getProject, updateProjectLink, getDao, updateProjectMember, deleteProjectMember, archiveProject, deleteProject, updateProject } from "state/dashboard/actions";
+import { resetUpdateProjectMemberLoader, resetDeleteProjectMemberLoader, resetArchiveProjectLoader, resetDeleteProjectLoader, resetUpdateProjectLoader } from 'state/dashboard/reducer';
 import AddLink from "./DashBoard/Project/AddLink";
 import Footer from "components/Footer";
 
@@ -33,6 +33,8 @@ import { useWeb3React } from "@web3-react/core";
 import { guild, role, user, setProjectName } from "@guildxyz/sdk";
 import { getSigner } from 'utils'
 import useRole from "hooks/useRole";
+
+import SimpleInputField from "UIpack/SimpleInputField";
 
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
@@ -44,10 +46,13 @@ const ProjectDetails = () => {
     const [showAddMember, setShowAddMember] = useState(false);
     const [showList, setShowList] = useState(false);
     const [showAddLink, setShowAddLink] = useState(false);
-    const { DAO, Project, ProjectLoading, updateProjectMemberLoading, deleteProjectMemberLoading, archiveProjectLoading, deleteProjectLoading } = useAppSelector((state) => state.dashboard);
+    const { DAO, Project, ProjectLoading, updateProjectMemberLoading, deleteProjectMemberLoading, archiveProjectLoading, deleteProjectLoading, updateProjectLoading } = useAppSelector((state) => state.dashboard);
     console.log("Project : ", Project)
     const daoName = _get(DAO, 'name', '').split(" ");
     const { myRole, can } = useRole(DAO, account);
+
+    const [name, setName] = useState('');
+    const [description, setDescription] = useState('');
 
     console.log("myRole", myRole)
 
@@ -58,6 +63,7 @@ const ProjectDetails = () => {
     const [newAddress, setNewAddress] = useState([]);
 
     const [editMember, setEditMember] = useState(false);
+    const [editMode, setEditMode] = useState(false);
 
     const [deleteMembers, setDeleteMembers] = useState([]);
     const [deletePrompt, setDeletePrompt] = useState(false);
@@ -129,6 +135,16 @@ const ProjectDetails = () => {
             navigate(-1);
         }
     }, [deleteProjectLoading]);
+
+    // runs after updating project name & description
+    useEffect(() => {
+        if (updateProjectLoading === false) {
+            dispatch(resetUpdateProjectLoader());
+            setName('');
+            setDescription('');
+            setEditMode(false);
+        }
+    }, [updateProjectLoading]);
 
     useEffect(() => {
         console.log("new address : ", newAddress);
@@ -281,6 +297,17 @@ const ProjectDetails = () => {
 
     const handleDeleteProject = () => {
         dispatch(deleteProject({ projectId, daoUrl: daoURL }));
+    }
+
+    const handleEditMode = () => {
+        setName(Project.name);
+        setDescription(Project.description);
+        setEditMode(true);
+    }
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            dispatch(updateProject({ projectId, daoUrl: daoURL, payload: { name, description } }))
+        }
     }
 
     return (
@@ -469,11 +496,26 @@ const ProjectDetails = () => {
                     <div className="projectDetails-top">
                         <div className="projectDetails-name">
                             <div>
-                                <h1>{Project?.name}</h1>
+                                {
+                                    editMode
+                                        ?
+                                        <SimpleInputField
+                                            className="inputField"
+                                            height={50}
+                                            width={180}
+                                            placeholder="Project name"
+                                            value={name}
+                                            onchange={(e) => { setName(e.target.value) }}
+                                            onKeyDown={(e) => handleKeyDown(e)}
+                                        />
+                                        :
+                                        <h1>{Project?.name}</h1>
+                                }
+
                             </div>
                             {
                                 <div>
-                                    <button>
+                                    <button onClick={handleEditMode}>
                                         <img src={editToken} alt="hk-logo" />
                                     </button>
 
@@ -502,7 +544,22 @@ const ProjectDetails = () => {
                             }
                         </div>
                         <div className="projectDetails-description">
-                            <p>{Project?.description}</p>
+                            {
+                                editMode
+                                    ?
+                                    <SimpleInputField
+                                        className="inputField"
+                                        height={50}
+                                        width={'50%'}
+                                        placeholder="Project description"
+                                        value={description}
+                                        onchange={(e) => { setDescription(e.target.value) }}
+                                        onKeyDown={(e) => handleKeyDown(e)}
+                                    />
+                                    :
+                                    <p>{Project?.description}</p>
+                            }
+
                         </div>
                     </div>
 

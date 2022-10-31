@@ -19,6 +19,7 @@ import {
 	updateProjectLink,
 	getProject,
 	addProjectLinks,
+	updateProject,
 	getCurrentUser,
 	updateCurrentUser
 } from "./actions";
@@ -46,6 +47,7 @@ export interface DashboardState {
 	archiveProjectLoading: boolean | null;
 	deleteProjectLoading: boolean | null;
 	addProjectLinksLoading: boolean | null;
+	updateProjectLoading: boolean | null;
 }
 
 const initialState: DashboardState = {
@@ -69,6 +71,7 @@ const initialState: DashboardState = {
 	archiveProjectLoading: null,
 	deleteProjectLoading: null,
 	addProjectLinksLoading: null,
+	updateProjectLoading: null,
 };
 
 const dashboardSlice = createSlice({
@@ -104,6 +107,9 @@ const dashboardSlice = createSlice({
 		},
 		resetCreateProjectLoader(state) {
 			state.createProjectLoading = null
+		},
+		resetUpdateProjectLoader(state) {
+			state.updateProjectLoading = null
 		},
 		resetAddProjectMemberLoader(state) {
 			state.addProjectMemberLoading = null
@@ -270,6 +276,15 @@ const dashboardSlice = createSlice({
 		[`${getProject.pending}`]: (state) => {
 			state.ProjectLoading = true;
 		},
+		// update project details
+		[`${updateProject.fulfilled}`]: (state, action) => {
+			state.updateProjectLoading = false;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
+		},
+		[`${updateProject.pending}`]: (state) => {
+			state.updateProjectLoading = true;
+		},
 		// add project members
 		[`${addProjectMember.fulfilled}`]: (state, action) => {
 			state.addProjectMemberLoading = false;
@@ -347,6 +362,7 @@ export const {
 	resetCreateProjectLoader,
 	resetAddProjectMemberLoader,
 	resetUpdateProjectMemberLoader,
+	resetUpdateProjectLoader,
 	resetDeleteProjectMemberLoader,
 	resetArchiveProjectLoader,
 	resetDeleteProjectLoader,
