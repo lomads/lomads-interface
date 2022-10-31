@@ -83,7 +83,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 			)
 			.then(ptx => _filter(ptx, p => {
 				let matchRejTx = _find(ptx, px => px.nonce === p.nonce && px.data === null);
-				if(matchRejTx)
+				if (matchRejTx)
 					return matchRejTx.safeTxHash !== p.safeTxHash
 				return true
 			}))
@@ -137,6 +137,16 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 			}
 		}
 	}, [DAO, daoURL, chainId])
+
+	useEffect(() => {
+		if (props.tokens) {
+			let total = 0;
+			props.tokens.map((t: any) => {
+				total = +t.fiatBalance + total
+			})
+			setTotalUSD(total.toFixed(2))
+		}
+	}, [props.tokens])
 
 	const handleConfirmTransaction = async (_safeTxHashs: string) => {
 		try {
@@ -301,18 +311,6 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	// 	}
 	// 	return 0
 	// }, [props.fiatBalance]);
-
-	const balanceUsd = useMemo(() => {
-		if (props.tokens) {
-			let total = 0;
-			props.tokens.map((t: any) => {
-				total = +t.fiatBalance + total
-			})
-			setTotalUSD(total.toFixed(2))
-		}
-	}, [props.tokens]);
-
-	console.log("TOKENS AMOUNT : ", balanceUsd)
 
 	const hasValidToken = useMemo(() => {
 		if (props.tokens && props.tokens.length > 0) {
