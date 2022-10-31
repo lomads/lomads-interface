@@ -41,6 +41,8 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
 	const { myRole, can } = useRole(DAO, account);
 
+	const [totalUSD, setTotalUSD] = useState<any>('0');
+
 	useImperativeHandle(props.innerRef, () => ({
 		reload: (event: any) => {
 			loadPendingTxn();
@@ -289,18 +291,28 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		}
 	};
 
-	const balance = useMemo(() => {
-		if (props.fiatBalance) {
+	// const balance = useMemo(() => {
+	// 	if (props.fiatBalance) {
+	// 		let total = 0;
+	// 		props.fiatBalance.map((t: any) => {
+	// 			total = +t.fiatBalance + total
+	// 		})
+	// 		return total.toFixed(2);
+	// 	}
+	// 	return 0
+	// }, [props.fiatBalance]);
+
+	const balanceUsd = useMemo(() => {
+		if (props.tokens) {
 			let total = 0;
-			props.fiatBalance.map((t: any) => {
+			props.tokens.map((t: any) => {
 				total = +t.fiatBalance + total
 			})
-			return total.toFixed(2);
+			setTotalUSD(total.toFixed(2))
 		}
-		return 0
-	}, [props.fiatBalance]);
+	}, [props.tokens]);
 
-	console.log("TOKENS", props.tokens)
+	console.log("TOKENS AMOUNT : ", balanceUsd)
 
 	const hasValidToken = useMemo(() => {
 		if (props.tokens && props.tokens.length > 0) {
@@ -343,33 +355,35 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
 			<div className="treasuryTokens">
 				<div className="treasuryTokens-left">
-					<img src={coin} alt="asset" />
-					<span>
-						$8,34
-					</span>
-					<div className="dashboardText">total balance</div>
+					{
+						totalUSD === '0.00'
+							?
+							null
+							:
+							<>
+								<img src={coin} alt="asset" />
+
+								<span>
+									${totalUSD}
+								</span>
+
+								<div className="dashboardText">total balance</div></>
+					}
+
 				</div>
 				<div className="treasuryTokens-right">
-					<div className="tokenDiv">
-						<span>240</span>
-						<h1>HK</h1>
-					</div>
-					<div className="tokenDiv">
-						<span>240</span>
-						<h1>BV</h1>
-					</div>
-					<div className="tokenDiv">
-						<span>240</span>
-						<h1>Rho</h1>
-					</div>
-					<div className="tokenDiv">
-						<span>240</span>
-						<h1>ToK</h1>
-					</div>
-					<div className="tokenDiv">
-						<span>240</span>
-						<h1>Eth</h1>
-					</div>
+					{
+						props.tokens.map((token: any) => {
+							return (
+								<>
+									<div className="tokenDiv">
+										<span>{`${_get(token, 'balance', 0) / 10 ** 18}`}</span>
+										<h1>{`${_get(token, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}`}</h1>
+									</div>
+								</>
+							)
+						})
+					}
 				</div>
 			</div>
 			<>
