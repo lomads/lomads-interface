@@ -454,7 +454,7 @@ const CreateProject = () => {
                                                                 <span style={{ fontSize: '13px', color: '#C84A32' }}>{linkError}</span>
                                                             </div>
                                                             {
-                                                                link && link.indexOf('discord.com') > -1
+                                                                link && link.indexOf('discord.') > -1
                                                                     ?
                                                                     <AddDiscordLink onGuildCreateSuccess={handleAddResource} title={title} link={link} roleName={roleName} accessControl={accessControl} />
                                                                     :

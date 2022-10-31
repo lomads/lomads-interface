@@ -31,6 +31,7 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
     const [poll, setPoll] = useState(null);
     const [addLinkLoading, setAddLinkLoading] = useState(null);
     const [hasClickedAuth, setHasClickedAuth] = useState(false)
+    const [addedLomdsBot, setAddedLomadsBot] = useState(false)
 
     const getDiscordServers = useCallback(async () => {
         console.log("getDiscordServers", authorization)
@@ -85,6 +86,12 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
     }, [channels, activeAddBotPopup])
 
     const onGuildBotAdded = async () => {
+        if(!addedLomdsBot){
+            const redirectUri = typeof window !== "undefined" && `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
+            openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=1036510041286639656&guild_id=${server.id}&permissions=1024&scope=bot&redirect_uri=${redirectUri}`)
+            setAddedLomadsBot(true)
+            return;
+        }
         try{
         setAddLinkLoading(true)
         const url = new URL(link)

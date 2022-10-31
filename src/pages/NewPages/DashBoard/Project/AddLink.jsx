@@ -41,7 +41,7 @@ const AddLink = (props) => {
         if (link.length > 8) {
             try {
                 const url = new URL(link);
-                if (url.hostname === 'discord.com' || url.hostname === 'discord.gg')
+                if (url.hostname.indexOf('discord.') > -1)
                     document.getElementById('accessControl').disabled = false;
                 else
                     document.getElementById('accessControl').disabled = true;
@@ -148,7 +148,7 @@ const AddLink = (props) => {
                         </div>
                         <div>
                             {
-                                link && link.indexOf('discord.com') > -1 ?
+                                link && link.indexOf('discord.') > -1 ?
                                     <AddDiscordLink onGuildCreateSuccess={handleAddLink} okButton title={title} link={link} roleName={roleName} accessControl={accessControl} /> :
                                     <SimpleButton title="OK" bgColor="#C94B32" className="button" fontsize={16} fontweight={400} height={40} width={129} onClick={() => handleAddLink()} />
                             }
