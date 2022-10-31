@@ -48,6 +48,7 @@ const AddNewSafe = () => {
 	const flow = useAppSelector((state) => state.flow);
 	let Myvalue = useRef<Array<InviteGangType>>([]);
 	const [polygonGasEstimate, setPolygonGasEstimate] = useState<any>(null)
+	let retries = 0;
 
 	//let thresholdValue = useRef<string>("");
 	const [thresholdValue, setThresholdValue] = useState<number>(1);
@@ -116,6 +117,7 @@ const AddNewSafe = () => {
 
 
 	const runAfterCreation = async (addr:string, owners: any) => {
+		console.log("runAfterCreation", "safe addr", addr)
 		dispatch(updateSafeAddress(addr as string));
 		const totalAddresses = [...invitedMembers, ...Myvalue.current];
 		const value = totalAddresses.reduce((final: any, current: any) => {
@@ -149,6 +151,25 @@ const AddNewSafe = () => {
 		dispatch(createDAO(payload))
 		setisLoading(false);
 	}
+
+
+	const checkNewSafe = (currentSafes:any, owners: any) => {
+		setTimeout(async () => {
+			const latestSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
+			console.log("latestSafes", latestSafes)
+			if(latestSafes.length === currentSafes.length && retries < 5) {
+				retries = retries + 1;
+				checkNewSafe(currentSafes, owners)
+			}
+			let newSafeAddr = _.find(latestSafes, ls => currentSafes.indexOf(ls) === -1)
+			console.log("FOUND NEW SAFE", newSafeAddr)
+			if(newSafeAddr)
+				runAfterCreation(newSafeAddr, owners)
+			else
+				console.log("checkNewSafe", "Could not find new safe")
+		}, 1000)
+	}
+
 
 	const deployNewSafe = async () => {
 		setisLoading(true);
@@ -217,10 +238,7 @@ const AddNewSafe = () => {
 			.catch(async (err) => {
 				console.log("An error occured while creating safe", err);
 				if(chainId === SupportedChainId.POLYGON) {
-					const latestSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
-					console.log("latestSafes", latestSafes)
-					let newSafeAddr = _.find(latestSafes, ls => currentSafes.indexOf(ls) === -1)
-					runAfterCreation(newSafeAddr, owners)
+					checkNewSafe(currentSafes, owners)
 				} else {
 					setisLoading(false);
 				}
