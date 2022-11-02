@@ -8,7 +8,7 @@ import memberIcon from '../../assets/svg/memberIcon.svg';
 import notionIcon from '../../assets/svg/Notion-logo.svg';
 import { AiOutlinePlus } from "react-icons/ai";
 import { SiNotion } from "react-icons/si";
-import { BsDiscord, BsGoogle, BsGithub, BsLink } from "react-icons/bs";
+import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe } from "react-icons/bs";
 import { toast, ToastContainer } from "react-toastify";
 import { ProjectContext } from "context/ProjectContext";
 import { useNavigate } from "react-router-dom";
@@ -138,8 +138,11 @@ const CreateProject = () => {
             else if (link.hostname.indexOf('google.') > -1) {
                 return <BsGoogle color='#B12F15' size={20} />
             }
+            else if (link.hostname.indexOf('twitter.') > -1) {
+                return <BsTwitter color='#B12F15' size={20} />
+            }
             else {
-                return <span><BsLink size={20} /></span>
+                return <span><BsGlobe size={20} /></span>
             }
         }
         catch (e) {

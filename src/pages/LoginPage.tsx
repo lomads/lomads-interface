@@ -167,7 +167,7 @@ const LoginPage = (props: any) => {
             SUPPORTED_CHAIN_IDS.map(chain => <option value={+chain}>{CHAIN_IDS_TO_NAMES[chain]}</option>)
           }
         </select>
-        <div className={"modalbuttons"}>
+        <div style={{ zIndex: 1 }} className={"modalbuttons"}>
           <button
             key="metamask"
             className="modalLoginButton"
