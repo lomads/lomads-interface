@@ -121,6 +121,14 @@ const Dashboard = () => {
 			})
 	}
 
+	const prevDAO = usePrevious(DAO);
+
+	useEffect(() => {
+		if(prevDAO && !DAO){
+			setSafeTokens([])
+		}
+	}, [DAO, prevDAO])
+
 	useEffect(() => {
 		if (chainId && !account)
 			window.location.href = '/login'
@@ -255,10 +263,8 @@ const Dashboard = () => {
 
 	useEffect(() => {
 		if (chainId && DAO && DAO.chainId === chainId) {
-			if (DAO && _get(DAO, 'url') === daoURL) {
+			if (DAO && _get(DAO, 'url') === daoURL)
 				prepare(_get(DAO, 'safe.address'))
-				getTokens(_get(DAO, 'safe.address'));
-			}
 		}
 	}, [DAO, daoURL, chainId]);
 
@@ -380,7 +386,7 @@ const Dashboard = () => {
 
 				{/* <Tasks /> */}
 				<MyProject />
-				{(can(myRole, 'transaction.view') || isSafeOwner) &&
+				{(can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') &&
 					<TreasuryCard
 						innerRef={treasuryRef}
 						safeAddress={safeAddress}

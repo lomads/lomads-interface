@@ -14,7 +14,10 @@ import {
   updateSafeAddress,
   updatesafeName,
   updateTotalMembers,
-  resetCreateDAOLoader
+  resetCreateDAOLoader,
+  updateDaoAddress,
+  updateDaoName,
+  updateInvitedGang
 } from "state/flow/reducer";
 import { ethers } from "ethers";
 import AddressInputField from "UIpack/AddressInputField";
@@ -27,6 +30,7 @@ import { createDAO } from '../../state/flow/actions';
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
 import { SupportedChainId, SUPPORTED_CHAIN_IDS, CHAIN_IDS_TO_NAMES } from 'constants/chains'
 import { usePrevious } from "hooks/usePrevious";
+import { updateDaoMember } from "state/dashboard/actions";
 
 const AddExistingSafe = () => {
   const dispatch = useAppDispatch();
@@ -111,8 +115,13 @@ const AddExistingSafe = () => {
 
   useEffect(() => {
     if(createDAOLoading == false){
+		dispatch(updateSafeAddress(''))
+		dispatch(updatesafeName(''))
+		dispatch(updateDaoName(''))
+		dispatch(updateInvitedGang([]))
+		dispatch(updateTotalMembers([]))
       setisLoading(false)
-      resetCreateDAOLoader()
+      dispatch(resetCreateDAOLoader())
       return navigate(`/success?dao=${flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, '')}`);
     }
     if(createDAOLoading == true)
@@ -136,7 +145,7 @@ const AddExistingSafe = () => {
       url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
       image: null,
       members: value.map((m:any) => {
-		return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase() }
+		return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: m.role ? m.role : owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'ADMIN' : 'CONTRIBUTOR' }
 	  }),
       safe: {
         name: safeName,

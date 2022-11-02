@@ -217,10 +217,11 @@ const ProjectDetails = () => {
                     window.open(inviteLink, '_blank')
                 }
             } else {
-                unlockLoading(null)
+                setUnlockLoading(null)
             }
         } catch (e) {
-            unlockLoading(null)
+            console.log(e)
+            setUnlockLoading(null)
         }
     }
 

@@ -99,7 +99,9 @@ const TransactionSend = (props: IselectTransactionSend) => {
 												width={106}
 												placeholder="Amount"
 												type="number"
+				
 												onchange={(e) => {
+													console.log(e.target.value)
 													props.setRecipient.current[index].amount =
 														e.target.value;
 												}}

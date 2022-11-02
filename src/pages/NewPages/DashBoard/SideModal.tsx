@@ -89,7 +89,7 @@ const SideModal = (props: IsideModal) => {
 					async (result: IsetRecipientType, index: number) => {
 						const unsignedTransaction = await token.populateTransaction.transfer(
 							result.recipient,
-							BigInt(parseInt(result.amount) * 10 ** 18)
+							BigInt(parseFloat(result.amount) * 10 ** 18)
 						);
 						const transactionData = {
 							to: selectedToken,

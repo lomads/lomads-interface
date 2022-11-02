@@ -20,6 +20,8 @@ import PendingTxn from './TreasuryCard/PendingTxn';
 import CompleteTxn from './TreasuryCard/CompleteTxn';
 import useRole from "hooks/useRole";
 import { SupportedChainId } from "constants/chains";
+import { usePrevious } from "hooks/usePrevious";
+import { off } from "process";
 
 const TreasuryCard = (props: ItreasuryCardType) => {
 	const { provider, account, chainId, ...rest } = useWeb3React();
@@ -42,6 +44,15 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	const { myRole, can } = useRole(DAO, account);
 
 	const [totalUSD, setTotalUSD] = useState<any>('0');
+
+	const prevDAO = usePrevious(DAO);
+
+	useEffect(() => {
+		if(prevDAO && !DAO){
+			setExecutedTxn(undefined)
+			setPendingTxn(undefined)
+		}
+	}, [DAO, prevDAO])
 
 	useImperativeHandle(props.innerRef, () => ({
 		reload: (event: any) => {
@@ -326,6 +337,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		return false
 	}, [props.tokens])
 
+	if(!DAO || (DAO && DAO.url !== daoURL))
+		return null
+
 	return (
 		<div className="treasuryCard">
 			<div className="treasuryHeader">
@@ -356,7 +370,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 					{owner && <SafeButton onClick={props.toggleModal} height={40} width={150} titleColor="#B12F15" title="SEND TOKEN" bgColor={!hasValidToken ? "#f0f2f6" : "#FFFFFF"} opacity={!hasValidToken ? "0.4" : "1"} disabled={!hasValidToken} fontweight={400} fontsize={16} />}
 				</div>
 			</div>
-
+			{ props.tokens && props.tokens.length > 0 &&
 			<div className="treasuryTokens">
 				<div className="treasuryTokens-left">
 					{
@@ -390,6 +404,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 					}
 				</div>
 			</div>
+			}
 			<>
 				{
 					pendingTxn !== undefined && executedTxn !== undefined &&
