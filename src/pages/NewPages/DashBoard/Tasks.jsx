@@ -13,7 +13,7 @@ import archiveIcon from '../../../assets/svg/archiveIcon.svg';
 
 const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
 
-const Tasks = () => {
+const Tasks = ({ toggleShowCreateTask }) => {
     const navigate = useNavigate();
     const { DAO } = useAppSelector((state) => state.dashboard);
     const { account } = useWeb3React();
@@ -89,7 +89,7 @@ const Tasks = () => {
                                 disabled={false}
                                 fontweight={400}
                                 fontsize={16}
-                                onClick={() => { }}
+                                onClick={() => { toggleShowCreateTask() }}
                             />
                         </div>
                     }

@@ -47,6 +47,7 @@ import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains';
 import { switchChain } from "utils/switchChain";
 import { SupportedChainId, SUPPORTED_CHAIN_IDS, CHAIN_IDS_TO_NAMES } from 'constants/chains'
 import Tasks from "./Tasks";
+import CreateTask from "./Task/CreateTask";
 
 const Dashboard = () => {
 	const dispatch = useAppDispatch();
@@ -70,6 +71,7 @@ const Dashboard = () => {
 	const [showNotification, setShowNotification] = useState<boolean>(false);
 	const [showAddMember, setShowAddMember] = useState<boolean>(false);
 	const [showEditMember, setShowEditMember] = useState<boolean>(false);
+	const [showCreateTask, setShowCreateTask] = useState<boolean>(false);
 	const [showNavBar, setShowNavBar] = useState<boolean>(false);
 	const [checkLoading, setCheckLoading] = useState<boolean>(true);
 	const currentNonce = useAppSelector((state) => state.flow.currentNonce);
@@ -105,6 +107,10 @@ const Dashboard = () => {
 
 	const toggleShowEditMember = () => {
 		setShowEditMember(!showEditMember);
+	};
+
+	const toggleShowCreateTask = () => {
+		setShowCreateTask(!showCreateTask);
 	};
 
 	const showSideBar = (_choice: boolean) => {
@@ -378,7 +384,7 @@ const Dashboard = () => {
 						/>
 					)}
 
-				{/* <Tasks /> */}
+				<Tasks toggleShowCreateTask={toggleShowCreateTask} />
 				<MyProject />
 				{(can(myRole, 'transaction.view') || isSafeOwner) &&
 					<TreasuryCard
@@ -421,6 +427,10 @@ const Dashboard = () => {
 			/>
 			{showAddMember && <AddMember toggleShowMember={toggleShowMember} />}
 			{showEditMember && <EditMember toggleShowEditMember={toggleShowEditMember} DAO={DAO} amIAdmin={amIAdmin} account={account} />}
+
+			{/* create task side modal */}
+			{showCreateTask && <CreateTask toggleShowCreateTask={toggleShowCreateTask} />}
+
 		</>
 	);
 };

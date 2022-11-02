@@ -10,7 +10,7 @@ const TaskCard = () => {
     const navigate = useNavigate();
 
     return (
-        <div className='tasks-card'>
+        <div className='tasks-card' onClick={() => navigate('/taskDetails')}>
             <div>
                 <p className="p-name">Project Name</p>
                 <span>
