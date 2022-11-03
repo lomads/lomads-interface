@@ -1,19 +1,88 @@
+import { useState, useEffect } from 'react';
+import { find as _find, get as _get, debounce as _debounce } from 'lodash';
 import './CreateTask.css';
 import { CgClose } from 'react-icons/cg'
 import createProjectSvg from '../../../../assets/svg/createProject.svg';
 
 import SimpleInputField from "UIpack/SimpleInputField";
-import { useState } from 'react';
 import { HiOutlinePlus } from 'react-icons/hi';
 import SelectRoles from './SelectRoles';
 
+import { useAppSelector, useAppDispatch } from "state/hooks";
+
+import { createTask } from 'state/dashboard/actions'
+import { resetCreateTaskLoader } from 'state/dashboard/reducer';
+
 const CreateTask = ({ toggleShowCreateTask }) => {
-    const [tab, setTab] = useState(2);
-    const [rolesEnabled, setRolesEnabled] = useState(false);
+
+    const dispatch = useAppDispatch();
+    const { DAO, createTaskLoading } = useAppSelector((state) => state.dashboard);
+
+    const [contributionType, setContributionType] = useState('assign');
+    const [isSingleContributor, setIsSingleContributor] = useState(false);
+    const [isFilterRoles, setIsFilterRoles] = useState(false);
     const [select, setSelect] = useState(false);
+    const [validRoles, setValidRoles] = useState([]);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [name, setName] = useState('');
+    const [description, setDescription] = useState('');
+    const [dchannel, setDChannel] = useState('');
+    const [deadline, setDeadline] = useState('');
+    const [projectId, setProjectId] = useState(null);
+    const [subLink, setSubLink] = useState('');
+    const [reviewer, setReviewer] = useState(null);
+    const [currency, setCurrency] = useState('MATIC');
+    const [amount, setAmount] = useState(0);
+
+    useEffect(() => {
+        if (createTaskLoading === false) {
+            dispatch(resetCreateTaskLoader());
+            setContributionType('assign');
+            setIsSingleContributor(false);
+            setIsFilterRoles(false);
+            setValidRoles([]);
+            setSelectedUser(null);
+            setName('');
+            setDescription('');
+            setDChannel('');
+            setDeadline('');
+            setProjectId(null);
+            setSubLink('');
+            setReviewer(null);
+            setCurrency('MATIC');
+            setAmount(0);
+            toggleShowCreateTask();
+        }
+    }, [createTaskLoading]);
 
     const toggleSelect = () => {
         setSelect(!select);
+    }
+
+    const handleSetApplicant = (userIndex) => {
+        let user = DAO.members[userIndex].member;
+        setSelectedUser({ _id: user._id, address: user.wallet });
+    }
+
+    const handleSubmit = () => {
+        let task = {};
+        task.daoId = DAO?._id;
+        task.name = name;
+        task.description = description;
+        task.applicant = selectedUser;
+        task.projectId = projectId;
+        task.discussionChannel = dchannel;
+        task.deadline = deadline;
+        task.submissionLink = subLink;
+        task.compensation = { currency, amount };
+        task.reviewer = reviewer;
+        task.contributionType = contributionType;
+        task.isSingleContributor = isSingleContributor;
+        task.isFilterRoles = isFilterRoles;
+        task.validRoles = validRoles;
+
+        console.log("task : ", task);
+        dispatch(createTask({ payload: task }))
     }
 
     return (
@@ -41,6 +110,8 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                     id="nameInput"
                                     height={50}
                                     width={'100%'}
+                                    value={name}
+                                    onchange={(e) => setName(e.target.value)}
                                     placeholder="Name of the task"
                                 />
                             </div>
@@ -51,6 +122,8 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                     style={{ width: '100%' }}
                                     className="inputField"
                                     placeholder='Enter task description'
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
                                 />
                             </div>
 
@@ -63,6 +136,8 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                         height={50}
                                         width={'100%'}
                                         placeholder="Dsicussion channel url"
+                                        value={dchannel}
+                                        onchange={(e) => setDChannel(e.target.value)}
                                     />
                                 </div>
                                 <div className='createTask-inputRow-half'>
@@ -73,6 +148,9 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                         height={50}
                                         width={'100%'}
                                         placeholder="Deadline"
+                                        value={deadline}
+                                        type="date"
+                                        onchange={(e) => setDeadline(e.target.value)}
                                     />
                                 </div>
                             </div>
@@ -85,12 +163,20 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                     </div>
                                 </div>
                                 <select
-                                    name="chain"
-                                    id="chain"
+                                    name="project"
+                                    id="project"
                                     className="tokenDropdown"
                                     style={{ width: '100%' }}
+                                    onChange={(e) => setProjectId(e.target.value)}
                                 >
-                                    <option value="ADMIN">Project Name</option>
+                                    <option value="">Select project</option>
+                                    {
+                                        _get(DAO, 'projects', []).map((item, index) => {
+                                            return (
+                                                <option value={`${item._id}`}>{item.name}</option>
+                                            )
+                                        })
+                                    }
                                 </select>
                             </div>
 
@@ -99,38 +185,46 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                             <div className='createTask-inputRow'>
                                 <span>Contribution</span>
                                 <div className='createTask-buttonRow'>
-                                    <button onClick={() => { setTab(1); setRolesEnabled(false) }} className={tab === 1 ? 'active' : null}>ASSIGN MEMBER</button>
-                                    <button onClick={() => setTab(2)} className={tab === 2 ? 'active' : null}>OPEN</button>
+                                    <button onClick={() => { setContributionType('assign'); setIsFilterRoles(false) }} className={contributionType === 'assign' ? 'active' : null}>ASSIGN MEMBER</button>
+                                    <button onClick={() => { setContributionType('open'); setSelectedUser(null) }} className={contributionType === 'open' ? 'active' : null}>OPEN</button>
                                 </div>
                             </div>
 
                             {
-                                tab === 1 &&
+                                contributionType === 'assign' &&
                                 <div className='createTask-inputRow'>
                                     <p style={{ margin: '0' }}>This member will be in charge of completing this task</p>
                                     <select
-                                        name="chain"
-                                        id="chain"
+                                        name="member"
+                                        id="member"
                                         className="tokenDropdown"
                                         style={{ width: '100%' }}
+                                        onChange={(e) => handleSetApplicant(e.target.value)}
                                     >
-                                        <option value="ADMIN">Select member</option>
+                                        <option value="">Select member</option>
+                                        {
+                                            _get(DAO, 'members', []).map((item, index) => {
+                                                return (
+                                                    <option value={`${index}`}>{item.member.name}</option>
+                                                )
+                                            })
+                                        }
                                     </select>
                                 </div>
                             }
 
                             {
-                                tab === 2 &&
+                                contributionType === 'open' &&
                                 <div className='contributor-section'>
                                     <div className='contributor-check'>
-                                        <input type="checkbox" onChange={(e) => console.log(e.target.value)} />
+                                        <input type="checkbox" onChange={(e) => setIsSingleContributor(!isSingleContributor)} />
                                         <div>
                                             <h1>SINGLE CONTRIBUTOR</h1>
                                             <span>The reviewer will pick a contributor from the applicants (if unchecked, everyone can contribute)</span>
                                         </div>
                                     </div>
                                     <div className='contributor-check'>
-                                        <input type="checkbox" onChange={(e) => setRolesEnabled(!rolesEnabled)} />
+                                        <input type="checkbox" onChange={(e) => setIsFilterRoles(!isFilterRoles)} />
                                         <div>
                                             <h1>FILTER BY ROLES (DISCORD)</h1>
                                         </div>
@@ -139,7 +233,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                             }
 
                             {
-                                rolesEnabled &&
+                                isFilterRoles &&
                                 <div className='selected-roles'>
                                     <div className='roles-left'>
                                         <div className='roles-li'>
@@ -192,6 +286,8 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                     id="nameInput"
                                     height={50}
                                     width={'100%'}
+                                    value={subLink}
+                                    onchange={(e) => setSubLink(e.target.value)}
                                     placeholder="Google drive folder, notion page, github"
                                 />
                             </div>
@@ -207,21 +303,35 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                         className="tokenDropdown"
                                         style={{ width: '100%' }}
                                     >
-                                        <option value="ADMIN">MATIC</option>
+                                        <option value="MATIC">MATIC</option>
                                     </select>
-                                    <input className="inputField" type={'number'} style={{ height: '50px' }} />
+                                    <input
+                                        className="inputField"
+                                        type={'number'}
+                                        style={{ height: '50px' }}
+                                        value={amount}
+                                        onChange={(e) => setAmount(parseInt(e.target.value))}
+                                    />
                                 </div>
                             </div>
 
                             <div className='createTask-inputRow'>
                                 <span>Reviewer</span>
                                 <select
-                                    name="chain"
-                                    id="chain"
+                                    name="reviewer"
+                                    id="reviewer"
                                     className="tokenDropdown"
                                     style={{ width: '100%' }}
+                                    onChange={(e) => setReviewer(e.target.value)}
                                 >
-                                    <option value="ADMIN">Select member</option>
+                                    <option value="">Select member</option>
+                                    {
+                                        _get(DAO, 'members', []).map((item, index) => {
+                                            return (
+                                                <option value={`${item.member.wallet}`}>{item.member.name}</option>
+                                            )
+                                        })
+                                    }
                                 </select>
                             </div>
 
@@ -231,7 +341,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                             <button onClick={() => toggleShowCreateTask()}>
                                 SAVE AS DRAFT
                             </button>
-                            <button>
+                            <button onClick={handleSubmit}>
                                 CREATE
                             </button>
                         </div>

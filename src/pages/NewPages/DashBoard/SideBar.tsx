@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 const SideBar = (props: any) => {
 	const navigate = useNavigate();
 	const { DAOList } = useAppSelector((state) => state.dashboard);
-	const name = props.name.split(" ");
+	const name = props.name ? props.name.split(" ") : 'Sample Dao';
 	const SideBarStrip = () => {
 		return (
 			<>

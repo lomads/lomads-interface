@@ -229,3 +229,12 @@ export const updateProjectLink = createAsyncThunk(
 			})
 	}
 );
+
+export const createTask = createAsyncThunk(
+	'dao/createTask',
+	async (params: any, thunkApi) => {
+		return axiosHttp.post(`task`, params.payload)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+)

@@ -21,7 +21,8 @@ import {
 	addProjectLinks,
 	updateProject,
 	getCurrentUser,
-	updateCurrentUser
+	updateCurrentUser,
+	createTask,
 } from "./actions";
 import { createContract } from "state/contract/actions";
 import { get as _get, find as _find } from "lodash";
@@ -48,6 +49,7 @@ export interface DashboardState {
 	deleteProjectLoading: boolean | null;
 	addProjectLinksLoading: boolean | null;
 	updateProjectLoading: boolean | null;
+	createTaskLoading: boolean | null;
 }
 
 const initialState: DashboardState = {
@@ -72,6 +74,7 @@ const initialState: DashboardState = {
 	deleteProjectLoading: null,
 	addProjectLinksLoading: null,
 	updateProjectLoading: null,
+	createTaskLoading: null,
 };
 
 const dashboardSlice = createSlice({
@@ -128,6 +131,9 @@ const dashboardSlice = createSlice({
 		},
 		resetAddProjectLinksLoader(state) {
 			state.addProjectLinksLoading = null
+		},
+		resetCreateTaskLoader(state) {
+			state.createTaskLoading = null
 		},
 		setDAOList(state, action) {
 			state.DAOList = action.payload
@@ -344,6 +350,14 @@ const dashboardSlice = createSlice({
 		[`${updateProjectLink.pending}`]: (state) => {
 
 		},
+		// task creation
+		[`${createTask.fulfilled}`]: (state, action) => {
+			state.createTaskLoading = false;
+			state.DAO = action.payload;
+		},
+		[`${createTask.pending}`]: (state) => {
+			state.createTaskLoading = true;
+		},
 	},
 });
 
@@ -367,6 +381,7 @@ export const {
 	resetArchiveProjectLoader,
 	resetDeleteProjectLoader,
 	resetAddProjectLinksLoader,
-	updateSafeTransaction
+	updateSafeTransaction,
+	resetCreateTaskLoader,
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;
