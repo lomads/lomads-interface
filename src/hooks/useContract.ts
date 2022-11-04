@@ -33,6 +33,7 @@ import { V3Migrator } from 'types/v3/V3Migrator'
 import { ABI as DAOAbi } from "abis/DaoFactory";
 import { getContract } from '../utils'
 import { TOKEN_ABI as TokenAbi } from 'abis/DaoToken'
+import { SupportedChainId } from 'constants/chains'
 
 const { abi: IUniswapV2PairABI } = IUniswapV2PairJson
 const { abi: IUniswapV2Router02ABI } = IUniswapV2Router02Json
@@ -128,9 +129,17 @@ export function DAOTokenContract(_tokenAddress: string) {
 }
 
 export function useSBTDeployerContract(){
-  return useContract(SBT_DEPLOYER_ADDRESSES, SBTDEPLOYER_ABI, true);
+  const { chainId } = useWeb3React()
+  let path = require('../abis/SBTDeployer.json')
+  if(chainId === SupportedChainId.POLYGON)
+    path = require('../abisPolygon/SBTDeployer.json')
+  return useContract(SBT_DEPLOYER_ADDRESSES, path, true);
 }
 
 export function useSBTContract(contractAddr : String) {
-  return useContract(contractAddr, SBT_ABI, true);
+  const { chainId } = useWeb3React()
+  let path = require('../abis/SBT.json')
+  if(chainId === SupportedChainId.POLYGON)
+    path = require('../abisPolygon/SBT.json')
+  return useContract(contractAddr, path, true);
 }
