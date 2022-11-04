@@ -27,6 +27,7 @@ import { guild } from "@guildxyz/sdk";
 import { useWeb3React } from "@web3-react/core";
 import { getSigner } from 'utils'
 import AddDiscordLink from 'components/AddDiscordLink';
+import AddNotionLink from 'components/AddNotionLink';
 import { nanoid } from '@reduxjs/toolkit';
 
 const CreateProject = () => {
@@ -48,6 +49,7 @@ const CreateProject = () => {
     const [link, setLink] = useState('');
     const [linkError, setLinkError] = useState(null);
     const [roleName, setRoleName] = useState(null);
+    const [spaceDomain, setSpaceDomain] = useState(null);
     const [accessControl, setAccessControl] = useState(false);
     const [title, setTitle] = useState('');
     const [titleError, setTitleError] = useState(null);
@@ -89,7 +91,7 @@ const CreateProject = () => {
         if (link.length > 8 && accessControlElement) {
             try {
                 const url = new URL(link);
-                if (url.hostname === 'discord.com' || url.hostname === 'discord.gg')
+                if (url.hostname.indexOf('discord.') > -1 || url.hostname.indexOf('notion.') > -1 )
                     accessControlElement.disabled = false;
                 else
                     accessControlElement.disabled = true;
@@ -229,6 +231,13 @@ const CreateProject = () => {
         project.daoId = DAO?._id;
         console.log(project)
        dispatch(createProject({ payload: project }))
+    }
+
+    const LinkBtn = (props) => {
+        if(link && link.indexOf('discord.') > -1)
+            return <AddDiscordLink {...props} />
+        if(link && link.indexOf('notion.') > -1)
+            return <AddNotionLink {...props} />
     }
 
     return (
@@ -458,9 +467,8 @@ const CreateProject = () => {
                                                                 <span style={{ fontSize: '13px', color: '#C84A32' }}>{linkError}</span>
                                                             </div>
                                                             {
-                                                                link && link.indexOf('discord.com') > -1
-                                                                    ?
-                                                                    <AddDiscordLink onGuildCreateSuccess={handleAddResource} title={title} link={link} roleName={roleName} accessControl={accessControl} />
+                                                                link && (link.indexOf('discord.') > -1 || link.indexOf('notion.') > -1) ?
+                                                                    <LinkBtn spaceDomain={spaceDomain} onGuildCreateSuccess={handleAddResource} title={title} link={link} roleName={roleName} accessControl={accessControl} />
                                                                     :
                                                                     <button
                                                                         style={link !== '' && title !== '' ? { background: '#C84A32' } : null}
@@ -470,7 +478,7 @@ const CreateProject = () => {
                                                                     </button>
                                                             }
                                                         </div>
-                                                        {accessControl ? <div className='resource-body'>
+                                                        {accessControl && link && link.indexOf('discord.') > -1 ? <div className='resource-body'>
                                                             <div>
                                                             <input
                                                                 type="text"
@@ -483,6 +491,19 @@ const CreateProject = () => {
                                                             />
                                                             </div>
                                                         </div> : null}
+                                                        {accessControl && link && link.indexOf('notion.') > -1 ? <div className='resource-body'>
+                                                            <div>
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Space domain"
+                                                                className="input2"
+                                                                style={{ marginTop: 16 }}
+                                                                name="spaceDomain"
+                                                                value={spaceDomain}
+                                                                onChange={(e) => setSpaceDomain(e.target.value)}
+                                                            />
+                                                            </div>
+                                                        </div> : null}
                                                         {
                                                             DAO?.sbt
                                                                 ?
@@ -490,7 +511,7 @@ const CreateProject = () => {
                                                                     <input id="accessControl" type="checkbox" value={accessControl} disabled={true} onChange={e => setAccessControl(prev => !prev)} />
                                                                     <div>
                                                                         <p>ACCESS CONTROL</p>
-                                                                        <span>Currently available for discord only</span>
+                                                                        <span>Currently available for discord & notion only</span>
                                                                     </div>
                                                                 </div>
                                                                 :
