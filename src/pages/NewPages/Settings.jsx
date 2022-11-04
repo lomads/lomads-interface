@@ -34,7 +34,7 @@ const Settings = () => {
     const [update, setUpdate] = useState(0);
     const { provider, chainId, account, connector } = useWeb3React();
     const { DAO, updateDaoLoading, updateDaoLinksLoading } = useAppSelector((state) => state.dashboard);
-    const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
+    const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '', chainId);
     console.log("DAO data : ", DAO);
     const daoName = _get(DAO, 'name', '').split(" ");
     const [copy, setCopy] = useState(false);

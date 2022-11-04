@@ -77,7 +77,7 @@ const Dashboard = () => {
 
 	console.log("role", myRole)
 
-	const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
+	const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '', chainId);
 
 	const amIAdmin = useMemo(() => {
 		if (DAO) {
