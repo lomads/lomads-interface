@@ -399,8 +399,9 @@ const Settings = () => {
                             :
                             <>
                                 <p>The organisation doesn’t have token yet</p>
-                                <button style={{ backgroundColor: chainId === SupportedChainId.POLYGON ? 'grey' : '#b24734' }} disabled={chainId === SupportedChainId.POLYGON} onClick={() => navigate('/sbt/create')}>configure pass token</button>
-                                { chainId === SupportedChainId.POLYGON && <p style={{ marginTop: 6 }}>Coming soon on polygon</p> }
+                                <button style={{ backgroundColor: '#b24734' }} onClick={() => navigate('/sbt/create')}>configure pass token</button>
+                                {/* <button style={{ backgroundColor: chainId === SupportedChainId.POLYGON ? 'grey' : '#b24734' }} disabled={chainId === SupportedChainId.POLYGON} onClick={() => navigate('/sbt/create')}>configure pass token</button> */}
+                                {/* { chainId === SupportedChainId.POLYGON && <p style={{ marginTop: 6 }}>Coming soon on polygon</p> } */}
                             </>
                     }
                 </div> 
