@@ -18,7 +18,7 @@ import { useAppSelector, useAppDispatch } from "state/hooks";
 import axiosHttp from '../api';
 import { nanoid } from "@reduxjs/toolkit";
 
-export default ({ title, desc, link, spaceDomain, accessControl, okButton, ...props }) => {
+export default ({ title, desc, link, spaceDomain, accessControl, okButton, onNotionCheckStatus, ...props }) => {
 
     const { provider, account, chainId } = useWeb3React();
 
@@ -34,8 +34,14 @@ export default ({ title, desc, link, spaceDomain, accessControl, okButton, ...pr
         }
         else {
             if(accessControl){
-                axiosHttp.get(`/project/notion/space-admin-status?${spaceDomain}`)
-                .then(res => console.log(res.data))
+                axiosHttp.get(`/project/notion/space-admin-status?domain=${spaceDomain}`)
+                .then(res => onNotionCheckStatus(res.data))
+                .catch(e => {
+                    console.log(e)
+                    onNotionCheckStatus(false)
+                })
+            } else {
+                onNotionCheckStatus(true)
             }
         }
     }
