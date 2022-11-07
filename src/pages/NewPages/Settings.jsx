@@ -34,7 +34,7 @@ const Settings = () => {
     const [update, setUpdate] = useState(0);
     const { provider, chainId, account, connector } = useWeb3React();
     const { DAO, updateDaoLoading, updateDaoLinksLoading } = useAppSelector((state) => state.dashboard);
-    const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
+    const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '', chainId);
     console.log("DAO data : ", DAO);
     const daoName = _get(DAO, 'name', '').split(" ");
     const [copy, setCopy] = useState(false);
@@ -399,8 +399,9 @@ const Settings = () => {
                             :
                             <>
                                 <p>The organisation doesn’t have token yet</p>
-                                <button style={{ backgroundColor: chainId === SupportedChainId.POLYGON ? 'grey' : '#b24734' }} disabled={chainId === SupportedChainId.POLYGON} onClick={() => navigate('/sbt/create')}>configure pass token</button>
-                                { chainId === SupportedChainId.POLYGON && <p style={{ marginTop: 6 }}>Coming soon on polygon</p> }
+                                <button style={{ backgroundColor: '#b24734' }} onClick={() => navigate('/sbt/create')}>configure pass token</button>
+                                {/* <button style={{ backgroundColor: chainId === SupportedChainId.POLYGON ? 'grey' : '#b24734' }} disabled={chainId === SupportedChainId.POLYGON} onClick={() => navigate('/sbt/create')}>configure pass token</button> */}
+                                {/* { chainId === SupportedChainId.POLYGON && <p style={{ marginTop: 6 }}>Coming soon on polygon</p> } */}
                             </>
                     }
                 </div> 

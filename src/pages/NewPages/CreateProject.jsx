@@ -200,6 +200,7 @@ const CreateProject = () => {
             resource.id = nanoid(16);
             resource.title = title;
             resource.link = tempLink;
+            resource.provider = new URL(tempLink).hostname;
             let dcserverid = undefined;
             if (guildId)
                 dcserverid = new URL(tempLink).pathname.split('/')[2]
@@ -470,6 +471,7 @@ const CreateProject = () => {
                                                             }
                                                         </div>
                                                         {accessControl ? <div className='resource-body'>
+                                                            <div>
                                                             <input
                                                                 type="text"
                                                                 placeholder="Role name"
@@ -479,6 +481,7 @@ const CreateProject = () => {
                                                                 value={roleName}
                                                                 onChange={(e) => setRoleName(e.target.value)}
                                                             />
+                                                            </div>
                                                         </div> : null}
                                                         {
                                                             DAO?.sbt

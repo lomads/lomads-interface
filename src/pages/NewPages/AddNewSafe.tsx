@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import _ from "lodash";
 import "../../styles/pages/AddNewSafe.css";
@@ -16,7 +16,9 @@ import {
 	updatesafeName,
 	updateThreshold,
 	updateTotalMembers,
-	resetCreateDAOLoader
+	resetCreateDAOLoader,
+	updateDaoName,
+	updateInvitedGang
 } from "state/flow/reducer";
 import daoMember2 from "../../assets/svg/daoMember2.svg";
 import { updateHolder } from "state/proposal/reducer";
@@ -54,13 +56,15 @@ const AddNewSafe = () => {
 	const [thresholdValue, setThresholdValue] = useState<number>(1);
 
 	useEffect(() => {
-		const { name, address } = invitedMembers[0];
-		const creator = { name: name, address: address };
-		const check = Myvalue.current.some(
-			(owner) => owner.address === creator.address
-		);
-		if (!check) {
-			Myvalue.current.push(creator);
+		if(invitedMembers && invitedMembers.length > 0) {
+			const { name, address } = invitedMembers[0];
+			const creator = { name: name, address: address };
+			const check = Myvalue.current.some(
+				(owner) => owner.address === creator.address
+			);
+			if (!check) {
+				Myvalue.current.push(creator);
+			}
 		}
 	}, [invitedMembers]);
 
@@ -96,7 +100,12 @@ const AddNewSafe = () => {
 	useEffect(() => {
 		if (createDAOLoading == false) {
 			setisLoading(false)
-			resetCreateDAOLoader()
+			dispatch(updateSafeAddress(''))
+			dispatch(updatesafeName(''))
+			dispatch(updateDaoName(''))
+			dispatch(updateInvitedGang([]))
+			dispatch(updateTotalMembers([]))
+			dispatch(resetCreateDAOLoader())
 			return navigate(`/success?dao=${flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, '')}`);
 		}
 		if (createDAOLoading == true)
@@ -225,7 +234,7 @@ const AddNewSafe = () => {
 					image: null,
 					members: value.map((m: any) => {
 						return {
-							...m, creator: m.address.toLowerCase() === account?.toLowerCase()
+							...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: m.role ? m.role : 'CONTRIBUTOR'
 						}
 					}),
 					safe: {
@@ -245,6 +254,9 @@ const AddNewSafe = () => {
 				}
 			});
 	};
+
+	const deployNewSafeDelayed = useCallback(_.debounce(deployNewSafe, 1000), [deployNewSafe])
+
 	const AddOwners = () => {
 		return (
 			<>
@@ -407,11 +419,12 @@ const AddNewSafe = () => {
 				<div className="createButton">
 					<SimpleLoadButton
 						title="CREATE SAFE"
-						bgColor="#C94B32"
+						bgColor={isLoading ? 'grey' : "#C94B32" }
 						height={50}
 						width={250}
 						fontsize={20}
-						onClick={deployNewSafe}
+						disabled={isLoading}
+						onClick={deployNewSafeDelayed}
 						condition={isLoading}
 					/>
 				</div>

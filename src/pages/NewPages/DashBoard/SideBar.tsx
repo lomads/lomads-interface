@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import { get as _get } from 'lodash'
 import "../../../styles/pages/DashBoard/DashBoard.css";
 import plus from "../../../assets/svg/plus.svg";
-import { useAppSelector } from "state/hooks";
+import { useAppSelector, useAppDispatch } from "state/hooks";
 import { useNavigate } from "react-router-dom";
+import { setDAO } from "state/dashboard/reducer";
 
 const SideBar = (props: any) => {
 	const navigate = useNavigate();
+	const dispatch = useAppDispatch()
 	const { DAOList } = useAppSelector((state) => state.dashboard);
 	const name = props.name ? props.name.split(" ") : 'Sample Dao';
 	const SideBarStrip = () => {
@@ -15,12 +17,14 @@ const SideBar = (props: any) => {
 				<div className="sideBarStrip">
 					{
 						DAOList && DAOList.map(dao => {
-							const daoName = _get(dao, 'name', '').split(" ");
+							console.log("const daoName", dao)
+							const daoName = _get(dao, 'name', '') ? _get(dao, 'name', '').split(" ") : '';
 							return (
 								<div className="sideBarStripItem">
 									<div
 										className="stripInvertedBoxOutline"
 										onClick={() => {
+											dispatch(setDAO(null))
 											navigate(`/${dao.url}`);
 										}}
 									>

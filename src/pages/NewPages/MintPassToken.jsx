@@ -40,7 +40,7 @@ const MintPassToken = () => {
     const [telegramError, setTelegramError] = useState(false);
     const { account, chainId, provider } = useWeb3React();
     const { user, DAO, DAOLoading } = useAppSelector((state) => state.dashboard);
-    const { needWhitelist, isWhitelisted, balanceOf, contractName, currentIndex } = useSBTStats(provider, account, update, contractAddr ? contractAddr : '');
+    const { needWhitelist, isWhitelisted, balanceOf, contractName, currentIndex } = useSBTStats(provider, account, update, contractAddr ? contractAddr : '', chainId);
     const sbtContract = useSBTContract(contractAddr ? contractAddr : null);
 
     useEffect(() => {

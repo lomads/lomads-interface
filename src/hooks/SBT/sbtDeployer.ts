@@ -52,7 +52,8 @@ export const createNewSBT = async (sbtDeployerContract: Contract, SBTConstructor
 export const getContractById = async (sbtDeployerContract: Contract, id: BigNumber) => {
     if (sbtDeployerContract.signer || sbtDeployerContract.provider) {
         try {
-            const contractAddr = await sbtDeployerContract.getContractByIndex(parseInt(id.toString()));
+            console.log(parseInt(id.toString()))
+            const contractAddr = await sbtDeployerContract.getContractByIndex(BigNumber.from(parseInt(id.toString())));
             return contractAddr;
         }
         catch (e) {

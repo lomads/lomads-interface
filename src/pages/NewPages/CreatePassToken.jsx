@@ -207,22 +207,25 @@ const CreatePassToken = () => {
                 return;
             }
             else {
-                console.log("Contract deployed");
+                console.log("Contract deployed", tx, counter);
                 const contractAddr = await getContractById(sbtDeployerContract, counter);
-                setContractAddr(contractAddr);
-                const contractJSON = {
-                    name: sbtName,
-                    image,
-                    tokenSupply: tokenQuantity,
-                    address: contractAddr,
-                    admin: account,
-                    whitelisted,
-                    contactDetail: selectedOptions,
-                    metadata: [],
-                    membersList: memberList,
-                    daoId: DAO._id
+                console.log(contractAddr)
+                if(contractAddr) {
+                    setContractAddr(contractAddr);
+                    const contractJSON = {
+                        name: sbtName,
+                        image,
+                        tokenSupply: tokenQuantity,
+                        address: contractAddr,
+                        admin: account,
+                        whitelisted,
+                        contactDetail: selectedOptions,
+                        metadata: [],
+                        membersList: memberList,
+                        daoId: DAO._id
+                    }
+                    dispatch(createContract(contractJSON))
                 }
-                dispatch(createContract(contractJSON))
                 //     const req = await APInewContract(contractJSON);
                 //     if (req){
                 //         setIsLoading(false)

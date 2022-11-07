@@ -69,10 +69,13 @@ const AddLink = (props) => {
             if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
                 tempLink = 'https://' + tempLink;
             }
-            let dcserverid = undefined;
-            if (guildId)
-                dcserverid = new URL(tempLink).pathname.split('/')[2]
-            const resource = { id: nanoid(16), title, link: tempLink, platformId: dcserverid, accessControl, ...(guildId ? { guildId } : {}) };
+            let platformId = undefined;
+            if (guildId){
+                console.log(new URL(link).pathname.split('/')[2])
+                platformId = new URL(link).pathname.split('/')[2]
+            }
+            const resource = { id: nanoid(16), title, link: tempLink, provider: new URL(link).hostname, platformId, accessControl, ...(guildId ? { guildId } : {}) };
+            console.log(resource)
             dispatch(addProjectLinks({ projectId: props.projectId, daoUrl: props.daoUrl, payload: resource }))
         }
     };

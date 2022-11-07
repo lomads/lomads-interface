@@ -79,7 +79,7 @@ const Dashboard = () => {
 
 	console.log("role", myRole)
 
-	const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
+	const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '', chainId);
 
 	const amIAdmin = useMemo(() => {
 		if (DAO) {
@@ -126,6 +126,14 @@ const Dashboard = () => {
 				window.location.href = '/'
 			})
 	}
+
+	const prevDAO = usePrevious(DAO);
+
+	useEffect(() => {
+		if(prevDAO && !DAO){
+			setSafeTokens([])
+		}
+	}, [DAO, prevDAO])
 
 	useEffect(() => {
 		if (chainId && !account)
@@ -261,10 +269,8 @@ const Dashboard = () => {
 
 	useEffect(() => {
 		if (chainId && DAO && DAO.chainId === chainId) {
-			if (DAO && _get(DAO, 'url') === daoURL) {
+			if (DAO && _get(DAO, 'url') === daoURL)
 				prepare(_get(DAO, 'safe.address'))
-				getTokens(_get(DAO, 'safe.address'));
-			}
 		}
 	}, [DAO, daoURL, chainId]);
 
@@ -386,7 +392,7 @@ const Dashboard = () => {
 
 				<Tasks toggleShowCreateTask={toggleShowCreateTask} />
 				<MyProject />
-				{(can(myRole, 'transaction.view') || isSafeOwner) &&
+				{(can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') &&
 					<TreasuryCard
 						innerRef={treasuryRef}
 						safeAddress={safeAddress}
