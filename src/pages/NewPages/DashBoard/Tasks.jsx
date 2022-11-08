@@ -96,13 +96,16 @@ const Tasks = ({ toggleShowCreateTask }) => {
                 </div>
             </div>
 
-            <div className='tasks-body' style={data.length > 6 ? { height: '272px', overflow: 'scroll' } : null}>
+            <div className='tasks-body'>
                 {
-                    data.map((item, index) => {
+                    _get(DAO, 'tasks', []).map((item, index) => {
                         if (index < 20) {
                             return (
                                 <div key={index}>
-                                    <TaskCard />
+                                    <TaskCard
+                                        task={item}
+                                        daoUrl={DAO?.url}
+                                    />
                                 </div>
                             )
                         }

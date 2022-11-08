@@ -89,7 +89,7 @@ export default [
         component: ProjectDetails
     },
     {
-        path: '/taskDetails',
+        path: '/:daoURL/task/:taskId',
         component: TaskDetails
     },
     {

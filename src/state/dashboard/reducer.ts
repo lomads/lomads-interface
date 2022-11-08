@@ -23,6 +23,9 @@ import {
 	getCurrentUser,
 	updateCurrentUser,
 	createTask,
+	draftTask,
+	getTask,
+	applyTask,
 } from "./actions";
 import { createContract } from "state/contract/actions";
 import { get as _get, find as _find } from "lodash";
@@ -50,6 +53,10 @@ export interface DashboardState {
 	addProjectLinksLoading: boolean | null;
 	updateProjectLoading: boolean | null;
 	createTaskLoading: boolean | null;
+	Task: any;
+	TaskLoading: boolean | null;
+	draftTaskLoading: boolean | null;
+	applyTaskLoading: boolean | null;
 }
 
 const initialState: DashboardState = {
@@ -75,6 +82,10 @@ const initialState: DashboardState = {
 	addProjectLinksLoading: null,
 	updateProjectLoading: null,
 	createTaskLoading: null,
+	Task: null,
+	TaskLoading: null,
+	draftTaskLoading: null,
+	applyTaskLoading: null,
 };
 
 const dashboardSlice = createSlice({
@@ -134,6 +145,12 @@ const dashboardSlice = createSlice({
 		},
 		resetCreateTaskLoader(state) {
 			state.createTaskLoading = null
+		},
+		resetDraftTaskLoader(state) {
+			state.draftTaskLoading = null
+		},
+		resetApplyTaskLoader(state) {
+			state.applyTaskLoading = null
 		},
 		setDAOList(state, action) {
 			state.DAOList = action.payload
@@ -358,6 +375,31 @@ const dashboardSlice = createSlice({
 		[`${createTask.pending}`]: (state) => {
 			state.createTaskLoading = true;
 		},
+		// draft a task
+		[`${draftTask.fulfilled}`]: (state, action) => {
+			state.draftTaskLoading = false;
+			state.DAO = action.payload;
+		},
+		[`${draftTask.pending}`]: (state) => {
+			state.draftTaskLoading = true;
+		},
+		// get task
+		[`${getTask.fulfilled}`]: (state, action) => {
+			state.TaskLoading = false;
+			state.Task = action.payload;
+		},
+		[`${getTask.pending}`]: (state) => {
+			state.TaskLoading = true;
+		},
+		// apply task
+		[`${applyTask.fulfilled}`]: (state, action) => {
+			state.applyTaskLoading = false;
+			state.Task = action.payload.task;
+			state.DAO = action.payload.dao;
+		},
+		[`${applyTask.pending}`]: (state) => {
+			state.applyTaskLoading = true;
+		},
 	},
 });
 
@@ -383,5 +425,7 @@ export const {
 	resetAddProjectLinksLoader,
 	updateSafeTransaction,
 	resetCreateTaskLoader,
+	resetDraftTaskLoader,
+	resetApplyTaskLoader,
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

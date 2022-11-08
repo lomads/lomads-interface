@@ -70,7 +70,7 @@ const AddLink = (props) => {
                 tempLink = 'https://' + tempLink;
             }
             let platformId = undefined;
-            if (guildId){
+            if (guildId) {
                 console.log(new URL(link).pathname.split('/')[2])
                 platformId = new URL(link).pathname.split('/')[2]
             }

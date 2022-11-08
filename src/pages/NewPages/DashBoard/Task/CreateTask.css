@@ -75,6 +75,12 @@
     margin-bottom: 30px;
 }
 
+.createTaskOverlay .createTaskContainer .createTask-body .createTask-inputRow .error-msg {
+    margin-bottom: 0;
+    font-size: 13px;
+    color: #C94B32;
+}
+
 .createTaskOverlay .createTaskContainer .createTask-body .createTask-inputRow.row-align {
     display: flex;
     align-items: center;
@@ -241,7 +247,7 @@
 }
 
 .createTaskOverlay .createTaskContainer .createTask-body .selected-roles .roles-left .roles-li .roles-pill {
-    width: 120px;
+    width: 200px;
     height: 30px;
     border-radius: 100px;
     display: flex;

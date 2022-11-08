@@ -3,6 +3,7 @@ import { find as _find, get as _get, debounce as _debounce } from 'lodash';
 import './CreateTask.css';
 import { CgClose } from 'react-icons/cg'
 import createProjectSvg from '../../../../assets/svg/createProject.svg';
+import createTaskSvg from '../../../../assets/svg/task.svg';
 
 import SimpleInputField from "UIpack/SimpleInputField";
 import { HiOutlinePlus } from 'react-icons/hi';
@@ -10,13 +11,13 @@ import SelectRoles from './SelectRoles';
 
 import { useAppSelector, useAppDispatch } from "state/hooks";
 
-import { createTask } from 'state/dashboard/actions'
-import { resetCreateTaskLoader } from 'state/dashboard/reducer';
+import { createTask, draftTask } from 'state/dashboard/actions'
+import { resetCreateTaskLoader, resetDraftTaskLoader } from 'state/dashboard/reducer';
 
 const CreateTask = ({ toggleShowCreateTask }) => {
 
     const dispatch = useAppDispatch();
-    const { DAO, createTaskLoading } = useAppSelector((state) => state.dashboard);
+    const { DAO, createTaskLoading, draftTaskLoading } = useAppSelector((state) => state.dashboard);
 
     const [contributionType, setContributionType] = useState('assign');
     const [isSingleContributor, setIsSingleContributor] = useState(false);
@@ -35,8 +36,9 @@ const CreateTask = ({ toggleShowCreateTask }) => {
     const [amount, setAmount] = useState(0);
 
     useEffect(() => {
-        if (createTaskLoading === false) {
+        if (createTaskLoading === false || draftTaskLoading === false) {
             dispatch(resetCreateTaskLoader());
+            dispatch(resetDraftTaskLoader());
             setContributionType('assign');
             setIsSingleContributor(false);
             setIsFilterRoles(false);
@@ -53,7 +55,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
             setAmount(0);
             toggleShowCreateTask();
         }
-    }, [createTaskLoading]);
+    }, [createTaskLoading, draftTaskLoading]);
 
     const toggleSelect = () => {
         setSelect(!select);
@@ -62,9 +64,60 @@ const CreateTask = ({ toggleShowCreateTask }) => {
     const handleSetApplicant = (userIndex) => {
         let user = DAO.members[userIndex].member;
         setSelectedUser({ _id: user._id, address: user.wallet });
+        document.getElementById('error-applicant').innerHTML = ''
     }
 
-    const handleSubmit = () => {
+    const handleRemoveRole = (role) => {
+        setValidRoles(validRoles.filter((item) => item !== role))
+    }
+
+    const handleCreateTask = () => {
+        if (name === '') {
+            document.getElementById('error-name').innerHTML = 'Enter name';
+            return;
+        }
+        else if (description === '') {
+            document.getElementById('error-desc').innerHTML = 'Enter description';
+            return;
+        }
+        else if (dchannel === '') {
+            document.getElementById('error-dchannel').innerHTML = 'Enter discussion channel';
+            return;
+        }
+        else if (deadline === '') {
+            document.getElementById('error-deadline').innerHTML = 'Enter application deadline';
+            return;
+        }
+        else if (contributionType === 'assign' && selectedUser === null) {
+            document.getElementById('error-applicant').innerHTML = 'Select one applicant for the task';
+            return;
+        }
+        else if (reviewer === null) {
+            document.getElementById('error-reviewer').innerHTML = 'Select a reviewer';
+            return;
+        }
+        else {
+            let task = {};
+            task.daoId = DAO?._id;
+            task.name = name;
+            task.description = description;
+            task.applicant = selectedUser;
+            task.projectId = projectId;
+            task.discussionChannel = dchannel;
+            task.deadline = deadline;
+            task.submissionLink = subLink;
+            task.compensation = { currency, amount };
+            task.reviewer = reviewer;
+            task.contributionType = contributionType;
+            task.isSingleContributor = isSingleContributor;
+            task.isFilterRoles = isFilterRoles;
+            task.validRoles = validRoles;
+
+            dispatch(createTask({ payload: task }))
+        }
+    }
+
+    const handleDraftTask = () => {
         let task = {};
         task.daoId = DAO?._id;
         task.name = name;
@@ -81,8 +134,8 @@ const CreateTask = ({ toggleShowCreateTask }) => {
         task.isFilterRoles = isFilterRoles;
         task.validRoles = validRoles;
 
-        console.log("task : ", task);
-        dispatch(createTask({ payload: task }))
+        // dispatch(draftTask({ payload: task }))
+        console.log("Draft Task : ", task)
     }
 
     return (
@@ -90,7 +143,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
             {
                 select
                     ?
-                    <SelectRoles toggleSelect={toggleSelect} />
+                    <SelectRoles toggleSelect={toggleSelect} validRoles={validRoles} handleValidRoles={(value) => setValidRoles(value)} />
                     :
                     <div className="createTaskContainer">
                         <div className='createTask-header'>
@@ -100,7 +153,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                         </div>
 
                         <div className='createTask-body'>
-                            <img src={createProjectSvg} alt="frame-icon" />
+                            <img src={createTaskSvg} alt="frame-icon" />
                             <h1>Create task</h1>
 
                             <div className='createTask-inputRow'>
@@ -111,9 +164,10 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                     height={50}
                                     width={'100%'}
                                     value={name}
-                                    onchange={(e) => setName(e.target.value)}
+                                    onchange={(e) => { setName(e.target.value); document.getElementById('error-name').innerHTML = '' }}
                                     placeholder="Name of the task"
                                 />
+                                <span className='error-msg' id="error-name"></span>
                             </div>
 
                             <div className='createTask-inputRow'>
@@ -123,8 +177,9 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                     className="inputField"
                                     placeholder='Enter task description'
                                     value={description}
-                                    onChange={(e) => setDescription(e.target.value)}
+                                    onChange={(e) => { setDescription(e.target.value); document.getElementById('error-desc').innerHTML = '' }}
                                 />
+                                <span className='error-msg' id="error-desc"></span>
                             </div>
 
                             <div className='createTask-inputRow row-align'>
@@ -137,8 +192,9 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                         width={'100%'}
                                         placeholder="Dsicussion channel url"
                                         value={dchannel}
-                                        onchange={(e) => setDChannel(e.target.value)}
+                                        onchange={(e) => { setDChannel(e.target.value); document.getElementById('error-dchannel').innerHTML = '' }}
                                     />
+                                    <span className='error-msg' id="error-dchannel"></span>
                                 </div>
                                 <div className='createTask-inputRow-half'>
                                     <span>Deadline</span>
@@ -150,8 +206,9 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                         placeholder="Deadline"
                                         value={deadline}
                                         type="date"
-                                        onchange={(e) => setDeadline(e.target.value)}
+                                        onchange={(e) => { setDeadline(e.target.value); document.getElementById('error-deadline').innerHTML = '' }}
                                     />
+                                    <span className='error-msg' id="error-deadline"></span>
                                 </div>
                             </div>
 
@@ -178,6 +235,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                         })
                                     }
                                 </select>
+
                             </div>
 
                             <div className='hr-line'></div>
@@ -210,6 +268,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                             })
                                         }
                                     </select>
+                                    <span className='error-msg' id="error-applicant"></span>
                                 </div>
                             }
 
@@ -217,14 +276,27 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                 contributionType === 'open' &&
                                 <div className='contributor-section'>
                                     <div className='contributor-check'>
-                                        <input type="checkbox" onChange={(e) => setIsSingleContributor(!isSingleContributor)} />
+                                        {
+                                            isSingleContributor
+                                                ?
+                                                <input type="checkbox" onChange={(e) => setIsSingleContributor(!isSingleContributor)} checked />
+                                                :
+                                                <input type="checkbox" onChange={(e) => setIsSingleContributor(!isSingleContributor)} />
+                                        }
                                         <div>
                                             <h1>SINGLE CONTRIBUTOR</h1>
                                             <span>The reviewer will pick a contributor from the applicants (if unchecked, everyone can contribute)</span>
                                         </div>
                                     </div>
                                     <div className='contributor-check'>
-                                        <input type="checkbox" onChange={(e) => setIsFilterRoles(!isFilterRoles)} />
+                                        {
+                                            isFilterRoles
+                                                ?
+                                                <input type="checkbox" onChange={(e) => setIsFilterRoles(!isFilterRoles)} checked />
+                                                :
+                                                <input type="checkbox" onChange={(e) => setIsFilterRoles(!isFilterRoles)} />
+                                        }
+
                                         <div>
                                             <h1>FILTER BY ROLES (DISCORD)</h1>
                                         </div>
@@ -234,42 +306,40 @@ const CreateTask = ({ toggleShowCreateTask }) => {
 
                             {
                                 isFilterRoles &&
-                                <div className='selected-roles'>
-                                    <div className='roles-left'>
-                                        <div className='roles-li'>
-                                            <div className='roles-pill' style={{ background: 'rgba(146, 225, 168, 0.3)' }}>
-                                                <div className='roles-circle' style={{ background: 'rgba(146, 225, 168, 1)' }}></div>
-                                                <span>Roles 1</span>
-                                            </div>
-                                            <div className='roles-close'>
-                                                <CgClose color='#FFF' />
-                                            </div>
+                                <>
+                                    <div className='selected-roles'>
+                                        <div className='roles-left'>
+
+                                            {
+                                                validRoles.map((item, index) => {
+                                                    return (
+                                                        <div className='roles-li'>
+                                                            <div
+                                                                className='roles-pill'
+                                                                style={index === 0 ? { background: 'rgba(146, 225, 168, 0.3)' } : index === 1 ? { background: 'rgba(137,179,229,0.3)' } : index === 2 ? { background: 'rgba(234,100,71,0.3)' } : { background: 'rgba(146, 225, 168, 0.3)' }}
+                                                            >
+                                                                <div
+                                                                    className='roles-circle'
+                                                                    style={index === 0 ? { background: 'rgba(146, 225, 168, 1)' } : index === 1 ? { background: 'rgba(137,179,229,1)' } : index === 2 ? { background: 'rgba(234,100,71,1)' } : { background: 'rgba(146, 225, 168, 1)' }}
+                                                                ></div>
+                                                                <span>{item}</span>
+                                                            </div>
+                                                            <div className='roles-close' onClick={() => handleRemoveRole(item)}>
+                                                                <CgClose color='#FFF' />
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                })
+                                            }
+
                                         </div>
-                                        <div className='roles-li'>
-                                            <div className='roles-pill' style={{ background: 'rgba(137,179,229,0.3)' }}>
-                                                <div className='roles-circle' style={{ background: 'rgba(137,179,229,1)' }}></div>
-                                                <span>Roles 2</span>
-                                            </div>
-                                            <div className='roles-close'>
-                                                <CgClose color='#FFF' />
-                                            </div>
-                                        </div>
-                                        <div className='roles-li'>
-                                            <div className='roles-pill' style={{ background: 'rgba(234,100,71,0.3)' }}>
-                                                <div className='roles-circle' style={{ background: 'rgba(234,100,71,1)' }}></div>
-                                                <span>Roles 3</span>
-                                            </div>
-                                            <div className='roles-close'>
-                                                <CgClose color='#FFF' />
-                                            </div>
+                                        <div className='roles-right'>
+                                            <button onClick={toggleSelect}>
+                                                <HiOutlinePlus size={24} color='#C94B32' />
+                                            </button>
                                         </div>
                                     </div>
-                                    <div className='roles-right'>
-                                        <button onClick={toggleSelect}>
-                                            <HiOutlinePlus size={24} color='#C94B32' />
-                                        </button>
-                                    </div>
-                                </div>
+                                </>
                             }
 
                             <div className='createTask-inputRow'>
@@ -304,11 +374,12 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                         style={{ width: '100%' }}
                                     >
                                         <option value="MATIC">MATIC</option>
+                                        <option value="SWEAT">SWEAT</option>
                                     </select>
                                     <input
                                         className="inputField"
                                         type={'number'}
-                                        style={{ height: '50px' }}
+                                        style={{ height: '55px' }}
                                         value={amount}
                                         onChange={(e) => setAmount(parseInt(e.target.value))}
                                     />
@@ -322,26 +393,27 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                     id="reviewer"
                                     className="tokenDropdown"
                                     style={{ width: '100%' }}
-                                    onChange={(e) => setReviewer(e.target.value)}
+                                    onChange={(e) => { setReviewer(e.target.value); document.getElementById('error-reviewer').innerHTML = '' }}
                                 >
                                     <option value="">Select member</option>
                                     {
                                         _get(DAO, 'members', []).map((item, index) => {
                                             return (
-                                                <option value={`${item.member.wallet}`}>{item.member.name}</option>
+                                                <option value={`${item.member._id}`}>{item.member.name}</option>
                                             )
                                         })
                                     }
                                 </select>
+                                <span className='error-msg' id="error-reviewer"></span>
                             </div>
 
                         </div>
 
                         <div className='createTask-footer'>
-                            <button onClick={() => toggleShowCreateTask()}>
+                            <button onClick={handleDraftTask}>
                                 SAVE AS DRAFT
                             </button>
-                            <button onClick={handleSubmit}>
+                            <button onClick={handleCreateTask}>
                                 CREATE
                             </button>
                         </div>
