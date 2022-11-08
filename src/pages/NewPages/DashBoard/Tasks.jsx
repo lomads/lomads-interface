@@ -13,7 +13,7 @@ import archiveIcon from '../../../assets/svg/archiveIcon.svg';
 
 const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
 
-const Tasks = () => {
+const Tasks = ({ toggleShowCreateTask }) => {
     const navigate = useNavigate();
     const { DAO } = useAppSelector((state) => state.dashboard);
     const { account } = useWeb3React();
@@ -89,20 +89,23 @@ const Tasks = () => {
                                 disabled={false}
                                 fontweight={400}
                                 fontsize={16}
-                                onClick={() => { }}
+                                onClick={() => { toggleShowCreateTask() }}
                             />
                         </div>
                     }
                 </div>
             </div>
 
-            <div className='tasks-body' style={data.length > 6 ? { height: '272px', overflow: 'scroll' } : null}>
+            <div className='tasks-body'>
                 {
-                    data.map((item, index) => {
+                    _get(DAO, 'tasks', []).map((item, index) => {
                         if (index < 20) {
                             return (
                                 <div key={index}>
-                                    <TaskCard />
+                                    <TaskCard
+                                        task={item}
+                                        daoUrl={DAO?.url}
+                                    />
                                 </div>
                             )
                         }

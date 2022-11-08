@@ -10,7 +10,7 @@ const SideBar = (props: any) => {
 	const navigate = useNavigate();
 	const dispatch = useAppDispatch()
 	const { DAOList } = useAppSelector((state) => state.dashboard);
-	const name = props.name.split(" ")
+	const name = props.name ? props.name.split(" ") : 'Sample Dao';
 	const SideBarStrip = () => {
 		return (
 			<>
