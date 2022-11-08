@@ -134,6 +134,18 @@ export const getProject = createAsyncThunk(
 	}
 );
 
+export const updateProject = createAsyncThunk(
+	'dao/updateProject',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`project/${params.projectId}/update-project?daoUrl=${params.daoUrl}`, params.payload)
+			.then(res => res.data)
+			.catch(e => {
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
+	}
+);
+
 export const addProjectMember = createAsyncThunk(
 	'dao/addProjectMember',
 	async (params: any, thunkApi) => {
@@ -217,3 +229,43 @@ export const updateProjectLink = createAsyncThunk(
 			})
 	}
 );
+
+// TASK ACTIONS
+
+export const getTask = createAsyncThunk(
+	'dao/getTask',
+	async (params: any, thunkApi) => {
+		console.log("called getTask")
+		return axiosHttp.get(`task/${params}`)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+);
+
+export const createTask = createAsyncThunk(
+	'dao/createTask',
+	async (params: any, thunkApi) => {
+		return axiosHttp.post(`task`, params.payload)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+)
+
+export const draftTask = createAsyncThunk(
+	'dao/draftTask',
+	async (params: any, thunkApi) => {
+		return axiosHttp.post(`task/draft`, params.payload)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+)
+
+export const applyTask = createAsyncThunk(
+	'dao/applyTask',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`task/${params.taskId}/apply?daoUrl=${params.daoUrl}`, params.payload)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+)
+

@@ -19,8 +19,13 @@ import {
 	updateProjectLink,
 	getProject,
 	addProjectLinks,
+	updateProject,
 	getCurrentUser,
-	updateCurrentUser
+	updateCurrentUser,
+	createTask,
+	draftTask,
+	getTask,
+	applyTask,
 } from "./actions";
 import { createContract } from "state/contract/actions";
 import { get as _get, find as _find } from "lodash";
@@ -46,6 +51,12 @@ export interface DashboardState {
 	archiveProjectLoading: boolean | null;
 	deleteProjectLoading: boolean | null;
 	addProjectLinksLoading: boolean | null;
+	updateProjectLoading: boolean | null;
+	createTaskLoading: boolean | null;
+	Task: any;
+	TaskLoading: boolean | null;
+	draftTaskLoading: boolean | null;
+	applyTaskLoading: boolean | null;
 }
 
 const initialState: DashboardState = {
@@ -69,6 +80,12 @@ const initialState: DashboardState = {
 	archiveProjectLoading: null,
 	deleteProjectLoading: null,
 	addProjectLinksLoading: null,
+	updateProjectLoading: null,
+	createTaskLoading: null,
+	Task: null,
+	TaskLoading: null,
+	draftTaskLoading: null,
+	applyTaskLoading: null,
 };
 
 const dashboardSlice = createSlice({
@@ -105,6 +122,9 @@ const dashboardSlice = createSlice({
 		resetCreateProjectLoader(state) {
 			state.createProjectLoading = null
 		},
+		resetUpdateProjectLoader(state) {
+			state.updateProjectLoading = null
+		},
 		resetAddProjectMemberLoader(state) {
 			state.addProjectMemberLoading = null
 		},
@@ -122,6 +142,15 @@ const dashboardSlice = createSlice({
 		},
 		resetAddProjectLinksLoader(state) {
 			state.addProjectLinksLoading = null
+		},
+		resetCreateTaskLoader(state) {
+			state.createTaskLoading = null
+		},
+		resetDraftTaskLoader(state) {
+			state.draftTaskLoading = null
+		},
+		resetApplyTaskLoader(state) {
+			state.applyTaskLoading = null
 		},
 		setDAOList(state, action) {
 			state.DAOList = action.payload
@@ -270,6 +299,15 @@ const dashboardSlice = createSlice({
 		[`${getProject.pending}`]: (state) => {
 			state.ProjectLoading = true;
 		},
+		// update project details
+		[`${updateProject.fulfilled}`]: (state, action) => {
+			state.updateProjectLoading = false;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
+		},
+		[`${updateProject.pending}`]: (state) => {
+			state.updateProjectLoading = true;
+		},
 		// add project members
 		[`${addProjectMember.fulfilled}`]: (state, action) => {
 			state.addProjectMemberLoading = false;
@@ -329,6 +367,39 @@ const dashboardSlice = createSlice({
 		[`${updateProjectLink.pending}`]: (state) => {
 
 		},
+		// task creation
+		[`${createTask.fulfilled}`]: (state, action) => {
+			state.createTaskLoading = false;
+			state.DAO = action.payload;
+		},
+		[`${createTask.pending}`]: (state) => {
+			state.createTaskLoading = true;
+		},
+		// draft a task
+		[`${draftTask.fulfilled}`]: (state, action) => {
+			state.draftTaskLoading = false;
+			state.DAO = action.payload;
+		},
+		[`${draftTask.pending}`]: (state) => {
+			state.draftTaskLoading = true;
+		},
+		// get task
+		[`${getTask.fulfilled}`]: (state, action) => {
+			state.TaskLoading = false;
+			state.Task = action.payload;
+		},
+		[`${getTask.pending}`]: (state) => {
+			state.TaskLoading = true;
+		},
+		// apply task
+		[`${applyTask.fulfilled}`]: (state, action) => {
+			state.applyTaskLoading = false;
+			state.Task = action.payload.task;
+			state.DAO = action.payload.dao;
+		},
+		[`${applyTask.pending}`]: (state) => {
+			state.applyTaskLoading = true;
+		},
 	},
 });
 
@@ -347,10 +418,14 @@ export const {
 	resetCreateProjectLoader,
 	resetAddProjectMemberLoader,
 	resetUpdateProjectMemberLoader,
+	resetUpdateProjectLoader,
 	resetDeleteProjectMemberLoader,
 	resetArchiveProjectLoader,
 	resetDeleteProjectLoader,
 	resetAddProjectLinksLoader,
-	updateSafeTransaction
+	updateSafeTransaction,
+	resetCreateTaskLoader,
+	resetDraftTaskLoader,
+	resetApplyTaskLoader,
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;
