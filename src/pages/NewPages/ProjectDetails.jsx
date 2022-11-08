@@ -48,13 +48,15 @@ const ProjectDetails = () => {
     const [showList, setShowList] = useState(false);
     const [showAddLink, setShowAddLink] = useState(false);
     const [update, setUpdate] = useState(0);
-    const { DAO, Project, ProjectLoading, updateProjectMemberLoading, deleteProjectMemberLoading, archiveProjectLoading, deleteProjectLoading } = useAppSelector((state) => state.dashboard);
+    const { DAO, Project, ProjectLoading, updateProjectMemberLoading, deleteProjectMemberLoading, archiveProjectLoading, deleteProjectLoading, updateProjectLoading } = useAppSelector((state) => state.dashboard);
     console.log("Project : ", Project)
     const daoName = _get(DAO, 'name', '').split(" ");
     const { myRole, can } = useRole(DAO, account);
     const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
     console.log(contractName)
     console.log("myRole", myRole)
+    const [name, setName] = useState("");
+    const [description, setDescription] = useState("");
 
     const [lockedLinks, setLockedLinks] = useState([]);
     const [openLinks, setOpenLinks] = useState([]);
