@@ -35,6 +35,7 @@ import { getSigner } from 'utils'
 import useRole from "hooks/useRole";
 import { useSBTStats } from "hooks/SBT/sbt";
 import axiosHttp from '../../api';
+import { updateCurrentUser } from "state/dashboard/actions";
 
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
@@ -52,7 +53,7 @@ const ProjectDetails = () => {
     const daoName = _get(DAO, 'name', '').split(" ");
     const { myRole, can } = useRole(DAO, account);
     const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
-
+    console.log(contractName)
     console.log("myRole", myRole)
 
     const [lockedLinks, setLockedLinks] = useState([]);
@@ -192,12 +193,13 @@ const ProjectDetails = () => {
 
     const unlock = useCallback(async (link, update = true) => {
         if (unlockLoading) return;
+        setUnlockLoading(link.id)
+        let memberExists = _find(_uniqBy(Project?.members, '_id'), member => member.wallet.toLowerCase() === account.toLowerCase())
+        console.log("Member-exists", memberExists)
+        if (!memberExists)
+            return setUnlockLoading(null);
         if(link.link.indexOf('discord.') > -1) {
             try {
-                setUnlockLoading(link.id)
-                let memberExists = _find(_uniqBy(Project?.members, '_id'), member => member.wallet.toLowerCase() === account.toLowerCase())
-                if (!memberExists)
-                    return setUnlockLoading(null);
                 const g = await guild.get(link.guildId)
                 let inviteLink = _get(_find(_get(g, 'guildPlatforms'), gp => gp.platformId == 1), 'invite', null)
                 if (!inviteLink) return setUnlockLoading(null);
@@ -228,15 +230,38 @@ const ProjectDetails = () => {
                 setUnlockLoading(null)
             }
         } else if (link.link.indexOf('notion.') > -1) {
+            if(_get(DAO, 'sbt.contactDetail', []).indexOf('email') === -1){
+                return;
+            }
+            setUnlockLoading(link.id)
             try {
                 axiosHttp.get(`/project/notion/space-admin-status?domain=${link.spaceDomain}`)
-                .then(res => {
+                .then(async res => {
                     if(res.data) {
                         console.log(res.data)
-                        if (contractName !== '' && balanceOf) {
-                            console.log(balanceOf)
+                        console.log("BALANCEOF:", parseInt(balanceOf._hex, 16), contractName)
+                        if (contractName !== '' && parseInt(balanceOf._hex, 16) === 1) {
                             if (parseInt(balanceOf._hex, 16) === 1) {
-                                window.open(link.link, '_blank')
+                               const metadata = await axiosHttp.get(`/metadata/${_get(DAO, 'sbt._id', '')}`)
+                               if(metadata && metadata.data) {
+                                    console.log(metadata.data)
+                                    const notion_email = _get(_find(metadata.data.attributes, attr => attr.trait_type === 'EMAIL'), 'value', null)
+                                    //const notion_email = 'rish6ix@gmail.com'
+                                    if(notion_email) {
+                                        const notionUser = await axiosHttp.get(`project/notion/notion-user?email=${notion_email}`).then(res => res.data)
+                                        console.log(notionUser)
+                                        if(_get(notionUser, 'value.value.id', null)) {
+                                            const notionUserId = _get(notionUser, 'value.value.id', null);
+                                            dispatch(updateCurrentUser({ notionUserId }))
+                                            axiosHttp.post(`project/notion/add-role`, { notionUserId, linkId: link.id, projectId, account })
+                                            .then(res => {
+                                                if (update)
+                                                    unlockLink(link)
+                                                window.open(link.link, '_blank')
+                                            })
+                                        }
+                                    }
+                               }
                             }
                         }
                     }
@@ -245,6 +270,7 @@ const ProjectDetails = () => {
                     setUnlockLoading(null)
                     console.log(e)
                 })
+                .finally(() => setUnlockLoading(null))
             } catch (e) {
                 console.log(e)
                 setUnlockLoading(null)

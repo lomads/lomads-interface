@@ -11,7 +11,7 @@ import { SiNotion } from "react-icons/si";
 import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe } from "react-icons/bs";
 import { toast, ToastContainer } from "react-toastify";
 import { ProjectContext } from "context/ProjectContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import { createProject } from 'state/dashboard/actions'
 import { isValidUrl } from 'utils';
@@ -51,6 +51,7 @@ const CreateProject = () => {
     const [roleName, setRoleName] = useState(null);
     const [spaceDomain, setSpaceDomain] = useState(null);
     const [accessControl, setAccessControl] = useState(false);
+    const [accessControlError, setAccessControlError] = useState(null);
     const [title, setTitle] = useState('');
     const [titleError, setTitleError] = useState(null);
     const [newAddress, setNewAddress] = useState([]);
@@ -73,6 +74,15 @@ const CreateProject = () => {
     }, [createProjectLoading])
 
     useEffect(() => {
+        if(link && link.length > 8 && link.indexOf('notion.') > -1) {
+            let lnk = new URL(link).pathname;
+            lnk = lnk.split('/')
+            if(lnk && lnk.length > 2)
+                setSpaceDomain(lnk[1])
+        }
+    }, [link])
+
+    useEffect(() => {
         const memberList = DAO?.members;
         if (memberList.length > 0 && selectedMembers.length === 0) {
             for (let i = 0; i < memberList.length; i++) {
@@ -85,6 +95,14 @@ const CreateProject = () => {
             }
         }
     }, []);
+
+    useEffect(() => {
+        if(link && link.indexOf('notion.') > -1 && _get(DAO, 'sbt.contactDetail', []).indexOf('email') === -1){
+            setAccessControlError('Email does not exist in SBT')
+        } else {
+            setAccessControlError(null)
+        }
+    }, [link, DAO])
 
     // useEffect(() => {
     //     let accessControlElement = document.getElementById('accessControl');
@@ -225,7 +243,7 @@ const CreateProject = () => {
                 setRoleName(null)
                 setSpaceDomain(null)
             } else if(link.indexOf('notion.') > -1) {
-                if(status) {
+                if(status.status) {
                     let tempLink = link;
                     if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
                         tempLink = 'https://' + tempLink;
@@ -244,7 +262,7 @@ const CreateProject = () => {
                     setRoleName(null)
                     setSpaceDomain(null)
                 } else {
-
+                    setLinkError(status.message || 'Something went wrong.')
                 }
             }
         }
@@ -253,6 +271,12 @@ const CreateProject = () => {
     const handleRemoveResource = (position) => {
         setResourceList(resourceList.filter((_, index) => index !== position));
     }
+
+    const linkHasDomain = useMemo(() => {
+        if(link && link.indexOf('notion.') > -1)
+            return (new URL(link).pathname).split('/').length > 2
+        return false;
+    }, [link])
 
     const handleCreateProject = () => {
         let project = {};
@@ -523,11 +547,11 @@ const CreateProject = () => {
                                                             />
                                                             </div>
                                                         </div> : null}
-                                                        {accessControl && link && link.indexOf('notion.') > -1 ? <div className='resource-body'>
+                                                        {accessControl && link && link.indexOf('notion.') > -1 && !linkHasDomain ? <div className='resource-body'>
                                                             <div>
                                                             <input
                                                                 type="text"
-                                                                placeholder="Space domain"
+                                                                placeholder="Notion Domain"
                                                                 className="input2"
                                                                 style={{ marginTop: 16 }}
                                                                 name="spaceDomain"
@@ -537,13 +561,18 @@ const CreateProject = () => {
                                                             </div>
                                                         </div> : null}
                                                         {
+                                                            accessControl && link && link.indexOf('notion.') > -1 &&
+                                                            <div style={{ fontSize: 14, fontStyle:'italic', color: "rgba(118, 128, 141, 0.5)" }}>Invite <span style={{ color: "#76808D" }}>hello@lomads.co</span> to be an Admin of your workspace</div>
+                                                        }
+                                                        {
                                                             DAO?.sbt
                                                                 ?
                                                                 <div className='resource-footer'>
-                                                                    <input id="accessControl" type="checkbox" checked={accessControl} value={accessControl} disabled={accesscontrolDisabled} onChange={e => setAccessControl(prev => !prev)} />
+                                                                    <input id="accessControl" type="checkbox" checked={accessControl} value={accessControl} disabled={accessControlError || accesscontrolDisabled} onChange={e => setAccessControl(prev => !prev)} />
                                                                     <div>
                                                                         <p>ACCESS CONTROL</p>
                                                                         <span>Currently available for discord & notion only</span>
+                                                                        { accessControlError && <div><span style={{ color: 'red' }}>{ accessControlError }</span></div> }
                                                                     </div>
                                                                 </div>
                                                                 :
