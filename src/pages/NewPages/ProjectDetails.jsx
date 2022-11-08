@@ -258,9 +258,11 @@ const ProjectDetails = () => {
                         if (contractName !== '' && parseInt(balanceOf._hex, 16) === 1) {
                             if (parseInt(balanceOf._hex, 16) === 1) {
                                const metadata = await axiosHttp.get(`/metadata/${_get(DAO, 'sbt._id', '')}`)
+                               console.log(metadata)
                                if(metadata && metadata.data) {
                                     console.log(metadata.data)
-                                    const notion_email = _get(_find(metadata.data.attributes, attr => attr.trait_type === 'EMAIL'), 'value', null)
+                                    const notion_email = _get(_find(metadata.data.attributes, attr => attr.trait_type === "Email"), 'value', null)
+                                    console.log(notion_email)
                                     //const notion_email = 'rish6ix@gmail.com'
                                     if(notion_email) {
                                         const notionUser = await axiosHttp.get(`project/notion/notion-user?email=${notion_email}`).then(res => res.data)
