@@ -562,7 +562,7 @@ const CreateProject = () => {
                                                         </div> : null}
                                                         {
                                                             accessControl && link && link.indexOf('notion.') > -1 &&
-                                                            <div style={{ fontSize: 14, fontStyle:'italic', color: "rgba(118, 128, 141, 0.5)" }}>Invite <span style={{ color: "#76808D" }}>hello@lomads.co</span> to be an Admin of your workspace</div>
+                                                            <div style={{ fontSize: 14, fontStyle:'italic', color: "rgba(118, 128, 141, 0.5)" }}>Invite <span style={{ color: "#76808D" }}>{ process.env.REACT_APP_NOTION_ADMIN_EMAIL }</span> to be an Admin of your workspace</div>
                                                         }
                                                         {
                                                             DAO?.sbt
