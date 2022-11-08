@@ -33,6 +33,9 @@ import { useWeb3React } from "@web3-react/core";
 import { guild, role, user, setProjectName } from "@guildxyz/sdk";
 import { getSigner } from 'utils'
 import useRole from "hooks/useRole";
+import { useSBTStats } from "hooks/SBT/sbt";
+import axiosHttp from '../../api';
+import { updateCurrentUser } from "state/dashboard/actions";
 
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
@@ -44,11 +47,13 @@ const ProjectDetails = () => {
     const [showAddMember, setShowAddMember] = useState(false);
     const [showList, setShowList] = useState(false);
     const [showAddLink, setShowAddLink] = useState(false);
+    const [update, setUpdate] = useState(0);
     const { DAO, Project, ProjectLoading, updateProjectMemberLoading, deleteProjectMemberLoading, archiveProjectLoading, deleteProjectLoading } = useAppSelector((state) => state.dashboard);
     console.log("Project : ", Project)
     const daoName = _get(DAO, 'name', '').split(" ");
     const { myRole, can } = useRole(DAO, account);
-
+    const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
+    console.log(contractName)
     console.log("myRole", myRole)
 
     const [lockedLinks, setLockedLinks] = useState([]);
@@ -84,7 +89,6 @@ const ProjectDetails = () => {
         if (!Project) return false;
         let creator = _get(Project, 'creator', '').toLowerCase() === account.toLowerCase();
         let inProject = _find(_uniqBy(Project?.members, '_id'), m => m.wallet.toLowerCase() === account.toLowerCase())
-        console.log(creator)
         if (myRole === 'ADMIN' || myRole === "CONTRIBUTOR")
             return can(myRole, permission)
         if (myRole === 'CORE_CONTRIBUTOR')
@@ -187,43 +191,92 @@ const ProjectDetails = () => {
         }))
     }
 
-    const unlock = async (link, update = true) => {
+    const unlock = useCallback(async (link, update = true) => {
         if (unlockLoading) return;
-        try {
-            setUnlockLoading(link.id)
-            let memberExists = _find(_uniqBy(Project?.members, '_id'), member => member.wallet.toLowerCase() === account.toLowerCase())
-            if (!memberExists)
-                return setUnlockLoading(null);
-            const g = await guild.get(link.guildId)
-            let inviteLink = _get(_find(_get(g, 'guildPlatforms'), gp => gp.platformId == 1), 'invite', null)
-            if (!inviteLink) return setUnlockLoading(null);
-
-            let access = await guild.getUserAccess(link.guildId, account)
-            access = access?.some?.(({ access }) => access)
-            if (access) {
-                const membership = await guild.getUserMemberships(link.guildId, account);
-                if (!membership?.some?.(({ access }) => access)) {
-                    const success = await user.join(link.guildId, account, signerFunction)
-                    if (success) {
+        setUnlockLoading(link.id)
+        let memberExists = _find(_uniqBy(Project?.members, '_id'), member => member.wallet.toLowerCase() === account.toLowerCase())
+        console.log("Member-exists", memberExists)
+        if (!memberExists)
+            return setUnlockLoading(null);
+        if(link.link.indexOf('discord.') > -1) {
+            try {
+                const g = await guild.get(link.guildId)
+                let inviteLink = _get(_find(_get(g, 'guildPlatforms'), gp => gp.platformId == 1), 'invite', null)
+                if (!inviteLink) return setUnlockLoading(null);
+    
+                let access = await guild.getUserAccess(link.guildId, account)
+                access = access?.some?.(({ access }) => access)
+                if (access) {
+                    const membership = await guild.getUserMemberships(link.guildId, account);
+                    if (!membership?.some?.(({ access }) => access)) {
+                        const success = await user.join(link.guildId, account, signerFunction)
+                        if (success) {
+                            if (update)
+                                unlockLink(link)
+                            setUnlockLoading(null)
+                            window.open(inviteLink, '_blank')
+                        }
+                    } else {
                         if (update)
                             unlockLink(link)
                         setUnlockLoading(null)
                         window.open(inviteLink, '_blank')
                     }
                 } else {
-                    if (update)
-                        unlockLink(link)
                     setUnlockLoading(null)
-                    window.open(inviteLink, '_blank')
                 }
-            } else {
+            } catch (e) {
+                console.log(e)
                 setUnlockLoading(null)
             }
-        } catch (e) {
-            console.log(e)
-            setUnlockLoading(null)
+        } else if (link.link.indexOf('notion.') > -1) {
+            if(_get(DAO, 'sbt.contactDetail', []).indexOf('email') === -1){
+                return;
+            }
+            setUnlockLoading(link.id)
+            try {
+                axiosHttp.get(`/project/notion/space-admin-status?domain=${link.spaceDomain}`)
+                .then(async res => {
+                    if(res.data) {
+                        console.log(res.data)
+                        console.log("BALANCEOF:", parseInt(balanceOf._hex, 16), contractName)
+                        if (contractName !== '' && parseInt(balanceOf._hex, 16) === 1) {
+                            if (parseInt(balanceOf._hex, 16) === 1) {
+                               const metadata = await axiosHttp.get(`/metadata/${_get(DAO, 'sbt._id', '')}`)
+                               if(metadata && metadata.data) {
+                                    console.log(metadata.data)
+                                    const notion_email = _get(_find(metadata.data.attributes, attr => attr.trait_type === 'EMAIL'), 'value', null)
+                                    //const notion_email = 'rish6ix@gmail.com'
+                                    if(notion_email) {
+                                        const notionUser = await axiosHttp.get(`project/notion/notion-user?email=${notion_email}`).then(res => res.data)
+                                        console.log(notionUser)
+                                        if(_get(notionUser, 'value.value.id', null)) {
+                                            const notionUserId = _get(notionUser, 'value.value.id', null);
+                                            dispatch(updateCurrentUser({ notionUserId }))
+                                            axiosHttp.post(`project/notion/add-role`, { notionUserId, linkId: link.id, projectId, account })
+                                            .then(res => {
+                                                if (update)
+                                                    unlockLink(link)
+                                                window.open(link.link, '_blank')
+                                            })
+                                        }
+                                    }
+                               }
+                            }
+                        }
+                    }
+                })
+                .catch(e => {
+                    setUnlockLoading(null)
+                    console.log(e)
+                })
+                .finally(() => setUnlockLoading(null))
+            } catch (e) {
+                console.log(e)
+                setUnlockLoading(null)
+            }
         }
-    }
+    }, [contractName, balanceOf, unlockLoading])
 
     const handleAddMember = (user) => {
         if (extraMembers.includes(user.member._id)) {
