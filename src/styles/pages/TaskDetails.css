@@ -672,8 +672,7 @@
     display: flex;
     flex-direction: column;
     align-items: center !important;
-    padding: 0 20px;
-    background-color: red;
+    padding: 0 35px;
 }
 
 .taskDetails-container .applicant-overlay .applicant-container .applicant-slider .slider-content h1 {
@@ -699,12 +698,15 @@
     color: #76808D;
 }
 
-.taskDetails-container .applicant-overlay .applicant-container .applicant-slider .slider-content .note-container {
-    width: 70%;
+.taskDetails-container .applicant-overlay .applicant-container .applicant-slider .slider-content .detail-container {
+    width: 100%;
     margin: 30px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.taskDetails-container .applicant-overlay .applicant-container .applicant-slider .slider-content .note-container span {
+.taskDetails-container .applicant-overlay .applicant-container .applicant-slider .slider-content .detail-container span {
     font-style: normal;
     font-weight: 700;
     font-size: 16px;
@@ -717,7 +719,7 @@
     color: #76808D;
 }
 
-.taskDetails-container .applicant-overlay .applicant-container .applicant-slider .slider-content .note-container p {
+.taskDetails-container .applicant-overlay .applicant-container .applicant-slider .slider-content .detail-container p {
     font-family: Arial, Helvetica, sans-serif;
     font-style: normal;
     font-weight: 400;
@@ -726,4 +728,30 @@
     color: #1B2B41;
     margin-top: 15px;
     text-align: left;
+}
+
+.taskDetails-container .applicant-overlay .applicant-container .applicant-slider .slider-content .detail-container button {
+    background: #FFFFFF;
+    /* Color-drop */
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    /* or 112% */
+    display: flex;
+    align-items: center;
+    text-align: center;
+    letter-spacing: -0.011em;
+    text-transform: uppercase;
+
+    /* RED */
+    color: #C94B32;
+    width: 300px;
+    height: 40px;
+    margin-top: 10px;
 }

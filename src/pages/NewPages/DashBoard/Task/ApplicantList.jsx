@@ -8,14 +8,28 @@ const ApplicantList = ({ task, close }) => {
     const RenderApplicantCard = ({ applicant }) => {
         return (
             <>
-                <img src={bigMember} alt="icon" />
+                <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                    <img src={bigMember} alt="icon" />
+                </div>
                 <h1>{applicant.member.name}</h1>
                 <p>{applicant.member.wallet}</p>
 
-                <div className='note-container'>
+                <div className='detail-container'>
                     <span>Note</span>
                     <p>{applicant.note}</p>
                 </div>
+
+                <div className='detail-container'>
+                    <span>Links</span>
+                    {
+                        applicant.links.map((item, index) => {
+                            return (
+                                <button onClick={() => window.open(item.link, '_blank', 'noopener,noreferrer')}>{item.title}</button>
+                            )
+                        })
+                    }
+                </div>
+
             </>
         )
     }
