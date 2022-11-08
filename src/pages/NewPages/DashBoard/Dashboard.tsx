@@ -25,6 +25,7 @@ import SideModal from "./SideModal";
 import SideBar from "./SideBar";
 import axios from "axios";
 import NotificationArea from "./NotificationArea";
+import Notifications from "../../../components/Notifications";
 import AddMember from "./MemberCard/AddMember";
 import dashboardfooterlogo from "../../../assets/svg/dashboardfooterlogo.svg";
 import { useAppDispatch } from "state/hooks";
@@ -165,6 +166,7 @@ const Dashboard = () => {
 	useEffect(() => {
 		if (chainId) {
 			if (contractName !== '' && DAO && DAO.sbt && DAO.sbt && account && balanceOf) {
+				console.log("BALANCEOF:", parseInt(balanceOf._hex, 16))
 				if (chainId === DAO.chainId) {
 					if (DAO?.sbt?.whitelisted) {
 						if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
@@ -380,7 +382,9 @@ const Dashboard = () => {
 
 				{_get(DAO, 'links', []).length > 0 && <LinksArea links={_get(DAO, 'links', [])} />}
 
-				{pendingTransactions !== undefined &&
+				<Notifications/>
+
+				{/* {pendingTransactions !== undefined &&
 					pendingTransactions?.count >= 1 &&
 					showNotification && can(myRole, 'notification.view') && (
 						<NotificationArea
@@ -388,7 +392,7 @@ const Dashboard = () => {
 							pendingTransactionCount={pendingTransactions?.count}
 							showNotificationArea={showNotificationArea}
 						/>
-					)}
+					)} */}
 
 				<Tasks toggleShowCreateTask={toggleShowCreateTask} />
 				<MyProject />

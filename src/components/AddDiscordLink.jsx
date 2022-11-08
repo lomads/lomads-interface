@@ -17,6 +17,7 @@ import { guild, role } from "@guildxyz/sdk";
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import axiosHttp from '../api';
 import { nanoid } from "@reduxjs/toolkit";
+import { SupportedChainId } from "constants/chains";
 
 export default ({ title, desc, link, roleName, accessControl, okButton, onGuildCreateSuccess, ...props }) => {
 
@@ -82,7 +83,6 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
        // onSelect(serverData.id)
             if(poll)
                 setPoll(null)
-            setAddLinkLoading(null);
         }
     }, [prevActiveAddBotPopup, activeAddBotPopup, poll])
 
@@ -152,7 +152,7 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                         logic : "AND",
                         requirements: [{
                             type: "ERC721",
-                            chain: "GOERLI",
+                            chain: chainId === SupportedChainId.POLYGON ? 'POLYGON': 'GOERLI',
                             address: _get(DAO, 'sbt.address', null),
                             data : {
                                 minAmount: 1
@@ -193,7 +193,7 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                 setLomadsPoll(serv.id)
                 const redirectUri = typeof window !== "undefined" && `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
                 setTimeout(() => 
-                    openAddLomadsBotPopup(`https://discord.com/api/oauth2/authorize?client_id=1036510041286639656&guild_id=${serv.id}&permissions=1024&scope=bot%20applications.commands&redirect_uri=${redirectUri}`),
+                    openAddLomadsBotPopup(`https://discord.com/api/oauth2/authorize?client_id=1036510041286639656&guild_id=${serv.id}&permissions=268782673&scope=bot%20applications.commands&redirect_uri=${redirectUri}`),
                     1000
                 )
             } else {
@@ -242,7 +242,7 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                                             logic : "AND",
                                             requirements: [{
                                                 type: "ERC721",
-                                                chain: "GOERLI",
+                                                chain: chainId === SupportedChainId.POLYGON ? 'POLYGON': 'GOERLI',
                                                 address: _get(DAO, 'sbt.address', null),
                                                 data : {
                                                     minAmount: 1
@@ -284,11 +284,11 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                                    setPoll(dcserverid)
                                    openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=868172385000509460&guild_id=${dcserverid}&permissions=268782673&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
                                } else {
-                                   onGuildBotAddedDelayed()
+                                   onGuildBotAddedDelayed(validServer)
                                }
                             }
                         } else {
-                            setAddLinkLoading(null);
+                            //setAddLinkLoading(null);
                             //toast.error("Invalid discord server");
                             setHasClickedAuth(true)
                             onResetAuth()
@@ -316,12 +316,11 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                 okButton ? 
                 <SimpleLoadButton condition={addLinkLoading} disabled={addLinkLoading} title="OK" bgColor="#C94B32" className="button" fontsize={16} fontweight={400} height={40} width={129} onClick={() => handleAddResource()} /> : 
                 <button
-                    style={link !== '' && title !== '' ? { background: '#C84A32' } : null}
+                    style={{ background: link !== '' && title !== '' && !addLinkLoading ? '#C84A32' : 'rgba(27, 43, 65, 0.2)', width: 50, height: 50, display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+                    disabled={link === '' || title === '' || addLinkLoading}
                     onClick={() => handleAddResource() }
-                >   { addLinkLoading ?
-                    <LeapFrog size={20} color="#FFF" /> :
+                > 
                     <AiOutlinePlus color="#FFF" size={25} />
-                    }
                 </button>
             }
         </>
