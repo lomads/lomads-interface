@@ -25,11 +25,17 @@ const ApplyTask = ({ task, close }) => {
     const [title, setTitle] = useState('');
     const [link, setLink] = useState('');
     const [resourceList, setResourceList] = useState([]);
+    const [showSuccess, setShowSuccess] = useState(false);
 
     useEffect(() => {
         if (applyTaskLoading === false) {
             dispatch(resetApplyTaskLoader());
-            close();
+            setShowSuccess(true);
+
+            setTimeout(() => {
+                setShowSuccess(false);
+                close();
+            }, 3000);
         }
     }, [applyTaskLoading]);
 
@@ -106,85 +112,97 @@ const ApplyTask = ({ task, close }) => {
                     </button>
                 </div>
 
-                <div className='taskApply-body'>
-                    <img src={createTaskSvg} alt="frame-icon" />
-                    <h1>Apply to task</h1>
-
-                    <div className='taskApply-rowInput' style={{ margin: '35px 0' }}>
-                        <label>Note</label>
-                        <textarea
-                            style={{ width: '100%' }}
-                            className="inputField"
-                            placeholder='I want to work on this because...'
-                            value={note}
-                            onChange={handleChangeNote}
-                        />
-                        <span style={{ fontSize: '13px', color: '#C84A32' }} id="note-error"></span>
-                    </div>
-
-                    <div className='taskApply-rowInput'>
-                        <label>Add links</label>
-                        <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-                            <div style={{ marginRight: '10px', height: '70px' }}>
-                                <SimpleInputField
-                                    className="inputField"
-                                    height={50}
-                                    width={135}
-                                    placeholder="Ex portfolio"
-                                    value={title}
-                                    onchange={handleChangeTitle}
-                                />
-                                <span style={{ fontSize: '13px', color: '#C84A32' }} id="title-error"></span>
-                            </div>
-                            <div style={{ marginRight: '10px', height: '70px' }}>
-                                <AddressInputField
-                                    className="inputField"
-                                    height={50}
-                                    width={175}
-                                    placeholder="Link"
-                                    value={link}
-                                    onchange={handleChangeLink}
-                                />
-                                <span style={{ fontSize: '13px', color: '#C84A32' }} id="link-error"></span>
-                            </div>
-                            <button
-                                style={link !== '' && title !== '' ? { background: '#C84A32' } : null}
-                                onClick={() => handleAddResource()}
-                            >
-                                <AiOutlinePlus color="#FFF" size={25} />
-                            </button>
+                {
+                    showSuccess
+                        ?
+                        <div className='createTask-success'>
+                            <img src={createTaskSvg} alt="frame-icon" />
+                            <h1>Application sent!</h1>
+                            <span>Your application is sent.<br />You will be redirected in a few seconds.</span>
                         </div>
-                        <span style={{ fontSize: '13px', color: '#C84A32', marginTop: '-15px' }} id="resource-error"></span>
-                    </div>
+                        :
+                        <>
+                            <div className='taskApply-body'>
+                                <img src={createTaskSvg} alt="frame-icon" />
+                                <h1>Apply to task</h1>
 
-                    {
-                        resourceList.length > 0
-                            ?
-                            <div className='transparent-list'>
+                                <div className='taskApply-rowInput' style={{ margin: '35px 0' }}>
+                                    <label>Note</label>
+                                    <textarea
+                                        style={{ width: '100%' }}
+                                        className="inputField"
+                                        placeholder='I want to work on this because...'
+                                        value={note}
+                                        onChange={handleChangeNote}
+                                    />
+                                    <span style={{ fontSize: '13px', color: '#C84A32' }} id="note-error"></span>
+                                </div>
+
+                                <div className='taskApply-rowInput'>
+                                    <label>Add links</label>
+                                    <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+                                        <div style={{ marginRight: '10px', height: '70px' }}>
+                                            <SimpleInputField
+                                                className="inputField"
+                                                height={50}
+                                                width={135}
+                                                placeholder="Ex portfolio"
+                                                value={title}
+                                                onchange={handleChangeTitle}
+                                            />
+                                            <span style={{ fontSize: '13px', color: '#C84A32' }} id="title-error"></span>
+                                        </div>
+                                        <div style={{ marginRight: '10px', height: '70px' }}>
+                                            <AddressInputField
+                                                className="inputField"
+                                                height={50}
+                                                width={175}
+                                                placeholder="Link"
+                                                value={link}
+                                                onchange={handleChangeLink}
+                                            />
+                                            <span style={{ fontSize: '13px', color: '#C84A32' }} id="link-error"></span>
+                                        </div>
+                                        <button
+                                            style={link !== '' && title !== '' ? { background: '#C84A32' } : null}
+                                            onClick={() => handleAddResource()}
+                                        >
+                                            <AiOutlinePlus color="#FFF" size={25} />
+                                        </button>
+                                    </div>
+                                    <span style={{ fontSize: '13px', color: '#C84A32', marginTop: '-15px' }} id="resource-error"></span>
+                                </div>
+
                                 {
-                                    resourceList.map((item, index) => {
-                                        return (
-                                            <div className="member-li" key={index}>
-                                                <div className="member-img-name">
-                                                    {/* {handleParseUrl(item.link)} */}
-                                                    <p style={{ marginLeft: '5px' }}>{item.title}</p>
-                                                </div>
-                                                <div className="member-address">
-                                                    <p>{item.link.length > 30 ? item.link.slice(0, 30) + "..." : item.link}</p>
-                                                    <button onClick={() => handleRemoveResource(index)}>X</button>
-                                                </div>
-                                            </div>
-                                        )
-                                    })
+                                    resourceList.length > 0
+                                        ?
+                                        <div className='transparent-list'>
+                                            {
+                                                resourceList.map((item, index) => {
+                                                    return (
+                                                        <div className="member-li" key={index}>
+                                                            <div className="member-img-name">
+                                                                {/* {handleParseUrl(item.link)} */}
+                                                                <p style={{ marginLeft: '5px' }}>{item.title}</p>
+                                                            </div>
+                                                            <div className="member-address">
+                                                                <p>{item.link.length > 30 ? item.link.slice(0, 30) + "..." : item.link}</p>
+                                                                <button onClick={() => handleRemoveResource(index)}>X</button>
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                })
+                                            }
+                                        </div>
+                                        :
+                                        null
                                 }
+
+                                <button className='taskApply-sendBtn' onClick={handleSubmitApplication}>SEND</button>
+
                             </div>
-                            :
-                            null
-                    }
-
-                    <button className='taskApply-sendBtn' onClick={handleSubmitApplication}>SEND</button>
-
-                </div>
+                        </>
+                }
 
             </div>
         </div>

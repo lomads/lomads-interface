@@ -32,6 +32,8 @@ import memberIcon from '../../assets/svg/memberIcon.svg';
 import SubmitTask from "./DashBoard/Task/SubmitTask";
 import ApplicantList from "./DashBoard/Task/ApplicantList";
 
+import { IoMdClose } from 'react-icons/io'
+
 const TaskDetails = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
@@ -67,7 +69,7 @@ const TaskDetails = () => {
 
     const amIApproved = useMemo(() => {
         if (Task) {
-            let user = _find(_get(Task, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.isApproved === true)
+            let user = _find(_get(Task, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.status === 'approved')
             if (user)
                 return true
             return false
@@ -76,7 +78,7 @@ const TaskDetails = () => {
     }, [account, Task]);
 
     const amIEligible = useMemo(() => {
-        if (DAO) {
+        if (DAO && Task) {
             let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
             if (user) {
                 let index = Task?.validRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase());
@@ -90,10 +92,26 @@ const TaskDetails = () => {
             return false;
         }
         return false;
-    }, [account, DAO]);
+    }, [account, DAO, Task]);
+
+    const amICreator = useMemo(() => {
+        if (DAO && Task) {
+            let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
+            if (user) {
+                if (user.member._id === Task.creator) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            return false;
+        }
+        return false;
+    }, [account, DAO, Task])
 
     const assignedUser = useMemo(() => {
-        let user = _find(_get(Task, 'members', []), m => m.isApproved === true)
+        let user = _find(_get(Task, 'members', []), m => m.status === 'approved')
         if (user)
             return user.member.name
     }, [Task]);
@@ -159,49 +177,87 @@ const TaskDetails = () => {
                                         </div>
                                         <div className="right">
                                             <h1>{Task.name}</h1>
+                                            <p>Single contributor : {Task.isSingleContributor ? 'true' : 'false'}</p>
                                             <div className="menu">
 
                                                 {/* Task status */}
+                                                {/* If task was manually assigned---check if current user is approved applicant or other user*/}
                                                 {
-                                                    amIApplicant && Task.contributionType === 'open'
+                                                    Task.contributionType === 'assign' && Task.taskStatus === 'assigned'
                                                         ?
-                                                        <div>
-                                                            <img src={applied} style={{ marginRight: '5px' }} />
-                                                            <span style={{ color: '#FFB600' }}>Applied</span>
-                                                        </div>
+                                                        <>
+                                                            {
+                                                                amIApproved
+                                                                    ?
+                                                                    <div>
+                                                                        <img src={assign} style={{ marginRight: '5px' }} />
+                                                                        <span style={{ color: '#0EC1B0' }}>Assigned to me</span>
+
+                                                                    </div>
+                                                                    :
+                                                                    <div>
+                                                                        <img src={assign} style={{ marginRight: '5px' }} />
+                                                                        <span style={{ color: '#0EC1B0' }}>Assigned</span>
+                                                                    </div>
+                                                            }
+                                                        </>
                                                         :
                                                         null
                                                 }
 
+                                                {/* if task was open for all and task status is still open --- check if current user has applied or not */}
                                                 {
-                                                    amIApproved
+                                                    Task.contributionType === 'open' && Task.taskStatus === 'open'
                                                         ?
-                                                        <div>
-                                                            <img src={assign} style={{ marginRight: '5px' }} />
-                                                            <span style={{ color: '#0EC1B0' }}>Assigned to me</span>
-                                                        </div>
+                                                        <>
+                                                            {
+                                                                amIApplicant
+                                                                    ?
+                                                                    <div>
+                                                                        <img src={applied} style={{ marginRight: '5px' }} />
+                                                                        <span style={{ color: '#FFB600' }}>Applied</span>
+                                                                    </div>
+                                                                    :
+                                                                    <div>
+                                                                        <img src={open} style={{ marginRight: '5px' }} />
+                                                                        <span style={{ color: '#4BA1DB' }}>Open</span>
+                                                                    </div>
+                                                            }
+                                                        </>
                                                         :
                                                         null
                                                 }
 
+                                                {/* if task was open for all and task has been assigned --- check if current user is approved or other */}
                                                 {
-                                                    Task.taskStatus === 'assigned' && !amIApproved
+                                                    Task.contributionType === 'open' && Task.taskStatus === 'assigned'
                                                         ?
-                                                        <div>
-                                                            <img src={assign} style={{ marginRight: '5px' }} />
-                                                            <span style={{ color: '#0EC1B0' }}>Assigned</span>
-                                                        </div>
-                                                        :
-                                                        null
-                                                }
-
-                                                {
-                                                    Task.taskStatus === 'open' && !amIApplicant
-                                                        ?
-                                                        <div>
-                                                            <img src={open} style={{ marginRight: '5px' }} />
-                                                            <span style={{ color: '#4BA1DB' }}>Open</span>
-                                                        </div>
+                                                        <>
+                                                            {
+                                                                amIApplicant
+                                                                    ?
+                                                                    <>
+                                                                        {
+                                                                            amIApproved
+                                                                                ?
+                                                                                <div>
+                                                                                    <img src={assign} style={{ marginRight: '5px' }} />
+                                                                                    <span style={{ color: '#0EC1B0' }}>Assigned to me</span>
+                                                                                </div>
+                                                                                :
+                                                                                <div>
+                                                                                    <IoMdClose color="red" size={20} />
+                                                                                    <span style={{ color: 'red' }}>Rejected</span>
+                                                                                </div>
+                                                                        }
+                                                                    </>
+                                                                    :
+                                                                    <div>
+                                                                        <img src={assign} style={{ marginRight: '5px' }} />
+                                                                        <span style={{ color: '#0EC1B0' }}>Assigned</span>
+                                                                    </div>
+                                                            }
+                                                        </>
                                                         :
                                                         null
                                                 }
@@ -209,7 +265,8 @@ const TaskDetails = () => {
 
                                                 {/* edit and menu button visible only to the creator */}
                                                 {
-                                                    account.toLowerCase() === Task?.creator.toLowerCase()
+                                                    // account.toLowerCase() === Task?.creator.toLowerCase()
+                                                    amICreator
                                                         ?
                                                         <>
                                                             <button style={{ marginRight: '25px' }}>
@@ -251,20 +308,30 @@ const TaskDetails = () => {
 
 
                                         <div>
-                                            <div>
-                                                <span>Compensation</span>
-                                                <img src={compensationStar} />
-                                                {
-                                                    Task.compensation.currency === 'MATIC'
-                                                        ?
-                                                        <span>{Task.compensation.amount} MATIC</span>
-                                                        :
-                                                        <span>{Task.compensation.amount} points</span>
-                                                }
+                                            {
+                                                Task.compensation.amount !== 0
 
-                                            </div>
+                                                    ?
+                                                    <>
+                                                        <div>
+                                                            <span>Compensation</span>
+                                                            <img src={compensationStar} />
+                                                            {
+                                                                Task.compensation.currency === 'MATIC'
+                                                                    ?
+                                                                    <span>{Task.compensation.amount} MATIC</span>
+                                                                    :
+                                                                    <span>{Task.compensation.amount} points</span>
+                                                            }
 
-                                            <div className="v-line"></div>
+                                                        </div>
+
+                                                        <div className="v-line"></div>
+                                                    </>
+                                                    :
+                                                    null
+
+                                            }
 
                                             <div>
                                                 <span>Deadline</span>
@@ -289,9 +356,10 @@ const TaskDetails = () => {
                                         Task.taskStatus === 'open'
                                             ?
                                             <>
-                                                {/* if creator --- display applicants*/}
+                                                {/* if user is the creator --- display applicants*/}
                                                 {
-                                                    account.toLowerCase() === Task?.creator.toLowerCase()
+                                                    // account.toLowerCase() === Task?.creator.toLowerCase()
+                                                    amICreator
                                                         ?
                                                         <>
                                                             <div>
@@ -304,7 +372,7 @@ const TaskDetails = () => {
                                                         :
                                                         <>
                                                             {
-                                                                // check if user has applied or not
+                                                                // user is not creator --- check if user has applied or not
                                                                 amIApplicant
                                                                     ?
                                                                     <>
@@ -322,8 +390,23 @@ const TaskDetails = () => {
                                                                                         amIEligible
                                                                                             ?
                                                                                             <>
-                                                                                                <h1>This task<br />fits your role.</h1>
-                                                                                                <button onClick={() => setOpenApply(true)}>APPLY</button>
+                                                                                                {
+                                                                                                    Task.isSingleContributor
+                                                                                                        ?
+                                                                                                        // user need to apply --- single contributor
+                                                                                                        <>
+
+                                                                                                            <h1>This task<br />fits your role.</h1>
+                                                                                                            <button onClick={() => setOpenApply(true)}>APPLY</button>
+                                                                                                        </>
+                                                                                                        :
+                                                                                                        // mulitple contributor
+                                                                                                        <>
+                                                                                                            <h1>This task<br />fits your role.</h1>
+                                                                                                            <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>
+                                                                                                        </>
+                                                                                                }
+
                                                                                             </>
                                                                                             :
                                                                                             <>
@@ -333,8 +416,22 @@ const TaskDetails = () => {
                                                                                 </>
                                                                                 :
                                                                                 <>
-                                                                                    <h1>This task needs a<br />contributor.</h1>
-                                                                                    <button onClick={() => setOpenApply(true)}>APPLY</button>
+                                                                                    {
+                                                                                        Task.isSingleContributor
+                                                                                            ?
+                                                                                            // user need to apply --- single contributor
+                                                                                            <>
+
+                                                                                                <h1>This task needs a<br />contributor.</h1>
+                                                                                                <button onClick={() => setOpenApply(true)}>APPLY</button>
+                                                                                            </>
+                                                                                            :
+                                                                                            // mulitple contributor
+                                                                                            <>
+                                                                                                <h1>Open for all.</h1>
+                                                                                                <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>
+                                                                                            </>
+                                                                                    }
                                                                                 </>
                                                                         }
                                                                     </>
@@ -387,9 +484,15 @@ const TaskDetails = () => {
                                     <img src={memberIcon} alt="member-icon" />
                                     <p>{assignedUser ? assignedUser : 'Not yet assigned'}</p>
                                 </div>
-                                <div>
-                                    <span>SEE PREVIOUS APPLICANTS</span>
-                                </div>
+                                {
+                                    Task.taskStatus !== 'open' && Task.contributionType === 'open' && Task.isSingleContributor
+                                        ?
+                                        <div>
+                                            <span style={{ cursor: 'pointer' }} onClick={() => setOpenApplicantsList(true)}>SEE PREVIOUS APPLICANTS</span>
+                                        </div>
+                                        :
+                                        null
+                                }
                                 <div>
                                     <span>Created At {moment(Task.createdAt).format('L')} {moment(Task.createdAt).format('LT')}</span>
                                 </div>
