@@ -73,6 +73,7 @@ const TransactionSend = (props: IselectTransactionSend) => {
 									)
 								);
 							})}
+							<option value="SWEAT">SWEAT</option>
 						</select>
 					</div>
 				</div>

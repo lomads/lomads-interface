@@ -21,7 +21,9 @@ import CompleteTxn from './TreasuryCard/CompleteTxn';
 import useRole from "hooks/useRole";
 import { SupportedChainId } from "constants/chains";
 import { usePrevious } from "hooks/usePrevious";
-import { off } from "process";
+import axiosHttp from 'api'
+import { nanoid } from "@reduxjs/toolkit";
+import moment from "moment";
 
 const TreasuryCard = (props: ItreasuryCardType) => {
 	const { provider, account, chainId, ...rest } = useWeb3React();
@@ -38,10 +40,12 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
 	const [pendingTxn, setPendingTxn] = useState<Array<any>>();
 	const [executedTxn, setExecutedTxn] = useState<Array<any>>();
+	const [offChainPendingTxn, setOffChainPendingTxn] = useState<Array<any>>();
+	const [offChainExecutedTxn, setOffChainExecutedTxn] = useState<Array<any>>();
 
 	const { DAO } = useAppSelector(store => store.dashboard);
 
-	const { myRole, can } = useRole(DAO, account);
+	const { myRole, can, isSafeOwner } = useRole(DAO, account);
 
 	const [totalUSD, setTotalUSD] = useState<any>('0');
 
@@ -58,6 +62,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		reload: (event: any) => {
 			loadPendingTxn();
 			loadExecutedTxn();
+			loadOffChainTxn();
 		}
 	}));
 
@@ -79,6 +84,16 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		setThreshold(threshold)
 	};
 
+	const loadOffChainTxn = async () => {
+		return axiosHttp.get(`transaction/off-chain?daoId=${DAO._id}`)
+		.then(txn => txn.data)
+		.then(txn => {
+			const pTxn = txn.filter((tx:any) => !tx.isExecuted)
+			const eTxn = txn.filter((tx:any) => tx.isExecuted)
+			return { pTxn, eTxn }
+		})
+	}
+
 	const loadPendingTxn = async () => {
 		(await safeService(provider, `${chainId}`))
 			.getPendingTransactions(_get(DAO, 'safe.address', ''))
@@ -99,6 +114,10 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				return true
 			}))
 			.then(ptx => _filter(ptx, p => !p.dataDecoded || (_get(p, 'dataDecoded.method', '') === 'multiSend' || _get(p, 'dataDecoded.method', '') === 'transfer')))
+			.then(async ptx => {
+				const { pTxn } = await loadOffChainTxn() 
+				return ptx.concat(pTxn)
+			})
 			.then(ptx => _sortBy(ptx, 'nonce', 'ASC'))
 			.then(ptx => { console.log("loadPendingTxn", ptx); return ptx })
 			.then(ptx => setPendingTxn(ptx))
@@ -129,9 +148,12 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				isOwner(_get(DAO, 'safe.address', ''))
 				loadPendingTxn()
 				loadExecutedTxn()
+				loadOffChainTxn()
 			} else {
 				setPendingTxn(undefined);
 				setExecutedTxn(undefined);
+				setOffChainPendingTxn(undefined);
+				setOffChainExecutedTxn(undefined)
 			}
 		}
 	}, [DAO, daoURL, threshold])
@@ -142,9 +164,12 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				isOwner(_get(DAO, 'safe.address', ''))
 				loadPendingTxn()
 				loadExecutedTxn()
+				loadOffChainTxn()
 			} else {
 				setPendingTxn(undefined);
 				setExecutedTxn(undefined);
+				setOffChainPendingTxn(undefined);
+				setOffChainExecutedTxn(undefined)
 			}
 		}
 	}, [DAO, daoURL, chainId])
@@ -159,104 +184,140 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		}
 	}, [props.tokens])
 
-	const handleConfirmTransaction = async (_safeTxHashs: string) => {
-		try {
+	const handleConfirmTransaction = async (_safeTxHashs: string, offChain: boolean = false) => {
+		if(offChain){
 			setConfirmTxLoading(_safeTxHashs);
-			const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
-			const isOwner = await safeSDK.isOwner(account as string);
-			if (isOwner) {
-				const senderSignature = await safeSDK.signTransactionHash(_safeTxHashs);
-				await (await safeService(provider, `${chainId}`))
-					.confirmTransaction(_safeTxHashs, senderSignature.data)
-					.then(async (success) => {
-						await (await safeService(provider, `${chainId}`)).getTransactionConfirmations(_safeTxHashs)
-							.then(async (res) => {
-								console.log(res)
-								setPendingTxn(prev => {
-									return prev?.map(tx => {
-										if (tx.safeTxHash === _safeTxHashs)
-											return { ...tx, confirmations: res.results }
-										if (tx.rejectedTxn && tx.rejectedTxn.safeTxHash === _safeTxHashs)
-											return { ...tx, rejectedTxn: { ...tx.rejectedTxn, confirmations: res.results } }
-										return tx
+			axiosHttp.patch(`transaction/off-chain/${_safeTxHashs}/approve`,
+				{
+					confirmations: isSafeOwner ? [{
+						owner: account,
+						submissionDate:  moment().utc().toDate()
+					}]: []
+				}
+			)
+			.then(res => loadPendingTxn())
+			.catch(e => console.log(e))
+			.finally(() => setConfirmTxLoading(null))
+		} else {
+			try {
+				setConfirmTxLoading(_safeTxHashs);
+				const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
+				const isOwner = await safeSDK.isOwner(account as string);
+				if (isOwner) {
+					const senderSignature = await safeSDK.signTransactionHash(_safeTxHashs);
+					await (await safeService(provider, `${chainId}`))
+						.confirmTransaction(_safeTxHashs, senderSignature.data)
+						.then(async (success) => {
+							await (await safeService(provider, `${chainId}`)).getTransactionConfirmations(_safeTxHashs)
+								.then(async (res) => {
+									console.log(res)
+									setPendingTxn(prev => {
+										return prev?.map(tx => {
+											if (tx.safeTxHash === _safeTxHashs)
+												return { ...tx, confirmations: res.results }
+											if (tx.rejectedTxn && tx.rejectedTxn.safeTxHash === _safeTxHashs)
+												return { ...tx, rejectedTxn: { ...tx.rejectedTxn, confirmations: res.results } }
+											return tx
+										})
 									})
+									setConfirmTxLoading(null);
+									console.log("User confirmed the transaction");
 								})
-								setConfirmTxLoading(null);
-								console.log("User confirmed the transaction");
-							})
-					})
-					.catch((err) => {
-						setConfirmTxLoading(null);
-						console.log("error occured while confirming transaction", err);
-					});
-			} else {
+						})
+						.catch((err) => {
+							setConfirmTxLoading(null);
+							console.log("error occured while confirming transaction", err);
+						});
+				} else {
+					setConfirmTxLoading(null);
+					console.log("sorry you already approved the transaction");
+				}
+			} catch (e) {
+				console.log(e)
 				setConfirmTxLoading(null);
-				console.log("sorry you already approved the transaction");
 			}
-		} catch (e) {
-			console.log(e)
-			setConfirmTxLoading(null);
 		}
 	};
 
-	const handleRejectTransaction = async (_nonce: number) => {
-		try {
+	const handleRejectTransaction = async (_nonce: number, offChain: boolean = false) => {
+		if(offChain) {
 			setRejectTxLoading(_nonce);
-			const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
-			const transactionObject = await safeSDK.createRejectionTransaction(_nonce);
-			const safeTxHash = await safeSDK.getTransactionHash(transactionObject);
-			const signature = await safeSDK.signTransactionHash(safeTxHash);
-			const senderAddress = account as string;
-			const safeAddress = _get(DAO, 'safe.address', '');
-			await (
-				await safeService(provider, `${chainId}`)
+			axiosHttp.patch(`transaction/off-chain/${_nonce}/reject`,
+				{
+					_nonce,
+					safeTxHash: nanoid(32),
+					value: "0",
+					submissionDate:  moment().utc().toDate(),
+					token:{ symbol: 'SWEAT' },
+					confirmations: isSafeOwner ? [{
+						owner: account,
+						submissionDate:  moment().utc().toDate()
+					}] : [],
+					dataDecoded: null
+				}
 			)
-				.proposeTransaction({
-					safeAddress,
-					safeTransactionData: transactionObject.data,
-					safeTxHash,
-					senderAddress,
-					senderSignature: signature.data,
-				})
-				.then((result) => {
-					console.log(result)
-					console.log(
-						"on chain rejection transaction has been proposed successfully."
-					);
-				})
-				.catch((err) => {
-					setRejectTxLoading(null);
-					console.log(err)
-					console.log("an error occured while proposing a reject transaction.");
-				});
-			await (await safeService(provider, `${chainId}`))
-				.confirmTransaction(safeTxHash, signature.data)
-				.then(async (result) => {
-					console.log("on chain transaction has been confirmed by the signer");
-					await loadPendingTxn()
-					setRejectTxLoading(null);
-					// await (await safeService(provider, `${chainId}`)).getTransactionConfirmations(safeTxHash)
-					// 	.then(async (res) => {
-					// 		console.log(res)
-					// 		setRejectTxLoading(null);
-					// 		setPendingTxn(prev => {
-					// 			let succTxn = _find(prev, p => p.nonce === _nonce)
-					// 			return prev?.map(tx => {
-					// 				if (tx.safeTxHash === succTxn.safeTxHash)
-					// 					return { ...succTxn, rejectedTxn: { safeTxHash, data: null, nonce: _nonce, confirmations: res.results } }
-					// 				return tx
-					// 			})
-					// 		})
-					// 		console.log("User confirmed the transaction");
-					// 	})
-				})
-				.catch((err) => {
-					setRejectTxLoading(null);
-					console.log("an error occured while confirming a reject transaction.");
-				});
-		} catch (e) {
-			console.log(e)
-			setRejectTxLoading(null);
+			.then(res => loadPendingTxn())
+			.catch(e => console.log(e))
+			.finally(() => setRejectTxLoading(null))
+		} else {
+			try {
+				setRejectTxLoading(_nonce);
+				const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
+				const transactionObject = await safeSDK.createRejectionTransaction(_nonce);
+				const safeTxHash = await safeSDK.getTransactionHash(transactionObject);
+				const signature = await safeSDK.signTransactionHash(safeTxHash);
+				const senderAddress = account as string;
+				const safeAddress = _get(DAO, 'safe.address', '');
+				await (
+					await safeService(provider, `${chainId}`)
+				)
+					.proposeTransaction({
+						safeAddress,
+						safeTransactionData: transactionObject.data,
+						safeTxHash,
+						senderAddress,
+						senderSignature: signature.data,
+					})
+					.then((result) => {
+						console.log(result)
+						console.log(
+							"on chain rejection transaction has been proposed successfully."
+						);
+					})
+					.catch((err) => {
+						setRejectTxLoading(null);
+						console.log(err)
+						console.log("an error occured while proposing a reject transaction.");
+					});
+				await (await safeService(provider, `${chainId}`))
+					.confirmTransaction(safeTxHash, signature.data)
+					.then(async (result) => {
+						console.log("on chain transaction has been confirmed by the signer");
+						await loadPendingTxn()
+						setRejectTxLoading(null);
+						// await (await safeService(provider, `${chainId}`)).getTransactionConfirmations(safeTxHash)
+						// 	.then(async (res) => {
+						// 		console.log(res)
+						// 		setRejectTxLoading(null);
+						// 		setPendingTxn(prev => {
+						// 			let succTxn = _find(prev, p => p.nonce === _nonce)
+						// 			return prev?.map(tx => {
+						// 				if (tx.safeTxHash === succTxn.safeTxHash)
+						// 					return { ...succTxn, rejectedTxn: { safeTxHash, data: null, nonce: _nonce, confirmations: res.results } }
+						// 				return tx
+						// 			})
+						// 		})
+						// 		console.log("User confirmed the transaction");
+						// 	})
+					})
+					.catch((err) => {
+						setRejectTxLoading(null);
+						console.log("an error occured while confirming a reject transaction.");
+					});
+			} catch (e) {
+				console.log(e)
+				setRejectTxLoading(null);
+			}
 		}
 	};
 

@@ -18,6 +18,7 @@ export default () => {
 	const { provider, account, chainId, connector } = useWeb3React();
     const [myNotifications, setMyNotifications] = useState([])
     const [timeline, setTimeline] = useState([])
+    let navigate = useNavigate();
     
     const dispatch = useAppDispatch();
 
@@ -46,11 +47,17 @@ export default () => {
                 if(notification.to._id === user._id)
                     return 'You are <span class="bold">invited</span>'
                 if(_get(notification, 'to.name', "") && _get(notification, 'to.name', "") !== "")
-                    return `${_get(notification, 'to.name', "")} has been <span class="bold">invited to</span> ${ _get(notification, 'project.name', '') }`
-                return `${beautifyHexToken(_get(notification, 'to.wallet', ""))} has been <span class="bold">invited to</span> ${ _get(notification, 'project.name', '') }`
+                    return `${_get(notification, 'to.name', "")} has been <span class="bold">invited</span> to ${ _get(notification, 'project.name', '') }`
+                return `${beautifyHexToken(_get(notification, 'to.wallet', ""))} has been <span class="bold">invited </span> to ${ _get(notification, 'project.name', '') }`
             } else if (notification.type === 'project:created') {
                 return `${ _get(notification, "project.name", "") } <span class="bold">created</span>`
             }
+        }
+    }
+
+    const navigateTo = notification => {
+        if(notification.model === 'Project') {
+            navigate(`/${DAO.url}/project/${_get(notification, 'project._id', '')}`)
         }
     }
 
@@ -64,7 +71,7 @@ export default () => {
                     {
                         myNotifications.map(notification => {
                             return (
-                                <div  key={notification._id} className='notification-item'>
+                                <div onClick={() => navigateTo(notification)} key={notification._id} className='notification-item'>
                                     <div className='notification-item__container'>
                                         <div className='notification-item__container-header'>
                                             <img className='icon' src={PROJECT_ICON} ></img>
@@ -85,7 +92,7 @@ export default () => {
                         timeline.map((notification, i) => {
                             return (
                                 <>
-                                    <div key={notification._id} className='notification-item'>
+                                    <div onClick={() => navigateTo(notification)} key={notification._id} className='notification-item'>
                                         <div className='notification-item__container'>
                                             <div className='left-section'>
                                                 <img className='icon' src={USER_ICON} ></img>

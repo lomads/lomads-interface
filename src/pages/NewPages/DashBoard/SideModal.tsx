@@ -26,6 +26,9 @@ import { updateTotalMembers } from "state/flow/reducer";
 import axiosHttp from '../../../api'
 import { SupportedChainId } from "constants/chains";
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
+import { nanoid } from "@reduxjs/toolkit";
+import moment from "moment";
+import useRole from "hooks/useRole";
 
 const SideModal = (props: IsideModal) => {
 	const dispatch = useAppDispatch();
@@ -51,6 +54,7 @@ const SideModal = (props: IsideModal) => {
 	const safeAddress = useAppSelector((state) => state.flow.safeAddress);
 
 	const { DAO } = useAppSelector(store => store.dashboard);
+	const { isSafeOwner } = useRole(DAO, account);
 
 	const showNavigation = (
 		_showRecipient: boolean,
@@ -69,9 +73,92 @@ const SideModal = (props: IsideModal) => {
 		setAddNewRecipient(!addNewRecipient);
 	};
 
+	const createOffChainTxn = () => {
+		setisLoading(true);
+		const nonce = moment().unix();
+		let payload = {}
+		if(setRecipient.current.length > 1){
+			payload = {
+				daoId: _get(DAO, '_id', undefined),
+				safe: props.safeAddress,
+				safeTxHash: nanoid(32),
+				nonce,
+				executor: account,
+				submissionDate: moment().utc().toDate(),
+				token:{
+					symbol: 'SWEAT'
+				},
+				confirmations: isSafeOwner ? [{
+					owner: account,
+					submissionDate:  moment().utc().toDate()
+				}] : [],
+				dataDecoded: {
+					method: "multiSend",
+					parameters: [{
+						valueDecoded: setRecipient.current.map(r => {
+							return {
+								dataDecoded: {
+									method: 'transfer',
+									parameters: [
+										{ name: 'to', type: "address", value: r.recipient },
+										{ name: 'value', type: "uint256", value: `${BigInt(parseFloat(r.amount) * 10 ** 18)}` },
+									]
+								}
+							}
+						})
+					}]
+				}
+			}
+		} else {
+			payload = {
+				daoId: _get(DAO, '_id', undefined),
+				safe: props.safeAddress,
+				nonce,
+				safeTxHash: nanoid(32),
+				executor: account,
+				submissionDate: moment().utc().toDate(),
+				token:{
+					symbol: 'SWEAT'
+				},
+				confirmations: isSafeOwner ? [{
+					owner: account,
+					submissionDate:  moment().utc().toDate()
+				}] : [],
+				dataDecoded: {
+					method: 'transfer',
+					parameters: [
+						{ name: 'to', type: "address", value: setRecipient.current[0].recipient },
+						{ name: 'value', type: "uint256", value: `${BigInt(parseFloat(setRecipient.current[0].amount) * 10 ** 18)}` },
+					]
+				}
+			}
+		}
+		axiosHttp.post('transaction/off-chain', payload)
+		.then(res => {
+			console.log(res);
+			axiosHttp.post(`transaction`, {
+				safeAddress: props.safeAddress,
+				safeTxHash: res.data.safeTxHash,
+				rejectTxHash: null,
+				data: setRecipient.current,
+				nonce,
+			})
+			.then(async () => {
+				dispatch(getDao(DAO.url))
+				await props.getPendingTransactions();
+				showNavigation(false, true, false);
+				setisLoading(false);
+			})
+		})
+		.finally(() => setisLoading(false))
+	}
+
 	const createTransaction = async () => {
 		try {
 			setError(null)
+			if(selectedToken === 'SWEAT') {
+				return createOffChainTxn()
+			}
 			let sendTotal = setRecipient.current.reduce((pv: any, cv) => pv + (+cv.amount), 0);
 			let selToken = _find(safeTokens, t => t.tokenAddress === selectedToken)
 			if(safeTokens.length > 0 && !selToken)
@@ -137,7 +224,6 @@ const SideModal = (props: IsideModal) => {
 				.then(async (success) => {
 					console.log("transaction is successful");
 					console.log("success:", success);
-
 					axiosHttp.post(`transaction`, {
 						safeAddress: safeAddress,
 						safeTxHash: safeTxHash,
@@ -145,12 +231,12 @@ const SideModal = (props: IsideModal) => {
 						data: setRecipient.current,
 						nonce: currentNonce,
 					})
-						.then(async () => {
-							dispatch(getDao(DAO.url))
-							await props.getPendingTransactions();
-							showNavigation(false, true, false);
-							setisLoading(false);
-						})
+					.then(async () => {
+						dispatch(getDao(DAO.url))
+						await props.getPendingTransactions();
+						showNavigation(false, true, false);
+						setisLoading(false);
+					})
 				})
 				.catch((err) => {
 					setisLoading(false);

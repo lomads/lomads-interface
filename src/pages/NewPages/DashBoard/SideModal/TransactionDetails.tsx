@@ -46,6 +46,9 @@ const TransactionDetails = (props: ItransactionDetailsType) => {
                   )
                 );
               })}
+              <option value="SWEAT">
+                SWEAT
+              </option>
             </select>
           </div>
         </div>

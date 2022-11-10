@@ -89,7 +89,7 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
         const mulAmount = _get(item, 'dataDecoded.parameters[1].value')
         const mulRecipient = _get(item, 'dataDecoded.parameters[0].value')
         const isLast = _get(transaction, 'dataDecoded.parameters[0].valueDecoded', []).length - 1 === index;
-        const token = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')
+        const token = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
         let trans = _find(_get(DAO, 'safe.transactions', []), t => t.safeTxHash === transaction.safeTxHash)
         let mulReason = '';
         if (trans)
@@ -164,11 +164,11 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
                     </div>
                     { index == 0 ? <div className="confirmIconGrp">
                     {!confirmReached && !rejectReached &&
-                            <IconButton disabled={!owner || hasMyRejectVote || confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={(e) => rejectTransaction(_get(transaction, 'nonce'))} Icon={
+                            <IconButton disabled={!owner || hasMyRejectVote || confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={(e) => rejectTransaction(_get(transaction, 'nonce'), transaction.offChain)} Icon={
                                 rejectTxLoading === _get(transaction, 'nonce', '') ? <LeapFrog size={10} color="#C94B32" /> : <AiOutlineClose style={{ color: !owner || hasMyRejectVote ? "rgba(27, 43, 65, 0.2)" : "#C94B32", height: "16px", width: "16px", }} />
                             } bgColor={!owner || hasMyRejectVote ? "rgba(27, 43, 65, 0)" : "#FFF00"} height={30} width={30} border={`2px solid ${!owner || hasMyRejectVote ? 'rgba(27, 43, 65, 0.2)' : '#C94B32'}`} className="iconButtons outline" />}
                         {!confirmReached && !rejectReached &&
-                            <IconButton disabled={!owner || hasMyConfirmVote || confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={(e) => confirmTransaction(_get(transaction, 'safeTxHash'))} Icon={
+                            <IconButton disabled={!owner || hasMyConfirmVote || confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={(e) => confirmTransaction(_get(transaction, 'safeTxHash'), transaction.offChain)} Icon={
                                 confirmTxLoading === _get(transaction, 'safeTxHash') ? <LeapFrog size={10} color="#FFF" /> : <AiOutlineCheck style={{ color: "#FFFFFF", height: "16px", width: "16px", }} />
                             } bgColor={!owner || hasMyConfirmVote ? "rgba(27, 43, 65, 0.2)" : "#C94B32"} height={30} width={30} border={`2px solid ${!owner || hasMyConfirmVote ? 'rgba(27, 43, 65, 0.1)' : '#C94B32'}`} className="iconButtons" />}
                         {confirmReached &&
@@ -243,7 +243,7 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
                         <div className="coinText">
                             <img src={sendTokenOutline} alt="" />
                             <div className="dashboardTextBold">
-                                {`${amount / 10 ** 18} ${_get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}`}
+                                {`${amount / 10 ** 18} ${_get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))}`}
                             </div>
                         </div>
                         <div className="transactionName">
@@ -305,11 +305,11 @@ const PendingTxn = ({ tokens, executeFirst = '', threshold, transaction, owner, 
                         </div>
                         { true ? <div className="confirmIconGrp">
                             {!confirmReached && !rejectReached &&
-                                <IconButton disabled={!owner || hasMyRejectVote || confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={(e) => rejectTransaction(_get(transaction, 'nonce'))} Icon={
+                                <IconButton disabled={!owner || hasMyRejectVote || confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={(e) => rejectTransaction(_get(transaction, 'nonce'), transaction.offChain)} Icon={
                                     rejectTxLoading === _get(transaction, 'nonce') ? <LeapFrog size={10} color="#C94B32" /> : <AiOutlineClose style={{ color: !owner || hasMyRejectVote ? "rgba(27, 43, 65, 0.2)" : "#C94B32", height: "16px", width: "16px", }} />
                                 } bgColor={!owner || hasMyRejectVote ? "rgba(27, 43, 65, 0)" : "#FFF00"} height={30} width={30} border={`2px solid ${!owner || hasMyRejectVote ? 'rgba(27, 43, 65, 0.2)' : '#C94B32'}`} className="iconButtons" />}
                             {!confirmReached && !rejectReached &&
-                                <IconButton disabled={!owner || hasMyConfirmVote || confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={(e) => confirmTransaction(_get(transaction, 'safeTxHash'))} Icon={
+                                <IconButton disabled={!owner || hasMyConfirmVote || confirmTxLoading || rejectTxLoading || executeTxLoading} onClick={(e) => confirmTransaction(_get(transaction, 'safeTxHash'), transaction.offChain)} Icon={
                                     confirmTxLoading === _get(transaction, 'safeTxHash') ? <LeapFrog size={10} color="#FFF" /> : <AiOutlineCheck style={{ color: "#FFFFFF", height: "16px", width: "16px", }} />
                                 } bgColor={!owner || hasMyConfirmVote ? "rgba(27, 43, 65, 0.2)" : "#C94B32"} height={30} width={30} border={`2px solid ${ !owner ||hasMyConfirmVote ? 'rgba(27, 43, 65, 0.1)' : '#C94B32'}`} className="iconButtons" />}
                             {confirmReached &&

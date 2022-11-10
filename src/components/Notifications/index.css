@@ -27,6 +27,7 @@
 }
 
 .notifications .my_notifications .list-container .notification-item { 
+    cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -114,10 +115,9 @@
     width: 100%;
     height: 100%;
     overflow-y: auto;
-    padding: 8px 0;
+    padding: 21px;
     display: flex;
     flex-direction: column;
-    padding: 21px;
 }
 
 .notifications .timeline_notifications .list-container .dash {
@@ -125,7 +125,8 @@
 } 
 
 .notifications .timeline_notifications .list-container .notification-item { 
-    padding: 21px 0px;
+    padding: 18px 0px;
+    cursor: pointer;
 }
 
 .notifications .timeline_notifications .list-container .notification-item__container { 
