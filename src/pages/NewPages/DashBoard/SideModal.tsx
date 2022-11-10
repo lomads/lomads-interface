@@ -74,10 +74,10 @@ const SideModal = (props: IsideModal) => {
 			setError(null)
 			let sendTotal = setRecipient.current.reduce((pv: any, cv) => pv + (+cv.amount), 0);
 			let selToken = _find(safeTokens, t => t.tokenAddress === selectedToken)
-			if(safeTokens.length > 0 && !selToken)
+			if (safeTokens.length > 0 && !selToken)
 				selToken = safeTokens[0];
 			if (selToken && (_get(selToken, 'balance', 0) / 10 ** 18) < sendTotal)
-			//{ _get(result, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR') }
+				//{ _get(result, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR') }
 				//return setError(`Low token balance. Available tokens ${_get(selToken, 'balance', 0) / 10 ** 18} ${selToken.token.symbol}`);
 				return setError(`Low token balance. Available tokens ${_get(selToken, 'balance', 0) / 10 ** 18} ${_get(selToken, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}`);
 			setisLoading(true);
@@ -164,13 +164,13 @@ const SideModal = (props: IsideModal) => {
 
 	const getTokens = async (safeAddress: string) => {
 		chainId &&
-		await axios
-			.get(
-				`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`
-			)
-			.then((tokens: any) => {
-				setSafeTokens(tokens.data);
-			});
+			await axios
+				.get(
+					`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`
+				)
+				.then((tokens: any) => {
+					setSafeTokens(tokens.data);
+				});
 	};
 
 	useEffect(() => {

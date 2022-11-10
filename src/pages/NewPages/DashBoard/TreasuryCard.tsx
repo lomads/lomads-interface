@@ -48,7 +48,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	const prevDAO = usePrevious(DAO);
 
 	useEffect(() => {
-		if(prevDAO && !DAO){
+		if (prevDAO && !DAO) {
 			setExecutedTxn(undefined)
 			setPendingTxn(undefined)
 		}
@@ -337,7 +337,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		return false
 	}, [props.tokens])
 
-	if(!DAO || (DAO && DAO.url !== daoURL))
+	if (!DAO || (DAO && DAO.url !== daoURL))
 		return null
 
 	return (
@@ -370,40 +370,40 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 					{owner && <SafeButton onClick={props.toggleModal} height={40} width={150} titleColor="#B12F15" title="SEND TOKEN" bgColor={!hasValidToken ? "#f0f2f6" : "#FFFFFF"} opacity={!hasValidToken ? "0.4" : "1"} disabled={!hasValidToken} fontweight={400} fontsize={16} />}
 				</div>
 			</div>
-			{ props.tokens && props.tokens.length > 0 &&
-			<div className="treasuryTokens">
-				<div className="treasuryTokens-left">
-					{
-						totalUSD === '0.00'
-							?
-							null
-							:
-							<>
-								<img src={coin} alt="asset" />
-
-								<span>
-									${totalUSD}
-								</span>
-
-								<div className="dashboardText">total balance</div></>
-					}
-
-				</div>
-				<div className="treasuryTokens-right">
-					{
-						props.tokens.map((token: any) => {
-							return (
+			{props.tokens && props.tokens.length > 0 &&
+				<div className="treasuryTokens">
+					<div className="treasuryTokens-left">
+						{
+							totalUSD === '0.00'
+								?
+								null
+								:
 								<>
-									<div className="tokenDiv">
-										<span>{`${_get(token, 'balance', 0) / 10 ** 18}`}</span>
-										<h1>{`${_get(token, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}`}</h1>
-									</div>
-								</>
-							)
-						})
-					}
+									<img src={coin} alt="asset" />
+
+									<span>
+										${totalUSD}
+									</span>
+
+									<div className="dashboardText">total balance</div></>
+						}
+
+					</div>
+					<div className="treasuryTokens-right">
+						{
+							props.tokens.map((token: any) => {
+								return (
+									<>
+										<div className="tokenDiv">
+											<span>{`${_get(token, 'balance', 0) / 10 ** 18}`}</span>
+											<h1>{`${_get(token, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}`}</h1>
+										</div>
+									</>
+								)
+							})
+						}
+					</div>
 				</div>
-			</div>
 			}
 			<>
 				{

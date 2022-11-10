@@ -68,7 +68,7 @@ const Tasks = ({ toggleShowCreateTask }) => {
                     <div className="divider"></div>
 
                     <button className={tab === 4 ? 'active' : null} onClick={() => setTab(4)}>
-                        All projects
+                        All tasks
                     </button>
                 </div>
                 <div className="tasks-buttons">
@@ -99,20 +99,13 @@ const Tasks = ({ toggleShowCreateTask }) => {
             <div className='tasks-body'>
                 {
                     _get(DAO, 'tasks', []).map((item, index) => {
-                        if (index < 20) {
+                        if (index < 10) {
                             return (
                                 <div key={index}>
                                     <TaskCard
                                         task={item}
                                         daoUrl={DAO?.url}
                                     />
-                                </div>
-                            )
-                        }
-                        else {
-                            return (
-                                <div className='all-tasks'>
-                                    <p>Show All</p>
                                 </div>
                             )
                         }

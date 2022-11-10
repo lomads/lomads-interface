@@ -131,7 +131,7 @@ const Dashboard = () => {
 	const prevDAO = usePrevious(DAO);
 
 	useEffect(() => {
-		if(prevDAO && !DAO){
+		if (prevDAO && !DAO) {
 			setSafeTokens([])
 		}
 	}, [DAO, prevDAO])
@@ -382,7 +382,7 @@ const Dashboard = () => {
 
 				{_get(DAO, 'links', []).length > 0 && <LinksArea links={_get(DAO, 'links', [])} />}
 
-				<Notifications/>
+				<Notifications />
 
 				{/* {pendingTransactions !== undefined &&
 					pendingTransactions?.count >= 1 &&

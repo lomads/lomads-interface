@@ -14,10 +14,18 @@ import { useAppSelector, useAppDispatch } from "state/hooks";
 import { createTask, draftTask } from 'state/dashboard/actions'
 import { resetCreateTaskLoader, resetDraftTaskLoader } from 'state/dashboard/reducer';
 
+import { useWeb3React } from "@web3-react/core";
+import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
+import { SupportedChainId } from "constants/chains";
+
+import axios from "axios";
+import { isValidUrl } from 'utils';
+
 const CreateTask = ({ toggleShowCreateTask }) => {
 
     const dispatch = useAppDispatch();
     const { DAO, createTaskLoading, draftTaskLoading } = useAppSelector((state) => state.dashboard);
+    const { chainId } = useWeb3React();
 
     const [contributionType, setContributionType] = useState('assign');
     const [isSingleContributor, setIsSingleContributor] = useState(false);
@@ -34,11 +42,31 @@ const CreateTask = ({ toggleShowCreateTask }) => {
     const [reviewer, setReviewer] = useState(null);
     const [currency, setCurrency] = useState('MATIC');
     const [amount, setAmount] = useState(0);
+    const [safeTokens, setSafeTokens] = useState([]);
+    const [showSuccess, setShowSuccess] = useState(false);
+
+    const getTokens = async (safeAddress) => {
+        safeAddress && chainId &&
+            await axios
+                .get(
+                    `${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`
+                )
+                .then((tokens) => {
+                    setSafeTokens(tokens.data);
+                    console.log("tokens : ", tokens.data);
+                });
+    };
+
+    useEffect(() => {
+        getTokens(_get(DAO, 'safe.address'));
+        return () => { };
+    }, [DAO]);
 
     useEffect(() => {
         if (createTaskLoading === false || draftTaskLoading === false) {
             dispatch(resetCreateTaskLoader());
             dispatch(resetDraftTaskLoader());
+            setShowSuccess(true);
             setContributionType('assign');
             setIsSingleContributor(false);
             setIsFilterRoles(false);
@@ -53,7 +81,11 @@ const CreateTask = ({ toggleShowCreateTask }) => {
             setReviewer(null);
             setCurrency('MATIC');
             setAmount(0);
-            toggleShowCreateTask();
+
+            setTimeout(() => {
+                setShowSuccess(false);
+                toggleShowCreateTask();
+            }, 3000);
         }
     }, [createTaskLoading, draftTaskLoading]);
 
@@ -73,39 +105,71 @@ const CreateTask = ({ toggleShowCreateTask }) => {
 
     const handleCreateTask = () => {
         if (name === '') {
-            document.getElementById('error-name').innerHTML = 'Enter name';
+            let e = document.getElementById('error-name');
+            e.innerHTML = 'Enter name';
+            e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             return;
         }
         else if (description === '') {
-            document.getElementById('error-desc').innerHTML = 'Enter description';
+            let e = document.getElementById('error-desc');
+            e.innerHTML = 'Enter description';
+            e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             return;
         }
-        else if (dchannel === '') {
-            document.getElementById('error-dchannel').innerHTML = 'Enter discussion channel';
+        // else if (dchannel === '') {
+        //     let e = document.getElementById('error-dchannel');
+        //     e.innerHTML = 'Enter discussion channel link';
+        //     e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+        //     return;
+        // }
+        else if (!isValidUrl(dchannel)) {
+            let e = document.getElementById('error-dchannel');
+            e.innerHTML = 'Please enter a valid link';
+            e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+            return;
+        }
+        else if (subLink && !isValidUrl(subLink)) {
+            let e = document.getElementById('error-sublink');
+            e.innerHTML = 'Please enter a valid link';
+            e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             return;
         }
         else if (deadline === '') {
-            document.getElementById('error-deadline').innerHTML = 'Enter application deadline';
+            let e = document.getElementById('error-deadline');
+            e.innerHTML = 'Enter application deadline';
+            e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             return;
         }
         else if (contributionType === 'assign' && selectedUser === null) {
-            document.getElementById('error-applicant').innerHTML = 'Select one applicant for the task';
+            let e = document.getElementById('error-applicant');
+            e.innerHTML = 'Select one applicant for the task';
+            e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             return;
         }
         else if (reviewer === null) {
-            document.getElementById('error-reviewer').innerHTML = 'Select a reviewer';
+            let e = document.getElementById('error-reviewer');
+            e.innerHTML = 'Select a reviewer';
+            e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             return;
         }
         else {
+            let tempLink = dchannel;
+            if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
+                tempLink = 'https://' + tempLink;
+            }
+            let tempSub = subLink;
+            if (tempSub !== '' && tempSub.indexOf('https://') === -1 && tempSub.indexOf('http://') === -1) {
+                tempSub = 'https://' + tempSub;
+            }
             let task = {};
             task.daoId = DAO?._id;
             task.name = name;
             task.description = description;
             task.applicant = selectedUser;
             task.projectId = projectId;
-            task.discussionChannel = dchannel;
+            task.discussionChannel = tempLink;
             task.deadline = deadline;
-            task.submissionLink = subLink;
+            task.submissionLink = tempSub;
             task.compensation = { currency, amount };
             task.reviewer = reviewer;
             task.contributionType = contributionType;
@@ -151,272 +215,298 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                 <CgClose size={20} color="#C94B32" />
                             </button>
                         </div>
-
-                        <div className='createTask-body'>
-                            <img src={createTaskSvg} alt="frame-icon" />
-                            <h1>Create task</h1>
-
-                            <div className='createTask-inputRow'>
-                                <span>Name of the task</span>
-                                <SimpleInputField
-                                    className="inputField"
-                                    id="nameInput"
-                                    height={50}
-                                    width={'100%'}
-                                    value={name}
-                                    onchange={(e) => { setName(e.target.value); document.getElementById('error-name').innerHTML = '' }}
-                                    placeholder="Name of the task"
-                                />
-                                <span className='error-msg' id="error-name"></span>
-                            </div>
-
-                            <div className='createTask-inputRow'>
-                                <span>Description</span>
-                                <textarea
-                                    style={{ width: '100%' }}
-                                    className="inputField"
-                                    placeholder='Enter task description'
-                                    value={description}
-                                    onChange={(e) => { setDescription(e.target.value); document.getElementById('error-desc').innerHTML = '' }}
-                                />
-                                <span className='error-msg' id="error-desc"></span>
-                            </div>
-
-                            <div className='createTask-inputRow row-align'>
-                                <div className='createTask-inputRow-half'>
-                                    <span>Discussion channel</span>
-                                    <SimpleInputField
-                                        className="inputField"
-                                        id="discussionInput"
-                                        height={50}
-                                        width={'100%'}
-                                        placeholder="Dsicussion channel url"
-                                        value={dchannel}
-                                        onchange={(e) => { setDChannel(e.target.value); document.getElementById('error-dchannel').innerHTML = '' }}
-                                    />
-                                    <span className='error-msg' id="error-dchannel"></span>
+                        {
+                            showSuccess
+                                ?
+                                <div className='createTask-success'>
+                                    <img src={createTaskSvg} alt="frame-icon" />
+                                    <h1>New task created!</h1>
+                                    <span>The new task is created.<br />You will be redirected in a few seconds.</span>
                                 </div>
-                                <div className='createTask-inputRow-half'>
-                                    <span>Deadline</span>
-                                    <SimpleInputField
-                                        className="inputField"
-                                        id="deadlineInput"
-                                        height={50}
-                                        width={'100%'}
-                                        placeholder="Deadline"
-                                        value={deadline}
-                                        type="date"
-                                        onchange={(e) => { setDeadline(e.target.value); document.getElementById('error-deadline').innerHTML = '' }}
-                                    />
-                                    <span className='error-msg' id="error-deadline"></span>
-                                </div>
-                            </div>
-
-                            <div className='createTask-inputRow'>
-                                <div className='createTask-optionalDiv'>
-                                    <span>In project:</span>
-                                    <div className='option-div'>
-                                        Optionnal
-                                    </div>
-                                </div>
-                                <select
-                                    name="project"
-                                    id="project"
-                                    className="tokenDropdown"
-                                    style={{ width: '100%' }}
-                                    onChange={(e) => setProjectId(e.target.value)}
-                                >
-                                    <option value="">Select project</option>
-                                    {
-                                        _get(DAO, 'projects', []).map((item, index) => {
-                                            return (
-                                                <option value={`${item._id}`}>{item.name}</option>
-                                            )
-                                        })
-                                    }
-                                </select>
-
-                            </div>
-
-                            <div className='hr-line'></div>
-
-                            <div className='createTask-inputRow'>
-                                <span>Contribution</span>
-                                <div className='createTask-buttonRow'>
-                                    <button onClick={() => { setContributionType('assign'); setIsFilterRoles(false) }} className={contributionType === 'assign' ? 'active' : null}>ASSIGN MEMBER</button>
-                                    <button onClick={() => { setContributionType('open'); setSelectedUser(null) }} className={contributionType === 'open' ? 'active' : null}>OPEN</button>
-                                </div>
-                            </div>
-
-                            {
-                                contributionType === 'assign' &&
-                                <div className='createTask-inputRow'>
-                                    <p style={{ margin: '0' }}>This member will be in charge of completing this task</p>
-                                    <select
-                                        name="member"
-                                        id="member"
-                                        className="tokenDropdown"
-                                        style={{ width: '100%' }}
-                                        onChange={(e) => handleSetApplicant(e.target.value)}
-                                    >
-                                        <option value="">Select member</option>
-                                        {
-                                            _get(DAO, 'members', []).map((item, index) => {
-                                                return (
-                                                    <option value={`${index}`}>{item.member.name}</option>
-                                                )
-                                            })
-                                        }
-                                    </select>
-                                    <span className='error-msg' id="error-applicant"></span>
-                                </div>
-                            }
-
-                            {
-                                contributionType === 'open' &&
-                                <div className='contributor-section'>
-                                    <div className='contributor-check'>
-                                        {
-                                            isSingleContributor
-                                                ?
-                                                <input type="checkbox" onChange={(e) => setIsSingleContributor(!isSingleContributor)} checked />
-                                                :
-                                                <input type="checkbox" onChange={(e) => setIsSingleContributor(!isSingleContributor)} />
-                                        }
-                                        <div>
-                                            <h1>SINGLE CONTRIBUTOR</h1>
-                                            <span>The reviewer will pick a contributor from the applicants (if unchecked, everyone can contribute)</span>
-                                        </div>
-                                    </div>
-                                    <div className='contributor-check'>
-                                        {
-                                            isFilterRoles
-                                                ?
-                                                <input type="checkbox" onChange={(e) => setIsFilterRoles(!isFilterRoles)} checked />
-                                                :
-                                                <input type="checkbox" onChange={(e) => setIsFilterRoles(!isFilterRoles)} />
-                                        }
-
-                                        <div>
-                                            <h1>FILTER BY ROLES (DISCORD)</h1>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-
-                            {
-                                isFilterRoles &&
+                                :
                                 <>
-                                    <div className='selected-roles'>
-                                        <div className='roles-left'>
+                                    <div className='createTask-body'>
+                                        <img src={createTaskSvg} alt="frame-icon" />
+                                        <h1>Create task</h1>
 
-                                            {
-                                                validRoles.map((item, index) => {
-                                                    return (
-                                                        <div className='roles-li'>
-                                                            <div
-                                                                className='roles-pill'
-                                                                style={index === 0 ? { background: 'rgba(146, 225, 168, 0.3)' } : index === 1 ? { background: 'rgba(137,179,229,0.3)' } : index === 2 ? { background: 'rgba(234,100,71,0.3)' } : { background: 'rgba(146, 225, 168, 0.3)' }}
-                                                            >
-                                                                <div
-                                                                    className='roles-circle'
-                                                                    style={index === 0 ? { background: 'rgba(146, 225, 168, 1)' } : index === 1 ? { background: 'rgba(137,179,229,1)' } : index === 2 ? { background: 'rgba(234,100,71,1)' } : { background: 'rgba(146, 225, 168, 1)' }}
-                                                                ></div>
-                                                                <span>{item}</span>
-                                                            </div>
-                                                            <div className='roles-close' onClick={() => handleRemoveRole(item)}>
-                                                                <CgClose color='#FFF' />
-                                                            </div>
-                                                        </div>
-                                                    )
-                                                })
-                                            }
+                                        <div className='createTask-inputRow'>
+                                            <span>Name of the task</span>
+                                            <SimpleInputField
+                                                className="inputField"
+                                                id="nameInput"
+                                                height={50}
+                                                width={'100%'}
+                                                value={name}
+                                                onchange={(e) => { setName(e.target.value); document.getElementById('error-name').innerHTML = '' }}
+                                                placeholder="Name of the task"
+                                            />
+                                            <span className='error-msg' id="error-name"></span>
+                                        </div>
+
+                                        <div className='createTask-inputRow'>
+                                            <span>Description</span>
+                                            <textarea
+                                                style={{ width: '100%' }}
+                                                className="inputField"
+                                                placeholder='Enter task description'
+                                                value={description}
+                                                onChange={(e) => { setDescription(e.target.value); document.getElementById('error-desc').innerHTML = '' }}
+                                            />
+                                            <span className='error-msg' id="error-desc"></span>
+                                        </div>
+
+                                        <div className='createTask-inputRow row-align'>
+                                            <div className='createTask-inputRow-half' style={{ height: '70px' }}>
+                                                <span>Discussion channel</span>
+                                                <SimpleInputField
+                                                    className="inputField"
+                                                    id="discussionInput"
+                                                    height={50}
+                                                    width={'100%'}
+                                                    placeholder="Discussion channel url"
+                                                    value={dchannel}
+                                                    onchange={(e) => { setDChannel(e.target.value); document.getElementById('error-dchannel').innerHTML = '' }}
+                                                />
+                                                <span className='error-msg' id="error-dchannel"></span>
+                                            </div>
+                                            <div className='createTask-inputRow-half' style={{ height: '70px' }}>
+                                                <span>Deadline</span>
+                                                <SimpleInputField
+                                                    className="inputField"
+                                                    id="deadlineInput"
+                                                    height={50}
+                                                    width={'100%'}
+                                                    placeholder="Deadline"
+                                                    value={deadline}
+                                                    type="date"
+                                                    onchange={(e) => { setDeadline(e.target.value); document.getElementById('error-deadline').innerHTML = '' }}
+                                                />
+                                                <span className='error-msg' id="error-deadline"></span>
+                                            </div>
+                                        </div>
+
+                                        <div className='createTask-inputRow'>
+                                            <div className='createTask-optionalDiv'>
+                                                <span>In project:</span>
+                                                <div className='option-div'>
+                                                    Optionnal
+                                                </div>
+                                            </div>
+                                            <select
+                                                name="project"
+                                                id="project"
+                                                className="tokenDropdown"
+                                                style={{ width: '100%' }}
+                                                onChange={(e) => setProjectId(e.target.value)}
+                                            >
+                                                <option value="">Select project</option>
+                                                {
+                                                    _get(DAO, 'projects', []).map((item, index) => {
+                                                        return (
+                                                            <option value={`${item._id}`}>{item.name}</option>
+                                                        )
+                                                    })
+                                                }
+                                            </select>
 
                                         </div>
-                                        <div className='roles-right'>
-                                            <button onClick={toggleSelect}>
-                                                <HiOutlinePlus size={24} color='#C94B32' />
-                                            </button>
+
+                                        <div className='hr-line'></div>
+
+                                        <div className='createTask-inputRow'>
+                                            <span>Contribution</span>
+                                            <div className='createTask-buttonRow'>
+                                                <button onClick={() => { setContributionType('assign'); setIsFilterRoles(false) }} className={contributionType === 'assign' ? 'active' : null}>ASSIGN MEMBER</button>
+                                                <button onClick={() => { setContributionType('open'); setSelectedUser(null) }} className={contributionType === 'open' ? 'active' : null}>OPEN</button>
+                                            </div>
                                         </div>
+
+                                        {
+                                            contributionType === 'assign' &&
+                                            <div className='createTask-inputRow'>
+                                                <p style={{ margin: '0' }}>This member will be in charge of completing this task</p>
+                                                <select
+                                                    name="member"
+                                                    id="member"
+                                                    className="tokenDropdown"
+                                                    style={{ width: '100%' }}
+                                                    onChange={(e) => handleSetApplicant(e.target.value)}
+                                                >
+                                                    <option value="">Select member</option>
+                                                    {
+                                                        _get(DAO, 'members', []).map((item, index) => {
+                                                            return (
+                                                                <option value={`${index}`}>{item.member.name}</option>
+                                                            )
+                                                        })
+                                                    }
+                                                </select>
+                                                <span className='error-msg' id="error-applicant"></span>
+                                            </div>
+                                        }
+
+                                        {
+                                            contributionType === 'open' &&
+                                            <div className='contributor-section'>
+                                                <div className='contributor-check'>
+                                                    {
+                                                        isSingleContributor
+                                                            ?
+                                                            <input type="checkbox" onChange={(e) => setIsSingleContributor(!isSingleContributor)} checked />
+                                                            :
+                                                            <input type="checkbox" onChange={(e) => setIsSingleContributor(!isSingleContributor)} />
+                                                    }
+                                                    <div>
+                                                        <h1>SINGLE CONTRIBUTOR</h1>
+                                                        <span>The reviewer will pick a contributor from the applicants (if unchecked, everyone can contribute)</span>
+                                                    </div>
+                                                </div>
+                                                <div className='contributor-check'>
+                                                    {
+                                                        isFilterRoles
+                                                            ?
+                                                            <input type="checkbox" onChange={(e) => setIsFilterRoles(!isFilterRoles)} checked />
+                                                            :
+                                                            <input type="checkbox" onChange={(e) => setIsFilterRoles(!isFilterRoles)} />
+                                                    }
+
+                                                    <div>
+                                                        <h1>FILTER BY ROLES (DISCORD)</h1>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+
+                                        {
+                                            isFilterRoles &&
+                                            <>
+                                                <div className='selected-roles'>
+                                                    <div className='roles-left'>
+
+                                                        {
+                                                            validRoles.map((item, index) => {
+                                                                return (
+                                                                    <div className='roles-li'>
+                                                                        <div
+                                                                            className='roles-pill'
+                                                                            style={index === 0 ? { background: 'rgba(146, 225, 168, 0.3)' } : index === 1 ? { background: 'rgba(137,179,229,0.3)' } : index === 2 ? { background: 'rgba(234,100,71,0.3)' } : { background: 'rgba(146, 225, 168, 0.3)' }}
+                                                                        >
+                                                                            <div
+                                                                                className='roles-circle'
+                                                                                style={index === 0 ? { background: 'rgba(146, 225, 168, 1)' } : index === 1 ? { background: 'rgba(137,179,229,1)' } : index === 2 ? { background: 'rgba(234,100,71,1)' } : { background: 'rgba(146, 225, 168, 1)' }}
+                                                                            ></div>
+                                                                            <span>{item}</span>
+                                                                        </div>
+                                                                        <div className='roles-close' onClick={() => handleRemoveRole(item)}>
+                                                                            <CgClose color='#FFF' />
+                                                                        </div>
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        }
+
+                                                    </div>
+                                                    <div className='roles-right'>
+                                                        <button onClick={toggleSelect}>
+                                                            <HiOutlinePlus size={24} color='#C94B32' />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        }
+
+                                        <div className='createTask-inputRow'>
+                                            <div className='createTask-optionalDiv'>
+                                                <span>Submission link</span>
+
+                                                <div className='option-div'>
+                                                    Optionnal
+                                                </div>
+                                            </div>
+                                            <p>Provide a link here only if the submissions will come from trusted contributors</p>
+                                            <SimpleInputField
+                                                className="inputField"
+                                                id="nameInput"
+                                                height={50}
+                                                width={'100%'}
+                                                value={subLink}
+                                                onchange={(e) => { setSubLink(e.target.value); document.getElementById('error-sublink').innerHTML = '' }}
+                                                placeholder="Google drive folder, notion page, github"
+                                            />
+                                            <span className='error-msg' id="error-sublink"></span>
+                                        </div>
+
+                                        <div className='hr-line'></div>
+
+                                        <div className='createTask-inputRow'>
+                                            <span>Compensation</span>
+                                            <div className='createTask-compensation'>
+                                                <select
+                                                    name="chain"
+                                                    id="chain"
+                                                    className="tokenDropdown"
+                                                    style={{ width: '100%' }}
+                                                >
+                                                    <option value="" disabled={true}>
+                                                        select a token
+                                                    </option>
+                                                    {safeTokens.map((result, index) => {
+                                                        console.log("tokens_RESULT", result)
+                                                        return (
+                                                            (
+                                                                <>
+                                                                    <option value={result.tokenAddress ? result.tokenAddress : chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS} key={index}>
+                                                                        {_get(result, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}
+                                                                    </option>
+                                                                </>
+                                                            )
+                                                        );
+                                                    })}
+                                                    <option value="SWEAT">SWEAT</option>
+                                                </select>
+                                                <input
+                                                    className="inputField"
+                                                    type={'number'}
+                                                    style={{ height: '55px' }}
+                                                    value={amount}
+                                                    onChange={(e) => setAmount(parseInt(e.target.value))}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className='createTask-inputRow'>
+                                            <span>Reviewer</span>
+                                            <select
+                                                name="reviewer"
+                                                id="reviewer"
+                                                className="tokenDropdown"
+                                                style={{ width: '100%' }}
+                                                onChange={(e) => { setReviewer(e.target.value); document.getElementById('error-reviewer').innerHTML = '' }}
+                                            >
+                                                <option value="">Select member</option>
+                                                {
+                                                    _get(DAO, 'members', []).map((item, index) => {
+                                                        return (
+                                                            <option value={`${item.member._id}`}>{item.member.name}</option>
+                                                        )
+                                                    })
+                                                }
+                                            </select>
+                                            <span className='error-msg' id="error-reviewer"></span>
+                                        </div>
+
+                                    </div>
+
+                                    <div className='createTask-footer'>
+                                        <button onClick={handleDraftTask}>
+                                            SAVE AS DRAFT
+                                        </button>
+                                        <button onClick={handleCreateTask}>
+                                            CREATE
+                                        </button>
                                     </div>
                                 </>
-                            }
-
-                            <div className='createTask-inputRow'>
-                                <div className='createTask-optionalDiv'>
-                                    <span>Submission link</span>
-
-                                    <div className='option-div'>
-                                        Optionnal
-                                    </div>
-                                </div>
-                                <p>Provide a link here only if the submissions will come from trusted contributors</p>
-                                <SimpleInputField
-                                    className="inputField"
-                                    id="nameInput"
-                                    height={50}
-                                    width={'100%'}
-                                    value={subLink}
-                                    onchange={(e) => setSubLink(e.target.value)}
-                                    placeholder="Google drive folder, notion page, github"
-                                />
-                            </div>
-
-                            <div className='hr-line'></div>
-
-                            <div className='createTask-inputRow'>
-                                <span>Compensation</span>
-                                <div className='createTask-compensation'>
-                                    <select
-                                        name="chain"
-                                        id="chain"
-                                        className="tokenDropdown"
-                                        style={{ width: '100%' }}
-                                    >
-                                        <option value="MATIC">MATIC</option>
-                                        <option value="SWEAT">SWEAT</option>
-                                    </select>
-                                    <input
-                                        className="inputField"
-                                        type={'number'}
-                                        style={{ height: '55px' }}
-                                        value={amount}
-                                        onChange={(e) => setAmount(parseInt(e.target.value))}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className='createTask-inputRow'>
-                                <span>Reviewer</span>
-                                <select
-                                    name="reviewer"
-                                    id="reviewer"
-                                    className="tokenDropdown"
-                                    style={{ width: '100%' }}
-                                    onChange={(e) => { setReviewer(e.target.value); document.getElementById('error-reviewer').innerHTML = '' }}
-                                >
-                                    <option value="">Select member</option>
-                                    {
-                                        _get(DAO, 'members', []).map((item, index) => {
-                                            return (
-                                                <option value={`${item.member._id}`}>{item.member.name}</option>
-                                            )
-                                        })
-                                    }
-                                </select>
-                                <span className='error-msg' id="error-reviewer"></span>
-                            </div>
-
-                        </div>
-
-                        <div className='createTask-footer'>
-                            <button onClick={handleDraftTask}>
-                                SAVE AS DRAFT
-                            </button>
-                            <button onClick={handleCreateTask}>
-                                CREATE
-                            </button>
-                        </div>
+                        }
                     </div>
             }
         </div>
