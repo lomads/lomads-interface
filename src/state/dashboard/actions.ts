@@ -269,3 +269,12 @@ export const applyTask = createAsyncThunk(
 	}
 )
 
+export const assignTask = createAsyncThunk(
+	'dao/assignTask',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`task/${params.taskId}/assign?daoUrl=${params.daoUrl}`, params.payload)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+)
+

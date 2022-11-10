@@ -26,6 +26,7 @@ import {
 	draftTask,
 	getTask,
 	applyTask,
+	assignTask,
 } from "./actions";
 import { createContract } from "state/contract/actions";
 import { get as _get, find as _find } from "lodash";
@@ -57,6 +58,7 @@ export interface DashboardState {
 	TaskLoading: boolean | null;
 	draftTaskLoading: boolean | null;
 	applyTaskLoading: boolean | null;
+	assignTaskLoading: boolean | null;
 }
 
 const initialState: DashboardState = {
@@ -86,6 +88,7 @@ const initialState: DashboardState = {
 	TaskLoading: null,
 	draftTaskLoading: null,
 	applyTaskLoading: null,
+	assignTaskLoading: null,
 };
 
 const dashboardSlice = createSlice({
@@ -151,6 +154,9 @@ const dashboardSlice = createSlice({
 		},
 		resetApplyTaskLoader(state) {
 			state.applyTaskLoading = null
+		},
+		resetAssignTaskLoader(state) {
+			state.assignTaskLoading = null
 		},
 		setDAOList(state, action) {
 			state.DAOList = action.payload
@@ -400,6 +406,15 @@ const dashboardSlice = createSlice({
 		[`${applyTask.pending}`]: (state) => {
 			state.applyTaskLoading = true;
 		},
+		// assign task
+		[`${assignTask.fulfilled}`]: (state, action) => {
+			state.assignTaskLoading = false;
+			state.Task = action.payload.task;
+			state.DAO = action.payload.dao;
+		},
+		[`${assignTask.pending}`]: (state) => {
+			state.assignTaskLoading = true;
+		},
 	},
 });
 
@@ -427,5 +442,6 @@ export const {
 	resetCreateTaskLoader,
 	resetDraftTaskLoader,
 	resetApplyTaskLoader,
+	resetAssignTaskLoader,
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

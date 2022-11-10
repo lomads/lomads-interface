@@ -40,7 +40,7 @@ const TransactionDetails = (props: ItransactionDetailsType) => {
                   (
                     <>
                       <option value={result.tokenAddress ? result.tokenAddress : chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS} key={index}>
-                      { _get(result, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR') }
+                        {_get(result, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}
                       </option>
                     </>
                   )

@@ -1,36 +1,89 @@
+import { useState, useEffect } from 'react';
+import { get as _get, find as _find, uniqBy as _uniqBy } from 'lodash';
+import './ApplicantList.css';
 import { CgClose } from 'react-icons/cg';
 import { IoIosArrowBack } from 'react-icons/io'
 
 import bigMember from '../../../../assets/svg/bigMember.svg';
 
+import { useAppSelector, useAppDispatch } from "state/hooks";
+
+import { assignTask } from 'state/dashboard/actions'
+import { resetAssignTaskLoader } from 'state/dashboard/reducer';
+
 const ApplicantList = ({ task, close }) => {
+
+    const dispatch = useAppDispatch();
+    const { DAO, assignTaskLoading } = useAppSelector((state) => state.dashboard);
+    const [pos, setPos] = useState(0);
+
+    useEffect(() => {
+        if (assignTaskLoading === false) {
+            dispatch(resetAssignTaskLoader());
+            close();
+            // setTimeout(() => {
+            //     close();
+            // }, 3000);
+        }
+    }, [assignTaskLoading]);
+
+    const handleNext = () => {
+        if (pos < task.members.length - 1) {
+            setPos(pos + 1);
+        }
+        else {
+            setPos(0);
+        }
+    }
+
+    const handleBack = () => {
+        if (pos > 0) {
+            setPos(pos - 1);
+        }
+        else {
+            setPos(task.members.length - 1);
+        }
+    }
+
+    const handleAssignTask = (applicant) => {
+        dispatch(assignTask({ taskId: task._id, daoUrl: _get(DAO, 'url', ''), payload: { memberId: applicant.member._id } }));
+    }
 
     const RenderApplicantCard = ({ applicant }) => {
         return (
-            <>
-                <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+            <div className='applicant-card'>
+                <div className='applicant-body'>
                     <img src={bigMember} alt="icon" />
+                    <h1>{applicant.member.name}</h1>
+                    <p>{applicant.member.wallet.slice(0, 6) + "..." + applicant.member.wallet.slice(-4)}</p>
+                    <div className='detail-container'>
+                        <span>Note</span>
+                        <p>{applicant.note}</p>
+                    </div>
+                    <div className='detail-container'>
+                        <span>Links</span>
+                        {
+                            applicant.links.map((item, index) => {
+                                return (
+                                    <button onClick={() => window.open(item.link, '_blank', 'noopener,noreferrer')}>{item.title}</button>
+                                )
+                            })
+                        }
+                    </div>
                 </div>
-                <h1>{applicant.member.name}</h1>
-                <p>{applicant.member.wallet}</p>
-
-                <div className='detail-container'>
-                    <span>Note</span>
-                    <p>{applicant.note}</p>
-                </div>
-
-                <div className='detail-container'>
-                    <span>Links</span>
+                <div className='applicant-foot'>
                     {
-                        applicant.links.map((item, index) => {
-                            return (
-                                <button onClick={() => window.open(item.link, '_blank', 'noopener,noreferrer')}>{item.title}</button>
-                            )
-                        })
+                        applicant.status === 'pending'
+                            ?
+                            <>
+                                <button>REJECT</button>
+                                <button onClick={() => handleAssignTask(applicant)}>ASSIGN</button>
+                            </>
+                            :
+                            null
                     }
                 </div>
-
-            </>
+            </div>
         )
     }
 
@@ -47,25 +100,29 @@ const ApplicantList = ({ task, close }) => {
 
                 <div className='applicant-slider'>
                     <div className='slider-controls'>
-                        <button className='control-btn'>
+                        <button className='control-btn' onClick={handleBack}>
                             <IoIosArrowBack size={20} color="#C94B32" />
                         </button>
                     </div>
                     <div className='slider-content'>
+                        <RenderApplicantCard applicant={task?.members[pos]} />
+                    </div>
+                    <div className='slider-controls'>
+                        <button className='control-btn' style={{ transform: 'rotate(180deg)' }} onClick={handleNext}>
+                            <IoIosArrowBack size={20} color="#C94B32" />
+                        </button>
+                    </div>
+                </div>
+
+                <div className='applicant-footer'>
+                    <div className='dots-container'>
                         {
-                            task?.members.map((item, index) => {
+                            task.members.map((item, index) => {
                                 return (
-                                    <div key={index}>
-                                        <RenderApplicantCard applicant={item} />
-                                    </div>
+                                    <div className='dots' key={index} style={pos === index ? { backgroundColor: '#C94B32' } : null}></div>
                                 )
                             })
                         }
-                    </div>
-                    <div className='slider-controls'>
-                        <button className='control-btn' style={{ transform: 'rotate(180deg)' }}>
-                            <IoIosArrowBack size={20} color="#C94B32" />
-                        </button>
                     </div>
                 </div>
 
