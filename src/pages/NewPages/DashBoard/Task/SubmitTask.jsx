@@ -6,27 +6,29 @@ import createTaskSvg from '../../../../assets/svg/task.svg';
 
 import SimpleInputField from "UIpack/SimpleInputField";
 import AddressInputField from "UIpack/AddressInputField";
-
+import SUBMISSION_DONE from '../../../../assets/svg/submission-done.svg'
 import { AiOutlinePlus } from "react-icons/ai";
 
 import { isValidUrl } from 'utils';
 
 import { useAppDispatch, useAppSelector } from "state/hooks";
 
-import { applyTask } from 'state/dashboard/actions'
-import { resetApplyTaskLoader } from 'state/dashboard/reducer';
+import { applyTask, submitTaskAction } from 'state/dashboard/actions'
+import { resetApplyTaskLoader, resetSubmitTaskLoading } from 'state/dashboard/reducer';
 
 import folder from '../../../../assets/svg/folder.svg';
 
 const SubmitTask = ({ task, close }) => {
     const dispatch = useAppDispatch();
 
-    const { DAO, applyTaskLoading } = useAppSelector((state) => state.dashboard);
+    const { DAO, applyTaskLoading, submitTaskLoading } = useAppSelector((state) => state.dashboard);
 
     const [note, setNote] = useState('');
     const [title, setTitle] = useState('');
     const [link, setLink] = useState('');
     const [resourceList, setResourceList] = useState([]);
+
+    const [submissionDone, setSubmissionDone] = useState(false);
 
     useEffect(() => {
         if (applyTaskLoading === false) {
@@ -34,6 +36,17 @@ const SubmitTask = ({ task, close }) => {
             close();
         }
     }, [applyTaskLoading]);
+
+    useEffect(() => {
+        if (submitTaskLoading === false) {
+            dispatch(resetSubmitTaskLoading());
+            setSubmissionDone(true);
+            setTimeout(() => {
+                setSubmissionDone(false);
+                close();
+            }, 3000);
+        }
+    }, [submitTaskLoading]);
 
     const handleChangeNote = (e) => {
         document.getElementById('note-error').innerHTML = '';
@@ -88,12 +101,14 @@ const SubmitTask = ({ task, close }) => {
             document.getElementById('note-error').innerHTML = 'Please enter a note';
             return;
         }
-        else if (resourceList.length === 0) {
-            document.getElementById('resource-error').innerHTML = 'Please provide atleast one link to your portfolio';
+        else if (task.submissionLink && task.submissionLink.length == 0 && resourceList.length === 0) {
+            document.getElementById('resource-error').innerHTML = 'Please provide atleast one link';
             return;
         }
         else {
             // dispatch(applyTask({ taskId: task._id, daoUrl: _get(DAO, 'url', ''), payload: { note, resourceList } }));
+            const payload = { daoUrl: _get(DAO, 'url', ''), taskId: task._id,  note, ...(task.submissionLink && task.submissionLink.length == 0 ? { submissionLink: resourceList } : {})}
+            dispatch(submitTaskAction(payload))
         }
     }
 
@@ -102,12 +117,19 @@ const SubmitTask = ({ task, close }) => {
             <div className="taskApply-container">
 
                 <div className="taskApply-header">
-                    <span>{task.name}</span>
+                    { !submissionDone && <span>{task.name}</span> }
                     <button onClick={close}>
                         <CgClose size={20} color="#C94B32" />
                     </button>
                 </div>
 
+            {
+                submissionDone ? 
+                <div className='createTask-success'>
+                    <img src={SUBMISSION_DONE} alt="frame-icon" />
+                    <h1>Done!</h1>
+                    <span>Your submission is sent.<br />You will be redirected in a few seconds.</span>
+                </div> : 
                 <div className='taskApply-body'>
                     <img src={createTaskSvg} alt="frame-icon" />
                     <h1>Submit your work</h1>
@@ -125,7 +147,7 @@ const SubmitTask = ({ task, close }) => {
                     </div>
 
                     {
-                        task.submissionLink !== ''
+                        task.submissionLink && task.submissionLink.length > 0
                             ?
                             <button className='submitLink-btn' onClick={() => window.open(task.submissionLink, '_blank', 'noopener,noreferrer')}>
                                 <img src={folder} />
@@ -196,7 +218,7 @@ const SubmitTask = ({ task, close }) => {
                     <button className='taskApply-sendBtn' onClick={handleSubmitWork}>SEND</button>
 
                 </div>
-
+                }
             </div>
         </div>
     )

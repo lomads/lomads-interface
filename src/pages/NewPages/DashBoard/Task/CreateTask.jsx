@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { find as _find, get as _get, debounce as _debounce } from 'lodash';
 import './CreateTask.css';
 import { CgClose } from 'react-icons/cg'
@@ -40,7 +40,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
     const [projectId, setProjectId] = useState(null);
     const [subLink, setSubLink] = useState('');
     const [reviewer, setReviewer] = useState(null);
-    const [currency, setCurrency] = useState('MATIC');
+    const [currency, setCurrency] = useState(null);
     const [amount, setAmount] = useState(0);
     const [safeTokens, setSafeTokens] = useState([]);
     const [showSuccess, setShowSuccess] = useState(false);
@@ -79,7 +79,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
             setProjectId(null);
             setSubLink('');
             setReviewer(null);
-            setCurrency('MATIC');
+            setCurrency(null);
             setAmount(0);
 
             setTimeout(() => {
@@ -93,9 +93,9 @@ const CreateTask = ({ toggleShowCreateTask }) => {
         setSelect(!select);
     }
 
-    const handleSetApplicant = (userIndex) => {
-        let user = DAO.members[userIndex].member;
-        setSelectedUser({ _id: user._id, address: user.wallet });
+    const handleSetApplicant = (value) => {
+        let user = _find(DAO.members, m => m.member._id === value);
+        setSelectedUser({ _id: user.member._id, address: user.wallet });
         document.getElementById('error-applicant').innerHTML = ''
     }
 
@@ -122,7 +122,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
         //     e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
         //     return;
         // }
-        else if (!isValidUrl(dchannel)) {
+        else if (dchannel && !isValidUrl(dchannel)) {
             let e = document.getElementById('error-dchannel');
             e.innerHTML = 'Please enter a valid link';
             e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
@@ -153,13 +153,18 @@ const CreateTask = ({ toggleShowCreateTask }) => {
             return;
         }
         else {
-            let tempLink = dchannel;
-            if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
-                tempLink = 'https://' + tempLink;
+            let tempLink, tempSub  = null;
+            if(dchannel && dchannel !== '') {
+                tempLink = dchannel;
+                if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
+                    tempLink = 'https://' + tempLink;
+                }
             }
-            let tempSub = subLink;
-            if (tempSub !== '' && tempSub.indexOf('https://') === -1 && tempSub.indexOf('http://') === -1) {
-                tempSub = 'https://' + tempSub;
+            if(subLink && subLink !== '') {
+                 tempSub = subLink;
+                if (tempSub !== '' && tempSub.indexOf('https://') === -1 && tempSub.indexOf('http://') === -1) {
+                    tempSub = 'https://' + tempSub;
+                }
             }
             let task = {};
             task.daoId = DAO?._id;
@@ -169,7 +174,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
             task.projectId = projectId;
             task.discussionChannel = tempLink;
             task.deadline = deadline;
-            task.submissionLink = tempSub;
+            task.submissionLink = tempSub ? [tempSub] : [];
             task.compensation = { currency, amount };
             task.reviewer = reviewer;
             task.contributionType = contributionType;
@@ -201,6 +206,14 @@ const CreateTask = ({ toggleShowCreateTask }) => {
         // dispatch(draftTask({ payload: task }))
         console.log("Draft Task : ", task)
     }
+
+    const eligibleContributors = useMemo(() => {
+        return _get(DAO, 'members', []).filter(m => (reviewer || "").toLowerCase() !== m.member._id.toLowerCase() )
+    }, [DAO, selectedUser, reviewer])
+
+    const eligibleReviewers = useMemo(() => {
+        return _get(DAO, 'members', []).filter(m => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase())
+    }, [DAO, reviewer, selectedUser])
 
     return (
         <div className="createTaskOverlay">
@@ -289,7 +302,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                             <div className='createTask-optionalDiv'>
                                                 <span>In project:</span>
                                                 <div className='option-div'>
-                                                    Optionnal
+                                                    Optional
                                                 </div>
                                             </div>
                                             <select
@@ -299,9 +312,9 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                                 style={{ width: '100%' }}
                                                 onChange={(e) => setProjectId(e.target.value)}
                                             >
-                                                <option value="">Select project</option>
+                                                <option value={null}>Select project</option>
                                                 {
-                                                    _get(DAO, 'projects', []).map((item, index) => {
+                                                    _get(DAO, 'projects', []).filter(p => !p.archivedAt && !p.deletedAt).map((item, index) => {
                                                         return (
                                                             <option value={`${item._id}`}>{item.name}</option>
                                                         )
@@ -332,11 +345,11 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                                     style={{ width: '100%' }}
                                                     onChange={(e) => handleSetApplicant(e.target.value)}
                                                 >
-                                                    <option value="">Select member</option>
+                                                    <option value={null}>Select member</option>
                                                     {
-                                                        _get(DAO, 'members', []).map((item, index) => {
+                                                        eligibleContributors.map((item, index) => {
                                                             return (
-                                                                <option value={`${index}`}>{item.member.name}</option>
+                                                                <option value={`${item.member._id}`}>{item.member.name}</option>
                                                             )
                                                         })
                                                     }
@@ -446,8 +459,9 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                                     id="chain"
                                                     className="tokenDropdown"
                                                     style={{ width: '100%' }}
+                                                    onChange={e => setCurrency(e.target.value)}
                                                 >
-                                                    <option value="" disabled={true}>
+                                                    <option value={null}>
                                                         select a token
                                                     </option>
                                                     {safeTokens.map((result, index) => {
@@ -483,9 +497,9 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                                 style={{ width: '100%' }}
                                                 onChange={(e) => { setReviewer(e.target.value); document.getElementById('error-reviewer').innerHTML = '' }}
                                             >
-                                                <option value="">Select member</option>
+                                                <option value={null}>Select member</option>
                                                 {
-                                                    _get(DAO, 'members', []).map((item, index) => {
+                                                    eligibleReviewers.map((item, index) => {
                                                         return (
                                                             <option value={`${item.member._id}`}>{item.member.name}</option>
                                                         )

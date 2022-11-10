@@ -26,6 +26,7 @@ import moment from "moment";
 import ApplyTask from "./DashBoard/Task/ApplyTask";
 
 import assign from '../../assets/svg/assign.svg'
+import submitted from '../../assets/svg/submitted.svg'
 import applied from '../../assets/svg/applied.svg'
 import open from '../../assets/svg/open.svg'
 import memberIcon from '../../assets/svg/memberIcon.svg';
@@ -67,6 +68,16 @@ const TaskDetails = () => {
         return false;
     }, [account, Task]);
 
+    const hasMySubmission = useMemo(() => {
+        if (Task) {
+            let user = _find(_get(Task, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
+            if (user && user.submission)
+                return true
+            return false
+        }
+        return false;
+    }, [account, Task]);
+
     const amIApproved = useMemo(() => {
         if (Task) {
             let user = _find(_get(Task, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.status === 'approved')
@@ -98,7 +109,7 @@ const TaskDetails = () => {
         if (DAO && Task) {
             let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
             if (user) {
-                if (user.member._id === Task.creator) {
+                if (user.member._id === Task.reviewer._id) {
                     return true;
                 }
                 else {
@@ -110,6 +121,16 @@ const TaskDetails = () => {
         return false;
     }, [account, DAO, Task])
 
+    const submissionCount = useMemo(() => {
+        if (Task) {
+            let submissions = _get(Task, 'members', []).filter(m => m.submission)
+            if (submissions)
+                return submissions.length
+            return 0
+        }
+        return 0;
+    }, [Task]);
+
     const assignedUser = useMemo(() => {
         let user = _find(_get(Task, 'members', []), m => m.status === 'approved')
         if (user)
@@ -117,10 +138,14 @@ const TaskDetails = () => {
     }, [Task]);
 
     const handleOpenApplicantsSlider = () => {
-        if (Task.members.length > 0) {
+        if (taskMembers.length > 0) {
             setOpenApplicantsList(true);
         }
     }
+
+    const taskMembers = useMemo(() => {
+        return _get(Task, 'members', []).filter(m => m.status !== 'rejected');
+    }, [Task])
 
     return (
         <>
@@ -177,10 +202,32 @@ const TaskDetails = () => {
                                         </div>
                                         <div className="right">
                                             <h1>{Task.name}</h1>
-                                            <p>Single contributor : {Task.isSingleContributor ? 'true' : 'false'}</p>
+                                            {/* <p>Single contributor : {Task.isSingleContributor ? 'true' : 'false'}</p> */}
                                             <div className="menu">
 
                                                 {/* Task status */}
+                                                {/* If task was manually assigned---check if current user is approved applicant or other user*/}
+                                                {
+                                                   (Task.contributionType === 'assign' || Task.contributionType === 'open') && Task.taskStatus === 'submitted'
+                                                        ?
+                                                        <>
+                                                            {
+                                                                amIApproved
+                                                                    ?
+                                                                    <div>
+                                                                        <img src={submitted} style={{ marginRight: '5px' }} />
+                                                                        <span style={{ color: '#6B99F7' }}>Under review</span>
+                                                                    </div>
+                                                                    :
+                                                                    <div>
+                                                                        <img src={submitted} style={{ marginRight: '5px' }} />
+                                                                        <span style={{ color: '#6B99F7' }}>Submitted</span>
+                                                                    </div>
+                                                            }
+                                                        </>
+                                                        :
+                                                        null
+                                                }
                                                 {/* If task was manually assigned---check if current user is approved applicant or other user*/}
                                                 {
                                                     Task.contributionType === 'assign' && Task.taskStatus === 'assigned'
@@ -211,11 +258,11 @@ const TaskDetails = () => {
                                                         ?
                                                         <>
                                                             {
-                                                                amIApplicant
+                                                                amIApplicant && hasMySubmission
                                                                     ?
                                                                     <div>
-                                                                        <img src={applied} style={{ marginRight: '5px' }} />
-                                                                        <span style={{ color: '#FFB600' }}>Applied</span>
+                                                                        <img src={submitted} style={{ marginRight: '5px' }} />
+                                                                        <span style={{ color: '#6B99F7' }}>Under review</span>
                                                                     </div>
                                                                     :
                                                                     <div>
@@ -246,8 +293,8 @@ const TaskDetails = () => {
                                                                                 </div>
                                                                                 :
                                                                                 <div>
-                                                                                    <IoMdClose color="red" size={20} />
-                                                                                    <span style={{ color: 'red' }}>Rejected</span>
+                                                                                    <img src={assign} style={{ marginRight: '5px' }} />
+                                                                                    <span style={{ color: '#0EC1B0' }}>Assigned</span>
                                                                                 </div>
                                                                         }
                                                                     </>
@@ -286,7 +333,7 @@ const TaskDetails = () => {
                                     <div className="header-others">
                                         <div>
                                             {
-                                                Task.discussionChannel !== ''
+                                                Task.discussionChannel && Task.discussionChannel !== ''
                                                     ?
                                                     <button className="other-btn" onClick={() => window.open(Task.discussionChannel, '_blank', 'noopener,noreferrer')}>
                                                         <SiNotion color="#B12F15" size={20} style={{ marginRight: '5px' }} />
@@ -296,9 +343,9 @@ const TaskDetails = () => {
                                                     null
                                             }
                                             {
-                                                Task.submissionLink !== ''
+                                                Task.submissionLink && Task.submissionLink.length > 0
                                                     ?
-                                                    <button className="other-btn" onClick={() => window.open(Task.submissionLink, '_blank', 'noopener,noreferrer')}>
+                                                    <button className="other-btn" onClick={() => window.open(Task.submissionLink[0], '_blank', 'noopener,noreferrer')}>
                                                         <img src={folder} />
                                                     </button>
                                                     :
@@ -362,12 +409,23 @@ const TaskDetails = () => {
                                                     amICreator
                                                         ?
                                                         <>
-                                                            <div>
-                                                                <img src={applicants} />
-                                                                <span>{Task.members.length}</span>
-                                                            </div>
-                                                            <h1>{Task.members.length > 1 ? 'Applicants' : 'Applicant'}</h1>
-                                                            <button onClick={handleOpenApplicantsSlider}>CHECK</button>
+                                                        { Task.contributionType === 'open' && Task.isSingleContributor == false ?
+                                                            <>
+                                                                 <div>
+                                                                    <img src={applicants} />
+                                                                    <span>{submissionCount}</span>
+                                                                </div>
+                                                                <h1>{submissionCount.length > 1 ? 'Submissions' : 'Submission'}</h1>
+                                                                <button>CHECK</button> 
+                                                            </> :
+                                                            <>
+                                                                <div>
+                                                                    <img src={applicants} />
+                                                                    <span>{taskMembers.length}</span>
+                                                                </div>
+                                                                <h1>{taskMembers.length > 1 ? 'Applicants' : 'Applicant'}</h1>
+                                                                <button onClick={handleOpenApplicantsSlider}>CHECK</button>
+                                                            </> }
                                                         </>
                                                         :
                                                         <>
@@ -376,7 +434,11 @@ const TaskDetails = () => {
                                                                 amIApplicant
                                                                     ?
                                                                     <>
-                                                                        <h1>The reviewer is<br />looking at your<br />application.</h1>
+                                                                        {
+                                                                            Task.contributionType === 'open' && hasMySubmission ? 
+                                                                            <h1>Waiting<br/> for validation</h1> :
+                                                                            <h1>The reviewer is<br />looking at your<br />application.</h1>
+                                                                        }
                                                                     </>
                                                                     :
                                                                     // Not applied yet --- check if valid roles condition exists
@@ -469,6 +531,29 @@ const TaskDetails = () => {
                                             null
                                     }
 
+{
+                                        Task.taskStatus === 'submitted'
+                                            ?
+                                            <>
+                                                {
+                                                    // submitted
+                                                    amIApproved
+                                                        ?
+                                                        <>
+                                                            <h1>Waiting<br/> for validation</h1>
+                                                        </>
+                                                        :
+                                                        // for others
+                                                        <>
+                                                            <h1>Task is submitted</h1>
+                                                            { amICreator && <button>CHECK</button> }
+                                                        </>
+                                                }
+                                            </>
+                                            :
+                                            null
+                                    }
+
                                 </div>
                             </div>
 
@@ -479,11 +564,12 @@ const TaskDetails = () => {
                                     <img src={memberIcon} alt="member-icon" />
                                     <p>{Task.reviewer.name}</p>
                                 </div>
+                                { !(Task.isSingleContributor === false && Task.contributionType === 'open') && 
                                 <div>
                                     <span>Assigned</span>
                                     <img src={memberIcon} alt="member-icon" />
                                     <p>{assignedUser ? assignedUser : 'Not yet assigned'}</p>
-                                </div>
+                                </div> }
                                 {
                                     Task.taskStatus !== 'open' && Task.contributionType === 'open' && Task.isSingleContributor
                                         ?

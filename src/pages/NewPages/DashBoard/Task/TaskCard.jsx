@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useWeb3React } from "@web3-react/core";
 
 import calendarIcon from '../../../../assets/svg/calendar.svg'
+import submitted from '../../../../assets/svg/submitted.svg'
 import moment from "moment";
 
 import assign from '../../../../assets/svg/assign.svg'
@@ -22,6 +23,16 @@ const TaskCard = ({ task, daoUrl }) => {
         if (task) {
             let user = _find(_get(task, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
             if (user)
+                return true
+            return false
+        }
+        return false;
+    }, [account, task]);
+
+    const hasMySubmission = useMemo(() => {
+        if (task) {
+            let user = _find(_get(task, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
+            if (user && user.submission)
                 return true
             return false
         }
@@ -48,6 +59,29 @@ const TaskCard = ({ task, daoUrl }) => {
             </div>
             <div>
                 {/* Task status */}
+                {
+                    (task.contributionType === 'assign' || task.contributionType === 'open')  && task.taskStatus === 'submitted'
+                        ?
+                        <>
+                            {
+                                amIApproved
+                                    ?
+                                    <div>
+                                        <img src={submitted} style={{ marginRight: '5px' }} />
+                                        <p style={{ color: '#6B99F7' }}>Under review</p>
+
+                                    </div>
+                                    :
+                                    <div>
+                                        <img src={submitted} style={{ marginRight: '5px' }} />
+                                        <p style={{ color: '#6B99F7' }}>Submitted</p>
+                                    </div>
+                            }
+                        </>
+                        :
+                        null
+                }
+
                 {/* If task was manually assigned---check if current user is approved applicant or other user*/}
                 {
                     task.contributionType === 'assign' && task.taskStatus === 'assigned'
@@ -78,11 +112,11 @@ const TaskCard = ({ task, daoUrl }) => {
                         ?
                         <>
                             {
-                                amIApplicant
+                                amIApplicant && hasMySubmission
                                     ?
                                     <div>
-                                        <img src={applied} style={{ marginRight: '5px' }} />
-                                        <p style={{ color: '#FFB600' }}>Applied</p>
+                                        <img src={submitted} style={{ marginRight: '5px' }} />
+                                        <span style={{ color: '#6B99F7' }}>Under review</span>
                                     </div>
                                     :
                                     <div>
@@ -113,8 +147,8 @@ const TaskCard = ({ task, daoUrl }) => {
                                                 </div>
                                                 :
                                                 <div>
-                                                    <IoMdClose color="red" size={20} />
-                                                    <p style={{ color: 'red' }}>Rejected</p>
+                                                    <img src={assign} style={{ marginRight: '5px' }} />
+                                                    <p style={{ color: '#0EC1B0' }}>Assigned</p>
                                                 </div>
                                         }
                                     </>

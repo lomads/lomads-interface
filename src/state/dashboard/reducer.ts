@@ -27,6 +27,8 @@ import {
 	getTask,
 	applyTask,
 	assignTask,
+	rejectTaskMember,
+	submitTaskAction
 } from "./actions";
 import { createContract } from "state/contract/actions";
 import { get as _get, find as _find } from "lodash";
@@ -43,6 +45,7 @@ export interface DashboardState {
 	manageMemberLoading: boolean | null;
 	addDaoLinksLoading: boolean | null;
 	updateDaoLinksLoading: boolean | null;
+	rejectTaskMemberLoading: boolean | null;
 	Project: any;
 	ProjectLoading: boolean | null;
 	createProjectLoading: boolean | null;
@@ -59,6 +62,7 @@ export interface DashboardState {
 	draftTaskLoading: boolean | null;
 	applyTaskLoading: boolean | null;
 	assignTaskLoading: boolean | null;
+	submitTaskLoading: boolean | null;
 }
 
 const initialState: DashboardState = {
@@ -73,6 +77,7 @@ const initialState: DashboardState = {
 	manageMemberLoading: null,
 	addDaoLinksLoading: null,
 	updateDaoLinksLoading: null,
+	rejectTaskMemberLoading: null,
 	Project: null,
 	ProjectLoading: null,
 	createProjectLoading: null,
@@ -89,6 +94,7 @@ const initialState: DashboardState = {
 	draftTaskLoading: null,
 	applyTaskLoading: null,
 	assignTaskLoading: null,
+	submitTaskLoading: null
 };
 
 const dashboardSlice = createSlice({
@@ -152,11 +158,17 @@ const dashboardSlice = createSlice({
 		resetDraftTaskLoader(state) {
 			state.draftTaskLoading = null
 		},
+		resetSubmitTaskLoading(state) {
+			state.submitTaskLoading = null
+		},
 		resetApplyTaskLoader(state) {
 			state.applyTaskLoading = null
 		},
 		resetAssignTaskLoader(state) {
 			state.assignTaskLoading = null
+		},
+		resetRejectTaskMemberLoader(state) {
+			state.rejectTaskMemberLoading = null
 		},
 		setDAOList(state, action) {
 			state.DAOList = action.payload
@@ -415,6 +427,23 @@ const dashboardSlice = createSlice({
 		[`${assignTask.pending}`]: (state) => {
 			state.assignTaskLoading = true;
 		},
+		// assign task
+		[`${rejectTaskMember.fulfilled}`]: (state, action) => {
+			state.rejectTaskMemberLoading = false;
+			state.Task = action.payload.task;
+			state.DAO = action.payload.dao;
+		},
+		[`${rejectTaskMember.pending}`]: (state) => {
+			state.rejectTaskMemberLoading = true;
+		},
+		[`${submitTaskAction.fulfilled}`]: (state, action) => {
+			state.submitTaskLoading = false;
+			state.Task = action.payload.task;
+			state.DAO = action.payload.dao;
+		},
+		[`${submitTaskAction.pending}`]: (state) => {
+			state.submitTaskLoading = true;
+		},
 	},
 });
 
@@ -443,5 +472,7 @@ export const {
 	resetDraftTaskLoader,
 	resetApplyTaskLoader,
 	resetAssignTaskLoader,
+	resetRejectTaskMemberLoader,
+	resetSubmitTaskLoading
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

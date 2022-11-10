@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { get as _get, find as _find, uniqBy as _uniqBy } from 'lodash';
 import './ApplicantList.css';
 import { CgClose } from 'react-icons/cg';
@@ -8,13 +8,13 @@ import bigMember from '../../../../assets/svg/bigMember.svg';
 
 import { useAppSelector, useAppDispatch } from "state/hooks";
 
-import { assignTask } from 'state/dashboard/actions'
-import { resetAssignTaskLoader } from 'state/dashboard/reducer';
+import { assignTask, rejectTaskMember } from 'state/dashboard/actions'
+import { resetAssignTaskLoader, resetRejectTaskMemberLoader } from 'state/dashboard/reducer';
 
 const ApplicantList = ({ task, close }) => {
 
     const dispatch = useAppDispatch();
-    const { DAO, assignTaskLoading } = useAppSelector((state) => state.dashboard);
+    const { DAO, assignTaskLoading, rejectTaskMemberLoading } = useAppSelector((state) => state.dashboard);
     const [pos, setPos] = useState(0);
 
     useEffect(() => {
@@ -27,8 +27,23 @@ const ApplicantList = ({ task, close }) => {
         }
     }, [assignTaskLoading]);
 
+
+    const taskMembers = useMemo(() => {
+        return _get(task, 'members', []).filter(m => m.status !== 'rejected');
+    }, [task])
+
+
+    useEffect(() => {
+        if(rejectTaskMemberLoading === false) {
+            dispatch(resetRejectTaskMemberLoader());
+            if(taskMembers.length == 0)
+                close();
+            setPos(0)
+        }
+    }, [rejectTaskMemberLoading, taskMembers])
+
     const handleNext = () => {
-        if (pos < task.members.length - 1) {
+        if (pos < taskMembers.length - 1) {
             setPos(pos + 1);
         }
         else {
@@ -41,12 +56,16 @@ const ApplicantList = ({ task, close }) => {
             setPos(pos - 1);
         }
         else {
-            setPos(task.members.length - 1);
+            setPos(taskMembers.length - 1);
         }
     }
 
     const handleAssignTask = (applicant) => {
         dispatch(assignTask({ taskId: task._id, daoUrl: _get(DAO, 'url', ''), payload: { memberId: applicant.member._id } }));
+    }
+
+    const handleRejectMember = (applicant) => {
+        dispatch(rejectTaskMember({ taskId: task._id, daoUrl: _get(DAO, 'url', ''), payload: { memberId: applicant.member._id } }));
     }
 
     const RenderApplicantCard = ({ applicant }) => {
@@ -76,7 +95,7 @@ const ApplicantList = ({ task, close }) => {
                         applicant.status === 'pending'
                             ?
                             <>
-                                <button>REJECT</button>
+                                <button disabled={rejectTaskMemberLoading} onClick={() =>handleRejectMember(applicant)}>REJECT</button>
                                 <button onClick={() => handleAssignTask(applicant)}>ASSIGN</button>
                             </>
                             :
@@ -117,7 +136,7 @@ const ApplicantList = ({ task, close }) => {
                 <div className='applicant-footer'>
                     <div className='dots-container'>
                         {
-                            task.members.map((item, index) => {
+                            taskMembers.map((item, index) => {
                                 return (
                                     <div className='dots' key={index} style={pos === index ? { backgroundColor: '#C94B32' } : null}></div>
                                 )
