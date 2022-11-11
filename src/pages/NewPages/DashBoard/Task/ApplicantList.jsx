@@ -30,15 +30,19 @@ const ApplicantList = ({ task, close }) => {
 
     const taskMembers = useMemo(() => {
         return _get(task, 'members', []).filter(m => m.status !== 'rejected');
-    }, [task])
+    }, [task, rejectTaskMemberLoading, assignTaskLoading])
 
+
+    console.log("taskMembers", taskMembers)
 
     useEffect(() => {
         if(rejectTaskMemberLoading === false) {
             dispatch(resetRejectTaskMemberLoader());
-            if(taskMembers.length == 0)
+            if(taskMembers.length == 0){
                 close();
-            setPos(0)
+            } else {
+                setPos(0)
+            }
         }
     }, [rejectTaskMemberLoading, taskMembers])
 
@@ -69,13 +73,14 @@ const ApplicantList = ({ task, close }) => {
     }
 
     const RenderApplicantCard = ({ applicant }) => {
+        if(!applicant) return null;
         return (
             <div className='applicant-card'>
                 <div className='applicant-body'>
                     <img src={bigMember} alt="icon" />
-                    <h1>{applicant.member.name}</h1>
+                    <h1 style={{ minHeight: '45px' }}>{_get(applicant, 'member.name', '')}</h1>
                     <p>{applicant.member.wallet.slice(0, 6) + "..." + applicant.member.wallet.slice(-4)}</p>
-                    <div className='detail-container'>
+                    <div className='detail-container' style={{ overflowY: 'scroll' }}>
                         <span>Note</span>
                         <p>{applicant.note}</p>
                     </div>
@@ -124,7 +129,7 @@ const ApplicantList = ({ task, close }) => {
                         </button>
                     </div>
                     <div className='slider-content'>
-                        <RenderApplicantCard applicant={task?.members[pos]} />
+                        <RenderApplicantCard applicant={taskMembers[pos]} />
                     </div>
                     <div className='slider-controls'>
                         <button className='control-btn' style={{ transform: 'rotate(180deg)' }} onClick={handleNext}>

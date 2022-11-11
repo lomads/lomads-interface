@@ -32,6 +32,7 @@ import open from '../../assets/svg/open.svg'
 import memberIcon from '../../assets/svg/memberIcon.svg';
 import SubmitTask from "./DashBoard/Task/SubmitTask";
 import ApplicantList from "./DashBoard/Task/ApplicantList";
+import TaskReview from "./DashBoard/Task/TaskReview";
 
 import { IoMdClose } from 'react-icons/io'
 
@@ -47,6 +48,7 @@ const TaskDetails = () => {
     const [openApply, setOpenApply] = useState(false);
     const [openSubmit, setOpenSubmit] = useState(false);
     const [openApplicantsList, setOpenApplicantsList] = useState(false);
+    const [openTaskReview, setOpenTaskReview] = useState(false);
 
     useEffect(() => {
         if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
@@ -175,6 +177,9 @@ const TaskDetails = () => {
                         {/* show applicants */}
                         {
                             openApplicantsList && <ApplicantList task={Task} close={() => setOpenApplicantsList(false)} />
+                        }
+                        {
+                            openTaskReview && <TaskReview task={Task} close={() => setOpenTaskReview(false)} />
                         }
 
                         <div className="info">
@@ -394,7 +399,9 @@ const TaskDetails = () => {
                             <div className="taskDetails-body">
                                 <div className="body-left">
                                     <h1>Description</h1>
-                                    <span>{Task.description}</span>
+                                    <div>
+                                        <span>{Task.description}</span>
+                                    </div>
                                 </div>
                                 <div className="body-right">
 
@@ -546,7 +553,7 @@ const TaskDetails = () => {
                                                         // for others
                                                         <>
                                                             <h1>Task is submitted</h1>
-                                                            { amICreator && <button>CHECK</button> }
+                                                            { amICreator && <button onClick={() => setOpenTaskReview(true)}>CHECK</button> }
                                                         </>
                                                 }
                                             </>
