@@ -3,13 +3,16 @@ import IconButton from "UIpack/IconButton";
 import "./Settings.css";
 import PT from "../../assets/images/drawer-icons/PT.svg";
 import { Button, Image, Input } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 
-const CreateMorePassTokenModal = ({ toggleCreatePassTokenModal }) => {
+const CreateMorePassTokenModal = ({navFromSetting, toggleModal, toggleCreatePassTokenModal }) => {
+  const navigate = useNavigate();
   return (
     <>
       <div className="sidebarModal">
         <div
           onClick={() => {
+            navFromSetting && toggleModal();
             toggleCreatePassTokenModal();
           }}
           className="overlay"
@@ -31,6 +34,7 @@ const CreateMorePassTokenModal = ({ toggleCreatePassTokenModal }) => {
               width={37}
               className="sideModalCloseButton"
               onClick={() => {
+                navFromSetting && toggleModal();
                 toggleCreatePassTokenModal();
               }}
             />
@@ -52,7 +56,7 @@ const CreateMorePassTokenModal = ({ toggleCreatePassTokenModal }) => {
                 The organisation doesn’t have token yet
               </div>
               <div>
-                <Button id="button-configure-token">
+                <Button onClick={() => navigate('/sbt/create')} id="button-configure-token">
                   CONFIGURE PASS TOKEN
                 </Button>
               </div>

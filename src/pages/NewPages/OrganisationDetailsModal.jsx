@@ -1,15 +1,67 @@
-import { AiOutlineClose } from "react-icons/ai";
+import { AiOutlineClose, AiOutlinePlus } from "react-icons/ai";
 import { IsideModalNew } from "types/DashBoardType";
 import IconButton from "UIpack/IconButton";
 import "./Settings.css";
 import OD from "../../assets/images/drawer-icons/OD.svg";
-import { Button, Image, Input } from "@chakra-ui/react";
+import { Button, Image, Input, Textarea } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
+import { useAppSelector } from "state/hooks";
+import { useEffect, useState } from "react";
+import { get as _get, find as _find } from 'lodash';
+import { isValidUrl } from "utils";
+import { useDispatch } from "react-redux";
+import { updateDao, updateDaoLinks } from 'state/dashboard/actions';
 
 const OrganisationDetails = ({
   toggleModal,
   toggleOrganisationDetailsModal,
 }) => {
+
+  const { DAO, updateDaoLoading, updateDaoLinksLoading } = useAppSelector((state) => state.dashboard);
+  const [name, setName] = useState(_get(DAO, 'name', ''));
+  const [oUrl, setOUrl] = useState(_get(DAO, 'url', ''));
+  const [description, setDescription] = useState(_get(DAO, 'description', ''));
+  const [daoLinks, setDaoLinks] = useState(_get(DAO, 'links', []));
+  const [linkTitle, setLinkTitle] = useState("");
+  const [link, setLink] = useState("");
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    setDaoLinks(_get(DAO, 'links', []));
+  }, [DAO])
+
+  const addLink = () => {
+    setDaoLinks([...daoLinks, {title:linkTitle, link: link}]);
+    setLinkTitle("")
+    setLink("")
+  }
+
+  const addNewLink = (e) => {
+    let errorCount = 0;
+    for (var i = 0; i < daoLinks.length; i++) {
+        const title = daoLinks[i].title;
+        const link = daoLinks[i].link;
+        if (title === '') {
+            errorCount += 1;
+            document.getElementById(`title${i}`).innerHTML = 'Please enter title'
+        }
+        else if (link === '') {
+            errorCount += 1;
+            document.getElementById(`link${i}`).innerHTML = 'Please enter link'
+        }
+    }
+    if (errorCount === 0) {
+        console.log("DAo links : ", daoLinks);
+        // dispatch(updateDaoLinks({ url: DAO?.url, payload: { links: daoLinks } }))
+    }
+}
+
+  const deleteLink = (item) => {
+    // let links = _get(DAO, 'links', []);
+    let links = daoLinks.filter(l => !(l.title === item.title && l.link === item.link))
+    setDaoLinks(links)
+    // dispatch(updateDao({ url: DAO?.url, payload: { links } }))
+  }
   return (
     <>
       <div className="sidebarModal">
@@ -61,11 +113,16 @@ const OrganisationDetails = ({
               }}
             >
               <div id="text-type-od">Name</div>
-              <Input variant="filled" placeholder="Fashion Fusion" />
+              <Input value={name} variant="filled" onChange={(evt)=>setName(evt.target.value)}  placeholder="Fashion Fusion" />
+              <div id="text-type-od">Description</div>
+              <Textarea value={description} onchange={(e) => { setDescription(e.target.value) }} placeholder='DAO Description' variant="filled" />
+              {/* <Input value={name} variant="filled" onChange={(evt)=>setName(evt.target.value)}  placeholder="Fashion Fusion" /> */}
               <div id="text-type-od">Organisation’s URL</div>
               <Input
                 variant="filled"
                 placeholder="https://app.lomads.xyz/Name"
+                disabled
+                value={process.env.REACT_APP_URL + "/" + name}
               />
 
               <hr
@@ -109,25 +166,57 @@ const OrganisationDetails = ({
                   placeholder="Ex Portfolio"
                   variant="filled"
                   width="35%"
+                  value={linkTitle}
+                  onChange={(evt)=>setLinkTitle(evt.target.value)} 
                 />
-                <Input placeholder="link" variant="filled" width="50%" />
-                <IconButton icon={<AddIcon />} />
+                <Input value={link} placeholder="link" variant="filled" width="50%" onChange={(evt)=>setLink(evt.target.value)}  />
+                {/* <IconButton icon={<AddIcon />} /> */}
+                <IconButton
+                  className="addButton"
+                  Icon={<AiOutlinePlus style={{ height: 30, width: 30 }} />}
+                  height={40}
+                  width={40}
+                  onClick={addLink}
+                  bgColor={
+                    (linkTitle.length > 0 && isValidUrl(link))
+                      ? "#C94B32"
+                      : "rgba(27, 43, 65, 0.2)"
+                  }
+							  />
               </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  marginTop: "9px",
-                  padding: "20px",
-                  backgroundColor: "#edf2f7",
-                  color: "#718096",
-                  borderRadius: "5px",
-                }}
-              >
-                <p width="50%">Link 1</p>
-                <p width="50%">https://discord/kkibhh</p>
-              </div>
+              {daoLinks.map((item, index) => {
+                return (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    marginTop: "9px",
+                    padding: "20px",
+                    backgroundColor: "#edf2f7",
+                    color: "#718096",
+                    borderRadius: "5px",
+                    justifyContent:'space-between'
+                  }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row"
+                    }}
+                  >
+                    <p width="50%">{ item.title}</p>
+                    <p width="50%" style={{paddingLeft:8}}>{ item.link}</p>
+                  </div>
+                  <div
+                          className="deleteButton"
+                          onClick={() => {
+                            deleteLink(item);
+                          }}
+                        >
+                          <AiOutlineClose style={{ height: 15, width: 15 }} />
+                  </div>
+                </div>
+                )
+              })}
             </div>
 
             {/* //! FOOTER */}

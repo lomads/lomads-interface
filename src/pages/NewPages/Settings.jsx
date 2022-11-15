@@ -54,6 +54,8 @@ import XpPointsModal from "./XpPointsModal";
 import PassTokenModal from "./PassTokenModal";
 import TerminologyModal from "./TerminologyModal";
 import DiscordModal from "./DiscordModal";
+import { useAppSelector } from "state/hooks";
+import CreateMorePassTokenModal from "./CreateMorePassTokenModal";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -67,6 +69,17 @@ const Settings = () => {
   const [openXpPoints, setOpenXpPoints] = useState(false);
   const [openTerminology, setOpenTerminology] = useState(false);
   const [openDiscord, setOpenDiscord] = useState(false);
+  const [openCreatePassToken, setOpenCreatePassToken] = useState(false);
+
+
+  const { DAO, updateDaoLoading, updateDaoLinksLoading } = useAppSelector((state) => state.dashboard);
+
+  console.log("DAO data : ", DAO);
+  const daoName = _get(DAO, 'name', '').split(" ");
+  const [name, setName] = useState(_get(DAO, 'name', ''));
+  
+
+
   //! TOGGLE FUNCTIONS
   let toggleModal = () => {
     setShowModal(!showModal);
@@ -93,18 +106,23 @@ const Settings = () => {
     setOpenDiscord(!openDiscord);
   };
 
+  let toggleCreatePassTokenModal = () => {
+    setOpenCreatePassToken(!openCreatePassToken);
+  };
   return (
     <>
       <div className="settings-page">
         <div className="settings-left-bar">
           <div onClick={() => navigate(-1)} className="logo-container">
-            <p>HG</p>
+            <p>{ daoName.length === 1
+                                ? daoName[0].charAt(0)
+                                : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)}</p>
           </div>
           <img src={settingIcon} />
         </div>
         <div className="settings-center">
           <div className="settings-header">
-            <h1>Fashion Fusion</h1>
+            <h1>{ name }</h1>
             <h2>Settings</h2>
           </div>
           <div className="settings-organisation">
@@ -178,7 +196,7 @@ const Settings = () => {
                   style={{ color: "#C94B32" }}
                   onClick={() => {
                     toggleModal();
-                    togglePassToken();
+                    DAO?.sbt?.name ? togglePassToken() : toggleCreatePassTokenModal()
                   }}
                 >
                   Pass Tokens
@@ -281,6 +299,13 @@ const Settings = () => {
         <PassTokenModal
           toggleModal={toggleModal}
           togglePassToken={togglePassToken}
+        />
+      )}
+      {showModal && openCreatePassToken && (
+        <CreateMorePassTokenModal
+          toggleModal={toggleModal}
+          navFromSetting={true}
+          toggleCreatePassTokenModal={toggleCreatePassTokenModal}
         />
       )}
       {/* // !-------------  XP Points ------------ */}

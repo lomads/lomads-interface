@@ -4,15 +4,39 @@ import "./Settings.css";
 import PT from "../../assets/images/drawer-icons/PT.svg";
 import { Button, Image, Input } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CreateMorePassTokenModal from "./CreateMorePassTokenModal";
+import { useAppSelector } from "state/hooks";
+import coin from '../../assets/svg/coin.svg';
+import { get as _get, find as _find } from 'lodash';
+
 
 const PassTokenModal = ({ toggleModal, togglePassToken }) => {
   const [openCreatePassToken, setOpenCreatePassToken] = useState(false);
 
+  const { DAO, updateDaoLoading, updateDaoLinksLoading } = useAppSelector((state) => state.dashboard);
+
+  const [dWhiteListed, setDWhiteListed] = useState(_get(DAO?.sbt, 'whitelisted', false));
+  const [contactDetail, setContactDetail] = useState(_get(DAO?.sbt, 'contactDetail', []));
+
+
   let toggleCreatePassTokenModal = () => {
     setOpenCreatePassToken(!openCreatePassToken);
   };
+
+  let changeContactDetails = (contact) => {
+    if (contactDetail.indexOf(contact) > -1) {
+      let newDetailsArray = contactDetail.filter(l => !(l === contact))
+      setContactDetail(newDetailsArray)
+    } else {
+      let newDetailsArray = [...contactDetail , contact]
+      setContactDetail(newDetailsArray)
+    }
+  }
+
+  // useEffect(()=>{
+  //   console.log(contactDetail)
+  // },[contactDetail])
 
   return (
     <>
@@ -72,7 +96,7 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
             >
               {/* logo container  */}
               <div id="pass-tokens-logo-container">
-                <p>hk</p>
+                {DAO?.sbt?.image ? <img style={{ width: 24, height: 24 }} src={DAO?.sbt?.image} alt="asset" /> : <img src={coin} alt="asset" />}
               </div>
               <div
                 style={{
@@ -83,7 +107,7 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
                   justifyContent: "end",
                 }}
               >
-                <div id="token-title">Token name</div>
+                <div id="token-title">{DAO?.sbt?.name}</div>
                 <div id="#number-100">x100</div>
               </div>
             </div>
@@ -109,7 +133,7 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
 
               <div style={{ display: "flex", alignItems: "center" }}>
                 <label class="switch">
-                  <input type="checkbox" />
+                  <input defaultChecked={dWhiteListed} onChange={(e, d) => setDWhiteListed(e.target.checked)} type="checkbox" />
                   <span class="slider round"></span>
                 </label>
                 <div id="switch-title">WHITELISTED</div>
@@ -129,7 +153,7 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
                 }}
               >
                 <label class="switch">
-                  <input type="checkbox" />
+                  <input defaultChecked={contactDetail.indexOf('email') > -1} onChange={(e, d) => changeContactDetails("email")} type="checkbox" />
                   <span class="slider check round"></span>
                 </label>
                 <div id="switch-title">Email</div>
@@ -147,7 +171,7 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
                 }}
               >
                 <label class="switch">
-                  <input type="checkbox" />
+                  <input defaultChecked={contactDetail.indexOf('discord') > -1} onChange={(e, d) => changeContactDetails("discord")} type="checkbox" />
                   <span class="slider check round"></span>
                 </label>
                 <div id="switch-title">Discord user-id</div>
@@ -165,7 +189,7 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
                 }}
               >
                 <label class="switch">
-                  <input type="checkbox" />
+                  <input defaultChecked={contactDetail.indexOf('telegram') > -1} onChange={(e, d) => changeContactDetails("telegram")} type="checkbox" />
                   <span class="slider check round"></span>
                 </label>
                 <div id="switch-title">Telegram user-id</div>
@@ -195,6 +219,7 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
 
       {openCreatePassToken && (
         <CreateMorePassTokenModal
+          navFromSetting={false}
           toggleCreatePassTokenModal={toggleCreatePassTokenModal}
         />
       )}

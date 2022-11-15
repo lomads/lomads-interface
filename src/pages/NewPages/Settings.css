@@ -682,11 +682,11 @@ td {
     width: 39.63px;
     height: 39.63px;
 
-    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
-    border-radius: 10px;
-    transform: rotate(45deg);
+    /* box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 10px; */
+    /* transform: rotate(45deg); */
 
-    border: 1px solid #76808D;
+    /* border: 1px solid #76808D; */
     transform: matrix(0.71, -0.7, 0.71, 0.71, 0, 0);
 
 }

@@ -9,6 +9,7 @@ import AddExistingSafe from "../pages/NewPages/AddExistingSafe";
 import AddNewSafe from "../pages/NewPages/AddNewSafe";
 import Dashboard from "../pages/NewPages/DashBoard/Dashboard";
 import Settings from "../pages/NewPages/Settings";
+import SettingsOlder from "../pages/NewPages/SettingsOlder";
 import DCAuth from '../pages/NewPages/DCAuth';
 import CreatePassToken from "../pages/NewPages/CreatePassToken";
 import MintPassToken from "../pages/NewPages/MintPassToken";
