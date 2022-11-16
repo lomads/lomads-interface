@@ -297,3 +297,13 @@ export const submitTaskAction = createAsyncThunk(
 	}
 )
 
+export const approveTask = createAsyncThunk(
+	'dao/approvetaskaction',
+	async (params: any, thunkApi) => {
+		return axiosHttp.post(`task/${params.taskId}/approve?daoUrl=${params.daoUrl}`, params.payload)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+)
+
+

@@ -17,6 +17,7 @@ import { resetCreateTaskLoader, resetDraftTaskLoader } from 'state/dashboard/red
 import { useWeb3React } from "@web3-react/core";
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
 import { SupportedChainId } from "constants/chains";
+import { getSafeTokens } from '../../../../utils'
 
 import axios from "axios";
 import { isValidUrl } from 'utils';
@@ -46,15 +47,8 @@ const CreateTask = ({ toggleShowCreateTask }) => {
     const [showSuccess, setShowSuccess] = useState(false);
 
     const getTokens = async (safeAddress) => {
-        safeAddress && chainId &&
-            await axios
-                .get(
-                    `${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`
-                )
-                .then((tokens) => {
-                    setSafeTokens(tokens.data);
-                    console.log("tokens : ", tokens.data);
-                });
+        const tokens = await getSafeTokens(chainId, safeAddress)
+        setSafeTokens(tokens)
     };
 
     useEffect(() => {
@@ -166,6 +160,10 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                     tempSub = 'https://' + tempSub;
                 }
             }
+
+            let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
+            symbol = _get(symbol, 'token.symbol', 'SWEAT')
+
             let task = {};
             task.daoId = DAO?._id;
             task.name = name;
@@ -175,7 +173,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
             task.discussionChannel = tempLink;
             task.deadline = deadline;
             task.submissionLink = tempSub ? [tempSub] : [];
-            task.compensation = { currency, amount };
+            task.compensation = { currency, amount, symbol };
             task.reviewer = reviewer;
             task.contributionType = contributionType;
             task.isSingleContributor = isSingleContributor;
@@ -187,6 +185,8 @@ const CreateTask = ({ toggleShowCreateTask }) => {
     }
 
     const handleDraftTask = () => {
+        let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
+        symbol = _get(symbol, 'token.symbol', 'SWEAT')
         let task = {};
         task.daoId = DAO?._id;
         task.name = name;
@@ -196,7 +196,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
         task.discussionChannel = dchannel;
         task.deadline = deadline;
         task.submissionLink = subLink;
-        task.compensation = { currency, amount };
+        task.compensation = { currency, amount, symbol };
         task.reviewer = reviewer;
         task.contributionType = contributionType;
         task.isSingleContributor = isSingleContributor;
@@ -459,7 +459,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                                     id="chain"
                                                     className="tokenDropdown"
                                                     style={{ width: '100%' }}
-                                                    onChange={e => setCurrency(e.target.value)}
+                                                    onChange={e => setCurrency({ currency: e.target.value })}
                                                 >
                                                     <option value={null}>
                                                         select a token

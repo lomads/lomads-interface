@@ -108,6 +108,7 @@ const SubmitTask = ({ task, close }) => {
         else {
             // dispatch(applyTask({ taskId: task._id, daoUrl: _get(DAO, 'url', ''), payload: { note, resourceList } }));
             const payload = { daoUrl: _get(DAO, 'url', ''), taskId: task._id,  note, ...(task.submissionLink && task.submissionLink.length == 0 ? { submissionLink: resourceList } : {})}
+            //console.log(payload)
             dispatch(submitTaskAction(payload))
         }
     }

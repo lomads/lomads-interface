@@ -86,7 +86,8 @@ const SideModal = (props: IsideModal) => {
 				executor: account,
 				submissionDate: moment().utc().toDate(),
 				token:{
-					symbol: 'SWEAT'
+					symbol: 'SWEAT',
+					tokenAddress: 'SWEAT',
 				},
 				confirmations: isSafeOwner ? [{
 					owner: account,
@@ -118,7 +119,8 @@ const SideModal = (props: IsideModal) => {
 				executor: account,
 				submissionDate: moment().utc().toDate(),
 				token:{
-					symbol: 'SWEAT'
+					symbol: 'SWEAT',
+					tokenAddress: 'SWEAT',
 				},
 				confirmations: isSafeOwner ? [{
 					owner: account,

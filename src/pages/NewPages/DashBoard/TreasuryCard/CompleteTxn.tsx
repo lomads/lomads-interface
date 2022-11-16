@@ -23,7 +23,7 @@ const CompleteTxn = ({ transaction, tokens, owner, isAdmin }: any) => {
     const { isCredit, amount, symbol, recipient, date, reason } = useMemo(() => {
         let isCredit = _get(transaction, 'txType', '') === 'ETHEREUM_TRANSACTION'
         let amount = _get(transaction, 'transfers[0].value', '')
-        let symbol = _get(transaction, 'transfers[0].tokenInfo.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')
+        const symbol = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
         let recipient = _get(transaction, 'transfers[0].to', '')
         let trans = _find(_get(DAO, 'safe.transactions', []), t => t.safeTxHash === _get(transaction, 'safeTxHash', _get(transaction, 'txHash', '')))
 
@@ -76,6 +76,7 @@ const CompleteTxn = ({ transaction, tokens, owner, isAdmin }: any) => {
         const mulRecipient = _get(item, 'dataDecoded.parameters[0].value', "")
         const isLast = _get(transaction, 'dataDecoded.parameters[0].valueDecoded', []).length - 1 === index;
         let trans = _find(_get(DAO, 'safe.transactions', []), t => t.safeTxHash === transaction.safeTxHash)
+        const token = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
         let mulReason = '';
         if (trans)
             mulReason = _get(_find(trans.data, u => u.recipient.toLowerCase() === mulRecipient.toLowerCase()), 'reason', "")
@@ -84,7 +85,7 @@ const CompleteTxn = ({ transaction, tokens, owner, isAdmin }: any) => {
                 <div className="coinText">
                     <img src={isCredit ? receiveToken : sendToken} alt="" />
                     <div className="dashboardTextBold">
-                        {`${mulAmount / 10 ** 18} ${symbol}`}
+                        {`${mulAmount / 10 ** 18} ${token}`}
                     </div>
                 </div>
                 <div className="transactionName">
