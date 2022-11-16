@@ -184,6 +184,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
 	useEffect(() => {
 		if (props.tokens) {
+			console.log("tokens:", props.tokens)
 			let total = 0;
 			props.tokens.map((t: any) => {
 				total = +t.fiatBalance + total
@@ -202,8 +203,11 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				const receiver = _get(txn, 'dataDecoded.parameters[0].value')
                 const tokens = await getSafeTokens(chainId, _get(DAO, 'safe.address', null))
                 let selToken = _find(tokens, t => t.tokenAddress === _get(txn, 'token.tokenAddress', null))
-                if (selToken && (_get(selToken, 'balance', 0)) < amountValue)
-                    return console.log('Low token balance');
+				console.log(selToken, amountValue)
+				if(selToken){
+					if(+_get(selToken, 'balance', 0) < +amountValue)
+						return console.log('Low token balance');
+				}
                 const token = await tokenCallSafe(_get(txn, 'token.tokenAddress', null));
                 const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
                 const nonce = await (await safeService(provider, `${chainId}`)).getNextNonce(_get(DAO, 'safe.address', null));
@@ -246,7 +250,10 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 						.confirmTransaction(safeTxHash, signature.data)
 						.then(async (success) => {
 							console.log("transaction has been confirmed");
-							await axiosHttp.delete(`transaction/off-chain/${txn.safeTxHash}`)
+							await axiosHttp.patch(`transaction/off-chain/${txn.safeTxHash}/move-on-chain`, {
+								onChainTxHash: safeTxHash,
+								taskId: txn.taskId
+							})
 							console.log("success", success)
 							resolve({ safeTxHash, signature, nonce })
 						})
@@ -404,8 +411,8 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	};
 
 
-	const handleExecuteTransactions = async (_txs: any, reject: boolean | undefined) => {
-		let txn = _txs;
+	const handleExecuteTransactions = async (txn: any, reject: boolean | undefined) => {
+		let _txs = txn;
 		if(txn.offChain && _get(txn, 'token.symbol') === 'SWEAT'){
 			setExecuteTxLoading(txn.safeTxHash)
 			axiosHttp.get(`transaction/off-chain/${txn.safeTxHash}/execute${reject ? '?rejectedTxn=true' : ''}`)
@@ -413,8 +420,8 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 			.catch(e => console.log(e))
 			.finally(() => setExecuteTxLoading(null))
 		} else {
-			if(txn.rejectedTxn)
-				txn = txn.rejectedTxn;
+			if(txn.rejectedTxn && reject)
+				_txs = txn.rejectedTxn;
 			try {
 				setExecuteTxLoading(_txs.safeTxHash)
 				console.log(_txs);
@@ -449,6 +456,16 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 					(await executeTxResponse.transactionResponse.wait());
 				console.log("confirmed", receipt);
 				setExecuteTxLoading(null)
+				if(!reject)
+					await axiosHttp.patch(`transaction/on-chain/executed`, { 
+						safeTx: { 
+							..._txs,
+							token: {
+								tokenAddress: _get(txn, 'to', ''),
+								symbol: _get(_find(props.tokens, t => t.tokenAddress === _get(txn, 'to', '')), 'token.symbol', _get(txn, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))}
+							}
+						}
+					)
 				await loadPendingTxn()
 				await loadExecutedTxn()
 			} catch (e) {

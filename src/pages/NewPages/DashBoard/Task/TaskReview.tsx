@@ -138,6 +138,7 @@ const TaskReview = ({ task, close }: any) => {
 
         const offChainPayload = {
             daoId: _get(DAO, '_id', undefined),
+            taskId: _get(task, '_id', undefined),
             safe: _get(DAO, 'safe.address', undefined),
             nonce: moment().unix(),
             safeTxHash: nanoid(32),
