@@ -209,8 +209,8 @@ const ProjectDetails = () => {
     const unlock = useCallback(async (link, update = true) => {
         if (unlockLoading) return;
         setUnlockLoading(link.id)
+        console.log(_uniqBy(Project?.members, '_id'))
         let memberExists = _find(_uniqBy(Project?.members, '_id'), member => member.wallet.toLowerCase() === account.toLowerCase())
-        console.log("Member-exists", memberExists)
         if (!memberExists)
             return setUnlockLoading(null);
         if(link.link.indexOf('discord.') > -1) {
@@ -293,7 +293,7 @@ const ProjectDetails = () => {
                 setUnlockLoading(null)
             }
         }
-    }, [contractName, balanceOf, unlockLoading])
+    }, [contractName, balanceOf, unlockLoading, Project, account])
 
     const handleAddMember = (user) => {
         if (extraMembers.includes(user.member._id)) {
