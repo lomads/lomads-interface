@@ -2,9 +2,17 @@ import './LinksArea.css';
 
 import { SiNotion } from "react-icons/si";
 import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe } from "react-icons/bs";
+import useRole from "hooks/useRole";
+import { useNavigate } from "react-router-dom";
+import { useWeb3React } from "@web3-react/core";
+import settingIcon from '../../../assets/svg/settings.svg';
+import { useAppSelector } from "state/hooks";
 
 const LinksArea = ({ links }) => {
-
+    const navigate = useNavigate();
+    const {  account  } = useWeb3React();
+    const { DAO } = useAppSelector((state) => state.dashboard);
+	const { myRole, can } = useRole(DAO, account);
     const handleParseUrl = (url) => {
         try {
             const link = new URL(url);
@@ -43,10 +51,18 @@ const LinksArea = ({ links }) => {
 
     return (
         <div className='links-container'>
+            <div className='links-container-links'>
+                {
+                    links.map((item, index) => {
+                        return renderLinks(item)
+                    })
+                }
+            </div>
             {
-                links.map((item, index) => {
-                    return renderLinks(item)
-                })
+                can(myRole, 'settings') && 
+                <button className='settings' onClick={() => { navigate(`/${DAO.url}/settings`) }}>
+                    <img src={settingIcon} alt="settings-icon" />
+                </button>
             }
         </div>
     )

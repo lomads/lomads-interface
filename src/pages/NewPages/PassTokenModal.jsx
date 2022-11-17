@@ -3,7 +3,6 @@ import IconButton from "UIpack/IconButton";
 import "./Settings.css";
 import PT from "../../assets/images/drawer-icons/PT.svg";
 import { Button, Image, Input } from "@chakra-ui/react";
-import { AddIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
 import CreateMorePassTokenModal from "./CreateMorePassTokenModal";
 import { useAppSelector } from "state/hooks";

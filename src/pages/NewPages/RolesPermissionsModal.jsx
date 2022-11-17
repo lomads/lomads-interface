@@ -4,7 +4,6 @@ import IconButton from "UIpack/IconButton";
 import "./Settings.css";
 import { Button, Image, Input } from "@chakra-ui/react";
 import Table from "react-bootstrap/Table";
-import { AddIcon } from "@chakra-ui/icons";
 // ! IMAGES
 import RP from "../../assets/images/drawer-icons/RP.svg";
 import TotalAccess from "../../assets/images/drawer-icons/StatusAccess.svg";

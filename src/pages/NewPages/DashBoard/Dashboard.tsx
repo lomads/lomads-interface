@@ -28,6 +28,8 @@ import NotificationArea from "./NotificationArea";
 import Notifications from "../../../components/Notifications";
 import AddMember from "./MemberCard/AddMember";
 import dashboardfooterlogo from "../../../assets/svg/dashboardfooterlogo.svg";
+import starDashboard from "../../../assets/svg/star_dashboard.svg";
+import tokenDashboard from "../../../assets/svg/token_dashboard.svg";
 import { useAppDispatch } from "state/hooks";
 import { getCurrentUser, getDao } from "state/dashboard/actions";
 import { setDAO, setDAOList } from "state/dashboard/reducer";
@@ -317,6 +319,24 @@ const Dashboard = () => {
 		}
 	}, [chainId, DAO, pendingTransactions])
 
+	const swtBalance = useMemo(() => {
+		const swt = _find(_get(user, 'earnings', []), (e:any) => e.currency === 'SWEAT')
+		if(swt)
+			return _get(swt, 'value', 0)
+		return 0
+	}, [user])
+
+	const tokenDollarBalance = useMemo(() => {
+		const myTokens = _get(user, 'earnings', [])
+		console.log('safeTkn',safeTokens)
+		for (let index = 0; index < myTokens.length; index++) {
+			const myToken = myTokens[index];
+			const safeTkn = _find(safeTokens, (st:any) => st.tokenAddress === myToken.currency)
+			console.log("safeTkn", safeTkn)
+		}
+		return 0
+	}, [user, safeTokens])
+
 	return (
 		<>
 			{!validDaoChain || !DAO || DAOLoading || (daoURL && (DAO && DAO.url !== daoURL)) ?
@@ -365,14 +385,19 @@ const Dashboard = () => {
 					</div>
 					<div className="DAOsettings">
 						<div className="DAOadminPill">
-							<p>You're an&nbsp;<span>{displayRole}</span></p>
+							<p>{displayRole}</p>
 						</div>
-						{
-							can(myRole, 'settings') && <button onClick={() => { navigate(`/${DAO.url}/settings`) }}>
-								<img src={settingIcon} alt="settings-icon" />
-							</button>
-						}
-						<select name="chain" id="chain" value={chainId} onChange={e => handleSwitchChain(+e.target.value)} className="drop" style={{ width: 150 }}>
+						<div className="tokens">
+							<div className="token">
+								<img src={tokenDashboard} />
+								<div className="text">${tokenDollarBalance}</div>
+							</div>
+							<div className="token">
+								<img src={starDashboard} />
+								<div className="text">{ swtBalance }</div>
+							</div>
+						</div>
+						<select name="chain" id="chain" value={chainId} onChange={e => handleSwitchChain(+e.target.value)} className="chain" style={{ width: 150 }}>
 							{
 								SUPPORTED_CHAIN_IDS.map(chain => <option value={+chain}>{CHAIN_IDS_TO_NAMES[chain]}</option>)
 							}

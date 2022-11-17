@@ -20,7 +20,7 @@ body.active-modal {
     justify-content: space-between;
     align-items: center;
     background: transparent;
-    padding: 35px 0px;
+    padding: 28px 0px;
 }
 
 .DAOname {
@@ -49,20 +49,62 @@ body.active-modal {
     display: flex;
     align-items: center;
     flex-direction: row;
+    background-color: rgba(118, 128, 141, 0.05);
+    border-radius: 30px 0 0 30px;
+    padding: 12px 42px 12px 11px;
+    right: -30px;
+    position: relative;
+    height: 60px;
 }
 
-.DAOdetails .DAOsettings div {
-    /* width: 170px; */
-    padding: 10px 20px;
-    background: #FFFFFF;
-    border-radius: 100px;
+.DAOdetails .tokens {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 0 16px;
+}
+
+.DAOdetails .token {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 0 8px;
+}
+
+.DAOdetails .token .text {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    margin-right: 20px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+    margin-left: 6px;
+}
+
+.DAOdetails .chain {
+    background: rgba(118, 128, 141, 0.05) !important;
+    border-radius: 10px;
+    padding: 11px 18px 11px 18px;
+}
+
+.DAOdetails .DAOsettings .DAOadminPill {
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 20px;
+    gap: 23px;
+    width: 156px;
+    height: 36px;
+    background: rgba(118, 128, 141, 0.05);
+    border-radius: 100px;
 }
 
 .DAOdetails .DAOsettings div p {
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 400;
     font-size: 14px;

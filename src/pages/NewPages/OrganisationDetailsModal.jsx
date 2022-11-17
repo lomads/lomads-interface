@@ -4,7 +4,6 @@ import IconButton from "UIpack/IconButton";
 import "./Settings.css";
 import OD from "../../assets/images/drawer-icons/OD.svg";
 import { Button, Image, Input, Textarea } from "@chakra-ui/react";
-import { AddIcon } from "@chakra-ui/icons";
 import { useAppSelector } from "state/hooks";
 import { useCallback, useEffect, useState } from "react";
 import { get as _get, find as _find } from 'lodash';

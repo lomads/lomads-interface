@@ -4,7 +4,6 @@ import { get as _get, find as _find } from "lodash";
 import settingIcon from "../../assets/svg/settingsXL.svg";
 import { CgClose } from "react-icons/cg";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { AddIcon, CheckCircleIcon } from "@chakra-ui/icons";
 import Table from "react-bootstrap/Table";
 
 import {
