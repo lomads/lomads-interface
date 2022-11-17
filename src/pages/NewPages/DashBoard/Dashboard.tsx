@@ -405,7 +405,7 @@ const Dashboard = () => {
 					</div>
 				</div>
 
-				{_get(DAO, 'links', []).length > 0 && <LinksArea links={_get(DAO, 'links', [])} />}
+				<LinksArea links={_get(DAO, 'links', [])} />
 
 				<Notifications />
 

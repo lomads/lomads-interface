@@ -49,6 +49,10 @@ const LinksArea = ({ links }) => {
         )
     }
 
+    if(links.length == 0 && !can(myRole, 'settings')){
+        return null
+    }
+
     return (
         <div className='links-container'>
             <div className='links-container-links'>

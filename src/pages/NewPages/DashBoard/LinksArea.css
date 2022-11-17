@@ -6,10 +6,12 @@
     flex-direction: row;
     align-items: center;
     margin-bottom: 6px;
+    height: 80px;
 }
 
 .links-container-links {
     display: flex;
+    width: 100%;
     align-items: center;
     padding: 20px 22px;
     overflow: scroll;
