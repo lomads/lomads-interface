@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./Settings.css";
 import { get as _get, find as _find } from "lodash";
 import settingIcon from "../../assets/svg/settingsXL.svg";
 import { CgClose } from "react-icons/cg";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { AddIcon, CheckCircleIcon } from "@chakra-ui/icons";
 import Table from "react-bootstrap/Table";
 
@@ -54,11 +54,20 @@ import XpPointsModal from "./XpPointsModal";
 import PassTokenModal from "./PassTokenModal";
 import TerminologyModal from "./TerminologyModal";
 import DiscordModal from "./DiscordModal";
-import { useAppSelector } from "state/hooks";
+import { useAppDispatch, useAppSelector } from "state/hooks";
 import CreateMorePassTokenModal from "./CreateMorePassTokenModal";
+import { getDao } from "state/dashboard/actions";
+import CompensateMembersModal from "./CompensateMembersModal";
+import CompensateMembersDescriptionModal from "./CompensateMembersDescriptionModal";
+import CompensateMembersDoneModal from "./CompensateMembersDoneModal";
+import DisableXpPointDailog from "./DisableXpPointDailog";
+import eventEmitter from "utils/eventEmmiter";
 
 const Settings = () => {
   const navigate = useNavigate();
+  const { daoURL } = useParams();
+
+  const dispatch = useAppDispatch();
 
   //! CONST DECLARATION
   const [showModal, setShowModal] = useState(false);
@@ -75,8 +84,32 @@ const Settings = () => {
   const { DAO, updateDaoLoading, updateDaoLinksLoading } = useAppSelector((state) => state.dashboard);
 
   console.log("DAO data : ", DAO);
-  const daoName = _get(DAO, 'name', '').split(" ");
+  
   const [name, setName] = useState(_get(DAO, 'name', ''));
+
+  useEffect(()=>{
+    setName(_get(DAO, 'name', ''))
+  },[DAO])
+  
+  useEffect(()=>{
+    if (!DAO || (DAO && DAO.url !== daoURL))
+				dispatch(getDao(daoURL))
+			}
+  ,[DAO])
+
+  useEffect(() => {
+    eventEmitter.on('close-xp-modal', ()=>{
+      setShowModal(false)
+      setOpenXpPoints(false)
+    })
+    return () => {
+      eventEmitter.off('close-xp-modal', ()=>{
+        setShowModal(false)
+        setOpenXpPoints(false)
+      })
+    }
+  }, [])
+  
   
 
 
@@ -109,12 +142,17 @@ const Settings = () => {
   let toggleCreatePassTokenModal = () => {
     setOpenCreatePassToken(!openCreatePassToken);
   };
+  const daoName = name.split(" ");
   return (
     <>
       <div className="settings-page">
+      {/* <DisableXpPointDailog
+                    toggleShowLink={toggleCreatePassTokenModal}
+                    daoUrl={_get(DAO, 'url', '')}
+                /> */}
         <div className="settings-left-bar">
           <div onClick={() => navigate(-1)} className="logo-container">
-            <p>{ daoName.length === 1
+            <p style={{textTransform: "capitalize"}}>{ daoName.length === 1
                                 ? daoName[0].charAt(0)
                                 : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)}</p>
           </div>
@@ -222,7 +260,7 @@ const Settings = () => {
                     setOpenXpPoints(true);
                   }}
                 >
-                  XP points
+                  SWEAT points
                   <ChevronRight />
                 </Link>
               </div>
@@ -308,7 +346,7 @@ const Settings = () => {
           toggleCreatePassTokenModal={toggleCreatePassTokenModal}
         />
       )}
-      {/* // !-------------  XP Points ------------ */}
+      {/* // !-------------  SWEAT Points ------------ */}
       {showModal && openXpPoints && (
         <XpPointsModal toggleModal={toggleModal} toggleXp={toggleXp} />
       )}

@@ -24,10 +24,11 @@ import { ethers } from "ethers";
 import { LeapFrog } from "@uiball/loaders";
 import axiosHttp from '../../api'
 import imageToBase64 from "utils/imageToBase64";
+import { SupportedChainId } from "constants/chains";
 
 
 const CreatePassToken = () => {
-    const { account, provider } = useWeb3React();
+    const { account, provider, chainId } = useWeb3React();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const { DAO } = useAppSelector((state) => state.dashboard);
@@ -110,7 +111,9 @@ const CreatePassToken = () => {
             }
         }
         else {
-            const ENSname = await provider?.lookupAddress(_ownerAddress);
+			let ENSname = null;
+			if(chainId !== SupportedChainId.POLYGON)
+				ENSname = await provider?.lookupAddress(_ownerAddress);
             if (ENSname) {
                 member.name = _ownerName !== '' ? _ownerName : ENSname;
             }
@@ -204,22 +207,25 @@ const CreatePassToken = () => {
                 return;
             }
             else {
-                console.log("Contract deployed");
+                console.log("Contract deployed", tx, counter);
                 const contractAddr = await getContractById(sbtDeployerContract, counter);
-                setContractAddr(contractAddr);
-                const contractJSON = {
-                    name: sbtName,
-                    image,
-                    tokenSupply: tokenQuantity,
-                    address: contractAddr,
-                    admin: account,
-                    whitelisted,
-                    contactDetail: selectedOptions,
-                    metadata: [],
-                    membersList: memberList,
-                    daoId: DAO._id
+                console.log(contractAddr)
+                if(contractAddr) {
+                    setContractAddr(contractAddr);
+                    const contractJSON = {
+                        name: sbtName,
+                        image,
+                        tokenSupply: tokenQuantity,
+                        address: contractAddr,
+                        admin: account,
+                        whitelisted,
+                        contactDetail: selectedOptions,
+                        metadata: [],
+                        membersList: memberList,
+                        daoId: DAO._id
+                    }
+                    dispatch(createContract(contractJSON))
                 }
-                dispatch(createContract(contractJSON))
                 //     const req = await APInewContract(contractJSON);
                 //     if (req){
                 //         setIsLoading(false)

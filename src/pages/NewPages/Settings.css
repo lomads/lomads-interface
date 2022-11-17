@@ -270,6 +270,36 @@
     margin-bottom: 10px;
 }
 
+.settings-page .settings-center .settings-links .links-header div {
+    display: flex;
+    align-items: center;
+}
+
+.settings-page .settings-center .settings-links .links-header div .addLink-btn {
+    margin-left: 22px;
+    width: 140px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    font-style: normal;
+    /* font-weight: 400; */
+    font-size: 16px;
+    line-height: 18px;
+    /* or 112% */
+    display: flex;
+    align-items: center;
+    text-align: center;
+    letter-spacing: -0.011em;
+    text-transform: uppercase;
+
+    /* RED */
+    color: #C94B32;
+}
+
 .settings-page .settings-center .settings-links .links-header h1 {
     font-style: normal;
     font-weight: 400;
@@ -296,6 +326,44 @@
 
 }
 
+.settings-page .settings-center .settings-links .link-body .editLinkSection {
+    width: 420px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 0;
+}
+
+.settings-page .settings-center .settings-links .link-body .editLinkSection .editLinkCol {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 8px;
+    margin-bottom: 0 !important;
+    height: 85px;
+}
+
+.settings-page .settings-center .settings-links .link-body .editLinkSection .editLinkCol span {
+    margin-bottom: 0;
+    margin-top: -13px !important;
+    font-size: 13px;
+    color: #C94B32;
+}
+
+.settings-page .settings-center .settings-links .link-body .editLinkSection .linkDeleteBtn {
+    background-color: #FFF;
+    padding: 5px;
+    min-width: 50px;
+    border-radius: 5px;
+    color: #FFFFFF;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px !important;
+    margin-left: 15px;
+}
+
 .settings-page .settings-center .settings-links .link-body div {
     width: 100%;
     display: flex;
@@ -305,16 +373,24 @@
 
 .settings-page .settings-center .settings-links .link-body div button {
     height: 40px;
-    width: 145px;
+    width: 150px;
+    padding: 0 20px;
     filter: drop-shadow(0px 3px 3px rgba(27, 43, 65, 0.1)) drop-shadow(-1px -2px 3px rgba(201, 75, 50, 0.05));
     border-radius: 5px;
     background: #FFFFFF;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     text-transform: capitalize;
     color: #B12F15;
     margin-right: 10px;
+}
+
+.settings-page .settings-center .settings-links .link-body div button span {
+    color: #B12F15;
+    margin: 0;
+    margin-left: 5px;
+    font-style: normal;
 }
 
 .settings-page .settings-center .settings-links .link-body div p {
@@ -408,15 +484,40 @@
 }
 
 
-#title-type {
-    margin-top: 6.9px;
-    font-size: "22px";
-    color: #C94B32;
+#cm-info {
+    width: 400px;
+    height: 18px;
+
+    /* Note */
+    font-family: 'Inter', sans-serif;
+    font-style: italic;
     font-weight: 400;
-    font-size: 22px;
-    line-height: 25px;
+    font-size: 14px;
+    line-height: 18px;
+    /* identical to box height, or 129% */
     text-align: center;
     letter-spacing: -0.011em;
+    margin-top: 35px;
+    /* Grey */
+    color: #76808D;
+}
+#title-type {
+    width: 529px;
+    height: 37px;
+
+    /* Med-title */
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 33px;
+    /* or 110% */
+    text-align: center;
+
+    /* RED */
+    color: #C94B32;
+
+
 }
 
 #text-type {
@@ -490,6 +591,29 @@
     flex: none;
     order: 2;
     flex-grow: 0;
+}
+
+#xp-text {
+    font-family: 'Inter', sans-serif;
+    width: 400px;
+    height: 112px;
+
+    /* corps */
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    /* or 114% */
+    text-align: center;
+
+    /* Grey */
+    color: #76808D;
+
+
+    /* Inside auto layout */
+    /* flex: none;
+    order: 2;
+    flex-grow: 0; */
 }
 
 #paragraph-type {
@@ -865,7 +989,7 @@ td {
     flex-grow: 0;
 }
 
-.MainComponent #membership-policy-section {
+.MainComponent #membersship-policy-section {
     /* Auto layout */
 
     display: flex;
@@ -936,4 +1060,94 @@ td {
     letter-spacing: -0.011em;
     color: rgba(118, 128, 141, 0.5);
 
+}
+
+
+ .main-picker-container  {
+    display: flex;
+    flex-direction: row;
+    height: 50px;
+    margin: 20px 0;
+    align-items: center;
+    justify-content: center;
+ }
+
+
+ .picker-container {
+    display: flex;
+    flex-direction: row;
+    height: 50px;
+    margin: 20px 0;
+}
+
+ .main-picker-container .currency {
+    background: #FFFFFF;
+    /* box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1); */
+    /* border-radius: 0px 10px 10px 0px; */
+    transform: rotate(180deg);
+    /* width: 187px; */
+    height: 50px;
+}
+
+ .main-picker-container .currency-container {
+    height: 50px;
+    transform: rotate(180deg);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-items: flex-start;
+    padding-right: 20px;
+}
+
+ .main-picker-container .currency-container div {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-size: 16px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    text-transform: uppercase;
+    color: #76808D;
+    font-weight: 700;
+    margin-left: 12px;
+}
+
+ .main-picker-container .currency-container {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    text-transform: uppercase;
+    color: #76808D;
+}
+
+ .picker-container .number-input {
+    background: #FFFFFF; 
+    /* box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1); */
+    /* border-radius: 0px 10px 10px 0px; */
+}
+
+ .picker-container .number-input .input {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    /* border-radius: 10px 10px 10px 10px; */
+    /* identical to box height, or 112% */
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+
+    text-align: center;
+    letter-spacing: -0.011em;
+
+    color: rgba(27, 45, 65, 0.6);
+}
+
+ .picker-container .counter {
+    width: 40px;
+    height: 50px;
+    background: #FFFFFF;
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    /* border-radius: 0px 10px 10px 0px; */
 }

@@ -24,10 +24,15 @@ import axios from "axios";
 import { getDao } from "state/dashboard/actions";
 import { updateTotalMembers } from "state/flow/reducer";
 import axiosHttp from '../../../api'
+import { SupportedChainId } from "constants/chains";
+import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
+import { nanoid } from "@reduxjs/toolkit";
+import moment from "moment";
+import useRole from "hooks/useRole";
 
 const SideModal = (props: IsideModal) => {
 	const dispatch = useAppDispatch();
-	const { provider, account } = useWeb3React();
+	const { provider, account, chainId } = useWeb3React();
 	const [selectedToken, setSelectedToken] = useState<string>("");
 	const [addNewRecipient, setAddNewRecipient] = useState<boolean>(false);
 	const [modalNavigation, setModalNavigation] = useState({
@@ -49,6 +54,7 @@ const SideModal = (props: IsideModal) => {
 	const safeAddress = useAppSelector((state) => state.flow.safeAddress);
 
 	const { DAO } = useAppSelector(store => store.dashboard);
+	const { isSafeOwner } = useRole(DAO, account);
 
 	const showNavigation = (
 		_showRecipient: boolean,
@@ -67,14 +73,102 @@ const SideModal = (props: IsideModal) => {
 		setAddNewRecipient(!addNewRecipient);
 	};
 
+	const createOffChainTxn = () => {
+		setisLoading(true);
+		const nonce = moment().unix();
+		let payload = {}
+		if(setRecipient.current.length > 1){
+			payload = {
+				daoId: _get(DAO, '_id', undefined),
+				safe: props.safeAddress,
+				safeTxHash: nanoid(32),
+				nonce,
+				executor: account,
+				submissionDate: moment().utc().toDate(),
+				token:{
+					symbol: 'SWEAT'
+				},
+				confirmations: isSafeOwner ? [{
+					owner: account,
+					submissionDate:  moment().utc().toDate()
+				}] : [],
+				dataDecoded: {
+					method: "multiSend",
+					parameters: [{
+						valueDecoded: setRecipient.current.map(r => {
+							return {
+								dataDecoded: {
+									method: 'transfer',
+									parameters: [
+										{ name: 'to', type: "address", value: r.recipient },
+										{ name: 'value', type: "uint256", value: `${BigInt(parseFloat(r.amount) * 10 ** 18)}` },
+									]
+								}
+							}
+						})
+					}]
+				}
+			}
+		} else {
+			payload = {
+				daoId: _get(DAO, '_id', undefined),
+				safe: props.safeAddress,
+				nonce,
+				safeTxHash: nanoid(32),
+				executor: account,
+				submissionDate: moment().utc().toDate(),
+				token:{
+					symbol: 'SWEAT'
+				},
+				confirmations: isSafeOwner ? [{
+					owner: account,
+					submissionDate:  moment().utc().toDate()
+				}] : [],
+				dataDecoded: {
+					method: 'transfer',
+					parameters: [
+						{ name: 'to', type: "address", value: setRecipient.current[0].recipient },
+						{ name: 'value', type: "uint256", value: `${BigInt(parseFloat(setRecipient.current[0].amount) * 10 ** 18)}` },
+					]
+				}
+			}
+		}
+		axiosHttp.post('transaction/off-chain', payload)
+		.then(res => {
+			console.log(res);
+			axiosHttp.post(`transaction`, {
+				safeAddress: props.safeAddress,
+				safeTxHash: res.data.safeTxHash,
+				rejectTxHash: null,
+				data: setRecipient.current,
+				nonce,
+			})
+			.then(async () => {
+				dispatch(getDao(DAO.url))
+				await props.getPendingTransactions();
+				showNavigation(false, true, false);
+				setisLoading(false);
+			})
+		})
+		.finally(() => setisLoading(false))
+	}
+
 	const createTransaction = async () => {
 		try {
 			setError(null)
+			if(selectedToken === 'SWEAT') {
+				return createOffChainTxn()
+			}
 			let sendTotal = setRecipient.current.reduce((pv: any, cv) => pv + (+cv.amount), 0);
 			let selToken = _find(safeTokens, t => t.tokenAddress === selectedToken)
-			if ((_get(selToken, 'balance', 0) / 10 ** 18) < sendTotal)
-				return setError(`Low token balance. Available tokens ${_get(selToken, 'balance', 0) / 10 ** 18} ${selToken.token.symbol}`);
+			if (safeTokens.length > 0 && !selToken)
+				selToken = safeTokens[0];
+			if (selToken && (_get(selToken, 'balance', 0) / 10 ** 18) < sendTotal)
+				//{ _get(result, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR') }
+				//return setError(`Low token balance. Available tokens ${_get(selToken, 'balance', 0) / 10 ** 18} ${selToken.token.symbol}`);
+				return setError(`Low token balance. Available tokens ${_get(selToken, 'balance', 0) / 10 ** 18} ${_get(selToken, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}`);
 			setisLoading(true);
+			console.log(selectedToken, props.safeAddress)
 			const token = await tokenCallSafe(selectedToken);
 			const safeSDK = await ImportSafe(provider, props.safeAddress);
 			const safeTransactionData: SafeTransactionDataPartial[] = await Promise.all(
@@ -82,7 +176,7 @@ const SideModal = (props: IsideModal) => {
 					async (result: IsetRecipientType, index: number) => {
 						const unsignedTransaction = await token.populateTransaction.transfer(
 							result.recipient,
-							BigInt(parseInt(result.amount) * 10 ** 18)
+							BigInt(parseFloat(result.amount) * 10 ** 18)
 						);
 						const transactionData = {
 							to: selectedToken,
@@ -93,6 +187,8 @@ const SideModal = (props: IsideModal) => {
 					}
 				)
 			);
+
+
 			const options: SafeTransactionOptionalProps = {
 				nonce: currentNonce,
 			};
@@ -105,7 +201,7 @@ const SideModal = (props: IsideModal) => {
 			const senderAddress = account as string;
 			const safeAddress = props.safeAddress;
 			await (
-				await safeService(provider)
+				await safeService(provider, `${chainId}`)
 			)
 				.proposeTransaction({
 					safeAddress,
@@ -122,13 +218,12 @@ const SideModal = (props: IsideModal) => {
 					setisLoading(false);
 				});
 			await (
-				await safeService(provider)
+				await safeService(provider, `${chainId}`)
 			)
 				.confirmTransaction(safeTxHash, signature.data)
 				.then(async (success) => {
 					console.log("transaction is successful");
 					console.log("success:", success);
-
 					axiosHttp.post(`transaction`, {
 						safeAddress: safeAddress,
 						safeTxHash: safeTxHash,
@@ -136,12 +231,12 @@ const SideModal = (props: IsideModal) => {
 						data: setRecipient.current,
 						nonce: currentNonce,
 					})
-						.then(async () => {
-							dispatch(getDao(DAO.url))
-							await props.getPendingTransactions();
-							showNavigation(false, true, false);
-							setisLoading(false);
-						})
+					.then(async () => {
+						dispatch(getDao(DAO.url))
+						await props.getPendingTransactions();
+						showNavigation(false, true, false);
+						setisLoading(false);
+					})
 				})
 				.catch((err) => {
 					setisLoading(false);
@@ -154,13 +249,14 @@ const SideModal = (props: IsideModal) => {
 	};
 
 	const getTokens = async (safeAddress: string) => {
-		await axios
-			.get(
-				`https://safe-transaction.goerli.gnosis.io/api/v1/safes/${safeAddress}/balances/usd/`
-			)
-			.then((tokens: any) => {
-				setSafeTokens(tokens.data);
-			});
+		chainId &&
+			await axios
+				.get(
+					`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`
+				)
+				.then((tokens: any) => {
+					setSafeTokens(tokens.data);
+				});
 	};
 
 	useEffect(() => {

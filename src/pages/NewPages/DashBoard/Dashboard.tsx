@@ -25,10 +25,12 @@ import SideModal from "./SideModal";
 import SideBar from "./SideBar";
 import axios from "axios";
 import NotificationArea from "./NotificationArea";
+import Notifications from "../../../components/Notifications";
 import AddMember from "./MemberCard/AddMember";
 import dashboardfooterlogo from "../../../assets/svg/dashboardfooterlogo.svg";
 import { useAppDispatch } from "state/hooks";
-import { getDao } from "state/dashboard/actions";
+import { getCurrentUser, getDao } from "state/dashboard/actions";
+import { setDAO, setDAOList } from "state/dashboard/reducer";
 import { loadDao } from 'state/dashboard/actions';
 import copyIcon from "../../../assets/svg/copyIcon.svg";
 import { useDispatch } from "react-redux";
@@ -39,32 +41,46 @@ import MyProject from "./MyProject";
 
 import { useSBTStats } from "hooks/SBT/sbt";
 import Footer from "components/Footer";
+import EditMember from "./MemberCard/EditMember";
+import LinksArea from "./LinksArea";
+import useRole from "hooks/useRole";
+import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains';
+import { switchChain } from "utils/switchChain";
+import { SupportedChainId, SUPPORTED_CHAIN_IDS, CHAIN_IDS_TO_NAMES } from 'constants/chains'
+import Tasks from "./Tasks";
+import CreateTask from "./Task/CreateTask";
 
 const Dashboard = () => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const { daoURL } = useParams();
-	const { DAO, DAOList, DAOLoading } = useAppSelector((state) => state.dashboard);
+	const { user, DAO, DAOList, DAOLoading } = useAppSelector((state) => state.dashboard);
 	console.log("DAO : ", DAO);
 	const [update, setUpdate] = useState(0);
 	const treasuryRef = useRef<any>();
-	const { provider, account, chainId } = useWeb3React();
+	const { provider, account, chainId, connector } = useWeb3React();
 	const safeAddress = useAppSelector((state) => state.flow.safeAddress);
 	const totalMembers = useAppSelector((state) => state.flow.totalMembers);
 	const [pendingTransactions, setPendingTransactions] =
 		useState<SafeMultisigTransactionListResponse>();
 	const [executedTransactions, setExecutedTransactions] =
 		useState<AllTransactionsListResponse>();
+	const [validDaoChain, setValidDaoChain] = useState<boolean>(false);
 	const [showModal, setShowModal] = useState<boolean>(false);
 	const [ownerCount, setOwnerCount] = useState<number>();
 	const [safeTokens, setSafeTokens] = useState<Array<any>>([]);
 	const [showNotification, setShowNotification] = useState<boolean>(false);
 	const [showAddMember, setShowAddMember] = useState<boolean>(false);
+	const [showEditMember, setShowEditMember] = useState<boolean>(false);
+	const [showCreateTask, setShowCreateTask] = useState<boolean>(false);
 	const [showNavBar, setShowNavBar] = useState<boolean>(false);
 	const [checkLoading, setCheckLoading] = useState<boolean>(true);
 	const currentNonce = useAppSelector((state) => state.flow.currentNonce);
+	const { myRole, displayRole, permissions, can, isSafeOwner } = useRole(DAO, account);
 
-	const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
+	console.log("role", myRole)
+
+	const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '', chainId);
 
 	const amIAdmin = useMemo(() => {
 		if (DAO) {
@@ -76,6 +92,11 @@ const Dashboard = () => {
 		return false;
 	}, [account, DAO])
 
+	const handleRenderRole = () => {
+		const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase());
+		return _get(user, 'role', '').replaceAll('_', ' ').toLowerCase();
+	}
+
 	const [copy, setCopy] = useState<boolean>(false);
 	const toggleModal = () => {
 		setShowModal(!showModal);
@@ -84,29 +105,56 @@ const Dashboard = () => {
 	const toggleShowMember = () => {
 		setShowAddMember(!showAddMember);
 	};
+
+	const toggleShowEditMember = () => {
+		setShowEditMember(!showEditMember);
+	};
+
+	const toggleShowCreateTask = () => {
+		setShowCreateTask(!showCreateTask);
+	};
+
 	const showSideBar = (_choice: boolean) => {
 		setShowNavBar(_choice);
 	};
 
+	const handleSwitchChain = async (chain: number) => {
+		switchChain(connector, chain)
+			.then(res => {
+				sessionStorage.clear()
+				dispatch(setDAOList([]))
+				dispatch(setDAO(null))
+				window.location.href = '/'
+			})
+	}
+
+	const prevDAO = usePrevious(DAO);
+
 	useEffect(() => {
-		if(chainId && !account)
+		if (prevDAO && !DAO) {
+			setSafeTokens([])
+		}
+	}, [DAO, prevDAO])
+
+	useEffect(() => {
+		if (chainId && !account)
 			window.location.href = '/login'
 	}, [chainId, account])
 
 	useEffect(() => {
-		if(chainId && account) {
-			if(!DAOList)
-				dispatch(loadDao({}))
+		if (chainId && account) {
+			if (!DAOList)
+				dispatch(loadDao({ chainId }))
 			else {
-				if(DAOList && DAOList.length == 0){
-					if(!daoURL)
-						navigate(`/namedao`)
+				if (DAOList && DAOList.length == 0) {
+					if (!daoURL)
+						navigate(`/createorg`)
 					else {
 						if (!DAO || (DAO && DAO.url !== daoURL))
 							dispatch(getDao(daoURL))
 					}
-				} else if(DAOList && DAOList.length > 0) {
-					if(!daoURL)
+				} else if (DAOList && DAOList.length > 0) {
+					if (!daoURL)
 						navigate(`/${DAOList[0].url}`)
 					else if (!DAO || (DAO && DAO.url !== daoURL))
 						dispatch(getDao(daoURL))
@@ -116,71 +164,87 @@ const Dashboard = () => {
 	}, [chainId, account, DAOList, daoURL])
 
 	useEffect(() => {
-		if (contractName !== '' && DAO && DAO.sbt &&  DAO.sbt && account) {
-			if (DAO?.sbt?.whitelisted) {
-				if(_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
-					if(parseInt(balanceOf._hex, 16) === 0)
-						navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
+		if (chainId) {
+			if (contractName !== '' && DAO && DAO.sbt && DAO.sbt && account && balanceOf) {
+				console.log("BALANCEOF:", parseInt(balanceOf._hex, 16))
+				if (chainId === DAO.chainId) {
+					if (DAO?.sbt?.whitelisted) {
+						if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
+							if (parseInt(balanceOf._hex, 16) === 0)
+								navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
+						} else {
+							navigate('/only-whitelisted')
+						}
+					} else if (!DAO?.sbt?.whitelisted) {
+						if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
+							if (parseInt(balanceOf._hex, 16) === 0)
+								navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
+						} else {
+							//add to DAO
+							if (parseInt(balanceOf._hex, 16) === 0)
+								navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
+						}
+					}
 				} else {
-					navigate('/only-whitelisted')
-				}
-			} else if (!DAO?.sbt?.whitelisted) {
-				if(_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
-					if(parseInt(balanceOf._hex, 16) === 0)
-						navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
-				} else {
-					//add to DAO
-					if(parseInt(balanceOf._hex, 16) === 0)
-						navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
+					console.log('Switch chain to', DAO.chainId)
 				}
 			}
 		}
-	}, [DAO, balanceOf, contractName, account]);
+	}, [chainId, DAO, balanceOf, contractName, account]);
 
 	useEffect(() => {
-		if(DAO && account) {
-			if(!DAO.sbt){
-				if(!_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase()))
-					navigate('/noaccess')
+		if (account && chainId && (!user || (user && user.wallet.toLowerCase() !== account.toLowerCase()))) {
+			dispatch(getCurrentUser({}))
+		}
+	}, [account, chainId, user])
+
+
+	useEffect(() => {
+		if (DAO && chainId) {
+			if (DAO.chainId !== chainId) {
+				setValidDaoChain(false)
+				switchChain(connector, DAO.chainId)
+			}
+			else
+				setValidDaoChain(true)
+		}
+	}, [DAO, chainId]);
+
+	useEffect(() => {
+		if (DAO && account && chainId) {
+			if (chainId === DAO.chainId) {
+				if (!DAO.sbt) {
+					if (!_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase()))
+						navigate('/noaccess')
+				}
 			}
 		}
-	}, [DAO, account]);
-
-	// useEffect(() => {
-	// 	if (chainId && account)
-	// 		dispatch(loadDao({}))
-	// }, [chainId, account])
-
-	// const hasDAOAccess = useMemo(() => {
-	// 	if (!DAOList || DAOList.length == 0) return false;
-	// 	let hasAccess = _find(DAOList, d => d.url === daoURL)
-	// 	if (hasAccess) return true;
-	// 	return false
-	// }, [DAOList, daoURL])
-
-	// useEffect(() => {
-	// 	if (DAOList && DAOList.length > 0) {
-	// 		if (!hasDAOAccess) {
-	// 			navigate('/noaccess')
-	// 		}
-	// 	}
-	// }, [DAOList, hasDAOAccess])
-
-	// useEffect(() => {
-	// 	if (hasDAOAccess && chainId && account && daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
-	// 		dispatch(getDao(daoURL))
-	// }, [hasDAOAccess, DAOList, daoURL, chainId, account])
+	}, [DAO, account, chainId]);
 
 	useEffect(() => {
-		if (DAO)
+		if (DAO && account && chainId) {
+			if (chainId === DAO.chainId) {
+				if (!DAO.sbt) {
+					if (!_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase()))
+						navigate('/noaccess')
+				}
+			}
+		}
+	}, [DAO, account, chainId]);
+
+
+	useEffect(() => {
+		if (DAO && chainId && DAO.chainId === chainId)
 			dispatch(updateSafeAddress(_get(DAO, 'safe.address', '')))
-	}, [DAO])
+	}, [DAO, chainId])
 
 	const prepare = async (_safeAddress: string) => {
-		await ownersCount(_safeAddress);
-		const nonce = await (await safeService(provider)).getNextNonce(_safeAddress);
-		dispatch(updateCurrentNonce(nonce));
-		await getTokens(_safeAddress);
+		if (chainId) {
+			await ownersCount(_safeAddress);
+			const nonce = await (await safeService(provider, `${chainId}`)).getNextNonce(_safeAddress);
+			dispatch(updateCurrentNonce(nonce));
+			await getTokens(_safeAddress);
+		}
 	};
 
 	const ownersCount = async (_safeAddress: string) => {
@@ -192,24 +256,25 @@ const Dashboard = () => {
 	};
 
 	const getTokens = async (safeAddress: string) => {
-		await axios
-			.get(
-				`https://safe-transaction.goerli.gnosis.io/api/v1/safes/${safeAddress}/balances/usd/`,
-				{
-					withCredentials: false
-				}
-			)
-			.then((tokens: any) => {
-				setSafeTokens(tokens.data);
-			});
+		chainId &&
+			await axios
+				.get(
+					`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`,
+					{
+						withCredentials: false
+					}
+				)
+				.then((tokens: any) => {
+					setSafeTokens(tokens.data);
+				});
 	};
 
 	useEffect(() => {
-		if (DAO && _get(DAO, 'url') === daoURL) {
-			prepare(_get(DAO, 'safe.address'))
-			getTokens(_get(DAO, 'safe.address'));
+		if (chainId && DAO && DAO.chainId === chainId) {
+			if (DAO && _get(DAO, 'url') === daoURL)
+				prepare(_get(DAO, 'safe.address'))
 		}
-	}, [DAO, daoURL]);
+	}, [DAO, daoURL, chainId]);
 
 	if (showModal) {
 		document.body.classList.add("active-modal");
@@ -221,7 +286,7 @@ const Dashboard = () => {
 	};
 
 	useEffect(() => {
-		if (DAO) {
+		if (DAO && chainId && DAO.chainId === chainId) {
 			const prevShow = localStorage.getItem(`lmds_notification_count_${DAO._id}_show`)
 			if (!prevShow || (prevShow && prevShow === '1'))
 				return setShowNotification(true)
@@ -250,11 +315,11 @@ const Dashboard = () => {
 				}
 			}
 		}
-	}, [DAO, pendingTransactions])
+	}, [chainId, DAO, pendingTransactions])
 
 	return (
 		<>
-			{!DAO || DAOLoading || (daoURL && (DAO && DAO.url !== daoURL)) ?
+			{!validDaoChain || !DAO || DAOLoading || (daoURL && (DAO && DAO.url !== daoURL)) ?
 				<div style={{ backgroundColor: '#FFF', height: '100vh', zIndex: 99999, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
 					<div className="logo">
 						<img src={lomadsfulllogo} alt="" />
@@ -279,66 +344,79 @@ const Dashboard = () => {
 							setCopy(false);
 						}}
 					>
-						<div className="DAOname">
-							{_get(DAO, 'name', '')}
-						</div>
-						<Tooltip label={copy ? "copied" : "copy"}>
-							<div
-								className="copyLinkButton"
-								onClick={() => {
-									navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/${_get(DAO, 'url', '')}`);
-								}}
-							>
-								<img src={copyIcon} alt="copy" className="safeCopyImage" />
+						<div>
+							<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+								<div className="DAOname">
+									{_get(DAO, 'name', '')}
+								</div>
+								<Tooltip label={copy ? "copied" : "copy"}>
+									<div
+										className="copyLinkButton"
+										onClick={() => {
+											navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/${_get(DAO, 'url', '')}`);
+										}}
+									>
+										<img src={copyIcon} alt="copy" className="safeCopyImage" />
+									</div>
+								</Tooltip>
 							</div>
-						</Tooltip>
+							<div className="DAODescription">{_get(DAO, 'description', '')}</div>
+						</div>
 					</div>
 					<div className="DAOsettings">
 						<div className="DAOadminPill">
-							{
-								amIAdmin
-									?
-									<p>You're an&nbsp;<span>Admin</span></p>
-									:
-									<p>You're a&nbsp;<span>Core contributor</span></p>
-							}
-
+							<p>You're an&nbsp;<span>{displayRole}</span></p>
 						</div>
 						{
-							amIAdmin && <button onClick={() => { navigate('/settings') }}>
+							can(myRole, 'settings') && <button onClick={() => { navigate(`/${DAO.url}/settings`) }}>
 								<img src={settingIcon} alt="settings-icon" />
 							</button>
 						}
+						<select name="chain" id="chain" value={chainId} onChange={e => handleSwitchChain(+e.target.value)} className="drop" style={{ width: 150 }}>
+							{
+								SUPPORTED_CHAIN_IDS.map(chain => <option value={+chain}>{CHAIN_IDS_TO_NAMES[chain]}</option>)
+							}
+						</select>
 					</div>
 				</div>
-				{pendingTransactions !== undefined &&
+
+				{_get(DAO, 'links', []).length > 0 && <LinksArea links={_get(DAO, 'links', [])} />}
+
+				<Notifications />
+
+				{/* {pendingTransactions !== undefined &&
 					pendingTransactions?.count >= 1 &&
-					showNotification && (
+					showNotification && can(myRole, 'notification.view') && (
 						<NotificationArea
 							daoId={DAO._id}
 							pendingTransactionCount={pendingTransactions?.count}
 							showNotificationArea={showNotificationArea}
 						/>
-					)}
+					)} */}
 
+				<Tasks toggleShowCreateTask={toggleShowCreateTask} />
 				<MyProject />
-
-				<TreasuryCard
-					innerRef={treasuryRef}
-					safeAddress={safeAddress}
-					pendingTransactions={pendingTransactions}
-					executedTransactions={executedTransactions}
-					ownerCount={ownerCount}
-					toggleModal={toggleModal}
-					fiatBalance={safeTokens}
-					account={account}
-					onChangePendingTransactions={(tx: any) => setPendingTransactions(tx)}
-					tokens={safeTokens}
-				/>
-				<MemberCard
-					totalMembers={totalMembers}
-					toggleShowMember={toggleShowMember}
-				/>
+				{(can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') &&
+					<TreasuryCard
+						innerRef={treasuryRef}
+						safeAddress={safeAddress}
+						pendingTransactions={pendingTransactions}
+						executedTransactions={executedTransactions}
+						ownerCount={ownerCount}
+						toggleModal={toggleModal}
+						fiatBalance={safeTokens}
+						account={account}
+						onChangePendingTransactions={(tx: any) => setPendingTransactions(tx)}
+						tokens={safeTokens}
+					/>
+				}
+				{can(myRole, 'members.view') &&
+					<MemberCard
+						totalMembers={totalMembers}
+						toggleShowMember={toggleShowMember}
+						toggleShowEditMember={toggleShowEditMember}
+					/>
+				}
 				<Footer theme="dark" />
 			</div>
 			{showModal && (
@@ -358,6 +436,11 @@ const Dashboard = () => {
 				showNavBar={showNavBar}
 			/>
 			{showAddMember && <AddMember toggleShowMember={toggleShowMember} />}
+			{showEditMember && <EditMember toggleShowEditMember={toggleShowEditMember} DAO={DAO} amIAdmin={amIAdmin} account={account} />}
+
+			{/* create task side modal */}
+			{showCreateTask && <CreateTask toggleShowCreateTask={toggleShowCreateTask} />}
+
 		</>
 	);
 };

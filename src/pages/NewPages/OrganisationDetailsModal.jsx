@@ -6,7 +6,7 @@ import OD from "../../assets/images/drawer-icons/OD.svg";
 import { Button, Image, Input, Textarea } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import { useAppSelector } from "state/hooks";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { get as _get, find as _find } from 'lodash';
 import { isValidUrl } from "utils";
 import { useDispatch } from "react-redux";
@@ -31,9 +31,21 @@ const OrganisationDetails = ({
   }, [DAO])
 
   const addLink = () => {
-    setDaoLinks([...daoLinks, {title:linkTitle, link: link}]);
+    let tempLink = link
+    if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
+      tempLink = 'https://' + link;
+    }    
+    setDaoLinks([...daoLinks, {title:linkTitle, link: tempLink}]);
     setLinkTitle("")
     setLink("")
+  }
+
+  const saveChanges = () =>{
+    console.log(description)
+    dispatch(updateDao({ url: DAO?.url, payload: { name, description } }))
+    dispatch(updateDaoLinks({ url: DAO?.url, payload: { links: daoLinks } }))
+    toggleModal();
+    toggleOrganisationDetailsModal();
   }
 
   const addNewLink = (e) => {
@@ -115,14 +127,14 @@ const OrganisationDetails = ({
               <div id="text-type-od">Name</div>
               <Input value={name} variant="filled" onChange={(evt)=>setName(evt.target.value)}  placeholder="Fashion Fusion" />
               <div id="text-type-od">Description</div>
-              <Textarea value={description} onchange={(e) => { setDescription(e.target.value) }} placeholder='DAO Description' variant="filled" />
+              <Textarea value={description} onChange={(e) => { setDescription(e.target.value) }} placeholder='DAO Description' variant="filled" />
               {/* <Input value={name} variant="filled" onChange={(evt)=>setName(evt.target.value)}  placeholder="Fashion Fusion" /> */}
               <div id="text-type-od">Organisation’s URL</div>
               <Input
                 variant="filled"
                 placeholder="https://app.lomads.xyz/Name"
                 disabled
-                value={process.env.REACT_APP_URL + "/" + name}
+                value={process.env.REACT_APP_URL + "/" + _get(DAO, 'url', '')}
               />
 
               <hr
@@ -184,6 +196,15 @@ const OrganisationDetails = ({
                   }
 							  />
               </div>
+              <div
+                  style={{
+                    marginTop: "9px",
+                    padding: "9px 20px 9px 20px",
+                    backgroundColor: "#edf2f7",
+                    color: "#718096",
+                    borderRadius: "5px",
+                    justifyContent:'space-between'
+                  }}>
               {daoLinks.map((item, index) => {
                 return (
                 <div
@@ -191,10 +212,7 @@ const OrganisationDetails = ({
                     display: "flex",
                     flexDirection: "row",
                     marginTop: "9px",
-                    padding: "20px",
-                    backgroundColor: "#edf2f7",
                     color: "#718096",
-                    borderRadius: "5px",
                     justifyContent:'space-between'
                   }}>
                   <div
@@ -203,8 +221,8 @@ const OrganisationDetails = ({
                       flexDirection: "row"
                     }}
                   >
-                    <p width="50%">{ item.title}</p>
-                    <p width="50%" style={{paddingLeft:8}}>{ item.link}</p>
+                    <p width="50%">{ item.title.length > 7 ? item.title.substring(0, 7) + "..." : item.title}</p>
+                    <p width="50%" style={{paddingLeft:8}}>{ item.link.length > 6 ? item.link.substring(0, 40) + "..." : item.link}</p>
                   </div>
                   <div
                           className="deleteButton"
@@ -217,6 +235,7 @@ const OrganisationDetails = ({
                 </div>
                 )
               })}
+              </div>
             </div>
 
             {/* //! FOOTER */}
@@ -231,7 +250,9 @@ const OrganisationDetails = ({
               >
                 Cancel
               </Button>
-              <Button id="button-save">SAVE CHANGES</Button>
+              <Button onClick={() => {
+                            saveChanges()
+                          }}  id="button-save">SAVE CHANGES</Button>
             </div>
           </div>
         </div>

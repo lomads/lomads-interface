@@ -9,7 +9,7 @@ import { LeapFrog } from "@uiball/loaders";
 import { CHAIN_INFO } from "constants/chainInfo";
 import { SupportedChainId } from "constants/chains";
 import { useNativeCurrencyBalances } from "state/connection/hooks";
-import { setDAOList } from "state/dashboard/reducer";
+import { setDAOList, setUser } from "state/dashboard/reducer";
 import styled from "styled-components/macro";
 import { isChainAllowed } from "utils/switchChain";
 import { updateSelectedWallet } from "state/user/reducer";
@@ -174,6 +174,7 @@ export default function Header() {
     dispatch(updateExplain(""));
     dispatch(updateSupply(0));
     dispatch(updateIconImgPath(""));
+    dispatch(setUser(null))
   };
 
 

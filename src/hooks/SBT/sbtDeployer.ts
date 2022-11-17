@@ -38,7 +38,7 @@ export const createNewSBT = async (sbtDeployerContract: Contract, SBTConstructor
     }
     if (sbtDeployerContract.signer) {
         try {
-            const tx = await sbtDeployerContract.deployNewSBT(SBTConstructor.name, "SBT", SBTConstructor.supply, process.env.REACT_APP_NODE_BASE_URL, needWhitelist, memberAddr);
+            const tx = await sbtDeployerContract.deployNewSBT(SBTConstructor.name, "SBT", SBTConstructor.supply, `${process.env.REACT_APP_NODE_BASE_URL}/v1`, needWhitelist, memberAddr);
             return await tx.wait();
         }
         catch (e) {
@@ -52,7 +52,8 @@ export const createNewSBT = async (sbtDeployerContract: Contract, SBTConstructor
 export const getContractById = async (sbtDeployerContract: Contract, id: BigNumber) => {
     if (sbtDeployerContract.signer || sbtDeployerContract.provider) {
         try {
-            const contractAddr = await sbtDeployerContract.getContractByIndex(parseInt(id.toString()));
+            console.log(parseInt(id.toString()))
+            const contractAddr = await sbtDeployerContract.getContractByIndex(BigNumber.from(parseInt(id.toString())));
             return contractAddr;
         }
         catch (e) {

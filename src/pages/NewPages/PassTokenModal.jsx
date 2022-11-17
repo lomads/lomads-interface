@@ -111,7 +111,7 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
                 <div id="#number-100">x100</div>
               </div>
             </div>
-            <div id="create-more-section">
+            {/* <div id="create-more-section">
               <Button
                 id="button-create-more"
                 onClick={toggleCreatePassTokenModal}
@@ -119,8 +119,8 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
                 <AddIcon id="add-icon" />
                 CREATE MORE
               </Button>
+            </div> */}
               <div id="hr" />
-            </div>
             <div
               id="membership-policy-section"
               // style={{
