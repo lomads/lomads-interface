@@ -368,7 +368,7 @@ const Dashboard = () => {
 							<p>You're an&nbsp;<span>{displayRole}</span></p>
 						</div>
 						{
-							can(myRole, 'settings') && <button onClick={() => { navigate('/settings') }}>
+							can(myRole, 'settings') && <button onClick={() => { navigate(`/${DAO.url}/settings`) }}>
 								<img src={settingIcon} alt="settings-icon" />
 							</button>
 						}
