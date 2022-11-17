@@ -23,7 +23,7 @@ import {
     NumberInputStepper,
     NumberDecrementStepper,
     NumberIncrementStepper,
-  } from "@chakra-ui/react";
+} from "@chakra-ui/react";
 import { tokenCallSafe } from "connection/DaoTokenCall";
 import { getSafeTokens } from 'utils'
 import { useAppSelector, useAppDispatch } from "state/hooks";
@@ -43,32 +43,39 @@ const TaskReview = ({ task, close }: any) => {
     const { DAO } = useAppSelector((state) => state.dashboard);
     const [newCompensation, setNewCompensation] = useState<number>(0)
     const [showModifyCompensation, setShowModifyCompensation] = useState<boolean>(false)
-	const { provider, account, chainId, connector } = useWeb3React();
+    const [showRejectSubmission, setShowRejectSubmission] = useState<boolean>(false)
+    const { provider, account, chainId, connector } = useWeb3React();
     const [activeSubmission, setActiveSubmission] = useState<any>(null)
     const [approveLoading, setApproveLoading] = useState<any>(false)
     const { isSafeOwner } = useRole(DAO, account);
     const currentNonce = useAppSelector((state) => state.flow.currentNonce);
 
     const taskSubmissions = useMemo(() => {
-        if(task)
+        if (task)
             return _get(task, 'members', []).filter((member: any) => member.submission)
         return []
     }, [task])
 
     useEffect(() => {
-        if(!activeSubmission && taskSubmissions.length > 0)
+        if (!activeSubmission && taskSubmissions.length > 0)
             setActiveSubmission(taskSubmissions[0])
     }, [taskSubmissions])
 
     useEffect(() => {
-        if(task)
+        if (task)
             setNewCompensation(+_get(task, 'compensation.amount', 0))
     }, [task])
+
+    const assignedUser = useMemo(() => {
+        let user = _find(_get(task, 'members', []), m => m.status === 'approved')
+        if (user)
+            return user.member.name
+    }, [task]);
 
     const createOnChainTxn = async () => {
         return new Promise(async (resolve, reject) => {
             try {
-                if(!chainId) return;
+                if (!chainId) return;
                 let sendTotal = newCompensation;
                 const tokens = await getSafeTokens(chainId, _get(DAO, 'safe.address', null))
                 let selToken = _find(tokens, t => t.tokenAddress === _get(task, 'compensation.currency', null))
@@ -95,30 +102,30 @@ const TaskReview = ({ task, close }: any) => {
                 const senderAddress = account as string;
                 const safeAddress = _get(DAO, 'safe.address', '');
                 await (await safeService(provider, `${chainId}`))
-                .proposeTransaction({
-                    safeAddress,
-                    safeTransactionData: safeTransaction.data,
-                    safeTxHash,
-                    senderAddress,
-                    senderSignature: signature.data,
-                })
-                .then((value) => {
-                    console.log("transaction has been proposed");
-                })
-                .catch((error) => {
-                    console.log("an error occoured while proposing transaction", error);
-                    reject(error)
-                });
-                if(isSafeOwner) {
-                    await ( await safeService(provider, `${chainId}`) )
-                    .confirmTransaction(safeTxHash, signature.data)
-                    .then(async (success) => {
-                        resolve(safeTxHash)
+                    .proposeTransaction({
+                        safeAddress,
+                        safeTransactionData: safeTransaction.data,
+                        safeTxHash,
+                        senderAddress,
+                        senderSignature: signature.data,
                     })
-                    .catch((err) => {
-                        console.log("error occured while confirming transaction", err);
-                        reject(err)
+                    .then((value) => {
+                        console.log("transaction has been proposed");
+                    })
+                    .catch((error) => {
+                        console.log("an error occoured while proposing transaction", error);
+                        reject(error)
                     });
+                if (isSafeOwner) {
+                    await (await safeService(provider, `${chainId}`))
+                        .confirmTransaction(safeTxHash, signature.data)
+                        .then(async (success) => {
+                            resolve(safeTxHash)
+                        })
+                        .catch((err) => {
+                            console.log("error occured while confirming transaction", err);
+                            reject(err)
+                        });
                 } else {
                     resolve(safeTxHash)
                 }
@@ -132,7 +139,7 @@ const TaskReview = ({ task, close }: any) => {
     const handleApproveTask = async () => {
         setApproveLoading(true);
         let onChainSafeTxHash = undefined;
-        if(isSafeOwner && _get(task, 'compensation.currency', 'SWEAT') !== 'SWEAT') {
+        if (isSafeOwner && _get(task, 'compensation.currency', 'SWEAT') !== 'SWEAT') {
             onChainSafeTxHash = await createOnChainTxn();
         }
 
@@ -143,13 +150,13 @@ const TaskReview = ({ task, close }: any) => {
             safeTxHash: nanoid(32),
             executor: account,
             submissionDate: moment().utc().toDate(),
-            token:{
+            token: {
                 symbol: _get(task, 'compensation.symbol', 'SWEAT'),
                 tokenAddress: _get(task, 'compensation.currency', 'SWEAT')
             },
             confirmations: isSafeOwner && _get(task, 'compensation.symbol', 'SWEAT') === 'SWEAT' ? [{
                 owner: account,
-                submissionDate:  moment().utc().toDate()
+                submissionDate: moment().utc().toDate()
             }] : [],
             dataDecoded: {
                 method: 'transfer',
@@ -159,20 +166,20 @@ const TaskReview = ({ task, close }: any) => {
                 ]
             }
         }
-        const payload = { 
+        const payload = {
             daoUrl: _get(DAO, 'url', undefined),
             compensationDelta: newCompensation - _get(task, 'compensation.amount', 0),
-            offChainPayload: !isSafeOwner || _get(task, 'compensation.symbol', 'SWEAT') == 'SWEAT' ? offChainPayload: undefined,
+            offChainPayload: !isSafeOwner || _get(task, 'compensation.symbol', 'SWEAT') == 'SWEAT' ? offChainPayload : undefined,
             onChainSafeTxHash,
             recipient: _get(activeSubmission, 'member._id', null)
-        } 
+        }
         axiosHttp.post(`task/${task._id}/approve?daoUrl=${DAO.url}`, payload)
-        .then(res => {
-            dispatch(setDAO(res.data.dao))
-            dispatch(setTask(res.data.task))
-            close()
-        })
-        .finally(() => setApproveLoading(false))
+            .then(res => {
+                dispatch(setDAO(res.data.dao))
+                dispatch(setTask(res.data.task))
+                close()
+            })
+            .finally(() => setApproveLoading(false))
     }
 
     const updateCompensation = () => {
@@ -193,21 +200,21 @@ const TaskReview = ({ task, close }: any) => {
                                 <div className='currency'>
                                     <div className='currency-container'>
                                         <img src={_get(task, 'compensation.symbol', 'SWEAT') === 'MATIC' ? polygonIcon : starIcon} />
-                                        <div>{ _get(task, 'compensation.symbol', 'SWEAT') }</div>
+                                        <div>{_get(task, 'compensation.symbol', 'SWEAT')}</div>
                                     </div>
                                 </div>
                                 <div className='number-input'>
-                                    <NumberInput onChange={e => setNewCompensation(+e)} defaultValue={newCompensation} style={{ width: (64 + 50), height:50, borderRadius: '0px 10px 10px 0px', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)' }} step={1} min={0}>
-                                        <NumberInputField className='input' style={{ padding: 0, textAlign: "center", height: 50, width: 64, backgroundColor: '#F5F5F5', borderRadius: '0', borderWidth: 0 }}/>
+                                    <NumberInput onChange={e => setNewCompensation(+e)} defaultValue={newCompensation} style={{ width: (64 + 50), height: 50, borderRadius: '0px 10px 10px 0px', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)' }} step={1} min={0}>
+                                        <NumberInputField className='input' style={{ padding: 0, textAlign: "center", height: 50, width: 64, backgroundColor: '#F5F5F5', borderRadius: '0', borderWidth: 0 }} />
                                         <NumberInputStepper style={{ width: 50, backgroundColor: 'transparent', borderRadius: '0px 10px 10px 0px' }}>
                                             <NumberIncrementStepper color="#C94B32" />
                                             <NumberDecrementStepper color="#C94B32" style={{ borderTopWidth: 0 }} />
-                                        </NumberInputStepper> 
+                                        </NumberInputStepper>
                                     </NumberInput>
                                 </div>
                             </div>
                             <div className='task-review-foot'>
-                                <button onClick={() => { 
+                                <button onClick={() => {
                                     setShowModifyCompensation(false)
                                     setNewCompensation(+_get(task, 'compensation.amount', 0))
                                 }}>CANCEL</button>
@@ -223,19 +230,20 @@ const TaskReview = ({ task, close }: any) => {
     }
 
     const renderSingleSubmission = (submission: any) => {
-        if(!submission) return null;
+        console.log("submission : ", submission);
+        if (!submission) return null;
         return (
             <div className='task-review-card'>
                 <div className='task-review-body'>
-                    { taskSubmissions.length > 1 ?
+                    {taskSubmissions.length > 1 ?
                         <>
                             <img src={userPlaceholder} alt="icon" />
-                            <h1 style={{ minHeight: '45px' }}>{ submission.member.name }</h1>
+                            <h1 style={{ minHeight: '45px' }}>{submission.member.name}</h1>
                             <p className='wallet-address'>{submission.member.wallet.slice(0, 6) + "..." + submission.member.wallet.slice(-4)}</p>
-                        </> : 
+                        </> :
                         <>
                             <img src={clipboard} alt="icon" />
-                            <h1 style={{ minHeight: '45px' }}>{ submission.member.name } did the job!</h1>
+                            <h1 style={{ minHeight: '45px' }}>{submission.member.name} did the job!</h1>
                         </>
                     }
                     <div className='detail-container'>
@@ -243,24 +251,24 @@ const TaskReview = ({ task, close }: any) => {
                         <div className='note'>{submission.submission.note}</div>
                     </div>
                     <div className='detail-container'>
-                        { task.submissionLink.length == 0 ?
-                        <>
-                            <span>Links</span>
-                            {
-                                submission.submission.submissionLink.map((item:any, index: number) => {
-                                    return (
-                                        <button onClick={() => window.open(item.link, '_blank', 'noopener,noreferrer')}>{item.title}</button>
-                                    )
-                                })
-                            }
-                        </> : 
-                        <>
-                            <span>Check submission:</span>
-                            <button className='submitLink-btn' onClick={() => window.open(task.submissionLink, '_blank', 'noopener,noreferrer')}>
-                                <img style={{ marginRight: 8 }} src={folder} />
-                                SUBMISSION LINK
-                            </button>
-                        </>
+                        {task.submissionLink.length == 0 ?
+                            <>
+                                <span>Links</span>
+                                {
+                                    submission.submission.submissionLink.map((item: any, index: number) => {
+                                        return (
+                                            <button onClick={() => window.open(item.link, '_blank', 'noopener,noreferrer')}>{item.title}</button>
+                                        )
+                                    })
+                                }
+                            </> :
+                            <>
+                                <span>Check submission:</span>
+                                <button className='submitLink-btn' onClick={() => window.open(task.submissionLink, '_blank', 'noopener,noreferrer')}>
+                                    <img style={{ marginRight: 8 }} src={folder} />
+                                    SUBMISSION LINK
+                                </button>
+                            </>
                         }
                     </div>
                 </div>
@@ -268,10 +276,10 @@ const TaskReview = ({ task, close }: any) => {
                     <div className='task-review-compensation-main'>
                         <div className='container'>
                             <div>Compensation</div>
-                            <img src={starIcon}/>
-                            <div className='amount'>{ _get(task, 'compensation.amount', 0) }</div>
-                            { (newCompensation - _get(task, 'compensation.amount', 0)) !== 0 && <div className='extra'>{ `${ (newCompensation - _get(task, 'compensation.amount', 0)) > 0 ? '+' : '' } ${ (newCompensation - _get(task, 'compensation.amount', 0)) }` }</div> }
-                            <div>{ _get(task, 'compensation.symbol', "SWEAT") }</div>
+                            <img src={starIcon} />
+                            <div className='amount'>{_get(task, 'compensation.amount', 0)}</div>
+                            {(newCompensation - _get(task, 'compensation.amount', 0)) !== 0 && <div className='extra'>{`${(newCompensation - _get(task, 'compensation.amount', 0)) > 0 ? '+' : ''} ${(newCompensation - _get(task, 'compensation.amount', 0))}`}</div>}
+                            <div>{_get(task, 'compensation.symbol', "SWEAT")}</div>
                         </div>
                         <button onClick={() => setShowModifyCompensation(true)}>
                             <img src={editIcon} alt="edit-icon" />
@@ -279,7 +287,7 @@ const TaskReview = ({ task, close }: any) => {
                     </div>
                 </div>
                 <div className='task-review-foot'>
-                    <button>REJECT</button>
+                    <button onClick={() => setShowRejectSubmission(true)}>REJECT</button>
                     <button disabled={approveLoading} style={{ backgroundColor: approveLoading ? 'grey' : '#C94B32' }} onClick={() => handleApproveTask()}>APPROVE</button>
                 </div>
             </div>
@@ -287,20 +295,86 @@ const TaskReview = ({ task, close }: any) => {
     }
 
     const handleBack = () => {
-        if(activeSubmission) {
-            const currIndex = _findIndex(taskSubmissions, (t:any) => t._id === activeSubmission._id)
+        if (activeSubmission) {
+            const currIndex = _findIndex(taskSubmissions, (t: any) => t._id === activeSubmission._id)
             const prevSubmission = _get(taskSubmissions, `${currIndex - 1}`, undefined)
-            if(prevSubmission)
+            if (prevSubmission)
                 setActiveSubmission(prevSubmission)
         }
     }
     const handleNext = () => {
-        if(activeSubmission) {
-            const currIndex = _findIndex(taskSubmissions, (t:any) => t._id === activeSubmission._id)
+        if (activeSubmission) {
+            const currIndex = _findIndex(taskSubmissions, (t: any) => t._id === activeSubmission._id)
             const nextSubmission = _get(taskSubmissions, `${currIndex + 1}`, undefined)
-            if(nextSubmission)
+            if (nextSubmission)
                 setActiveSubmission(nextSubmission)
         }
+    }
+
+    const renderRejectTask = () => {
+        return (
+            <div className='task-review-overlay'>
+                <div className='task-review-container'>
+                    <div className="task-review-header">
+                        <span>{task.name}</span>
+                        <button onClick={close}>
+                            <CgClose size={20} color="#C94B32" />
+                        </button>
+                    </div>
+
+                    <div className='task-reject-body'>
+                        <img src={clipboard} alt="icon" />
+                        <h1 style={{ minHeight: '45px' }}>Reject Submission</h1>
+
+                        <div className='taskApply-rowInput' style={{ margin: '35px 0' }}>
+                            <label>Note</label>
+                            <textarea
+                                style={{ width: '100%' }}
+                                className="inputField"
+                                placeholder='Why I reject this submission,
+                                What should be improved...'
+                                value={''}
+                            />
+                            <span style={{ fontSize: '13px', color: '#C84A32' }} id="note-error"></span>
+                        </div>
+
+                        {
+                            task.contributionType === 'open' && task.isSingleContributor
+                                ?
+                                <div className='taskApply-inputRow row-align'>
+                                    <input type="checkbox" />
+                                    <div>
+                                        <span>REOPEN TASK</span>
+                                        <p>{assignedUser} will be removed from the task</p>
+                                    </div>
+                                </div>
+                                :
+                                <div className='taskApply-inputRow'>
+                                    <div className='taskApply-optionalDiv'>
+                                        <span>Change contributor</span>
+                                        <div className='option-div'>
+                                            Optional
+                                        </div>
+                                    </div>
+                                    <select
+                                        name="project"
+                                        id="project"
+                                        className="tokenDropdown"
+                                        style={{ width: '100%' }}
+                                    >
+                                        <option>Select member</option>
+                                    </select>
+                                </div>
+                        }
+
+                        <div className='taskApply-btn-container'>
+                            <button onClick={() => setShowRejectSubmission(false)}>CANCEL</button>
+                            <button>VALIDATE</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     const renderTaskApproval = () => {
@@ -315,11 +389,11 @@ const TaskReview = ({ task, close }: any) => {
                     </div>
                     <div className='task-review-slider'>
                         <div className='slider-controls'>
-                        { taskSubmissions.length > 1 ?
-                            <button className='control-btn' onClick={handleBack}>
-                                <IoIosArrowBack size={20} color="#C94B32" />
-                            </button> : null
-                        }
+                            {taskSubmissions.length > 1 ?
+                                <button className='control-btn' onClick={handleBack}>
+                                    <IoIosArrowBack size={20} color="#C94B32" />
+                                </button> : null
+                            }
                         </div>
                         <div className='slider-content'>
                             {
@@ -327,11 +401,11 @@ const TaskReview = ({ task, close }: any) => {
                             }
                         </div>
                         <div className='slider-controls'>
-                        { taskSubmissions.length > 1 ?
-                            <button className='control-btn' style={{ transform: 'rotate(180deg)' }} onClick={handleNext}>
-                                <IoIosArrowBack size={20} color="#C94B32" />
-                            </button> : null
-                        }
+                            {taskSubmissions.length > 1 ?
+                                <button className='control-btn' style={{ transform: 'rotate(180deg)' }} onClick={handleNext}>
+                                    <IoIosArrowBack size={20} color="#C94B32" />
+                                </button> : null
+                            }
                         </div>
                     </div>
                 </div>
@@ -339,11 +413,14 @@ const TaskReview = ({ task, close }: any) => {
         )
     }
 
-    if(showModifyCompensation)
+    if (showModifyCompensation)
         return updateCompensation()
-    
+
+    if (showRejectSubmission)
+        return renderRejectTask()
+
     return renderTaskApproval()
-    
+
 }
 
 export default TaskReview;

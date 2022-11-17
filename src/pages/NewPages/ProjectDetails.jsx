@@ -38,6 +38,7 @@ import axiosHttp from '../../api';
 import { updateCurrentUser } from "state/dashboard/actions";
 
 import SimpleInputField from "UIpack/SimpleInputField";
+import Tasks from "./DashBoard/Tasks";
 
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
@@ -213,12 +214,12 @@ const ProjectDetails = () => {
         console.log("Member-exists", memberExists)
         if (!memberExists)
             return setUnlockLoading(null);
-        if(link.link.indexOf('discord.') > -1) {
+        if (link.link.indexOf('discord.') > -1) {
             try {
                 const g = await guild.get(link.guildId)
                 let inviteLink = _get(_find(_get(g, 'guildPlatforms'), gp => gp.platformId == 1), 'invite', null)
                 if (!inviteLink) return setUnlockLoading(null);
-    
+
                 let access = await guild.getUserAccess(link.guildId, account)
                 access = access?.some?.(({ access }) => access)
                 if (access) {
@@ -245,49 +246,49 @@ const ProjectDetails = () => {
                 setUnlockLoading(null)
             }
         } else if (link.link.indexOf('notion.') > -1) {
-            if(_get(DAO, 'sbt.contactDetail', []).indexOf('email') === -1){
+            if (_get(DAO, 'sbt.contactDetail', []).indexOf('email') === -1) {
                 return;
             }
             setUnlockLoading(link.id)
             try {
                 axiosHttp.get(`/project/notion/space-admin-status?domain=${link.spaceDomain}`)
-                .then(async res => {
-                    if(res.data) {
-                        console.log(res.data)
-                        console.log("BALANCEOF:", parseInt(balanceOf._hex, 16), contractName)
-                        if (contractName !== '' && parseInt(balanceOf._hex, 16) === 1) {
-                            if (parseInt(balanceOf._hex, 16) === 1) {
-                               const metadata = await axiosHttp.get(`/metadata/${_get(DAO, 'sbt._id', '')}`)
-                               console.log(metadata)
-                               if(metadata && metadata.data) {
-                                    console.log(metadata.data)
-                                    const notion_email = _get(_find(metadata.data.attributes, attr => attr.trait_type === "Email"), 'value', null)
-                                    console.log(notion_email)
-                                    //const notion_email = 'rish6ix@gmail.com'
-                                    if(notion_email) {
-                                        const notionUser = await axiosHttp.get(`project/notion/notion-user?email=${notion_email}`).then(res => res.data)
-                                        console.log(notionUser)
-                                        if(_get(notionUser, 'value.value.id', null)) {
-                                            const notionUserId = _get(notionUser, 'value.value.id', null);
-                                            dispatch(updateCurrentUser({ notionUserId }))
-                                            axiosHttp.post(`project/notion/add-role`, { notionUserId, linkId: link.id, projectId, account })
-                                            .then(res => {
-                                                if (update)
-                                                    unlockLink(link)
-                                                window.open(link.link, '_blank')
-                                            })
+                    .then(async res => {
+                        if (res.data) {
+                            console.log(res.data)
+                            console.log("BALANCEOF:", parseInt(balanceOf._hex, 16), contractName)
+                            if (contractName !== '' && parseInt(balanceOf._hex, 16) === 1) {
+                                if (parseInt(balanceOf._hex, 16) === 1) {
+                                    const metadata = await axiosHttp.get(`/metadata/${_get(DAO, 'sbt._id', '')}`)
+                                    console.log(metadata)
+                                    if (metadata && metadata.data) {
+                                        console.log(metadata.data)
+                                        const notion_email = _get(_find(metadata.data.attributes, attr => attr.trait_type === "Email"), 'value', null)
+                                        console.log(notion_email)
+                                        //const notion_email = 'rish6ix@gmail.com'
+                                        if (notion_email) {
+                                            const notionUser = await axiosHttp.get(`project/notion/notion-user?email=${notion_email}`).then(res => res.data)
+                                            console.log(notionUser)
+                                            if (_get(notionUser, 'value.value.id', null)) {
+                                                const notionUserId = _get(notionUser, 'value.value.id', null);
+                                                dispatch(updateCurrentUser({ notionUserId }))
+                                                axiosHttp.post(`project/notion/add-role`, { notionUserId, linkId: link.id, projectId, account })
+                                                    .then(res => {
+                                                        if (update)
+                                                            unlockLink(link)
+                                                        window.open(link.link, '_blank')
+                                                    })
+                                            }
                                         }
                                     }
-                               }
+                                }
                             }
                         }
-                    }
-                })
-                .catch(e => {
-                    setUnlockLoading(null)
-                    console.log(e)
-                })
-                .finally(() => setUnlockLoading(null))
+                    })
+                    .catch(e => {
+                        setUnlockLoading(null)
+                        console.log(e)
+                    })
+                    .finally(() => setUnlockLoading(null))
             } catch (e) {
                 console.log(e)
                 setUnlockLoading(null)
@@ -384,9 +385,7 @@ const ProjectDetails = () => {
                     :
                     null
             }
-            <div
-                className='projectDetails-container'
-            >
+            <div className='projectDetails-container'>
                 <div className="info">
                     {
                         showList
@@ -755,6 +754,11 @@ const ProjectDetails = () => {
                             }
                         </div>
                     </div>
+                </div>
+
+                {/* Tasks section */}
+                <div style={{ width: '80%', marginTop: '20px' }}>
+                    <Tasks onlyProjects={true} />
                 </div>
                 <div style={{ width: '80%' }}>
                     <Footer theme="dark" />
