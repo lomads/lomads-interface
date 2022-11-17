@@ -45,6 +45,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	const [executedTxn, setExecutedTxn] = useState<Array<any>>();
 	const [offChainPendingTxn, setOffChainPendingTxn] = useState<Array<any>>();
 	const [offChainExecutedTxn, setOffChainExecutedTxn] = useState<Array<any>>();
+	const [labels, setLabels] = useState<Array<any>>();
 
 	const { DAO } = useAppSelector(store => store.dashboard);
 
@@ -66,6 +67,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 			loadPendingTxn();
 			loadExecutedTxn();
 			loadOffChainTxn();
+			loadTxnLabel()
 		}
 	}));
 
@@ -95,6 +97,11 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 			const eTxn = txn.filter((tx:any) => tx.isExecuted)
 			return { pTxn, eTxn }
 		})
+	}
+
+	const loadTxnLabel = async() => {
+		axiosHttp.get(`transaction/label?safeAddress=${_get(DAO, 'safe.address', '')}`)
+		.then(res => setLabels(res.data))
 	}
 
 	const loadPendingTxn = async () => {
@@ -157,11 +164,13 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				loadPendingTxn()
 				loadExecutedTxn()
 				loadOffChainTxn()
+				loadTxnLabel()
 			} else {
 				setPendingTxn(undefined);
 				setExecutedTxn(undefined);
 				setOffChainPendingTxn(undefined);
 				setOffChainExecutedTxn(undefined)
+				setLabels(undefined)
 			}
 		}
 	}, [DAO, daoURL, threshold])
@@ -173,11 +182,13 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				loadPendingTxn()
 				loadExecutedTxn()
 				loadOffChainTxn()
+				loadTxnLabel()
 			} else {
 				setPendingTxn(undefined);
 				setExecutedTxn(undefined);
 				setOffChainPendingTxn(undefined);
 				setOffChainExecutedTxn(undefined)
+				setLabels(undefined)
 			}
 		}
 	}, [DAO, daoURL, chainId])
@@ -262,7 +273,10 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 							return reject(null)
 						});
 					} else {
-						await axiosHttp.delete(`transaction/off-chain/${txn.safeTxHash}`)
+						await axiosHttp.patch(`transaction/off-chain/${txn.safeTxHash}/move-on-chain`, {
+							onChainTxHash: safeTxHash,
+							taskId: txn.taskId
+						})
 						return resolve({ safeTxHash, signature, nonce })
 					}
                 })
@@ -294,6 +308,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		} else if(txn.offChain && _get(txn, 'token.symbol') !== 'SWEAT') { 
 			await createOnChainTxn(txn, 'confirm')
 			loadPendingTxn();
+			loadTxnLabel();
 		} else {
 			try {
 				setConfirmTxLoading(_safeTxHashs);
@@ -391,6 +406,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 						.then(async (result) => {
 							console.log("on chain transaction has been confirmed by the signer");
 							await loadPendingTxn()
+							await loadTxnLabel()
 							setRejectTxLoading(null);
 						})
 						.catch((err) => {
@@ -468,6 +484,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 					)
 				await loadPendingTxn()
 				await loadExecutedTxn()
+				await loadTxnLabel()
 			} catch (e) {
 				console.log(e)
 				setExecuteTxLoading(null)
@@ -570,12 +587,12 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 						<div className="dashboardText" style={{ marginBottom: '6px' }}>Last Transactions</div>
 						{
 							pendingTxn.map((ptx, index) =>
-								<PendingTxn executeFirst={executeFirst} isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
+								<PendingTxn onLoadLabels={(l:any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} executeFirst={executeFirst} isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
 							)
 						}
 						{
 							executedTxn.map((ptx, index) =>
-								<CompleteTxn isAdmin={amIAdmin} owner={owner} transaction={ptx} tokens={props.tokens} />
+								<CompleteTxn onLoadLabels={(l:any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels}  isAdmin={amIAdmin} owner={owner} transaction={ptx} tokens={props.tokens} />
 							)
 						}
 					</div>
