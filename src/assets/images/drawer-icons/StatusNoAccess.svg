@@ -1,0 +1,15 @@
+<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="0.5" y="0.5" width="29" height="29" rx="14.5" stroke="#76808D"/>
+<mask id="path-3-inside-1_2128_1994" fill="white">
+<path d="M9.75 21L21 9.75L9.75 21Z"/>
+</mask>
+<path d="M9.75 21L21 9.75L9.75 21Z" fill="#76808D"/>
+<path d="M10.4571 21.7071L21.7071 10.4571L20.2929 9.04289L9.04289 20.2929L10.4571 21.7071ZM20.2929 9.04289L9.04289 20.2929L10.4571 21.7071L21.7071 10.4571L20.2929 9.04289Z" fill="#76808D" mask="url(#path-3-inside-1_2128_1994)"/>
+<path d="M9.75 21L21 9.75" stroke="#76808D" stroke-linecap="round"/>
+<mask id="path-6-inside-2_2128_1994" fill="white">
+<path d="M21 21L9.75 9.75L21 21Z"/>
+</mask>
+<path d="M21 21L9.75 9.75L21 21Z" fill="#76808D"/>
+<path d="M21.7071 20.2929L10.4571 9.04289L9.04289 10.4571L20.2929 21.7071L21.7071 20.2929ZM9.04289 10.4571L20.2929 21.7071L21.7071 20.2929L10.4571 9.04289L9.04289 10.4571Z" fill="#76808D" mask="url(#path-6-inside-2_2128_1994)"/>
+<path d="M21 21L9.75 9.75" stroke="#76808D" stroke-linecap="round"/>
+</svg>
