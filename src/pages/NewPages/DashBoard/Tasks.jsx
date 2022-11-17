@@ -80,7 +80,7 @@ const Tasks = ({ toggleShowCreateTask }) => {
                         </button>
                     </div>
                     {
-                        amIAdmin && can(myRole, 'task.create') && <div>
+                        can(myRole, 'task.create') && <div>
                             <SafeButton
                                 height={40}
                                 width={150}

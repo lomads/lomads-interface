@@ -365,14 +365,9 @@ const Dashboard = () => {
 					</div>
 					<div className="DAOsettings">
 						<div className="DAOadminPill">
-							<p>You're an&nbsp;<span>{displayRole}</span></p>
+							<p>{displayRole}</p>
 						</div>
-						{
-							can(myRole, 'settings') && <button onClick={() => { navigate('/settings') }}>
-								<img src={settingIcon} alt="settings-icon" />
-							</button>
-						}
-						<select name="chain" id="chain" value={chainId} onChange={e => handleSwitchChain(+e.target.value)} className="drop" style={{ width: 150 }}>
+						<select name="chain" id="chain" value={chainId} onChange={e => handleSwitchChain(+e.target.value)} className="chain" style={{ width: 150 }}>
 							{
 								SUPPORTED_CHAIN_IDS.map(chain => <option value={+chain}>{CHAIN_IDS_TO_NAMES[chain]}</option>)
 							}
