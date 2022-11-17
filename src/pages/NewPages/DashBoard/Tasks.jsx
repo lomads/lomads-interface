@@ -12,33 +12,58 @@ import useRole from '../../../hooks/useRole'
 
 import archiveIcon from '../../../assets/svg/archiveIcon.svg';
 
-const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
-
-const Tasks = ({ toggleShowCreateTask }) => {
+const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
     const navigate = useNavigate();
-    const { DAO } = useAppSelector((state) => state.dashboard);
+    const { DAO, user, Project } = useAppSelector((state) => state.dashboard);
+    console.log("user : ", user)
     const { account } = useWeb3React();
-    const [tab, setTab] = useState(2);
-    const [myProjects, setMyProjects] = useState([]);
-    const [otherProjects, setOtherProjects] = useState([]);
+    const [tab, setTab] = useState(4);
+    const [myTasks, setMyTasks] = useState([]);
+    const [manageTasks, setManageTasks] = useState([]);
+    const [draftTasks, setDraftTasks] = useState([]);
+    const [otherTasks, setOtherTasks] = useState([]);
+    const [initialCheck, setInitialCheck] = useState(false);
     const { myRole, can } = useRole(DAO, account)
-    // const [initialCheck, setInitialCheck] = useState(false);
 
-    // useEffect(() => {
-    //     if (DAO) {
-    //         setMyProjects(_get(DAO, 'projects', []).filter(project => _find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase())))
-    //         setOtherProjects(_get(DAO, 'projects', []).filter(project => !_find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase())))
-    //     }
-    // }, [DAO, tab]);
+    useEffect(() => {
+        if (onlyProjects) {
+            fetchProjectTasks();
+        }
+        else {
+            fetchDaoTasks();
+        }
+    }, [DAO, Project, tab, user, onlyProjects]);
 
-    // useEffect(() => {
-    //     if (!initialCheck) {
-    //         if (myProjects.length > 0) {
-    //             setInitialCheck(true)
-    //             setTab(1);
-    //         }
-    //     }
-    // }, [myProjects, initialCheck]);
+    const fetchProjectTasks = () => {
+        if (Project && user) {
+            setMyTasks(_get(Project, 'tasks', []).filter(task => _find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())))
+            setManageTasks(_get(Project, 'tasks', []).filter(task => task.creator === user._id || task.reviewer === user._id));
+            setDraftTasks(_get(Project, 'tasks', []).filter(task => task.draftedAt !== null));
+            setOtherTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && task.creator !== user._id && task.reviewer !== user._id && !_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())));
+        }
+    }
+
+    const fetchDaoTasks = () => {
+        if (DAO && user) {
+            setMyTasks(_get(DAO, 'tasks', []).filter(task => _find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())))
+            setManageTasks(_get(DAO, 'tasks', []).filter(task => task.creator === user._id || task.reviewer === user._id));
+            setDraftTasks(_get(DAO, 'tasks', []).filter(task => task.draftedAt !== null));
+            setOtherTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && task.creator !== user._id && task.reviewer !== user._id && !_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())));
+        }
+    }
+
+    useEffect(() => {
+        if (!initialCheck) {
+            if (myTasks.length > 0) {
+                setInitialCheck(true)
+                setTab(1);
+            }
+            else if (manageTasks.length > 0) {
+                setInitialCheck(true)
+                setTab(2);
+            }
+        }
+    }, [myTasks, manageTasks, initialCheck]);
 
     const amIAdmin = useMemo(() => {
         if (DAO) {
@@ -100,21 +125,53 @@ const Tasks = ({ toggleShowCreateTask }) => {
 
             <div className='tasks-body'>
                 {
-                    _get(DAO, 'tasks', []).map((item, index) => {
-                        if (index < 10) {
-                            return (
-                                <div key={index}>
-                                    <TaskCard
-                                        task={item}
-                                        daoUrl={DAO?.url}
-                                    />
-                                </div>
-                            )
-                        }
-
+                    tab === 1 && myTasks && myTasks.map((item, index) => {
+                        return (
+                            <div key={index}>
+                                <TaskCard
+                                    task={item}
+                                    daoUrl={DAO?.url}
+                                />
+                            </div>
+                        )
                     })
                 }
-
+                {
+                    tab === 2 && manageTasks && manageTasks.map((item, index) => {
+                        return (
+                            <div key={index}>
+                                <TaskCard
+                                    task={item}
+                                    daoUrl={DAO?.url}
+                                />
+                            </div>
+                        )
+                    })
+                }
+                {
+                    tab === 3 && draftTasks && draftTasks.map((item, index) => {
+                        return (
+                            <div key={index}>
+                                <TaskCard
+                                    task={item}
+                                    daoUrl={DAO?.url}
+                                />
+                            </div>
+                        )
+                    })
+                }
+                {
+                    tab === 4 && otherTasks && otherTasks.map((item, index) => {
+                        return (
+                            <div key={index}>
+                                <TaskCard
+                                    task={item}
+                                    daoUrl={DAO?.url}
+                                />
+                            </div>
+                        )
+                    })
+                }
             </div>
         </div>
     )
