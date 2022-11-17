@@ -36,6 +36,7 @@ import { resetAssignTaskLoader, resetRejectTaskMemberLoader } from 'state/dashbo
 import { id } from 'ethers/lib/utils';
 import moment from 'moment';
 import { nanoid } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 const TaskReview = ({ task, close }: any) => {
 
@@ -138,13 +139,14 @@ const TaskReview = ({ task, close }: any) => {
 
     const handleApproveTask = async () => {
         setApproveLoading(true);
-        let onChainSafeTxHash = undefined;
+        let onChainSafeTxHash: any = undefined;
         if (isSafeOwner && _get(task, 'compensation.currency', 'SWEAT') !== 'SWEAT') {
             onChainSafeTxHash = await createOnChainTxn();
         }
 
         const offChainPayload = {
             daoId: _get(DAO, '_id', undefined),
+            taskId: _get(task, '_id', undefined),
             safe: _get(DAO, 'safe.address', undefined),
             nonce: moment().unix(),
             safeTxHash: nanoid(32),
@@ -174,7 +176,14 @@ const TaskReview = ({ task, close }: any) => {
             recipient: _get(activeSubmission, 'member._id', null)
         }
         axiosHttp.post(`task/${task._id}/approve?daoUrl=${DAO.url}`, payload)
-            .then(res => {
+            .then(async res => {
+                let m = _get(activeSubmission, 'member.name', '') === '' ? _get(activeSubmission, 'member.wallet', '') : _get(activeSubmission, 'member.name', '')
+                await axiosHttp.post(`transaction/label`, {
+                    safeAddress: _get(DAO, 'safe.address', null),
+                    safeTxHash: onChainSafeTxHash ? onChainSafeTxHash : offChainPayload.safeTxHash,
+                    recipient: _get(activeSubmission, 'member.wallet', null),
+                    label: `${m} | ${_get(task, '_id', '')}`
+                })
                 dispatch(setDAO(res.data.dao))
                 dispatch(setTask(res.data.task))
                 close()

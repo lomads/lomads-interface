@@ -16,6 +16,10 @@ export type ProjectContextType = {
   projects: IProject[];
 };
 
+export interface IsideModalNew {
+  toggleModal: () => void;
+}
+
 export interface IsideModal {
   toggleModal: () => void;
   tokens: any;

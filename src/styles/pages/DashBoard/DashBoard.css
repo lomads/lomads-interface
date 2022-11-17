@@ -563,6 +563,41 @@ body.active-modal {
     top: 0;
 }
 
+.SideModalNew {
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 43px 23px;
+    gap: 35px;
+    background: #FFFFFF;
+    border-radius: 20px 0px 0px 20px;
+    position: absolute;
+    height: 100vh;
+    width: 575px;
+    right: 0;
+    top: 0;
+}
+
+.SideModalRolesPermissions {
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 43px 23px;
+    gap: 35px;
+    background: #FFFFFF;
+    border-radius: 20px 0px 0px 20px;
+    position: absolute;
+    height: 100vh;
+    width: 868px;
+    right: 0;
+    top: 0;
+}
+
+
 .closeButtonArea {
     display: flex;
     flex-direction: row;
@@ -720,7 +755,8 @@ body.active-modal {
 .sideBarStrip {
     background: linear-gradient(178.31deg, #C94B32 0.74%, #A54536 63.87%);
     height: 100%;
-    width: 100px;
+    width: 100px !important;
+    max-width: 100px !important;
     padding-top: 10%;
     position: absolute;
     top: 0;

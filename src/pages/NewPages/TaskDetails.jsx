@@ -18,6 +18,7 @@ import compensationStar from '../../assets/svg/compensationStar.svg';
 import calendarIcon from '../../assets/svg/calendar.svg'
 import applicants from '../../assets/svg/applicants.svg'
 import folder from '../../assets/svg/folder.svg'
+import paid from '../../assets/svg/paid.svg'
 import approved from '../../assets/svg/approved.svg'
 
 import { useWeb3React } from "@web3-react/core";
@@ -328,6 +329,19 @@ const TaskDetails = () => {
                                                         null
                                                 }
 
+                                                {
+                                                     Task.taskStatus === 'paid'
+                                                        ?
+                                                        <>
+                                                            <div>
+                                                                <img src={paid} style={{ marginRight: '5px' }} />
+                                                                <span style={{ color: '#74D415' }}>Paid</span>
+                                                            </div>
+                                                        </>
+                                                        :
+                                                        null
+                                                }
+
 
                                                 {/* edit and menu button visible only to the creator */}
                                                 {
@@ -569,7 +583,7 @@ const TaskDetails = () => {
                                     }
 
 {
-                                        Task.taskStatus === 'approved'
+                                        Task.taskStatus === 'approved' || Task.taskStatus === 'paid'
                                             ?
                                             <>
                                                 {
@@ -582,7 +596,7 @@ const TaskDetails = () => {
                                                         :
                                                         // for others
                                                         <>
-                                                            <h1>Task has been<br/> approved</h1>
+                                                            <h1>Task has been<br/> {  Task.taskStatus }</h1>
                                                         </>
                                                 }
                                             </>

@@ -1,419 +1,368 @@
-import { useState, useEffect, useMemo } from 'react';
-import './Settings.css';
-import { get as _get, find as _find } from 'lodash';
-import settingIcon from '../../assets/svg/settingsXL.svg';
-import editIcon from '../../assets/svg/editButton.svg';
-import copy from '../../assets/svg/copyIcon.svg';
-import logo from '../../assets/svg/lomadsLogoExpand.svg';
-import { useNavigate } from 'react-router-dom';
-import { useAppSelector, useAppDispatch } from "state/hooks";
-import { useWeb3React } from "@web3-react/core";
-import { useSBTStats } from "hooks/SBT/sbt";
-import { Tooltip } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import "./Settings.css";
+import { get as _get, find as _find } from "lodash";
+import settingIcon from "../../assets/svg/settingsXL.svg";
+import { CgClose } from "react-icons/cg";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { AddIcon, CheckCircleIcon } from "@chakra-ui/icons";
+import Table from "react-bootstrap/Table";
+
+import {
+  Button,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerFooter,
+  DrawerOverlay,
+  FormLabel,
+  IconButton,
+  Image,
+  Input,
+  Switch,
+  TableContainer,
+  Tbody,
+  Td,
+  Text,
+  Tfoot,
+  Th,
+  Thead,
+  Tooltip,
+  Tr,
+} from "@chakra-ui/react";
 import copyIcon from "../../assets/svg/copyIcon.svg";
 import { isChainAllowed } from "utils/switchChain";
-import coin from '../../assets/svg/coin.svg';
-import Footer from 'components/Footer';
-import { AiOutlineClose } from "react-icons/ai";
-import { SiNotion } from "react-icons/si";
-import { HiOutlinePlus } from "react-icons/hi";
-import { CgClose } from 'react-icons/cg'
-import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe } from "react-icons/bs";
-import AddDaoLink from './DashBoard/Settings/AddDaoLink';
-import SimpleInputField from "UIpack/SimpleInputField";
-import { updateDao, updateDaoLinks } from 'state/dashboard/actions';
-import { resetUpdateDAOLoader, resetUpdateDaoLinksLoader } from 'state/dashboard/reducer';
-import { isValidUrl } from 'utils';
-import useRole from "hooks/useRole";
-import binRed from '../../assets/svg/bin-red.svg'
-import { SupportedChainId } from 'constants/chains';
+import coin from "../../assets/svg/coin.svg";
+import Footer from "components/Footer";
+import { ChevronRight } from "react-feather";
+import { IoMdCloseCircle } from "react-icons/io";
+
+// ASSETS
+import OrganistionDetails from "../../assets/images/settings-page/1-ogranisation-details.svg";
+import RolesPermissions from "../../assets/images/settings-page/2-roles-permissions.svg";
+import Safe from "../../assets/images/settings-page/3-safe.svg";
+import PassTokens from "../../assets/images/settings-page/4-pass-tokens.svg";
+import XpPoints from "../../assets/images/settings-page/5-xp-points.svg";
+import Terminology from "../../assets/images/settings-page/6-terminology.svg";
+import Discord from "../../assets/images/settings-page/7-discord.svg";
+
+import SideModal from "./DashBoard/SideModal";
+import OrganisationDetailsModal from "./OrganisationDetailsModal";
+import RolesPermissionsModal from "./RolesPermissionsModal";
+import SafeModal from "./SafeModal";
+import XpPointsModal from "./XpPointsModal";
+import PassTokenModal from "./PassTokenModal";
+import TerminologyModal from "./TerminologyModal";
+import DiscordModal from "./DiscordModal";
+import { useAppDispatch, useAppSelector } from "state/hooks";
+import CreateMorePassTokenModal from "./CreateMorePassTokenModal";
+import { getDao } from "state/dashboard/actions";
+import CompensateMembersModal from "./CompensateMembersModal";
+import CompensateMembersDescriptionModal from "./CompensateMembersDescriptionModal";
+import CompensateMembersDoneModal from "./CompensateMembersDoneModal";
+import DisableXpPointDailog from "./DisableXpPointDailog";
+import eventEmitter from "utils/eventEmmiter";
 
 const Settings = () => {
-    const navigate = useNavigate();
-    const dispatch = useAppDispatch();
-    const [update, setUpdate] = useState(0);
-    const { provider, chainId, account, connector } = useWeb3React();
-    const { DAO, updateDaoLoading, updateDaoLinksLoading } = useAppSelector((state) => state.dashboard);
-    const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '', chainId);
-    console.log("DAO data : ", DAO);
-    const daoName = _get(DAO, 'name', '').split(" ");
-    const [copy, setCopy] = useState(false);
-    const [showAddLink, setShowAddLink] = useState(false);
-    const [editMode, setEditMode] = useState(false);
-    const [editLink, setEditLink] = useState(false);
-    const [name, setName] = useState(_get(DAO, 'name', ''));
-    const [description, setDescription] = useState(_get(DAO, 'description', ''));
-    const [daoLinks, setDaoLinks] = useState(_get(DAO, 'links', []));
-    const chainAllowed = chainId && isChainAllowed(connector, chainId);
-    const { displayRole } = useRole(DAO, account);
+  const navigate = useNavigate();
+  const { daoURL } = useParams();
 
-    useEffect(() => {
-        if (chainId && !chainAllowed && !account) {
-            navigate('/')
-        }
-    }, [chainId, account, chainAllowed, navigate]);
+  const dispatch = useAppDispatch();
 
-    useEffect(() => {
-        if (contractName !== '' && balanceOf) {
-            if (DAO?.sbt && parseInt(balanceOf._hex, 16) === 0) {
-                navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
-            }
-        }
-    }, [DAO, balanceOf, contractName]);
+  //! CONST DECLARATION
+  const [showModal, setShowModal] = useState(false);
+  const [openOrganisationDetails, setOpenOrganisationDetails] = useState(false);
+  const [openRolesPermissions, setOpenRolesPermissions] = useState(false);
+  const [openSafe, setOpenSafe] = useState(false);
+  const [openPassToken, setOpenPassToken] = useState(false);
+  const [openXpPoints, setOpenXpPoints] = useState(false);
+  const [openTerminology, setOpenTerminology] = useState(false);
+  const [openDiscord, setOpenDiscord] = useState(false);
+  const [openCreatePassToken, setOpenCreatePassToken] = useState(false);
 
-    useEffect(() => {
-        setDaoLinks(_get(DAO, 'links', []));
-    }, [DAO])
 
-    useEffect(() => {
-        if (updateDaoLoading === false) {
-            dispatch(resetUpdateDAOLoader());
-            setEditMode(false);
-        }
-    }, [updateDaoLoading]);
+  const { DAO, updateDaoLoading, updateDaoLinksLoading } = useAppSelector((state) => state.dashboard);
 
-    useEffect(() => {
-        if (updateDaoLinksLoading === false) {
-            dispatch(resetUpdateDaoLinksLoader());
-            setEditLink(false);
-        }
-    }, [updateDaoLinksLoading]);
+  console.log("DAO data : ", DAO);
+  
+  const [name, setName] = useState(_get(DAO, 'name', ''));
 
-    const amIAdmin = useMemo(() => {
-        if (DAO) {
-            let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'ADMIN')
-            if (user)
-                return true
-            return false
-        }
-        return false;
-    }, [account, DAO])
+  useEffect(()=>{
+    setName(_get(DAO, 'name', ''))
+  },[DAO])
+  
+  useEffect(()=>{
+    if (!DAO || (DAO && DAO.url !== daoURL))
+				dispatch(getDao(daoURL))
+			}
+  ,[DAO])
 
-    const toggleShowLink = () => {
-        setShowAddLink(!showAddLink);
-    };
-
-    const handleParseUrl = (url) => {
-        try {
-            const link = new URL(url);
-            if (link.hostname.indexOf('notion.') > -1) {
-                return <SiNotion color='#B12F15' size={20} />
-            }
-            else if (link.hostname.indexOf('discord.') > -1) {
-                return <BsDiscord color='#B12F15' size={20} />
-            }
-            else if (link.hostname.indexOf('github.') > -1) {
-                return <BsGithub color='#B12F15' size={20} />
-            }
-            else if (link.hostname.indexOf('google.') > -1) {
-                return <BsGoogle color='#B12F15' size={20} />
-            }
-            else if (link.hostname.indexOf('twitter.') > -1) {
-                return <BsTwitter color='#B12F15' size={20} />
-            }
-            else {
-                return <span><BsGlobe size={20} /></span>
-            }
-        }
-        catch (e) {
-            console.error(e);
-        }
+  useEffect(() => {
+    eventEmitter.on('close-xp-modal', ()=>{
+      setShowModal(false)
+      setOpenXpPoints(false)
+    })
+    return () => {
+      eventEmitter.off('close-xp-modal', ()=>{
+        setShowModal(false)
+        setOpenXpPoints(false)
+      })
     }
+  }, [])
+  
+  
 
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter') {
-            dispatch(updateDao({ url: DAO?.url, payload: { name, description } }))
-        }
-    }
 
-    const handleChangeState = (e, index) => {
-        const newArray = daoLinks.map((item, i) => {
-            if (index === i) {
-                if (e.target.name === 'title') {
-                    document.getElementById(`title${index}`).innerHTML = '';
-                }
-                else if (e.target.name === 'link') {
-                    document.getElementById(`link${index}`).innerHTML = '';
-                }
-                return { ...item, [e.target.name]: e.target.value };
-            }
-            else {
-                return item;
-            }
-        });
-        setDaoLinks(newArray);
-    }
+  //! TOGGLE FUNCTIONS
+  let toggleModal = () => {
+    setShowModal(!showModal);
+  };
+  let toggleOrganisationDetailsModal = () => {
+    setOpenOrganisationDetails(!openOrganisationDetails);
+  };
+  let toggleRP = () => {
+    setOpenRolesPermissions(!openRolesPermissions);
+  };
+  let toggleS = () => {
+    setOpenSafe(!openSafe);
+  };
+  let togglePassToken = () => {
+    setOpenPassToken(!openPassToken);
+  };
+  let toggleXp = () => {
+    setOpenXpPoints(!openXpPoints);
+  };
+  let toggleTerminology = () => {
+    setOpenTerminology(!openTerminology);
+  };
+  let toggleDiscord = () => {
+    setOpenDiscord(!openDiscord);
+  };
 
-    const deleteLink = (item) => {
-        let links = _get(DAO, 'links', []);
-        links = links.filter(l => !(l.title === item.title && l.link === item.link))
-        dispatch(updateDao({ url: DAO?.url, payload: { links } }))
-    }
-
-    const handleKeyDown2 = (e) => {
-        if (e.key === 'Enter') {
-            let errorCount = 0;
-            for (var i = 0; i < daoLinks.length; i++) {
-                const title = daoLinks[i].title;
-                const link = daoLinks[i].link;
-                if (title === '') {
-                    errorCount += 1;
-                    document.getElementById(`title${i}`).innerHTML = 'Please enter title'
-                }
-                else if (link === '') {
-                    errorCount += 1;
-                    document.getElementById(`link${i}`).innerHTML = 'Please enter link'
-                }
-                else if (!isValidUrl(link)) {
-                    errorCount += 1;
-                    document.getElementById(`link${i}`).innerHTML = 'Please enter a valid link'
-                }
-            }
-            if (errorCount === 0) {
-                console.log("DAo links : ", daoLinks);
-                dispatch(updateDaoLinks({ url: DAO?.url, payload: { links: daoLinks } }))
-            }
-        }
-    }
-
-    return (
-        <div className='settings-page'>
-            {
-                showAddLink &&
-                <AddDaoLink
-                    toggleShowLink={toggleShowLink}
+  let toggleCreatePassTokenModal = () => {
+    setOpenCreatePassToken(!openCreatePassToken);
+  };
+  const daoName = name.split(" ");
+  return (
+    <>
+      <div className="settings-page">
+      {/* <DisableXpPointDailog
+                    toggleShowLink={toggleCreatePassTokenModal}
                     daoUrl={_get(DAO, 'url', '')}
-                />
-            }
-            <div className='settings-left-bar'>
-                <div onClick={() => navigate(-1)} className='logo-container'>
-                    <p>
-                        {
-                            daoName.length === 1
+                /> */}
+        <div className="settings-left-bar">
+          <div onClick={() => navigate(-1)} className="logo-container">
+            <p style={{textTransform: "capitalize"}}>{ daoName.length === 1
                                 ? daoName[0].charAt(0)
-                                : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)
-                        }
-                    </p>
-                </div>
-                <img src={settingIcon} />
-            </div>
-            <div className='settings-center'>
-                <div className='settings-header'>
-                    <h1>Settings</h1>
-                    <p>You're an&nbsp;<span>{displayRole}</span></p>
-                </div>
-
-                <div className='settings-organisation'>
-                    <div className='organisation-name'>
-                        {
-                            editMode
-                                ?
-                                <SimpleInputField
-                                    className="inputField"
-                                    height={50}
-                                    width={144}
-                                    placeholder="DAO name"
-                                    value={name}
-                                    onchange={(e) => { setName(e.target.value) }}
-                                    onKeyDown={(e) => handleKeyDown(e)}
-                                />
-                                :
-                                <h1>{name ? name : 'DAO Name'}</h1>
-                        }
-                        <button onClick={() => setEditMode(true)}>
-                            <img src={editIcon} alt="edit-icon" />
-                        </button>
-                    </div>
-
-                    <div className='organisation-desc'>
-                        {
-                            editMode
-                                ?
-                                <SimpleInputField
-                                    className="inputField"
-                                    height={50}
-                                    width={'100%'}
-                                    placeholder="DAO description"
-                                    value={description}
-                                    onchange={(e) => { setDescription(e.target.value) }}
-                                    onKeyDown={(e) => handleKeyDown(e)}
-                                />
-                                :
-                                <>
-                                    {
-                                        description
-                                            ?
-                                            <p>{description}</p>
-                                            :
-                                            <p>Description</p>
-                                    }
-                                </>
-                        }
-
-                    </div>
-
-                    <div className='organisation-link'>
-                        <div
-                            className="copyArea"
-                            onClick={() => {
-                                setCopy(true);
-                            }}
-                            onMouseOut={() => {
-                                setCopy(false);
-                            }}
-                        >
-                            <Tooltip label={copy ? "copied" : "copy"}>
-                                <div
-                                    className="copyLinkButton"
-                                    onClick={() => {
-                                        navigator.clipboard.writeText(`${process.env.REACT_APP_URL + "/" + _get(DAO, 'url', '')}`);
-                                    }}
-                                >
-                                    <img src={copyIcon} alt="copy" className="safeCopyImage" />
-                                </div>
-                            </Tooltip>
-                            <p>{process.env.REACT_APP_URL + "/" + _get(DAO, 'url', '')}</p>
-                        </div>
-                    </div>
-
-                    {/* <div className='organisation-link'>
-                        <button>
-                            <img src={copy} alt="copy" />
-                        </button>
-                        <p>{process.env.REACT_APP_URL + "/" + _get(DAO, 'url', '')}</p>
-                    </div> */}
-
-                    {/* <div className='organisation-policy'>
-                        <p>Membership policy :</p>
-                        <div>
-                            <input type='checkbox' />
-                            <span>WHITELISTED</span>
-                        </div>
-                    </div> */}
-                </div>
-
-                <div className='settings-links'>
-                    <div className='links-header'>
-                        <h1>Links</h1>
-                        <div>
-                            <button onClick={() => setEditLink(true)}>
-                                <img src={editIcon} alt="edit-icon" />
-                            </button>
-                            <button onClick={toggleShowLink} className="addLink-btn">
-                                <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
-                                LINK
-                            </button>
-                        </div>
-                    </div>
-                    <span>Please add links for your organisation</span>
-                    <div className='link-body'>
-                        {
-                            editLink
-                                ?
-                                daoLinks.map((item, index) => {
-                                    return (
-                                        <div className='editLinkSection' key={index} id={`row${index}`}>
-                                            <div className='editLinkCol'>
-                                                <SimpleInputField
-                                                    className="inputField"
-                                                    height={50}
-                                                    width={150}
-                                                    placeholder="Title"
-                                                    value={item.title}
-                                                    name="title"
-                                                    onchange={(e) => handleChangeState(e, index)}
-                                                    onKeyDown={(e) => handleKeyDown2(e)}
-                                                />
-                                                <span id={`title${index}`}></span>
-                                            </div>
-                                            <div className='editLinkCol'>
-                                                <SimpleInputField
-                                                    className="inputField"
-                                                    height={50}
-                                                    width={250}
-                                                    placeholder="Link"
-                                                    value={item.link}
-                                                    name="link"
-                                                    onchange={(e) => handleChangeState(e, index)}
-                                                    onKeyDown={(e) => handleKeyDown2(e)}
-                                                />
-                                                <span id={`link${index}`}></span>
-                                            </div>
-                                            <button className='linkDeleteBtn' onClick={() => deleteLink(item)}>
-												<img src={binRed} alt="bin-red" />
-											</button>
-                                        </div>
-                                    )
-                                })
-                                :
-                                _get(DAO, 'links', []).map((item, index) => {
-                                    return (
-                                        <div>
-                                            <button onClick={() => window.open(item.link, '_blank')}>
-                                                {handleParseUrl(item.link)}
-                                                <span>{item.title.length > 6 ? item.title.substring(0, 6) + "..." : item.title}</span>
-                                            </button>
-                                            <p>{item.link.length > 6 ? item.link.substring(0, 40) + "..." : item.link}</p>
-                                        </div>
-                                    )
-                                })
-                        }
-                    </div>
-                </div>
-                <div className='settings-token'>
-                    <h1>Pass Tokens</h1>
-                    {
-                        DAO?.sbt?.name
-                            ?
-                            // <div className='token-details'>
-                            //     <button>
-                            //         <img src={copy} alt="copy" />
-                            //     </button>
-                            //     <img src={coin} alt="asset" />
-                            //     <p>{DAO?.sbt?.name}</p>
-                            // </div>
-                            <div className='token-details'>
-                                <div
-                                    className="copyArea"
-                                    onClick={() => {
-                                        setCopy(true);
-                                    }}
-                                    onMouseOut={() => {
-                                        setCopy(false);
-                                    }}
-                                >
-                                    <Tooltip label={copy ? "copied" : "copy"}>
-                                        <div
-                                            className="copyLinkButton"
-                                            onClick={() => {
-                                                navigator.clipboard.writeText(`${DAO?.sbt?.address}`);
-                                            }}
-                                        >
-                                            <img src={copyIcon} alt="copy" className="safeCopyImage" />
-                                        </div>
-                                    </Tooltip>
-                                    {DAO?.sbt?.image ? <img style={{ width: 24, height: 24 }} src={DAO?.sbt?.image} alt="asset" /> : <img src={coin} alt="asset" />}
-                                    <p>{DAO?.sbt?.name}</p>
-                                </div>
-                            </div>
-                            :
-                            <>
-                                <p>The organisation doesn’t have token yet</p>
-                                <button style={{ backgroundColor: '#b24734' }} onClick={() => navigate('/sbt/create')}>configure pass token</button>
-                                {/* <button style={{ backgroundColor: chainId === SupportedChainId.POLYGON ? 'grey' : '#b24734' }} disabled={chainId === SupportedChainId.POLYGON} onClick={() => navigate('/sbt/create')}>configure pass token</button> */}
-                                {/* { chainId === SupportedChainId.POLYGON && <p style={{ marginTop: 6 }}>Coming soon on polygon</p> } */}
-                            </>
-                    }
-                </div> 
-                <Footer theme="light" />
-            </div>
-            <div className='settings-right-bar'>
-                <button onClick={() => navigate(-1)}>
-                    <CgClose color='#FFF' size={24} />
-                </button>
-            </div>
+                                : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)}</p>
+          </div>
+          <img src={settingIcon} />
         </div>
-    )
-}
+        <div className="settings-center">
+          <div className="settings-header">
+            <h1>{ name }</h1>
+            <h2>Settings</h2>
+          </div>
+          <div className="settings-organisation">
+            <div>
+              <img src={OrganistionDetails} style={{ height: "35px" }} />
+              <Link
+                className="style-content"
+                style={{ color: "#C94B32" }}
+                onClick={() => {
+                  toggleModal();
+                  setOpenOrganisationDetails(true);
+                }}
+              >
+                Organisation Details
+                <ChevronRight />
+              </Link>
+            </div>
+          </div>
+
+          <div className="settings-organisation-flexbox">
+            <div className="settings-organisation-child">
+              <div
+                style={{
+                  padding: "20px",
+                }}
+              >
+                <img src={RolesPermissions} style={{ height: "35px" }} />
+                <Link
+                  className="style-content"
+                  style={{ color: "#C94B32" }}
+                  onClick={() => {
+                    toggleModal();
+                    setOpenRolesPermissions(true);
+                  }}
+                >
+                  Roles & Permissions
+                  <ChevronRight />
+                </Link>
+              </div>
+            </div>
+            <div className="settings-organisation-child">
+              <div
+                style={{
+                  padding: "20px",
+                }}
+              >
+                <img src={Safe} style={{ height: "35px" }} />
+                <Link
+                  className="style-content"
+                  style={{ color: "#C94B32" }}
+                  onClick={() => {
+                    toggleModal();
+                    setOpenSafe(true);
+                  }}
+                >
+                  Safe
+                  <ChevronRight />
+                </Link>
+              </div>
+            </div>
+
+            <div className="settings-organisation-child">
+              <div
+                style={{
+                  padding: "20px",
+                }}
+              >
+                <img src={PassTokens} style={{ height: "35px" }} />
+                <Link
+                  className="style-content"
+                  style={{ color: "#C94B32" }}
+                  onClick={() => {
+                    toggleModal();
+                    DAO?.sbt?.name ? togglePassToken() : toggleCreatePassTokenModal()
+                  }}
+                >
+                  Pass Tokens
+                  <ChevronRight />
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="settings-organisation-flexbox">
+            <div className="settings-organisation-child">
+              <div
+                style={{
+                  padding: "20px",
+                }}
+              >
+                <img src={XpPoints} style={{ height: "35px" }} />
+                <Link
+                  className="style-content"
+                  style={{ color: "#C94B32" }}
+                  onClick={() => {
+                    toggleModal();
+                    setOpenXpPoints(true);
+                  }}
+                >
+                  SWEAT points
+                  <ChevronRight />
+                </Link>
+              </div>
+            </div>
+            <div className="settings-organisation-child">
+              <div
+                style={{
+                  padding: "20px",
+                }}
+              >
+                <img src={Terminology} style={{ height: "35px" }} />
+                <Link
+                  className="style-content"
+                  style={{ color: "#C94B32" }}
+                  onClick={() => {
+                    toggleModal();
+                    setOpenTerminology(true);
+                  }}
+                >
+                  Terminology
+                  <ChevronRight />
+                </Link>
+              </div>
+            </div>
+
+            <div className="settings-organisation-child">
+              <div
+                style={{
+                  padding: "20px",
+                }}
+              >
+                <img src={Discord} style={{ height: "35px" }} />
+                <Link
+                  className="style-content"
+                  style={{ color: "#C94B32" }}
+                  onClick={() => {
+                    toggleModal();
+                    setOpenDiscord(true);
+                  }}
+                >
+                  Discord
+                  <ChevronRight />
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <Footer theme="light" />
+        </div>
+        <div className="settings-right-bar">
+          <button onClick={() => navigate(-1)}>
+            <CgClose color="#FFF" size={24} />
+          </button>
+        </div>
+      </div>
+
+      {/* // !-------------  Organisation Details ------------ */}
+      {showModal && openOrganisationDetails && (
+        <OrganisationDetailsModal
+          toggleModal={toggleModal}
+          toggleOrganisationDetailsModal={toggleOrganisationDetailsModal}
+        />
+      )}
+      {/* // !-------------  Roles & Permissions ------------ */}
+      {showModal && openRolesPermissions && (
+        <RolesPermissionsModal toggleModal={toggleModal} toggleRP={toggleRP} />
+      )}
+      {/* // !-------------  Safe ------------ */}
+      {showModal && openSafe && (
+        <SafeModal toggleModal={toggleModal} toggleS={toggleS} />
+      )}
+      {/* // !-------------  Pass Token ------------ */}
+      {showModal && openPassToken && (
+        <PassTokenModal
+          toggleModal={toggleModal}
+          togglePassToken={togglePassToken}
+        />
+      )}
+      {showModal && openCreatePassToken && (
+        <CreateMorePassTokenModal
+          toggleModal={toggleModal}
+          navFromSetting={true}
+          toggleCreatePassTokenModal={toggleCreatePassTokenModal}
+        />
+      )}
+      {/* // !-------------  SWEAT Points ------------ */}
+      {showModal && openXpPoints && (
+        <XpPointsModal toggleModal={toggleModal} toggleXp={toggleXp} />
+      )}
+      {/* // !-------------  Terminology ------------ */}
+      {showModal && openTerminology && (
+        <TerminologyModal
+          toggleModal={toggleModal}
+          toggleTerminology={toggleTerminology}
+        />
+      )}
+      {/* // !-------------  Discord ------------ */}
+      {showModal && openDiscord && (
+        <DiscordModal toggleModal={toggleModal} toggleDiscord={toggleDiscord} />
+      )}
+    </>
+  );
+};
 
 export default Settings;

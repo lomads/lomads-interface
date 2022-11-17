@@ -6,7 +6,7 @@ const capitalizeFirstLetter = (string: string) => {
 
 const CONTRIBUTOR: Array<string> = ['project.view', 'project.view.own',  'members.view'];
 const ACTIVE_CONTRIBUTOR: Array<string> = [...CONTRIBUTOR, 'project.view.archives', 'project.create', 'project.delete', 'project.archive', 'project.member.add', 'project.member.edit', 'project.link.add'];
-const CORE_CONTRIBUTOR: Array<string> = [...ACTIVE_CONTRIBUTOR, 'project.view.all', 'transaction.view', 'members.add', 'notification.view']
+const CORE_CONTRIBUTOR: Array<string> = [...ACTIVE_CONTRIBUTOR, 'project.view.all', 'transaction.view', 'members.add', 'notification.view', 'task.create', 'task.create.sweat']
 const ADMIN: Array<string> = [...CORE_CONTRIBUTOR, 'settings', 'members.edit', 'members.delete'];
 
 const permissions: any = { ADMIN, ACTIVE_CONTRIBUTOR, CORE_CONTRIBUTOR, CONTRIBUTOR, "": [] }

@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "state/hooks";
 import { useWeb3React } from "@web3-react/core";
 import TaskCard from './Task/TaskCard';
+import useRole from '../../../hooks/useRole'
 
 import archiveIcon from '../../../assets/svg/archiveIcon.svg';
 
@@ -22,6 +23,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
     const [draftTasks, setDraftTasks] = useState([]);
     const [otherTasks, setOtherTasks] = useState([]);
     const [initialCheck, setInitialCheck] = useState(false);
+    const { myRole, can } = useRole(DAO, account)
 
     useEffect(() => {
         if (onlyProjects) {
@@ -103,7 +105,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                         </button>
                     </div>
                     {
-                        amIAdmin && <div>
+                        amIAdmin && can(myRole, 'task.create') && <div>
                             <SafeButton
                                 height={40}
                                 width={150}
