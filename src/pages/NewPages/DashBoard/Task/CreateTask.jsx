@@ -10,6 +10,7 @@ import { HiOutlinePlus } from 'react-icons/hi';
 import SelectRoles from './SelectRoles';
 
 import { useAppSelector, useAppDispatch } from "state/hooks";
+import { getCurrentUser } from "state/dashboard/actions";
 
 import { createTask, draftTask } from 'state/dashboard/actions'
 import { resetCreateTaskLoader, resetDraftTaskLoader } from 'state/dashboard/reducer';
@@ -17,6 +18,9 @@ import { resetCreateTaskLoader, resetDraftTaskLoader } from 'state/dashboard/red
 import { useWeb3React } from "@web3-react/core";
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
 import { SupportedChainId } from "constants/chains";
+import { getSafeTokens } from '../../../../utils'
+
+import useRole from '../../../../hooks/useRole'
 
 import axios from "axios";
 import { isValidUrl } from 'utils';
@@ -24,8 +28,10 @@ import { isValidUrl } from 'utils';
 const CreateTask = ({ toggleShowCreateTask }) => {
 
     const dispatch = useAppDispatch();
-    const { DAO, createTaskLoading, draftTaskLoading } = useAppSelector((state) => state.dashboard);
-    const { chainId } = useWeb3React();
+    const { DAO, user, createTaskLoading, draftTaskLoading } = useAppSelector((state) => state.dashboard);
+    const { chainId, account } = useWeb3React();
+
+    const { myRole, can } = useRole(DAO, account)
 
     const [contributionType, setContributionType] = useState('assign');
     const [isSingleContributor, setIsSingleContributor] = useState(false);
@@ -46,16 +52,15 @@ const CreateTask = ({ toggleShowCreateTask }) => {
     const [showSuccess, setShowSuccess] = useState(false);
 
     const getTokens = async (safeAddress) => {
-        safeAddress && chainId &&
-            await axios
-                .get(
-                    `${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`
-                )
-                .then((tokens) => {
-                    setSafeTokens(tokens.data);
-                    console.log("tokens : ", tokens.data);
-                });
+        const tokens = await getSafeTokens(chainId, safeAddress)
+        setSafeTokens(tokens)
     };
+
+    useEffect(() => {
+		if (account && chainId && (!user || (user && user.wallet.toLowerCase() !== account.toLowerCase()))) {
+			dispatch(getCurrentUser({}))
+		}
+	}, [account, chainId, user])
 
     useEffect(() => {
         getTokens(_get(DAO, 'safe.address'));
@@ -78,7 +83,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
             setDeadline('');
             setProjectId(null);
             setSubLink('');
-            setReviewer(null);
+            //setReviewer(null);
             setCurrency(null);
             setAmount(0);
 
@@ -146,12 +151,12 @@ const CreateTask = ({ toggleShowCreateTask }) => {
             e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             return;
         }
-        else if (reviewer === null) {
-            let e = document.getElementById('error-reviewer');
-            e.innerHTML = 'Select a reviewer';
-            e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
-            return;
-        }
+        // else if (reviewer === null) {
+        //     let e = document.getElementById('error-reviewer');
+        //     e.innerHTML = 'Select a reviewer';
+        //     e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+        //     return;
+        // }
         else {
             let tempLink, tempSub  = null;
             if(dchannel && dchannel !== '') {
@@ -166,6 +171,12 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                     tempSub = 'https://' + tempSub;
                 }
             }
+
+            let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
+            symbol = _get(symbol, 'token.symbol', null)
+            if(!symbol)
+                symbol = currency.currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ? 'MATIC' : currency.currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? 'GOR' : 'SWEAT'
+
             let task = {};
             task.daoId = DAO?._id;
             task.name = name;
@@ -175,18 +186,19 @@ const CreateTask = ({ toggleShowCreateTask }) => {
             task.discussionChannel = tempLink;
             task.deadline = deadline;
             task.submissionLink = tempSub ? [tempSub] : [];
-            task.compensation = { currency, amount };
-            task.reviewer = reviewer;
+            task.compensation = { currency: currency.currency, amount, symbol };
+            task.reviewer = user._id;
             task.contributionType = contributionType;
             task.isSingleContributor = isSingleContributor;
             task.isFilterRoles = isFilterRoles;
             task.validRoles = validRoles;
-
             dispatch(createTask({ payload: task }))
         }
     }
 
     const handleDraftTask = () => {
+        let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
+        symbol = _get(symbol, 'token.symbol', 'SWEAT')
         let task = {};
         task.daoId = DAO?._id;
         task.name = name;
@@ -196,7 +208,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
         task.discussionChannel = dchannel;
         task.deadline = deadline;
         task.submissionLink = subLink;
-        task.compensation = { currency, amount };
+        task.compensation = { currency, amount, symbol };
         task.reviewer = reviewer;
         task.contributionType = contributionType;
         task.isSingleContributor = isSingleContributor;
@@ -459,7 +471,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                                     id="chain"
                                                     className="tokenDropdown"
                                                     style={{ width: '100%' }}
-                                                    onChange={e => setCurrency(e.target.value)}
+                                                    onChange={e => setCurrency({ currency: e.target.value })}
                                                 >
                                                     <option value={null}>
                                                         select a token
@@ -476,7 +488,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                                             )
                                                         );
                                                     })}
-                                                    <option value="SWEAT">SWEAT</option>
+                                                   { can(myRole, 'task.create.sweat') && <option value="SWEAT">SWEAT</option> }
                                                 </select>
                                                 <input
                                                     className="inputField"
@@ -488,7 +500,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                             </div>
                                         </div>
 
-                                        <div className='createTask-inputRow'>
+                                        {/* <div className='createTask-inputRow'>
                                             <span>Reviewer</span>
                                             <select
                                                 name="reviewer"
@@ -507,7 +519,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                                 }
                                             </select>
                                             <span className='error-msg' id="error-reviewer"></span>
-                                        </div>
+                                        </div> */}
 
                                     </div>
 

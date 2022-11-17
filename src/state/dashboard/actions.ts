@@ -291,9 +291,19 @@ export const rejectTaskMember = createAsyncThunk(
 export const submitTaskAction = createAsyncThunk(
 	'dao/submittaskaction',
 	async (params: any, thunkApi) => {
-		return axiosHttp.patch(`task/${params.taskId}/submit?daoUrl=${params.daoUrl}`, params.payload)
+		return axiosHttp.patch(`task/${params.taskId}/submit?daoUrl=${params.daoUrl}`, params)
 			.then(res => res.data)
 			.catch(e => thunkApi.rejectWithValue(e))
 	}
 )
+
+export const approveTask = createAsyncThunk(
+	'dao/approvetaskaction',
+	async (params: any, thunkApi) => {
+		return axiosHttp.post(`task/${params.taskId}/approve?daoUrl=${params.daoUrl}`, params.payload)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+)
+
 

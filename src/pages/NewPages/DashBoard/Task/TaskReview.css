@@ -82,7 +82,7 @@
 }
 
 .task-review-overlay .task-review-container .task-review-slider .slider-content {
-    width: 80%;
+    width: 95%;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -100,11 +100,22 @@
 
 .task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body {
     width: 100%;
-    height: 90%;
+    height: 95%;
     overflow-y: scroll;
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .wallet-address {
+    font-family: 'Inter', sans-serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+    text-align: center;
+    letter-spacing: -0.011em;
+    color: #76808D;
 }
 
 .task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body h1 {
@@ -131,16 +142,15 @@
 }
 
 .task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container {
-    width: 80%;
+    width: 95%;
     margin: 30px 0;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    flex: 1
 }
 
 .task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container:last-child {
-    margin: 0;
+    margin: 0 0 30px 0;
 }
 
 .task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container span {
@@ -156,15 +166,16 @@
     color: #76808D;
 }
 
-.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container p {
-    font-family: Arial, Helvetica, sans-serif;
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container .note {
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
     line-height: 16px;
-    color: #1B2B41;
-    margin-top: 15px;
     text-align: left;
+    color: #1B2B41;
+    margin-top: 16px;
+    min-height: 120px;
 }
 
 .task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container button {
@@ -188,9 +199,17 @@
 
     /* RED */
     color: #C94B32;
-    width: 300px;
+    width: 100%;
     height: 40px;
     margin-top: 10px;
+}
+
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container .submitLink-btn {
+    background: #FFFFFF;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    width: 200px;
+    margin-top: 16px;
 }
 
 .task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-foot {
@@ -203,7 +222,7 @@
 
 .task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-foot button {
     height: 50px;
-    width: 150px;
+    width: 184px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -211,7 +230,7 @@
 }
 
 .task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-foot button:first-child {
-    margin-right: 20px;
+    margin: 0 20px;
     border: 1px solid #C94B32;
     background-color: white;
     color: #C94B32;
@@ -244,4 +263,185 @@
     border-radius: 5px;
     margin-right: 10px;
     background-color: #f0f0f0;
+}
+
+.task-review-compensation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.task-review-compensation-main {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 15px 22px;
+    gap: 10px;
+    background: #FFFFFF;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    width: 95%;
+}
+
+.task-review-compensation .container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.task-review-compensation .container div {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    margin: 0 4px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+
+.task-review-compensation .container .amount, .task-review-compensation .container .extra {
+    font-weight: bold;
+}
+
+.task-review-compensation .container .extra {
+    color: red;
+}
+
+.task-review-compensation .container img {
+    margin-left: 16px;
+}
+
+.task-review-edit-compensation {
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.task-review-edit-compensation .container {
+    width: 95%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.task-review-edit-compensation .container .task-review-foot {
+    width: 100%;
+    margin: 20px 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.task-review-edit-compensation .container .task-review-foot button {
+    height: 50px;
+    width: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+}
+
+.task-review-edit-compensation .container .task-review-foot button:first-child {
+    margin: 0 20px;
+    border: 1px solid #C94B32;
+    background-color: white;
+    color: #C94B32;
+}
+
+.task-review-edit-compensation .container .task-review-foot button:last-child {
+    margin-right: 20px;
+    background-color: #C94B32;
+    color: #FFF;
+}
+
+.task-review-edit-compensation .container .title {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 33px;
+    text-align: center;
+    color: #C94B32;
+    margin: 20px 0;
+}
+
+.task-review-edit-compensation .container .picker-container {
+    display: flex;
+    flex-direction: row;
+    height: 50px;
+    margin: 20px 0;
+}
+
+.task-review-edit-compensation .container .picker-container .currency {
+    background: #FFFFFF;
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 0px 10px 10px 0px;
+    transform: rotate(180deg);
+    width: 187px;
+    height: 50px;
+}
+
+.task-review-edit-compensation .container .picker-container .currency-container {
+    height: 50px;
+    transform: rotate(180deg);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-items: flex-start;
+    padding-left: 16px;
+}
+
+.task-review-edit-compensation .container .picker-container .currency-container div {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    text-transform: uppercase;
+    color: #76808D;
+    margin-left: 12px;
+}
+
+.task-review-edit-compensation .container .picker-container .currency-container {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    text-transform: uppercase;
+    color: #76808D;
+}
+
+.task-review-edit-compensation .container .picker-container .number-input {
+    background: #FFFFFF;
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 0px 10px 10px 0px;
+}
+
+.task-review-edit-compensation .container .picker-container .number-input .input {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    /* identical to box height, or 112% */
+
+    text-align: center;
+    letter-spacing: -0.011em;
+
+    color: rgba(27, 45, 65, 0.6);
+}
+
+.task-review-edit-compensation .container .picker-container .counter {
+    width: 40px;
+    height: 50px;
+    background: #FFFFFF;
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 0px 10px 10px 0px;
 }

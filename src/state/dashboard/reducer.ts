@@ -176,6 +176,9 @@ const dashboardSlice = createSlice({
 		setDAO(state, action) {
 			state.DAO = action.payload
 		},
+		setTask(state, action) {
+			state.Task = action.payload
+		},
 		updateSafeTransaction(state, action) {
 			console.log(action.payload)
 			const tx = _find(state.DAO.safe.transactions, t => t.safeTxHash === action.payload.safeTxHash);
@@ -450,6 +453,7 @@ const dashboardSlice = createSlice({
 export const {
 	setDAOList,
 	setDAO,
+	setTask,
 	setUser,
 	resetCreateDAOLoader,
 	resetUpdateDAOLoader,

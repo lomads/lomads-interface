@@ -9,6 +9,8 @@ import submitted from '../../../../assets/svg/submitted.svg'
 import moment from "moment";
 
 import assign from '../../../../assets/svg/assign.svg'
+import paid from '../../../../assets/svg/paid.svg'
+import approved from '../../../../assets/svg/approved.svg'
 import open from '../../../../assets/svg/open.svg'
 import applied from '../../../../assets/svg/applied.svg'
 
@@ -158,6 +160,32 @@ const TaskCard = ({ task, daoUrl }) => {
                                         <p style={{ color: '#0EC1B0' }}>Assigned</p>
                                     </div>
                             }
+                        </>
+                        :
+                        null
+                }
+
+                {
+                    task.taskStatus === 'approved'
+                        ?
+                        <>
+                            <div>
+                                <img src={approved} style={{ marginRight: '5px' }} />
+                                <p style={{ color: '#27C46E' }}>Approved</p>
+                            </div>
+                        </>
+                        :
+                        null
+                }
+
+{
+                    task.taskStatus === 'paid'
+                        ?
+                        <>
+                            <div>
+                                <img src={paid} style={{ marginRight: '5px' }} />
+                                <p style={{ color: '#74D415' }}>paid</p>
+                            </div>
                         </>
                         :
                         null

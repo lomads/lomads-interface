@@ -18,6 +18,8 @@ import compensationStar from '../../assets/svg/compensationStar.svg';
 import calendarIcon from '../../assets/svg/calendar.svg'
 import applicants from '../../assets/svg/applicants.svg'
 import folder from '../../assets/svg/folder.svg'
+import paid from '../../assets/svg/paid.svg'
+import approved from '../../assets/svg/approved.svg'
 
 import { useWeb3React } from "@web3-react/core";
 
@@ -314,6 +316,32 @@ const TaskDetails = () => {
                                                         null
                                                 }
 
+                                                {
+                                                     Task.taskStatus === 'approved'
+                                                        ?
+                                                        <>
+                                                            <div>
+                                                                <img src={approved} style={{ marginRight: '5px' }} />
+                                                                <span style={{ color: '#27C46E' }}>Approved</span>
+                                                            </div>
+                                                        </>
+                                                        :
+                                                        null
+                                                }
+
+                                                {
+                                                     Task.taskStatus === 'paid'
+                                                        ?
+                                                        <>
+                                                            <div>
+                                                                <img src={paid} style={{ marginRight: '5px' }} />
+                                                                <span style={{ color: '#74D415' }}>Paid</span>
+                                                            </div>
+                                                        </>
+                                                        :
+                                                        null
+                                                }
+
 
                                                 {/* edit and menu button visible only to the creator */}
                                                 {
@@ -368,14 +396,7 @@ const TaskDetails = () => {
                                                         <div>
                                                             <span>Compensation</span>
                                                             <img src={compensationStar} />
-                                                            {
-                                                                Task.compensation.currency === 'MATIC'
-                                                                    ?
-                                                                    <span>{Task.compensation.amount} MATIC</span>
-                                                                    :
-                                                                    <span>{Task.compensation.amount} points</span>
-                                                            }
-
+                                                            <span>{Task.compensation.amount} {Task.compensation.symbol}</span>
                                                         </div>
 
                                                         <div className="v-line"></div>
@@ -538,7 +559,7 @@ const TaskDetails = () => {
                                             null
                                     }
 
-{
+                                    {
                                         Task.taskStatus === 'submitted'
                                             ?
                                             <>
@@ -554,6 +575,28 @@ const TaskDetails = () => {
                                                         <>
                                                             <h1>Task is submitted</h1>
                                                             { amICreator && <button onClick={() => setOpenTaskReview(true)}>CHECK</button> }
+                                                        </>
+                                                }
+                                            </>
+                                            :
+                                            null
+                                    }
+
+{
+                                        Task.taskStatus === 'approved' || Task.taskStatus === 'paid'
+                                            ?
+                                            <>
+                                                {
+                                                    // submitted
+                                                    amIApproved
+                                                        ?
+                                                        <>
+                                                            <h1>Well done !</h1>
+                                                        </>
+                                                        :
+                                                        // for others
+                                                        <>
+                                                            <h1>Task has been<br/> {  Task.taskStatus }</h1>
                                                         </>
                                                 }
                                             </>

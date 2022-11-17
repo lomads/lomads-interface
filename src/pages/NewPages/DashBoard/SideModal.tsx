@@ -86,7 +86,8 @@ const SideModal = (props: IsideModal) => {
 				executor: account,
 				submissionDate: moment().utc().toDate(),
 				token:{
-					symbol: 'SWEAT'
+					symbol: 'SWEAT',
+					tokenAddress: 'SWEAT',
 				},
 				confirmations: isSafeOwner ? [{
 					owner: account,
@@ -118,7 +119,8 @@ const SideModal = (props: IsideModal) => {
 				executor: account,
 				submissionDate: moment().utc().toDate(),
 				token:{
-					symbol: 'SWEAT'
+					symbol: 'SWEAT',
+					tokenAddress: 'SWEAT',
 				},
 				confirmations: isSafeOwner ? [{
 					owner: account,
@@ -136,13 +138,16 @@ const SideModal = (props: IsideModal) => {
 		axiosHttp.post('transaction/off-chain', payload)
 		.then(res => {
 			console.log(res);
-			axiosHttp.post(`transaction`, {
-				safeAddress: props.safeAddress,
-				safeTxHash: res.data.safeTxHash,
-				rejectTxHash: null,
-				data: setRecipient.current,
-				nonce,
+			let payload: any[] = [];
+			setRecipient.current.map(r => {
+				payload.push({
+					safeAddress: _get(DAO, 'safe.address', null),
+					safeTxHash: res.data.safeTxHash,
+					recipient: r.recipient,
+					label: _get(r, 'reason', null)
+				})
 			})
+			axiosHttp.post(`transaction/label`, payload)
 			.then(async () => {
 				dispatch(getDao(DAO.url))
 				await props.getPendingTransactions();
@@ -224,13 +229,16 @@ const SideModal = (props: IsideModal) => {
 				.then(async (success) => {
 					console.log("transaction is successful");
 					console.log("success:", success);
-					axiosHttp.post(`transaction`, {
-						safeAddress: safeAddress,
-						safeTxHash: safeTxHash,
-						rejectTxHash: null,
-						data: setRecipient.current,
-						nonce: currentNonce,
+					let payload: any[] = [];
+					setRecipient.current.map(r => {
+						payload.push({
+							safeAddress: _get(DAO, 'safe.address', null),
+							safeTxHash: safeTxHash,
+							recipient: r.recipient,
+							label: _get(r, 'reason', null)
+						})
 					})
+					axiosHttp.post(`transaction/label`, payload)
 					.then(async () => {
 						dispatch(getDao(DAO.url))
 						await props.getPendingTransactions();

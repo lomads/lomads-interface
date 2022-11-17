@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { get as _get, find as _find, uniqBy as _uniqBy } from 'lodash';
 
 import { CgClose } from 'react-icons/cg';
@@ -96,7 +96,7 @@ const SubmitTask = ({ task, close }) => {
         setResourceList(resourceList.filter((_, index) => index !== position));
     }
 
-    const handleSubmitWork = () => {
+    const handleSubmitWork = useCallback(() => {
         if (note === '') {
             document.getElementById('note-error').innerHTML = 'Please enter a note';
             return;
@@ -107,10 +107,17 @@ const SubmitTask = ({ task, close }) => {
         }
         else {
             // dispatch(applyTask({ taskId: task._id, daoUrl: _get(DAO, 'url', ''), payload: { note, resourceList } }));
-            const payload = { daoUrl: _get(DAO, 'url', ''), taskId: task._id,  note, ...(task.submissionLink && task.submissionLink.length == 0 ? { submissionLink: resourceList } : {})}
+            const payload = { 
+                daoUrl: _get(DAO, 'url', ''), 
+                taskId: task._id,  
+                note,
+                ...(task.submissionLink && task.submissionLink.length == 0 ? { submissionLink: resourceList } : {})
+            }
+            console.log(payload)
+            //console.log(payload)
             dispatch(submitTaskAction(payload))
         }
-    }
+    }, [note, resourceList])
 
     return (
         <div className="taskApply-overlay">

@@ -12,7 +12,7 @@ import axiosHttp from '../../../../api';
 import { updateSafeTransaction } from "state/dashboard/reducer";
 import { SupportedChainId } from "constants/chains";
 
-const CompleteTxn = ({ transaction, tokens, owner, isAdmin }: any) => {
+const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress, onLoadLabels }: any) => {
 	const { chainId } = useWeb3React();
     const threshold = useAppSelector((state) => state.flow.safeThreshold);
     const { DAO } = useAppSelector(store => store.dashboard);
@@ -23,13 +23,11 @@ const CompleteTxn = ({ transaction, tokens, owner, isAdmin }: any) => {
     const { isCredit, amount, symbol, recipient, date, reason } = useMemo(() => {
         let isCredit = _get(transaction, 'txType', '') === 'ETHEREUM_TRANSACTION'
         let amount = _get(transaction, 'transfers[0].value', '')
-        let symbol = _get(transaction, 'transfers[0].tokenInfo.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')
+        const symbol = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
         let recipient = _get(transaction, 'transfers[0].to', '')
-        let trans = _find(_get(DAO, 'safe.transactions', []), t => t.safeTxHash === _get(transaction, 'safeTxHash', _get(transaction, 'txHash', '')))
-
         let reason = null
-        if (trans) {
-            reason = _get(_find(trans.data, u => u.recipient.toLowerCase() === recipient.toLowerCase() || u.recipient.toLowerCase() === DAO.safe.address.toLowerCase()), 'reason', "")
+        if(labels && labels.length > 0) {
+            reason = _get(_find(labels, l => l.recipient.toLowerCase() === recipient.toLowerCase() && l.safeTxHash === _get(transaction, 'safeTxHash', _get(transaction, 'txHash', ''))), "label", null)
         }
 
         let date = moment.utc(
@@ -39,13 +37,13 @@ const CompleteTxn = ({ transaction, tokens, owner, isAdmin }: any) => {
         ).local().format('MM/DD hh:mm')
         console.log('reason', reason)
         return { isCredit, amount, symbol, recipient, date, reason }
-    }, [transaction])
+    }, [transaction, labels])
 
     const _handleReasonKeyDown = (safeTxHash: string, recipient: string, reasonText: string) => {
         if (reasonText && reasonText !== '') {
-            axiosHttp.patch('transaction', { chainId, reason: reasonText, safeTxHash: safeTxHash ? safeTxHash : transaction.txHash, recipient, txType: transaction.txType, safeAddress: DAO.safe.address })
+            axiosHttp.patch('transaction/label', { safeAddress, label: reasonText, safeTxHash, recipient })
                 .then(res => { 
-                    dispatch(updateSafeTransaction(res.data))
+                    onLoadLabels(res.data)
                     if (editMode && editMode === `${safeTxHash}-${recipient}`) {
                         setEditMode(null);
                         setReasonText(prev => {
@@ -75,16 +73,17 @@ const CompleteTxn = ({ transaction, tokens, owner, isAdmin }: any) => {
         const mulAmount = _get(item, 'dataDecoded.parameters[1].value')
         const mulRecipient = _get(item, 'dataDecoded.parameters[0].value', "")
         const isLast = _get(transaction, 'dataDecoded.parameters[0].valueDecoded', []).length - 1 === index;
-        let trans = _find(_get(DAO, 'safe.transactions', []), t => t.safeTxHash === transaction.safeTxHash)
+        const token = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
         let mulReason = '';
-        if (trans)
-            mulReason = _get(_find(trans.data, u => u.recipient.toLowerCase() === mulRecipient.toLowerCase()), 'reason', "")
+        if(labels && labels.length > 0) {
+            mulReason = _get(_find(labels, l => l.recipient.toLowerCase() === mulRecipient.toLowerCase() && l.safeTxHash === _get(transaction, 'safeTxHash', _get(transaction, 'txHash', ''))), "label", null)
+        }
         return (
             <div className="transactionRow">
                 <div className="coinText">
                     <img src={isCredit ? receiveToken : sendToken} alt="" />
                     <div className="dashboardTextBold">
-                        {`${mulAmount / 10 ** 18} ${symbol}`}
+                        {`${mulAmount / 10 ** 18} ${token}`}
                     </div>
                 </div>
                 <div className="transactionName">
@@ -108,7 +107,7 @@ const CompleteTxn = ({ transaction, tokens, owner, isAdmin }: any) => {
                                                         }
                                                     })
                                                 }}
-                                                onKeyDown={(e: any) => { console.log(e.target); if (e.key === 'Enter') { _handleReasonKeyDown(transaction.safeTxHash, mulRecipient, e.target.value) } }}
+                                                onKeyDown={(e: any) => { console.log(e.target); if (e.key === 'Enter') { _handleReasonKeyDown(_get(transaction, 'safeTxHash', _get(transaction, 'txHash', undefined)), mulRecipient, e.target.value) } }}
                                                 className="inputField"
                                                 height={30}
                                                 width={"100%"}
@@ -172,7 +171,7 @@ const CompleteTxn = ({ transaction, tokens, owner, isAdmin }: any) => {
                                                             }
                                                         })
                                                     }}
-                                                    onKeyDown={(e: any) => {  console.log(e); if (e.key === 'Enter') { _handleReasonKeyDown(transaction.safeTxHash, recipient, e.target.value) } }}
+                                                    onKeyDown={(e: any) => {  console.log(e); if (e.key === 'Enter') { _handleReasonKeyDown(_get(transaction, 'safeTxHash', _get(transaction, 'txHash', undefined)), recipient, e.target.value) } }}
                                                     className="inputField"
                                                     height={30}
                                                     width={"100%"}

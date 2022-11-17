@@ -755,7 +755,8 @@ body.active-modal {
 .sideBarStrip {
     background: linear-gradient(178.31deg, #C94B32 0.74%, #A54536 63.87%);
     height: 100%;
-    width: 100px;
+    width: 100px !important;
+    max-width: 100px !important;
     padding-top: 10%;
     position: absolute;
     top: 0;
