@@ -186,7 +186,7 @@ const TaskDetails = () => {
 
                         <div className="info">
 
-                            <div className="home-btn">
+                            <div className="home-btn" onClick={() => navigate(-1)}>
                                 <div className="invertedBox">
                                     <div className="navbarText">
                                         {

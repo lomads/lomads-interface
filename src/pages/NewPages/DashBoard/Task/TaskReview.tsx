@@ -182,7 +182,7 @@ const TaskReview = ({ task, close }: any) => {
                     safeAddress: _get(DAO, 'safe.address', null),
                     safeTxHash: onChainSafeTxHash ? onChainSafeTxHash : offChainPayload.safeTxHash,
                     recipient: _get(activeSubmission, 'member.wallet', null),
-                    label: `${m} | ${_get(task, '_id', '')}`
+                    label: `${m} | ${_get(task, 'name', '')}`
                 })
                 dispatch(setDAO(res.data.dao))
                 dispatch(setTask(res.data.task))

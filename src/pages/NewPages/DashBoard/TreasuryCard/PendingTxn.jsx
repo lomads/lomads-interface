@@ -118,7 +118,7 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
                                         isAdmin
                                             ?
                                             <SimpleInputField
-                                                disabled={!owner}
+                                                disabled={!owner && !isAdmin}
                                                 value={_get(reasonText, `${transaction.safeTxHash}-${mulRecipient}`, null)}
                                                 onchange={e => {
                                                     setReasonText(prev => {
@@ -259,7 +259,7 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
                                             isAdmin
                                                 ?
                                                 <SimpleInputField
-                                                    disabled={!owner}
+                                                    disabled={!owner && !isAdmin}
                                                     value={_get(reasonText, `${transaction.safeTxHash}-${recipient}`, null)}
                                                     onchange={e => {
                                                         setReasonText(prev => {
