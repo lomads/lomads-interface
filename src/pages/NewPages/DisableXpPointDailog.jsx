@@ -77,7 +77,11 @@ const DisableXpPointDailog = (props) => {
                     >
                     NO
                     </Button>
-                    <Button id="button-save">YES</Button>
+                    <Button id="button-save" onClick={() => { 
+                      props.setShowDisableDailog(false)
+                      props.setIsXpPointEnable(false)
+                      props.isXpPointSetByDailog(true)
+                     }}>YES</Button>
                 </div>
                 </div>
             </div>

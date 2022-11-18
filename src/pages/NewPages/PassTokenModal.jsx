@@ -5,19 +5,22 @@ import PT from "../../assets/images/drawer-icons/PT.svg";
 import { Button, Image, Input } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import CreateMorePassTokenModal from "./CreateMorePassTokenModal";
-import { useAppSelector } from "state/hooks";
+import { useAppDispatch, useAppSelector } from "state/hooks";
 import coin from '../../assets/svg/coin.svg';
 import { get as _get, find as _find } from 'lodash';
+import { updateContract } from "state/dashboard/actions";
 
 
 const PassTokenModal = ({ toggleModal, togglePassToken }) => {
+
+  const dispatch = useAppDispatch()
+
   const [openCreatePassToken, setOpenCreatePassToken] = useState(false);
 
-  const { DAO, updateDaoLoading, updateDaoLinksLoading } = useAppSelector((state) => state.dashboard);
+  const { DAO, updateContractLoading } = useAppSelector((state) => state.dashboard);
 
   const [dWhiteListed, setDWhiteListed] = useState(_get(DAO?.sbt, 'whitelisted', false));
   const [contactDetail, setContactDetail] = useState(_get(DAO?.sbt, 'contactDetail', []));
-
 
   let toggleCreatePassTokenModal = () => {
     setOpenCreatePassToken(!openCreatePassToken);
@@ -31,6 +34,17 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
       let newDetailsArray = [...contactDetail , contact]
       setContactDetail(newDetailsArray)
     }
+  }
+
+  const handleSave = () => {
+    dispatch(updateContract({ 
+      contractAddress: _get(DAO, 'sbt.address', ''),
+      payload: {
+        daoId: _get(DAO, '_id', ''),
+        whitelisted: dWhiteListed,
+        contactDetail
+      }
+     }))
   }
 
   // useEffect(()=>{
@@ -210,7 +224,7 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
               >
                 Cancel
               </Button>
-              <Button id="button-save">SAVE CHANGES</Button>
+              <Button disabled={updateContractLoading == true} onClick={() => handleSave()} id="button-save">SAVE CHANGES</Button>
             </div>
           </div>
         </div>

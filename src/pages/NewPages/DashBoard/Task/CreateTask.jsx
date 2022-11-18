@@ -493,7 +493,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                                             )
                                                         );
                                                     })}
-                                                   { can(myRole, 'task.create.sweat') && <option value="SWEAT">SWEAT</option> }
+                                                   { can(myRole, 'task.create.sweat') &&  _get(DAO, 'sweatPoints', false) && <option value="SWEAT">SWEAT</option> }
                                                 </select>
                                                 <input
                                                     className="inputField"

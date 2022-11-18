@@ -310,6 +310,15 @@ export const rejectTask = createAsyncThunk(
 	'dao/rejectTask',
 	async (params: any, thunkApi) => {
 		return axiosHttp.post(`task/${params.taskId}/reject?daoUrl=${params.daoUrl}`, params.payload)
+		.then(res => res.data)
+		.catch(e => thunkApi.rejectWithValue(e))
+	}
+)
+
+export const toggleXPPoints = createAsyncThunk(
+	'dao/togglexppoints',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`dao/${params.daoUrl}/sweat-points`, params.payload)
 			.then(res => res.data)
 			.catch(e => thunkApi.rejectWithValue(e))
 	}
@@ -340,5 +349,13 @@ export const deleteTask = createAsyncThunk(
 );
 
 
+export const updateContract = createAsyncThunk(
+	'contract/update',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`contract/${params.contractAddress}`, params.payload)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+)
 
 
