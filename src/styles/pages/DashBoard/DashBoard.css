@@ -113,6 +113,10 @@ body.active-modal {
     align-items: center;
     text-align: center;
     color: #76808D;
+    clear: both;
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .DAOdetails .DAOsettings div span {

@@ -538,7 +538,13 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 					loadPendingTxn()
 					loadExecutedTxn()
 				}}>Treasury
-				<span><img style={{ width: 24, height: 24, objectFit: 'contain', marginLeft: 8 }} src={chainId === SupportedChainId.GOERLI ? GOERLI_LOGO : POLYGON_LOGO}/></span>
+				<span onClick={() => {
+					window.open(
+						chainId === SupportedChainId.GOERLI ? 
+						`https://goerli.etherscan.io/address/${_get(DAO, 'safe.address')}`:
+						`https://polygonscan.com/address/${_get(DAO, 'safe.address')}`
+					)
+				}}><img style={{ width: 24, height: 24, objectFit: 'contain', marginLeft: 8 }} src={chainId === SupportedChainId.GOERLI ? GOERLI_LOGO : POLYGON_LOGO}/></span>
 				</div>
 				<div className="headerDetails">
 					{/* <div><hr className="vl" /></div> */}
