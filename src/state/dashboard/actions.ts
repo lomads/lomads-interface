@@ -306,6 +306,15 @@ export const approveTask = createAsyncThunk(
 	}
 )
 
+export const rejectTask = createAsyncThunk(
+	'dao/rejectTask',
+	async (params: any, thunkApi) => {
+		return axiosHttp.post(`task/${params.taskId}/reject?daoUrl=${params.daoUrl}`, params.payload)
+		.then(res => res.data)
+		.catch(e => thunkApi.rejectWithValue(e))
+	}
+)
+
 export const toggleXPPoints = createAsyncThunk(
 	'dao/togglexppoints',
 	async (params: any, thunkApi) => {
@@ -314,6 +323,31 @@ export const toggleXPPoints = createAsyncThunk(
 			.catch(e => thunkApi.rejectWithValue(e))
 	}
 )
+
+export const archiveTask = createAsyncThunk(
+	'dao/archiveTask',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`task/${params.taskId}/archive?daoUrl=${params.daoUrl}`)
+			.then(res => res.data)
+			.catch(e => {
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
+	}
+);
+
+export const deleteTask = createAsyncThunk(
+	'dao/deleteTask',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`task/${params.taskId}/delete?daoUrl=${params.daoUrl}`)
+			.then(res => res.data)
+			.catch(e => {
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
+	}
+);
+
 
 export const updateContract = createAsyncThunk(
 	'contract/update',

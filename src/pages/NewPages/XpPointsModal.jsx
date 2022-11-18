@@ -14,13 +14,13 @@ import { toggleXPPoints } from "state/dashboard/actions";
 
 
 const XpPointsModal = ({ toggleModal, toggleXp }) => {
-  const [showDisableDailog , setShowDisableDailog] = useState(false)
-  const [isXpPointEnable , setIsXpPointEnable] = useState(false)
-  const [isXpPointSetByDailog , setIsXpPointSetByDailog] = useState(false)
-  const [showCompensateMembersModals , setShowCompensateMembersModals] = useState(false)
-  const [firstUpdate , setFirstUpdate] = useState(false)
+  const [showDisableDailog, setShowDisableDailog] = useState(false)
+  const [isXpPointEnable, setIsXpPointEnable] = useState(false)
+  const [isXpPointSetByDailog, setIsXpPointSetByDailog] = useState(false)
+  const [showCompensateMembersModals, setShowCompensateMembersModals] = useState(false)
+  const [firstUpdate, setFirstUpdate] = useState(false)
   const dispatch = useAppDispatch()
-
+  
   const { DAO } = useAppSelector((state) => state.dashboard);
 
   useEffect(() => {
@@ -84,7 +84,7 @@ const XpPointsModal = ({ toggleModal, toggleXp }) => {
               alignItems: "center",
             }}
           >
-            <XpPoints style={{marginTop: "100px", marginBottom:'10px', width: "94.48px", height: "50px",color: "#C94B32" }} />
+            <XpPoints style={{ marginTop: "100px", marginBottom: '10px', width: "94.48px", height: "50px", color: "#C94B32" }} />
             {/* <Image
               src={XpPoints}
               alt="SWEAT Points icon"
@@ -101,7 +101,7 @@ const XpPointsModal = ({ toggleModal, toggleXp }) => {
             organisation has its own token or it has funds to pay, you can compensate members in
             proportion to the SWEAT points they have.
           </div>
-          {isXpPointEnable && <Button onClick={()=>setShowCompensateMembersModals(true)} id="button-save">{'Convert to tokens & Compensate members'}</Button>}
+          {isXpPointEnable && <Button onClick={() => setShowCompensateMembersModals(true)} id="button-save">{'Convert to tokens & Compensate members'}</Button>}
           <div
                 style={{
                   marginTop: "10px",
@@ -140,7 +140,7 @@ const XpPointsModal = ({ toggleModal, toggleXp }) => {
         </div>
       </div>
       {showCompensateMembersModals && (
-        <CompensateMembersModal toggleCompensate={()=>setShowCompensateMembersModals(false)} />
+        <CompensateMembersModal toggleCompensate={() => setShowCompensateMembersModals(false)} />
       )}
     </>
   );

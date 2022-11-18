@@ -166,6 +166,14 @@
     color: #76808D;
 }
 
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container textarea {
+    resize: none;
+    margin-top: 16px;
+    height: 75px;
+    resize: none;
+    padding: 15px;
+}
+
 .task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container .note {
     font-family: 'Inter', sans-serif;
     font-style: normal;

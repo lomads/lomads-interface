@@ -11,11 +11,11 @@ import TaskCard from './Task/TaskCard';
 import useRole from '../../../hooks/useRole'
 
 import archiveIcon from '../../../assets/svg/archiveIcon.svg';
+import expandIcon from '../../../assets/svg/expand.svg';
 
 const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
     const navigate = useNavigate();
     const { DAO, user, Project } = useAppSelector((state) => state.dashboard);
-    console.log("user : ", user)
     const { account } = useWeb3React();
     const [tab, setTab] = useState(4);
     const [myTasks, setMyTasks] = useState([]);
@@ -99,6 +99,11 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                     </button>
                 </div>
                 <div className="tasks-buttons">
+                    <div style={{ marginRight: '20px' }}>
+                        <button className='archive-btn' onClick={() => navigate('/tasks', { state: { activeTab: tab } })}>
+                            <img src={expandIcon} alt="archive-icon" />
+                        </button>
+                    </div>
                     <div style={{ marginRight: '20px' }}>
                         <button className='archive-btn'>
                             <img src={archiveIcon} alt="archive-icon" />
