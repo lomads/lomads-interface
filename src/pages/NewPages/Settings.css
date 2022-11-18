@@ -136,7 +136,7 @@
 }
 
 .settings-page .settings-center .settings-organisation-child {
-
+    cursor: pointer;
     height: 130px;
     width: 300px;
     background-color: #FFF;
@@ -146,6 +146,11 @@
     flex-direction: column;
     margin-bottom: 20px;
     color: #C94B32;
+}
+
+.settings-page .settings-center .settings-organisation-child.disabled {
+    background-color: #fff;
+    opacity: 0.8;
 }
 
 .settings-page .settings-organisation-flexbox {

@@ -53,7 +53,7 @@ export const addDaoMember = createAsyncThunk(
 		return axiosHttp.patch(`dao/${params.url}/add-member`, params.payload)
 			.then(res => res.data)
 			.catch(e => {
-				toast.error(e.response.data.message);
+				//toast.error(e.response.data.message);
 				return thunkApi.rejectWithValue(e)
 			})
 	}

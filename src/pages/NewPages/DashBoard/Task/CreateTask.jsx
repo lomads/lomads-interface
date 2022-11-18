@@ -109,6 +109,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
     }
 
     const handleCreateTask = () => {
+        console.log(currency, amount)
         if (name === '') {
             let e = document.getElementById('error-name');
             e.innerHTML = 'Enter name';
@@ -121,12 +122,12 @@ const CreateTask = ({ toggleShowCreateTask }) => {
             e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             return;
         }
-        // else if (dchannel === '') {
-        //     let e = document.getElementById('error-dchannel');
-        //     e.innerHTML = 'Enter discussion channel link';
-        //     e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
-        //     return;
-        // }
+        else if (!currency || amount === '' || amount === 0) {
+            let e = document.getElementById('error-compensation');
+            e.innerHTML = 'Enter compensation';
+            e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+            return;
+        }
         else if (dchannel && !isValidUrl(dchannel)) {
             let e = document.getElementById('error-dchannel');
             e.innerHTML = 'Please enter a valid link';
@@ -215,16 +216,20 @@ const CreateTask = ({ toggleShowCreateTask }) => {
         task.isFilterRoles = isFilterRoles;
         task.validRoles = validRoles;
 
-        // dispatch(draftTask({ payload: task }))
+        //dispatch(draftTask({ payload: task }))
         console.log("Draft Task : ", task)
     }
 
     const eligibleContributors = useMemo(() => {
-        return _get(DAO, 'members', []).filter(m => (reviewer || "").toLowerCase() !== m.member._id.toLowerCase() )
+        return _get(DAO, 'members', []).filter(m => (reviewer || "").toLowerCase() !== m.member._id && m.member._id !== user._id )
     }, [DAO, selectedUser, reviewer])
 
     const eligibleReviewers = useMemo(() => {
         return _get(DAO, 'members', []).filter(m => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase())
+    }, [DAO, reviewer, selectedUser])
+
+    const eligibleProjects = useMemo(() => {
+        return _get(DAO, 'projects', []).filter(p => _find(p.members, m => m._id === user._id))
     }, [DAO, reviewer, selectedUser])
 
     return (
@@ -326,7 +331,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                             >
                                                 <option value={null}>Select project</option>
                                                 {
-                                                    _get(DAO, 'projects', []).filter(p => !p.archivedAt && !p.deletedAt).map((item, index) => {
+                                                    eligibleProjects.filter(p => !p.archivedAt && !p.deletedAt).map((item, index) => {
                                                         return (
                                                             <option value={`${item._id}`}>{item.name}</option>
                                                         )
@@ -498,6 +503,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                                     onChange={(e) => setAmount(parseInt(e.target.value))}
                                                 />
                                             </div>
+                                            <span className='error-msg' id="error-compensation"></span>
                                         </div>
 
                                         {/* <div className='createTask-inputRow'>
