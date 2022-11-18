@@ -171,7 +171,7 @@ const MintPassToken = () => {
                             dispatch(addDaoMember({ url: DAO?.url, payload: { name: '', address: account } }))
                             dispatch(getDao(DAO.url));
                             setLoading(false);
-                            toast.success("SBT mint successfuly !");
+                            //toast.success("SBT mint successfuly !");
                             setTimeout(() => navigate(`/${DAO.url}`), 1500);
                             return;
                         }

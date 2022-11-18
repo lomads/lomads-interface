@@ -320,22 +320,30 @@ const Dashboard = () => {
 	}, [chainId, DAO, pendingTransactions])
 
 	const swtBalance = useMemo(() => {
-		const swt = _find(_get(user, 'earnings', []), (e:any) => e.currency === 'SWEAT')
-		if(swt)
-			return _get(swt, 'value', 0)
-		return 0
-	}, [user])
-
-	const tokenDollarBalance = useMemo(() => {
-		const myTokens = _get(user, 'earnings', [])
-		console.log('safeTkn',safeTokens)
-		for (let index = 0; index < myTokens.length; index++) {
-			const myToken = myTokens[index];
-			const safeTkn = _find(safeTokens, (st:any) => st.tokenAddress === myToken.currency)
-			console.log("safeTkn", safeTkn)
+		if(DAO && user) {
+			const swt = _find(_get(user, 'earnings', []), (e:any) => e.currency === 'SWEAT' && e.daoId === _get(DAO, '_id'))
+			if(swt)
+				return _get(swt, 'value', 0)
 		}
 		return 0
-	}, [user, safeTokens])
+	}, [user, DAO])
+
+	const tokenDollarBalance = useMemo(() => {
+		if(DAO && user) {
+			let usdVal = 0
+			const myTokens = _get(user, 'earnings', []).filter((e:any) => e.daoId === _get(DAO, '_id'))
+			for (let index = 0; index < myTokens.length; index++) {
+				const myToken = myTokens[index];
+				const safeTkn = _find(safeTokens, (st:any) => (st.tokenAddress ? st.tokenAddress : chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS )  === myToken.currency)
+				if(safeTkn) {
+					console.log("safeTkn", safeTkn, myToken)
+					usdVal = usdVal + (+_get(safeTkn, 'fiatConversion', 0) * _get(myToken, 'value', 0))
+				}
+			}
+			return (usdVal || 0).toFixed(2)
+		}
+		return 0
+	}, [user, safeTokens, DAO])
 
 	return (
 		<>

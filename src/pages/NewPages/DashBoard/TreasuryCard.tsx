@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo, useImperativeHandle } from "react";
 import { get as _get, sortBy as _sortBy, filter as _filter, map as _map, find as _find } from 'lodash';
-import { useAppSelector } from "state/hooks";
+import { useAppDispatch, useAppSelector } from "state/hooks";
 import SafeButton from "UIpack/SafeButton";
 import { useWeb3React } from "@web3-react/core";
 import { EthSignSignature } from "@gnosis.pm/safe-core-sdk";
@@ -27,11 +27,13 @@ import { usePrevious } from "hooks/usePrevious";
 import axiosHttp from 'api'
 import { nanoid } from "@reduxjs/toolkit";
 import moment from "moment";
+import { setDAO } from "state/dashboard/reducer";
 
 const TreasuryCard = (props: ItreasuryCardType) => {
 	const { provider, account, chainId, ...rest } = useWeb3React();
 	console.log("useWeb3React", chainId, rest)
 	const { daoURL } = useParams()
+	const dispatch = useAppDispatch()
 	const [copy, setCopy] = useState<boolean>(false);
 	const [isAddressValid, setisAddressValid] = useState<boolean>(false);
 	const [owner, setOwner] = useState<boolean>(false);
@@ -102,6 +104,12 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	const loadTxnLabel = async() => {
 		axiosHttp.get(`transaction/label?safeAddress=${_get(DAO, 'safe.address', '')}`)
 		.then(res => setLabels(res.data))
+	}
+
+	const fetchDao = async () => {
+		return axiosHttp.get(`dao/${daoURL}`)
+			.then(res => dispatch(setDAO(res.data)))
+			.catch(e => console.log(e))
 	}
 
 	const loadPendingTxn = async () => {
@@ -431,8 +439,11 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		let _txs = txn;
 		if(txn.offChain && _get(txn, 'token.symbol') === 'SWEAT'){
 			setExecuteTxLoading(txn.safeTxHash)
-			axiosHttp.get(`transaction/off-chain/${txn.safeTxHash}/execute${reject ? '?rejectedTxn=true' : ''}`)
-			.then(res => loadPendingTxn())
+			axiosHttp.get(`transaction/off-chain/${txn.safeTxHash}/execute${reject ? `?rejectedTxn=true&daoId=${_get(DAO, '_id', '')}` : `?daoId=${_get(DAO, '_id', '')}`}`)
+			.then(res => { 
+				loadPendingTxn()
+				fetchDao()
+			 })
 			.catch(e => console.log(e))
 			.finally(() => setExecuteTxLoading(null))
 		} else {
@@ -473,7 +484,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				console.log("confirmed", receipt);
 				setExecuteTxLoading(null)
 				if(!reject)
-					await axiosHttp.patch(`transaction/on-chain/executed`, { 
+					await axiosHttp.patch(`transaction/on-chain/executed?daoId=${_get(DAO, '_id', '')}`, { 
 						safeTx: { 
 							..._txs,
 							token: {
@@ -485,6 +496,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				await loadPendingTxn()
 				await loadExecutedTxn()
 				await loadTxnLabel()
+				await fetchDao()
 			} catch (e) {
 				console.log(e)
 				setExecuteTxLoading(null)

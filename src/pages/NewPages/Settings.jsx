@@ -162,16 +162,17 @@ const Settings = () => {
             <h1>{ name }</h1>
             <h2>Settings</h2>
           </div>
-          <div className="settings-organisation">
+          <div className="settings-organisation" 
+                          onClick={() => {
+                            toggleModal();
+                            setOpenOrganisationDetails(true);
+                          }}
+          >
             <div>
               <img src={OrganistionDetails} style={{ height: "35px" }} />
               <Link
                 className="style-content"
                 style={{ color: "#C94B32" }}
-                onClick={() => {
-                  toggleModal();
-                  setOpenOrganisationDetails(true);
-                }}
               >
                 Organisation Details
                 <ChevronRight />
@@ -180,7 +181,12 @@ const Settings = () => {
           </div>
 
           <div className="settings-organisation-flexbox">
-            <div className="settings-organisation-child">
+            <div className="settings-organisation-child"
+                onClick={() => {
+                  toggleModal();
+                  setOpenRolesPermissions(true);
+                }}
+            >
               <div
                 style={{
                   padding: "20px",
@@ -190,17 +196,13 @@ const Settings = () => {
                 <Link
                   className="style-content"
                   style={{ color: "#C94B32" }}
-                  onClick={() => {
-                    toggleModal();
-                    setOpenRolesPermissions(true);
-                  }}
                 >
                   Roles & Permissions
                   <ChevronRight />
                 </Link>
               </div>
             </div>
-            <div className="settings-organisation-child">
+            <div className="settings-organisation-child disabled">
               <div
                 style={{
                   padding: "20px",
@@ -210,10 +212,6 @@ const Settings = () => {
                 <Link
                   className="style-content"
                   style={{ color: "#C94B32" }}
-                  onClick={() => {
-                    toggleModal();
-                    setOpenSafe(true);
-                  }}
                 >
                   Safe
                   <ChevronRight />
@@ -221,7 +219,12 @@ const Settings = () => {
               </div>
             </div>
 
-            <div className="settings-organisation-child">
+            <div className="settings-organisation-child"
+              onClick={() => {
+                toggleModal();
+                DAO?.sbt?.name ? togglePassToken() : toggleCreatePassTokenModal()
+              }}
+            >
               <div
                 style={{
                   padding: "20px",
@@ -231,10 +234,6 @@ const Settings = () => {
                 <Link
                   className="style-content"
                   style={{ color: "#C94B32" }}
-                  onClick={() => {
-                    toggleModal();
-                    DAO?.sbt?.name ? togglePassToken() : toggleCreatePassTokenModal()
-                  }}
                 >
                   Pass Tokens
                   <ChevronRight />
@@ -244,7 +243,12 @@ const Settings = () => {
           </div>
 
           <div className="settings-organisation-flexbox">
-            <div className="settings-organisation-child">
+            <div className="settings-organisation-child"
+              onClick={() => {
+                toggleModal();
+                setOpenXpPoints(true);
+              }}
+            >
               <div
                 style={{
                   padding: "20px",
@@ -254,17 +258,13 @@ const Settings = () => {
                 <Link
                   className="style-content"
                   style={{ color: "#C94B32" }}
-                  onClick={() => {
-                    toggleModal();
-                    setOpenXpPoints(true);
-                  }}
                 >
                   SWEAT points
                   <ChevronRight />
                 </Link>
               </div>
             </div>
-            <div className="settings-organisation-child">
+            <div className="settings-organisation-child disabled">
               <div
                 style={{
                   padding: "20px",
@@ -274,10 +274,6 @@ const Settings = () => {
                 <Link
                   className="style-content"
                   style={{ color: "#C94B32" }}
-                  onClick={() => {
-                    toggleModal();
-                    setOpenTerminology(true);
-                  }}
                 >
                   Terminology
                   <ChevronRight />
@@ -285,7 +281,7 @@ const Settings = () => {
               </div>
             </div>
 
-            <div className="settings-organisation-child">
+            <div className="settings-organisation-child disabled">
               <div
                 style={{
                   padding: "20px",
@@ -295,10 +291,6 @@ const Settings = () => {
                 <Link
                   className="style-content"
                   style={{ color: "#C94B32" }}
-                  onClick={() => {
-                    toggleModal();
-                    setOpenDiscord(true);
-                  }}
                 >
                   Discord
                   <ChevronRight />

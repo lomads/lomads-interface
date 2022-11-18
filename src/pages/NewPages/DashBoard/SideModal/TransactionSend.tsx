@@ -18,10 +18,12 @@ import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import { ImportSafe } from "connection/SafeCall";
 import { SupportedChainId } from "constants/chains";
 import { useWeb3React } from "@web3-react/core";
+import { useAppSelector } from "state/hooks";
 
 
 const TransactionSend = (props: IselectTransactionSend) => {
 	console.log(props.selectedToken)
+	const { DAO } = useAppSelector((state) => state.dashboard);
 	const { chainId } = useWeb3React();
 	const managePreviousNavigation = () => {
 		const length = props.setRecipient.current.length;
@@ -73,7 +75,8 @@ const TransactionSend = (props: IselectTransactionSend) => {
 									)
 								);
 							})}
-							<option value="SWEAT">SWEAT</option>
+							{ _get(DAO, 'sweatPoints', false) &&
+							<option value="SWEAT">SWEAT</option> }
 						</select>
 					</div>
 				</div>
