@@ -418,9 +418,9 @@ const TaskDetails = () => {
                                                     amICreator
                                                         ?
                                                         <>
-                                                            <button style={{ marginRight: '25px' }}>
+                                                            {/* <button style={{ marginRight: '25px' }}>
                                                                 <img src={editToken} alt="hk-logo" />
-                                                            </button>
+                                                            </button> */}
 
                                                             <button style={{ marginRight: '25px' }} onClick={() => setDeletePrompt(true)}>
                                                                 <img src={deleteIcon} alt="hk-logo" />
@@ -432,7 +432,7 @@ const TaskDetails = () => {
                                                                         height={40}
                                                                         width={150}
                                                                         titleColor="#C94B32"
-                                                                        title="CLOSE PROJECT"
+                                                                        title="CLOSE TASK"
                                                                         bgColor="#FFFFFF"
                                                                         opacity="1"
                                                                         disabled={false}

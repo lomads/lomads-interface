@@ -28,6 +28,9 @@ import axiosHttp from 'api'
 import { nanoid } from "@reduxjs/toolkit";
 import moment from "moment";
 import { setDAO } from "state/dashboard/reducer";
+import { getCurrentUser } from "state/dashboard/actions";
+import GOERLI_LOGO from '../../../assets/images/goerli.png';
+import POLYGON_LOGO from '../../../assets/images/polygon.png';
 
 const TreasuryCard = (props: ItreasuryCardType) => {
 	const { provider, account, chainId, ...rest } = useWeb3React();
@@ -443,6 +446,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 			.then(res => { 
 				loadPendingTxn()
 				fetchDao()
+				dispatch(getCurrentUser({}))
 			 })
 			.catch(e => console.log(e))
 			.finally(() => setExecuteTxLoading(null))
@@ -497,6 +501,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				await loadExecutedTxn()
 				await loadTxnLabel()
 				await fetchDao()
+				dispatch(getCurrentUser({}))
 			} catch (e) {
 				console.log(e)
 				setExecuteTxLoading(null)
@@ -532,7 +537,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				<div id="treasuryCardTitle" onClick={(e) => {
 					loadPendingTxn()
 					loadExecutedTxn()
-				}}>Treasury</div>
+				}}>Treasury
+				<span><img style={{ width: 24, height: 24, objectFit: 'contain', marginLeft: 8 }} src={chainId === SupportedChainId.GOERLI ? GOERLI_LOGO : POLYGON_LOGO}/></span>
+				</div>
 				<div className="headerDetails">
 					{/* <div><hr className="vl" /></div> */}
 					<div className="copyArea" onClick={() => setCopy(true)} onMouseOut={() => setCopy(false)}>

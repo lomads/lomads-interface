@@ -44,7 +44,8 @@ const LinksArea = ({ links }) => {
         return (
             <div onClick={() => window.open(item.link, '_blank')} className='link-pill'>
                 {handleParseUrl(item.link)}
-                <span>{item.title.length > 6 ? item.title.substring(0, 6) + "..." : item.title}</span>
+                <span>{ item.title }</span>
+                {/* <span>{item.title.length > 6 ? item.title.substring(0, 6) + "..." : item.title}</span> */}
             </div>
         )
     }
@@ -57,7 +58,7 @@ const LinksArea = ({ links }) => {
         <div className='links-container'>
             <div className='links-container-links'>
                 {
-                    links.map((item, index) => {
+                    links && links.map((item, index) => {
                         return renderLinks(item)
                     })
                 }

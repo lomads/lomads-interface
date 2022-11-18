@@ -97,7 +97,7 @@ body.active-modal {
     align-items: center;
     padding: 10px 20px;
     gap: 23px;
-    width: 156px;
+    min-width: 156px;
     height: 36px;
     background: rgba(118, 128, 141, 0.05);
     border-radius: 100px;
@@ -227,6 +227,9 @@ body.active-modal {
     line-height: 25px;
     letter-spacing: -0.011em;
     color: #76808D;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 
 #treasuryCardTitle:hover {

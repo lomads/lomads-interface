@@ -18,7 +18,7 @@ import { resetCreateTaskLoader, resetDraftTaskLoader } from 'state/dashboard/red
 import { useWeb3React } from "@web3-react/core";
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
 import { SupportedChainId } from "constants/chains";
-import { getSafeTokens } from '../../../../utils'
+import { beautifyHexToken, getSafeTokens } from '../../../../utils'
 
 import useRole from '../../../../hooks/useRole'
 
@@ -366,7 +366,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                                     {
                                                         eligibleContributors.map((item, index) => {
                                                             return (
-                                                                <option value={`${item.member._id}`}>{item.member.name}</option>
+                                                                <option value={`${item.member._id}`}>{item.member.name && item.member.name !== "" ? `${item.member.name}  (${beautifyHexToken(item.member.wallet)})` : beautifyHexToken(item.member.wallet)}</option>
                                                             )
                                                         })
                                                     }
