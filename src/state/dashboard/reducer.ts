@@ -28,7 +28,8 @@ import {
 	applyTask,
 	assignTask,
 	rejectTaskMember,
-	submitTaskAction
+	submitTaskAction,
+	rejectTask,
 } from "./actions";
 import { createContract } from "state/contract/actions";
 import { get as _get, find as _find } from "lodash";
@@ -63,6 +64,7 @@ export interface DashboardState {
 	applyTaskLoading: boolean | null;
 	assignTaskLoading: boolean | null;
 	submitTaskLoading: boolean | null;
+	rejectTaskLoading: boolean | null;
 }
 
 const initialState: DashboardState = {
@@ -94,7 +96,8 @@ const initialState: DashboardState = {
 	draftTaskLoading: null,
 	applyTaskLoading: null,
 	assignTaskLoading: null,
-	submitTaskLoading: null
+	submitTaskLoading: null,
+	rejectTaskLoading: null,
 };
 
 const dashboardSlice = createSlice({
@@ -169,6 +172,9 @@ const dashboardSlice = createSlice({
 		},
 		resetRejectTaskMemberLoader(state) {
 			state.rejectTaskMemberLoading = null
+		},
+		resetRejectTaskLoader(state) {
+			state.rejectTaskLoading = null
 		},
 		setDAOList(state, action) {
 			state.DAOList = action.payload
@@ -430,7 +436,7 @@ const dashboardSlice = createSlice({
 		[`${assignTask.pending}`]: (state) => {
 			state.assignTaskLoading = true;
 		},
-		// assign task
+		// reject task member
 		[`${rejectTaskMember.fulfilled}`]: (state, action) => {
 			state.rejectTaskMemberLoading = false;
 			state.Task = action.payload.task;
@@ -439,6 +445,8 @@ const dashboardSlice = createSlice({
 		[`${rejectTaskMember.pending}`]: (state) => {
 			state.rejectTaskMemberLoading = true;
 		},
+
+		// submit task
 		[`${submitTaskAction.fulfilled}`]: (state, action) => {
 			state.submitTaskLoading = false;
 			state.Task = action.payload.task;
@@ -446,6 +454,16 @@ const dashboardSlice = createSlice({
 		},
 		[`${submitTaskAction.pending}`]: (state) => {
 			state.submitTaskLoading = true;
+		},
+
+		// reject task submission
+		[`${rejectTask.fulfilled}`]: (state, action) => {
+			state.rejectTaskLoading = false;
+			state.Task = action.payload.task;
+			state.DAO = action.payload.dao;
+		},
+		[`${rejectTask.pending}`]: (state) => {
+			state.rejectTaskLoading = true;
 		},
 	},
 });
@@ -477,6 +495,7 @@ export const {
 	resetApplyTaskLoader,
 	resetAssignTaskLoader,
 	resetRejectTaskMemberLoader,
-	resetSubmitTaskLoading
+	resetSubmitTaskLoading,
+	resetRejectTaskLoader,
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

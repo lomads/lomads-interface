@@ -11,24 +11,24 @@ import CompensateMembersModal from "./CompensateMembersModal";
 
 
 const XpPointsModal = ({ toggleModal, toggleXp }) => {
-  const [showDisableDailog , setShowDisableDailog] = useState(false)
-  const [isXpPointEnable , setIsXpPointEnable] = useState(false)
-  const [isXpPointSetByDailog , setIsXpPointSetByDailog] = useState(false)
-  const [showCompensateMembersModals , setShowCompensateMembersModals] = useState(false)
-  const [firstUpdate , setFirstUpdate] = useState(false)
+  const [showDisableDailog, setShowDisableDailog] = useState(false)
+  const [isXpPointEnable, setIsXpPointEnable] = useState(false)
+  const [isXpPointSetByDailog, setIsXpPointSetByDailog] = useState(false)
+  const [showCompensateMembersModals, setShowCompensateMembersModals] = useState(false)
+  const [firstUpdate, setFirstUpdate] = useState(false)
 
 
   useEffect(() => {
     if (!firstUpdate) {
       setFirstUpdate(true)
     } else {
-      if(!isXpPointEnable && !isXpPointSetByDailog) {
+      if (!isXpPointEnable && !isXpPointSetByDailog) {
         setShowDisableDailog(true)
         setIsXpPointSetByDailog(false)
       }
     }
-  },[isXpPointEnable]);
-  
+  }, [isXpPointEnable]);
+
   return (
     <>
       <div className="sidebarModal">
@@ -70,7 +70,7 @@ const XpPointsModal = ({ toggleModal, toggleXp }) => {
               alignItems: "center",
             }}
           >
-            <XpPoints style={{marginTop: "100px", marginBottom:'10px', width: "94.48px", height: "50px",color: "#C94B32" }} />
+            <XpPoints style={{ marginTop: "100px", marginBottom: '10px', width: "94.48px", height: "50px", color: "#C94B32" }} />
             {/* <Image
               src={XpPoints}
               alt="SWEAT Points icon"
@@ -87,20 +87,20 @@ const XpPointsModal = ({ toggleModal, toggleXp }) => {
             organisation has its own token or it has funds to pay, you can compensate members in
             proportion to the SWEAT points they have.
           </div>
-          {isXpPointEnable && <Button onClick={()=>setShowCompensateMembersModals(true)} id="button-save">{'Convert to tokens & Compensate members'}</Button>}
+          {isXpPointEnable && <Button onClick={() => setShowCompensateMembersModals(true)} id="button-save">{'Convert to tokens & Compensate members'}</Button>}
           <div
-                style={{
-                  marginTop: "10px",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <label class="switch">
-                  <input checked={isXpPointEnable} onChange={(e, d) => setIsXpPointEnable(!isXpPointEnable)} type="checkbox" />
-                  <span class="slider check round"></span>
-                </label>
-                <div id="switch-title">{isXpPointEnable ? "ENABLED" : "DISABLED"}</div>
-              </div>
+            style={{
+              marginTop: "10px",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <label class="switch">
+              <input checked={isXpPointEnable} onChange={(e, d) => setIsXpPointEnable(!isXpPointEnable)} type="checkbox" />
+              <span class="slider check round"></span>
+            </label>
+            <div id="switch-title">{isXpPointEnable ? "ENABLED" : "DISABLED"}</div>
+          </div>
           {/* //! FOOTER */}
           {/* <div className="button-section">
             <Button
@@ -118,7 +118,7 @@ const XpPointsModal = ({ toggleModal, toggleXp }) => {
         </div>
       </div>
       {showCompensateMembersModals && (
-        <CompensateMembersModal toggleCompensate={()=>setShowCompensateMembersModals(false)} />
+        <CompensateMembersModal toggleCompensate={() => setShowCompensateMembersModals(false)} />
       )}
     </>
   );

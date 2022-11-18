@@ -62,7 +62,7 @@ const TaskCard = ({ task, daoUrl }) => {
             <div>
                 {/* Task status */}
                 {
-                    (task.contributionType === 'assign' || task.contributionType === 'open')  && task.taskStatus === 'submitted'
+                    (task.contributionType === 'assign' || task.contributionType === 'open') && task.taskStatus === 'submitted'
                         ?
                         <>
                             {
@@ -114,17 +114,28 @@ const TaskCard = ({ task, daoUrl }) => {
                         ?
                         <>
                             {
-                                amIApplicant && hasMySubmission
+                                hasMySubmission
                                     ?
                                     <div>
                                         <img src={submitted} style={{ marginRight: '5px' }} />
                                         <span style={{ color: '#6B99F7' }}>Under review</span>
                                     </div>
                                     :
-                                    <div>
-                                        <img src={open} style={{ marginRight: '5px' }} />
-                                        <p style={{ color: '#4BA1DB' }}>Open</p>
-                                    </div>
+                                    <>
+                                        {
+                                            amIApplicant
+                                                ?
+                                                <div>
+                                                    <img src={applied} style={{ marginRight: '5px' }} />
+                                                    <p style={{ color: '#FFB600' }}>Applied</p>
+                                                </div>
+                                                :
+                                                <div>
+                                                    <img src={open} style={{ marginRight: '5px' }} />
+                                                    <p style={{ color: '#4BA1DB' }}>Open</p>
+                                                </div>
+                                        }
+                                    </>
                             }
                         </>
                         :
@@ -178,7 +189,7 @@ const TaskCard = ({ task, daoUrl }) => {
                         null
                 }
 
-{
+                {
                     task.taskStatus === 'paid'
                         ?
                         <>

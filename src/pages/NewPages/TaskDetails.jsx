@@ -5,6 +5,8 @@ import '../../styles/pages/TaskDetails.css';
 import Footer from "components/Footer";
 import { LeapFrog } from "@uiball/loaders";
 
+import SafeButton from "UIpack/SafeButton";
+
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -14,12 +16,14 @@ import { SiNotion } from "react-icons/si";
 import lomadsfulllogo from "../../assets/svg/lomadsfulllogo.svg";
 
 import editToken from '../../assets/svg/editToken.svg';
+import deleteIcon from '../../assets/svg/deleteIcon.svg';
 import compensationStar from '../../assets/svg/compensationStar.svg';
 import calendarIcon from '../../assets/svg/calendar.svg'
 import applicants from '../../assets/svg/applicants.svg'
 import folder from '../../assets/svg/folder.svg'
 import paid from '../../assets/svg/paid.svg'
 import approved from '../../assets/svg/approved.svg'
+import iconSvg from '../../assets/svg/createProject.svg';
 
 import { useWeb3React } from "@web3-react/core";
 
@@ -36,7 +40,7 @@ import SubmitTask from "./DashBoard/Task/SubmitTask";
 import ApplicantList from "./DashBoard/Task/ApplicantList";
 import TaskReview from "./DashBoard/Task/TaskReview";
 
-import { IoMdClose } from 'react-icons/io'
+import { CgClose } from 'react-icons/cg'
 
 const TaskDetails = () => {
     const dispatch = useAppDispatch();
@@ -51,6 +55,8 @@ const TaskDetails = () => {
     const [openSubmit, setOpenSubmit] = useState(false);
     const [openApplicantsList, setOpenApplicantsList] = useState(false);
     const [openTaskReview, setOpenTaskReview] = useState(false);
+    const [deletePrompt, setDeletePrompt] = useState(false);
+    const [closePrompt, setClosePrompt] = useState(false);
 
     useEffect(() => {
         if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
@@ -151,6 +157,14 @@ const TaskDetails = () => {
         return _get(Task, 'members', []).filter(m => m.status !== 'rejected');
     }, [Task])
 
+    const handleCloseTask = () => {
+        // dispatch(archiveProject({ projectId, daoUrl: daoURL }));
+    }
+
+    const handleDeleteTask = () => {
+        // dispatch(deleteProject({ projectId, daoUrl: daoURL }));
+    }
+
     return (
         <>
             {
@@ -186,6 +200,50 @@ const TaskDetails = () => {
 
                         <div className="info">
 
+                            {/* close prompt */}
+                            {
+                                closePrompt
+                                    ?
+                                    <div className="taskDetails-overlay">
+                                        <div className="taskDetails-modal">
+                                            <button className="close-btn" onClick={() => setClosePrompt(false)}>
+                                                <CgClose size={20} color="#C94B32" />
+                                            </button>
+                                            <img src={iconSvg} alt="frame-icon" />
+                                            <h1>Close {Task?.name}</h1>
+                                            <p>This action <span>is irreversible</span> for now.<br />You will find closed tasks in the archives.</p>
+                                            <div>
+                                                <button onClick={() => setClosePrompt(false)}>NO</button>
+                                                <button onClick={handleCloseTask}>YES</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    :
+                                    null
+                            }
+
+                            {/* delete prompt */}
+                            {
+                                deletePrompt
+                                    ?
+                                    <div className="taskDetails-overlay">
+                                        <div className="taskDetails-modal">
+                                            <button className="close-btn" onClick={() => setDeletePrompt(false)}>
+                                                <CgClose size={20} color="#C94B32" />
+                                            </button>
+                                            <img src={iconSvg} alt="frame-icon" />
+                                            <h1>Delete {Task?.name}</h1>
+                                            <p>This action <span>is irreversible</span>.</p>
+                                            <div>
+                                                <button onClick={() => setDeletePrompt(false)}>NO</button>
+                                                <button onClick={handleDeleteTask}>YES</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    :
+                                    null
+                            }
+
                             <div className="home-btn">
                                 <div className="invertedBox">
                                     <div className="navbarText">
@@ -215,7 +273,7 @@ const TaskDetails = () => {
                                                 {/* Task status */}
                                                 {/* If task was manually assigned---check if current user is approved applicant or other user*/}
                                                 {
-                                                   (Task.contributionType === 'assign' || Task.contributionType === 'open') && Task.taskStatus === 'submitted'
+                                                    (Task.contributionType === 'assign' || Task.contributionType === 'open') && Task.taskStatus === 'submitted'
                                                         ?
                                                         <>
                                                             {
@@ -265,17 +323,28 @@ const TaskDetails = () => {
                                                         ?
                                                         <>
                                                             {
-                                                                amIApplicant && hasMySubmission
+                                                                hasMySubmission
                                                                     ?
                                                                     <div>
                                                                         <img src={submitted} style={{ marginRight: '5px' }} />
                                                                         <span style={{ color: '#6B99F7' }}>Under review</span>
                                                                     </div>
                                                                     :
-                                                                    <div>
-                                                                        <img src={open} style={{ marginRight: '5px' }} />
-                                                                        <span style={{ color: '#4BA1DB' }}>Open</span>
-                                                                    </div>
+                                                                    <>
+                                                                        {
+                                                                            amIApplicant
+                                                                                ?
+                                                                                <div>
+                                                                                    <img src={applied} style={{ marginRight: '5px' }} />
+                                                                                    <span style={{ color: '#FFB600' }}>Applied</span>
+                                                                                </div>
+                                                                                :
+                                                                                <div>
+                                                                                    <img src={open} style={{ marginRight: '5px' }} />
+                                                                                    <span style={{ color: '#4BA1DB' }}>Open</span>
+                                                                                </div>
+                                                                        }
+                                                                    </>
                                                             }
                                                         </>
                                                         :
@@ -317,7 +386,7 @@ const TaskDetails = () => {
                                                 }
 
                                                 {
-                                                     Task.taskStatus === 'approved'
+                                                    Task.taskStatus === 'approved'
                                                         ?
                                                         <>
                                                             <div>
@@ -330,7 +399,7 @@ const TaskDetails = () => {
                                                 }
 
                                                 {
-                                                     Task.taskStatus === 'paid'
+                                                    Task.taskStatus === 'paid'
                                                         ?
                                                         <>
                                                             <div>
@@ -352,6 +421,28 @@ const TaskDetails = () => {
                                                             <button style={{ marginRight: '25px' }}>
                                                                 <img src={editToken} alt="hk-logo" />
                                                             </button>
+
+                                                            <button style={{ marginRight: '25px' }} onClick={() => setDeletePrompt(true)}>
+                                                                <img src={deleteIcon} alt="hk-logo" />
+                                                            </button>
+                                                            {
+                                                                Task?.archivedAt === null
+                                                                    ?
+                                                                    <SafeButton
+                                                                        height={40}
+                                                                        width={150}
+                                                                        titleColor="#C94B32"
+                                                                        title="CLOSE PROJECT"
+                                                                        bgColor="#FFFFFF"
+                                                                        opacity="1"
+                                                                        disabled={false}
+                                                                        fontweight={400}
+                                                                        fontsize={16}
+                                                                        onClick={() => setClosePrompt(true)}
+                                                                    />
+                                                                    :
+                                                                    null
+                                                            }
 
                                                             {/* <button className="kebab-btn">
                                                         <GoKebabVertical size={24} color="#76808D" />
@@ -437,23 +528,23 @@ const TaskDetails = () => {
                                                     amICreator
                                                         ?
                                                         <>
-                                                        { Task.contributionType === 'open' && Task.isSingleContributor == false ?
-                                                            <>
-                                                                 <div>
-                                                                    <img src={applicants} />
-                                                                    <span>{submissionCount}</span>
-                                                                </div>
-                                                                <h1>{submissionCount.length > 1 ? 'Submissions' : 'Submission'}</h1>
-                                                                <button>CHECK</button> 
-                                                            </> :
-                                                            <>
-                                                                <div>
-                                                                    <img src={applicants} />
-                                                                    <span>{taskMembers.length}</span>
-                                                                </div>
-                                                                <h1>{taskMembers.length > 1 ? 'Applicants' : 'Applicant'}</h1>
-                                                                <button onClick={handleOpenApplicantsSlider}>CHECK</button>
-                                                            </> }
+                                                            {Task.contributionType === 'open' && Task.isSingleContributor == false ?
+                                                                <>
+                                                                    <div>
+                                                                        <img src={applicants} />
+                                                                        <span>{submissionCount}</span>
+                                                                    </div>
+                                                                    <h1>{submissionCount.length > 1 ? 'Submissions' : 'Submission'}</h1>
+                                                                    <button>CHECK</button>
+                                                                </> :
+                                                                <>
+                                                                    <div>
+                                                                        <img src={applicants} />
+                                                                        <span>{taskMembers.length}</span>
+                                                                    </div>
+                                                                    <h1>{taskMembers.length > 1 ? 'Applicants' : 'Applicant'}</h1>
+                                                                    <button onClick={handleOpenApplicantsSlider}>CHECK</button>
+                                                                </>}
                                                         </>
                                                         :
                                                         <>
@@ -463,9 +554,9 @@ const TaskDetails = () => {
                                                                     ?
                                                                     <>
                                                                         {
-                                                                            Task.contributionType === 'open' && hasMySubmission ? 
-                                                                            <h1>Waiting<br/> for validation</h1> :
-                                                                            <h1>The reviewer is<br />looking at your<br />application.</h1>
+                                                                            Task.contributionType === 'open' && hasMySubmission ?
+                                                                                <h1>Waiting<br /> for validation</h1> :
+                                                                                <h1>The reviewer is<br />looking at your<br />application.</h1>
                                                                         }
                                                                     </>
                                                                     :
@@ -568,13 +659,13 @@ const TaskDetails = () => {
                                                     amIApproved
                                                         ?
                                                         <>
-                                                            <h1>Waiting<br/> for validation</h1>
+                                                            <h1>Waiting<br /> for validation</h1>
                                                         </>
                                                         :
                                                         // for others
                                                         <>
                                                             <h1>Task is submitted</h1>
-                                                            { amICreator && <button onClick={() => setOpenTaskReview(true)}>CHECK</button> }
+                                                            {amICreator && <button onClick={() => setOpenTaskReview(true)}>CHECK</button>}
                                                         </>
                                                 }
                                             </>
@@ -582,7 +673,7 @@ const TaskDetails = () => {
                                             null
                                     }
 
-{
+                                    {
                                         Task.taskStatus === 'approved' || Task.taskStatus === 'paid'
                                             ?
                                             <>
@@ -596,7 +687,7 @@ const TaskDetails = () => {
                                                         :
                                                         // for others
                                                         <>
-                                                            <h1>Task has been<br/> {  Task.taskStatus }</h1>
+                                                            <h1>Task has been<br /> {Task.taskStatus}</h1>
                                                         </>
                                                 }
                                             </>
@@ -614,12 +705,12 @@ const TaskDetails = () => {
                                     <img src={memberIcon} alt="member-icon" />
                                     <p>{Task.reviewer.name}</p>
                                 </div>
-                                { !(Task.isSingleContributor === false && Task.contributionType === 'open') && 
-                                <div>
-                                    <span>Assigned</span>
-                                    <img src={memberIcon} alt="member-icon" />
-                                    <p>{assignedUser ? assignedUser : 'Not yet assigned'}</p>
-                                </div> }
+                                {!(Task.isSingleContributor === false && Task.contributionType === 'open') &&
+                                    <div>
+                                        <span>Assigned</span>
+                                        <img src={memberIcon} alt="member-icon" />
+                                        <p>{assignedUser ? assignedUser : 'Not yet assigned'}</p>
+                                    </div>}
                                 {
                                     Task.taskStatus !== 'open' && Task.contributionType === 'open' && Task.isSingleContributor
                                         ?

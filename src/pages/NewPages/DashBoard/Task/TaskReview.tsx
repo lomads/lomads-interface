@@ -257,7 +257,13 @@ const TaskReview = ({ task, close }: any) => {
                     }
                     <div className='detail-container'>
                         <span>Note</span>
-                        <div className='note'>{submission.submission.note}</div>
+                        <textarea
+                            style={{ width: '100%' }}
+                            className="inputField"
+                            disabled
+                            value={submission.submission.note}
+                        />
+                        {/* <div className='note'>{submission.submission.note}</div> */}
                     </div>
                     <div className='detail-container'>
                         {task.submissionLink.length == 0 ?
@@ -351,13 +357,21 @@ const TaskReview = ({ task, close }: any) => {
                             task.contributionType === 'open' && task.isSingleContributor
                                 ?
                                 <div className='taskApply-inputRow row-align'>
-                                    <input type="checkbox" />
+                                    <label className="switch">
+                                        <input type="checkbox" />
+                                        <span className="slider check round"></span>
+                                    </label>
                                     <div>
                                         <span>REOPEN TASK</span>
                                         <p>{assignedUser} will be removed from the task</p>
                                     </div>
                                 </div>
                                 :
+                                null
+                        }
+                        {
+                            task.contributionType === 'assigned'
+                                ?
                                 <div className='taskApply-inputRow'>
                                     <div className='taskApply-optionalDiv'>
                                         <span>Change contributor</span>
@@ -374,6 +388,8 @@ const TaskReview = ({ task, close }: any) => {
                                         <option>Select member</option>
                                     </select>
                                 </div>
+                                :
+                                null
                         }
 
                         <div className='taskApply-btn-container'>

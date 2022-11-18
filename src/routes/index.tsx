@@ -19,6 +19,7 @@ import ProjectDetails from "../pages/NewPages/ProjectDetails";
 import OnlyWhitelisted from "pages/NewPages/OnlyWhitelisted";
 import ArchiveProjects from "../pages/NewPages/ArchiveProjects";
 import TaskDetails from "pages/NewPages/TaskDetails";
+import AllTasks from "pages/NewPages/AllTasks";
 
 export default [
     {
@@ -100,6 +101,10 @@ export default [
     {
         path: '/archives',
         component: ArchiveProjects
+    },
+    {
+        path: '/tasks',
+        component: AllTasks
     },
     {
         path: '/:daoURL',

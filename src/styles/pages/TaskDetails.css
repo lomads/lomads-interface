@@ -10,6 +10,109 @@
     overflow-y: scroll;
 }
 
+.taskDetails-container .taskDetails-overlay {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(27, 43, 65, 0.25);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.taskDetails-container .taskDetails-overlay .taskDetails-modal {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 22px;
+    gap: 20px;
+
+    width: 573px;
+    height: 312px;
+
+    /* WHITE */
+    background: #FFFFFF;
+    border-radius: 20px;
+    position: relative;
+}
+
+.taskDetails-container .taskDetails-overlay .taskDetails-modal .close-btn {
+    height: 40px;
+    width: 40px;
+    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 28px;
+    right: 30px;
+}
+
+.taskDetails-container .taskDetails-overlay .taskDetails-modal h1 {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 33px;
+    /* or 110% */
+    text-align: center;
+
+    /* RED */
+    color: #C94B32;
+}
+
+.taskDetails-container .taskDetails-overlay .taskDetails-modal p {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    /* or 114% */
+    text-align: center;
+
+    /* Grey */
+    color: #76808D;
+}
+
+.taskDetails-container .taskDetails-overlay .taskDetails-modal p span {
+    font-weight: 700;
+}
+
+.taskDetails-container .taskDetails-overlay .taskDetails-modal div {
+    display: flex;
+    align-items: center;
+}
+
+.taskDetails-container .taskDetails-overlay .taskDetails-modal div button {
+    height: 40px;
+    width: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+}
+
+.taskDetails-container .taskDetails-overlay .taskDetails-modal div button:first-child {
+    background: #FFFFFF;
+    /* RED */
+    border: 1px solid #C94B32;
+    color: #C94B32;
+    margin-right: 20px;
+}
+
+.taskDetails-container .taskDetails-overlay .taskDetails-modal div button:last-child {
+    background: #C94B32;
+    color: #FFF;
+}
+
+
+
+
+
+
 .taskDetails-container .home-btn {
     width: 100px;
     height: 100px;
