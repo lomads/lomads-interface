@@ -28,7 +28,9 @@ import {
 	applyTask,
 	assignTask,
 	rejectTaskMember,
-	submitTaskAction
+	submitTaskAction,
+	toggleXPPoints,
+	updateContract
 } from "./actions";
 import { createContract } from "state/contract/actions";
 import { get as _get, find as _find } from "lodash";
@@ -63,6 +65,7 @@ export interface DashboardState {
 	applyTaskLoading: boolean | null;
 	assignTaskLoading: boolean | null;
 	submitTaskLoading: boolean | null;
+	updateContractLoading: boolean | null;
 }
 
 const initialState: DashboardState = {
@@ -94,7 +97,8 @@ const initialState: DashboardState = {
 	draftTaskLoading: null,
 	applyTaskLoading: null,
 	assignTaskLoading: null,
-	submitTaskLoading: null
+	submitTaskLoading: null,
+	updateContractLoading: null
 };
 
 const dashboardSlice = createSlice({
@@ -447,6 +451,16 @@ const dashboardSlice = createSlice({
 		[`${submitTaskAction.pending}`]: (state) => {
 			state.submitTaskLoading = true;
 		},
+		[`${toggleXPPoints.fulfilled}`]: (state, action) => {
+			state.DAO = action.payload;
+		},
+		[`${updateContract.fulfilled}`]: (state, action) => {
+			state.updateContractLoading = false
+			state.DAO = action.payload;
+		},
+		[`${updateContract.pending}`]: (state, action) => {
+			state.updateContractLoading = true
+		}
 	},
 });
 

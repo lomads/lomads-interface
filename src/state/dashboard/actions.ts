@@ -306,4 +306,22 @@ export const approveTask = createAsyncThunk(
 	}
 )
 
+export const toggleXPPoints = createAsyncThunk(
+	'dao/togglexppoints',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`dao/${params.daoUrl}/sweat-points`, params.payload)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+)
+
+export const updateContract = createAsyncThunk(
+	'contract/update',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`contract/${params.contractAddress}`, params.payload)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+)
+
 

@@ -1,5 +1,6 @@
 import { AiOutlineClose } from "react-icons/ai";
 import IconButton from "UIpack/IconButton";
+import { get as _get } from 'lodash'
 import "./Settings.css";
 import OD from "../../assets/images/drawer-icons/OD.svg";
 import { Button, Image, Input } from "@chakra-ui/react";
@@ -7,6 +8,8 @@ import { ReactComponent as XpPoints } from "../../assets/images/settings-page/5-
 import DisableXpPointDailog from "./DisableXpPointDailog";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import CompensateMembersModal from "./CompensateMembersModal";
+import { useAppDispatch, useAppSelector } from "state/hooks";
+import { toggleXPPoints } from "state/dashboard/actions";
 
 
 
@@ -16,23 +19,34 @@ const XpPointsModal = ({ toggleModal, toggleXp }) => {
   const [isXpPointSetByDailog , setIsXpPointSetByDailog] = useState(false)
   const [showCompensateMembersModals , setShowCompensateMembersModals] = useState(false)
   const [firstUpdate , setFirstUpdate] = useState(false)
+  const dispatch = useAppDispatch()
 
+  const { DAO } = useAppSelector((state) => state.dashboard);
 
   useEffect(() => {
-    if (!firstUpdate) {
-      setFirstUpdate(true)
-    } else {
-      if(!isXpPointEnable && !isXpPointSetByDailog) {
-        setShowDisableDailog(true)
-        setIsXpPointSetByDailog(false)
-      }
-    }
-  },[isXpPointEnable]);
+    if(DAO)
+      setIsXpPointEnable(_get(DAO, 'sweatPoints', false))
+  }, [DAO])
+
+  // useEffect(() => {
+  //   if (!firstUpdate) {
+  //     setFirstUpdate(true)
+  //   } else {
+  //     if(!isXpPointEnable && !isXpPointSetByDailog) {
+  //       setShowDisableDailog(true)
+  //       setIsXpPointSetByDailog(false)
+  //     }
+  //   }
+  // },[isXpPointEnable]);
   
   return (
     <>
       <div className="sidebarModal">
-        {showDisableDailog && <DisableXpPointDailog setShowDisableDailog={setShowDisableDailog} setIsXpPointEnable={setIsXpPointEnable} isXpPointSetByDailog={isXpPointSetByDailog} />}
+        {showDisableDailog && <DisableXpPointDailog setShowDisableDailog={setShowDisableDailog} setIsXpPointEnable={(status) => {
+          if(!status) {
+            dispatch(toggleXPPoints({ payload: { status }, daoUrl: _get(DAO, 'url', '')}))
+          }
+        }} isXpPointSetByDailog={isXpPointSetByDailog} />}
         <div
           onClick={() => {
             toggleModal();
@@ -96,7 +110,15 @@ const XpPointsModal = ({ toggleModal, toggleXp }) => {
                 }}
               >
                 <label class="switch">
-                  <input checked={isXpPointEnable} onChange={(e, d) => setIsXpPointEnable(!isXpPointEnable)} type="checkbox" />
+                  <input checked={isXpPointEnable} onChange={(e, d) => { 
+                    if(!isXpPointEnable) {
+                      dispatch(toggleXPPoints({ payload: { status: !isXpPointEnable }, daoUrl: _get(DAO, 'url', '')}))
+                      setIsXpPointEnable(!isXpPointEnable)
+                    } else {
+                      setShowDisableDailog(true)
+                      setIsXpPointSetByDailog(false)
+                    } 
+                  }} type="checkbox" />
                   <span class="slider check round"></span>
                 </label>
                 <div id="switch-title">{isXpPointEnable ? "ENABLED" : "DISABLED"}</div>
