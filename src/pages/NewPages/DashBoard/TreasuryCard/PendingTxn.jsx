@@ -115,7 +115,7 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
                                 :
                                 <>
                                     {
-                                        isAdmin
+                                        isAdmin || owner
                                             ?
                                             <SimpleInputField
                                                 disabled={!owner && !isAdmin}
@@ -256,7 +256,7 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
                                 <div className="dashboardText" onClick={() => handleEnableEditMode(`${transaction.safeTxHash}-${recipient}`, reason)}>{reason}</div> :
                                  <>
                                         {
-                                            isAdmin
+                                            isAdmin || owner
                                                 ?
                                                 <SimpleInputField
                                                     disabled={!owner && !isAdmin}
