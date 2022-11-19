@@ -36,18 +36,18 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
 
     const fetchProjectTasks = () => {
         if (Project && user) {
-            setMyTasks(_get(Project, 'tasks', []).filter(task => _find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())))
-            setManageTasks(_get(Project, 'tasks', []).filter(task => task.creator === user._id || task.reviewer === user._id));
-            setDraftTasks(_get(Project, 'tasks', []).filter(task => task.draftedAt !== null));
+            setMyTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && _find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())))
+            setManageTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && (task.creator === user._id || task.reviewer === user._id)));
+            setDraftTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
             setOtherTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && task.creator !== user._id && task.reviewer !== user._id && !_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())));
         }
     }
 
     const fetchDaoTasks = () => {
         if (DAO && user) {
-            setMyTasks(_get(DAO, 'tasks', []).filter(task => _find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())))
-            setManageTasks(_get(DAO, 'tasks', []).filter(task => task.creator === user._id || task.reviewer === user._id));
-            setDraftTasks(_get(DAO, 'tasks', []).filter(task => task.draftedAt !== null));
+            setMyTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && _find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())))
+            setManageTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && (task.creator === user._id || task.reviewer === user._id)));
+            setDraftTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
             setOtherTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && task.creator !== user._id && task.reviewer !== user._id && !_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())));
         }
     }

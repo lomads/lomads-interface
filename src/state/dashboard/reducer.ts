@@ -30,6 +30,8 @@ import {
 	rejectTaskMember,
 	submitTaskAction,
 	rejectTask,
+	archiveTask,
+	deleteTask,
 	toggleXPPoints,
 	updateContract
 } from "./actions";
@@ -67,6 +69,8 @@ export interface DashboardState {
 	assignTaskLoading: boolean | null;
 	submitTaskLoading: boolean | null;
 	rejectTaskLoading: boolean | null;
+	archiveTaskLoading: boolean | null;
+	deleteTaskLoading: boolean | null;
 	updateContractLoading: boolean | null;
 }
 
@@ -101,6 +105,8 @@ const initialState: DashboardState = {
 	assignTaskLoading: null,
 	submitTaskLoading: null,
 	rejectTaskLoading: null,
+	archiveTaskLoading: null,
+	deleteTaskLoading: null,
 	updateContractLoading: null
 };
 
@@ -179,6 +185,12 @@ const dashboardSlice = createSlice({
 		},
 		resetRejectTaskLoader(state) {
 			state.rejectTaskLoading = null
+		},
+		resetArchiveTaskLoader(state) {
+			state.archiveTaskLoading = null
+		},
+		resetDeleteTaskLoader(state) {
+			state.deleteTaskLoading = null
 		},
 		setDAOList(state, action) {
 			state.DAOList = action.payload
@@ -468,6 +480,24 @@ const dashboardSlice = createSlice({
 		[`${rejectTask.pending}`]: (state) => {
 			state.rejectTaskLoading = true;
 		},
+		// archive task
+		[`${archiveTask.fulfilled}`]: (state, action) => {
+			state.archiveTaskLoading = false;
+			state.Task = action.payload.task;
+			state.DAO = action.payload.dao;
+		},
+		[`${archiveTask.pending}`]: (state) => {
+			state.archiveTaskLoading = true;
+		},
+		// Delete task
+		[`${deleteTask.fulfilled}`]: (state, action) => {
+			state.deleteTaskLoading = false;
+			state.Task = action.payload.task;
+			state.DAO = action.payload.dao;
+		},
+		[`${deleteTask.pending}`]: (state) => {
+			state.deleteTaskLoading = true;
+		},
 		[`${toggleXPPoints.fulfilled}`]: (state, action) => {
 			state.DAO = action.payload;
 		},
@@ -510,5 +540,7 @@ export const {
 	resetRejectTaskMemberLoader,
 	resetSubmitTaskLoading,
 	resetRejectTaskLoader,
+	resetArchiveTaskLoader,
+	resetDeleteTaskLoader,
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;
