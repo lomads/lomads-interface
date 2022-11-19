@@ -31,7 +31,7 @@ import { useWeb3React } from "@web3-react/core";
 import axiosHttp from 'api'
 import { setDAO, setTask } from "state/dashboard/reducer";
 
-import { approveTask } from 'state/dashboard/actions'
+import { approveTask, rejectTask } from 'state/dashboard/actions'
 import { resetAssignTaskLoader, resetRejectTaskMemberLoader } from 'state/dashboard/reducer';
 import { id } from 'ethers/lib/utils';
 import moment from 'moment';
@@ -39,7 +39,7 @@ import { nanoid } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 const TaskReview = ({ task, close }: any) => {
-
+    console.log("task review : ", task);
     const dispatch = useAppDispatch();
     const { DAO } = useAppSelector((state) => state.dashboard);
     const [newCompensation, setNewCompensation] = useState<number>(0)
@@ -50,6 +50,8 @@ const TaskReview = ({ task, close }: any) => {
     const [approveLoading, setApproveLoading] = useState<any>(false)
     const { isSafeOwner } = useRole(DAO, account);
     const currentNonce = useAppSelector((state) => state.flow.currentNonce);
+
+    const [reopen, setReopen] = useState(false)
 
     const taskSubmissions = useMemo(() => {
         if (task)
@@ -189,6 +191,11 @@ const TaskReview = ({ task, close }: any) => {
                 close()
             })
             .finally(() => setApproveLoading(false))
+    }
+
+    const handleRejectTask = () => {
+        console.log("Reopen : ", reopen);
+        dispatch(rejectTask({ payload: { reopen, contributionType: _get(task, 'contributionType', '') }, daoUrl: _get(DAO, 'url', ''), taskId: _get(task, '_id', '') }));
     }
 
     const updateCompensation = () => {
@@ -358,7 +365,7 @@ const TaskReview = ({ task, close }: any) => {
                                 ?
                                 <div className='taskApply-inputRow row-align'>
                                     <label className="switch">
-                                        <input type="checkbox" />
+                                        <input type="checkbox" checked={reopen} onChange={() => setReopen(!reopen)} />
                                         <span className="slider check round"></span>
                                     </label>
                                     <div>
@@ -394,7 +401,7 @@ const TaskReview = ({ task, close }: any) => {
 
                         <div className='taskApply-btn-container'>
                             <button onClick={() => setShowRejectSubmission(false)}>CANCEL</button>
-                            <button>VALIDATE</button>
+                            <button onClick={handleRejectTask}>VALIDATE</button>
                         </div>
                     </div>
                 </div>

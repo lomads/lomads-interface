@@ -27,7 +27,8 @@ import iconSvg from '../../assets/svg/createProject.svg';
 
 import { useWeb3React } from "@web3-react/core";
 
-import { getTask, getDao } from "state/dashboard/actions";
+import { getTask, getDao, archiveTask, deleteTask } from "state/dashboard/actions";
+import { resetArchiveTaskLoader, resetDeleteTaskLoader } from 'state/dashboard/reducer';
 import moment from "moment";
 import ApplyTask from "./DashBoard/Task/ApplyTask";
 
@@ -47,7 +48,7 @@ const TaskDetails = () => {
     const navigate = useNavigate();
     const { provider, account, chainId } = useWeb3React();
     const { taskId, daoURL } = useParams();
-    const { DAO, Task, TaskLoading, user } = useAppSelector((state) => state.dashboard);
+    const { DAO, Task, TaskLoading, user, archiveTaskLoading, deleteTaskLoading } = useAppSelector((state) => state.dashboard);
     console.log("Task : ", Task);
     const daoName = _get(DAO, 'name', '').split(" ");
 
@@ -61,12 +62,30 @@ const TaskDetails = () => {
     useEffect(() => {
         if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
             dispatch(getDao(daoURL))
-    }, [DAO, daoURL])
+    }, [DAO, daoURL]);
 
     useEffect(() => {
         if (DAO && taskId && (!Task || (Task && Task._id !== taskId)))
             dispatch(getTask(taskId));
-    }, [taskId, DAO])
+    }, [taskId, DAO]);
+
+    // runs after archiving a task
+    useEffect(() => {
+        if (archiveTaskLoading === false) {
+            dispatch(resetArchiveTaskLoader());
+            setClosePrompt(false);
+            navigate(-1);
+        }
+    }, [archiveTaskLoading]);
+
+    // runs after deleting a task
+    useEffect(() => {
+        if (deleteTaskLoading === false) {
+            dispatch(resetDeleteTaskLoader());
+            setDeletePrompt(false);
+            navigate(-1);
+        }
+    }, [deleteTaskLoading]);
 
     const amIApplicant = useMemo(() => {
         if (Task) {
@@ -158,11 +177,11 @@ const TaskDetails = () => {
     }, [Task])
 
     const handleCloseTask = () => {
-        // dispatch(archiveProject({ projectId, daoUrl: daoURL }));
+        dispatch(archiveTask({ taskId, daoUrl: daoURL }));
     }
 
     const handleDeleteTask = () => {
-        // dispatch(deleteProject({ projectId, daoUrl: daoURL }));
+        dispatch(deleteTask({ taskId, daoUrl: daoURL }));
     }
 
     return (
