@@ -195,7 +195,7 @@ const TaskReview = ({ task, close }: any) => {
 
     const handleRejectTask = () => {
         console.log("Reopen : ", reopen);
-        dispatch(rejectTask({ payload: { reopen, contributionType: _get(task, 'contributionType', '') }, daoUrl: _get(DAO, 'url', ''), taskId: _get(task, '_id', '') }));
+        // dispatch(rejectTask({ payload: { reopen, contributionType: _get(task, 'contributionType', '') }, daoUrl: _get(DAO, 'url', ''), taskId: _get(task, '_id', '') }));
     }
 
     const updateCompensation = () => {
