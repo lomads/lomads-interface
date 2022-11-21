@@ -13,6 +13,7 @@ import paid from '../../../../assets/svg/paid.svg'
 import approved from '../../../../assets/svg/approved.svg'
 import open from '../../../../assets/svg/open.svg'
 import applied from '../../../../assets/svg/applied.svg'
+import rejected from '../../../../assets/svg/rejected.svg'
 
 import { IoMdClose } from 'react-icons/io'
 
@@ -44,6 +45,16 @@ const TaskCard = ({ task, daoUrl }) => {
     const amIApproved = useMemo(() => {
         if (task) {
             let user = _find(_get(task, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.status === "approved")
+            if (user)
+                return true
+            return false
+        }
+        return false;
+    }, [account, task]);
+
+    const amIRejected = useMemo(() => {
+        if (task) {
+            let user = _find(_get(task, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.status === "submission_rejected")
             if (user)
                 return true
             return false
@@ -98,10 +109,22 @@ const TaskCard = ({ task, daoUrl }) => {
 
                                     </div>
                                     :
-                                    <div>
-                                        <img src={assign} style={{ marginRight: '5px' }} />
-                                        <p style={{ color: '#0EC1B0' }}>Assigned</p>
-                                    </div>
+                                    // if not approved --- check if current user was rejected earlier
+                                    <>
+                                        {
+                                            amIRejected
+                                                ?
+                                                <div>
+                                                    <img src={rejected} style={{ marginRight: '5px' }} />
+                                                    <p style={{ color: '#E23B53' }}>Rejected</p>
+                                                </div>
+                                                :
+                                                <div>
+                                                    <img src={assign} style={{ marginRight: '5px' }} />
+                                                    <p style={{ color: '#0EC1B0' }}>Assigned</p>
+                                                </div>
+                                        }
+                                    </>
                             }
                         </>
                         :
@@ -110,7 +133,7 @@ const TaskCard = ({ task, daoUrl }) => {
 
                 {/* if task was open for all and task status is still open --- check if current user has applied or not */}
                 {
-                    task.contributionType === 'open' && task.taskStatus === 'open'
+                    task.contributionType === 'open' && task.taskStatus === 'open' && task.reopenedAt === null
                         ?
                         <>
                             {
@@ -144,7 +167,7 @@ const TaskCard = ({ task, daoUrl }) => {
 
                 {/* if task was open for all and task has been assigned --- check if current user is approved or other */}
                 {
-                    task.contributionType === 'open' && task.taskStatus === 'assigned'
+                    task.contributionType === 'open' && task.taskStatus === 'assigned' && task.reopenedAt === null
                         ?
                         <>
                             {
@@ -177,6 +200,17 @@ const TaskCard = ({ task, daoUrl }) => {
                 }
 
                 {
+                    task.reopenedAt !== null
+                        ?
+                        <div>
+                            <img src={open} style={{ marginRight: '5px' }} />
+                            <p style={{ color: '#4BA1DB' }}>Re-opened</p>
+                        </div>
+                        :
+                        null
+                }
+
+                {
                     task.taskStatus === 'approved'
                         ?
                         <>
@@ -196,6 +230,19 @@ const TaskCard = ({ task, daoUrl }) => {
                             <div>
                                 <img src={paid} style={{ marginRight: '5px' }} />
                                 <p style={{ color: '#74D415' }}>paid</p>
+                            </div>
+                        </>
+                        :
+                        null
+                }
+
+                {
+                    task.taskStatus === 'rejected'
+                        ?
+                        <>
+                            <div>
+                                <img src={rejected} style={{ marginRight: '5px' }} />
+                                <span style={{ color: '#E23B53' }}>Rejected</span>
                             </div>
                         </>
                         :

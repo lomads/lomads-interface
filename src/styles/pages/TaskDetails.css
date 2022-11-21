@@ -367,6 +367,7 @@
 .taskDetails-container .info .taskDetails-body .body-right {
     height: 100%;
     width: 60%;
+    padding: 0 1rem;
     background: linear-gradient(178.31deg, #C94B32 0.74%, #A54536 63.87%);
     border-radius: 5px;
     display: flex;
@@ -408,6 +409,10 @@
     /* WHITE */
     color: #FFFFFF;
     margin: 5px 0;
+}
+
+.taskDetails-container .info .taskDetails-body .body-right p {
+    text-align: center;
 }
 
 .taskDetails-container .info .taskDetails-body .body-right button {
