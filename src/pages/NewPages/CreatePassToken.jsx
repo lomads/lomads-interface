@@ -215,7 +215,7 @@ const CreatePassToken = () => {
                     setContractAddr(contractAddr);
                     const contractJSON = {
                         name: `${_get(DAO, 'name', '')} SBT`,
-                        token: sbtName,
+                        token: sbtSymbol,
                         image,
                         tokenSupply: SBTConstructor.supply,
                         address: contractAddr,
