@@ -145,7 +145,10 @@ const AddExistingSafe = () => {
       url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
       image: null,
       members: value.map((m:any) => {
-		return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: m.role ? m.role : owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'ADMIN' : 'CONTRIBUTOR' }
+		if(m.address.toLowerCase() === account?.toLowerCase()) {
+			return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'ADMIN' : 'CORE_CONTRIBUTOR' }
+		}
+		return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'ADMIN' :  m.role ? m.role: 'CONTRIBUTOR' }
 	  }),
       safe: {
         name: safeName,

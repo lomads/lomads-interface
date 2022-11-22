@@ -234,7 +234,7 @@ const AddNewSafe = () => {
 					image: null,
 					members: value.map((m: any) => {
 						return {
-							...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: m.role ? m.role : 'CONTRIBUTOR'
+							...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role:  m.address.toLowerCase() === account?.toLowerCase() ? 'ADMIN' : m.role ? m.role : 'CONTRIBUTOR'
 						}
 					}),
 					safe: {

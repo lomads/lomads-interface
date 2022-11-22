@@ -120,14 +120,18 @@ const Dashboard = () => {
 		setShowNavBar(_choice);
 	};
 
-	const handleSwitchChain = async (chain: number) => {
-		switchChain(connector, chain)
+	const handleSwitchChain = async (nextChain: number) => {
+		if(chainId !== nextChain) {
+			switchChain(connector, nextChain)
 			.then(res => {
-				sessionStorage.clear()
 				dispatch(setDAOList([]))
 				dispatch(setDAO(null))
-				window.location.href = '/'
+				setTimeout(() => {
+					sessionStorage.clear()
+					window.location.href = '/'
+				}, 1000)
 			})
+		}
 	}
 
 	const prevDAO = usePrevious(DAO);

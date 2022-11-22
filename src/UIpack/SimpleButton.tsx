@@ -15,7 +15,7 @@ const SimpleButton = (props: ButtonType) => {
           width: props.width,
           fontSize: props.fontsize,
           fontWeight: props.fontweight,
-          background: props.bgColor,
+          background: props.disabled ? "grey" : props.bgColor,
           boxShadow: props.shadow,
         }}
       >

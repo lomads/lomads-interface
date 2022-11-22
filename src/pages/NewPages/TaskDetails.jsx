@@ -43,6 +43,7 @@ import ApplicantList from "./DashBoard/Task/ApplicantList";
 import TaskReview from "./DashBoard/Task/TaskReview";
 
 import { CgClose } from 'react-icons/cg'
+import useRole from "hooks/useRole";
 
 const TaskDetails = () => {
     const dispatch = useAppDispatch();
@@ -52,6 +53,7 @@ const TaskDetails = () => {
     const { DAO, Task, TaskLoading, user, archiveTaskLoading, deleteTaskLoading } = useAppSelector((state) => state.dashboard);
     console.log("Task : ", Task);
     const daoName = _get(DAO, 'name', '').split(" ");
+    const { myRole, can  }  = useRole(DAO, account)
 
     const [openApply, setOpenApply] = useState(false);
     const [openSubmit, setOpenSubmit] = useState(false);
@@ -489,34 +491,38 @@ const TaskDetails = () => {
                                                 {/* edit and menu button visible only to the creator */}
                                                 {
                                                     // account.toLowerCase() === Task?.creator.toLowerCase()
-                                                    amICreator
+                                                    amICreator || can(myRole, 'task.edit') || can(myRole, 'task.delete') || can(myRole, 'task.close')
                                                         ?
                                                         <>
+                                                            { (amICreator || can(myRole, 'task.edit')) && false &&
                                                             <button style={{ marginRight: '25px' }}>
                                                                 <img src={editToken} alt="hk-logo" />
                                                             </button>
-
+                                                            }
+                                                            { (amICreator || can(myRole, 'task.delete')) &&
                                                             <button style={{ marginRight: '25px' }} onClick={() => setDeletePrompt(true)}>
                                                                 <img src={deleteIcon} alt="hk-logo" />
                                                             </button>
-                                                            {
-                                                                Task?.archivedAt === null
-                                                                    ?
-                                                                    <SafeButton
-                                                                        height={40}
-                                                                        width={150}
-                                                                        titleColor="#C94B32"
-                                                                        title="CLOSE TASK"
-                                                                        bgColor="#FFFFFF"
-                                                                        opacity="1"
-                                                                        disabled={false}
-                                                                        fontweight={400}
-                                                                        fontsize={16}
-                                                                        onClick={() => setClosePrompt(true)}
-                                                                    />
-                                                                    :
-                                                                    null
                                                             }
+                                                            <>
+                                                                {
+                                                                    Task?.archivedAt === null && ( amICreator || can(myRole, 'task.close')) ?
+                                                                        <SafeButton
+                                                                            height={40}
+                                                                            width={150}
+                                                                            titleColor="#C94B32"
+                                                                            title="CLOSE TASK"
+                                                                            bgColor="#FFFFFF"
+                                                                            opacity="1"
+                                                                            disabled={false}
+                                                                            fontweight={400}
+                                                                            fontsize={16}
+                                                                            onClick={() => setClosePrompt(true)}
+                                                                        />
+                                                                        :
+                                                                        null
+                                                                }
+                                                            </>
 
                                                             {/* <button className="kebab-btn">
                                                         <GoKebabVertical size={24} color="#76808D" />
