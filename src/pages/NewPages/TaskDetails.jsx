@@ -108,6 +108,16 @@ const TaskDetails = () => {
         return false;
     }, [account, Task]);
 
+    const isMySubmissionAccepted = useMemo(() => {
+        if (Task) {
+            let user = _find(_get(Task, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
+            if (user && user.submission && user.status === 'submission_accepted')
+                return true
+            return false
+        }
+        return false;
+    }, [account, Task]);
+
     const amIApproved = useMemo(() => {
         if (Task) {
             let user = _find(_get(Task, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.status === 'approved')
@@ -169,9 +179,19 @@ const TaskDetails = () => {
         return false;
     }, [account, DAO, Task])
 
+    const applicationCount = useMemo(() => {
+        if (Task) {
+            let applications = _get(Task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_rejected'))
+            if (applications)
+                return applications.length
+            return 0
+        }
+        return 0;
+    }, [Task]);
+
     const submissionCount = useMemo(() => {
         if (Task) {
-            let submissions = _get(Task, 'members', []).filter(m => m.submission)
+            let submissions = _get(Task, 'members', []).filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
             if (submissions)
                 return submissions.length
             return 0
@@ -632,16 +652,16 @@ const TaskDetails = () => {
                                                                             <img src={applicants} />
                                                                             <span>{submissionCount}</span>
                                                                         </div>
-                                                                        <h1>{submissionCount.length > 1 ? 'Submissions' : 'Submission'}</h1>
+                                                                        <h1>{submissionCount > 1 ? 'Submissions' : 'Submission'}</h1>
                                                                         <button onClick={() => setOpenTaskReview(true)}>CHECK</button>
                                                                     </>
                                                                     :
                                                                     <>
                                                                         <div>
                                                                             <img src={applicants} />
-                                                                            <span>{taskMembers.length}</span>
+                                                                            <span>{applicationCount}</span>
                                                                         </div>
-                                                                        <h1>{taskMembers.length > 1 ? 'Applicants' : 'Applicant'}</h1>
+                                                                        <h1>{applicationCount > 1 ? 'Applicants' : 'Applicant'}</h1>
                                                                         <button onClick={handleOpenApplicantsSlider}>CHECK</button>
                                                                     </>
                                                             }
@@ -665,7 +685,15 @@ const TaskDetails = () => {
                                                                                     {
                                                                                         Task.contributionType === 'open' && hasMySubmission
                                                                                             ?
-                                                                                            <h1>Waiting<br /> for validation</h1>
+                                                                                            <>
+                                                                                                {
+                                                                                                    isMySubmissionAccepted
+                                                                                                        ?
+                                                                                                        <h1>Well Done!</h1>
+                                                                                                        :
+                                                                                                        <h1>Waiting<br /> for validation</h1>
+                                                                                                }
+                                                                                            </>
                                                                                             :
                                                                                             <h1>The reviewer is<br />looking at your<br />application.</h1>
                                                                                     }
