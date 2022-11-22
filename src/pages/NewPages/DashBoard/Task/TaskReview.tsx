@@ -37,11 +37,12 @@ import { id } from 'ethers/lib/utils';
 import moment from 'moment';
 import { nanoid } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { beautifyHexToken } from '../../../../utils';
 
 const TaskReview = ({ task, close }: any) => {
     console.log("task review : ", task);
     const dispatch = useAppDispatch();
-    const { DAO } = useAppSelector((state) => state.dashboard);
+    const { DAO, user } = useAppSelector((state) => state.dashboard);
     const [newCompensation, setNewCompensation] = useState<number>(0)
     const [showModifyCompensation, setShowModifyCompensation] = useState<boolean>(false)
     const [showRejectSubmission, setShowRejectSubmission] = useState<boolean>(false)
@@ -51,7 +52,9 @@ const TaskReview = ({ task, close }: any) => {
     const { isSafeOwner } = useRole(DAO, account);
     const currentNonce = useAppSelector((state) => state.flow.currentNonce);
 
-    const [reopen, setReopen] = useState(false)
+    const [reopen, setReopen] = useState(false);
+    const [rejectionNote, setRejectionNote] = useState('');
+    const [selectedUser, setSelectedUser] = useState<any>(null);
 
     const taskSubmissions = useMemo(() => {
         if (task)
@@ -74,6 +77,10 @@ const TaskReview = ({ task, close }: any) => {
         if (user)
             return user.member.name
     }, [task]);
+
+    const eligibleContributors = useMemo(() => {
+        return _get(DAO, 'members', []).filter((m: { member: any; }) => task.reviewer !== m.member._id && m.member._id !== user._id && m.member.name !== assignedUser)
+    }, [DAO, selectedUser, task])
 
     const createOnChainTxn = async () => {
         return new Promise(async (resolve, reject) => {
@@ -194,8 +201,18 @@ const TaskReview = ({ task, close }: any) => {
     }
 
     const handleRejectTask = () => {
-        console.log("Reopen : ", reopen);
-        // dispatch(rejectTask({ payload: { reopen, contributionType: _get(task, 'contributionType', '') }, daoUrl: _get(DAO, 'url', ''), taskId: _get(task, '_id', '') }));
+        dispatch(rejectTask({
+            payload:
+            {
+                reopen,
+                rejectionNote,
+                contributionType: _get(task, 'contributionType', ''),
+                isSingleContributor: _get(task, 'isSingleContributor', ''),
+                newContributorId: selectedUser ? selectedUser._id : null
+            },
+            daoUrl: _get(DAO, 'url', ''),
+            taskId: _get(task, '_id', '')
+        }));
     }
 
     const updateCompensation = () => {
@@ -333,6 +350,11 @@ const TaskReview = ({ task, close }: any) => {
         }
     }
 
+    const handleSetApplicant = (value: any) => {
+        let user = _find(DAO.members, m => m.member._id === value);
+        setSelectedUser({ _id: user.member._id, address: user.wallet });
+    }
+
     const renderRejectTask = () => {
         return (
             <div className='task-review-overlay'>
@@ -355,7 +377,8 @@ const TaskReview = ({ task, close }: any) => {
                                 className="inputField"
                                 placeholder='Why I reject this submission,
                                 What should be improved...'
-                                value={''}
+                                value={rejectionNote}
+                                onChange={(e) => setRejectionNote(e.target.value)}
                             />
                             <span style={{ fontSize: '13px', color: '#C84A32' }} id="note-error"></span>
                         </div>
@@ -377,7 +400,7 @@ const TaskReview = ({ task, close }: any) => {
                                 null
                         }
                         {
-                            task.contributionType === 'assigned'
+                            task.contributionType === 'assign'
                                 ?
                                 <div className='taskApply-inputRow'>
                                     <div className='taskApply-optionalDiv'>
@@ -391,8 +414,16 @@ const TaskReview = ({ task, close }: any) => {
                                         id="project"
                                         className="tokenDropdown"
                                         style={{ width: '100%' }}
+                                        onChange={(e) => handleSetApplicant(e.target.value)}
                                     >
                                         <option>Select member</option>
+                                        {
+                                            eligibleContributors.map((item: any, index: any) => {
+                                                return (
+                                                    <option value={`${item.member._id}`}>{item.member.name && item.member.name !== "" ? `${item.member.name}  (${beautifyHexToken(item.member.wallet)})` : beautifyHexToken(item.member.wallet)}</option>
+                                                )
+                                            })
+                                        }
                                     </select>
                                 </div>
                                 :
