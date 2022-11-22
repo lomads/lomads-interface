@@ -22,8 +22,15 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
 
     const { isCredit, amount, symbol, recipient, date, reason } = useMemo(() => {
         let isCredit = _get(transaction, 'txType', '') === 'ETHEREUM_TRANSACTION'
-        let amount = _get(transaction, 'transfers[0].value', '')
-        const symbol = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
+        let decimal = 18;
+        if(_get(transaction, 'transfers[0].tokenInfo.decimals', null))
+            decimal = _get(transaction, 'transfers[0].tokenInfo.decimals', 18)
+        let amount = (+(_get(transaction, 'transfers[0].value', 0)) / 10 ** decimal)
+        let symbol = chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR';
+        if(_get(transaction, 'transfers[0].tokenAddress', null))
+            symbol = _get(transaction, 'transfers[0].tokenInfo.symbol', '')
+        else
+            symbol = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
         let recipient = _get(transaction, 'transfers[0].to', '')
         let reason = null
         if(labels && labels.length > 0) {
@@ -73,7 +80,18 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
         const mulAmount = _get(item, 'dataDecoded.parameters[1].value')
         const mulRecipient = _get(item, 'dataDecoded.parameters[0].value', "")
         const isLast = _get(transaction, 'dataDecoded.parameters[0].valueDecoded', []).length - 1 === index;
-        const token = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
+        let token = chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR';
+        if(_get(transaction, 'transfers[0].tokenAddress', null))
+            token = _get(transaction, 'transfers[0].tokenInfo.symbol', '')
+        else
+            token = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
+
+        let muldecimal = 18;
+        if(_get(transaction, 'transfers[0].tokenAddress', null))
+            muldecimal = _get(transaction, 'transfers[0].tokenInfo.decimals', '')
+        else
+            muldecimal = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.decimals', _get(transaction, 'token.decimals', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
+
         let mulReason = '';
         if(labels && labels.length > 0) {
             mulReason = _get(_find(labels, l => l.recipient.toLowerCase() === mulRecipient.toLowerCase() && l.safeTxHash === _get(transaction, 'safeTxHash', _get(transaction, 'txHash', ''))), "label", null)
@@ -83,7 +101,7 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
                 <div className="coinText">
                     <img src={isCredit ? receiveToken : sendToken} alt="" />
                     <div className="dashboardTextBold">
-                        {`${mulAmount / 10 ** 18} ${token}`}
+                        {`${mulAmount / 10 ** muldecimal} ${token}`}
                     </div>
                 </div>
                 <div className="transactionName">
@@ -149,7 +167,7 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
                     <div className="coinText">
                         <img src={isCredit ? receiveToken : sendToken} alt="" />
                         <div className="dashboardTextBold">
-                            {`${amount / 10 ** 18} ${symbol}`}
+                            {`${amount} ${symbol}`}
                         </div>
                     </div>
                     <div className="transactionName">

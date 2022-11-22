@@ -89,14 +89,14 @@ const TaskReview = ({ task, close }: any) => {
                 let sendTotal = newCompensation;
                 const tokens = await getSafeTokens(chainId, _get(DAO, 'safe.address', null))
                 let selToken = _find(tokens, t => t.tokenAddress === _get(task, 'compensation.currency', null))
-                if (selToken && (_get(selToken, 'balance', 0) / 10 ** 18) < sendTotal)
+                if (selToken && (_get(selToken, 'balance', 0) / 10 ** _get(selToken, 'token.decimals', 18)) < sendTotal)
                     return console.log('Low token balance');
                 const token = await tokenCallSafe(_get(task, 'compensation.currency', null));
                 const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
                 const nonce = await (await safeService(provider, `${chainId}`)).getNextNonce(_get(DAO, 'safe.address', null));
                 const unsignedTransaction = await token.populateTransaction.transfer(
                     activeSubmission.member.wallet,
-                    BigInt(parseFloat(`${newCompensation}`) * 10 ** 18)
+                    BigInt(parseFloat(`${newCompensation}`) * 10 ** _get(selToken, 'token.decimals', 18))
                 )
                 const safeTransactionData: SafeTransactionDataPartial[] = [{
                     to: _get(task, 'compensation.currency', null),
@@ -146,6 +146,16 @@ const TaskReview = ({ task, close }: any) => {
         })
     }
 
+    const tokenDecimal = async (addr:string) => {
+        if(chainId){
+            if(!addr || addr === 'SWEAT') return 18;
+            const tokens = await getSafeTokens(chainId, _get(DAO, 'safe.address', null))
+            const tkn = _find(tokens, t => t.tokenAddress === addr);
+            return _get(tkn, 'token.decimals', 18)
+        }
+        return 18
+	}
+
     const handleApproveTask = async () => {
         setApproveLoading(true);
         let onChainSafeTxHash: any = undefined;
@@ -173,7 +183,7 @@ const TaskReview = ({ task, close }: any) => {
                 method: 'transfer',
                 parameters: [
                     { name: 'to', type: "address", value: _get(activeSubmission, 'member.wallet', null) },
-                    { name: 'value', type: "uint256", value: `${BigInt(parseFloat(`${newCompensation}`) * 10 ** 18)}` },
+                    { name: 'value', type: "uint256", value: `${BigInt(parseFloat(`${newCompensation}`) * 10 ** (+tokenDecimal(_get(task, 'compensation.currency', 'SWEAT'))))}` },
                 ]
             }
         }

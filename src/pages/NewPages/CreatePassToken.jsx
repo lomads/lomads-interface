@@ -26,6 +26,7 @@ import { LeapFrog } from "@uiball/loaders";
 import axiosHttp from '../../api'
 import imageToBase64 from "utils/imageToBase64";
 import { SupportedChainId } from "constants/chains";
+import { BigNumber } from '@ethersproject/bignumber';
 
 
 const CreatePassToken = () => {
@@ -197,6 +198,30 @@ const CreatePassToken = () => {
         }
     }, [createContractLoading, contractAddr])
 
+const waitFor = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+const retry = (promise, onRetry, maxRetries) => {
+    const retryWithBackoff = async (retries) => {
+      try {
+        if (retries > 0) {
+          const timeToWait = 2 ** retries * 1000;
+          console.log(`waiting for ${timeToWait}ms...`);
+          await waitFor(timeToWait);
+        }
+        return await promise();
+      } catch (e) {
+        if (retries < maxRetries) {
+          onRetry();
+          return retryWithBackoff(retries + 1);
+        } else {
+          console.warn("Max retries reached. Bubbling the error up");
+          throw e;
+        }
+      }
+    }
+    return retryWithBackoff(0);
+  }
+
     const deploySBTContract = async () => {
         if (account) {
             setIsLoading(true);
@@ -209,12 +234,19 @@ const CreatePassToken = () => {
             }
             else {
                 console.log("Contract deployed", tx, counter);
-                const contractAddr = await getContractById(sbtDeployerContract, counter);
+                console.log('waiting')
+                //await wait(15000);
+                const contractAddr = await retry (
+                    await getContractById(sbtDeployerContract, counter),
+                    () => { console.log('retry called...') },
+                    50
+                )
+                //const contractAddr = await getContractById(sbtDeployerContract, counter);
                 console.log(contractAddr)
                 if (contractAddr) {
                     setContractAddr(contractAddr);
                     const contractJSON = {
-                        name: sbtSymbol,//`${_get(DAO, 'name', '')} SBT`,
+                        name: `${_get(DAO, 'name', '')} SBT`,
                         token: sbtSymbol,
                         image,
                         tokenSupply: SBTConstructor.supply,

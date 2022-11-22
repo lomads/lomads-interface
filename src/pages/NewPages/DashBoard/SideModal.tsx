@@ -168,10 +168,10 @@ const SideModal = (props: IsideModal) => {
 			let selToken = _find(safeTokens, t => t.tokenAddress === selectedToken)
 			if (safeTokens.length > 0 && !selToken)
 				selToken = safeTokens[0];
-			if (selToken && (_get(selToken, 'balance', 0) / 10 ** 18) < sendTotal)
+			if (selToken && (_get(selToken, 'balance', 0) / 10 ** _get(selToken, 'token.decimals', 18)) < sendTotal)
 				//{ _get(result, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR') }
 				//return setError(`Low token balance. Available tokens ${_get(selToken, 'balance', 0) / 10 ** 18} ${selToken.token.symbol}`);
-				return setError(`Low token balance. Available tokens ${_get(selToken, 'balance', 0) / 10 ** 18} ${_get(selToken, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}`);
+				return setError(`Low token balance. Available tokens ${_get(selToken, 'balance', 0) / 10 ** _get(selToken, 'token.decimals', 18)} ${_get(selToken, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}`);
 			setisLoading(true);
 			console.log(selectedToken, props.safeAddress)
 			const token = await tokenCallSafe(selectedToken);
@@ -181,7 +181,7 @@ const SideModal = (props: IsideModal) => {
 					async (result: IsetRecipientType, index: number) => {
 						const unsignedTransaction = await token.populateTransaction.transfer(
 							result.recipient,
-							BigInt(parseFloat(result.amount) * 10 ** 18)
+							BigInt(parseFloat(result.amount) * 10 ** _get(selToken, 'token.decimals', 18))
 						);
 						const transactionData = {
 							to: selectedToken,

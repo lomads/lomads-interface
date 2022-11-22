@@ -528,6 +528,12 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		return false
 	}, [props.tokens])
 
+	const tokenDecimal = (addr:string) => {
+		if(!addr) return 18
+		const tkn = _find(props.tokens, t => t.tokenAddress === addr);
+		return _get(tkn, 'token.decimals', 18)
+	}
+
 	if (!DAO || (DAO && DAO.url !== daoURL))
 		return null
 
@@ -594,7 +600,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 								return (
 									<>
 										<div className="tokenDiv">
-											<span>{`${_get(token, 'balance', 0) / 10 ** 18}`}</span>
+											<span>{`${_get(token, 'balance', 0) / 10 ** tokenDecimal(token.tokenAddress)}`}</span>
 											<h1>{`${_get(token, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}`}</h1>
 										</div>
 									</>
