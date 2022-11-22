@@ -29,7 +29,7 @@ const ApplicantList = ({ task, close }) => {
 
 
     const taskMembers = useMemo(() => {
-        return _get(task, 'members', []).filter(m => m.status !== 'rejected');
+        return _get(task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_rejected'));
     }, [task, rejectTaskMemberLoading, assignTaskLoading])
 
 
@@ -102,15 +102,6 @@ const ApplicantList = ({ task, close }) => {
                             <>
                                 <button disabled={rejectTaskMemberLoading} onClick={() => handleRejectMember(applicant)}>REJECT</button>
                                 <button onClick={() => handleAssignTask(applicant)}>ASSIGN</button>
-                            </>
-                            :
-                            null
-                    }
-                    {
-                        applicant.status === 'submission_rejected'
-                            ?
-                            <>
-                                <button disabled={rejectTaskMemberLoading}>SUBMISSION REJECT</button>
                             </>
                             :
                             null

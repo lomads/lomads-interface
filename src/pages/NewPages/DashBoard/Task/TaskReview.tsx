@@ -55,14 +55,17 @@ const TaskReview = ({ task, close }: any) => {
     const [reopen, setReopen] = useState(false);
     const [rejectionNote, setRejectionNote] = useState('');
     const [selectedUser, setSelectedUser] = useState<any>(null);
+    const [rejectUser, setRejectUser] = useState<any>(null);
 
     const taskSubmissions = useMemo(() => {
+        console.log("59 task : ", task)
         if (task)
-            return _get(task, 'members', []).filter((member: any) => member.submission)
+            return _get(task, 'members', []).filter((member: any) => member.submission && (member.status !== 'submission_accepted' && member.status !== 'submission_rejected'))
         return []
     }, [task])
 
     useEffect(() => {
+        console.log("task submissions : ", taskSubmissions);
         if (!activeSubmission && taskSubmissions.length > 0)
             setActiveSubmission(taskSubmissions[0])
     }, [taskSubmissions])
@@ -75,11 +78,12 @@ const TaskReview = ({ task, close }: any) => {
     const assignedUser = useMemo(() => {
         let user = _find(_get(task, 'members', []), m => m.status === 'approved')
         if (user)
-            return user.member.name
+            return user.member
+        return null;
     }, [task]);
 
     const eligibleContributors = useMemo(() => {
-        return _get(DAO, 'members', []).filter((m: { member: any; }) => task.reviewer !== m.member._id && m.member._id !== user._id && m.member.name !== assignedUser)
+        return _get(DAO, 'members', []).filter((m: { member: any; }) => task.reviewer !== m.member._id && m.member._id !== user._id && m.member._id !== assignedUser?._id)
     }, [DAO, selectedUser, task])
 
     const createOnChainTxn = async () => {
@@ -208,7 +212,8 @@ const TaskReview = ({ task, close }: any) => {
                 rejectionNote,
                 contributionType: _get(task, 'contributionType', ''),
                 isSingleContributor: _get(task, 'isSingleContributor', ''),
-                newContributorId: selectedUser ? selectedUser._id : null
+                newContributorId: selectedUser ? selectedUser._id : null,
+                rejectUser
             },
             daoUrl: _get(DAO, 'url', ''),
             taskId: _get(task, '_id', '')
@@ -326,7 +331,7 @@ const TaskReview = ({ task, close }: any) => {
                     </div>
                 </div>
                 <div className='task-review-foot'>
-                    <button onClick={() => setShowRejectSubmission(true)}>REJECT</button>
+                    <button onClick={() => { setRejectUser(submission.member._id); setShowRejectSubmission(true) }}>REJECT</button>
                     <button disabled={approveLoading} style={{ backgroundColor: approveLoading ? 'grey' : '#C94B32' }} onClick={() => handleApproveTask()}>APPROVE</button>
                 </div>
             </div>
@@ -393,7 +398,7 @@ const TaskReview = ({ task, close }: any) => {
                                     </label>
                                     <div>
                                         <span>REOPEN TASK</span>
-                                        <p>{assignedUser} will be removed from the task</p>
+                                        <p>{assignedUser.name} will be removed from the task</p>
                                     </div>
                                 </div>
                                 :
@@ -432,7 +437,7 @@ const TaskReview = ({ task, close }: any) => {
 
                         <div className='taskApply-btn-container'>
                             <button onClick={() => setShowRejectSubmission(false)}>CANCEL</button>
-                            <button onClick={handleRejectTask}>VALIDATE</button>
+                            <button onClick={() => handleRejectTask()}>VALIDATE</button>
                         </div>
                     </div>
                 </div>

@@ -202,10 +202,32 @@ const TaskCard = ({ task, daoUrl }) => {
                 {
                     task.reopenedAt !== null
                         ?
-                        <div>
-                            <img src={open} style={{ marginRight: '5px' }} />
-                            <p style={{ color: '#4BA1DB' }}>Re-opened</p>
-                        </div>
+                        <>
+                            {
+                                amIApplicant
+                                    ?
+                                    <div>
+                                        <img src={applied} style={{ marginRight: '5px' }} />
+                                        <p style={{ color: '#FFB600' }}>Applied</p>
+                                    </div>
+                                    :
+                                    <>
+                                        {
+                                            amIRejected
+                                                ?
+                                                <div>
+                                                    <img src={rejected} style={{ marginRight: '5px' }} />
+                                                    <p style={{ color: '#E23B53' }}>Rejected</p>
+                                                </div>
+                                                :
+                                                <div>
+                                                    <img src={open} style={{ marginRight: '5px' }} />
+                                                    <p style={{ color: '#4BA1DB' }}>Open</p>
+                                                </div>
+                                        }
+                                    </>
+                            }
+                        </>
                         :
                         null
                 }
