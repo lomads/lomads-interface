@@ -36,9 +36,9 @@ const ApplicantList = ({ task, close }) => {
     console.log("taskMembers", taskMembers)
 
     useEffect(() => {
-        if(rejectTaskMemberLoading === false) {
+        if (rejectTaskMemberLoading === false) {
             dispatch(resetRejectTaskMemberLoader());
-            if(taskMembers.length == 0){
+            if (taskMembers.length == 0) {
                 close();
             } else {
                 setPos(0)
@@ -73,7 +73,7 @@ const ApplicantList = ({ task, close }) => {
     }
 
     const RenderApplicantCard = ({ applicant }) => {
-        if(!applicant) return null;
+        if (!applicant) return null;
         return (
             <div className='applicant-card'>
                 <div className='applicant-body'>
@@ -100,8 +100,17 @@ const ApplicantList = ({ task, close }) => {
                         applicant.status === 'pending'
                             ?
                             <>
-                                <button disabled={rejectTaskMemberLoading} onClick={() =>handleRejectMember(applicant)}>REJECT</button>
+                                <button disabled={rejectTaskMemberLoading} onClick={() => handleRejectMember(applicant)}>REJECT</button>
                                 <button onClick={() => handleAssignTask(applicant)}>ASSIGN</button>
+                            </>
+                            :
+                            null
+                    }
+                    {
+                        applicant.status === 'submission_rejected'
+                            ?
+                            <>
+                                <button disabled={rejectTaskMemberLoading}>SUBMISSION REJECT</button>
                             </>
                             :
                             null

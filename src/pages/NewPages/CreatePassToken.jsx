@@ -36,7 +36,7 @@ const CreatePassToken = () => {
     console.log("DAO data : ", DAO);
     const sbtDeployerContract = useSBTDeployerContract();
     const [tab, setTab] = useState(1);
-    const [sbtName, setSbtName] = useState('');
+    const [sbtSymbol, setSbtSymbol] = useState('');
     const [error, setError] = useState('');
     const [nameError, setNameError] = useState(false);
     const [tokenQuantity, setTokenQuantity] = useState('');
@@ -112,9 +112,9 @@ const CreatePassToken = () => {
             }
         }
         else {
-			let ENSname = null;
-			if(chainId !== SupportedChainId.POLYGON)
-				ENSname = await provider?.lookupAddress(_ownerAddress);
+            let ENSname = null;
+            if (chainId !== SupportedChainId.POLYGON)
+                ENSname = await provider?.lookupAddress(_ownerAddress);
             if (ENSname) {
                 member.name = _ownerName !== '' ? _ownerName : ENSname;
             }
@@ -145,8 +145,8 @@ const CreatePassToken = () => {
         setMemberList(memberList.filter((_, index) => index !== position));
     }
 
-    const handleSBTname = (e) => {
-        setSbtName(e.target.value);
+    const handleSBTSymbol = (e) => {
+        setSbtSymbol(e.target.value);
         setError('');
         setNameError(false);
     }
@@ -158,7 +158,7 @@ const CreatePassToken = () => {
     }
 
     const addSBTConstructor = async () => {
-        if (sbtName === '') {
+        if (sbtSymbol === '') {
             setNameError(true);
             setError("Please enter token name");
             return;
@@ -177,7 +177,7 @@ const CreatePassToken = () => {
             const b64 = await imageToBase64(image)
             console.log(b64);
             setSBTConstructor({
-                name: sbtName,
+                name: sbtSymbol,
                 supply: +(tokenQuantity || 250),
                 img: b64
             });
@@ -201,7 +201,7 @@ const CreatePassToken = () => {
         if (account) {
             setIsLoading(true);
             const counter = await getCurrentId(sbtDeployerContract);
-            const tx = await createNewSBT(sbtDeployerContract, SBTConstructor, memberList);
+            const tx = await createNewSBT(sbtDeployerContract, SBTConstructor, memberList, DAO?.name);
             if (!tx) {
                 setIsLoading(false);
                 toast.error("Error during deployment");
@@ -211,7 +211,7 @@ const CreatePassToken = () => {
                 console.log("Contract deployed", tx, counter);
                 const contractAddr = await getContractById(sbtDeployerContract, counter);
                 console.log(contractAddr)
-                if(contractAddr) {
+                if (contractAddr) {
                     setContractAddr(contractAddr);
                     const contractJSON = {
                         name: `${_get(DAO, 'name', '')} SBT`,
@@ -245,23 +245,23 @@ const CreatePassToken = () => {
 
     const onDrop = useCallback(acceptedFiles => { setDroppedfiles(acceptedFiles) }, [])
 
-    const { getRootProps, getInputProps } = useDropzone({onDrop, multiple: false })
+    const { getRootProps, getInputProps } = useDropzone({ onDrop, multiple: false })
 
-	const getSignedUploadUrl = (file, callback) => { 
+    const getSignedUploadUrl = (file, callback) => {
         console.log(file)
         const filename = `SBT/${nanoid(32)}.${file.type.split('/')[1]}`
         return axiosHttp.post(`utility/upload-url`, { key: filename, mime: file.type }).then(res => callback(res.data))
     }
 
-	const onUploadProgress = (progress, message, file) => { }
+    const onUploadProgress = (progress, message, file) => { }
 
-	const onUploadError = error => { setDroppedfiles([]); setUploadLoading(false) }
+    const onUploadError = error => { setDroppedfiles([]); setUploadLoading(false) }
 
-	const onUploadStart = (file, next) => {	setUploadLoading(true); return next(file); }
+    const onUploadStart = (file, next) => { setUploadLoading(true); return next(file); }
 
-	const onFinish = finish => { 
+    const onFinish = finish => {
         setDroppedfiles([])
-        setUploadLoading(false);  
+        setUploadLoading(false);
         var arr = finish.signedUrl.split('?');
         console.log(arr)
         setImage(arr[0])
@@ -280,13 +280,13 @@ const CreatePassToken = () => {
                             ?
                             <>
                                 <div className="createPassToken-form-container">
-                                    <label>Name of the Pass Token</label>
+                                    <label>Symbol of the Pass Token</label>
                                     <input
                                         id="token-name"
                                         className="text-input"
-                                        placeholder="Enter token name"
-                                        value={sbtName}
-                                        onChange={(e) => handleSBTname(e)}
+                                        placeholder="Enter token symbol"
+                                        value={sbtSymbol}
+                                        onChange={(e) => handleSBTSymbol(e)}
                                     />
                                     {
                                         nameError && <p className="error">{error}</p>
@@ -301,41 +301,41 @@ const CreatePassToken = () => {
 
                                     <div className="image-picker-container">
                                         {
-                                            image ? 
-                                            <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                                                <div onClick={() => setImage(null)} style={{ cursor: 'pointer' }}>
-                                                    <img style={{ width: 18, height: 18, position: 'absolute', right: 8, top: 8, opacity: 0.7 }} src={require('../../assets/images/close.png')} />
+                                            image ?
+                                                <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                                                    <div onClick={() => setImage(null)} style={{ cursor: 'pointer' }}>
+                                                        <img style={{ width: 18, height: 18, position: 'absolute', right: 8, top: 8, opacity: 0.7 }} src={require('../../assets/images/close.png')} />
+                                                    </div>
+                                                    <img src={image} alt="selected-token-icon" className="selected-img" />
                                                 </div>
-                                                <img src={image} alt="selected-token-icon" className="selected-img" />
-                                            </div>
-                                             :
-                                            <div {...getRootProps()}>
-                                                <ReactS3Uploader
-                                                    droppedfiles={droppedfiles}
-                                                    getSignedUrl={getSignedUploadUrl}
-                                                    accept="image/*"
-                                                    className={{ display: 'none' }}
-                                                    onProgress={onUploadProgress}
-                                                    onError={onUploadError}
-                                                    preprocess={onUploadStart}
-                                                    onFinish={onFinish}
-                                                    multiple
-                                                    uploadRequestHeaders={{
-                                                    }}
-                                                    contentDisposition="auto"
-                                                />
-                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                                    { uploadLoading ?
-                                                    <LeapFrog size={24} color="#C94B32" /> :
-                                                    <>
-                                                        <img src={uploadIcon} alt="upload-icon" />
-                                                        <p>Choose <br /> or drag an image</p>
-                                                        <span>maximum size 2mb</span>
-                                                    </> 
-                                                    }
+                                                :
+                                                <div {...getRootProps()}>
+                                                    <ReactS3Uploader
+                                                        droppedfiles={droppedfiles}
+                                                        getSignedUrl={getSignedUploadUrl}
+                                                        accept="image/*"
+                                                        className={{ display: 'none' }}
+                                                        onProgress={onUploadProgress}
+                                                        onError={onUploadError}
+                                                        preprocess={onUploadStart}
+                                                        onFinish={onFinish}
+                                                        multiple
+                                                        uploadRequestHeaders={{
+                                                        }}
+                                                        contentDisposition="auto"
+                                                    />
+                                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                                        {uploadLoading ?
+                                                            <LeapFrog size={24} color="#C94B32" /> :
+                                                            <>
+                                                                <img src={uploadIcon} alt="upload-icon" />
+                                                                <p>Choose <br /> or drag an image</p>
+                                                                <span>maximum size 2mb</span>
+                                                            </>
+                                                        }
+                                                    </div>
+                                                    <input {...getInputProps()} />
                                                 </div>
-                                                <input {...getInputProps()} />
-                                            </div>
                                         }
                                     </div>
 
@@ -378,9 +378,9 @@ const CreatePassToken = () => {
                             <>
                                 <div className="tokenName-container">
                                     <div className="tokenName-box">
-                                        { image ? 
-                                        <img style={{ width: 20, height: 20, marginRight: 6 }} src={image} /> :
-                                        <img src={coin} alt="asset" />
+                                        {image ?
+                                            <img style={{ width: 20, height: 20, marginRight: 6 }} src={image} /> :
+                                            <img src={coin} alt="asset" />
                                         }
                                         {/* <img src={hklogo} alt="hk-logo" /> */}
                                         <p style={{ marginLeft: "5px" }}>{SBTConstructor.name}</p>

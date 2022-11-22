@@ -23,6 +23,7 @@ import applicants from '../../assets/svg/applicants.svg'
 import folder from '../../assets/svg/folder.svg'
 import paid from '../../assets/svg/paid.svg'
 import approved from '../../assets/svg/approved.svg'
+import rejected from '../../assets/svg/rejected.svg'
 import iconSvg from '../../assets/svg/createProject.svg';
 
 import { useWeb3React } from "@web3-react/core";
@@ -115,6 +116,24 @@ const TaskDetails = () => {
             return false
         }
         return false;
+    }, [account, Task]);
+
+    const amIRejected = useMemo(() => {
+        if (Task) {
+            let user = _find(_get(Task, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.status === 'submission_rejected')
+            if (user)
+                return true
+            return false
+        }
+        return false;
+    }, [account, Task]);
+
+    const renderRejectionNote = useMemo(() => {
+        if (Task) {
+            let user = _find(_get(Task, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.status === 'submission_rejected')
+            if (user)
+                return user.rejectionNote;
+        }
     }, [account, Task]);
 
     const amIEligible = useMemo(() => {
@@ -263,7 +282,7 @@ const TaskDetails = () => {
                                     null
                             }
 
-                            <div className="home-btn" onClick={() =>  navigate(-1)}>
+                            <div className="home-btn" onClick={() => navigate(-1)}>
                                 <div className="invertedBox">
                                     <div className="navbarText">
                                         {
@@ -326,10 +345,22 @@ const TaskDetails = () => {
 
                                                                     </div>
                                                                     :
-                                                                    <div>
-                                                                        <img src={assign} style={{ marginRight: '5px' }} />
-                                                                        <span style={{ color: '#0EC1B0' }}>Assigned</span>
-                                                                    </div>
+                                                                    // if not approved --- check if current user was rejected earlier
+                                                                    <>
+                                                                        {
+                                                                            amIRejected
+                                                                                ?
+                                                                                <div>
+                                                                                    <img src={rejected} style={{ marginRight: '5px' }} />
+                                                                                    <span style={{ color: '#E23B53' }}>Rejected</span>
+                                                                                </div>
+                                                                                :
+                                                                                <div>
+                                                                                    <img src={assign} style={{ marginRight: '5px' }} />
+                                                                                    <span style={{ color: '#0EC1B0' }}>Assigned</span>
+                                                                                </div>
+                                                                        }
+                                                                    </>
                                                             }
                                                         </>
                                                         :
@@ -338,7 +369,7 @@ const TaskDetails = () => {
 
                                                 {/* if task was open for all and task status is still open --- check if current user has applied or not */}
                                                 {
-                                                    Task.contributionType === 'open' && Task.taskStatus === 'open'
+                                                    Task.contributionType === 'open' && Task.taskStatus === 'open' && Task.reopenedAt === null
                                                         ?
                                                         <>
                                                             {
@@ -372,7 +403,7 @@ const TaskDetails = () => {
 
                                                 {/* if task was open for all and task has been assigned --- check if current user is approved or other */}
                                                 {
-                                                    Task.contributionType === 'open' && Task.taskStatus === 'assigned'
+                                                    Task.contributionType === 'open' && Task.taskStatus === 'assigned' && Task.reopenedAt === null
                                                         ?
                                                         <>
                                                             {
@@ -405,6 +436,17 @@ const TaskDetails = () => {
                                                 }
 
                                                 {
+                                                    Task.reopenedAt !== null
+                                                        ?
+                                                        <div>
+                                                            <img src={open} style={{ marginRight: '5px' }} />
+                                                            <span style={{ color: '#4BA1DB' }}>Re-opened</span>
+                                                        </div>
+                                                        :
+                                                        null
+                                                }
+
+                                                {
                                                     Task.taskStatus === 'approved'
                                                         ?
                                                         <>
@@ -430,6 +472,19 @@ const TaskDetails = () => {
                                                         null
                                                 }
 
+                                                {
+                                                    Task.taskStatus === 'rejected'
+                                                        ?
+                                                        <>
+                                                            <div>
+                                                                <img src={rejected} style={{ marginRight: '5px' }} />
+                                                                <span style={{ color: '#E23B53' }}>Rejected</span>
+                                                            </div>
+                                                        </>
+                                                        :
+                                                        null
+                                                }
+
 
                                                 {/* edit and menu button visible only to the creator */}
                                                 {
@@ -437,9 +492,9 @@ const TaskDetails = () => {
                                                     amICreator
                                                         ?
                                                         <>
-                                                            {/* <button style={{ marginRight: '25px' }}>
+                                                            <button style={{ marginRight: '25px' }}>
                                                                 <img src={editToken} alt="hk-logo" />
-                                                            </button> */}
+                                                            </button>
 
                                                             <button style={{ marginRight: '25px' }} onClick={() => setDeletePrompt(true)}>
                                                                 <img src={deleteIcon} alt="hk-logo" />
@@ -547,23 +602,27 @@ const TaskDetails = () => {
                                                     amICreator
                                                         ?
                                                         <>
-                                                            {Task.contributionType === 'open' && Task.isSingleContributor == false ?
-                                                                <>
-                                                                    <div>
-                                                                        <img src={applicants} />
-                                                                        <span>{submissionCount}</span>
-                                                                    </div>
-                                                                    <h1>{submissionCount.length > 1 ? 'Submissions' : 'Submission'}</h1>
-                                                                    <button>CHECK</button>
-                                                                </> :
-                                                                <>
-                                                                    <div>
-                                                                        <img src={applicants} />
-                                                                        <span>{taskMembers.length}</span>
-                                                                    </div>
-                                                                    <h1>{taskMembers.length > 1 ? 'Applicants' : 'Applicant'}</h1>
-                                                                    <button onClick={handleOpenApplicantsSlider}>CHECK</button>
-                                                                </>}
+                                                            {
+                                                                Task.contributionType === 'open' && Task.isSingleContributor == false
+                                                                    ?
+                                                                    <>
+                                                                        <div>
+                                                                            <img src={applicants} />
+                                                                            <span>{submissionCount}</span>
+                                                                        </div>
+                                                                        <h1>{submissionCount.length > 1 ? 'Submissions' : 'Submission'}</h1>
+                                                                        <button>CHECK</button>
+                                                                    </>
+                                                                    :
+                                                                    <>
+                                                                        <div>
+                                                                            <img src={applicants} />
+                                                                            <span>{taskMembers.length}</span>
+                                                                        </div>
+                                                                        <h1>{taskMembers.length > 1 ? 'Applicants' : 'Applicant'}</h1>
+                                                                        <button onClick={handleOpenApplicantsSlider}>CHECK</button>
+                                                                    </>
+                                                            }
                                                         </>
                                                         :
                                                         <>
@@ -573,10 +632,24 @@ const TaskDetails = () => {
                                                                     ?
                                                                     <>
                                                                         {
-                                                                            Task.contributionType === 'open' && hasMySubmission ?
-                                                                                <h1>Waiting<br /> for validation</h1> :
-                                                                                <h1>The reviewer is<br />looking at your<br />application.</h1>
+                                                                            amIRejected
+                                                                                ?
+                                                                                <>
+                                                                                    <h1>Your submission was rejected</h1>
+                                                                                    <p style={{ color: '#FFF' }}>{renderRejectionNote}</p>
+                                                                                </>
+                                                                                :
+                                                                                <>
+                                                                                    {
+                                                                                        Task.contributionType === 'open' && hasMySubmission
+                                                                                            ?
+                                                                                            <h1>Waiting<br /> for validation</h1>
+                                                                                            :
+                                                                                            <h1>The reviewer is<br />looking at your<br />application.</h1>
+                                                                                    }
+                                                                                </>
                                                                         }
+
                                                                     </>
                                                                     :
                                                                     // Not applied yet --- check if valid roles condition exists
@@ -659,9 +732,21 @@ const TaskDetails = () => {
                                                             <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>
                                                         </>
                                                         :
-                                                        // else display the name of the user who has been assigned
                                                         <>
-                                                            <h1>{assignedUser} is assigned</h1>
+                                                            {
+                                                                amIRejected
+                                                                    ?
+                                                                    // else display the name of the user who has been assigned
+                                                                    <>
+                                                                        <h1>Your submission was rejected</h1>
+                                                                        <p style={{ color: '#FFF' }}>{renderRejectionNote}</p>
+                                                                    </>
+                                                                    :
+                                                                    // else display the name of the user who has been assigned
+                                                                    <>
+                                                                        <h1>{assignedUser} is assigned</h1>
+                                                                    </>
+                                                            }
                                                         </>
                                                 }
                                             </>
@@ -707,6 +792,29 @@ const TaskDetails = () => {
                                                         // for others
                                                         <>
                                                             <h1>Task has been<br /> {Task.taskStatus}</h1>
+                                                        </>
+                                                }
+                                            </>
+                                            :
+                                            null
+                                    }
+
+                                    {
+                                        Task.taskStatus === 'rejected'
+                                            ?
+                                            <>
+                                                {
+                                                    // rejected
+                                                    amIRejected
+                                                        ?
+                                                        <>
+                                                            <h1>Your submission has been rejected!</h1>
+                                                            <p style={{ color: '#FFF' }}>{renderRejectionNote}</p>
+                                                        </>
+                                                        :
+                                                        // for others
+                                                        <>
+                                                            <h1>Submission has been<br /> {Task.taskStatus}</h1>
                                                         </>
                                                 }
                                             </>
