@@ -107,13 +107,13 @@ const SubmitTask = ({ task, close }) => {
         }
         else {
             // dispatch(applyTask({ taskId: task._id, daoUrl: _get(DAO, 'url', ''), payload: { note, resourceList } }));
-            const payload = { 
-                daoUrl: _get(DAO, 'url', ''), 
-                taskId: task._id,  
+            const payload = {
+                daoUrl: _get(DAO, 'url', ''),
+                taskId: task._id,
                 note,
                 ...(task.submissionLink && task.submissionLink.length == 0 ? { submissionLink: resourceList } : {})
             }
-            console.log(payload)
+            console.log("payload : ", payload)
             //console.log(payload)
             dispatch(submitTaskAction(payload))
         }
@@ -124,107 +124,107 @@ const SubmitTask = ({ task, close }) => {
             <div className="taskApply-container">
 
                 <div className="taskApply-header">
-                    { !submissionDone && <span>{task.name}</span> }
+                    {!submissionDone && <span>{task.name}</span>}
                     <button onClick={close}>
                         <CgClose size={20} color="#C94B32" />
                     </button>
                 </div>
 
-            {
-                submissionDone ? 
-                <div className='createTask-success'>
-                    <img src={SUBMISSION_DONE} alt="frame-icon" />
-                    <h1>Done!</h1>
-                    <span>Your submission is sent.<br />You will be redirected in a few seconds.</span>
-                </div> : 
-                <div className='taskApply-body'>
-                    <img src={createTaskSvg} alt="frame-icon" />
-                    <h1>Submit your work</h1>
+                {
+                    submissionDone ?
+                        <div className='createTask-success'>
+                            <img src={SUBMISSION_DONE} alt="frame-icon" />
+                            <h1>Done!</h1>
+                            <span>Your submission is sent.<br />You will be redirected in a few seconds.</span>
+                        </div> :
+                        <div className='taskApply-body'>
+                            <img src={createTaskSvg} alt="frame-icon" />
+                            <h1>Submit your work</h1>
 
-                    <div className='taskApply-rowInput' style={{ margin: '35px 0' }}>
-                        <label>Note</label>
-                        <textarea
-                            style={{ width: '100%' }}
-                            className="inputField"
-                            placeholder='I made this changes because...'
-                            value={note}
-                            onChange={handleChangeNote}
-                        />
-                        <span style={{ fontSize: '13px', color: '#C84A32' }} id="note-error"></span>
-                    </div>
+                            <div className='taskApply-rowInput' style={{ margin: '35px 0' }}>
+                                <label>Note</label>
+                                <textarea
+                                    style={{ width: '100%' }}
+                                    className="inputField"
+                                    placeholder='I made this changes because...'
+                                    value={note}
+                                    onChange={handleChangeNote}
+                                />
+                                <span style={{ fontSize: '13px', color: '#C84A32' }} id="note-error"></span>
+                            </div>
 
-                    {
-                        task.submissionLink && task.submissionLink.length > 0
-                            ?
-                            <button className='submitLink-btn' onClick={() => window.open(task.submissionLink, '_blank', 'noopener,noreferrer')}>
-                                <img src={folder} />
-                                SUBMISSION LINK
-                            </button>
-                            :
-                            <div className='taskApply-rowInput'>
-                                <label>Add links</label>
-                                <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-                                    <div style={{ marginRight: '10px', height: '70px' }}>
-                                        <SimpleInputField
-                                            className="inputField"
-                                            height={50}
-                                            width={135}
-                                            placeholder="Ex portfolio"
-                                            value={title}
-                                            onchange={handleChangeTitle}
-                                        />
-                                        <span style={{ fontSize: '13px', color: '#C84A32' }} id="title-error"></span>
-                                    </div>
-                                    <div style={{ marginRight: '10px', height: '70px' }}>
-                                        <AddressInputField
-                                            className="inputField"
-                                            height={50}
-                                            width={175}
-                                            placeholder="Link"
-                                            value={link}
-                                            onchange={handleChangeLink}
-                                        />
-                                        <span style={{ fontSize: '13px', color: '#C84A32' }} id="link-error"></span>
-                                    </div>
-                                    <button
-                                        style={link !== '' && title !== '' ? { background: '#C84A32' } : null}
-                                        onClick={() => handleAddResource()}
-                                    >
-                                        <AiOutlinePlus color="#FFF" size={25} />
+                            {
+                                task.submissionLink && task.submissionLink.length > 0
+                                    ?
+                                    <button className='submitLink-btn' onClick={() => window.open(task.submissionLink, '_blank', 'noopener,noreferrer')}>
+                                        <img src={folder} />
+                                        SUBMISSION LINK
                                     </button>
-                                </div>
-                                <span style={{ fontSize: '13px', color: '#C84A32', marginTop: '-15px' }} id="resource-error"></span>
-                            </div>
-                    }
-
-                    {
-                        resourceList.length > 0
-                            ?
-                            <div className='transparent-list'>
-                                {
-                                    resourceList.map((item, index) => {
-                                        return (
-                                            <div className="member-li" key={index}>
-                                                <div className="member-img-name">
-                                                    {/* {handleParseUrl(item.link)} */}
-                                                    <p style={{ marginLeft: '5px' }}>{item.title}</p>
-                                                </div>
-                                                <div className="member-address">
-                                                    <p>{item.link.length > 30 ? item.link.slice(0, 30) + "..." : item.link}</p>
-                                                    <button onClick={() => handleRemoveResource(index)}>X</button>
-                                                </div>
+                                    :
+                                    <div className='taskApply-rowInput'>
+                                        <label>Add links</label>
+                                        <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+                                            <div style={{ marginRight: '10px', height: '70px' }}>
+                                                <SimpleInputField
+                                                    className="inputField"
+                                                    height={50}
+                                                    width={135}
+                                                    placeholder="Ex portfolio"
+                                                    value={title}
+                                                    onchange={handleChangeTitle}
+                                                />
+                                                <span style={{ fontSize: '13px', color: '#C84A32' }} id="title-error"></span>
                                             </div>
-                                        )
-                                    })
-                                }
-                            </div>
-                            :
-                            null
-                    }
+                                            <div style={{ marginRight: '10px', height: '70px' }}>
+                                                <AddressInputField
+                                                    className="inputField"
+                                                    height={50}
+                                                    width={175}
+                                                    placeholder="Link"
+                                                    value={link}
+                                                    onchange={handleChangeLink}
+                                                />
+                                                <span style={{ fontSize: '13px', color: '#C84A32' }} id="link-error"></span>
+                                            </div>
+                                            <button
+                                                style={link !== '' && title !== '' ? { background: '#C84A32' } : null}
+                                                onClick={() => handleAddResource()}
+                                            >
+                                                <AiOutlinePlus color="#FFF" size={25} />
+                                            </button>
+                                        </div>
+                                        <span style={{ fontSize: '13px', color: '#C84A32', marginTop: '-15px' }} id="resource-error"></span>
+                                    </div>
+                            }
 
-                    <button className='taskApply-sendBtn' onClick={handleSubmitWork}>SEND</button>
+                            {
+                                resourceList.length > 0
+                                    ?
+                                    <div className='transparent-list'>
+                                        {
+                                            resourceList.map((item, index) => {
+                                                return (
+                                                    <div className="member-li" key={index}>
+                                                        <div className="member-img-name">
+                                                            {/* {handleParseUrl(item.link)} */}
+                                                            <p style={{ marginLeft: '5px' }}>{item.title}</p>
+                                                        </div>
+                                                        <div className="member-address">
+                                                            <p>{item.link.length > 30 ? item.link.slice(0, 30) + "..." : item.link}</p>
+                                                            <button onClick={() => handleRemoveResource(index)}>X</button>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            })
+                                        }
+                                    </div>
+                                    :
+                                    null
+                            }
 
-                </div>
+                            <button className='taskApply-sendBtn' onClick={handleSubmitWork}>SEND</button>
+
+                        </div>
                 }
             </div>
         </div>
