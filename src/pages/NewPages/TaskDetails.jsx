@@ -438,10 +438,32 @@ const TaskDetails = () => {
                                                 {
                                                     Task.reopenedAt !== null
                                                         ?
-                                                        <div>
-                                                            <img src={open} style={{ marginRight: '5px' }} />
-                                                            <span style={{ color: '#4BA1DB' }}>Re-opened</span>
-                                                        </div>
+                                                        <>
+                                                            {
+                                                                amIApplicant
+                                                                    ?
+                                                                    <div>
+                                                                        <img src={applied} style={{ marginRight: '5px' }} />
+                                                                        <span style={{ color: '#FFB600' }}>Applied</span>
+                                                                    </div>
+                                                                    :
+                                                                    <>
+                                                                        {
+                                                                            amIRejected
+                                                                                ?
+                                                                                <div>
+                                                                                    <img src={rejected} style={{ marginRight: '5px' }} />
+                                                                                    <span style={{ color: '#E23B53' }}>Rejected</span>
+                                                                                </div>
+                                                                                :
+                                                                                <div>
+                                                                                    <img src={open} style={{ marginRight: '5px' }} />
+                                                                                    <span style={{ color: '#4BA1DB' }}>Open</span>
+                                                                                </div>
+                                                                        }
+                                                                    </>
+                                                            }
+                                                        </>
                                                         :
                                                         null
                                                 }
@@ -611,7 +633,7 @@ const TaskDetails = () => {
                                                                             <span>{submissionCount}</span>
                                                                         </div>
                                                                         <h1>{submissionCount.length > 1 ? 'Submissions' : 'Submission'}</h1>
-                                                                        <button>CHECK</button>
+                                                                        <button onClick={() => setOpenTaskReview(true)}>CHECK</button>
                                                                     </>
                                                                     :
                                                                     <>
@@ -808,8 +830,20 @@ const TaskDetails = () => {
                                                     amIRejected
                                                         ?
                                                         <>
-                                                            <h1>Your submission has been rejected!</h1>
-                                                            <p style={{ color: '#FFF' }}>{renderRejectionNote}</p>
+                                                            {
+                                                                Task.reopenedAt
+                                                                    ?
+                                                                    <>
+                                                                        <h1>Your submission has been rejected!</h1>
+                                                                        <p style={{ color: '#FFF' }}>{renderRejectionNote}</p>
+                                                                    </>
+                                                                    :
+                                                                    <>
+                                                                        <h1>Your submission has been rejected!</h1>
+                                                                        <p style={{ color: '#FFF' }}>{renderRejectionNote}</p>
+                                                                        <button onClick={() => setOpenSubmit(true)}>SUBMIT AGAIN</button>
+                                                                    </>
+                                                            }
                                                         </>
                                                         :
                                                         // for others

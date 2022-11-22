@@ -57,12 +57,14 @@ const TaskReview = ({ task, close }: any) => {
     const [selectedUser, setSelectedUser] = useState<any>(null);
 
     const taskSubmissions = useMemo(() => {
+        console.log("59 task : ", task)
         if (task)
             return _get(task, 'members', []).filter((member: any) => member.submission)
         return []
     }, [task])
 
     useEffect(() => {
+        console.log("task submissions : ", taskSubmissions);
         if (!activeSubmission && taskSubmissions.length > 0)
             setActiveSubmission(taskSubmissions[0])
     }, [taskSubmissions])
@@ -75,11 +77,11 @@ const TaskReview = ({ task, close }: any) => {
     const assignedUser = useMemo(() => {
         let user = _find(_get(task, 'members', []), m => m.status === 'approved')
         if (user)
-            return user.member.name
+            return user.member
     }, [task]);
 
     const eligibleContributors = useMemo(() => {
-        return _get(DAO, 'members', []).filter((m: { member: any; }) => task.reviewer !== m.member._id && m.member._id !== user._id && m.member.name !== assignedUser)
+        return _get(DAO, 'members', []).filter((m: { member: any; }) => task.reviewer !== m.member._id && m.member._id !== user._id && m.member._id !== assignedUser._id)
     }, [DAO, selectedUser, task])
 
     const createOnChainTxn = async () => {
@@ -393,7 +395,7 @@ const TaskReview = ({ task, close }: any) => {
                                     </label>
                                     <div>
                                         <span>REOPEN TASK</span>
-                                        <p>{assignedUser} will be removed from the task</p>
+                                        <p>{assignedUser.name} will be removed from the task</p>
                                     </div>
                                 </div>
                                 :

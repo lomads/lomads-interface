@@ -310,8 +310,8 @@ export const rejectTask = createAsyncThunk(
 	'dao/rejectTask',
 	async (params: any, thunkApi) => {
 		return axiosHttp.post(`task/${params.taskId}/reject?daoUrl=${params.daoUrl}`, params.payload)
-		.then(res => res.data)
-		.catch(e => thunkApi.rejectWithValue(e))
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
 	}
 )
 
