@@ -74,11 +74,15 @@ const CreateProject = () => {
     }, [createProjectLoading])
 
     useEffect(() => {
-        if(link && link.length > 8 && link.indexOf('notion.') > -1) {
-            let lnk = new URL(link).pathname;
-            lnk = lnk.split('/')
-            if(lnk && lnk.length > 2)
-                setSpaceDomain(lnk[1])
+        try {
+            if(link && link.length > 8 && link.indexOf('notion.') > -1) {
+                let lnk = new URL(link).pathname;
+                lnk = lnk.split('/')
+                if(lnk && lnk.length > 2)
+                    setSpaceDomain(lnk[1])
+            }
+        } catch (e) {
+            console.log(e)
         }
     }, [link])
 
@@ -219,11 +223,11 @@ const CreateProject = () => {
         //     return toast.error("Please enter a valid link");
         // }
         else {
+            let tempLink = link;
+            if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
+                tempLink = 'https://' + tempLink;
+            }
             if(link.indexOf('discord.') > -1) {
-                let tempLink = link;
-                if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
-                    tempLink = 'https://' + tempLink;
-                }
                 let resource = {};
                 resource.id = nanoid(16);
                 resource.title = title;
@@ -244,10 +248,6 @@ const CreateProject = () => {
                 setSpaceDomain(null)
             } else if(link.indexOf('notion.') > -1) {
                 if(status.status) {
-                    let tempLink = link;
-                    if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
-                        tempLink = 'https://' + tempLink;
-                    }
                     let resource = {};
                     resource.id = nanoid(16);
                     resource.title = title;
@@ -264,6 +264,18 @@ const CreateProject = () => {
                 } else {
                     setLinkError(status.message || 'Something went wrong.')
                 }
+            } else {
+                let resource = {};
+                resource.id = nanoid(16);
+                resource.title = title;
+                resource.link = tempLink;
+                resource.accessControl = false
+                setResourceList([...resourceList, resource]);
+                setAccessControl(false);
+                setTitle('');
+                setLink('');
+                setRoleName(null)
+                setSpaceDomain(null)
             }
         }
     }
@@ -273,9 +285,13 @@ const CreateProject = () => {
     }
 
     const linkHasDomain = useMemo(() => {
-        if(link && link.indexOf('notion.') > -1)
-            return (new URL(link).pathname).split('/').length > 2
-        return false;
+        try {
+            if(link && link.indexOf('notion.') > -1)
+                return (new URL(link).pathname).split('/').length > 2
+            return false;
+        } catch (e) {
+            return false
+        }
     }, [link])
 
     const handleCreateProject = () => {

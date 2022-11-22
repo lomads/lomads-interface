@@ -28,6 +28,8 @@ const AddLink = (props) => {
     const [accessControl, setAccessControl] = useState(false);
     const [accessControlError, setAccessControlError] = useState(null);
 
+    const [addLoading, setAddLoading] = useState(null);
+
     useEffect(() => {
         if (addProjectLinksLoading === false) {
             dispatch(resetAddProjectLinksLoader())
@@ -40,11 +42,15 @@ const AddLink = (props) => {
     }, [addProjectLinksLoading])
 
     useEffect(() => {
-        if(link && link.length > 8 && link.indexOf('notion.') > -1) {
-            let lnk = new URL(link).pathname;
-            lnk = lnk.split('/')
-            if(lnk && lnk.length > 2)
-                setSpaceDomain(lnk[1])
+        try {
+            if(link && link.length > 8 && link.indexOf('notion.') > -1) {
+                let lnk = new URL(link).pathname;
+                lnk = lnk.split('/')
+                if(lnk && lnk.length > 2)
+                    setSpaceDomain(lnk[1])
+            }
+        } catch (e) {
+            console.log(e)
         }
     }, [link])
 
@@ -61,9 +67,14 @@ const AddLink = (props) => {
     }, [link, DAO])
 
     const linkHasDomain = useMemo(() => {
-        if(link && link.indexOf('notion.') > -1)
-            return (new URL(link).pathname).split('/').length > 2
-        return false;
+        try {
+            if(link && link.indexOf('notion.') > -1)
+                return (new URL(link).pathname).split('/').length > 2
+            return false;
+        }
+        catch (e) {
+            return false;
+        }
     }, [link])
 
     const handleAddLink = (status = undefined) => {
@@ -80,11 +91,12 @@ const AddLink = (props) => {
             return;
         }
         else {
+            setAddLoading(true)
+            let tempLink = link;
+            if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
+                tempLink = 'https://' + tempLink;
+            }
             if(link.indexOf('discord.') > -1) {
-                let tempLink = link;
-                if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
-                    tempLink = 'https://' + tempLink;
-                }
                 let platformId = undefined;
                 if (status){
                     console.log(new URL(link).pathname.split('/')[2])
@@ -93,12 +105,9 @@ const AddLink = (props) => {
                 const resource = { id: nanoid(16), title, link: tempLink, provider: new URL(link).hostname, platformId, accessControl, ...(status ? { guildId: status } : {}) };
                 console.log(resource)
                 dispatch(addProjectLinks({ projectId: props.projectId, daoUrl: props.daoUrl, payload: resource }))
+                setAddLoading(false)
             } else if(link.indexOf('notion.') > -1) {                
                 if(status.status === true) {
-                    let tempLink = link;
-                    if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
-                        tempLink = 'https://' + tempLink;
-                    }
                     let resource = {};
                     resource.id = nanoid(16);
                     resource.title = title;
@@ -112,9 +121,24 @@ const AddLink = (props) => {
                     setLink('');
                     setRoleName(null)
                     setSpaceDomain(null)
+                    setAddLoading(false)
                 } else {
+                    setAddLoading(false)
                     setLinkError(status.message || 'Something went wrong')
                 }
+            } else {
+                let resource = {};
+                resource.id = nanoid(16);
+                resource.title = title;
+                resource.link = tempLink;
+                resource.accessControl = false
+                dispatch(addProjectLinks({ projectId: props.projectId, daoUrl: props.daoUrl, payload: resource }))
+                setAccessControl(false);
+                setTitle('');
+                setLink('');
+                setRoleName(null)
+                setSpaceDomain(null)
+                setAddLoading(false)
             }
         }
     };
@@ -216,7 +240,7 @@ const AddLink = (props) => {
                             {
                                 link && (link.indexOf('discord.') > -1 || link.indexOf('notion.') > -1) ?
                                     <LinkBtn okButton spaceDomain={spaceDomain} onNotionCheckStatus={handleAddLink} onGuildCreateSuccess={handleAddLink} title={title} link={link} roleName={roleName} accessControl={accessControl} /> :
-                                    <SimpleButton title="OK" bgColor="#C94B32" className="button" fontsize={16} fontweight={400} height={40} width={129} onClick={() => handleAddLink()} />
+                                    <SimpleButton disabled={addLoading} title="OK" bgColor="#C94B32" className="button" fontsize={16} fontweight={400} height={40} width={129} onClick={() => handleAddLink()} />
                             }
                         </div>
                     </div>

@@ -53,6 +53,7 @@ export const getContractById = async (sbtDeployerContract: Contract, id: BigNumb
     if (sbtDeployerContract.signer || sbtDeployerContract.provider) {
         try {
             console.log(parseInt(id.toString()))
+            console.log(console.log(parseInt(id.toString())))
             const contractAddr = await sbtDeployerContract.getContractByIndex(BigNumber.from(parseInt(id.toString())));
             return contractAddr;
         }

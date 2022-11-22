@@ -304,7 +304,7 @@ const AddMember = (props: any) => {
 								onChange={(e) => setOwnerRole(e.target.value)}
 								style={{ margin: '0' }}
 							>
-								<option value="ADMIN">Admin</option>
+								{/* <option value="ADMIN">Admin</option> */}
 								<option value="CORE_CONTRIBUTOR">Core Contributor</option>
 								<option value="ACTIVE_CONTRIBUTOR">Active Contributor</option>
 								<option value="CONTRIBUTOR">Contributor</option>
@@ -386,7 +386,7 @@ const AddMember = (props: any) => {
 														defaultValue={item.role}
 														onChange={(e) => handleChangeState(e, index)}
 													>
-														<option value="ADMIN">Admin</option>
+														{/* <option value="ADMIN">Admin</option> */}
 														<option value="CORE_CONTRIBUTOR">Core Contributor</option>
 														<option value="ACTIVE_CONTRIBUTOR">Active Contributor</option>
 														<option value="CONTRIBUTOR">Contributor</option>

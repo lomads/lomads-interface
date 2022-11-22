@@ -65,7 +65,7 @@ const InviteGang = () => {
 		if (!check) {
 			let creator = [
 				...invitedMembers,
-				{ name: "", address: account as string, role: 'ADMIN' },
+				{ name: "", address: account as string, role: 'CORE_CONTRIBUTOR' },
 			];
 			creator = creator.filter(c => c.address !== undefined)
 			dispatch(updateInvitedGang(creator));
@@ -305,7 +305,7 @@ const InviteGang = () => {
 								onChange={(e) => setOwnerRole(e.target.value)}
 								style={{ margin: '0' }}
 							>
-								<option value="ADMIN">Admin</option>
+								{/* <option value="ADMIN">Admin</option> */}
 								<option value="CORE_CONTRIBUTOR">Core Contributor</option>
 								<option value="ACTIVE_CONTRIBUTOR">Active Contributor</option>
 								<option value="CONTRIBUTOR">Contributor</option>
@@ -352,7 +352,7 @@ const InviteGang = () => {
 												{
 													result.address !== undefined && result.address === account
 														?
-														`admin`
+														`Core Contributor`
 														:
 														result.role?.replaceAll('_', ' ').toLowerCase()
 												}
@@ -445,7 +445,7 @@ const InviteGang = () => {
 														defaultValue={item.role}
 														onChange={(e) => handleChangeState(e, index)}
 													>
-														<option value="ADMIN">Admin</option>
+														{/* <option value="ADMIN">Admin</option> */}
 														<option value="CORE_CONTRIBUTOR">Core Contributor</option>
 														<option value="ACTIVE_CONTRIBUTOR">Active Contributor</option>
 														<option value="CONTRIBUTOR">Contributor</option>

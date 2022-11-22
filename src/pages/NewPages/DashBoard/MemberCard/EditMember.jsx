@@ -97,7 +97,7 @@ const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
                 </div>
                 <div className="editDaoMember-body">
                     {
-                        DAO?.members.map((item, index) => (
+                        DAO?.members.filter(m => m.role !== 'ADMIN').map((item, index) => (
                             <div className="editDaoMember-row" key={index}>
                                 {
                                     deleteMembers.includes(item.member._id)
@@ -135,7 +135,7 @@ const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
                                     defaultValue={item.role}
                                     disabled={!amIAdmin}
                                 >
-                                    <option value="ADMIN">Admin</option>
+                                    {/* <option value="ADMIN">Admin</option> */}
                                     <option value="CORE_CONTRIBUTOR">Core Contributor</option>
                                     <option value="ACTIVE_CONTRIBUTOR">Active Contributor</option>
                                     <option value="CONTRIBUTOR">Contributor</option>
