@@ -120,8 +120,8 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
                   justifyContent: "end",
                 }}
               >
-                <div id="token-title">{DAO?.sbt?.name}</div>
-                <div id="#number-100">x100</div>
+                <div id="token-title">{DAO?.sbt?.token}</div>
+                { DAO?.sbt?.tokenSupply && <div id="#number-100">X{ DAO?.sbt?.tokenSupply }</div> }
               </div>
             </div>
             {/* <div id="create-more-section">

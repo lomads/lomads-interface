@@ -1,5 +1,6 @@
 
 import "../../styles/pages/CreatePassToken.css";
+import { get as _get } from 'lodash'
 import { useEffect, useCallback } from "react";
 import Frame from '../../assets/svg/frame.svg';
 import uploadIcon from '../../assets/svg/ico-upload.svg';
@@ -213,9 +214,10 @@ const CreatePassToken = () => {
                 if (contractAddr) {
                     setContractAddr(contractAddr);
                     const contractJSON = {
-                        name: sbtSymbol,
+                        name: `${_get(DAO, 'name', '')} SBT`,
+                        token: sbtSymbol,
                         image,
-                        tokenSupply: tokenQuantity,
+                        tokenSupply: SBTConstructor.supply,
                         address: contractAddr,
                         admin: account,
                         whitelisted,

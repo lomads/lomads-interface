@@ -797,6 +797,7 @@ td {
 /* PASS TOKEN SECTION */
 
 .MainComponent #pass-token-title {
+    font-family: 'Inter', sans-serif;
     margin-top: 6.9px;
     color: #C94B32;
     font-weight: 400;
@@ -810,13 +811,17 @@ td {
     /* position: absolute; */
     width: 39.63px;
     height: 39.63px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;;
 
     /* box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
     border-radius: 10px; */
     /* transform: rotate(45deg); */
 
     /* border: 1px solid #76808D; */
-    transform: matrix(0.71, -0.7, 0.71, 0.71, 0, 0);
+    /* transform: matrix(0.71, -0.7, 0.71, 0.71, 0, 0); */
 
 }
 
@@ -834,7 +839,7 @@ td {
     width: 40px;
     height: 36px;
 
-    font-family: var(--chakra-fonts-body);
+    font-family: 'Inter', sans-serif;;
     font-style: normal;
 
     text-align: center;
@@ -871,6 +876,7 @@ td {
 }
 
 .MainComponent #token-title {
+    font-family: 'Inter', sans-serif;
     width: 126px;
     height: 25px;
     position: relative;
@@ -880,8 +886,6 @@ td {
     /* bottom: 65.19%; */
 
     /* Corps Title */
-
-    font-family: 'Open Sans';
     font-style: normal;
     font-weight: 400;
     font-size: 22px;
