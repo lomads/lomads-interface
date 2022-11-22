@@ -57,7 +57,7 @@ export const getContractById = async (sbtDeployerContract: Contract, id: BigNumb
         }
         catch (e) {
             console.log(e);
-            return false;
+            throw e
         }
     }
     return false;

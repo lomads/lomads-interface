@@ -32,7 +32,7 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
 
     const { amount, recipient, reason, decimal } = useMemo(() => {
         const tokendata = _find(tokens, t => t.tokenAddress === _get(transaction, 'to', ''))
-        const decimal = _get(_find(tokens, t => t.tokenAddress === transaction.to), 'token.decimals', _get(transaction, 'token.decimals', 18))
+        const decimal = _get(tokendata, 'token.decimals', _get(transaction, 'token.decimals', 18))
         let amount = _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'value'), 'value', _get(transaction, 'value', 0))
         let recipient = _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'to'), 'value', _get(transaction, 'to', ''))
         //let trans = _find(_get(DAO, 'safe.transactions', []), t => t.safeTxHash === transaction.safeTxHash)
@@ -46,7 +46,7 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
         // }
         console.log('reason', reason)
         return { amount, recipient, reason, decimal }
-    }, [transaction, labels])
+    }, [transaction, labels, tokens])
 
     const { confirmReached, hasMyConfirmVote, rejectReached, hasMyRejectVote } = useMemo(() => {
         let confirmReached = _get(transaction, 'confirmations', []).length == threshold
@@ -94,7 +94,7 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
         const mulAmount = _get(item, 'dataDecoded.parameters[1].value')
         const mulRecipient = _get(item, 'dataDecoded.parameters[0].value')
         const isLast = _get(transaction, 'dataDecoded.parameters[0].valueDecoded', []).length - 1 === index;
-        const decimal = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.decimals', _get(transaction, 'token.decimals', 18))
+        const muldecimal = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.decimals', _get(transaction, 'token.decimals', 18))
         const token = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
         //let trans = _find(_get(DAO, 'safe.transactions', []), t => t.safeTxHash === transaction.safeTxHash)
         let mulReason = '';
@@ -107,7 +107,7 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
                     <div className="coinText">
                         <img src={sendTokenOutline} alt="" />
                         <div className="dashboardTextBold">
-                            {`${mulAmount / 10 ** decimal} ${token}`}
+                            {`${mulAmount / 10 ** muldecimal} ${token}`}
                         </div>
                     </div>
                     <div className="transactionName">

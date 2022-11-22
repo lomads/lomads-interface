@@ -27,6 +27,7 @@ import axiosHttp from '../../api'
 import imageToBase64 from "utils/imageToBase64";
 import { SupportedChainId } from "constants/chains";
 import { BigNumber } from '@ethersproject/bignumber';
+import { off } from "process";
 
 
 const CreatePassToken = () => {
@@ -237,7 +238,7 @@ const retry = (promise, onRetry, maxRetries) => {
                 console.log('waiting')
                 //await wait(15000);
                 const contractAddr = await retry (
-                    await getContractById(sbtDeployerContract, counter),
+                    () => getContractById(sbtDeployerContract, counter),
                     () => { console.log('retry called...') },
                     50
                 )

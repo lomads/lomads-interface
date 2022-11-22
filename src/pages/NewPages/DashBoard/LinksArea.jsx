@@ -50,9 +50,9 @@ const LinksArea = ({ links }) => {
         )
     }
 
-    if(links.length == 0 && !can(myRole, 'settings')){
-        return null
-    }
+    // if(links.length == 0 && !can(myRole, 'settings')){
+    //     return null
+    // }
 
     return (
         <div className='links-container'>
@@ -64,7 +64,7 @@ const LinksArea = ({ links }) => {
                 }
             </div>
             {
-                can(myRole, 'settings') && 
+                true && //can(myRole, 'settings') && 
                 <button className='settings' onClick={() => { navigate(`/${DAO.url}/settings`) }}>
                     <img src={settingIcon} alt="settings-icon" />
                 </button>
