@@ -442,7 +442,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		let _txs = txn;
 		if(txn.offChain && _get(txn, 'token.symbol') === 'SWEAT'){
 			setExecuteTxLoading(txn.safeTxHash)
-			axiosHttp.get(`transaction/off-chain/${txn.safeTxHash}/execute${reject ? `?rejectedTxn=true&daoId=${_get(DAO, '_id', '')}` : `?daoId=${_get(DAO, '_id', '')}`}`)
+			axiosHttp.get(`transaction/off-chain/${txn.safeTxHash}/execute${reject ? `?rejectedTxn=true&decimals=${tokenDecimal(_get(txn, 'to', ''))}&daoId=${_get(DAO, '_id', '')}` : `?decimals=${tokenDecimal(_get(txn, 'to', ''))}&daoId=${_get(DAO, '_id', '')}`}`)
 			.then(res => { 
 				loadPendingTxn()
 				fetchDao()
@@ -492,6 +492,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 						safeTx: { 
 							..._txs,
 							token: {
+								decimals: tokenDecimal(_get(txn, 'to', '')),
 								tokenAddress: _get(txn, 'to', ''),
 								symbol: _get(_find(props.tokens, t => t.tokenAddress === _get(txn, 'to', '')), 'token.symbol', _get(txn, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))}
 							}
