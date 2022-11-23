@@ -111,7 +111,12 @@ const TaskReview = ({ task, close }: any) => {
     }, [task]);
 
     const eligibleContributors = useMemo(() => {
-        return _get(DAO, 'members', []).filter((m: { member: any; }) => task.reviewer !== m.member._id && m.member._id !== user._id && (!assignedUser || (assignedUser && m.member._id !== assignedUser?._id)))
+        return _get(DAO, 'members', []).filter((m: { member: any; }) => 
+            task.reviewer !== m.member._id && 
+            m.member._id !== user._id && 
+            (!assignedUser || 
+            (assignedUser && m.member._id !== 
+            assignedUser?._id)))
     }, [DAO, selectedUser, task])
 
     const createOnChainTxn = async () => {
@@ -124,6 +129,7 @@ const TaskReview = ({ task, close }: any) => {
                 if (selToken && (_get(selToken, 'balance', 0) / 10 ** _get(selToken, 'token.decimals', tokenDecimal)) < sendTotal)
                     return console.log('Low token balance');
                 const token = await tokenCallSafe(_get(task, 'compensation.currency', null));
+                console.log("TOKEN", token)
                 const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
                 const nonce = await (await safeService(provider, `${chainId}`)).getNextNonce(_get(DAO, 'safe.address', null));
                 const unsignedTransaction = await token.populateTransaction.transfer(

@@ -15,12 +15,17 @@ import open from '../../../../assets/svg/open.svg'
 import applied from '../../../../assets/svg/applied.svg'
 import rejected from '../../../../assets/svg/rejected.svg'
 
+import applicationDashboard from '../../../../assets/svg/application_dashboard.svg'
+import submissionDashboard from '../../../../assets/svg/submission_dashboard.svg'
+
 import { IoMdClose } from 'react-icons/io'
+import { useAppSelector } from "state/hooks";
 
 const TaskCard = ({ task, daoUrl }) => {
     const navigate = useNavigate();
     console.log("task card : ", task)
     const { provider, account, chainId } = useWeb3React();
+    const { user } = useAppSelector((state) => state.dashboard);
 
     const amIApplicant = useMemo(() => {
         if (task) {
@@ -62,8 +67,45 @@ const TaskCard = ({ task, daoUrl }) => {
         return false;
     }, [account, task]);
 
+    const applicationCount = useMemo(() => {
+        if (task) {
+            if(task.taskStatus === 'open') {
+                let applications = _get(task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_rejected'))
+                if (applications)
+                    return applications.length
+            }
+            return 0
+        }
+        return 0;
+    }, [task]);
+
+    const submissionCount = useMemo(() => {
+        if (task) {
+            let submissions = _get(task, 'members', []).filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+            if (submissions)
+                return submissions.length
+            return 0
+        }
+        return 0;
+    }, [task]);
+
+
     return (
         <div className='tasks-card' onClick={() => navigate(`/${daoUrl}/task/${task._id}`, { state: { task } })}>
+                   { ( submissionCount > 0 || applicationCount > 0 ) && task.creator === user._id &&
+                    <div className='tasks-card-icons'>
+                        { (task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign' ?
+                        <div className='icon-container'>
+                            <img src={submissionDashboard} /> 
+                            <p>+{submissionCount}</p>
+                        </div> : 
+                        <div className='icon-container'>
+                            <img src={applicationDashboard} /> 
+                            <p>+{applicationCount}</p>
+                        </div>
+                        }
+                    </div>
+                    }
             <div>
                 <p className="p-name">{task.project?.name}</p>
             </div>
