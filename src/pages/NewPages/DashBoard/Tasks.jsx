@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import './Tasks.css';
 import { get as _get, find as _find } from 'lodash';
 
@@ -34,23 +34,69 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
         }
     }, [DAO, Project, tab, user, onlyProjects]);
 
+    const amIEligible = (Task) => {
+        if (DAO && Task && Task.contributionType === 'open') {
+            let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
+            if (user) {
+                if(Task?.validRoles.length > 0) {
+                    let index = Task?.validRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase());
+                    return index > -1
+                } else {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return true;
+    };
+
     const fetchProjectTasks = () => {
         if (Project && user) {
-            setMyTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && _find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())))
-            setManageTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id)));
+            setMyTasks(_get(Project, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) || (task.contributionType === 'open' && !task.isSingleContributor)))))
+            setManageTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && (task.creator === user._id || task.reviewer === user._id)));
             setDraftTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
-            setOtherTasks(_get(Project, 'tasks', []).filter(task => !(task.contributionType === 'open' && !task.isSingleContributor) && !task.deletedAt && !task.archivedAt && !task.draftedAt && task.creator !== user._id && task.reviewer !== user._id && !_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())));
+            setOtherTasks(_get(Project, 'tasks', []).filter(task => !amIEligible(task) && (!(task.contributionType === 'open' && !task.isSingleContributor) && !task.deletedAt && !task.archivedAt && !task.draftedAt && task.creator !== user._id && task.reviewer !== user._id && !_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()))));
         }
     }
 
     const fetchDaoTasks = () => {
         if (DAO && user) {
-            setMyTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && _find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())))
-            setManageTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id)));
+            setMyTasks(_get(DAO, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) ||  (task.contributionType === 'open' && !task.isSingleContributor))) ))
+            setManageTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && (task.creator === user._id || task.reviewer === user._id)));
             setDraftTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
-            setOtherTasks(_get(DAO, 'tasks', []).filter(task => !(task.contributionType === 'open' && !task.isSingleContributor) && !task.deletedAt && !task.archivedAt && !task.draftedAt && task.creator !== user._id && task.reviewer !== user._id && !_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())));
+            setOtherTasks(_get(DAO, 'tasks', []).filter(task => !amIEligible(task) && ( !(task.contributionType === 'open' && !task.isSingleContributor) && !task.deletedAt && !task.archivedAt && !task.draftedAt && task.creator !== user._id && task.reviewer !== user._id && !_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()))));
         }
     }
+
+    const applicationCount = useMemo(() => {
+        let sum = 0;
+        if (manageTasks.length > 0) {
+            for (let index = 0; index < manageTasks.length; index++) {
+                const task = manageTasks[index];
+                if(task.taskStatus === 'open' && task.isSingleContributor) {
+                    let applications = _get(task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_rejected'))
+                    if (applications)
+                        return sum = sum + applications.length
+                }
+            }
+        }
+        return 0;
+    }, [manageTasks]);
+
+    const submissionCount = useMemo(() => {
+        let sum = 0;
+        if (manageTasks.length > 0) {
+            for (let index = 0; index < manageTasks.length; index++) {
+                const task = manageTasks[index];
+                if((task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign') {
+                    let submissions = _get(task, 'members', []).filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+                    if (submissions)
+                        return sum = sum + submissions.length
+                }
+            }
+        }
+        return 0;
+    }, [manageTasks]);
 
     useEffect(() => {
         if (!initialCheck) {
@@ -75,6 +121,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
         return false;
     }, [account, DAO])
 
+
     return (
         <div className="tasks-container">
             <div className="tasks-header">
@@ -84,8 +131,15 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                     </button>
                     <div className="divider"></div>
 
-                    <button className={tab === 2 ? 'active' : null} onClick={() => setTab(2)}>
-                        Manage
+                    <button style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }} className={tab === 2 ? 'active' : null} onClick={() => setTab(2)}>
+                            <div>Manage</div>
+                            <div className='tasks-card-icons'>
+                                { (applicationCount + submissionCount) > 0 &&
+                                    <div className='icon-container'>
+                                        <p>{(applicationCount + submissionCount)}</p>
+                                    </div>
+                                }
+                            </div>
                     </button>
                     <div className="divider"></div>
 
