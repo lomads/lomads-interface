@@ -32,7 +32,7 @@ import axiosHttp from 'api'
 import { setDAO, setTask } from "state/dashboard/reducer";
 
 import { approveTask, rejectTask } from 'state/dashboard/actions'
-import { resetAssignTaskLoader, resetRejectTaskMemberLoader } from 'state/dashboard/reducer';
+import { resetAssignTaskLoader, resetRejectTaskMemberLoader, resetRejectTaskLoader } from 'state/dashboard/reducer';
 import { id } from 'ethers/lib/utils';
 import moment from 'moment';
 import { nanoid } from '@reduxjs/toolkit';
@@ -42,7 +42,7 @@ import { beautifyHexToken } from '../../../../utils';
 const TaskReview = ({ task, close }: any) => {
     console.log("task review : ", task);
     const dispatch = useAppDispatch();
-    const { DAO, user } = useAppSelector((state) => state.dashboard);
+    const { DAO, user, rejectTaskLoading } = useAppSelector((state) => state.dashboard);
     const [newCompensation, setNewCompensation] = useState<number>(0)
     const [showModifyCompensation, setShowModifyCompensation] = useState<boolean>(false)
     const [showRejectSubmission, setShowRejectSubmission] = useState<boolean>(false)
@@ -63,6 +63,26 @@ const TaskReview = ({ task, close }: any) => {
             return _get(task, 'members', []).filter((member: any) => member.submission && (member.status !== 'submission_accepted' && member.status !== 'submission_rejected'))
         return []
     }, [task])
+
+    // runs after rejecting a task submission
+    useEffect(() => {
+        if (rejectTaskLoading === false) {
+            dispatch(resetRejectTaskLoader());
+            if (taskSubmissions.length > 0) {
+                setShowRejectSubmission(false);
+                const currIndex = _findIndex(taskSubmissions, (t: any) => t._id === activeSubmission._id)
+                const nextSubmission = _get(taskSubmissions, `${currIndex + 1}`, undefined)
+                const prevSubmission = _get(taskSubmissions, `${currIndex - 1}`, undefined)
+                if (prevSubmission)
+                    setActiveSubmission(prevSubmission)
+                else if (nextSubmission)
+                    setActiveSubmission(nextSubmission)
+            }
+            else {
+                close();
+            }
+        }
+    }, [rejectTaskLoading]);
 
     useEffect(() => {
         console.log("task submissions : ", taskSubmissions);
