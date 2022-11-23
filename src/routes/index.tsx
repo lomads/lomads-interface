@@ -20,6 +20,7 @@ import OnlyWhitelisted from "pages/NewPages/OnlyWhitelisted";
 import ArchiveProjects from "../pages/NewPages/ArchiveProjects";
 import TaskDetails from "pages/NewPages/TaskDetails";
 import AllTasks from "pages/NewPages/AllTasks";
+import ArchiveTasks from "pages/NewPages/ArchiveTasks";
 
 export default [
     {
@@ -101,6 +102,10 @@ export default [
     {
         path: '/archives',
         component: ArchiveProjects
+    },
+    {
+        path: '/archiveTasks/:projectId',
+        component: ArchiveTasks
     },
     {
         path: '/tasks',

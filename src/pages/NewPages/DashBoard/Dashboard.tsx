@@ -121,16 +121,16 @@ const Dashboard = () => {
 	};
 
 	const handleSwitchChain = async (nextChain: number) => {
-		if(chainId !== nextChain) {
+		if (chainId !== nextChain) {
 			switchChain(connector, nextChain)
-			.then(res => {
-				dispatch(setDAOList([]))
-				dispatch(setDAO(null))
-				setTimeout(() => {
-					sessionStorage.clear()
-					window.location.href = '/'
-				}, 1000)
-			})
+				.then(res => {
+					dispatch(setDAOList([]))
+					dispatch(setDAO(null))
+					setTimeout(() => {
+						sessionStorage.clear()
+						window.location.href = '/'
+					}, 1000)
+				})
 		}
 	}
 
@@ -324,22 +324,22 @@ const Dashboard = () => {
 	}, [chainId, DAO, pendingTransactions])
 
 	const swtBalance = useMemo(() => {
-		if(DAO && user) {
-			const swt = _find(_get(user, 'earnings', []), (e:any) => e.currency === 'SWEAT' && e.daoId === _get(DAO, '_id'))
-			if(swt)
+		if (DAO && user) {
+			const swt = _find(_get(user, 'earnings', []), (e: any) => e.currency === 'SWEAT' && e.daoId === _get(DAO, '_id'))
+			if (swt)
 				return _get(swt, 'value', 0)
 		}
 		return 0
 	}, [user, DAO])
 
 	const tokenDollarBalance = useMemo(() => {
-		if(DAO && user) {
+		if (DAO && user) {
 			let usdVal = 0
-			const myTokens = _get(user, 'earnings', []).filter((e:any) => e.daoId === _get(DAO, '_id'))
+			const myTokens = _get(user, 'earnings', []).filter((e: any) => e.daoId === _get(DAO, '_id'))
 			for (let index = 0; index < myTokens.length; index++) {
 				const myToken = myTokens[index];
-				const safeTkn = _find(safeTokens, (st:any) => (st.tokenAddress ? st.tokenAddress : chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS )  === myToken.currency)
-				if(safeTkn) {
+				const safeTkn = _find(safeTokens, (st: any) => (st.tokenAddress ? st.tokenAddress : chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS) === myToken.currency)
+				if (safeTkn) {
 					console.log("safeTkn", safeTkn, myToken)
 					usdVal = usdVal + (+_get(safeTkn, 'fiatConversion', 0) * _get(myToken, 'value', 0))
 				}
@@ -404,11 +404,11 @@ const Dashboard = () => {
 								<img src={tokenDashboard} />
 								<div className="text">${tokenDollarBalance}</div>
 							</div>
-							{ _get(DAO, 'sweatPoints', false) === true && 
+							{_get(DAO, 'sweatPoints', false) === true &&
 								<div className="token">
 									<img src={starDashboard} />
-									<div className="text">{ swtBalance }</div>
-								</div> 
+									<div className="text">{swtBalance}</div>
+								</div>
 							}
 						</div>
 						<select name="chain" id="chain" value={chainId} onChange={e => handleSwitchChain(+e.target.value)} className="chain" style={{ width: 150 }}>
@@ -478,7 +478,7 @@ const Dashboard = () => {
 			{showEditMember && <EditMember toggleShowEditMember={toggleShowEditMember} DAO={DAO} amIAdmin={amIAdmin} account={account} />}
 
 			{/* create task side modal */}
-			{showCreateTask && <CreateTask toggleShowCreateTask={toggleShowCreateTask} />}
+			{showCreateTask && <CreateTask toggleShowCreateTask={toggleShowCreateTask} selectedProject={null} />}
 
 		</>
 	);

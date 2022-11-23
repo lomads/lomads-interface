@@ -413,7 +413,8 @@ const dashboardSlice = createSlice({
 		// task creation
 		[`${createTask.fulfilled}`]: (state, action) => {
 			state.createTaskLoading = false;
-			state.DAO = action.payload;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
 		},
 		[`${createTask.pending}`]: (state) => {
 			state.createTaskLoading = true;
@@ -421,7 +422,8 @@ const dashboardSlice = createSlice({
 		// draft a task
 		[`${draftTask.fulfilled}`]: (state, action) => {
 			state.draftTaskLoading = false;
-			state.DAO = action.payload;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
 		},
 		[`${draftTask.pending}`]: (state) => {
 			state.draftTaskLoading = true;
@@ -485,6 +487,7 @@ const dashboardSlice = createSlice({
 			state.archiveTaskLoading = false;
 			state.Task = action.payload.task;
 			state.DAO = action.payload.dao;
+			state.Project = action.payload.project;
 		},
 		[`${archiveTask.pending}`]: (state) => {
 			state.archiveTaskLoading = true;

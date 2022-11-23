@@ -110,7 +110,7 @@ const TaskCard = ({ task, daoUrl }) => {
                 <p className="p-name">{task.project?.name}</p>
             </div>
             <div>
-                <p className="t-name">{task.name}</p>
+                <p className="t-name">{task.name.length > 20 ? task.name.substring(0, 20) + "..." : task.name}</p>
             </div>
             <div>
                 {/* Task status */}

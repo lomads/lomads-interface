@@ -52,7 +52,6 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
 
     const fetchProjectTasks = () => {
         if (Project && user) {
-            console.log("task.creator", user)
             setMyTasks(_get(Project, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) || (task.contributionType === 'open' && !task.isSingleContributor)))))
             setManageTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && (task.creator === user._id || task.reviewer === user._id)));
             setDraftTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
@@ -62,7 +61,6 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
 
     const fetchDaoTasks = () => {
         if (DAO && user) {
-            console.log("task.creator", user)
             setMyTasks(_get(DAO, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) ||  (task.contributionType === 'open' && !task.isSingleContributor))) ))
             setManageTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && (task.creator === user._id || task.reviewer === user._id)));
             setDraftTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
@@ -161,7 +159,11 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                         </button>
                     </div> */}
                     <div style={{ marginRight: '20px' }}>
-                        <button className='archive-btn'>
+                        <button
+                            className='archive-btn'
+                            onClick={() => { onlyProjects ? navigate(`/archiveTasks/${Project._id}`) : navigate(`/archiveTasks/ `) }}
+                            disabled={_get(DAO, 'tasks', []).filter(task => !task.deletedAt && task.archivedAt).length > 0 ? false : true}
+                        >
                             <img src={archiveIcon} alt="archive-icon" />
                         </button>
                     </div>
