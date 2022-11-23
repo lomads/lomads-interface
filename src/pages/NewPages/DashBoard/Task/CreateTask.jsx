@@ -476,7 +476,11 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                                     id="chain"
                                                     className="tokenDropdown"
                                                     style={{ width: '100%' }}
-                                                    onChange={e => setCurrency({ currency: e.target.value })}
+                                                    onChange={e => { 
+                                                        let el = document.getElementById('error-compensation');
+                                                        el.innerHTML = '';
+                                                        setCurrency({ currency: e.target.value }) 
+                                                    }}
                                                 >
                                                     <option value={null}>
                                                         select a token
@@ -500,7 +504,11 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                                     type={'number'}
                                                     style={{ height: '55px' }}
                                                     value={amount}
-                                                    onChange={(e) => setAmount(parseInt(e.target.value))}
+                                                    onChange={(e) => { 
+                                                        let el = document.getElementById('error-compensation');
+                                                        el.innerHTML = '';
+                                                        setAmount(parseInt(e.target.value)) 
+                                                    }}
                                                 />
                                             </div>
                                             <span className='error-msg' id="error-compensation"></span>

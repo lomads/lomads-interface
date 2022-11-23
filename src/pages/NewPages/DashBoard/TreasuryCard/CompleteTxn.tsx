@@ -37,11 +37,7 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
             reason = _get(_find(labels, l => l.recipient.toLowerCase() === recipient.toLowerCase() && l.safeTxHash === _get(transaction, 'safeTxHash', _get(transaction, 'txHash', ''))), "label", null)
         }
 
-        let date = moment.utc(
-            transaction.txType === 'ETHEREUM_TRANSACTION' ? transaction.executionDate :
-                _get(transaction, 'dataDecoded.method', '') === 'multiSend' ? _get(transaction, `confirmations[${_get(transaction, 'confirmations', []).length - 1}]`) :
-                    _get(transaction, 'submissionDate', null)
-        ).local().format('MM/DD hh:mm')
+        let date = _get(transaction, 'executionDate', null) ? moment.utc(_get(transaction, 'executionDate', null)).local().format('MM/DD hh:mm') : moment.utc(_get(transaction, 'submissionDate', null)).local().format('MM/DD hh:mm')
         console.log('reason', reason)
         return { isCredit, amount, symbol, recipient, date, reason }
     }, [transaction, labels])

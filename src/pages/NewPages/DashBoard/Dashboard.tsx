@@ -404,10 +404,12 @@ const Dashboard = () => {
 								<img src={tokenDashboard} />
 								<div className="text">${tokenDollarBalance}</div>
 							</div>
-							<div className="token">
-								<img src={starDashboard} />
-								<div className="text">{ swtBalance }</div>
-							</div>
+							{ _get(DAO, 'sweatPoints', false) === true && 
+								<div className="token">
+									<img src={starDashboard} />
+									<div className="text">{ swtBalance }</div>
+								</div> 
+							}
 						</div>
 						<select name="chain" id="chain" value={chainId} onChange={e => handleSwitchChain(+e.target.value)} className="chain" style={{ width: 150 }}>
 							{

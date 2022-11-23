@@ -809,6 +809,7 @@ td {
 
 .MainComponent #pass-tokens-logo-container {
     /* position: absolute; */
+    cursor: pointer;
     width: 39.63px;
     height: 39.63px;
     display: flex;
