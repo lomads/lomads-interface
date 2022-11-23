@@ -53,7 +53,7 @@ const TaskDetails = () => {
     const { DAO, Task, TaskLoading, user, archiveTaskLoading, deleteTaskLoading } = useAppSelector((state) => state.dashboard);
     console.log("Task : ", Task);
     const daoName = _get(DAO, 'name', '').split(" ");
-    const { myRole, can  }  = useRole(DAO, account)
+    const { myRole, can } = useRole(DAO, account)
 
     const [openApply, setOpenApply] = useState(false);
     const [openSubmit, setOpenSubmit] = useState(false);
@@ -536,19 +536,19 @@ const TaskDetails = () => {
                                                     amICreator || can(myRole, 'task.edit') || can(myRole, 'task.delete') || can(myRole, 'task.close')
                                                         ?
                                                         <>
-                                                            { (amICreator || can(myRole, 'task.edit')) && false &&
-                                                            <button style={{ marginRight: '25px' }}>
-                                                                <img src={editToken} alt="hk-logo" />
-                                                            </button>
+                                                            {(amICreator || can(myRole, 'task.edit')) && false &&
+                                                                <button style={{ marginRight: '25px' }}>
+                                                                    <img src={editToken} alt="hk-logo" />
+                                                                </button>
                                                             }
-                                                            { (amICreator || can(myRole, 'task.delete')) &&
-                                                            <button style={{ marginRight: '25px' }} onClick={() => setDeletePrompt(true)}>
-                                                                <img src={deleteIcon} alt="hk-logo" />
-                                                            </button>
+                                                            {(amICreator || can(myRole, 'task.delete')) &&
+                                                                <button style={{ marginRight: '25px' }} onClick={() => setDeletePrompt(true)}>
+                                                                    <img src={deleteIcon} alt="hk-logo" />
+                                                                </button>
                                                             }
                                                             <>
                                                                 {
-                                                                    Task?.archivedAt === null && ( amICreator || can(myRole, 'task.close')) ?
+                                                                    Task?.archivedAt === null && (amICreator || can(myRole, 'task.close')) ?
                                                                         <SafeButton
                                                                             height={40}
                                                                             width={150}
@@ -659,7 +659,7 @@ const TaskDetails = () => {
                                                                             <span>{submissionCount}</span>
                                                                         </div>
                                                                         <h1>{submissionCount > 1 ? 'Submissions' : 'Submission'}</h1>
-                                                                        <button onClick={() => setOpenTaskReview(true)}>CHECK</button>
+                                                                        <button onClick={() => { submissionCount > 0 && setOpenTaskReview(true) }}>CHECK</button>
                                                                     </>
                                                                     :
                                                                     <>
