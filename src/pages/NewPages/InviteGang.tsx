@@ -352,7 +352,7 @@ const InviteGang = () => {
 												{
 													result.address !== undefined && result.address === account
 														?
-														`Core Contributor`
+														`core contributor`
 														:
 														result.role?.replaceAll('_', ' ').toLowerCase()
 												}

@@ -158,6 +158,7 @@
 }
 
 .tasks-card div .t-name {
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 400;
     font-size: 22px;

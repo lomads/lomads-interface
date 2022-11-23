@@ -66,6 +66,7 @@ const SubmitTask = ({ task, close }) => {
     }
 
     const handleAddResource = () => {
+        document.getElementById('resource-error').innerHTML = '';
         if (title === '') {
             document.getElementById('title-error').innerHTML = 'Please enter a title';
             return;

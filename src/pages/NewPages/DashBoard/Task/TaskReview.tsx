@@ -38,6 +38,7 @@ import moment from 'moment';
 import { nanoid } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { beautifyHexToken } from '../../../../utils';
+import { SupportedChainId } from 'constants/chains';
 
 const TaskReview = ({ task, close }: any) => {
     console.log("task review : ", task);
@@ -51,11 +52,18 @@ const TaskReview = ({ task, close }: any) => {
     const [approveLoading, setApproveLoading] = useState<any>(false)
     const { isSafeOwner } = useRole(DAO, account);
     const currentNonce = useAppSelector((state) => state.flow.currentNonce);
-
+    const [safeTokens, setSafeTokens] = useState([]);
     const [reopen, setReopen] = useState(false);
     const [rejectionNote, setRejectionNote] = useState('');
     const [selectedUser, setSelectedUser] = useState<any>(null);
     const [rejectUser, setRejectUser] = useState<any>(null);
+
+    useEffect(() => {
+        if(chainId) {
+            getSafeTokens(chainId, _get(DAO, 'safe.address', null))
+            .then(tokens => setSafeTokens(tokens))
+        }
+    }, [chainId, DAO])
 
     const taskSubmissions = useMemo(() => {
         console.log("59 task : ", task)
@@ -103,7 +111,7 @@ const TaskReview = ({ task, close }: any) => {
     }, [task]);
 
     const eligibleContributors = useMemo(() => {
-        return _get(DAO, 'members', []).filter((m: { member: any; }) => task.reviewer !== m.member._id && m.member._id !== user._id && m.member._id !== assignedUser?._id)
+        return _get(DAO, 'members', []).filter((m: { member: any; }) => task.reviewer !== m.member._id && m.member._id !== user._id && (!assignedUser || (assignedUser && m.member._id !== assignedUser?._id)))
     }, [DAO, selectedUser, task])
 
     const createOnChainTxn = async () => {
@@ -113,14 +121,14 @@ const TaskReview = ({ task, close }: any) => {
                 let sendTotal = newCompensation;
                 const tokens = await getSafeTokens(chainId, _get(DAO, 'safe.address', null))
                 let selToken = _find(tokens, t => t.tokenAddress === _get(task, 'compensation.currency', null))
-                if (selToken && (_get(selToken, 'balance', 0) / 10 ** 18) < sendTotal)
+                if (selToken && (_get(selToken, 'balance', 0) / 10 ** _get(selToken, 'token.decimals', tokenDecimal)) < sendTotal)
                     return console.log('Low token balance');
                 const token = await tokenCallSafe(_get(task, 'compensation.currency', null));
                 const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
                 const nonce = await (await safeService(provider, `${chainId}`)).getNextNonce(_get(DAO, 'safe.address', null));
                 const unsignedTransaction = await token.populateTransaction.transfer(
                     activeSubmission.member.wallet,
-                    BigInt(parseFloat(`${newCompensation}`) * 10 ** 18)
+                    BigInt(parseFloat(`${newCompensation}`) * 10 ** tokenDecimal)
                 )
                 const safeTransactionData: SafeTransactionDataPartial[] = [{
                     to: _get(task, 'compensation.currency', null),
@@ -170,6 +178,20 @@ const TaskReview = ({ task, close }: any) => {
         })
     }
 
+    const tokenDecimal = useMemo(() => {
+        if(task) {
+            const tokenAddr = _get(task, 'compensation.currency', 'SWEAT');
+            if(tokenAddr === SupportedChainId.POLYGON || tokenAddr === SupportedChainId.GOERLI || tokenAddr === 'SWEAT')
+                return 18
+            const tkn = _find(safeTokens, (stkn:any) => stkn.tokenAddress === tokenAddr)
+            if(tkn) {
+                console.log("tokenDecimal", tkn)
+                return _get(tkn, 'token.decimals', 18)
+            }
+        }
+        return 18
+    }, [safeTokens, task])
+
     const handleApproveTask = async () => {
         setApproveLoading(true);
         let onChainSafeTxHash: any = undefined;
@@ -186,6 +208,7 @@ const TaskReview = ({ task, close }: any) => {
             executor: account,
             submissionDate: moment().utc().toDate(),
             token: {
+                decimals: tokenDecimal,
                 symbol: _get(task, 'compensation.symbol', 'SWEAT'),
                 tokenAddress: _get(task, 'compensation.currency', 'SWEAT')
             },
@@ -197,7 +220,7 @@ const TaskReview = ({ task, close }: any) => {
                 method: 'transfer',
                 parameters: [
                     { name: 'to', type: "address", value: _get(activeSubmission, 'member.wallet', null) },
-                    { name: 'value', type: "uint256", value: `${BigInt(parseFloat(`${newCompensation}`) * 10 ** 18)}` },
+                    { name: 'value', type: "uint256", value: `${BigInt(parseFloat(`${newCompensation}`) * 10 ** tokenDecimal)}` },
                 ]
             }
         }
@@ -208,6 +231,7 @@ const TaskReview = ({ task, close }: any) => {
             onChainSafeTxHash,
             recipient: _get(activeSubmission, 'member._id', null)
         }
+
         axiosHttp.post(`task/${task._id}/approve?daoUrl=${DAO.url}`, payload)
             .then(async res => {
                 let m = _get(activeSubmission, 'member.name', '') === '' ? _get(activeSubmission, 'member.wallet', '') : _get(activeSubmission, 'member.name', '')

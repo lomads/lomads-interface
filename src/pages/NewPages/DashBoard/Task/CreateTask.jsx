@@ -500,7 +500,11 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                     id="chain"
                                                     className="tokenDropdown"
                                                     style={{ width: '100%' }}
-                                                    onChange={e => setCurrency({ currency: e.target.value })}
+                                                    onChange={e => {
+                                                        let el = document.getElementById('error-compensation');
+                                                        el.innerHTML = '';
+                                                        setCurrency({ currency: e.target.value })
+                                                    }}
                                                 >
                                                     <option value={null}>
                                                         select a token

@@ -285,7 +285,7 @@ body.active-modal {
 .dashboardText {
     font-family: 'Inter', sans-serif;
     font-weight: 400;
-    font-size: 16px;
+    font-size: 14px;
     line-height: 16px;
     display: flex;
     align-items: center;
@@ -303,7 +303,7 @@ body.active-modal {
     font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 800;
-    font-size: 16px;
+    font-size: 14px;
     line-height: 16px;
     display: flex;
     align-items: center;
@@ -456,6 +456,11 @@ body.active-modal {
 .transactionName {
     flex-grow: 1;
     min-width: 30%;
+}
+
+.transactionName input::placeholder {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
 }
 
 .transactionAddress {
@@ -1094,7 +1099,7 @@ body.active-modal {
     font-family: 'Inter', sans-serif;
     font-style: italic;
     font-weight: 400;
-    font-size: 16px;
+    font-size: 14px;
     line-height: 16px;
     display: flex;
     align-items: center;

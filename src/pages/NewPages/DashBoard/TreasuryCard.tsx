@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useImperativeHandle } from "react";
+import React, { useEffect, useState, useMemo, useImperativeHandle, useCallback } from "react";
 import { get as _get, sortBy as _sortBy, filter as _filter, map as _map, find as _find } from 'lodash';
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import SafeButton from "UIpack/SafeButton";
@@ -442,7 +442,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		let _txs = txn;
 		if(txn.offChain && _get(txn, 'token.symbol') === 'SWEAT'){
 			setExecuteTxLoading(txn.safeTxHash)
-			axiosHttp.get(`transaction/off-chain/${txn.safeTxHash}/execute${reject ? `?rejectedTxn=true&daoId=${_get(DAO, '_id', '')}` : `?daoId=${_get(DAO, '_id', '')}`}`)
+			axiosHttp.get(`transaction/off-chain/${txn.safeTxHash}/execute${reject ? `?rejectedTxn=true&decimals=${tokenDecimal(_get(txn, 'to', ''))}&daoId=${_get(DAO, '_id', '')}` : `?decimals=${tokenDecimal(_get(txn, 'to', ''))}&daoId=${_get(DAO, '_id', '')}`}`)
 			.then(res => { 
 				loadPendingTxn()
 				fetchDao()
@@ -492,6 +492,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 						safeTx: { 
 							..._txs,
 							token: {
+								decimals: tokenDecimal(_get(txn, 'to', '')),
 								tokenAddress: _get(txn, 'to', ''),
 								symbol: _get(_find(props.tokens, t => t.tokenAddress === _get(txn, 'to', '')), 'token.symbol', _get(txn, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))}
 							}
@@ -527,6 +528,26 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		}
 		return false
 	}, [props.tokens])
+
+
+	const tokenDecimal = useCallback((addr: any) => {
+		if(props.tokens){
+			if(!addr || addr === SupportedChainId.POLYGON || addr === SupportedChainId.GOERLI || addr === 'SWEAT')
+				return 18
+			const tkn = _find(props.tokens, (stkn:any) => stkn.tokenAddress === addr)
+			if(tkn) {
+				console.log("tokenDecimal", tkn)
+				return _get(tkn, 'token.decimals', 18)
+			}
+			return 18
+		}
+    }, [props.tokens])
+
+	// const tokenDecimal = (addr:string) => {
+	// 	if(!addr) return 18
+	// 	const tkn = _find(props.tokens, t => t.tokenAddress === addr);
+	// 	return _get(tkn, 'token.decimals', 18)
+	// }
 
 	if (!DAO || (DAO && DAO.url !== daoURL))
 		return null
@@ -594,7 +615,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 								return (
 									<>
 										<div className="tokenDiv">
-											<span>{`${_get(token, 'balance', 0) / 10 ** 18}`}</span>
+											<span>{`${_get(token, 'balance', 0) / 10 ** tokenDecimal(token.tokenAddress)}`}</span>
 											<h1>{`${_get(token, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}`}</h1>
 										</div>
 									</>

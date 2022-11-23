@@ -9,12 +9,15 @@ import { useAppDispatch, useAppSelector } from "state/hooks";
 import coin from '../../assets/svg/coin.svg';
 import { get as _get, find as _find } from 'lodash';
 import { updateContract } from "state/dashboard/actions";
+import { useWeb3React } from "@web3-react/core";
+import { SupportedChainId } from 'constants/chains'
+
 
 
 const PassTokenModal = ({ toggleModal, togglePassToken }) => {
 
   const dispatch = useAppDispatch()
-
+	const { provider, account, chainId, connector } = useWeb3React();
   const [openCreatePassToken, setOpenCreatePassToken] = useState(false);
 
   const { DAO, updateContractLoading } = useAppSelector((state) => state.dashboard);
@@ -89,7 +92,7 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
               style={{
                 display: "flex",
                 flexDirection: "column",
-                alignItems: "center",
+                alignItems: "center"
               }}
             >
               <Image
@@ -108,7 +111,16 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
               }}
             >
               {/* logo container  */}
-              <div id="pass-tokens-logo-container">
+              <div id="pass-tokens-logo-container"
+                  onClick={() => {
+                    return (
+                    chainId === SupportedChainId.POLYGON ?
+                    window.open(`https://polygonscan.com/address/${_get(DAO, 'sbt.address', '')}`, '_blank') : 
+                    chainId === SupportedChainId.GOERLI ?
+                    window.open(`https://etherscan.io/address/${_get(DAO, 'sbt.address', '')}`, '_blank') :
+                    undefined )
+                  }}
+              >
                 {DAO?.sbt?.image ? <img style={{ width: 24, height: 24 }} src={DAO?.sbt?.image} alt="asset" /> : <img src={coin} alt="asset" />}
               </div>
               <div
@@ -120,7 +132,7 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
                   justifyContent: "end",
                 }}
               >
-                <div id="token-title">{DAO?.sbt?.token}</div>
+                <div id="token-title">{_get(DAO, 'sbt.token', _get(DAO, 'sbt.name', ''))}</div>
                 { DAO?.sbt?.tokenSupply && <div id="#number-100">X{ DAO?.sbt?.tokenSupply }</div> }
               </div>
             </div>
