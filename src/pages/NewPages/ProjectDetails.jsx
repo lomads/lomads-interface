@@ -39,6 +39,7 @@ import { updateCurrentUser } from "state/dashboard/actions";
 
 import SimpleInputField from "UIpack/SimpleInputField";
 import Tasks from "./DashBoard/Tasks";
+import CreateTask from "./DashBoard/Task/CreateTask";
 
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
@@ -73,6 +74,8 @@ const ProjectDetails = () => {
     const [deleteMembers, setDeleteMembers] = useState([]);
     const [deletePrompt, setDeletePrompt] = useState(false);
     const [closePrompt, setClosePrompt] = useState(false);
+
+    const [showCreateTask, setShowCreateTask] = useState(false);
 
     useEffect(() => {
         if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
@@ -369,6 +372,10 @@ const ProjectDetails = () => {
         }
     }
 
+    const toggleShowCreateTask = () => {
+        setShowCreateTask(!showCreateTask);
+    };
+
     return (
         <>
             {
@@ -537,6 +544,9 @@ const ProjectDetails = () => {
                             :
                             null
                     }
+
+                    {/* create task side modal */}
+                    {showCreateTask && <CreateTask toggleShowCreateTask={toggleShowCreateTask} selectedProject={Project} />}
 
                     <div className="home-btn" onClick={() => navigate(-1)}>
                         <div className="invertedBox">
@@ -758,7 +768,7 @@ const ProjectDetails = () => {
 
                 {/* Tasks section */}
                 <div style={{ width: '80%', marginTop: '20px' }}>
-                    <Tasks onlyProjects={true} />
+                    <Tasks toggleShowCreateTask={toggleShowCreateTask} onlyProjects={true} />
                 </div>
                 <div style={{ width: '80%' }}>
                     <Footer theme="dark" />

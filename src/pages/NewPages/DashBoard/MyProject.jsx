@@ -59,29 +59,33 @@ const MyProject = () => {
             <div className="myproject-header">
                 <div className="myproject-title">
                     {
-                       can(myRole, 'project.view.own')
+                        can(myRole, 'project.view.own')
                             ?
                             <>
                                 <button className={tab === 1 ? 'active' : null} onClick={() => setTab(1)}>
                                     My projects
                                 </button>
-                                { can(myRole, 'project.view.all') && <div className="divider"></div> }
+                                {can(myRole, 'project.view.all') && <div className="divider"></div>}
                             </>
                             :
                             null
                     }
-                    { can(myRole, 'project.view.all') &&
-                    <button className={tab === 2 ? 'active' : null} onClick={() => setTab(2)}>
-                        All projects
-                    </button>
+                    {can(myRole, 'project.view.all') &&
+                        <button className={tab === 2 ? 'active' : null} onClick={() => setTab(2)}>
+                            All projects
+                        </button>
                     }
                 </div>
                 <div className="myproject-buttons">
-                   { can(myRole, 'project.view.archives') && <div style={{ marginRight: '20px' }}>
-                        <button className='archive-btn' onClick={() => navigate('/archives')}>
+                    {can(myRole, 'project.view.archives') && <div style={{ marginRight: '20px' }}>
+                        <button
+                            className='archive-btn'
+                            onClick={() => navigate('/archives')}
+                            disabled={_get(DAO, 'projects', []).filter(project => !project.deletedAt && project.archivedAt).length > 0 ? false : true}
+                        >
                             <img src={archiveIcon} alt="archive-icon" />
                         </button>
-                    </div> }
+                    </div>}
                     {
                         can(myRole, 'project.create') && <div>
                             <SafeButton
@@ -134,7 +138,7 @@ const MyProject = () => {
                         {
                             otherProjects.length > 0
                                 ?
-                                <div className='myproject-body-fixed' style={otherProjects.length > 9 ? { overflow: 'scroll', height: '375px' } : { height: 'auto'}}>
+                                <div className='myproject-body-fixed' style={otherProjects.length > 9 ? { overflow: 'scroll', height: '375px' } : { height: 'auto' }}>
                                     {
                                         otherProjects.map((item, index) => {
                                             if (item.deletedAt === null && item.archivedAt === null) {
@@ -152,9 +156,9 @@ const MyProject = () => {
                                     }
                                 </div>
                                 : null
-                                // <div className='myproject-body-nocontent'>
-                                //     <p>No projects</p>
-                                // </div>
+                            // <div className='myproject-body-nocontent'>
+                            //     <p>No projects</p>
+                            // </div>
                         }
                     </>
                     :

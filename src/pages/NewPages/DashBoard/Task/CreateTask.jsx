@@ -25,7 +25,7 @@ import useRole from '../../../../hooks/useRole'
 import axios from "axios";
 import { isValidUrl } from 'utils';
 
-const CreateTask = ({ toggleShowCreateTask }) => {
+const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
 
     const dispatch = useAppDispatch();
     const { DAO, user, createTaskLoading, draftTaskLoading } = useAppSelector((state) => state.dashboard);
@@ -57,10 +57,10 @@ const CreateTask = ({ toggleShowCreateTask }) => {
     };
 
     useEffect(() => {
-		if (account && chainId && (!user || (user && user.wallet.toLowerCase() !== account.toLowerCase()))) {
-			dispatch(getCurrentUser({}))
-		}
-	}, [account, chainId, user])
+        if (account && chainId && (!user || (user && user.wallet.toLowerCase() !== account.toLowerCase()))) {
+            dispatch(getCurrentUser({}))
+        }
+    }, [account, chainId, user])
 
     useEffect(() => {
         getTokens(_get(DAO, 'safe.address'));
@@ -159,15 +159,15 @@ const CreateTask = ({ toggleShowCreateTask }) => {
         //     return;
         // }
         else {
-            let tempLink, tempSub  = null;
-            if(dchannel && dchannel !== '') {
+            let tempLink, tempSub = null;
+            if (dchannel && dchannel !== '') {
                 tempLink = dchannel;
                 if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
                     tempLink = 'https://' + tempLink;
                 }
             }
-            if(subLink && subLink !== '') {
-                 tempSub = subLink;
+            if (subLink && subLink !== '') {
+                tempSub = subLink;
                 if (tempSub !== '' && tempSub.indexOf('https://') === -1 && tempSub.indexOf('http://') === -1) {
                     tempSub = 'https://' + tempSub;
                 }
@@ -175,7 +175,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
 
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
             symbol = _get(symbol, 'token.symbol', null)
-            if(!symbol)
+            if (!symbol)
                 symbol = currency.currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ? 'MATIC' : currency.currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? 'GOR' : 'SWEAT'
 
             let task = {};
@@ -183,7 +183,7 @@ const CreateTask = ({ toggleShowCreateTask }) => {
             task.name = name;
             task.description = description;
             task.applicant = selectedUser;
-            task.projectId = projectId;
+            task.projectId = selectedProject ? selectedProject._id : projectId;
             task.discussionChannel = tempLink;
             task.deadline = deadline;
             task.submissionLink = tempSub ? [tempSub] : [];
@@ -198,30 +198,44 @@ const CreateTask = ({ toggleShowCreateTask }) => {
     }
 
     const handleDraftTask = () => {
+        let tempLink, tempSub = null;
+        if (dchannel && dchannel !== '') {
+            tempLink = dchannel;
+            if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
+                tempLink = 'https://' + tempLink;
+            }
+        }
+        if (subLink && subLink !== '') {
+            tempSub = subLink;
+            if (tempSub !== '' && tempSub.indexOf('https://') === -1 && tempSub.indexOf('http://') === -1) {
+                tempSub = 'https://' + tempSub;
+            }
+        }
         let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
         symbol = _get(symbol, 'token.symbol', 'SWEAT')
+        if (!symbol)
+            symbol = currency.currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ? 'MATIC' : currency.currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? 'GOR' : 'SWEAT'
         let task = {};
         task.daoId = DAO?._id;
         task.name = name;
         task.description = description;
         task.applicant = selectedUser;
-        task.projectId = projectId;
-        task.discussionChannel = dchannel;
+        task.projectId = selectedProject ? selectedProject._id : projectId;;
+        task.discussionChannel = tempLink;
         task.deadline = deadline;
-        task.submissionLink = subLink;
-        task.compensation = { currency, amount, symbol };
-        task.reviewer = reviewer;
+        task.submissionLink = tempSub ? [tempSub] : [];
+        task.compensation = { currency: currency.currency, amount, symbol };
+        task.reviewer = user._id;
         task.contributionType = contributionType;
         task.isSingleContributor = isSingleContributor;
         task.isFilterRoles = isFilterRoles;
         task.validRoles = validRoles;
 
-        //dispatch(draftTask({ payload: task }))
-        console.log("Draft Task : ", task)
+        dispatch(draftTask({ payload: task }))
     }
 
     const eligibleContributors = useMemo(() => {
-        return _get(DAO, 'members', []).filter(m => (reviewer || "").toLowerCase() !== m.member._id && m.member._id !== user._id )
+        return _get(DAO, 'members', []).filter(m => (reviewer || "").toLowerCase() !== m.member._id && m.member._id !== user._id)
     }, [DAO, selectedUser, reviewer])
 
     const eligibleReviewers = useMemo(() => {
@@ -328,15 +342,25 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                                 className="tokenDropdown"
                                                 style={{ width: '100%' }}
                                                 onChange={(e) => setProjectId(e.target.value)}
+                                                disabled={selectedProject ? true : false}
                                             >
-                                                <option value={null}>Select project</option>
                                                 {
-                                                    eligibleProjects.filter(p => !p.archivedAt && !p.deletedAt).map((item, index) => {
-                                                        return (
-                                                            <option value={`${item._id}`}>{item.name}</option>
-                                                        )
-                                                    })
+                                                    selectedProject
+                                                        ?
+                                                        <option value={null}>{selectedProject.name}</option>
+                                                        :
+                                                        <>
+                                                            <option value={null}>Select project</option>
+                                                            {
+                                                                eligibleProjects.filter(p => !p.archivedAt && !p.deletedAt).map((item, index) => {
+                                                                    return (
+                                                                        <option value={`${item._id}`}>{item.name}</option>
+                                                                    )
+                                                                })
+                                                            }
+                                                        </>
                                                 }
+
                                             </select>
 
                                         </div>
@@ -493,14 +517,15 @@ const CreateTask = ({ toggleShowCreateTask }) => {
                                                             )
                                                         );
                                                     })}
-                                                   { can(myRole, 'task.create.sweat') &&  _get(DAO, 'sweatPoints', false) && <option value="SWEAT">SWEAT</option> }
+                                                    {can(myRole, 'task.create.sweat') && _get(DAO, 'sweatPoints', false) && <option value="SWEAT">SWEAT</option>}
                                                 </select>
                                                 <input
                                                     className="inputField"
                                                     type={'number'}
                                                     style={{ height: '55px' }}
                                                     value={amount}
-                                                    onChange={(e) => setAmount(parseInt(e.target.value))}
+                                                    step={0.01}
+                                                    onChange={(e) => setAmount(parseFloat(e.target.value))}
                                                 />
                                             </div>
                                             <span className='error-msg' id="error-compensation"></span>

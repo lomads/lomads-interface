@@ -36,8 +36,8 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
 
     const fetchProjectTasks = () => {
         if (Project && user) {
-            setMyTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && _find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())))
-            setManageTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && (task.creator === user._id || task.reviewer === user._id)));
+            setMyTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && _find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())))
+            setManageTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id)));
             setDraftTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
             setOtherTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && task.creator !== user._id && task.reviewer !== user._id && !_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())));
         }
@@ -45,8 +45,8 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
 
     const fetchDaoTasks = () => {
         if (DAO && user) {
-            setMyTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && _find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())))
-            setManageTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && (task.creator === user._id || task.reviewer === user._id)));
+            setMyTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && _find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())))
+            setManageTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id)));
             setDraftTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
             setOtherTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && task.creator !== user._id && task.reviewer !== user._id && !_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())));
         }
@@ -105,7 +105,11 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                         </button>
                     </div> */}
                     <div style={{ marginRight: '20px' }}>
-                        <button className='archive-btn'>
+                        <button
+                            className='archive-btn'
+                            onClick={() => { onlyProjects ? navigate(`/archiveTasks/${Project._id}`) : navigate(`/archiveTasks/ `) }}
+                            disabled={_get(DAO, 'tasks', []).filter(task => !task.deletedAt && task.archivedAt).length > 0 ? false : true}
+                        >
                             <img src={archiveIcon} alt="archive-icon" />
                         </button>
                     </div>
