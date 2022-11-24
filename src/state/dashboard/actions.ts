@@ -348,6 +348,15 @@ export const deleteTask = createAsyncThunk(
 	}
 );
 
+export const editTask = createAsyncThunk(
+	'dao/editTask',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`task/${params.taskId}/edit?daoUrl=${params.daoUrl}`, params.payload)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+)
+
 
 export const updateContract = createAsyncThunk(
 	'contract/update',

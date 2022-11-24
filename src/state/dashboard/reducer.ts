@@ -23,6 +23,7 @@ import {
 	getCurrentUser,
 	updateCurrentUser,
 	createTask,
+	editTask,
 	draftTask,
 	getTask,
 	applyTask,
@@ -62,6 +63,7 @@ export interface DashboardState {
 	addProjectLinksLoading: boolean | null;
 	updateProjectLoading: boolean | null;
 	createTaskLoading: boolean | null;
+	editTaskLoading: boolean | null;
 	Task: any;
 	TaskLoading: boolean | null;
 	draftTaskLoading: boolean | null;
@@ -98,6 +100,7 @@ const initialState: DashboardState = {
 	addProjectLinksLoading: null,
 	updateProjectLoading: null,
 	createTaskLoading: null,
+	editTaskLoading: null,
 	Task: null,
 	TaskLoading: null,
 	draftTaskLoading: null,
@@ -167,6 +170,9 @@ const dashboardSlice = createSlice({
 		},
 		resetCreateTaskLoader(state) {
 			state.createTaskLoading = null
+		},
+		resetEditTaskLoader(state) {
+			state.editTaskLoading = null
 		},
 		resetDraftTaskLoader(state) {
 			state.draftTaskLoading = null
@@ -419,6 +425,16 @@ const dashboardSlice = createSlice({
 		[`${createTask.pending}`]: (state) => {
 			state.createTaskLoading = true;
 		},
+		// edit task
+		[`${editTask.fulfilled}`]: (state, action) => {
+			state.editTaskLoading = false;
+			state.Task = action.payload.task;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
+		},
+		[`${editTask.pending}`]: (state) => {
+			state.editTaskLoading = true;
+		},
 		// draft a task
 		[`${draftTask.fulfilled}`]: (state, action) => {
 			state.draftTaskLoading = false;
@@ -537,6 +553,7 @@ export const {
 	resetAddProjectLinksLoader,
 	updateSafeTransaction,
 	resetCreateTaskLoader,
+	resetEditTaskLoader,
 	resetDraftTaskLoader,
 	resetApplyTaskLoader,
 	resetAssignTaskLoader,

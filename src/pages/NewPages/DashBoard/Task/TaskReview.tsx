@@ -59,9 +59,9 @@ const TaskReview = ({ task, close }: any) => {
     const [rejectUser, setRejectUser] = useState<any>(null);
 
     useEffect(() => {
-        if(chainId) {
+        if (chainId) {
             getSafeTokens(chainId, _get(DAO, 'safe.address', null))
-            .then(tokens => setSafeTokens(tokens))
+                .then(tokens => setSafeTokens(tokens))
         }
     }, [chainId, DAO])
 
@@ -111,12 +111,12 @@ const TaskReview = ({ task, close }: any) => {
     }, [task]);
 
     const eligibleContributors = useMemo(() => {
-        return _get(DAO, 'members', []).filter((m: { member: any; }) => 
-            task.reviewer !== m.member._id && 
-            m.member._id !== user._id && 
-            (!assignedUser || 
-            (assignedUser && m.member._id !== 
-            assignedUser?._id)))
+        return _get(DAO, 'members', []).filter((m: { member: any; }) =>
+            task.reviewer !== m.member._id &&
+            m.member._id !== user._id &&
+            (!assignedUser ||
+                (assignedUser && m.member._id !==
+                    assignedUser?._id)))
     }, [DAO, selectedUser, task])
 
     const createOnChainTxn = async () => {
@@ -185,12 +185,12 @@ const TaskReview = ({ task, close }: any) => {
     }
 
     const tokenDecimal = useMemo(() => {
-        if(task) {
+        if (task) {
             const tokenAddr = _get(task, 'compensation.currency', 'SWEAT');
-            if(tokenAddr === SupportedChainId.POLYGON || tokenAddr === SupportedChainId.GOERLI || tokenAddr === 'SWEAT')
+            if (tokenAddr === SupportedChainId.POLYGON || tokenAddr === SupportedChainId.GOERLI || tokenAddr === 'SWEAT')
                 return 18
-            const tkn = _find(safeTokens, (stkn:any) => stkn.tokenAddress === tokenAddr)
-            if(tkn) {
+            const tkn = _find(safeTokens, (stkn: any) => stkn.tokenAddress === tokenAddr)
+            if (tkn) {
                 console.log("tokenDecimal", tkn)
                 return _get(tkn, 'token.decimals', 18)
             }
@@ -336,13 +336,7 @@ const TaskReview = ({ task, close }: any) => {
                     }
                     <div className='detail-container'>
                         <span>Note</span>
-                        <textarea
-                            style={{ width: '100%' }}
-                            className="inputField"
-                            disabled
-                            value={submission.submission.note}
-                        />
-                        {/* <div className='note'>{submission.submission.note}</div> */}
+                        <div className='note'>{submission.submission.note}</div>
                     </div>
                     <div className='detail-container'>
                         {task.submissionLink.length == 0 ?
