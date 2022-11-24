@@ -153,11 +153,11 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                     </button>
                 </div>
                 <div className="tasks-buttons">
-                    {/* <div style={{ marginRight: '20px' }}>
+                    <div style={{ marginRight: '20px' }}>
                         <button className='archive-btn' onClick={() => navigate('/tasks', { state: { activeTab: tab } })}>
                             <img src={expandIcon} alt="archive-icon" />
                         </button>
-                    </div> */}
+                    </div>
                     <div style={{ marginRight: '20px' }}>
                         <button
                             className='archive-btn'

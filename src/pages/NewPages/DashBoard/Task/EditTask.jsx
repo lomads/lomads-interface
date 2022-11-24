@@ -12,8 +12,8 @@ import SelectRoles from './SelectRoles';
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import { getCurrentUser } from "state/dashboard/actions";
 
-import { createTask, draftTask } from 'state/dashboard/actions'
-import { resetCreateTaskLoader, resetDraftTaskLoader } from 'state/dashboard/reducer';
+import { editTask } from 'state/dashboard/actions'
+import { resetEditTaskLoader } from 'state/dashboard/reducer';
 
 import { useWeb3React } from "@web3-react/core";
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
@@ -21,33 +21,31 @@ import { SupportedChainId } from "constants/chains";
 import { beautifyHexToken, getSafeTokens } from '../../../../utils'
 
 import useRole from '../../../../hooks/useRole'
-
-import axios from "axios";
 import { isValidUrl } from 'utils';
 
-const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
-
+const EditTask = ({ close, task, daoURL }) => {
+    console.log("Task : ", task);
     const dispatch = useAppDispatch();
-    const { DAO, user, createTaskLoading, draftTaskLoading } = useAppSelector((state) => state.dashboard);
+    const { DAO, user, editTaskLoading } = useAppSelector((state) => state.dashboard);
     const { chainId, account } = useWeb3React();
 
     const { myRole, can } = useRole(DAO, account)
 
-    const [contributionType, setContributionType] = useState('assign');
-    const [isSingleContributor, setIsSingleContributor] = useState(false);
-    const [isFilterRoles, setIsFilterRoles] = useState(false);
+    const [contributionType, setContributionType] = useState(task.contributionType);
+    const [isSingleContributor, setIsSingleContributor] = useState(task.isSingleContributor);
+    const [isFilterRoles, setIsFilterRoles] = useState(task.isFilterRoles);
     const [select, setSelect] = useState(false);
-    const [validRoles, setValidRoles] = useState([]);
+    const [validRoles, setValidRoles] = useState(task.validRoles);
     const [selectedUser, setSelectedUser] = useState(null);
-    const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
-    const [dchannel, setDChannel] = useState('');
-    const [deadline, setDeadline] = useState('');
-    const [projectId, setProjectId] = useState(null);
-    const [subLink, setSubLink] = useState('');
+    const [name, setName] = useState(task.name);
+    const [description, setDescription] = useState(task.description);
+    const [dchannel, setDChannel] = useState(task.discussionChannel);
+    const [deadline, setDeadline] = useState(new Date(task.deadline).toISOString().substring(0, 10));
+    const [projectId, setProjectId] = useState(task.project._id);
+    const [subLink, setSubLink] = useState(task.submissionLink);
     const [reviewer, setReviewer] = useState(null);
-    const [currency, setCurrency] = useState(null);
-    const [amount, setAmount] = useState(0);
+    const [currency, setCurrency] = useState({ currency: task.compensation.currency });
+    const [amount, setAmount] = useState(task.compensation.amount);
     const [safeTokens, setSafeTokens] = useState([]);
     const [showSuccess, setShowSuccess] = useState(false);
 
@@ -68,31 +66,16 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
     }, [DAO]);
 
     useEffect(() => {
-        if (createTaskLoading === false || draftTaskLoading === false) {
-            dispatch(resetCreateTaskLoader());
-            dispatch(resetDraftTaskLoader());
+        if (editTaskLoading === false) {
+            dispatch(resetEditTaskLoader());
             setShowSuccess(true);
-            setContributionType('assign');
-            setIsSingleContributor(false);
-            setIsFilterRoles(false);
-            setValidRoles([]);
-            setSelectedUser(null);
-            setName('');
-            setDescription('');
-            setDChannel('');
-            setDeadline('');
-            setProjectId(null);
-            setSubLink('');
-            //setReviewer(null);
-            setCurrency(null);
-            setAmount(0);
 
             setTimeout(() => {
                 setShowSuccess(false);
-                toggleShowCreateTask();
+                close();
             }, 3000);
         }
-    }, [createTaskLoading, draftTaskLoading]);
+    }, [editTaskLoading]);
 
     const toggleSelect = () => {
         setSelect(!select);
@@ -108,8 +91,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
         setValidRoles(validRoles.filter((item) => item !== role))
     }
 
-    const handleCreateTask = () => {
-        console.log(currency, amount)
+    const handleEditTask = () => {
         if (name === '') {
             let e = document.getElementById('error-name');
             e.innerHTML = 'Enter name';
@@ -146,18 +128,6 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
             e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             return;
         }
-        else if (contributionType === 'assign' && selectedUser === null) {
-            let e = document.getElementById('error-applicant');
-            e.innerHTML = 'Select one applicant for the task';
-            e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
-            return;
-        }
-        // else if (reviewer === null) {
-        //     let e = document.getElementById('error-reviewer');
-        //     e.innerHTML = 'Select a reviewer';
-        //     e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
-        //     return;
-        // }
         else {
             let tempLink, tempSub = null;
             if (dchannel && dchannel !== '') {
@@ -178,60 +148,17 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
             if (!symbol)
                 symbol = currency.currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ? 'MATIC' : currency.currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? 'GOR' : 'SWEAT'
 
-            let task = {};
-            task.daoId = DAO?._id;
-            task.name = name;
-            task.description = description;
-            task.applicant = selectedUser;
-            task.projectId = selectedProject ? selectedProject._id : projectId;
-            task.discussionChannel = tempLink;
-            task.deadline = deadline;
-            task.submissionLink = tempSub ? tempSub : '';
-            task.compensation = { currency: currency.currency, amount, symbol };
-            task.reviewer = user._id;
-            task.contributionType = contributionType;
-            task.isSingleContributor = isSingleContributor;
-            task.isFilterRoles = isFilterRoles;
-            task.validRoles = validRoles;
-            dispatch(createTask({ payload: task }))
+            let taskOb = {};
+            taskOb.name = name;
+            taskOb.description = description;
+            taskOb.projectId = projectId;
+            taskOb.discussionChannel = tempLink;
+            taskOb.deadline = deadline;
+            taskOb.submissionLink = tempSub ? tempSub : '';
+            taskOb.compensation = { currency: currency.currency, amount, symbol };
+            console.log("task ob : ", taskOb)
+            dispatch(editTask({ payload: taskOb, daoUrl: daoURL, taskId: task._id }))
         }
-    }
-
-    const handleDraftTask = () => {
-        let tempLink, tempSub = null;
-        if (dchannel && dchannel !== '') {
-            tempLink = dchannel;
-            if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
-                tempLink = 'https://' + tempLink;
-            }
-        }
-        if (subLink && subLink !== '') {
-            tempSub = subLink;
-            if (tempSub !== '' && tempSub.indexOf('https://') === -1 && tempSub.indexOf('http://') === -1) {
-                tempSub = 'https://' + tempSub;
-            }
-        }
-        let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
-        symbol = _get(symbol, 'token.symbol', 'SWEAT')
-        if (!symbol)
-            symbol = currency.currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ? 'MATIC' : currency.currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? 'GOR' : 'SWEAT'
-        let task = {};
-        task.daoId = DAO?._id;
-        task.name = name;
-        task.description = description;
-        task.applicant = selectedUser;
-        task.projectId = selectedProject ? selectedProject._id : projectId;;
-        task.discussionChannel = tempLink;
-        task.deadline = deadline;
-        task.submissionLink = tempSub ? tempSub : '';
-        task.compensation = { currency: currency.currency, amount, symbol };
-        task.reviewer = user._id;
-        task.contributionType = contributionType;
-        task.isSingleContributor = isSingleContributor;
-        task.isFilterRoles = isFilterRoles;
-        task.validRoles = validRoles;
-
-        dispatch(draftTask({ payload: task }))
     }
 
     const eligibleContributors = useMemo(() => {
@@ -243,7 +170,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
     }, [DAO, reviewer, selectedUser])
 
     const eligibleProjects = useMemo(() => {
-        return _get(DAO, 'projects', []).filter(p => _find(p.members, m => m._id === user._id))
+        return _get(DAO, 'projects', []).filter(p => _find(p.members, m => m._id === user._id) && p._id !== task.project?._id)
     }, [DAO, reviewer, selectedUser])
 
     return (
@@ -255,7 +182,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                     :
                     <div className="createTaskContainer">
                         <div className='createTask-header'>
-                            <button onClick={() => toggleShowCreateTask()}>
+                            <button onClick={close}>
                                 <CgClose size={20} color="#C94B32" />
                             </button>
                         </div>
@@ -264,14 +191,14 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                 ?
                                 <div className='createTask-success'>
                                     <img src={createTaskSvg} alt="frame-icon" />
-                                    <h1>New task created!</h1>
-                                    <span>The new task is created.<br />You will be redirected in a few seconds.</span>
+                                    <h1>Task Edited!</h1>
+                                    <span>The task has been edited successfully.<br />You will be redirected in a few seconds.</span>
                                 </div>
                                 :
                                 <>
                                     <div className='createTask-body'>
                                         <img src={createTaskSvg} alt="frame-icon" />
-                                        <h1>Create task</h1>
+                                        <h1>Edit task</h1>
 
                                         <div className='createTask-inputRow'>
                                             <span>Name of the task</span>
@@ -342,12 +269,20 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                 className="tokenDropdown"
                                                 style={{ width: '100%' }}
                                                 onChange={(e) => setProjectId(e.target.value)}
-                                                disabled={selectedProject ? true : false}
                                             >
                                                 {
-                                                    selectedProject
+                                                    task.project
                                                         ?
-                                                        <option value={null}>{selectedProject.name}</option>
+                                                        <>
+                                                            <option value={task.project._id}>{task.project.name}</option>
+                                                            {
+                                                                eligibleProjects.filter(p => !p.archivedAt && !p.deletedAt).map((item, index) => {
+                                                                    return (
+                                                                        <option value={`${item._id}`}>{item.name}</option>
+                                                                    )
+                                                                })
+                                                            }
+                                                        </>
                                                         :
                                                         <>
                                                             <option value={null}>Select project</option>
@@ -370,8 +305,8 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                         <div className='createTask-inputRow'>
                                             <span>Contribution</span>
                                             <div className='createTask-buttonRow'>
-                                                <button onClick={() => { setContributionType('assign'); setIsFilterRoles(false) }} className={contributionType === 'assign' ? 'active' : null}>ASSIGN MEMBER</button>
-                                                <button onClick={() => { setContributionType('open'); setSelectedUser(null) }} className={contributionType === 'open' ? 'active' : null}>OPEN</button>
+                                                <button onClick={() => { setContributionType('assign'); setIsFilterRoles(false) }} className={contributionType === 'assign' ? 'active' : null} disabled style={{ cursor: 'not-allowed' }}>ASSIGN MEMBER</button>
+                                                <button onClick={() => { setContributionType('open'); setSelectedUser(null) }} className={contributionType === 'open' ? 'active' : null} disabled style={{ cursor: 'not-allowed' }}>OPEN</button>
                                             </div>
                                         </div>
 
@@ -385,15 +320,16 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                     className="tokenDropdown"
                                                     style={{ width: '100%' }}
                                                     onChange={(e) => handleSetApplicant(e.target.value)}
+                                                    disabled
                                                 >
-                                                    <option value={null}>Select member</option>
-                                                    {
+                                                    <option value={null}>{task.members[0].member.name && task.members[0].member.name !== "" ? `${task.members[0].member.name}  (${beautifyHexToken(task.members[0].member.wallet)})` : beautifyHexToken(task.members[0].member.wallet)}</option>
+                                                    {/* {
                                                         eligibleContributors.map((item, index) => {
                                                             return (
                                                                 <option value={`${item.member._id}`}>{item.member.name && item.member.name !== "" ? `${item.member.name}  (${beautifyHexToken(item.member.wallet)})` : beautifyHexToken(item.member.wallet)}</option>
                                                             )
                                                         })
-                                                    }
+                                                    } */}
                                                 </select>
                                                 <span className='error-msg' id="error-applicant"></span>
                                             </div>
@@ -406,9 +342,9 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                     {
                                                         isSingleContributor
                                                             ?
-                                                            <input type="checkbox" onChange={(e) => setIsSingleContributor(!isSingleContributor)} checked />
+                                                            <input type="checkbox" onChange={(e) => setIsSingleContributor(!isSingleContributor)} checked disabled style={{ cursor: 'not-allowed' }} />
                                                             :
-                                                            <input type="checkbox" onChange={(e) => setIsSingleContributor(!isSingleContributor)} />
+                                                            <input type="checkbox" onChange={(e) => setIsSingleContributor(!isSingleContributor)} disabled style={{ cursor: 'not-allowed' }} />
                                                     }
                                                     <div>
                                                         <h1>SINGLE CONTRIBUTOR</h1>
@@ -419,9 +355,9 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                     {
                                                         isFilterRoles
                                                             ?
-                                                            <input type="checkbox" onChange={(e) => setIsFilterRoles(!isFilterRoles)} checked />
+                                                            <input type="checkbox" onChange={(e) => setIsFilterRoles(!isFilterRoles)} checked disabled style={{ cursor: 'not-allowed' }} />
                                                             :
-                                                            <input type="checkbox" onChange={(e) => setIsFilterRoles(!isFilterRoles)} />
+                                                            <input type="checkbox" onChange={(e) => setIsFilterRoles(!isFilterRoles)} disabled style={{ cursor: 'not-allowed' }} />
                                                     }
 
                                                     <div>
@@ -451,7 +387,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                                             ></div>
                                                                             <span>{item}</span>
                                                                         </div>
-                                                                        <div className='roles-close' onClick={() => handleRemoveRole(item)}>
+                                                                        <div className='roles-close' style={{ cursor: 'not-allowed' }}>
                                                                             <CgClose color='#FFF' />
                                                                         </div>
                                                                     </div>
@@ -461,7 +397,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
 
                                                     </div>
                                                     <div className='roles-right'>
-                                                        <button onClick={toggleSelect}>
+                                                        <button onClick={toggleSelect} disabled style={{ cursor: 'not-allowed' }}>
                                                             <HiOutlinePlus size={24} color='#C94B32' />
                                                         </button>
                                                     </div>
@@ -505,7 +441,10 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                         el.innerHTML = '';
                                                         setCurrency({ currency: e.target.value })
                                                     }}
+                                                    value={currency.currency}
+                                                // disabled
                                                 >
+
                                                     <option value={null}>
                                                         select a token
                                                     </option>
@@ -558,12 +497,12 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
 
                                     </div>
 
-                                    <div className='createTask-footer'>
-                                        <button onClick={handleDraftTask}>
+                                    <div className='createTask-footer' style={{ justifyContent: 'center' }}>
+                                        {/* <button onClick={handleDraftTask}>
                                             SAVE AS DRAFT
-                                        </button>
-                                        <button onClick={handleCreateTask}>
-                                            CREATE
+                                        </button> */}
+                                        <button onClick={handleEditTask}>
+                                            EDIT
                                         </button>
                                     </div>
                                 </>
@@ -574,4 +513,4 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
     )
 }
 
-export default CreateTask;
+export default EditTask;

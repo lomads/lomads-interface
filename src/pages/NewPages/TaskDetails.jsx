@@ -44,6 +44,7 @@ import TaskReview from "./DashBoard/Task/TaskReview";
 
 import { CgClose } from 'react-icons/cg'
 import useRole from "hooks/useRole";
+import EditTask from "./DashBoard/Task/EditTask";
 
 const TaskDetails = () => {
     const dispatch = useAppDispatch();
@@ -51,7 +52,7 @@ const TaskDetails = () => {
     const { provider, account, chainId } = useWeb3React();
     const { taskId, daoURL } = useParams();
     const { DAO, Task, TaskLoading, user, archiveTaskLoading, deleteTaskLoading } = useAppSelector((state) => state.dashboard);
-    console.log("Task : ", Task);
+    // console.log("Task : ", Task);
     const daoName = _get(DAO, 'name', '').split(" ");
     const { myRole, can } = useRole(DAO, account)
 
@@ -61,6 +62,7 @@ const TaskDetails = () => {
     const [openTaskReview, setOpenTaskReview] = useState(false);
     const [deletePrompt, setDeletePrompt] = useState(false);
     const [closePrompt, setClosePrompt] = useState(false);
+    const [openEditTask, setOpenEditTask] = useState(false);
 
     useEffect(() => {
         if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
@@ -254,8 +256,15 @@ const TaskDetails = () => {
                         {
                             openApplicantsList && <ApplicantList task={Task} close={() => setOpenApplicantsList(false)} />
                         }
+
+                        {/* show task review side modal*/}
                         {
                             openTaskReview && <TaskReview task={Task} close={() => setOpenTaskReview(false)} />
+                        }
+
+                        {/* show edit task side modal */}
+                        {
+                            openEditTask && <EditTask task={Task} close={() => setOpenEditTask(false)} daoURL />
                         }
 
                         <div className="info">
@@ -536,8 +545,8 @@ const TaskDetails = () => {
                                                     amICreator || can(myRole, 'task.edit') || can(myRole, 'task.delete') || can(myRole, 'task.close')
                                                         ?
                                                         <>
-                                                            {(amICreator || can(myRole, 'task.edit')) && false &&
-                                                                <button style={{ marginRight: '25px' }}>
+                                                            {(amICreator || can(myRole, 'task.edit')) &&
+                                                                <button style={{ marginRight: '25px' }} onClick={() => setOpenEditTask(true)}>
                                                                     <img src={editToken} alt="hk-logo" />
                                                                 </button>
                                                             }
