@@ -76,6 +76,7 @@ const Dashboard = () => {
 	const [showEditMember, setShowEditMember] = useState<boolean>(false);
 	const [showCreateTask, setShowCreateTask] = useState<boolean>(false);
 	const [showNavBar, setShowNavBar] = useState<boolean>(false);
+	const [manualChainSwitch, setManualChainSwitch] = useState<boolean>(false);
 	const [checkLoading, setCheckLoading] = useState<boolean>(true);
 	const currentNonce = useAppSelector((state) => state.flow.currentNonce);
 	const { myRole, displayRole, permissions, can, isSafeOwner } = useRole(DAO, account);
@@ -121,15 +122,15 @@ const Dashboard = () => {
 	};
 
 	const handleSwitchChain = async (nextChain: number) => {
+		console.log("nextChain", nextChain)
 		if (chainId !== nextChain) {
+			sessionStorage.setItem('___lmds_chain_switch', "1");
 			switchChain(connector, nextChain)
 				.then(res => {
-					dispatch(setDAOList([]))
-					dispatch(setDAO(null))
-					setTimeout(() => {
-						sessionStorage.clear()
-						window.location.href = '/'
-					}, 1000)
+					window.location.href = '/'
+				})
+				.catch(e => {
+					sessionStorage.clear();
 				})
 		}
 	}
@@ -207,14 +208,16 @@ const Dashboard = () => {
 
 	useEffect(() => {
 		if (DAO && chainId) {
-			if (DAO.chainId !== chainId) {
+			const manualSwitch = sessionStorage.getItem('___lmds_chain_switch');
+			sessionStorage.clear()
+			if (((DAO.chainId !== chainId) && !manualSwitch)) {
 				setValidDaoChain(false)
 				switchChain(connector, DAO.chainId)
 			}
 			else
 				setValidDaoChain(true)
 		}
-	}, [DAO, chainId]);
+	}, [DAO, chainId, manualChainSwitch]);
 
 	useEffect(() => {
 		if (DAO && account && chainId) {

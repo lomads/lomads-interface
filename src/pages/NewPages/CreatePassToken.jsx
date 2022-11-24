@@ -154,7 +154,7 @@ const CreatePassToken = () => {
     }
 
     const handleSBTSupply = (e) => {
-        setTokenQuantity(e.target.value);
+        setTokenQuantity(parseInt(e.target.value));
         setError('');
         setSupplyError(false);
     }
@@ -304,6 +304,11 @@ const retry = (promise, onRetry, maxRetries) => {
     return (
         <>
             <div className="createPassToken-container">
+                          <div onClick={() => navigate(-1)} className="logo-container">
+            <p style={{textTransform: "capitalize"}}>{ _get(DAO, 'name', '').length === 1
+                                ? _get(DAO, 'name', '')[0].charAt(0)
+                                : _get(DAO, 'name', '')[0].charAt(0)}</p>
+          </div>
                 <div className="createPassToken-body">
                     <img src={Frame} alt="frame-icon" />
                     <p className="heading-text">Create New Pass Token</p>
@@ -380,7 +385,10 @@ const retry = (promise, onRetry, maxRetries) => {
                                     </div>
                                     <input
                                         id="token-supply"
+                                        type="number"
                                         className="text-input"
+                                        min={1}
+                                        max={250}
                                         placeholder="Number of existing tokens"
                                         value={tokenQuantity}
                                         onChange={(e) => handleSBTSupply(e)}
