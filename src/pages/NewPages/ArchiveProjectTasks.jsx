@@ -8,15 +8,16 @@ import { IoIosArrowBack } from 'react-icons/io'
 import ProjectCard from './DashBoard/Project/ProjectCard';
 import TaskCard from "./DashBoard/Task/TaskCard";
 
-const ArchiveTasks = () => {
+const ArchiveProjectTasks = () => {
     const navigate = useNavigate();
+    const { projectId } = useParams();
     const { DAO } = useAppSelector((state) => state.dashboard);
     const daoName = _get(DAO, 'name', '').split(" ");
 
     const [archivedTasks, setArchivedTasks] = useState([]);
 
     useEffect(() => {
-        let tasks = _get(DAO, 'tasks', []).filter(t => t.archivedAt !== null && t.deletedAt === null);
+        let tasks = _find(_get(DAO, 'projects', []), p => _get(p, '_id', '').toLowerCase() === projectId.toLowerCase()).tasks.filter((t) => !t.deletedAt && t.archivedAt)
         setArchivedTasks(tasks);
     }, [DAO]);
 
@@ -63,4 +64,4 @@ const ArchiveTasks = () => {
     )
 }
 
-export default ArchiveTasks;
+export default ArchiveProjectTasks;

@@ -38,7 +38,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
         if (DAO && Task && Task.contributionType === 'open') {
             let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
             if (user) {
-                if(Task?.validRoles.length > 0) {
+                if (Task?.validRoles.length > 0) {
                     let index = Task?.validRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase());
                     return index > -1
                 } else {
@@ -52,8 +52,8 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
 
     const fetchProjectTasks = () => {
         if (Project && user) {
-            setMyTasks(_get(Project, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) || (task.contributionType === 'open' && !task.isSingleContributor)))))
-            setManageTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && (task.creator === user._id || task.reviewer === user._id)));
+            setMyTasks(_get(Project, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) || (task.contributionType === 'open' && !task.isSingleContributor)))))
+            setManageTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id)));
             setDraftTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
             setOtherTasks(_get(Project, 'tasks', []).filter(task => !amIEligible(task) && (!(task.contributionType === 'open' && !task.isSingleContributor) && !task.deletedAt && !task.archivedAt && !task.draftedAt && task.creator !== user._id && task.reviewer !== user._id && !_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()))));
         }
@@ -61,10 +61,10 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
 
     const fetchDaoTasks = () => {
         if (DAO && user) {
-            setMyTasks(_get(DAO, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) ||  (task.contributionType === 'open' && !task.isSingleContributor))) ))
-            setManageTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && (task.creator === user._id || task.reviewer === user._id)));
+            setMyTasks(_get(DAO, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) || (task.contributionType === 'open' && !task.isSingleContributor)))))
+            setManageTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id)));
             setDraftTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
-            setOtherTasks(_get(DAO, 'tasks', []).filter(task => !amIEligible(task) && ( !(task.contributionType === 'open' && !task.isSingleContributor) && !task.deletedAt && !task.archivedAt && !task.draftedAt && task.creator !== user._id && task.reviewer !== user._id && !_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()))));
+            setOtherTasks(_get(DAO, 'tasks', []).filter(task => !amIEligible(task) && (!(task.contributionType === 'open' && !task.isSingleContributor) && !task.deletedAt && !task.archivedAt && !task.draftedAt && task.creator !== user._id && task.reviewer !== user._id && !_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()))));
         }
     }
 
@@ -73,7 +73,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
         if (manageTasks.length > 0) {
             for (let index = 0; index < manageTasks.length; index++) {
                 const task = manageTasks[index];
-                if(task.taskStatus === 'open' && task.isSingleContributor) {
+                if (task.taskStatus === 'open' && task.isSingleContributor) {
                     let applications = _get(task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_rejected'))
                     if (applications)
                         return sum = sum + applications.length
@@ -88,7 +88,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
         if (manageTasks.length > 0) {
             for (let index = 0; index < manageTasks.length; index++) {
                 const task = manageTasks[index];
-                if((task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign') {
+                if ((task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign') {
                     let submissions = _get(task, 'members', []).filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
                     if (submissions)
                         return sum = sum + submissions.length
@@ -132,14 +132,14 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                     <div className="divider"></div>
 
                     <button style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }} className={tab === 2 ? 'active' : null} onClick={() => setTab(2)}>
-                            <div>Manage</div>
-                            <div className='tasks-card-icons'>
-                                { (applicationCount + submissionCount) > 0 &&
-                                    <div className='icon-container'>
-                                        <p>{(applicationCount + submissionCount)}</p>
-                                    </div>
-                                }
-                            </div>
+                        <div>Manage</div>
+                        <div className='tasks-card-icons'>
+                            {(applicationCount + submissionCount) > 0 &&
+                                <div className='icon-container'>
+                                    <p>{(applicationCount + submissionCount)}</p>
+                                </div>
+                            }
+                        </div>
                     </button>
                     <div className="divider"></div>
 
@@ -161,7 +161,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                     <div style={{ marginRight: '20px' }}>
                         <button
                             className='archive-btn'
-                            onClick={() => { onlyProjects ? navigate(`/archiveTasks/${Project._id}`) : navigate(`/archiveTasks/ `) }}
+                            onClick={() => { onlyProjects ? navigate(`/archiveTasks/${Project._id}`) : navigate(`/archiveTasks`) }}
                             disabled={_get(DAO, 'tasks', []).filter(task => !task.deletedAt && task.archivedAt).length > 0 ? false : true}
                         >
                             <img src={archiveIcon} alt="archive-icon" />

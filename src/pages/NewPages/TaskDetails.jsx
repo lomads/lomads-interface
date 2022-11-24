@@ -726,13 +726,14 @@ const TaskDetails = () => {
                                                                                                         <>
 
                                                                                                             <h1>This task<br />fits your role.</h1>
-                                                                                                            <button onClick={() => setOpenApply(true)}>APPLY</button>
+                                                                                                            {moment(Task.deadline).isBefore(moment(), "day") ? null : <button onClick={() => setOpenApply(true)}>APPLY</button>}
                                                                                                         </>
                                                                                                         :
                                                                                                         // mulitple contributor
                                                                                                         <>
                                                                                                             <h1>This task<br />fits your role.</h1>
-                                                                                                            <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>
+                                                                                                            {moment(Task.deadline).isBefore(moment(), "day") ? null : <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>}
+
                                                                                                         </>
                                                                                                 }
 
@@ -752,13 +753,15 @@ const TaskDetails = () => {
                                                                                             <>
 
                                                                                                 <h1>This task needs a<br />contributor.</h1>
-                                                                                                <button onClick={() => setOpenApply(true)}>APPLY</button>
+                                                                                                {moment(Task.deadline).isBefore(moment(), "day") ? null : <button onClick={() => setOpenApply(true)}>APPLY</button>}
+
                                                                                             </>
                                                                                             :
                                                                                             // mulitple contributor
                                                                                             <>
                                                                                                 <h1>Open for all.</h1>
-                                                                                                <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>
+                                                                                                {moment(Task.deadline).isBefore(moment(), "day") ? null : <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>}
+
                                                                                             </>
                                                                                     }
                                                                                 </>
@@ -785,7 +788,8 @@ const TaskDetails = () => {
                                                         ?
                                                         <>
                                                             <h1>You are assigned.</h1>
-                                                            <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>
+                                                            {moment(Task.deadline).isBefore(moment(), "day") ? null : <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>}
+
                                                         </>
                                                         :
                                                         <>

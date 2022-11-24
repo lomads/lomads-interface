@@ -76,6 +76,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: space-between;
     padding-top: 4rem;
     padding-left: 4rem;
 
@@ -83,7 +84,7 @@
 }
 
 .settings-page .settings-center .settings-header {
-    width: 70%;
+    width: 947px;
     display: flex;
     flex-direction: column;
     /* justify-content: space-between; */
@@ -96,7 +97,6 @@
     font-size: 30px;
     line-height: 33px;
     color: #FFFFFF;
-    margin-left: -100px;
     margin-bottom: 20px;
 }
 
@@ -106,7 +106,6 @@
     font-size: 30px;
     line-height: 33px;
     color: #FFFFFF;
-    margin-left: -100px;
     margin-bottom: 40px;
 }
 
@@ -506,6 +505,7 @@
     /* Grey */
     color: #76808D;
 }
+
 #title-type {
     width: 529px;
     height: 37px;
@@ -815,7 +815,8 @@ td {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Inter', sans-serif;;
+    font-family: 'Inter', sans-serif;
+    ;
 
     /* box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
     border-radius: 10px; */
@@ -840,7 +841,8 @@ td {
     width: 40px;
     height: 36px;
 
-    font-family: 'Inter', sans-serif;;
+    font-family: 'Inter', sans-serif;
+    ;
     font-style: normal;
 
     text-align: center;
@@ -1073,24 +1075,24 @@ td {
 }
 
 
- .main-picker-container  {
+.main-picker-container {
     display: flex;
     flex-direction: row;
     height: 50px;
     margin: 20px 0;
     align-items: center;
     justify-content: center;
- }
+}
 
 
- .picker-container {
+.picker-container {
     display: flex;
     flex-direction: row;
     height: 50px;
     margin: 20px 0;
 }
 
- .main-picker-container .currency {
+.main-picker-container .currency {
     background: #FFFFFF;
     /* box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1); */
     /* border-radius: 0px 10px 10px 0px; */
@@ -1099,7 +1101,7 @@ td {
     height: 50px;
 }
 
- .main-picker-container .currency-container {
+.main-picker-container .currency-container {
     height: 50px;
     transform: rotate(180deg);
     display: flex;
@@ -1109,7 +1111,7 @@ td {
     padding-right: 20px;
 }
 
- .main-picker-container .currency-container div {
+.main-picker-container .currency-container div {
     font-family: 'Inter', sans-serif;
     font-style: normal;
     font-size: 16px;
@@ -1121,7 +1123,7 @@ td {
     margin-left: 12px;
 }
 
- .main-picker-container .currency-container {
+.main-picker-container .currency-container {
     font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 400;
@@ -1132,13 +1134,13 @@ td {
     color: #76808D;
 }
 
- .picker-container .number-input {
-    background: #FFFFFF; 
+.picker-container .number-input {
+    background: #FFFFFF;
     /* box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1); */
     /* border-radius: 0px 10px 10px 0px; */
 }
 
- .picker-container .number-input .input {
+.picker-container .number-input .input {
     font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 400;
@@ -1154,7 +1156,7 @@ td {
     color: rgba(27, 45, 65, 0.6);
 }
 
- .picker-container .counter {
+.picker-container .counter {
     width: 40px;
     height: 50px;
     background: #FFFFFF;
