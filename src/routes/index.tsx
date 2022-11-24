@@ -105,11 +105,11 @@ export default [
         component: ArchiveProjects
     },
     {
-        path: '/archiveTasks',
+        path: '/:daoURL/archiveTasks',
         component: ArchiveTasks
     },
     {
-        path: '/archiveTasks/:projectId',
+        path: '/:daoURL/archiveTasks/:projectId',
         component: ArchiveProjectTasks
     },
     {

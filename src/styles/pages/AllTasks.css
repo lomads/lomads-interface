@@ -6,7 +6,7 @@
     flex-direction: column;
     align-items: center;
     position: relative;
-    overflow: hidden;
+    overflow: auto;
 }
 
 .allTasks-container .home-btn {
@@ -58,7 +58,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 0.2rem;
+    /* margin-bottom: 0.2rem; */
     background-color: #FFF;
 }
 
@@ -113,22 +113,30 @@
 }
 
 .allTasks-container .allTasks-body {
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: calc(100% - 180px);
+    /* height: 100%; */
     display: flex;
-    overflow-x: scroll;
-    padding: 0 1rem;
+    overflow-x: auto;
+    /* white-space: nowrap; */
+    padding: 1rem;
+    /* background-color: blue; */
 }
 
 .allTasks-container .allTasks-body .allTasks-column {
+    height: 100%;
+    min-width: 340px;
+    /* background-color: green; */
     display: flex;
     flex-direction: column;
-    padding: 1rem 0;
-    margin-right: 25px;
+    /* align-items: center; */
+    padding: 10px 0 0 0;
+    margin-right: 20px;
 }
 
 .allTasks-container .allTasks-body .allTasks-column .col-head {
     width: 100%;
+    height: 25px;
     display: flex;
     margin-bottom: 17px;
 }
@@ -144,8 +152,16 @@
 
 .allTasks-container .allTasks-body .allTasks-column .col-body {
     width: 100%;
-    height: 100%;
+    height: calc(100% - 35px);
     display: flex;
     flex-direction: column;
     border-right: 1px solid rgba(118, 128, 141, 0.25);
+    overflow-x: hidden;
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.allTasks-container .allTasks-body .allTasks-column .col-body::-webkit-scrollbar {
+    display: none;
 }

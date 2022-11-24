@@ -17,6 +17,11 @@ const ArchiveTasks = () => {
 
     useEffect(() => {
         let tasks = _get(DAO, 'tasks', []).filter(t => t.archivedAt !== null && t.deletedAt === null);
+        // console.log("tasks length : ", tasks.length);
+        // if (tasks.length < 10) {
+
+        //     navigate(-1);
+        // }
         setArchivedTasks(tasks);
     }, [DAO]);
 
@@ -59,6 +64,7 @@ const ArchiveTasks = () => {
                     })
                 }
             </div>
+
         </div>
     )
 }

@@ -69,7 +69,7 @@ const TaskCard = ({ task, daoUrl }) => {
 
     const applicationCount = useMemo(() => {
         if (task) {
-            if(task.taskStatus === 'open') {
+            if (task.taskStatus === 'open') {
                 let applications = _get(task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_rejected'))
                 if (applications)
                     return applications.length
@@ -92,20 +92,20 @@ const TaskCard = ({ task, daoUrl }) => {
 
     return (
         <div className='tasks-card' onClick={() => navigate(`/${daoUrl}/task/${task._id}`, { state: { task } })}>
-                   { ( submissionCount > 0 || applicationCount > 0 ) && task.creator === user._id &&
-                    <div className='tasks-card-icons'>
-                        { (task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign' ?
+            {(submissionCount > 0 || applicationCount > 0) && task.creator === user._id &&
+                <div className='tasks-card-icons'>
+                    {(task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign' ?
                         <div className='icon-container'>
-                            <img src={submissionDashboard} /> 
+                            <img src={submissionDashboard} />
                             <p>+{submissionCount}</p>
-                        </div> : 
+                        </div> :
                         <div className='icon-container'>
-                            <img src={applicationDashboard} /> 
+                            <img src={applicationDashboard} />
                             <p>+{applicationCount}</p>
                         </div>
-                        }
-                    </div>
                     }
+                </div>
+            }
             <div>
                 <p className="p-name">{task.project?.name}</p>
             </div>

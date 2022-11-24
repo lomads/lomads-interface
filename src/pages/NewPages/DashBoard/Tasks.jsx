@@ -154,14 +154,14 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                 </div>
                 <div className="tasks-buttons">
                     <div style={{ marginRight: '20px' }}>
-                        <button className='archive-btn' onClick={() => navigate('/tasks', { state: { activeTab: tab } })}>
+                        {/* <button className='archive-btn' onClick={() => navigate('/tasks', { state: { activeTab: tab } })}>
                             <img src={expandIcon} alt="archive-icon" />
-                        </button>
+                        </button> */}
                     </div>
                     <div style={{ marginRight: '20px' }}>
                         <button
                             className='archive-btn'
-                            onClick={() => { onlyProjects ? navigate(`/archiveTasks/${Project._id}`) : navigate(`/archiveTasks`) }}
+                            onClick={() => { onlyProjects ? navigate(`/${DAO.url}/archiveTasks/${Project._id}`) : navigate(`/${DAO.url}/archiveTasks`) }}
                             disabled={_get(DAO, 'tasks', []).filter(task => !task.deletedAt && task.archivedAt).length > 0 ? false : true}
                         >
                             <img src={archiveIcon} alt="archive-icon" />

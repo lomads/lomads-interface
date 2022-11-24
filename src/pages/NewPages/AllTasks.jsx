@@ -15,6 +15,7 @@ import open from '../../assets/svg/open.svg';
 import submitted from '../../assets/svg/submitted.svg';
 import assign from '../../assets/svg/assign.svg';
 import paid from '../../assets/svg/paid.svg';
+import applied from '../../assets/svg/applied.svg'
 import approved from '../../assets/svg/approved.svg';
 import TaskCard from './DashBoard/Task/TaskCard';
 
@@ -33,12 +34,28 @@ const AllTasks = () => {
     const [initialCheck, setInitialCheck] = useState(false);
     const [currentTasks, setCurrentTasks] = useState([]);
 
+    const amIEligible = (Task) => {
+        if (DAO && Task && Task.contributionType === 'open') {
+            let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
+            if (user) {
+                if (Task?.validRoles.length > 0) {
+                    let index = Task?.validRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase());
+                    return index > -1
+                } else {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return true;
+    };
+
     useEffect(() => {
         if (DAO && user) {
-            setMyTasks(_get(DAO, 'tasks', []).filter(task => _find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())))
-            setManageTasks(_get(DAO, 'tasks', []).filter(task => task.creator === user._id || task.reviewer === user._id));
-            setDraftTasks(_get(DAO, 'tasks', []).filter(task => task.draftedAt !== null));
-            setOtherTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && task.creator !== user._id && task.reviewer !== user._id && !_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())));
+            setMyTasks(_get(DAO, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) || (task.contributionType === 'open' && !task.isSingleContributor)))))
+            setManageTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id)));
+            setDraftTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
+            setOtherTasks(_get(DAO, 'tasks', []).filter(task => !amIEligible(task) && (!(task.contributionType === 'open' && !task.isSingleContributor) && !task.deletedAt && !task.archivedAt && !task.draftedAt && task.creator !== user._id && task.reviewer !== user._id && !_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()))));
         }
     }, [DAO, tab, user]);
 
@@ -56,6 +73,16 @@ const AllTasks = () => {
             setCurrentTasks(otherTasks);
         }
     }, [tab, myTasks, manageTasks, draftTasks, otherTasks]);
+
+    // const amIApproved = useMemo(() => {
+    //     if (task) {
+    //         let user = _find(_get(task, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.status === "approved")
+    //         if (user)
+    //             return true
+    //         return false
+    //     }
+    //     return false;
+    // }, [account, task]);
 
     return (
         <div className='allTasks-container'>
@@ -128,94 +155,314 @@ const AllTasks = () => {
 
             <div className='allTasks-body'>
 
-                <div className='allTasks-column'>
-                    <div className='col-head'>
-                        <div className='head-pill' style={{ backgroundColor: 'rgba(75, 161, 219, 0.2)' }}>
-                            <img src={open} style={{ marginRight: '5px' }} />
-                            <p style={{ color: '#4BA1DB' }}>Open</p>
+                {/* My tasks --- with columns */}
+
+                {
+                    tab === 1 &&
+                    <>
+
+                        <div className='allTasks-column'>
+                            <div className='col-head'>
+                                <div className='head-pill' style={{ background: 'rgba(14, 193, 176, 0.2)' }}>
+                                    <img src={assign} style={{ marginRight: '5px' }} />
+                                    <p style={{ color: '#0EC1B0' }}>Assigned to me</p>
+                                </div>
+                            </div>
+                            <div className='col-body'>
+                                {
+                                    currentTasks && currentTasks.map((item, index) => {
+                                        if (item.taskStatus === 'assigned') {
+                                            return (
+                                                <div key={index}>
+                                                    <TaskCard
+                                                        task={item}
+                                                        daoUrl={DAO?.url}
+                                                    />
+                                                </div>
+                                            )
+                                        }
+                                    })
+                                }
+                            </div>
                         </div>
-                    </div>
-                    <div className='col-body'>
-                        {
-                            currentTasks && currentTasks.map((item, index) => {
-                                return (
-                                    <div key={index}>
-                                        <TaskCard
-                                            task={item}
-                                            daoUrl={DAO?.url}
-                                        />
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
-                </div>
-                <div className='allTasks-column'>
-                    <div className='col-head'>
-                        <div className='head-pill' style={{ backgroundColor: 'rgba(107, 153, 247, 0.2)' }}>
-                            <img src={submitted} style={{ marginRight: '5px' }} />
-                            <p style={{ color: '#6B99F7' }}>Submitted</p>
+
+                        <div className='allTasks-column'>
+                            <div className='col-head'>
+                                <div className='head-pill' style={{ backgroundColor: 'rgba(107, 153, 247, 0.2)' }}>
+                                    <img src={submitted} style={{ marginRight: '5px' }} />
+                                    <p style={{ color: '#6B99F7' }}>Under review</p>
+                                </div>
+                            </div>
+                            <div className='col-body'>
+                                {
+                                    currentTasks && currentTasks.map((item, index) => {
+                                        return (
+                                            <div key={index}>
+                                                <TaskCard
+                                                    task={item}
+                                                    daoUrl={DAO?.url}
+                                                />
+                                            </div>
+                                        )
+                                    })
+                                }
+                            </div>
                         </div>
-                    </div>
-                    <div className='col-body'>
-                        {
-                            currentTasks && currentTasks.map((item, index) => {
-                                return (
-                                    <div key={index}>
-                                        <TaskCard
-                                            task={item}
-                                            daoUrl={DAO?.url}
-                                        />
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
-                </div>
-                <div className='allTasks-column'>
-                    <div className='col-head'>
-                        <div className='head-pill' style={{ background: 'rgba(14, 193, 176, 0.2)' }}>
-                            <img src={assign} style={{ marginRight: '5px' }} />
-                            <p style={{ color: '#0EC1B0' }}>Assigned</p>
+
+                        <div className='allTasks-column'>
+                            <div className='col-head'>
+                                <div className='head-pill' style={{ backgroundColor: 'rgba(75, 161, 219, 0.2)' }}>
+                                    <img src={open} style={{ marginRight: '5px' }} />
+                                    <p style={{ color: '#4BA1DB' }}>Open</p>
+                                </div>
+                            </div>
+                            <div className='col-body'>
+                                {
+                                    currentTasks && currentTasks.map((item, index) => {
+                                        if (item.taskStatus === 'open') {
+                                            return (
+                                                <div key={index}>
+                                                    <TaskCard
+                                                        task={item}
+                                                        daoUrl={DAO?.url}
+                                                    />
+                                                </div>
+                                            )
+                                        }
+                                    })
+                                }
+                            </div>
                         </div>
-                    </div>
-                    <div className='col-body'>
-                        {
-                            currentTasks && currentTasks.map((item, index) => {
-                                return (
-                                    <div key={index}>
-                                        <TaskCard
-                                            task={item}
-                                            daoUrl={DAO?.url}
-                                        />
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
-                </div>
-                <div className='allTasks-column'>
-                    <div className='col-head'>
-                        <div className='head-pill' style={{ background: 'rgba(39, 196, 110, 0.2)' }}>
-                            <img src={approved} style={{ marginRight: '5px' }} />
-                            <p style={{ color: '#27C46E' }}>Approved</p>
+
+                        <div className='allTasks-column'>
+                            <div className='col-head'>
+                                <div className='head-pill' style={{ backgroundColor: 'rgb(245,234,216)' }}>
+                                    <img src={applied} style={{ marginRight: '5px' }} />
+                                    <p style={{ color: '#FFB600' }}>Applied</p>
+                                </div>
+                            </div>
+                            <div className='col-body'>
+                                {
+                                    currentTasks && currentTasks.map((item, index) => {
+                                        if (item.taskStatus === 'open') {
+                                            return (
+                                                <div key={index}>
+                                                    <TaskCard
+                                                        task={item}
+                                                        daoUrl={DAO?.url}
+                                                    />
+                                                </div>
+                                            )
+                                        }
+                                    })
+                                }
+                            </div>
                         </div>
-                    </div>
-                    <div className='col-body'>
-                        {
-                            currentTasks && currentTasks.map((item, index) => {
-                                return (
-                                    <div key={index}>
-                                        <TaskCard
-                                            task={item}
-                                            daoUrl={DAO?.url}
-                                        />
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
-                </div>
+
+                        <div className='allTasks-column'>
+                            <div className='col-head'>
+                                <div className='head-pill' style={{ background: 'rgba(39, 196, 110, 0.2)' }}>
+                                    <img src={approved} style={{ marginRight: '5px' }} />
+                                    <p style={{ color: '#27C46E' }}>Approved</p>
+                                </div>
+                            </div>
+                            <div className='col-body'>
+                                {
+                                    currentTasks && currentTasks.map((item, index) => {
+                                        if (item.taskStatus === 'approved') {
+                                            return (
+                                                <div key={index}>
+                                                    <TaskCard
+                                                        task={item}
+                                                        daoUrl={DAO?.url}
+                                                    />
+                                                </div>
+                                            )
+                                        }
+                                    })
+                                }
+                            </div>
+                        </div>
+                        <div className='allTasks-column'>
+                            <div className='col-head'>
+                                <div className='head-pill' style={{ background: 'rgb(217,236,198)' }}>
+                                    <img src={paid} style={{ marginRight: '5px' }} />
+                                    <p style={{ color: '#74D415' }}>Paid</p>
+                                </div>
+                            </div>
+                            <div className='col-body'>
+                                {
+                                    currentTasks && currentTasks.map((item, index) => {
+                                        if (item.taskStatus === 'paid') {
+                                            return (
+                                                <div key={index}>
+                                                    <TaskCard
+                                                        task={item}
+                                                        daoUrl={DAO?.url}
+                                                    />
+                                                </div>
+                                            )
+                                        }
+                                    })
+                                }
+                            </div>
+                        </div>
+                    </>
+                }
+
+                {/* Manage tasks --- with columns */}
+                {
+                    tab === 2 &&
+                    <>
+                        <div className='allTasks-column'>
+                            <div className='col-head'>
+                                <div className='head-pill' style={{ backgroundColor: 'rgba(75, 161, 219, 0.2)' }}>
+                                    <img src={open} style={{ marginRight: '5px' }} />
+                                    <p style={{ color: '#4BA1DB' }}>Open</p>
+                                </div>
+                            </div>
+                            <div className='col-body'>
+                                {
+                                    currentTasks && currentTasks.map((item, index) => {
+                                        if (item.taskStatus === 'open') {
+                                            return (
+                                                <div key={index}>
+                                                    <TaskCard
+                                                        task={item}
+                                                        daoUrl={DAO?.url}
+                                                    />
+                                                </div>
+                                            )
+                                        }
+                                    })
+                                }
+                            </div>
+                        </div>
+                        <div className='allTasks-column'>
+                            <div className='col-head'>
+                                <div className='head-pill' style={{ backgroundColor: 'rgba(107, 153, 247, 0.2)' }}>
+                                    <img src={submitted} style={{ marginRight: '5px' }} />
+                                    <p style={{ color: '#6B99F7' }}>Submitted</p>
+                                </div>
+                            </div>
+                            <div className='col-body'>
+                                {/* {
+                                    currentTasks && currentTasks.map((item, index) => {
+                                        return (
+                                            <div key={index}>
+                                                <TaskCard
+                                                    task={item}
+                                                    daoUrl={DAO?.url}
+                                                />
+                                            </div>
+                                        )
+                                    })
+                                } */}
+                            </div>
+                        </div>
+                        <div className='allTasks-column'>
+                            <div className='col-head'>
+                                <div className='head-pill' style={{ background: 'rgba(14, 193, 176, 0.2)' }}>
+                                    <img src={assign} style={{ marginRight: '5px' }} />
+                                    <p style={{ color: '#0EC1B0' }}>Assigned</p>
+                                </div>
+                            </div>
+                            <div className='col-body'>
+                                {
+                                    currentTasks && currentTasks.map((item, index) => {
+                                        if (item.taskStatus === 'assigned') {
+                                            return (
+                                                <div key={index}>
+                                                    <TaskCard
+                                                        task={item}
+                                                        daoUrl={DAO?.url}
+                                                    />
+                                                </div>
+                                            )
+                                        }
+                                    })
+                                }
+                            </div>
+                        </div>
+                        <div className='allTasks-column'>
+                            <div className='col-head'>
+                                <div className='head-pill' style={{ background: 'rgba(39, 196, 110, 0.2)' }}>
+                                    <img src={approved} style={{ marginRight: '5px' }} />
+                                    <p style={{ color: '#27C46E' }}>Approved</p>
+                                </div>
+                            </div>
+                            <div className='col-body'>
+                                {
+                                    currentTasks && currentTasks.map((item, index) => {
+                                        if (item.taskStatus === 'approved') {
+                                            return (
+                                                <div key={index}>
+                                                    <TaskCard
+                                                        task={item}
+                                                        daoUrl={DAO?.url}
+                                                    />
+                                                </div>
+                                            )
+                                        }
+                                    })
+                                }
+                            </div>
+                        </div>
+                        <div className='allTasks-column'>
+                            <div className='col-head'>
+                                <div className='head-pill' style={{ background: 'rgb(217,236,198)' }}>
+                                    <img src={paid} style={{ marginRight: '5px' }} />
+                                    <p style={{ color: '#74D415' }}>Paid</p>
+                                </div>
+                            </div>
+                            <div className='col-body'>
+                                {
+                                    currentTasks && currentTasks.map((item, index) => {
+                                        if (item.taskStatus === 'paid') {
+                                            return (
+                                                <div key={index}>
+                                                    <TaskCard
+                                                        task={item}
+                                                        daoUrl={DAO?.url}
+                                                    />
+                                                </div>
+                                            )
+                                        }
+                                    })
+                                }
+                            </div>
+                        </div>
+                    </>
+                }
+
+                {/* Draft tasks */}
+                {
+                    tab === 3 && currentTasks && currentTasks.map((item, index) => {
+                        return (
+                            <div key={index}>
+                                <TaskCard
+                                    task={item}
+                                    daoUrl={DAO?.url}
+                                />
+                            </div>
+                        )
+                    })
+                }
+
+                {/* other tasks */}
+                {
+                    tab === 4 && currentTasks && currentTasks.map((item, index) => {
+                        return (
+                            <div key={index}>
+                                <TaskCard
+                                    task={item}
+                                    daoUrl={DAO?.url}
+                                />
+                            </div>
+                        )
+                    })
+                }
+
 
             </div>
 
