@@ -24,6 +24,7 @@ import useRole from '../../../../hooks/useRole'
 
 import axios from "axios";
 import { isValidUrl } from 'utils';
+import NumberInputStepper from "UIpack/NumberInputStepper";
 
 const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
 
@@ -523,14 +524,23 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                     })}
                                                     {can(myRole, 'task.create.sweat') && _get(DAO, 'sweatPoints', false) && <option value="SWEAT">SWEAT</option>}
                                                 </select>
-                                                <input
+                                                {/* <input
                                                     className="inputField"
                                                     type={'number'}
                                                     style={{ height: '55px' }}
                                                     value={amount}
                                                     step={0.01}
                                                     onChange={(e) => setAmount(parseFloat(e.target.value))}
-                                                />
+                                                /> */}
+                                            <NumberInputStepper
+                                                className="inputField"
+												height={55}
+                                                step={0.01}
+                                                value={amount}
+												placeholder="Amount"
+												type="number"
+												onChange={(e) => setAmount(parseFloat(e.target.value))}
+											/>
                                             </div>
                                             <span className='error-msg' id="error-compensation"></span>
                                         </div>

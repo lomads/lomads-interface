@@ -51,13 +51,20 @@ export default () => {
                 return `${beautifyHexToken(_get(notification, 'to.wallet', ""))} has been <span class="bold">invited </span> to ${ _get(notification, 'project.name', '') }`
             } else if (notification.type === 'project:created') {
                 return `${ _get(notification, "project.name", "") } <span class="bold">created</span>`
+            } else if (notification.type === 'project:deleted') {
+                return `${ _get(notification, "project.name", "") } <span class="bold">deleted</span>`
+            } else if (notification.type === 'project:member:removed') {
+                return notification.notification
             }
         }
     }
 
     const navigateTo = notification => {
         if(notification.model === 'Project') {
-            navigate(`/${DAO.url}/project/${_get(notification, 'project._id', '')}`)
+            console.log(_get(notification, 'project', null))
+            if(!_get(notification, 'project.deletedAt', null) && !_get(notification, 'project.archivedAt', null)) {
+                navigate(`/${DAO.url}/project/${_get(notification, 'project._id', '')}`)
+            }
         }
     }
 

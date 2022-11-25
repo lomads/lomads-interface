@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import './EditMember.css';
 
 import { CgClose } from 'react-icons/cg'
@@ -26,6 +26,8 @@ const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
 
     const { myRole, can } = useRole(DAO, account)
 
+    console.log("MYROLE", myRole)
+
     useEffect(() => {
         if (manageMemberLoading === false) {
             dispatch(resetManageMemberLoader());
@@ -44,6 +46,16 @@ const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
     const handleChangeName = (e) => {
         setEditableName(e.target.value);
     }
+
+    const editableMembers = useMemo(() => {
+        let members = []
+        if(myRole === 'ADMIN'){
+            members = _get(DAO, 'members', []).filter(m => m.role !== 'ADMIN')
+        }
+        let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
+        members.push(user)
+        return members
+    }, [DAO])
 
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {
@@ -97,7 +109,7 @@ const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
                 </div>
                 <div className="editDaoMember-body">
                     {
-                        DAO?.members.filter(m => m.role !== 'ADMIN').map((item, index) => (
+                        editableMembers.map((item, index) => (
                             <div className="editDaoMember-row" key={index}>
                                 {
                                     deleteMembers.includes(item.member._id)
@@ -133,14 +145,14 @@ const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
                                     className="tokenDropdown"
                                     onChange={(e) => handleChangeRoles(item._id, e.target.value)}
                                     defaultValue={item.role}
-                                    disabled={!amIAdmin}
+                                    disabled={!amIAdmin || item.role === "ADMIN"}
                                 >
-                                    {/* <option value="ADMIN">Admin</option> */}
-                                    <option value="CORE_CONTRIBUTOR">Core Contributor</option>
-                                    <option value="ACTIVE_CONTRIBUTOR">Active Contributor</option>
-                                    <option value="CONTRIBUTOR">Contributor</option>
+                                    { item.role === "ADMIN" && <option selected={item.role === "ADMIN"} value="ADMIN">Admin</option> }
+                                    <option selected={item.role === "CORE_CONTRIBUTOR"} value="CORE_CONTRIBUTOR">Core Contributor</option>
+                                    <option selected={item.role === "ACTIVE_CONTRIBUTOR"} value="ACTIVE_CONTRIBUTOR">Active Contributor</option>
+                                    <option selected={item.role === "CONTRIBUTOR"} value="CONTRIBUTOR">Contributor</option>
                                 </select>
-                                { can(myRole, 'members.delete') && <button className={deleteMembers.includes(item.member._id) ? 'selected' : null} onClick={() => handleDeleteMembers(item.member._id)}>
+                                { can(myRole, 'members.delete') && _get(item, 'member.wallet', '').toLowerCase() !== account?.toLowerCase() ? <button className={deleteMembers.includes(item.member._id) ? 'selected' : null} onClick={() => handleDeleteMembers(item.member._id)}>
                                     {
                                         deleteMembers.includes(item.member._id)
                                             ?
@@ -148,7 +160,7 @@ const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
                                             :
                                             <img src={binRed} alt="bin-red" />
                                     }
-                                </button> }
+                                </button> : <button style={{ backgroundColor: 'grey' }}><img src={binWhite} alt="bin-red" /></button> }
                             </div>
                         ))
                     }

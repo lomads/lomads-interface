@@ -305,9 +305,9 @@ const retry = (promise, onRetry, maxRetries) => {
         <>
             <div className="createPassToken-container">
                           <div onClick={() => navigate(-1)} className="logo-container">
-            <p style={{textTransform: "capitalize"}}>{ _get(DAO, 'name', '').length === 1
-                                ? _get(DAO, 'name', '')[0].charAt(0)
-                                : _get(DAO, 'name', '')[0].charAt(0)}</p>
+                          <p style={{ textTransform: "capitalize" }}>{_get(DAO, 'name', '').length === 1
+							? _get(DAO, 'name', '')[0].charAt(0)
+							: _get(DAO, 'name', '')[0].charAt(0) + _get(DAO, 'name', '')[_get(DAO, 'name', '').length - 1].charAt(0)}</p>
           </div>
                 <div className="createPassToken-body">
                     <img src={Frame} alt="frame-icon" />
