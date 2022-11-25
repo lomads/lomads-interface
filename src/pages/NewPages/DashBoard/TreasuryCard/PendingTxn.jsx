@@ -91,15 +91,16 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
     }
 
     const renderItem = (item, index) => {
-        const mulAmount = _get(item, 'dataDecoded.parameters[1].value')
-        const mulRecipient = _get(item, 'dataDecoded.parameters[0].value')
+        const mulAmount = _get(item, 'dataDecoded.parameters[1].value', _get(item, 'value', 0))
+        const mulRecipient = _get(item, 'dataDecoded.parameters[0].value', _get(item, 'to', 0))
         const isLast = _get(transaction, 'dataDecoded.parameters[0].valueDecoded', []).length - 1 === index;
         const muldecimal = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.decimals', _get(transaction, 'token.decimals', 18))
         const token = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
         //let trans = _find(_get(DAO, 'safe.transactions', []), t => t.safeTxHash === transaction.safeTxHash)
         let mulReason = '';
         if(labels && labels.length > 0) {
-            mulReason = _get(_find(labels, l => l.recipient.toLowerCase() === mulRecipient.toLowerCase() && l.safeTxHash === transaction.safeTxHash), "label", null)
+            console.log("res", _find(labels, l => (_get(l, "recipient", "").toLowerCase() === mulRecipient.toLowerCase()) && (l.safeTxHash.toLowerCase() === transaction.safeTxHash.toLowerCase())))
+            mulReason = _get(_find(labels, l => (_get(l, "recipient", "").toLowerCase() === mulRecipient.toLowerCase()) && (l.safeTxHash.toLowerCase() === transaction.safeTxHash.toLowerCase())), "label", null)
         }
         return (
             <>

@@ -29,6 +29,7 @@ import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
 import { nanoid } from "@reduxjs/toolkit";
 import moment from "moment";
 import useRole from "hooks/useRole";
+import useSafeTransaction from "hooks/useSafeTransaction";
 
 const SideModal = (props: IsideModal) => {
 	const dispatch = useAppDispatch();
@@ -40,7 +41,7 @@ const SideModal = (props: IsideModal) => {
 		showTransactionSender: false,
 		showSuccess: false,
 	});
-	const [error, setError] = useState<string | null>(null)
+	const [error, setError] = useState<any>(null)
 	const [isLoading, setisLoading] = useState<boolean>(false);
 	const [safeTokens, setSafeTokens] = useState<Array<any>>([]);
 	const totalMembers = useAppSelector((state) => state.flow.totalMembers);
@@ -56,6 +57,8 @@ const SideModal = (props: IsideModal) => {
 	const { DAO } = useAppSelector(store => store.dashboard);
 	const { isSafeOwner } = useRole(DAO, account);
 
+	const { createSafeTransaction, createSafeTxnLoading } = useSafeTransaction(_get(DAO, 'safe.address', ''))
+
 	const showNavigation = (
 		_showRecipient: boolean,
 		_showSuccess: boolean,
@@ -68,6 +71,7 @@ const SideModal = (props: IsideModal) => {
 		});
 	};
 	const transactionData = useRef<TransactionDataType[]>([]);
+	
 
 	const toggleAddNewRecipient = () => {
 		setAddNewRecipient(!addNewRecipient);
@@ -159,139 +163,21 @@ const SideModal = (props: IsideModal) => {
 	}
 
 	const createTransaction = async () => {
+		setError(null)
+		if(selectedToken === 'SWEAT') {
+			return createOffChainTxn()
+		}
 		try {
-			setError(null)
-			if(selectedToken === 'SWEAT') {
-				return createOffChainTxn()
+			const txnResponse = await createSafeTransaction({ tokenAddress: selectedToken, send: setRecipient.current });
+			if(txnResponse?.safeTxHash) {
+				dispatch(getDao(DAO.url))
+				await props.getPendingTransactions();
+				showNavigation(false, true, false);
+				setisLoading(false);
 			}
-			let sendTotal = setRecipient.current.reduce((pv: any, cv) => pv + (+cv.amount), 0);
-			let selToken = _find(safeTokens, t => t.tokenAddress === selectedToken)
-			if (safeTokens.length > 0 && !selToken)
-				selToken = safeTokens[0];
-			if (selToken && (_get(selToken, 'balance', 0) / 10 ** _get(selToken, 'token.decimals', 18)) < sendTotal)
-				//{ _get(result, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR') }
-				//return setError(`Low token balance. Available tokens ${_get(selToken, 'balance', 0) / 10 ** 18} ${selToken.token.symbol}`);
-				return setError(`Low token balance. Available tokens ${_get(selToken, 'balance', 0) / 10 ** _get(selToken, 'token.decimals', 18)} ${_get(selToken, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}`);
-			setisLoading(true);
-			console.log(selectedToken, props.safeAddress)
-			const token = await tokenCallSafe(selectedToken);
-			const safeSDK = await ImportSafe(provider, props.safeAddress);
-
-			let safeTransaction = null;
-
-			if(selectedToken === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || selectedToken === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS) {
-				if(setRecipient.current.length == 1) {
-					const safeTransactionData: SafeTransactionDataPartial = {
-						to: _get(setRecipient, 'current.[0].recipient'),
-						data: "0x",
-						value: `${BigInt(parseFloat(_get(setRecipient, 'current.[0].amount')) * 10 ** _get(selToken, 'token.decimals', 18))}`,
-					}
-					const options: SafeTransactionOptionalProps = {
-						nonce: currentNonce,
-					};
-					safeTransaction = await safeSDK.createTransaction({
-						safeTransactionData,
-						options,
-					});
-				} else {
-					const safeTransactionData: SafeTransactionDataPartial[]  = await Promise.all(
-						setRecipient.current.map(
-							async (result: IsetRecipientType, index: number) => {
-								const transactionData = {
-									to: result.recipient,
-									data: "0x",
-									value: `${BigInt(parseFloat(result.amount) * 10 ** _get(selToken, 'token.decimals', 18))}`
-								};
-								return transactionData;
-							}
-						)
-					);
-					const options: SafeTransactionOptionalProps = {
-						nonce: currentNonce,
-					};
-					safeTransaction = await safeSDK.createTransaction({
-						safeTransactionData,
-						options,
-					});
-				}
-			} else {
-				const safeTransactionData: SafeTransactionDataPartial[]  = await Promise.all(
-					setRecipient.current.map(
-						async (result: IsetRecipientType, index: number) => {
-							const unsignedTransaction = await token.populateTransaction.transfer(
-								result.recipient,
-								BigInt(parseFloat(result.amount) * 10 ** _get(selToken, 'token.decimals', 18))
-							);
-							const transactionData = {
-								to: selectedToken,
-								data: unsignedTransaction.data as string,
-								value: "0",
-							};
-							return transactionData;
-						}
-					)
-				);
-				const options: SafeTransactionOptionalProps = {
-					nonce: currentNonce,
-				};
-				safeTransaction = await safeSDK.createTransaction({
-					safeTransactionData,
-					options,
-				});
-			}
-
-			const safeTxHash = await safeSDK.getTransactionHash(safeTransaction);
-			const signature = await safeSDK.signTransactionHash(safeTxHash);
-			const senderAddress = account as string;
-			const safeAddress = props.safeAddress;
-			await (
-				await safeService(provider, `${chainId}`)
-			)
-				.proposeTransaction({
-					safeAddress,
-					safeTransactionData: safeTransaction.data,
-					safeTxHash,
-					senderAddress,
-					senderSignature: signature.data,
-				})
-				.then((value) => {
-					console.log("transaction has been proposed");
-				})
-				.catch((error) => {
-					console.log("an error occoured while proposing transaction", error);
-					setisLoading(false);
-				});
-			await (
-				await safeService(provider, `${chainId}`)
-			)
-				.confirmTransaction(safeTxHash, signature.data)
-				.then(async (success) => {
-					console.log("transaction is successful");
-					console.log("success:", success);
-					let payload: any[] = [];
-					setRecipient.current.map(r => {
-						payload.push({
-							safeAddress: _get(DAO, 'safe.address', null),
-							safeTxHash: safeTxHash,
-							recipient: r.recipient,
-							label: _get(r, 'reason', null)
-						})
-					})
-					axiosHttp.post(`transaction/label`, payload)
-					.then(async () => {
-						dispatch(getDao(DAO.url))
-						await props.getPendingTransactions();
-						showNavigation(false, true, false);
-						setisLoading(false);
-					})
-				})
-				.catch((err) => {
-					setisLoading(false);
-					console.log("error occured while confirming transaction", err);
-				});
 		} catch (e) {
 			console.log(e)
-			setisLoading(false);
+			setError(e)
 		}
 	};
 
@@ -377,7 +263,7 @@ const SideModal = (props: IsideModal) => {
 								selectedToken={selectedToken}
 								toggleAddNewRecipient={toggleAddNewRecipient}
 								addNewRecipient={addNewRecipient}
-								isLoading={isLoading}
+								isLoading={isLoading || createSafeTxnLoading}
 								safeTokens={safeTokens}
 							/>
 						)}

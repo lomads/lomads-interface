@@ -31,6 +31,8 @@ import { setDAO } from "state/dashboard/reducer";
 import { getCurrentUser } from "state/dashboard/actions";
 import GOERLI_LOGO from '../../../assets/images/goerli.png';
 import POLYGON_LOGO from '../../../assets/images/polygon.png';
+import useSafeTokens from "hooks/useSafeTokens";
+import useSafeTransaction from "hooks/useSafeTransaction";
 
 const TreasuryCard = (props: ItreasuryCardType) => {
 	const { provider, account, chainId, ...rest } = useWeb3React();
@@ -53,6 +55,10 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	const [labels, setLabels] = useState<Array<any>>();
 
 	const { DAO } = useAppSelector(store => store.dashboard);
+
+	const { safeTokens, tokenBalance } = useSafeTokens(_get(DAO, 'safeAddress', ''))
+
+	const { createSafeTransaction, createSafeTxnLoading } = useSafeTransaction(_get(DAO, 'safe.address', ''))
 
 	const { myRole, can, isSafeOwner } = useRole(DAO, account);
 
@@ -122,14 +128,15 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 			.then(ptx => _get(ptx, 'results', []))
 			.then(ptx =>
 				_map(ptx, (p: any) => {
-					let matchRejTx = _find(ptx, px => px.nonce === p.nonce && px.data === null);
+					let matchRejTx = _find(ptx, px => px.nonce === p.nonce && px.data === null && px.value === "0");
 					if (matchRejTx)
 						return { ...p, rejectedTxn: matchRejTx }
 					return p
 				})
 			)
 			.then(ptx => _filter(ptx, p => {
-				let matchRejTx = _find(ptx, px => px.nonce === p.nonce && px.data === null);
+				let matchRejTx = _find(ptx, px => px.nonce === p.nonce && px.data === null && px.value === "0");
+				console.log("matchRejTx", matchRejTx)
 				if (matchRejTx)
 					return matchRejTx.safeTxHash !== p.safeTxHash
 				return true
@@ -140,7 +147,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				return ptx.concat(pTxn)
 			})
 			.then(ptx => _sortBy(ptx, 'submissionDate', 'ASC'))
-			.then(ptx => { console.log("loadPendingTxn", ptx); return ptx })
+			//.then(ptx => { console.log("loadPendingTxn", ptx); return ptx })
 			.then(ptx => setPendingTxn(ptx))
 	}
 
@@ -217,84 +224,22 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
 
 	const createOnChainTxn = async (txn: any, action: string | null) => {
-		console.log(txn);
         return new Promise(async (resolve, reject) => {
             try {
                 if(!chainId) return;
 				const amountValue = _get(txn, 'dataDecoded.parameters[1].value')
 				const receiver = _get(txn, 'dataDecoded.parameters[0].value')
-                const tokens = await getSafeTokens(chainId, _get(DAO, 'safe.address', null))
-                let selToken = _find(tokens, t => t.tokenAddress === _get(txn, 'token.tokenAddress', null))
-				console.log(selToken, amountValue)
-				if(selToken){
-					if(+_get(selToken, 'balance', 0) < +amountValue)
-						return console.log('Low token balance');
+				const send = [{ recipient: receiver, amount: amountValue }]
+				const txnResponse = await createSafeTransaction({ tokenAddress: _get(txn, 'token.tokenAddress', null), send, confirm: action === 'confirm' });
+				if(txnResponse) {
+					await axiosHttp.patch(`transaction/off-chain/${txn.safeTxHash}/move-on-chain`, {
+						onChainTxHash: txnResponse.safeTxHash,
+						taskId: txn.taskId
+					})
+					return resolve({ safeTxHash: txnResponse.safeTxHash, signature: txnResponse.signature, nonce: txnResponse.currentNonce })
+				} else {
+					reject(null)
 				}
-                const token = await tokenCallSafe(_get(txn, 'token.tokenAddress', null));
-                const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
-                const nonce = await (await safeService(provider, `${chainId}`)).getNextNonce(_get(DAO, 'safe.address', null));
-				console.log("nonce", nonce)
-				console.log("amountValue", amountValue)
-				console.log("receiver", receiver)
-                const unsignedTransaction = await token.populateTransaction.transfer(
-                    receiver,
-                    BigInt(amountValue)
-                )
-                const safeTransactionData: SafeTransactionDataPartial[] = [{
-                    to: _get(txn, 'token.tokenAddress', null),
-                    data: unsignedTransaction.data as string,
-                    value: "0",
-                }];
-				console.log(safeTransactionData)
-                const safeTransaction = await safeSDK.createTransaction({
-                    safeTransactionData,
-                    options: { nonce }
-                });
-				console.log(safeTransaction)
-                const safeTxHash = await safeSDK.getTransactionHash(safeTransaction);
-				console.log("safeTxHash", safeTxHash)
-                const signature = await safeSDK.signTransactionHash(safeTxHash);
-                const senderAddress = account as string;
-                const safeAddress = _get(DAO, 'safe.address', '');
-                await (await safeService(provider, `${chainId}`))
-                .proposeTransaction({
-                    safeAddress,
-                    safeTransactionData: safeTransaction.data,
-                    safeTxHash,
-                    senderAddress,
-                    senderSignature: signature.data,
-                })
-                .then(async (value) => {
-                    console.log("transaction has been proposed");
-					if(action === 'confirm') {
-						console.log("safeTxHash", safeTxHash)
-						await ( await safeService(provider, `${chainId}`) )
-						.confirmTransaction(safeTxHash, signature.data)
-						.then(async (success) => {
-							console.log("transaction has been confirmed");
-							await axiosHttp.patch(`transaction/off-chain/${txn.safeTxHash}/move-on-chain`, {
-								onChainTxHash: safeTxHash,
-								taskId: txn.taskId
-							})
-							console.log("success", success)
-							resolve({ safeTxHash, signature, nonce })
-						})
-						.catch((err) => {
-							console.log("error occured while confirming transaction", err);
-							return reject(null)
-						});
-					} else {
-						await axiosHttp.patch(`transaction/off-chain/${txn.safeTxHash}/move-on-chain`, {
-							onChainTxHash: safeTxHash,
-							taskId: txn.taskId
-						})
-						return resolve({ safeTxHash, signature, nonce })
-					}
-                })
-                .catch((error) => {
-                    console.log("an error occoured while proposing transaction", error);
-                    return reject(null)
-                });
             } catch (e) {
                 console.log(e)
                 reject(null)
@@ -438,7 +383,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	};
 
 
-	const handleExecuteTransactions = async (txn: any, reject: boolean | undefined) => {
+	const handleExecuteTransactions = useCallback(async (txn: any, reject: boolean | undefined) => {
 		let _txs = txn;
 		if(txn.offChain && _get(txn, 'token.symbol') === 'SWEAT'){
 			setExecuteTxLoading(txn.safeTxHash)
@@ -487,17 +432,21 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 					(await executeTxResponse.transactionResponse.wait());
 				console.log("confirmed", receipt);
 				setExecuteTxLoading(null)
-				if(!reject)
+				if(!reject) {
+					let safeToken = _find(safeTokens, (st:any) => _get(st, 'tokenAddress', '') === _get(txn, 'to', ''))
+					if(!safeToken)
+						safeToken = _find(safeTokens, (st:any) => _get(st, 'tokenAddress', '') === ( chainId === SupportedChainId.GOERLI ? process.env.REACT_APP_GOERLI_TOKEN_ADDRESS : process.env.REACT_APP_MATIC_TOKEN_ADDRESS ))
 					await axiosHttp.patch(`transaction/on-chain/executed?daoId=${_get(DAO, '_id', '')}`, { 
 						safeTx: { 
 							..._txs,
 							token: {
-								decimals: tokenDecimal(_get(txn, 'to', '')),
-								tokenAddress: _get(txn, 'to', ''),
-								symbol: _get(_find(props.tokens, t => t.tokenAddress === _get(txn, 'to', '')), 'token.symbol', _get(txn, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))}
+								decimals: tokenDecimal(_get(safeToken, 'tokenAddress', '')),
+								tokenAddress: _get(safeToken, 'tokenAddress', '') === '' ? chainId === SupportedChainId.GOERLI ? process.env.REACT_APP_GOERLI_TOKEN_ADDRESS : process.env.REACT_APP_MATIC_TOKEN_ADDRESS : _get(safeToken, 'tokenAddress', ''),
+								symbol: _get(_find(props.tokens, t => t.tokenAddress === _get(safeToken, 'tokenAddress', '')), 'token.symbol', _get(txn, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))}
 							}
 						}
 					)
+				}
 				await loadPendingTxn()
 				await loadExecutedTxn()
 				await loadTxnLabel()
@@ -508,7 +457,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				setExecuteTxLoading(null)
 			}
 		}
-	};
+	}, [safeTokens]);
 
 	// const balance = useMemo(() => {
 	// 	if (props.fiatBalance) {

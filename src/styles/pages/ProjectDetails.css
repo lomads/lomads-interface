@@ -272,6 +272,8 @@
     border-radius: 5px;
     padding: 26px 22px;
     opacity: 1;
+    max-height: 75vh;
+    position: relative;
 }
 
 .projectDetails-container .addMemberOverlay .project-members .project-members-header {
@@ -312,6 +314,9 @@
 
 .projectDetails-container .addMemberOverlay .project-members .member-list {
     width: 100%;
+    max-height: 50vh;
+    overflow: hidden;
+    overflow-y: auto;
 }
 
 .projectDetails-container .addMemberOverlay .project-members .member-list .member-li {

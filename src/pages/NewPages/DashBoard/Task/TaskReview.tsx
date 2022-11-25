@@ -39,6 +39,7 @@ import { nanoid } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { beautifyHexToken } from '../../../../utils';
 import { SupportedChainId } from 'constants/chains';
+import useSafeTransaction from 'hooks/useSafeTransaction';
 
 const TaskReview = ({ task, close }: any) => {
     console.log("task review : ", task);
@@ -57,6 +58,8 @@ const TaskReview = ({ task, close }: any) => {
     const [rejectionNote, setRejectionNote] = useState('');
     const [selectedUser, setSelectedUser] = useState<any>(null);
     const [rejectUser, setRejectUser] = useState<any>(null);
+
+    const { createSafeTransaction } = useSafeTransaction(_get(DAO, 'safe.address', ''))
 
     useEffect(() => {
         if (chainId) {
@@ -123,59 +126,10 @@ const TaskReview = ({ task, close }: any) => {
         return new Promise(async (resolve, reject) => {
             try {
                 if (!chainId) return;
-                let sendTotal = newCompensation;
-                const tokens = await getSafeTokens(chainId, _get(DAO, 'safe.address', null))
-                let selToken = _find(tokens, t => t.tokenAddress === _get(task, 'compensation.currency', null))
-                if (selToken && (_get(selToken, 'balance', 0) / 10 ** _get(selToken, 'token.decimals', tokenDecimal)) < sendTotal)
-                    return console.log('Low token balance');
-                const token = await tokenCallSafe(_get(task, 'compensation.currency', null));
-                console.log("TOKEN", token)
-                const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
-                const nonce = await (await safeService(provider, `${chainId}`)).getNextNonce(_get(DAO, 'safe.address', null));
-                const unsignedTransaction = await token.populateTransaction.transfer(
-                    activeSubmission.member.wallet,
-                    BigInt(parseFloat(`${newCompensation}`) * 10 ** tokenDecimal)
-                )
-                const safeTransactionData: SafeTransactionDataPartial[] = [{
-                    to: _get(task, 'compensation.currency', null),
-                    data: unsignedTransaction.data as string,
-                    value: "0",
-                }];
-                const safeTransaction = await safeSDK.createTransaction({
-                    safeTransactionData,
-                    options: { nonce }
-                });
-                const safeTxHash = await safeSDK.getTransactionHash(safeTransaction);
-                const signature = await safeSDK.signTransactionHash(safeTxHash);
-                const senderAddress = account as string;
-                const safeAddress = _get(DAO, 'safe.address', '');
-                await (await safeService(provider, `${chainId}`))
-                    .proposeTransaction({
-                        safeAddress,
-                        safeTransactionData: safeTransaction.data,
-                        safeTxHash,
-                        senderAddress,
-                        senderSignature: signature.data,
-                    })
-                    .then((value) => {
-                        console.log("transaction has been proposed");
-                    })
-                    .catch((error) => {
-                        console.log("an error occoured while proposing transaction", error);
-                        reject(error)
-                    });
-                if (isSafeOwner) {
-                    await (await safeService(provider, `${chainId}`))
-                        .confirmTransaction(safeTxHash, signature.data)
-                        .then(async (success) => {
-                            resolve(safeTxHash)
-                        })
-                        .catch((err) => {
-                            console.log("error occured while confirming transaction", err);
-                            reject(err)
-                        });
-                } else {
-                    resolve(safeTxHash)
+                const send = [{ recipient: activeSubmission.member.wallet, amount: newCompensation }]
+                const txnResponse = await createSafeTransaction({ tokenAddress: _get(task, 'compensation.currency', null), send, confirm: isSafeOwner, createLabel: false })
+                if(txnResponse) {
+                    resolve(txnResponse.safeTxHash)
                 }
             } catch (e) {
                 console.log(e)
