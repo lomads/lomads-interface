@@ -52,7 +52,7 @@ const TaskDetails = () => {
     const { provider, account, chainId } = useWeb3React();
     const { taskId, daoURL } = useParams();
     const { DAO, Task, TaskLoading, user, archiveTaskLoading, deleteTaskLoading } = useAppSelector((state) => state.dashboard);
-    // console.log("Task : ", Task);
+    console.log("Task : ", Task);
     const daoName = _get(DAO, 'name', '').split(" ");
     const { myRole, can } = useRole(DAO, account)
 

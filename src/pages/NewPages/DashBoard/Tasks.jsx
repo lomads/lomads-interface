@@ -24,6 +24,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
     const [otherTasks, setOtherTasks] = useState([]);
     const [initialCheck, setInitialCheck] = useState(false);
     const { myRole, can } = useRole(DAO, account)
+    console.log("My roel : ", myRole);
 
     useEffect(() => {
         if (onlyProjects) {
@@ -131,22 +132,30 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                     </button>
                     <div className="divider"></div>
 
-                    <button style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }} className={tab === 2 ? 'active' : null} onClick={() => setTab(2)}>
-                        <div>Manage</div>
-                        <div className='tasks-card-icons'>
-                            {(applicationCount + submissionCount) > 0 &&
-                                <div className='icon-container'>
-                                    <p>{(applicationCount + submissionCount)}</p>
-                                </div>
-                            }
-                        </div>
-                    </button>
-                    <div className="divider"></div>
+                    {
+                        myRole !== 'CONTRIBUTOR' && myRole !== 'ACTIVE_CONTRIBUTOR'
+                            ?
+                            <>
+                                <button style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }} className={tab === 2 ? 'active' : null} onClick={() => setTab(2)}>
+                                    <div>Manage</div>
+                                    <div className='tasks-card-icons'>
+                                        {(applicationCount + submissionCount) > 0 &&
+                                            <div className='icon-container'>
+                                                <p>{(applicationCount + submissionCount)}</p>
+                                            </div>
+                                        }
+                                    </div>
+                                </button>
+                                <div className="divider"></div>
 
-                    <button className={tab === 3 ? 'active' : null} onClick={() => setTab(3)}>
-                        Drafts
-                    </button>
-                    <div className="divider"></div>
+                                <button className={tab === 3 ? 'active' : null} onClick={() => setTab(3)}>
+                                    Drafts
+                                </button>
+                                <div className="divider"></div>
+                            </>
+                            :
+                            null
+                    }
 
                     <button className={tab === 4 ? 'active' : null} onClick={() => setTab(4)}>
                         All tasks
@@ -154,9 +163,9 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                 </div>
                 <div className="tasks-buttons">
                     <div style={{ marginRight: '20px' }}>
-                        {/* <button className='archive-btn' onClick={() => navigate('/tasks', { state: { activeTab: tab } })}>
+                        <button className='archive-btn' onClick={() => navigate('/tasks', { state: { activeTab: tab } })}>
                             <img src={expandIcon} alt="archive-icon" />
-                        </button> */}
+                        </button>
                     </div>
                     <div style={{ marginRight: '20px' }}>
                         <button
