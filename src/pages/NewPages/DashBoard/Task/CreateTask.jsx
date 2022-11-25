@@ -193,7 +193,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
             task.contributionType = contributionType;
             task.isSingleContributor = isSingleContributor;
             task.isFilterRoles = isFilterRoles;
-            task.validRoles = validRoles;
+            task.validRoles = isFilterRoles ? validRoles : [];
             dispatch(createTask({ payload: task }))
         }
     }
@@ -404,26 +404,34 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                             contributionType === 'open' &&
                                             <div className='contributor-section'>
                                                 <div className='contributor-check'>
-                                                    {
+                                                    <label class="switch">
+                                                        <input defaultChecked={isSingleContributor} onChange={(e) => setIsSingleContributor(!isSingleContributor)} type="checkbox" />
+                                                        <span class="slider check round"></span>
+                                                    </label>
+                                                    {/* {
                                                         isSingleContributor
                                                             ?
                                                             <input type="checkbox" onChange={(e) => setIsSingleContributor(!isSingleContributor)} checked />
                                                             :
                                                             <input type="checkbox" onChange={(e) => setIsSingleContributor(!isSingleContributor)} />
-                                                    }
+                                                    } */}
                                                     <div>
                                                         <h1>SINGLE CONTRIBUTOR</h1>
                                                         <span>The reviewer will pick a contributor from the applicants (if unchecked, everyone can contribute)</span>
                                                     </div>
                                                 </div>
                                                 <div className='contributor-check'>
-                                                    {
+                                                    {/* {
                                                         isFilterRoles
                                                             ?
                                                             <input type="checkbox" onChange={(e) => setIsFilterRoles(!isFilterRoles)} checked />
                                                             :
                                                             <input type="checkbox" onChange={(e) => setIsFilterRoles(!isFilterRoles)} />
-                                                    }
+                                                    } */}
+                                                    <label class="switch">
+                                                        <input defaultChecked={isFilterRoles} onChange={(e) => setIsFilterRoles(!isFilterRoles)} type="checkbox" />
+                                                        <span class="slider check round"></span>
+                                                    </label>
 
                                                     <div>
                                                         <h1>FILTER BY ROLES (DISCORD)</h1>
@@ -433,7 +441,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                         }
 
                                         {
-                                            isFilterRoles &&
+                                            isFilterRoles && validRoles &&
                                             <>
                                                 <div className='selected-roles'>
                                                     <div className='roles-left'>
@@ -532,15 +540,15 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                     step={0.01}
                                                     onChange={(e) => setAmount(parseFloat(e.target.value))}
                                                 /> */}
-                                            <NumberInputStepper
-                                                className="inputField"
-												height={55}
-                                                step={0.01}
-                                                value={amount}
-												placeholder="Amount"
-												type="number"
-												onchange={(e) => setAmount(parseFloat(e.target.value)) }
-											/>
+                                                <NumberInputStepper
+                                                    className="inputField"
+                                                    height={55}
+                                                    step={0.01}
+                                                    value={amount}
+                                                    placeholder="Amount"
+                                                    type="number"
+                                                    onchange={(e) => setAmount(parseFloat(e.target.value))}
+                                                />
                                             </div>
                                             <span className='error-msg' id="error-compensation"></span>
                                         </div>

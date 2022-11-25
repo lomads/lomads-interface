@@ -18,7 +18,7 @@ import POLYGON_LOGO from 'assets/images/polygon.png';
 const PassTokenModal = ({ toggleModal, togglePassToken }) => {
 
   const dispatch = useAppDispatch()
-	const { provider, account, chainId, connector } = useWeb3React();
+  const { provider, account, chainId, connector } = useWeb3React();
   const [openCreatePassToken, setOpenCreatePassToken] = useState(false);
 
   const { DAO, updateContractLoading } = useAppSelector((state) => state.dashboard);
@@ -35,20 +35,20 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
       let newDetailsArray = contactDetail.filter(l => !(l === contact))
       setContactDetail(newDetailsArray)
     } else {
-      let newDetailsArray = [...contactDetail , contact]
+      let newDetailsArray = [...contactDetail, contact]
       setContactDetail(newDetailsArray)
     }
   }
 
   const handleSave = () => {
-    dispatch(updateContract({ 
+    dispatch(updateContract({
       contractAddress: _get(DAO, 'sbt.address', ''),
       payload: {
         daoId: _get(DAO, '_id', ''),
         whitelisted: dWhiteListed,
         contactDetail
       }
-     }))
+    }))
   }
 
   // useEffect(()=>{
@@ -113,14 +113,14 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
             >
               {/* logo container  */}
               <div id="pass-tokens-logo-container"
-                  onClick={() => {
-                    return (
+                onClick={() => {
+                  return (
                     chainId === SupportedChainId.POLYGON ?
-                    window.open(`https://polygonscan.com/address/${_get(DAO, 'sbt.address', '')}`, '_blank') : 
-                    chainId === SupportedChainId.GOERLI ?
-                    window.open(`https://etherscan.io/address/${_get(DAO, 'sbt.address', '')}`, '_blank') :
-                    undefined )
-                  }}
+                      window.open(`https://polygonscan.com/address/${_get(DAO, 'sbt.address', '')}`, '_blank') :
+                      chainId === SupportedChainId.GOERLI ?
+                        window.open(`https://etherscan.io/address/${_get(DAO, 'sbt.address', '')}`, '_blank') :
+                        undefined)
+                }}
               >
                 {DAO?.sbt?.image ? <img style={{ width: 24, height: 24 }} src={DAO?.sbt?.image} alt="asset" /> : <img src={coin} alt="asset" />}
               </div>
@@ -134,15 +134,15 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
                 }}
               >
                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }} id="token-title">{_get(DAO, 'sbt.token', _get(DAO, 'sbt.name', ''))}
-                <span onClick={() => {
+                  <span onClick={() => {
                     window.open(
-                      chainId === SupportedChainId.GOERLI ? 
-                      `https://goerli.etherscan.io/address/${_get(DAO, 'sbt.address')}`:
-                      `https://polygonscan.com/address/${_get(DAO, 'sbt.address')}`
+                      chainId === SupportedChainId.GOERLI ?
+                        `https://goerli.etherscan.io/address/${_get(DAO, 'sbt.address')}` :
+                        `https://polygonscan.com/address/${_get(DAO, 'sbt.address')}`
                     )
-                  }}><img style={{ width: 20, height: 20, objectFit: 'contain', marginLeft: 16 }} src={chainId === SupportedChainId.GOERLI ? GOERLI_LOGO : POLYGON_LOGO}/></span>
+                  }}><img style={{ width: 20, height: 20, objectFit: 'contain', marginLeft: 16 }} src={chainId === SupportedChainId.GOERLI ? GOERLI_LOGO : POLYGON_LOGO} /></span>
                 </div>
-                { DAO?.sbt?.tokenSupply && <div id="#number-100">X{ DAO?.sbt?.tokenSupply }</div> }
+                {DAO?.sbt?.tokenSupply && <div id="#number-100">X{DAO?.sbt?.tokenSupply}</div>}
               </div>
             </div>
             {/* <div id="create-more-section">
@@ -154,14 +154,14 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
                 CREATE MORE
               </Button>
             </div> */}
-              <div id="hr" />
+            <div id="hr" />
             <div
               id="membership-policy-section"
-              // style={{
-              //   display: "flex",
-              //   flexDirection: "column",
-              //   justifyContent: "start",
-              // }}
+            // style={{
+            //   display: "flex",
+            //   flexDirection: "column",
+            //   justifyContent: "start",
+            // }}
             >
               <div id="text-type">Membership policy:</div>
 

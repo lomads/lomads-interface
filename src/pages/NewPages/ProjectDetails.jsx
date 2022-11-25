@@ -361,7 +361,8 @@ const ProjectDetails = () => {
         dispatch(deleteProject({ projectId, daoUrl: daoURL }));
     }
 
-    const handleEditMode = () => {
+    const handleEditMode = (e) => {
+        e.stopPropagation();
         setName(Project.name);
         setDescription(Project.description);
         setEditMode(true);
@@ -392,7 +393,7 @@ const ProjectDetails = () => {
                     :
                     null
             }
-            <div className='projectDetails-container'>
+            <div className='projectDetails-container' onClick={() => setEditMode(false)}>
                 <div className="info">
                     {
                         showList
@@ -574,6 +575,7 @@ const ProjectDetails = () => {
                                             value={name}
                                             onchange={(e) => { setName(e.target.value) }}
                                             onKeyDown={(e) => handleKeyDown(e)}
+                                            onClick={(e) => e.stopPropagation()}
                                         />
                                         :
                                         <h1>{Project?.name}</h1>
@@ -622,6 +624,7 @@ const ProjectDetails = () => {
                                         value={description}
                                         onchange={(e) => { setDescription(e.target.value) }}
                                         onKeyDown={(e) => handleKeyDown(e)}
+                                        onClick={(e) => e.stopPropagation()}
                                     />
                                     :
                                     <p>{Project?.description}</p>
