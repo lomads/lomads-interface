@@ -18,6 +18,11 @@ const ArchiveProjectTasks = () => {
 
     useEffect(() => {
         let tasks = _find(_get(DAO, 'projects', []), p => _get(p, '_id', '').toLowerCase() === projectId.toLowerCase()).tasks.filter((t) => !t.deletedAt && t.archivedAt)
+        if (tasks.length === 0) {
+            setTimeout(() => {
+                navigate(`/${DAO.url}`);
+            }, 2000);
+        }
         setArchivedTasks(tasks);
     }, [DAO]);
 

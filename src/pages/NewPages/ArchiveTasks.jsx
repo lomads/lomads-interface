@@ -19,7 +19,7 @@ const ArchiveTasks = () => {
         if (DAO) {
             let tasks = _get(DAO, 'tasks', []).filter(t => t.archivedAt !== null && t.deletedAt === null);
             console.log("tasks length : ", tasks.length);
-            if (tasks.length < 10) {
+            if (tasks.length === 0) {
                 setTimeout(() => {
                     navigate(`/${DAO.url}`);
                 }, 2000);

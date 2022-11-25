@@ -25,7 +25,6 @@ import useRole from '../../../../hooks/useRole'
 import { isValidUrl } from 'utils';
 
 const EditTask = ({ close, task, daoURL }) => {
-    console.log("Task : ", task);
     const dispatch = useAppDispatch();
     const { DAO, user, editTaskLoading } = useAppSelector((state) => state.dashboard);
     const { chainId, account } = useWeb3React();
@@ -471,15 +470,15 @@ const EditTask = ({ close, task, daoURL }) => {
                                                     step={0.01}
                                                     onChange={(e) => setAmount(parseFloat(e.target.value))}
                                                 /> */}
-                                            <NumberInputStepper
-                                                className="inputField"
-												height={55}
-                                                step={0.01}
-                                                value={amount}
-												placeholder="Amount"
-												type="number"
-												onchange={(e) => setAmount(parseFloat(e.target.value)) }
-											/>
+                                                <NumberInputStepper
+                                                    className="inputField"
+                                                    height={55}
+                                                    step={0.01}
+                                                    value={amount}
+                                                    placeholder="Amount"
+                                                    type="number"
+                                                    onchange={(e) => setAmount(parseFloat(e.target.value))}
+                                                />
                                             </div>
                                             <span className='error-msg' id="error-compensation"></span>
                                         </div>

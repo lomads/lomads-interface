@@ -17,7 +17,9 @@ import assign from '../../assets/svg/assign.svg';
 import paid from '../../assets/svg/paid.svg';
 import applied from '../../assets/svg/applied.svg'
 import approved from '../../assets/svg/approved.svg';
+import rejected from '../../assets/svg/rejected.svg';
 import TaskCard from './DashBoard/Task/TaskCard';
+import useRole from '../../hooks/useRole';
 
 const AllTasks = () => {
     const navigate = useNavigate();
@@ -33,6 +35,8 @@ const AllTasks = () => {
     const [otherTasks, setOtherTasks] = useState([]);
     const [initialCheck, setInitialCheck] = useState(false);
     const [currentTasks, setCurrentTasks] = useState([]);
+
+    const { myRole, can } = useRole(DAO, account)
 
     const amIEligible = (Task) => {
         if (DAO && Task && Task.contributionType === 'open') {
@@ -116,15 +120,23 @@ const AllTasks = () => {
                     </button>
                     <div className="divider"></div>
 
-                    <button className={tab === 2 ? 'active' : null} onClick={() => setTab(2)}>
-                        Manage
-                    </button>
-                    <div className="divider"></div>
+                    {
+                        myRole !== 'CONTRIBUTOR' && myRole !== 'ACTIVE_CONTRIBUTOR'
+                            ?
+                            <>
+                                <button className={tab === 2 ? 'active' : null} onClick={() => setTab(2)}>
+                                    Manage
+                                </button>
+                                <div className="divider"></div>
 
-                    <button className={tab === 3 ? 'active' : null} onClick={() => setTab(3)}>
-                        Drafts
-                    </button>
-                    <div className="divider"></div>
+                                <button className={tab === 3 ? 'active' : null} onClick={() => setTab(3)}>
+                                    Drafts
+                                </button>
+                                <div className="divider"></div>
+                            </>
+                            :
+                            null
+                    }
 
                     <button className={tab === 4 ? 'active' : null} onClick={() => setTab(4)}>
                         All tasks
@@ -171,7 +183,7 @@ const AllTasks = () => {
                             <div className='col-body'>
                                 {
                                     currentTasks && currentTasks.map((item, index) => {
-                                        if (item.taskStatus === 'assigned') {
+                                        if (item.taskStatus === 'assigned' && _find(_get(item, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.status === 'approved')) {
                                             return (
                                                 <div key={index}>
                                                     <TaskCard
@@ -196,14 +208,20 @@ const AllTasks = () => {
                             <div className='col-body'>
                                 {
                                     currentTasks && currentTasks.map((item, index) => {
-                                        return (
-                                            <div key={index}>
-                                                <TaskCard
-                                                    task={item}
-                                                    daoUrl={DAO?.url}
-                                                />
-                                            </div>
-                                        )
+                                        if (
+                                            ((item.contributionType === 'assign' || item.contributionType === 'open') && !item.reopenedAt && item.taskStatus === 'submitted' && _find(_get(item, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.status === 'approved'))
+                                            ||
+                                            (item.taskStatus === 'open' && item.contributionType === 'open' && !item.reopenedAt && _find(_get(item, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())?.submission)
+                                        ) {
+                                            return (
+                                                <div key={index}>
+                                                    <TaskCard
+                                                        task={item}
+                                                        daoUrl={DAO?.url}
+                                                    />
+                                                </div>
+                                            )
+                                        }
                                     })
                                 }
                             </div>
@@ -219,7 +237,7 @@ const AllTasks = () => {
                             <div className='col-body'>
                                 {
                                     currentTasks && currentTasks.map((item, index) => {
-                                        if (item.taskStatus === 'open') {
+                                        if (item.taskStatus === 'open' && !_find(_get(item, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())) {
                                             return (
                                                 <div key={index}>
                                                     <TaskCard
@@ -244,7 +262,32 @@ const AllTasks = () => {
                             <div className='col-body'>
                                 {
                                     currentTasks && currentTasks.map((item, index) => {
-                                        if (item.taskStatus === 'open') {
+                                        if (item.taskStatus === 'open' && item.reopenedAt) {
+                                            return (
+                                                <div key={index}>
+                                                    <TaskCard
+                                                        task={item}
+                                                        daoUrl={DAO?.url}
+                                                    />
+                                                </div>
+                                            )
+                                        }
+                                    })
+                                }
+                            </div>
+                        </div>
+
+                        <div className='allTasks-column'>
+                            <div className='col-head'>
+                                <div className='head-pill' style={{ backgroundColor: 'rgba(226, 59, 83, 0.2)' }}>
+                                    <img src={rejected} style={{ marginRight: '5px' }} />
+                                    <p style={{ color: '#E23B53' }}>Rejected</p>
+                                </div>
+                            </div>
+                            <div className='col-body'>
+                                {
+                                    currentTasks && currentTasks.map((item, index) => {
+                                        if (item.taskStatus === 'rejected' || (_find(_get(item, 'members', []), m => m.status === "submission_rejected"))) {
                                             return (
                                                 <div key={index}>
                                                     <TaskCard
@@ -283,6 +326,7 @@ const AllTasks = () => {
                                 }
                             </div>
                         </div>
+
                         <div className='allTasks-column'>
                             <div className='col-head'>
                                 <div className='head-pill' style={{ background: 'rgb(217,236,198)' }}>
@@ -346,18 +390,20 @@ const AllTasks = () => {
                                 </div>
                             </div>
                             <div className='col-body'>
-                                {/* {
+                                {
                                     currentTasks && currentTasks.map((item, index) => {
-                                        return (
-                                            <div key={index}>
-                                                <TaskCard
-                                                    task={item}
-                                                    daoUrl={DAO?.url}
-                                                />
-                                            </div>
-                                        )
+                                        if (item.taskStatus === 'open' && _get(item, 'members', []).filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected')).length > 0) {
+                                            return (
+                                                <div key={index}>
+                                                    <TaskCard
+                                                        task={item}
+                                                        daoUrl={DAO?.url}
+                                                    />
+                                                </div>
+                                            )
+                                        }
                                     })
-                                } */}
+                                }
                             </div>
                         </div>
                         <div className='allTasks-column'>

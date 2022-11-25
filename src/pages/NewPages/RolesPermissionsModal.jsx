@@ -90,7 +90,7 @@ const RolesPermissionsModal = ({ toggleModal, toggleRP }) => {
       name: "Create and modify tasks",
       admin: "total",
       coreContributor: "total",
-      activeContributor: "total",
+      activeContributor: "no",
       contributor: "no",
     },
     {
