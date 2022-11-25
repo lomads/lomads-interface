@@ -16,13 +16,16 @@ const ArchiveTasks = () => {
     const [archivedTasks, setArchivedTasks] = useState([]);
 
     useEffect(() => {
-        let tasks = _get(DAO, 'tasks', []).filter(t => t.archivedAt !== null && t.deletedAt === null);
-        // console.log("tasks length : ", tasks.length);
-        // if (tasks.length < 10) {
-
-        //     navigate(-1);
-        // }
-        setArchivedTasks(tasks);
+        if (DAO) {
+            let tasks = _get(DAO, 'tasks', []).filter(t => t.archivedAt !== null && t.deletedAt === null);
+            console.log("tasks length : ", tasks.length);
+            if (tasks.length < 10) {
+                setTimeout(() => {
+                    navigate(`/${DAO.url}`);
+                }, 2000);
+            }
+            setArchivedTasks(tasks);
+        }
     }, [DAO]);
 
     return (
