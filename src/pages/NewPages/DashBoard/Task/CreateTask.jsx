@@ -539,7 +539,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                 value={amount}
 												placeholder="Amount"
 												type="number"
-												onChange={(e) => setAmount(parseFloat(e.target.value))}
+												onchange={(e) => setAmount(parseFloat(e.target.value)) }
 											/>
                                             </div>
                                             <span className='error-msg' id="error-compensation"></span>

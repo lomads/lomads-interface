@@ -19,6 +19,7 @@ import { useWeb3React } from "@web3-react/core";
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
 import { SupportedChainId } from "constants/chains";
 import { beautifyHexToken, getSafeTokens } from '../../../../utils'
+import NumberInputStepper from "UIpack/NumberInputStepper";
 
 import useRole from '../../../../hooks/useRole'
 import { isValidUrl } from 'utils';
@@ -462,14 +463,23 @@ const EditTask = ({ close, task, daoURL }) => {
                                                     })}
                                                     {can(myRole, 'task.create.sweat') && _get(DAO, 'sweatPoints', false) && <option value="SWEAT">SWEAT</option>}
                                                 </select>
-                                                <input
+                                                {/* <input
                                                     className="inputField"
                                                     type={'number'}
                                                     style={{ height: '55px' }}
                                                     value={amount}
                                                     step={0.01}
                                                     onChange={(e) => setAmount(parseFloat(e.target.value))}
-                                                />
+                                                /> */}
+                                            <NumberInputStepper
+                                                className="inputField"
+												height={55}
+                                                step={0.01}
+                                                value={amount}
+												placeholder="Amount"
+												type="number"
+												onchange={(e) => setAmount(parseFloat(e.target.value)) }
+											/>
                                             </div>
                                             <span className='error-msg' id="error-compensation"></span>
                                         </div>
