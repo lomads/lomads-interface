@@ -5,12 +5,24 @@ import plus from "../../../assets/svg/plus.svg";
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import { useNavigate } from "react-router-dom";
 import { setDAO } from "state/dashboard/reducer";
+import { getDao } from "state/dashboard/actions";
 
 const SideBar = (props: any) => {
 	const navigate = useNavigate();
 	const dispatch = useAppDispatch()
-	const { DAOList } = useAppSelector((state) => state.dashboard);
+	const { DAOList, DAO } = useAppSelector((state) => state.dashboard);
 	const name = props.name ? props.name.split(" ") : 'Sample Dao';
+
+	const navigateTo = (url:string|undefined) => {
+		if(!url) return;
+		if(DAO && DAO.url === url) {
+			dispatch(getDao(url))
+		} else {
+			dispatch(setDAO(null))
+			navigate(`/${url}`);
+		}
+	}
+
 	const SideBarStrip = () => {
 		return (
 			<>
@@ -24,8 +36,7 @@ const SideBar = (props: any) => {
 									<div
 										className="stripInvertedBoxOutline"
 										onClick={() => {
-											dispatch(setDAO(null))
-											navigate(`/${dao.url}`);
+											navigateTo(dao?.url)
 										}}
 									>
 										<div className="navbarText" style={{ color: '#FFF' }}>

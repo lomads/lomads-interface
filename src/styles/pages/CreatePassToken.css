@@ -9,6 +9,52 @@
     overflow-y: scroll;
 }
 
+.createPassToken-container .logo-container {
+
+    position: absolute;
+    width: 70.71px;
+    height: 70.71px;
+    left: 83px;
+    top: 69px;
+
+    /* GRADIENT-light */
+
+    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
+    /* SMALL-inputs */
+
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 10px;
+    transform: rotate(45deg);
+}
+
+.createPassToken-container .logo-container p {
+    /* HG */
+
+
+    position: absolute;
+    width: 97px;
+    height: 61px;
+    top: 16px;
+
+    font-family: var(--chakra-fonts-body);
+    font-style: normal;
+    font-weight: 600;
+    font-size: 35px;
+    line-height: 25px;
+    /* or 71% */
+
+    text-align: center;
+    transform: rotate(-45deg);
+    letter-spacing: -0.011em;
+
+    /* RED */
+
+    color: #C94B32;
+
+
+
+}
+
 .createPassToken-container .address-dropdown-container {
     width: 220px;
     height: 60px;

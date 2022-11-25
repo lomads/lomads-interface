@@ -11,7 +11,8 @@ import { get as _get, find as _find } from 'lodash';
 import { updateContract } from "state/dashboard/actions";
 import { useWeb3React } from "@web3-react/core";
 import { SupportedChainId } from 'constants/chains'
-
+import GOERLI_LOGO from 'assets/images/goerli.png';
+import POLYGON_LOGO from 'assets/images/polygon.png';
 
 
 const PassTokenModal = ({ toggleModal, togglePassToken }) => {
@@ -132,7 +133,15 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
                   justifyContent: "end",
                 }}
               >
-                <div id="token-title">{_get(DAO, 'sbt.token', _get(DAO, 'sbt.name', ''))}</div>
+                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }} id="token-title">{_get(DAO, 'sbt.token', _get(DAO, 'sbt.name', ''))}
+                <span onClick={() => {
+                    window.open(
+                      chainId === SupportedChainId.GOERLI ? 
+                      `https://goerli.etherscan.io/address/${_get(DAO, 'sbt.address')}`:
+                      `https://polygonscan.com/address/${_get(DAO, 'sbt.address')}`
+                    )
+                  }}><img style={{ width: 20, height: 20, objectFit: 'contain', marginLeft: 16 }} src={chainId === SupportedChainId.GOERLI ? GOERLI_LOGO : POLYGON_LOGO}/></span>
+                </div>
                 { DAO?.sbt?.tokenSupply && <div id="#number-100">X{ DAO?.sbt?.tokenSupply }</div> }
               </div>
             </div>

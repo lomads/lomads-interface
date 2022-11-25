@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import _ from "lodash";
+import _, { get as _get } from "lodash";
 import SimpleButton from "UIpack/SimpleButton";
 import SimpleInputField from "UIpack/SimpleInputField";
 import "../../../../styles/Global.css";
@@ -46,8 +46,10 @@ const AddLink = (props) => {
             if(link && link.length > 8 && link.indexOf('notion.') > -1) {
                 let lnk = new URL(link).pathname;
                 lnk = lnk.split('/')
-                if(lnk && lnk.length > 2)
+                if(lnk && lnk.length > 2){
+                    console.log("setSpaceDomain", lnk[1])
                     setSpaceDomain(lnk[1])
+                }
             }
         } catch (e) {
             console.log(e)
@@ -209,10 +211,10 @@ const AddLink = (props) => {
                         <div style={{ fontSize: 14, fontStyle:'italic', color: "rgba(118, 128, 141, 0.5)" }}>Invite <span style={{ color: "#76808D" }}>{ process.env.REACT_APP_NOTION_ADMIN_EMAIL }</span> to be an Admin of your workspace</div>
                     }
                     {
-                        props.sbt
-                            ?
+                        props?.sbt ?
                             <div className='resource-footer'>
-                                <input id="accessControl" type="checkbox" disabled={accessControlError || accesscontrolDisabled} checked={accessControl} value={accessControl} onChange={() => setAccessControl(prev => !prev)} />
+                              { ( link && link.indexOf('notion.') > -1 && _get(props, 'sbt.contactDetail', '').indexOf('email') > -1) ||
+                        ( link && link.indexOf('discord.') > -1 && _get(props, 'sbt.contactDetail', '').indexOf('discord') > -1) &&  <input id="accessControl" type="checkbox" disabled={accessControlError || accesscontrolDisabled} checked={accessControl} value={accessControl} onChange={() => setAccessControl(prev => !prev)} /> }
                                 <div>
                                     <p>ACCESS CONTROL</p>
                                     <span>Currently available for discord & notion only</span>
@@ -221,7 +223,7 @@ const AddLink = (props) => {
                             </div>
                             :
                             null
-                    }
+                        }
                     <div id="addMemberButtonArea">
                         <div>
                             <OutlineButton

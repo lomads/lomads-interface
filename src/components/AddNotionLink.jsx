@@ -20,6 +20,7 @@ import { nanoid } from "@reduxjs/toolkit";
 
 export default ({ title, desc, link, spaceDomain, accessControl, okButton, onNotionCheckStatus, ...props }) => {
 
+    console.log("spaceDomain", spaceDomain)
     const { provider, account, chainId } = useWeb3React();
     const [linkLoading, setLinkLoading] = useState(false)
 
@@ -40,8 +41,12 @@ export default ({ title, desc, link, spaceDomain, accessControl, okButton, onNot
             if(accessControl){
                 setLinkLoading(true)
                 axiosHttp.get(`/project/notion/space-admin-status?domain=${spaceDomain}`)
-                .then(res => onNotionCheckStatus(res.data))
+                .then(res => { 
+                    console.log(res)
+                    onNotionCheckStatus(res.data) 
+                })
                 .catch(e => {
+                    console.log(e)
                     onNotionCheckStatus({ status:false, message: 'Something went wrong. Try again' })
                 })
                 .finally(() => setLinkLoading(false))

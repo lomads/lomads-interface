@@ -102,7 +102,7 @@ const CreateProject = () => {
 
     useEffect(() => {
         if(link && link.indexOf('notion.') > -1 && _get(DAO, 'sbt.contactDetail', []).indexOf('email') === -1){
-            setAccessControlError('Email does not exist in SBT')
+            setAccessControlError('Notion gated access not possible (No email in SBT)')
         } else {
             setAccessControlError(null)
         }
@@ -580,19 +580,20 @@ const CreateProject = () => {
                                                             accessControl && link && link.indexOf('notion.') > -1 &&
                                                             <div style={{ fontSize: 14, fontStyle:'italic', color: "rgba(118, 128, 141, 0.5)" }}>Invite <span style={{ color: "#76808D" }}>{ process.env.REACT_APP_NOTION_ADMIN_EMAIL }</span> to be an Admin of your workspace</div>
                                                         }
-                                                        {
-                                                            DAO?.sbt
-                                                                ?
+                                                        { DAO?.sbt && 
                                                                 <div className='resource-footer'>
-                                                                    <input id="accessControl" type="checkbox" checked={accessControl} value={accessControl} disabled={accessControlError || accesscontrolDisabled} onChange={e => setAccessControl(prev => !prev)} />
+                                                        { 
+                                                            ( link && link.indexOf('notion.') > -1 && _get(DAO, 'sbt.contactDetail', '').indexOf('email') > -1) ||
+                                                            ( link && link.indexOf('discord.') > -1 && _get(DAO, 'sbt.contactDetail', '').indexOf('discord') > -1)
+                                                            &&
+                                                                    <input id="accessControl" type="checkbox" checked={accessControl} value={accessControl} disabled={accessControlError || accesscontrolDisabled} onChange={e => setAccessControl(prev => !prev)} /> }
                                                                     <div>
                                                                         <p>ACCESS CONTROL</p>
                                                                         <span>Currently available for discord & notion only</span>
                                                                         { accessControlError && <div><span style={{ color: 'red' }}>{ accessControlError }</span></div> }
                                                                     </div>
                                                                 </div>
-                                                                :
-                                                                null
+
                                                         }
                                                     </div>
                                                     {
