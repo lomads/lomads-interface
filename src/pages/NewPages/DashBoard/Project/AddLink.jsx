@@ -214,7 +214,7 @@ const AddLink = (props) => {
                         props?.sbt ?
                             <div className='resource-footer'>
                               { ( link && link.indexOf('notion.') > -1 && _get(props, 'sbt.contactDetail', '').indexOf('email') > -1) ||
-                        ( link && link.indexOf('discord.') > -1 && _get(props, 'sbt.contactDetail', '').indexOf('discord') > -1) &&  <input id="accessControl" type="checkbox" disabled={accessControlError || accesscontrolDisabled} checked={accessControl} value={accessControl} onChange={() => setAccessControl(prev => !prev)} /> }
+                             ( link && link.indexOf('discord.') > -1 && _get(props, 'sbt.contactDetail', '').indexOf('discord') > -1) ?  <input id="accessControl" type="checkbox" disabled={accessControlError || accesscontrolDisabled} checked={accessControl} value={accessControl} onChange={() => setAccessControl(prev => !prev)} /> : null }
                                 <div>
                                     <p>ACCESS CONTROL</p>
                                     <span>Currently available for discord & notion only</span>

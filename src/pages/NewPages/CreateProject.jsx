@@ -585,8 +585,8 @@ const CreateProject = () => {
                                                         { 
                                                             ( link && link.indexOf('notion.') > -1 && _get(DAO, 'sbt.contactDetail', '').indexOf('email') > -1) ||
                                                             ( link && link.indexOf('discord.') > -1 && _get(DAO, 'sbt.contactDetail', '').indexOf('discord') > -1)
-                                                            &&
-                                                                    <input id="accessControl" type="checkbox" checked={accessControl} value={accessControl} disabled={accessControlError || accesscontrolDisabled} onChange={e => setAccessControl(prev => !prev)} /> }
+                                                            ?
+                                                                    <input id="accessControl" type="checkbox" checked={accessControl} value={accessControl} disabled={accessControlError || accesscontrolDisabled} onChange={e => setAccessControl(prev => !prev)} /> : null }
                                                                     <div>
                                                                         <p>ACCESS CONTROL</p>
                                                                         <span>Currently available for discord & notion only</span>

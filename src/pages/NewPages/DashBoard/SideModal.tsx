@@ -176,31 +176,70 @@ const SideModal = (props: IsideModal) => {
 			console.log(selectedToken, props.safeAddress)
 			const token = await tokenCallSafe(selectedToken);
 			const safeSDK = await ImportSafe(provider, props.safeAddress);
-			const safeTransactionData: SafeTransactionDataPartial[] = await Promise.all(
-				setRecipient.current.map(
-					async (result: IsetRecipientType, index: number) => {
-						const unsignedTransaction = await token.populateTransaction.transfer(
-							result.recipient,
-							BigInt(parseFloat(result.amount) * 10 ** _get(selToken, 'token.decimals', 18))
-						);
-						const transactionData = {
-							to: selectedToken,
-							data: unsignedTransaction.data as string,
-							value: "0",
-						};
-						return transactionData;
+
+			let safeTransaction = null;
+
+			if(selectedToken === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || selectedToken === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS) {
+				if(setRecipient.current.length == 1) {
+					const safeTransactionData: SafeTransactionDataPartial = {
+						to: _get(setRecipient, 'current.[0].recipient'),
+						data: "0x",
+						value: `${BigInt(parseFloat(_get(setRecipient, 'current.[0].amount')) * 10 ** _get(selToken, 'token.decimals', 18))}`,
 					}
-				)
-			);
+					const options: SafeTransactionOptionalProps = {
+						nonce: currentNonce,
+					};
+					safeTransaction = await safeSDK.createTransaction({
+						safeTransactionData,
+						options,
+					});
+				} else {
+					const safeTransactionData: SafeTransactionDataPartial[]  = await Promise.all(
+						setRecipient.current.map(
+							async (result: IsetRecipientType, index: number) => {
+								const transactionData = {
+									to: result.recipient,
+									data: "0x",
+									value: `${BigInt(parseFloat(result.amount) * 10 ** _get(selToken, 'token.decimals', 18))}`
+								};
+								return transactionData;
+							}
+						)
+					);
+					const options: SafeTransactionOptionalProps = {
+						nonce: currentNonce,
+					};
+					safeTransaction = await safeSDK.createTransaction({
+						safeTransactionData,
+						options,
+					});
+				}
+			} else {
+				const safeTransactionData: SafeTransactionDataPartial[]  = await Promise.all(
+					setRecipient.current.map(
+						async (result: IsetRecipientType, index: number) => {
+							const unsignedTransaction = await token.populateTransaction.transfer(
+								result.recipient,
+								BigInt(parseFloat(result.amount) * 10 ** _get(selToken, 'token.decimals', 18))
+							);
+							const transactionData = {
+								to: selectedToken,
+								data: unsignedTransaction.data as string,
+								value: "0",
+							};
+							return transactionData;
+						}
+					)
+				);
+				const options: SafeTransactionOptionalProps = {
+					nonce: currentNonce,
+				};
+				safeTransaction = await safeSDK.createTransaction({
+					safeTransactionData,
+					options,
+				});
+			}
 
-
-			const options: SafeTransactionOptionalProps = {
-				nonce: currentNonce,
-			};
-			const safeTransaction = await safeSDK.createTransaction({
-				safeTransactionData,
-				options,
-			});
 			const safeTxHash = await safeSDK.getTransactionHash(safeTransaction);
 			const signature = await safeSDK.signTransactionHash(safeTxHash);
 			const senderAddress = account as string;

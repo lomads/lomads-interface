@@ -2,6 +2,7 @@ import './index.css'
 import React, { useEffect, useState} from "react";
 import { get as _get } from 'lodash';
 import PROJECT_ICON from 'assets/svg/project-icon.svg'
+import TASK_ICON from 'assets/svg/taskicon.svg'
 import USER_ICON from 'assets/svg/user-icon.svg'
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from 'state/hooks';
@@ -56,19 +57,43 @@ export default () => {
             } else if (notification.type === 'project:member:removed') {
                 return notification.notification
             }
+        } else if(notification.model === 'Task') {
+            if(notification.type === 'task:member.assigned'){
+                if(notification.to._id === user._id)
+                    return 'You are <span class="bold">Assigned</span>'
+            }
+            return notification.notification
         }
     }
 
     const navigateTo = notification => {
         if(notification.model === 'Project') {
-            console.log(_get(notification, 'project', null))
             if(!_get(notification, 'project.deletedAt', null) && !_get(notification, 'project.archivedAt', null)) {
                 navigate(`/${DAO.url}/project/${_get(notification, 'project._id', '')}`)
+            }
+        } else if(notification.model === 'Task') {
+            if(!_get(notification, 'task.deletedAt', null) && !_get(notification, 'task.archivedAt', null)) {
+                navigate(`/${DAO.url}/task/${_get(notification, 'task._id', '')}`)
             }
         }
     }
 
-    if(myNotifications.length == 0 && timeline.length == 0)
+    const getIcon = (notification, userIcon = true) => {
+        if(notification.model === 'Task'){
+            if(notification.type.indexOf('member') > -1 && userIcon)
+                return USER_ICON
+            return TASK_ICON
+        }  else if(notification.model === 'Project'){
+            if(notification.type.indexOf('member') > -1 && userIcon)
+                return USER_ICON
+            return PROJECT_ICON
+        } else {
+            if(userIcon)
+                return USER_ICON
+        }
+    }
+
+    if(myNotifications.length == 0)
         return null
 
     return (
@@ -81,7 +106,7 @@ export default () => {
                                 <div onClick={() => navigateTo(notification)} key={notification._id} className='notification-item'>
                                     <div className='notification-item__container'>
                                         <div className='notification-item__container-header'>
-                                            <img className='icon' src={PROJECT_ICON} ></img>
+                                            <img className='icon' src={getIcon(notification, false)} ></img>
                                             <div className='title'>{ _get(notification, 'title', '') }</div>
                                             <div className='date'>{ moment.utc(notification.createdAt).local().format('MM/DD') }</div>
                                         </div>
@@ -102,7 +127,7 @@ export default () => {
                                     <div onClick={() => navigateTo(notification)} key={notification._id} className='notification-item'>
                                         <div className='notification-item__container'>
                                             <div className='left-section'>
-                                                <img className='icon' src={USER_ICON} ></img>
+                                                <img className='icon' src={getIcon(notification)} ></img>
                                                 <div className='title' dangerouslySetInnerHTML={{ __html: loadNotification(notification) }}></div>
                                             </div>
                                             <div className='date'>{ moment.utc(notification.createdAt).local().format('MM/DD') }</div>
