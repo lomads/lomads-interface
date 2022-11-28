@@ -112,13 +112,13 @@ const SubmitTask = ({ task, close }) => {
                 daoUrl: _get(DAO, 'url', ''),
                 taskId: task._id,
                 note,
-                ...(task.submissionLink && task.submissionLink.length == 0 ? { submissionLink: resourceList } : {})
+                submissionLink: task.submissionLink === "" ? resourceList: task.submissionLink
             }
             console.log("payload : ", payload)
             //console.log(payload)
-            dispatch(submitTaskAction(payload))
+           dispatch(submitTaskAction(payload))
         }
-    }, [note, resourceList])
+    }, [note, resourceList, task])
 
     return (
         <div className="taskApply-overlay">

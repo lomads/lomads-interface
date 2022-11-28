@@ -293,11 +293,11 @@ const TaskReview = ({ task, close }: any) => {
                         <div className='note'>{submission.submission.note}</div>
                     </div>
                     <div className='detail-container'>
-                        {task.submissionLink.length == 0 ?
+                        {task && _get(task, 'submissionLink', []).length == 0 ?
                             <>
                                 <span>Links</span>
-                                {
-                                    submission.submission.submissionLink.map((item: any, index: number) => {
+                                { submission.submission &&
+                                    _get(submission, 'submission.submissionLink', []).map((item: any, index: number) => {
                                         return (
                                             <button onClick={() => window.open(item.link, '_blank', 'noopener,noreferrer')}>{item.title}</button>
                                         )
@@ -396,7 +396,7 @@ const TaskReview = ({ task, close }: any) => {
                                     </label>
                                     <div>
                                         <span>REOPEN TASK</span>
-                                        <p>{assignedUser.name} will be removed from the task</p>
+                                        <p>{_get(assignedUser,'name', '')} will be removed from the task</p>
                                     </div>
                                 </div>
                                 :

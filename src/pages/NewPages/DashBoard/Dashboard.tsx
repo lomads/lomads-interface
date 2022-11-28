@@ -51,6 +51,7 @@ import { switchChain } from "utils/switchChain";
 import { SupportedChainId, SUPPORTED_CHAIN_IDS, CHAIN_IDS_TO_NAMES } from 'constants/chains'
 import Tasks from "./Tasks";
 import CreateTask from "./Task/CreateTask";
+const { toChecksumAddress } = require('ethereum-checksum-address')
 
 const Dashboard = () => {
 	const dispatch = useAppDispatch();
@@ -77,6 +78,7 @@ const Dashboard = () => {
 	const [showCreateTask, setShowCreateTask] = useState<boolean>(false);
 	const [showNavBar, setShowNavBar] = useState<boolean>(false);
 	const [manualChainSwitch, setManualChainSwitch] = useState<boolean>(false);
+	const [safeOwners, setSafeOwners] = useState<any>(null);
 	const [checkLoading, setCheckLoading] = useState<boolean>(true);
 	const currentNonce = useAppSelector((state) => state.flow.currentNonce);
 	const { myRole, displayRole, permissions, can, isSafeOwner } = useRole(DAO, account);
@@ -140,8 +142,17 @@ const Dashboard = () => {
 	useEffect(() => {
 		if (prevDAO && !DAO) {
 			setSafeTokens([])
+			setSafeOwners(null)
 		}
 	}, [DAO, prevDAO])
+
+	// useEffect(() => {
+	// 	console.log("safeOwners", safeOwners)
+	// 	if(DAO && DAO.url === daoURL && safeOwners) {
+	// 		let m: any = []
+
+	// 	}
+	// }, [safeOwners, DAO])
 
 	useEffect(() => {
 		if (chainId && !account)
@@ -259,6 +270,7 @@ const Dashboard = () => {
 	const ownersCount = async (_safeAddress: string) => {
 		const safeSDK = await ImportSafe(provider, _safeAddress);
 		const owners = await safeSDK.getOwners();
+		setSafeOwners(owners)
 		const threshold = await safeSDK.getThreshold();
 		dispatch(updateSafeThreshold(threshold));
 		setOwnerCount(owners.length);

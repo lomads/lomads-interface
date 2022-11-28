@@ -98,12 +98,13 @@ const ProjectDetails = () => {
         if (!Project) return false;
         let creator = _get(Project, 'creator', '').toLowerCase() === account.toLowerCase();
         let inProject = _find(_uniqBy(Project?.members, '_id'), m => m.wallet.toLowerCase() === account.toLowerCase())
-        if (myRole === 'ADMIN' || myRole === "CONTRIBUTOR")
-            return can(myRole, permission)
-        if (myRole === 'CORE_CONTRIBUTOR')
-            return inProject && can(myRole, permission)
-        if (myRole === 'ACTIVE_CONTRIBUTOR')
-            return creator && can(myRole, permission)
+        let p = permission;
+        if(inProject)
+            p = `${permission}.inproject`
+        if(creator)
+            p = `${permission}.creator` 
+        console.log(p)
+        return (can(myRole, p) || can(myRole, permission))
     }, [Project])
 
 
@@ -584,10 +585,11 @@ const ProjectDetails = () => {
                             </div>
                             {
                                 <div>
+                                    { canMyrole('project.edit') &&
                                     <button onClick={handleEditMode}>
                                         <img src={editToken} alt="hk-logo" />
                                     </button>
-
+                                    }
                                     {canMyrole('project.delete') && <button onClick={() => setDeletePrompt(true)}>
                                         <img src={deleteIcon} alt="hk-logo" />
                                     </button>}
@@ -688,6 +690,7 @@ const ProjectDetails = () => {
                                 </div>
                             </div>
                         </div>
+                        { canMyrole('project.links.view') &&
                         <div className="projectDetails-right">
                             <div className="add-link-section">
                                 <p className="link-header-text">Links</p>
@@ -765,14 +768,14 @@ const ProjectDetails = () => {
                                     :
                                     null
                             }
-                        </div>
+                        </div> }
                     </div>
                 </div>
 
                 {/* Tasks section */}
-                <div style={{ width: '80%', marginTop: '20px' }}>
+                { canMyrole('project.task.view') && <div style={{ width: '80%', marginTop: '20px' }}>
                     <Tasks toggleShowCreateTask={toggleShowCreateTask} onlyProjects={true} />
-                </div>
+                </div> }
                 <div style={{ width: '80%' }}>
                     <Footer theme="dark" />
                 </div>
