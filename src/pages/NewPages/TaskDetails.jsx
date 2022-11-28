@@ -650,7 +650,7 @@ const TaskDetails = () => {
 
                                     {/* if task status is open then users can apply */}
                                     {
-                                        Task.taskStatus === 'open'
+                                        Task.taskStatus === 'open' && !Task.archivedAt && !Task.deletedAt 
                                             ?
                                             <>
                                                 {/* if user is the creator --- display applicants*/}
@@ -720,7 +720,7 @@ const TaskDetails = () => {
                                                                     // Not applied yet --- check if valid roles condition exists
                                                                     <>
                                                                         {
-                                                                            Task.validRoles.length > 0
+                                                                            Task.validRoles.length > 0 && !Task.archivedAt && !Task.deletedAt
                                                                                 ?
                                                                                 <>
                                                                                     {
@@ -753,7 +753,7 @@ const TaskDetails = () => {
                                                                                             </>
                                                                                     }
                                                                                 </>
-                                                                                :
+                                                                                : !Task.archivedAt && !Task.deletedAt &&
                                                                                 <>
                                                                                     {
                                                                                         Task.isSingleContributor
@@ -788,7 +788,7 @@ const TaskDetails = () => {
                                     {/* if the task has status assigned --- render the assigned user */}
 
                                     {
-                                        Task.taskStatus === 'assigned'
+                                        Task.taskStatus === 'assigned' && !Task.archivedAt && !Task.deletedAt
                                             ?
                                             <>
                                                 {
@@ -824,7 +824,7 @@ const TaskDetails = () => {
                                     }
 
                                     {
-                                        Task.taskStatus === 'submitted'
+                                        Task.taskStatus === 'submitted' && !Task.archivedAt && !Task.deletedAt 
                                             ?
                                             <>
                                                 {
@@ -847,7 +847,7 @@ const TaskDetails = () => {
                                     }
 
                                     {
-                                        Task.taskStatus === 'approved' || Task.taskStatus === 'paid'
+                                        (Task.taskStatus === 'approved' || Task.taskStatus === 'paid') && !Task.archivedAt && !Task.deletedAt
                                             ?
                                             <>
                                                 {
@@ -869,7 +869,7 @@ const TaskDetails = () => {
                                     }
 
                                     {
-                                        Task.taskStatus === 'rejected'
+                                        Task.taskStatus === 'rejected' && !Task.archivedAt && !Task.deletedAt 
                                             ?
                                             <>
                                                 {

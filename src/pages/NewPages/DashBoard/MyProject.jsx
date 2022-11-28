@@ -58,23 +58,15 @@ const MyProject = () => {
         <div className="myproject-container">
             <div className="myproject-header">
                 <div className="myproject-title">
-                    {
-                        can(myRole, 'project.view.own')
-                            ?
-                            <>
-                                <button className={tab === 1 ? 'active' : null} onClick={() => setTab(1)}>
-                                    My projects
-                                </button>
-                                {can(myRole, 'project.view.all') && <div className="divider"></div>}
-                            </>
-                            :
-                            null
-                    }
-                    {can(myRole, 'project.view.all') &&
-                        <button className={tab === 2 ? 'active' : null} onClick={() => setTab(2)}>
-                            All projects
+                    <>
+                        <button className={tab === 1 ? 'active' : null} onClick={() => setTab(1)}>
+                            My projects
                         </button>
-                    }
+                        <div className="divider"></div>
+                    </>
+                    <button className={tab === 2 ? 'active' : null} onClick={() => setTab(2)}>
+                        All projects
+                    </button>
                 </div>
                 <div className="myproject-buttons">
                     {can(myRole, 'project.view.archives') && <div style={{ marginRight: '20px' }}>
@@ -108,7 +100,7 @@ const MyProject = () => {
             </div>
 
             {
-                tab === 1 && can(myRole, 'project.view.own')
+                tab === 1
                     ?
                     <div className='myproject-body'>
                         {
@@ -132,7 +124,7 @@ const MyProject = () => {
             }
 
             {
-                tab === 2 && can(myRole, 'project.view.all')
+                tab === 2
                     ?
                     <>
                         {

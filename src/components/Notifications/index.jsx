@@ -45,7 +45,7 @@ export default () => {
     const loadNotification = notification => {
         if(notification.model === 'Project') {
             if(notification.type === 'project:member.invited' || notification.type === 'project:member.added'){
-                if(notification.to._id === user._id)
+                if(notification.to && notification.to._id === user._id)
                     return 'You are <span class="bold">invited</span>'
                 if(_get(notification, 'to.name', "") && _get(notification, 'to.name', "") !== "")
                     return `${_get(notification, 'to.name', "")} has been <span class="bold">invited</span> to ${ _get(notification, 'project.name', '') }`
@@ -61,7 +61,16 @@ export default () => {
             if(notification.type === 'task:member.assigned'){
                 if(notification.to._id === user._id)
                     return 'You are <span class="bold">Assigned</span>'
+            } else if(notification.type === 'task:member.submission.rejected' || notification.type === 'task:member.submission.approve'){
+                if(notification.to && notification.to._id === user._id)
+                    return notification.type === 'task:member.submission.rejected' ? 'Submission <span class="bold">rejected</span>' : 'Submission <span class="bold">approved</span>'
             }
+            else if(notification.type === 'task:paid'){
+                if(notification.to && notification.to._id === user._id)
+                    return `Paid for <span class="bold">${notification.title}</span>`
+            }
+            return notification.notification
+        } else {
             return notification.notification
         }
     }
