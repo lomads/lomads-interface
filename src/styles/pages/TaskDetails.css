@@ -348,7 +348,7 @@
 }
 
 .taskDetails-container .info .taskDetails-body .body-left div {
-    padding: 0 28px;
+    padding: 5px 28px;
     height: 100%;
     overflow-y: auto;
 }

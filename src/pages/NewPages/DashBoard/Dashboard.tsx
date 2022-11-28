@@ -448,8 +448,9 @@ const Dashboard = () => {
 						/>
 					)} */}
 
-				<Tasks toggleShowCreateTask={toggleShowCreateTask} onlyProjects={false} />
+
 				<MyProject />
+				<Tasks toggleShowCreateTask={toggleShowCreateTask} onlyProjects={false} />
 				{(can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') &&
 					<TreasuryCard
 						innerRef={treasuryRef}

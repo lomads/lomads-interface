@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { find as _find, get as _get, debounce as _debounce } from 'lodash';
 import './CreateTask.css';
 import { CgClose } from 'react-icons/cg'
@@ -25,6 +25,7 @@ import useRole from '../../../../hooks/useRole'
 import axios from "axios";
 import { isValidUrl } from 'utils';
 import NumberInputStepper from "UIpack/NumberInputStepper";
+import { Editor } from '@tinymce/tinymce-react';
 
 const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
 
@@ -33,6 +34,8 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
     const { chainId, account } = useWeb3React();
 
     const { myRole, can } = useRole(DAO, account)
+
+    const editorRef = useRef(null);
 
     const [contributionType, setContributionType] = useState('assign');
     const [isSingleContributor, setIsSingleContributor] = useState(false);
@@ -200,6 +203,12 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
 
     const handleDraftTask = () => {
         let tempLink, tempSub = null;
+        if (name === '') {
+            let e = document.getElementById('error-name');
+            e.innerHTML = 'Enter name';
+            e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+            return;
+        }
         if (dchannel && dchannel !== '') {
             tempLink = dchannel;
             if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
@@ -225,12 +234,13 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
         task.discussionChannel = tempLink;
         task.deadline = deadline;
         task.submissionLink = tempSub ? tempSub : '';
-        task.compensation = { currency: currency.currency, amount, symbol };
+        task.compensation = { currency: currency?.currency, amount, symbol };
         task.reviewer = user._id;
         task.contributionType = contributionType;
         task.isSingleContributor = isSingleContributor;
         task.isFilterRoles = isFilterRoles;
         task.validRoles = validRoles;
+        // alert("sds")
 
         dispatch(draftTask({ payload: task }))
     }
@@ -290,13 +300,34 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
 
                                         <div className='createTask-inputRow'>
                                             <span>Description</span>
-                                            <textarea
+                                            <Editor
+                                                onInit={(evt, editor) => editorRef.current = editor}
+                                                init={{
+                                                    height: 300,
+                                                    menubar: false,
+                                                    branding: false,
+                                                    // plugins: [
+                                                    //     'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                                                    //     'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                                                    //     'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                                                    // ],
+                                                    // toolbar: 'undo redo | blocks | ' +
+                                                    //     'bold italic forecolor | alignleft aligncenter ' +
+                                                    //     'alignright alignjustify | bullist numlist outdent indent | ' +
+                                                    //     'removeformat | help',
+                                                    // content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+                                                }}
+                                                value={description}
+                                                onEditorChange={(text) => { setDescription(text); document.getElementById('error-desc').innerHTML = '' }}
+
+                                            />
+                                            {/* <textarea
                                                 style={{ width: '100%' }}
                                                 className="inputField"
                                                 placeholder='Enter task description'
                                                 value={description}
                                                 onChange={(e) => { setDescription(e.target.value); document.getElementById('error-desc').innerHTML = '' }}
-                                            />
+                                            /> */}
                                             <span className='error-msg' id="error-desc"></span>
                                         </div>
 
@@ -434,7 +465,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                     </label>
 
                                                     <div>
-                                                        <h1>FILTER BY ROLES (DISCORD)</h1>
+                                                        <h1>FILTER BY ROLES</h1>
                                                     </div>
                                                 </div>
                                             </div>

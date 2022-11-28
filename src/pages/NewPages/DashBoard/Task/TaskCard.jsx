@@ -314,10 +314,12 @@ const TaskCard = ({ task, daoUrl }) => {
                         null
                 }
 
-                <span>
-                    <img src={calendarIcon} alt="calendarIcon" />
-                    {moment(task.deadline).fromNow()}
-                </span>
+                {
+                    task.deadline && <span>
+                        <img src={calendarIcon} alt="calendarIcon" />
+                        {moment(task.deadline).fromNow()}
+                    </span>
+                }
             </div>
 
         </div>

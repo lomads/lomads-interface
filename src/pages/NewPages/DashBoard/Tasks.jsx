@@ -63,10 +63,12 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
 
     const fetchProjectTasks = () => {
         if (Project && user) {
-            setMyTasks(_get(Project, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) || (task.contributionType === 'open' && !task.isSingleContributor)))))
+            const myTasks = _get(Project, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) || (task.contributionType === 'open' && !task.isSingleContributor))))
+            setMyTasks(myTasks)
             setManageTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id)));
             setDraftTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
-            setOtherTasks(_get(Project, 'tasks', []).filter(task => !amIEligible(task) && (!(task.contributionType === 'open' && task.validRoles.length == 0 && !task.isSingleContributor) && !task.deletedAt && !task.archivedAt && !task.draftedAt && task.creator !== user._id && task.reviewer !== user._id && !_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()))));
+            const otherTasks = _get(Project, 'tasks', []).filter(task => !_find(myTasks, t => t._id === task._id) && !task.deletedAt && !task.archivedAt && !task.draftedAt && !(task.creator === user._id || task.reviewer === user._id))
+            setOtherTasks(otherTasks);
         }
     }
 
@@ -175,9 +177,9 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                 </div>
                 <div className="tasks-buttons">
                     <div style={{ marginRight: '20px' }}>
-                        {/* <button className='archive-btn' onClick={() => navigate('/tasks', { state: { activeTab: tab } })}>
+                        <button className='archive-btn' onClick={() => navigate('/tasks', { state: { activeTab: tab } })}>
                             <img src={expandIcon} alt="archive-icon" />
-                        </button> */}
+                        </button>
                     </div>
                     <div style={{ marginRight: '20px' }}>
                         <button
@@ -209,51 +211,87 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
 
             <div className='tasks-body'>
                 {
-                    tab === 1 && myTasks && myTasks.map((item, index) => {
-                        return (
-                            <div key={index}>
-                                <TaskCard
-                                    task={item}
-                                    daoUrl={DAO?.url}
-                                />
-                            </div>
-                        )
+                    tab === 1 && myTasks && myTasks.filter((item, index) => index < 6).map((item, index) => {
+                        if (index <= 4) {
+                            return (
+                                <div key={index}>
+                                    <TaskCard
+                                        task={item}
+                                        daoUrl={DAO?.url}
+                                    />
+                                </div>
+                            )
+                        }
+                        else {
+                            return (
+                                <div className='all-tasks' onClick={() => navigate('/tasks', { state: { activeTab: tab } })}>
+                                    <p>Show All</p>
+                                </div>
+                            )
+                        }
                     })
                 }
                 {
-                    tab === 2 && manageTasks && manageTasks.map((item, index) => {
-                        return (
-                            <div key={index}>
-                                <TaskCard
-                                    task={item}
-                                    daoUrl={DAO?.url}
-                                />
-                            </div>
-                        )
+                    tab === 2 && manageTasks && manageTasks.filter((item, index) => index < 6).map((item, index) => {
+                        if (index <= 4) {
+                            return (
+                                <div key={index}>
+                                    <TaskCard
+                                        task={item}
+                                        daoUrl={DAO?.url}
+                                    />
+                                </div>
+                            )
+                        }
+                        else {
+                            return (
+                                <div className='all-tasks' onClick={() => navigate('/tasks', { state: { activeTab: tab } })}>
+                                    <p>Show All</p>
+                                </div>
+                            )
+                        }
                     })
                 }
                 {
-                    tab === 3 && draftTasks && draftTasks.map((item, index) => {
-                        return (
-                            <div key={index}>
-                                <TaskCard
-                                    task={item}
-                                    daoUrl={DAO?.url}
-                                />
-                            </div>
-                        )
+                    tab === 3 && draftTasks && draftTasks.filter((item, index) => index < 6).map((item, index) => {
+                        if (index <= 4) {
+                            return (
+                                <div key={index}>
+                                    <TaskCard
+                                        task={item}
+                                        daoUrl={DAO?.url}
+                                    />
+                                </div>
+                            )
+                        }
+                        else {
+                            return (
+                                <div className='all-tasks' onClick={() => navigate('/tasks', { state: { activeTab: tab } })}>
+                                    <p>Show All</p>
+                                </div>
+                            )
+                        }
                     })
                 }
                 {
-                    tab === 4 && otherTasks && otherTasks.map((item, index) => {
-                        return (
-                            <div key={index}>
-                                <TaskCard
-                                    task={item}
-                                    daoUrl={DAO?.url}
-                                />
-                            </div>
-                        )
+                    tab === 4 && otherTasks && otherTasks.filter((item, index) => index < 6).map((item, index) => {
+                        if (index <= 4) {
+                            return (
+                                <div key={index}>
+                                    <TaskCard
+                                        task={item}
+                                        daoUrl={DAO?.url}
+                                    />
+                                </div>
+                            )
+                        }
+                        else {
+                            return (
+                                <div className='all-tasks' onClick={() => navigate('/tasks', { state: { activeTab: tab } })}>
+                                    <p>Show All</p>
+                                </div>
+                            )
+                        }
                     })
                 }
             </div>
