@@ -642,8 +642,8 @@ const TaskDetails = () => {
                             <div className="taskDetails-body">
                                 <div className="body-left">
                                     <h1>Description</h1>
-                                    <div>
-                                        <span>{Task.description}</span>
+                                    <div dangerouslySetInnerHTML={{ __html: Task.description }}>
+                                        {/* <span>{Task.description}</span> */}
                                     </div>
                                 </div>
                                 <div className="body-right">
@@ -668,7 +668,7 @@ const TaskDetails = () => {
                                                                             <span>{submissionCount}</span>
                                                                         </div>
                                                                         <h1>{submissionCount > 1 ? 'Submissions' : 'Submission'}</h1>
-                                                                        <button onClick={() => { submissionCount > 0 && setOpenTaskReview(true) }}>CHECK</button>
+                                                                        {!Task.draftedAt && <button onClick={() => { submissionCount > 0 && setOpenTaskReview(true) }}>CHECK</button>}
                                                                     </>
                                                                     :
                                                                     <>
@@ -677,7 +677,7 @@ const TaskDetails = () => {
                                                                             <span>{applicationCount}</span>
                                                                         </div>
                                                                         <h1>{applicationCount > 1 ? 'Applicants' : 'Applicant'}</h1>
-                                                                        <button onClick={handleOpenApplicantsSlider}>CHECK</button>
+                                                                        {!Task.draftedAt && <button onClick={handleOpenApplicantsSlider}>CHECK</button>}
                                                                     </>
                                                             }
                                                         </>
@@ -735,13 +735,13 @@ const TaskDetails = () => {
                                                                                                         <>
 
                                                                                                             <h1>This task<br />fits your role.</h1>
-                                                                                                            {moment(Task.deadline).isBefore(moment(), "day") ? null : <button onClick={() => setOpenApply(true)}>APPLY</button>}
+                                                                                                            {moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt ? null : <button onClick={() => setOpenApply(true)}>APPLY</button>}
                                                                                                         </>
                                                                                                         :
                                                                                                         // mulitple contributor
                                                                                                         <>
                                                                                                             <h1>This task<br />fits your role.</h1>
-                                                                                                            {moment(Task.deadline).isBefore(moment(), "day") ? null : <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>}
+                                                                                                            {!Task.draftedAt && <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>}
 
                                                                                                         </>
                                                                                                 }
@@ -762,14 +762,14 @@ const TaskDetails = () => {
                                                                                             <>
 
                                                                                                 <h1>This task needs a<br />contributor.</h1>
-                                                                                                {moment(Task.deadline).isBefore(moment(), "day") ? null : <button onClick={() => setOpenApply(true)}>APPLY</button>}
+                                                                                                {moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt ? null : <button onClick={() => setOpenApply(true)}>APPLY</button>}
 
                                                                                             </>
                                                                                             :
                                                                                             // mulitple contributor
                                                                                             <>
                                                                                                 <h1>Open for all.</h1>
-                                                                                                {moment(Task.deadline).isBefore(moment(), "day") ? null : <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>}
+                                                                                                {!Task.draftedAt && <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>}
 
                                                                                             </>
                                                                                     }
@@ -797,7 +797,7 @@ const TaskDetails = () => {
                                                         ?
                                                         <>
                                                             <h1>You are assigned.</h1>
-                                                            {moment(Task.deadline).isBefore(moment(), "day") ? null : <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>}
+                                                            {!Task.draftedAt && <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>}
 
                                                         </>
                                                         :
@@ -838,7 +838,7 @@ const TaskDetails = () => {
                                                         // for others
                                                         <>
                                                             <h1>Task is submitted</h1>
-                                                            {amICreator && <button onClick={() => setOpenTaskReview(true)}>CHECK</button>}
+                                                            {amICreator && !Task.draftedAt && <button onClick={() => setOpenTaskReview(true)}>CHECK</button>}
                                                         </>
                                                 }
                                             </>

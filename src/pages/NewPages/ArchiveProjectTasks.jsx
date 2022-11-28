@@ -46,7 +46,7 @@ const ArchiveProjectTasks = () => {
                         <IoIosArrowBack size={20} color="#C94B32" />
                     </div>
                     <div className="right">
-                        <p>Archives <span>Tasks</span></p>
+                        <p>Archived <span>Tasks</span></p>
                     </div>
                 </div>
             </div>

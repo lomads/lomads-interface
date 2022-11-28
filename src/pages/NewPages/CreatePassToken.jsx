@@ -154,9 +154,16 @@ const CreatePassToken = () => {
     }
 
     const handleSBTSupply = (e) => {
-        setTokenQuantity(parseInt(e.target.value));
-        setError('');
-        setSupplyError(false);
+        if (parseInt(e.target.value) > 250) {
+            setSupplyError(true);
+            setError("Supply cannot be more than 250");
+        }
+        else {
+            setTokenQuantity(parseInt(e.target.value));
+            setError('');
+            setSupplyError(false);
+        }
+
     }
 
     const addSBTConstructor = async () => {
@@ -199,29 +206,29 @@ const CreatePassToken = () => {
         }
     }, [createContractLoading, contractAddr])
 
-const waitFor = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+    const waitFor = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
-const retry = (promise, onRetry, maxRetries) => {
-    const retryWithBackoff = async (retries) => {
-      try {
-        if (retries > 0) {
-          const timeToWait = 2 ** retries * 1000;
-          console.log(`waiting for ${timeToWait}ms...`);
-          await waitFor(timeToWait);
+    const retry = (promise, onRetry, maxRetries) => {
+        const retryWithBackoff = async (retries) => {
+            try {
+                if (retries > 0) {
+                    const timeToWait = 2 ** retries * 1000;
+                    console.log(`waiting for ${timeToWait}ms...`);
+                    await waitFor(timeToWait);
+                }
+                return await promise();
+            } catch (e) {
+                if (retries < maxRetries) {
+                    onRetry();
+                    return retryWithBackoff(retries + 1);
+                } else {
+                    console.warn("Max retries reached. Bubbling the error up");
+                    throw e;
+                }
+            }
         }
-        return await promise();
-      } catch (e) {
-        if (retries < maxRetries) {
-          onRetry();
-          return retryWithBackoff(retries + 1);
-        } else {
-          console.warn("Max retries reached. Bubbling the error up");
-          throw e;
-        }
-      }
+        return retryWithBackoff(0);
     }
-    return retryWithBackoff(0);
-  }
 
     const deploySBTContract = async () => {
         if (account) {
@@ -237,7 +244,7 @@ const retry = (promise, onRetry, maxRetries) => {
                 console.log("Contract deployed", tx, counter);
                 console.log('waiting')
                 //await wait(15000);
-                const contractAddr = await retry (
+                const contractAddr = await retry(
                     () => getContractById(sbtDeployerContract, counter),
                     () => { console.log('retry called...') },
                     50
@@ -304,11 +311,11 @@ const retry = (promise, onRetry, maxRetries) => {
     return (
         <>
             <div className="createPassToken-container">
-                          <div onClick={() => navigate(-1)} className="logo-container">
-                          <p style={{ textTransform: "capitalize" }}>{_get(DAO, 'name', '').length === 1
-							? _get(DAO, 'name', '')[0].charAt(0)
-							: _get(DAO, 'name', '')[0].charAt(0) + _get(DAO, 'name', '')[_get(DAO, 'name', '').length - 1].charAt(0)}</p>
-          </div>
+                <div onClick={() => navigate(-1)} className="logo-container">
+                    <p style={{ textTransform: "capitalize" }}>{_get(DAO, 'name', '').length === 1
+                        ? _get(DAO, 'name', '')[0].charAt(0)
+                        : _get(DAO, 'name', '')[0].charAt(0) + _get(DAO, 'name', '')[_get(DAO, 'name', '').length - 1].charAt(0)}</p>
+                </div>
                 <div className="createPassToken-body">
                     <img src={Frame} alt="frame-icon" />
                     <p className="heading-text">Create New Pass Token</p>

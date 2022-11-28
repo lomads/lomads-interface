@@ -21,6 +21,8 @@ import rejected from '../../assets/svg/rejected.svg';
 import TaskCard from './DashBoard/Task/TaskCard';
 import useRole from '../../hooks/useRole';
 
+import CreateTask from "./DashBoard/Task/CreateTask";
+
 const AllTasks = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -37,6 +39,8 @@ const AllTasks = () => {
     const [currentTasks, setCurrentTasks] = useState([]);
 
     const { myRole, can } = useRole(DAO, account)
+
+    const [showCreateTask, setShowCreateTask] = useState(false);
 
     const amIEligible = (Task) => {
         if (DAO && Task && Task.contributionType === 'open') {
@@ -90,6 +94,9 @@ const AllTasks = () => {
 
     return (
         <div className='allTasks-container'>
+
+            {/* create task side modal */}
+            {showCreateTask && <CreateTask toggleShowCreateTask={() => setShowCreateTask(false)} selectedProject={null} />}
 
             <div className="home-btn" onClick={() => navigate(-1)}>
                 <div className="invertedBox">
@@ -145,7 +152,7 @@ const AllTasks = () => {
                 <div className="tasks-buttons">
 
                     <div style={{ marginRight: '20px' }}>
-                        <button className='archive-btn'>
+                        <button className='archive-btn' onClick={() => navigate(`/${DAO.url}/archiveTasks`)}>
                             <img src={archiveIcon} alt="archive-icon" />
                         </button>
                     </div>
@@ -160,6 +167,7 @@ const AllTasks = () => {
                             disabled={false}
                             fontweight={400}
                             fontsize={16}
+                            onClick={() => { setShowCreateTask(true) }}
                         />
                     </div>
                 </div>

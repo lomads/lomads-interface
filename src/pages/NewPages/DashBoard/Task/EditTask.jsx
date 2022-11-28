@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { find as _find, get as _get, debounce as _debounce } from 'lodash';
 import './CreateTask.css';
 import { CgClose } from 'react-icons/cg'
@@ -23,6 +23,7 @@ import NumberInputStepper from "UIpack/NumberInputStepper";
 
 import useRole from '../../../../hooks/useRole'
 import { isValidUrl } from 'utils';
+import { Editor } from '@tinymce/tinymce-react';
 
 const EditTask = ({ close, task, daoURL }) => {
     const dispatch = useAppDispatch();
@@ -30,6 +31,8 @@ const EditTask = ({ close, task, daoURL }) => {
     const { chainId, account } = useWeb3React();
 
     const { myRole, can } = useRole(DAO, account)
+
+    const editorRef = useRef(null);
 
     const [contributionType, setContributionType] = useState(task.contributionType);
     const [isSingleContributor, setIsSingleContributor] = useState(task.isSingleContributor);
@@ -41,7 +44,7 @@ const EditTask = ({ close, task, daoURL }) => {
     const [description, setDescription] = useState(task.description);
     const [dchannel, setDChannel] = useState(task.discussionChannel);
     const [deadline, setDeadline] = useState(new Date(task.deadline).toISOString().substring(0, 10));
-    const [projectId, setProjectId] = useState(task.project._id);
+    const [projectId, setProjectId] = useState(task.project?._id);
     const [subLink, setSubLink] = useState(task.submissionLink);
     const [reviewer, setReviewer] = useState(null);
     const [currency, setCurrency] = useState({ currency: task.compensation.currency });
@@ -216,13 +219,34 @@ const EditTask = ({ close, task, daoURL }) => {
 
                                         <div className='createTask-inputRow'>
                                             <span>Description</span>
-                                            <textarea
+                                            <Editor
+                                                onInit={(evt, editor) => editorRef.current = editor}
+                                                init={{
+                                                    height: 300,
+                                                    menubar: false,
+                                                    branding: false,
+                                                    // plugins: [
+                                                    //     'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                                                    //     'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                                                    //     'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                                                    // ],
+                                                    // toolbar: 'undo redo | blocks | ' +
+                                                    //     'bold italic forecolor | alignleft aligncenter ' +
+                                                    //     'alignright alignjustify | bullist numlist outdent indent | ' +
+                                                    //     'removeformat | help',
+                                                    // content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+                                                }}
+                                                value={description}
+                                                onEditorChange={(text) => { setDescription(text); document.getElementById('error-desc').innerHTML = '' }}
+
+                                            />
+                                            {/* <textarea
                                                 style={{ width: '100%' }}
                                                 className="inputField"
                                                 placeholder='Enter task description'
                                                 value={description}
                                                 onChange={(e) => { setDescription(e.target.value); document.getElementById('error-desc').innerHTML = '' }}
-                                            />
+                                            /> */}
                                             <span className='error-msg' id="error-desc"></span>
                                         </div>
 
@@ -361,7 +385,7 @@ const EditTask = ({ close, task, daoURL }) => {
                                                     }
 
                                                     <div>
-                                                        <h1>FILTER BY ROLES (DISCORD)</h1>
+                                                        <h1>FILTER BY ROLES</h1>
                                                     </div>
                                                 </div>
                                             </div>
