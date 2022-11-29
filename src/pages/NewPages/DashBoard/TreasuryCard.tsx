@@ -22,7 +22,6 @@ import { Tooltip } from "@chakra-ui/react";
 import PendingTxn from './TreasuryCard/PendingTxn';
 import CompleteTxn from './TreasuryCard/CompleteTxn';
 import useRole from "hooks/useRole";
-import { SupportedChainId } from "constants/chains";
 import { usePrevious } from "hooks/usePrevious";
 import axiosHttp from 'api'
 import { nanoid } from "@reduxjs/toolkit";
@@ -33,6 +32,8 @@ import GOERLI_LOGO from '../../../assets/images/goerli.png';
 import POLYGON_LOGO from '../../../assets/images/polygon.png';
 import useSafeTokens from "hooks/useSafeTokens";
 import useSafeTransaction from "hooks/useSafeTransaction";
+import axios from "axios";
+import { GNOSIS_SAFE_BASE_URLS, SupportedChainId } from 'constants/chains';
 
 const TreasuryCard = (props: ItreasuryCardType) => {
 	const { provider, account, chainId, ...rest } = useWeb3React();
@@ -56,7 +57,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
 	const { DAO } = useAppSelector(store => store.dashboard);
 
-	const { safeTokens, tokenBalance } = useSafeTokens(_get(DAO, 'safeAddress', ''))
+	//const { safeTokens, tokenBalance } = useSafeTokens(_get(DAO, 'safeAddress', ''))
 
 	const { createSafeTransaction, createSafeTxnLoading } = useSafeTransaction(_get(DAO, 'safe.address', ''))
 
@@ -65,6 +66,28 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	const [totalUSD, setTotalUSD] = useState<any>('0');
 
 	const prevDAO = usePrevious(DAO);
+
+	const getSafeTokens = async () => {
+		if(!chainId) return [];
+		return axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${_get(DAO, 'safe.address')}/balances/usd/`, {withCredentials: false })
+            .then(res => {
+                let tokens = res.data.map((t: any) => {
+                    let tkn = t
+                    if(!tkn.tokenAddress){
+                        return {
+                            ...t,
+                            tokenAddress: chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS,
+                            token: {
+                                symbol: chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR',
+                                decimals: 18
+                            }
+                        }
+                    }
+                    return t 
+                })
+				return tokens;
+            })
+	}
 
 	useEffect(() => {
 		if (prevDAO && !DAO) {
@@ -383,7 +406,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	};
 
 
-	const handleExecuteTransactions = useCallback(async (txn: any, reject: boolean | undefined) => {
+	const handleExecuteTransactions = async (txn: any, reject: boolean | undefined) => {
 		let _txs = txn;
 		if(txn.offChain && _get(txn, 'token.symbol') === 'SWEAT'){
 			setExecuteTxLoading(txn.safeTxHash)
@@ -433,9 +456,10 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				console.log("confirmed", receipt);
 				setExecuteTxLoading(null)
 				if(!reject) {
-					let safeToken = _find(safeTokens, (st:any) => _get(st, 'tokenAddress', '') === _get(txn, 'to', ''))
+					const safeTokens = await getSafeTokens();
+					let safeToken = _find(safeTokens || [], (st:any) => _get(st, 'tokenAddress', '') === _get(txn, 'to', ''))
 					if(!safeToken)
-						safeToken = _find(safeTokens, (st:any) => _get(st, 'tokenAddress', '') === ( chainId === SupportedChainId.GOERLI ? process.env.REACT_APP_GOERLI_TOKEN_ADDRESS : process.env.REACT_APP_MATIC_TOKEN_ADDRESS ))
+						safeToken = _find(safeTokens || [], (st:any) => _get(st, 'tokenAddress', '') === ( chainId === SupportedChainId.GOERLI ? process.env.REACT_APP_GOERLI_TOKEN_ADDRESS : process.env.REACT_APP_MATIC_TOKEN_ADDRESS ))
 					await axiosHttp.patch(`transaction/on-chain/executed?daoId=${_get(DAO, '_id', '')}`, { 
 						safeTx: { 
 							..._txs,
@@ -457,7 +481,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				setExecuteTxLoading(null)
 			}
 		}
-	}, [safeTokens]);
+	};
 
 	// const balance = useMemo(() => {
 	// 	if (props.fiatBalance) {
