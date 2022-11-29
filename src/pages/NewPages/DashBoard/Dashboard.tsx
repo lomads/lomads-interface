@@ -51,6 +51,7 @@ import { switchChain } from "utils/switchChain";
 import { SupportedChainId, SUPPORTED_CHAIN_IDS, CHAIN_IDS_TO_NAMES } from 'constants/chains'
 import Tasks from "./Tasks";
 import CreateTask from "./Task/CreateTask";
+import axiosHttp from 'api'
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
 const Dashboard = () => {
@@ -146,13 +147,6 @@ const Dashboard = () => {
 		}
 	}, [DAO, prevDAO])
 
-	// useEffect(() => {
-	// 	console.log("safeOwners", safeOwners)
-	// 	if(DAO && DAO.url === daoURL && safeOwners) {
-	// 		let m: any = []
-
-	// 	}
-	// }, [safeOwners, DAO])
 
 	useEffect(() => {
 		if (chainId && !account)
@@ -270,10 +264,12 @@ const Dashboard = () => {
 	const ownersCount = async (_safeAddress: string) => {
 		const safeSDK = await ImportSafe(provider, _safeAddress);
 		const owners = await safeSDK.getOwners();
-		setSafeOwners(owners)
+		//dispatch(syncSafeOwners({ daoUrl: DAO.url, payload: owners }))
 		const threshold = await safeSDK.getThreshold();
 		dispatch(updateSafeThreshold(threshold));
 		setOwnerCount(owners.length);
+		const dao = await axiosHttp.patch(`dao/${DAO.url}/sync-safe-owners`, owners)
+		//dispatch(setDAO(dao.data))
 	};
 
 	const getTokens = async (safeAddress: string) => {
