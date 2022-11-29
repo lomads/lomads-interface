@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import '../../styles/pages/AllTasks.css';
 import { find as _find, get as _get, debounce as _debounce } from 'lodash';
-
+import { orderBy as _orderBy } from 'lodash';
+import moment from 'moment';
 import { useAppSelector } from "state/hooks";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useWeb3React } from "@web3-react/core";
@@ -58,12 +59,62 @@ const AllTasks = () => {
         return true;
     };
 
+    const isOthersApproved = (Task) => {
+        if (Task) {
+            let user = _find(_get(Task, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() !== account?.toLowerCase() && m.status === 'approved')
+            if (user)
+                return true
+            return false
+        }
+        return false;
+    };
+
+    const taskApplicationCount = (task) => {
+        if (task) {
+            if (task.taskStatus === 'open') {
+                let applications = _get(task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_rejected'))
+                if (applications)
+                    return applications.length
+            }
+            return 0
+        }
+        return 0;
+    };
+
+    const taskSubmissionCount = (task) => {
+        if (task) {
+            let submissions = _get(task, 'members', []).filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+            if (submissions)
+                return submissions.length
+            return 0
+        }
+        return 0;
+    };
+
     useEffect(() => {
         if (DAO && user) {
-            setMyTasks(_get(DAO, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) || (task.contributionType === 'open' && !task.isSingleContributor)))))
-            setManageTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id)));
+            // setMyTasks(_get(DAO, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) || (task.contributionType === 'open' && !task.isSingleContributor)))))
+            // setManageTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id)));
+            // setDraftTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
+            // setOtherTasks(_get(DAO, 'tasks', []).filter(task => !amIEligible(task) && (!(task.contributionType === 'open' && !task.isSingleContributor) && !task.deletedAt && !task.archivedAt && !task.draftedAt && task.creator !== user._id && task.reviewer !== user._id && !_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()))));
+            const myTasks = _get(DAO, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) || (task.contributionType === 'open' && !task.isSingleContributor))))
+            setMyTasks(_orderBy(myTasks, i => moment(i.deadline).unix(), 'desc'))
+            let manageTasks = _get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id));
+            manageTasks = manageTasks.map(t => {
+                let tsk = { ...t, notification: 0 };
+                if(((t.contributionType === 'open' && !t.isSingleContributor) || t.contributionType === 'assign') && taskSubmissionCount(t) > 0 ) {
+                    tsk['notification'] = 1
+                } else {
+                    if(taskApplicationCount(t) > 0) {
+                        tsk['notification'] = 1
+                    }
+                }
+                return tsk
+            })
+            setManageTasks(_orderBy(manageTasks, ['notification', i => moment(i.deadline).unix()], ['desc', 'desc']));
             setDraftTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
-            setOtherTasks(_get(DAO, 'tasks', []).filter(task => !amIEligible(task) && (!(task.contributionType === 'open' && !task.isSingleContributor) && !task.deletedAt && !task.archivedAt && !task.draftedAt && task.creator !== user._id && task.reviewer !== user._id && !_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()))));
+            const otherTasks = _get(DAO, 'tasks', []).filter(task => !_find(myTasks, t => t._id === task._id) && !task.deletedAt && !task.archivedAt && !task.draftedAt && !(task.creator === user._id || task.reviewer === user._id))
+            setOtherTasks([..._orderBy(otherTasks, i => moment(i.deadline).unix(), 'desc'), ..._orderBy(myTasks, i => moment(i.deadline).unix(), 'desc')]);
         }
     }, [DAO, tab, user]);
 

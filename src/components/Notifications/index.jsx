@@ -31,7 +31,7 @@ export default () => {
 
     useEffect(() => {
         if(user && DAO && DAO.url === daoURL) {
-            axiosHttp.get(`notification?dao=${_get(DAO, '_id', '')}&limit=10`)
+            axiosHttp.get(`notification?dao=${_get(DAO, '_id', '')}&limit=20`)
             .then(res => {
                 setMyNotifications(res.data.data)
             })

@@ -66,6 +66,7 @@ const useSafeTransaction = (safeAddress: string) => {
         try {
             const safeToken = _find(safeTokens, t => _get(t, 'tokenAddress', null) === tokenAddress)
             let total = send.reduce((pv: any, cv: any) => pv + (+cv.amount), 0);
+            if(total == 0) throw 'Cannot send 0'
             if (tokenBalance(tokenAddress) < total)
                 throw 'Low token balance'
             setCreateSafeTxnLoading(true);

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import './Tasks.css';
-import { get as _get, find as _find } from 'lodash';
+import { get as _get, find as _find, orderBy as _orderBy } from 'lodash';
 
 import SafeButton from "UIpack/SafeButton";
 
@@ -12,6 +12,7 @@ import useRole from '../../../hooks/useRole'
 
 import archiveIcon from '../../../assets/svg/archiveIcon.svg';
 import expandIcon from '../../../assets/svg/expand.svg';
+import moment from 'moment';
 
 const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
     const navigate = useNavigate();
@@ -61,25 +62,73 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
         return false;
     };
 
+    const taskApplicationCount = (task) => {
+        if (task) {
+            if (task.taskStatus === 'open') {
+                let applications = _get(task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_rejected'))
+                if (applications)
+                    return applications.length
+            }
+            return 0
+        }
+        return 0;
+    };
+
+    const taskSubmissionCount = (task) => {
+        if (task) {
+            let submissions = _get(task, 'members', []).filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+            if (submissions)
+                return submissions.length
+            return 0
+        }
+        return 0;
+    };
+
     const fetchProjectTasks = () => {
         if (Project && user) {
             const myTasks = _get(Project, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) || (task.contributionType === 'open' && !task.isSingleContributor))))
-            setMyTasks(myTasks)
-            setManageTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id)));
+            console.log("setMyTasks", myTasks)
+            setMyTasks(_orderBy(myTasks, i => moment(i.deadline).unix(), 'desc'))
+            let manageTasks = _get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id));
+            manageTasks = manageTasks.map(t => {
+                let tsk = { ...t, notification: 0 };
+                if(((t.contributionType === 'open' && !t.isSingleContributor) || t.contributionType === 'assign') && taskSubmissionCount(t) > 0 ) {
+                    tsk['notification'] = 1
+                } else {
+                    if(taskApplicationCount(t) > 0) {
+                        tsk['notification'] = 1
+                    }
+                }
+                return tsk
+            })
+            setManageTasks(_orderBy(manageTasks, ['notification', i => moment(i.deadline).unix()], ['desc', 'desc']));
             setDraftTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
             const otherTasks = _get(Project, 'tasks', []).filter(task => !_find(myTasks, t => t._id === task._id) && !task.deletedAt && !task.archivedAt && !task.draftedAt && !(task.creator === user._id || task.reviewer === user._id))
-            setOtherTasks(otherTasks);
+            setOtherTasks([..._orderBy(otherTasks, i => moment(i.deadline).unix(), 'desc'), ..._orderBy(myTasks, i => moment(i.deadline).unix(), 'desc')]);
         }
     }
 
     const fetchDaoTasks = () => {
         if (DAO && user) {
             const myTasks = _get(DAO, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) || (task.contributionType === 'open' && !task.isSingleContributor))))
-            setMyTasks(myTasks)
-            setManageTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id)));
+            console.log("setMyTasks", myTasks)
+            setMyTasks(_orderBy(myTasks, i => moment(i.deadline).unix(), 'asc'))
+            let manageTasks = _get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id));
+            manageTasks = manageTasks.map(t => {
+                let tsk = { ...t, notification: 0 };
+                if(((t.contributionType === 'open' && !t.isSingleContributor) || t.contributionType === 'assign') && taskSubmissionCount(t) > 0 ) {
+                    tsk['notification'] = 1
+                } else {
+                    if(taskApplicationCount(t) > 0) {
+                        tsk['notification'] = 1
+                    }
+                }
+                return tsk
+            })
+            setManageTasks(_orderBy(manageTasks, ['notification', i => moment(i.deadline).unix()], ['desc', 'desc']));
             setDraftTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
             const otherTasks = _get(DAO, 'tasks', []).filter(task => !_find(myTasks, t => t._id === task._id) && !task.deletedAt && !task.archivedAt && !task.draftedAt && !(task.creator === user._id || task.reviewer === user._id))
-            setOtherTasks(otherTasks);
+            setOtherTasks([..._orderBy(otherTasks, i => moment(i.deadline).unix(), 'desc'), ..._orderBy(myTasks, i => moment(i.deadline).unix(), 'desc')]);
         }
     }
 

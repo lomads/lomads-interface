@@ -19,11 +19,21 @@ import { useWeb3React } from "@web3-react/core";
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
 import { SupportedChainId } from "constants/chains";
 import { beautifyHexToken, getSafeTokens } from '../../../../utils'
-import NumberInputStepper from "UIpack/NumberInputStepper";
 
 import useRole from '../../../../hooks/useRole'
 import { isValidUrl } from 'utils';
 import { Editor } from '@tinymce/tinymce-react';
+
+import {
+    Input,
+    FormControl,
+    FormErrorMessage,
+    NumberInput,
+    NumberInputField,
+    NumberInputStepper,
+    NumberDecrementStepper,
+    NumberIncrementStepper,
+} from "@chakra-ui/react";
 
 const EditTask = ({ close, task, daoURL }) => {
     const dispatch = useAppDispatch();
@@ -494,7 +504,7 @@ const EditTask = ({ close, task, daoURL }) => {
                                                     step={0.01}
                                                     onChange={(e) => setAmount(parseFloat(e.target.value))}
                                                 /> */}
-                                                <NumberInputStepper
+                                                {/* <NumberInputStepper
                                                     className="inputField"
                                                     height={55}
                                                     step={0.01}
@@ -502,7 +512,14 @@ const EditTask = ({ close, task, daoURL }) => {
                                                     placeholder="Amount"
                                                     type="number"
                                                     onchange={(e) => setAmount(parseFloat(e.target.value))}
-                                                />
+                                                /> */}
+                                                <NumberInput value={amount} onChange={(e) => setAmount(parseFloat(e))}  style={{ marginTop: 10, width: 350, height: 50, borderRadius: '10px 10px 10px 10px', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)' }} step={1} min={0}>
+                                                    <NumberInputField placeholder='Amount' className='input' style={{ padding: 0, width: 130, textAlign: "center", height: 50, backgroundColor: '#F5F5F5', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)', borderRadius: '10px 0px 0px 10px', borderWidth: 0 }} />
+                                                    <NumberInputStepper style={{ width: 50, backgroundColor: '#FFF', borderRadius: '0px 10px 10px 0px' }}>
+                                                        <NumberIncrementStepper color="#C94B32" />
+                                                        <NumberDecrementStepper color="#C94B32" style={{ borderTopWidth: 0 }} />
+                                                    </NumberInputStepper>
+                                                </NumberInput>
                                             </div>
                                             <span className='error-msg' id="error-compensation"></span>
                                         </div>

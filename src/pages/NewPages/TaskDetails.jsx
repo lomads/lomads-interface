@@ -204,7 +204,7 @@ const TaskDetails = () => {
     }, [Task]);
 
     const assignedUser = useMemo(() => {
-        let user = _find(_get(Task, 'members', []), m => m.status === 'approved')
+        let user = _find(_get(Task, 'members', []), m => m.status === 'approved' || m.status === 'submission_accepted' )
         if (user)
             return user.member.name
     }, [Task]);

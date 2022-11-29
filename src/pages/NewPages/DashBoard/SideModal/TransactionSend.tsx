@@ -13,12 +13,22 @@ import { ethers } from "ethers";
 import { InviteGangType } from "types/UItype";
 import { IselectTransactionSend, IsetRecipientType } from "types/DashBoardType";
 import AddRecipient from "./AddRecipient";
-import NumberInputStepper from "UIpack/NumberInputStepper";
+// import NumberInputStepper from "UIpack/NumberInputStepper";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import { ImportSafe } from "connection/SafeCall";
 import { SupportedChainId } from "constants/chains";
 import { useWeb3React } from "@web3-react/core";
 import { useAppSelector } from "state/hooks";
+import {
+    Input,
+    FormControl,
+    FormErrorMessage,
+    NumberInput,
+    NumberInputField,
+    NumberInputStepper,
+    NumberDecrementStepper,
+    NumberIncrementStepper,
+} from "@chakra-ui/react";
 
 
 const TransactionSend = (props: IselectTransactionSend) => {
@@ -98,7 +108,7 @@ const TransactionSend = (props: IselectTransactionSend) => {
 									</div>
 									<div id="amountInputFields">
 										<div>
-											<NumberInputStepper
+											{/* <NumberInputStepper
 												height={50}
 												width={106}
 												placeholder="Amount"
@@ -109,7 +119,16 @@ const TransactionSend = (props: IselectTransactionSend) => {
 													props.setRecipient.current[index].amount =
 														e.target.value;
 												}}
-											/>
+											/> */}
+										<NumberInput onChange={(e) => {
+													props.setRecipient.current[index].amount = `${+e}`;
+												}}  style={{ width: (64 + 50), height: 50, borderRadius: '10px 10px 10px 10px', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)' }} step={1} min={0}>
+											<NumberInputField className='input' style={{ padding: 0, textAlign: "center", height: 50, width: 64, backgroundColor: '#F5F5F5', borderRadius: '10px 0px 0px 10px', borderWidth: 0 }} />
+											<NumberInputStepper style={{ width: 50, backgroundColor: 'transparent', borderRadius: '10px 10px 10px 10px' }}>
+												<NumberIncrementStepper color="#C94B32" />
+												<NumberDecrementStepper color="#C94B32" style={{ borderTopWidth: 0 }} />
+											</NumberInputStepper>
+										</NumberInput>
 										</div>
 										<div>
 											<SimpleInputField
