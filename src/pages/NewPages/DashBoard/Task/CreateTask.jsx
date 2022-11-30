@@ -318,6 +318,8 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                     // menubar: false,
                                                     branding: false,
                                                     default_link_target: "_blank",
+                                                    extended_valid_elements: "a[href|target=_blank]",
+                                                    link_assume_external_targets: true,
                                                     plugins: [
                                                         'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
                                                         'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',

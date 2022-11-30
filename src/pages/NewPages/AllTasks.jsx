@@ -102,10 +102,10 @@ const AllTasks = () => {
             let manageTasks = _get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id));
             manageTasks = manageTasks.map(t => {
                 let tsk = { ...t, notification: 0 };
-                if(((t.contributionType === 'open' && !t.isSingleContributor) || t.contributionType === 'assign') && taskSubmissionCount(t) > 0 ) {
+                if (((t.contributionType === 'open' && !t.isSingleContributor) || t.contributionType === 'assign') && taskSubmissionCount(t) > 0) {
                     tsk['notification'] = 1
                 } else {
-                    if(taskApplicationCount(t) > 0) {
+                    if (taskApplicationCount(t) > 0) {
                         tsk['notification'] = 1
                     }
                 }
@@ -203,7 +203,11 @@ const AllTasks = () => {
                 <div className="tasks-buttons">
 
                     <div style={{ marginRight: '20px' }}>
-                        <button className='archive-btn' onClick={() => navigate(`/${DAO.url}/archiveTasks`)}>
+                        <button
+                            className='archive-btn'
+                            onClick={() => navigate(`/${DAO.url}/archiveTasks`)}
+                            disabled={_get(DAO, 'tasks', []).filter(task => !task.deletedAt && task.archivedAt).length > 0 ? false : true}
+                        >
                             <img src={archiveIcon} alt="archive-icon" />
                         </button>
                     </div>
