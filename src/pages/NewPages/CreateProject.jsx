@@ -365,14 +365,17 @@ const CreateProject = () => {
                                             />
                                         </div>
 
-                                        <div className='input-div' style={{ width: '880px' }}>
+                                        <div className='input-div' style={{ width: '480px' }}>
                                             <label>Short description</label>
                                             <Editor
+                                                apiKey='p0turvzgbtf8rr24txekw7sgjye6xunw2near38hwoohdg13'
                                                 onInit={(evt, editor) => editorRef.current = editor}
                                                 init={{
-                                                    height: 500,
+                                                    height: 300,
                                                     branding: false,
                                                     default_link_target: "_blank",
+                                                    extended_valid_elements: "a[href|target=_blank]",
+                                                    link_assume_external_targets: true,
                                                     plugins: [
                                                         'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
                                                         'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
@@ -387,22 +390,14 @@ const CreateProject = () => {
                                                 value={desc}
                                                 onEditorChange={(text) => { setDesc(text) }}
                                             />
-
-                                            {/* <textarea
-                                                className='text-area'
-                                                rows="4"
-                                                cols="50"
-                                                placeholder='Enter short description'
-                                                name='desc'
-                                                value={desc}
-                                                onChange={(e) => setDesc(e.target.value)}
-                                            ></textarea> */}
                                         </div>
-                                        <button
-                                            className='input-btn'
-                                            style={name !== '' && desc !== '' ? { background: '#C94B32' } : { background: 'rgba(27, 43, 65, 0.2)' }}
-                                            onClick={handleNext}
-                                        >NEXT</button>
+                                        <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                                            <button
+                                                className='input-btn'
+                                                style={name !== '' && desc !== '' ? { background: '#C94B32' } : { background: 'rgba(27, 43, 65, 0.2)' }}
+                                                onClick={handleNext}
+                                            >NEXT</button>
+                                        </div>
                                     </div>
                                     :
                                     <>

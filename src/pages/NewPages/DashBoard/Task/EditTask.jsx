@@ -24,6 +24,8 @@ import useRole from '../../../../hooks/useRole'
 import { isValidUrl } from 'utils';
 import { Editor } from '@tinymce/tinymce-react';
 
+import SimpleLoadButton from "UIpack/SimpleLoadButton";
+
 import {
     Input,
     FormControl,
@@ -61,6 +63,7 @@ const EditTask = ({ close, task, daoURL }) => {
     const [amount, setAmount] = useState(task.compensation.amount);
     const [safeTokens, setSafeTokens] = useState([]);
     const [showSuccess, setShowSuccess] = useState(false);
+    const [isLoading, setLoading] = useState(false);
 
     const getTokens = async (safeAddress) => {
         const tokens = await getSafeTokens(chainId, safeAddress)
@@ -230,12 +233,15 @@ const EditTask = ({ close, task, daoURL }) => {
                                         <div className='createTask-inputRow'>
                                             <span>Description</span>
                                             <Editor
+                                                apiKey='p0turvzgbtf8rr24txekw7sgjye6xunw2near38hwoohdg13'
                                                 onInit={(evt, editor) => editorRef.current = editor}
                                                 init={{
                                                     height: 400,
                                                     // menubar: false,
                                                     branding: false,
                                                     default_link_target: "_blank",
+                                                    extended_valid_elements: "a[href|target=_blank]",
+                                                    link_assume_external_targets: true,
                                                     plugins: [
                                                         'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
                                                         'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
@@ -552,9 +558,19 @@ const EditTask = ({ close, task, daoURL }) => {
                                         {/* <button onClick={handleDraftTask}>
                                             SAVE AS DRAFT
                                         </button> */}
-                                        <button onClick={handleEditTask}>
+                                        <SimpleLoadButton
+                                            title="EDIT"
+                                            height={40}
+                                            width={180}
+                                            fontsize={20}
+                                            fontweight={400}
+                                            onClick={handleEditTask}
+                                            bgColor={"#C94B32"}
+                                            condition={editTaskLoading}
+                                        />
+                                        {/* <button onClick={handleEditTask}>
                                             EDIT
-                                        </button>
+                                        </button> */}
                                     </div>
                                 </>
                         }

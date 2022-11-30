@@ -42,6 +42,7 @@ import Tasks from "./DashBoard/Tasks";
 import CreateTask from "./DashBoard/Task/CreateTask";
 
 import { Editor } from '@tinymce/tinymce-react';
+import SimpleLoadButton from "UIpack/SimpleLoadButton";
 
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
@@ -621,41 +622,46 @@ const ProjectDetails = () => {
                                 editMode
                                     ?
                                     <>
-                                        <Editor
-                                            onInit={(evt, editor) => editorRef.current = editor}
-                                            init={{
-                                                height: 500,
-                                                // menubar: false,
-                                                branding: false,
-                                                default_link_target: "_blank",
-                                                plugins: [
-                                                    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                                                    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                                                    'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
-                                                ],
-                                                toolbar: 'undo redo | blocks | ' +
-                                                    'bold italic forecolor | alignleft aligncenter ' +
-                                                    'alignright alignjustify | bullist numlist outdent indent | ' +
-                                                    'removeformat | help',
-                                                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-                                            }}
-                                            value={description}
-                                            // onKeyDown={(e) => handleKeyDown(e)}
-                                            onClick={(e) => e.stopPropagation()}
-                                            onEditorChange={(text) => { setDescription(text) }}
-                                        />
-                                        <SafeButton
-                                            height={40}
-                                            width={150}
-                                            titleColor="#FFF"
-                                            title="SAVE CHANGES"
-                                            bgColor="#C94B32"
-                                            opacity="1"
-                                            disabled={false}
-                                            fontweight={400}
-                                            fontsize={16}
-                                            onClick={handleSaveChanges}
-                                        />
+                                        <div style={{ width: '480px' }}>
+                                            <Editor
+                                                apiKey='p0turvzgbtf8rr24txekw7sgjye6xunw2near38hwoohdg13'
+                                                onInit={(evt, editor) => editorRef.current = editor}
+                                                init={{
+                                                    height: 400,
+                                                    // menubar: false,
+                                                    branding: false,
+                                                    default_link_target: "_blank",
+                                                    extended_valid_elements: "a[href|target=_blank]",
+                                                    link_assume_external_targets: true,
+                                                    plugins: [
+                                                        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                                                        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                                                        'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                                                    ],
+                                                    toolbar: 'undo redo | blocks | ' +
+                                                        'bold italic forecolor | alignleft aligncenter ' +
+                                                        'alignright alignjustify | bullist numlist outdent indent | ' +
+                                                        'removeformat | help',
+                                                    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+                                                }}
+                                                value={description}
+                                                // onKeyDown={(e) => handleKeyDown(e)}
+                                                onClick={(e) => e.stopPropagation()}
+                                                onEditorChange={(text) => { setDescription(text) }}
+                                            />
+                                        </div>
+                                        <div style={{ marginLeft: '1rem' }}>
+                                            <SimpleLoadButton
+                                                title="SAVE CHANGES"
+                                                height={40}
+                                                width={180}
+                                                fontsize={16}
+                                                fontweight={400}
+                                                onClick={handleSaveChanges}
+                                                bgColor={"#C94B32"}
+                                                condition={updateProjectLoading}
+                                            />
+                                        </div>
                                     </>
                                     :
                                     <p dangerouslySetInnerHTML={{ __html: Project?.description }}></p>

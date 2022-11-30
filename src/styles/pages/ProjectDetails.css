@@ -434,7 +434,7 @@
     border-radius: 5px;
     display: flex;
     align-items: flex-end;
-    justify-content: space-between;
+    /* justify-content: space-between; */
     margin-top: 0.2rem;
 }
 
@@ -455,6 +455,7 @@
     color: rgb(201, 75, 50);
     background-color: rgb(255, 255, 255);
     opacity: 1;
+    margin-left: 1rem !important;
 }
 
 
