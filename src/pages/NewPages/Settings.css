@@ -43,8 +43,7 @@
     width: 97px;
     height: 61px;
     top: 16px;
-
-    font-family: var(--chakra-fonts-body);
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 600;
     font-size: 35px;
@@ -420,7 +419,7 @@
 }
 
 #text-type {
-    font-family: var(--chakra-fonts-body);
+    font-family: 'Inter', sans-serif;
     font-weight: 700;
     font-size: 16px;
     line-height: 18px;
@@ -431,7 +430,7 @@
 
 #notes-type {
     margin-top: 35px;
-    font-family: var(--chakra-fonts-body);
+    font-family: 'Inter', sans-serif;
     font-weight: 700;
     font-size: 16px;
     line-height: 18px;
@@ -442,7 +441,7 @@
 
 #text-type-od {
     margin-top: 35px;
-    font-family: var(--chakra-fonts-body);
+    font-family: 'Inter', sans-serif;
     font-weight: 700;
     font-size: 16px;
     line-height: 18px;
@@ -452,18 +451,27 @@
 }
 
 
+#button-cancel {
+    width: 129px;
+    height: 40px;
+    border-radius: 5px;
+    font-weight: 400;
+    color: #C94B32;
+    margin-right: 20px;
+    background: #FFFFFF;
+    border: 1px solid #C94B32;
+}
+
 #button-save {
     color: #FFFFFF;
     font-weight: 400;
     background: #C94B32;
     border-radius: 5px;
-
-
 }
 
 .button-section {
 
-    margin-top: 35px;
+    /* margin-top: 35px; */
     flex: none;
     order: 5;
     flex-grow: 0;
@@ -472,7 +480,7 @@
 #rp-text {
     width: 400px;
     height: 80px;
-    font-family: var(--chakra-fonts-body);
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
@@ -493,7 +501,7 @@
 }
 
 #paragraph-type {
-    font-family: var(--chakra-fonts-body);
+    font-family: 'Inter', sans-serif;
     font-style: italic;
     font-weight: 400;
     font-size: 14px;
@@ -568,7 +576,7 @@ input:checked+.slider.check:before {
 
 /* SWITCH TITLES */
 #switch-title {
-    font-family: var(--chakra-fonts-body);
+    font-family: 'Inter', sans-serif;
     font-weight: 400;
     font-size: 16px;
     line-height: 18px;
@@ -704,8 +712,7 @@ td {
     /* position: absolute; */
     width: 40px;
     height: 36px;
-
-    font-family: var(--chakra-fonts-body);
+    font-family: 'Inter', sans-serif;
     font-style: normal;
 
     text-align: center;
@@ -909,8 +916,7 @@ td {
 
 
 .MainComponent #contact-details-section #paragraph-type-1 {
-
-    font-family: var(--chakra-fonts-body);
+    font-family: 'Inter', sans-serif;
     font-weight: 400;
     font-size: 14px;
     line-height: 16px;
@@ -924,8 +930,7 @@ td {
 
 
 .MainComponent #contact-details-section #paragraph-type {
-
-    font-family: var(--chakra-fonts-body);
+    font-family: 'Inter', sans-serif;
     font-style: italic;
     font-weight: 400;
     font-size: 14px;
@@ -936,4 +941,339 @@ td {
     letter-spacing: -0.011em;
     color: rgba(118, 128, 141, 0.5);
 
+}
+
+#discord-section {
+    /* Auto layout */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0px;
+    gap: 45px;
+
+    width: 400px;
+    height: 296px;
+
+
+    /* Inside auto layout */
+
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+}
+
+/* //! TERMINOLOGY  */
+
+.terminology-label {
+    /* Labels used in all your organisation’s interface. */
+
+
+    width: 300px;
+    height: 18px;
+    margin-bottom: 35px;
+
+    /* Note */
+
+    font-family: 'Inter', sans-serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+    /* identical to box height, or 129% */
+
+    text-align: center;
+    letter-spacing: -0.011em;
+
+    /* Grey */
+
+    color: #76808D;
+
+
+    /* Inside auto layout */
+
+    flex: none;
+    order: 2;
+    flex-grow: 0;
+}
+
+.terminology-group1 {
+    /* Group 617 */
+
+    /* 
+    width: 300px;
+    height: 42px; */
+
+
+    /* Inside auto layout */
+    /* margin-top: 35px; */
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+}
+
+.terminology-group1 .terminology-projects {
+    /* Projects: */
+
+
+    width: 68px;
+    height: 18px;
+
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
+    /* identical to box height, or 112% */
+
+    letter-spacing: -0.011em;
+
+    /* Grey */
+
+    color: #76808D;
+
+
+    /* Inside auto layout */
+
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+}
+
+.terminology-group1 .description {
+    /* Pods */
+
+
+    /* width: 34px; */
+    height: 18px;
+
+    font-family: 'Inter', sans-serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    /* identical to box height, or 112% */
+
+    letter-spacing: -0.011em;
+    margin-left: 5px;
+
+    /* Grey */
+
+    color: #76808D;
+
+
+    /* Inside auto layout */
+
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+}
+
+.terminology-group1 .text-type {
+    width: 217px;
+    height: 50px;
+    /* Light1 */
+
+    background: #F5F5F5;
+    /* SMALL-inputs */
+
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 10px;
+
+}
+
+
+.terminology-edit {
+    width: 387px;
+
+
+}
+
+.terminology-edit .terminology-edit-content {
+    display: flex;
+    width: 387px;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.terminology-edit .terminology-edit-content .button-style {
+
+    width: 217px;
+    height: 50px;
+    /* position: absolute;
+    left: 43.93%;
+    right: 0%;
+    top: 0%;
+    bottom: 0%; */
+
+    /* Light1 */
+
+    background: #F5F5F5;
+    /* SMALL-inputs */
+
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 10px;
+
+
+    /* Inside auto layout */
+
+    flex: none;
+    order: 2;
+    flex-grow: 0;
+}
+
+/* //! EDIT TERMINOLOGY DROPDOWN */
+.select-dropdown {
+    position: absolute;
+    /* left: 43.26%;
+    right: 0%;
+    top: 0%;
+    bottom: 80.77%; */
+
+    /* Light1 */
+
+    background: #F5F5F5;
+    border-radius: 10px;
+}
+
+.terminology-edit .terminology-edit-content .dropdown-terminology {
+    display: inline-block;
+    position: relative;
+    width: 219px;
+}
+
+.terminology-edit .terminology-edit-content .dropdown-terminology .dropdown-content {
+    display: none;
+    position: absolute;
+    width: 100%;
+    overflow: auto;
+    /* Light2 */
+
+    background: #F0F0F0;
+    border-radius: 10px;
+
+
+}
+
+.terminology-edit .terminology-edit-content .dropdown-terminology:hover .dropdown-content {
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+
+    align-items: flex-start;
+    padding: 13px;
+    gap: 20px;
+
+    height: 210px;
+
+    overflow-x: hidden;
+
+
+}
+
+.terminology-edit .terminology-edit-content .dropdown-terminology .dropdown-content a {
+    display: block;
+    /* Joko */
+
+
+    /* position: absolute; */
+    /* left: 5.99%;
+    right: 66.82%;
+    top: 34.76%;
+    bottom: 57.62%; */
+
+    /* corps */
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    /* identical to box height, or 114% */
+
+
+    /* Grey */
+
+    color: #76808D;
+}
+
+.terminology-edit .terminology-edit-content .dropdown-terminology .dropdown-content a:hover {
+    color: #FFFFFF;
+    background-color: #C94B32;
+}
+
+.terminology-edit .terminology-edit-content .dropdown-terminology button {
+    width: 219px;
+    height: 50px;
+
+    /* Light1 */
+
+    /* GRADIENT-light */
+
+    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
+    border-radius: 10px;
+
+    align-self: center;
+
+    /* Inside auto layout */
+
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+
+    /* text */
+
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    /* or 112% */
+
+    display: flex;
+    align-items: center;
+    text-align: center;
+
+    /* identical to box height, or 112% */
+
+    letter-spacing: -0.011em;
+
+    /* Grey */
+
+    color: rgba(27, 45, 65, 0.6);
+
+
+    justify-content: flex-start;
+}
+
+.terminology-edit .terminology-edit-content .dropdown-terminology .dropdown-content button {
+    width: 191px;
+    height: 40px;
+
+    margin-top: 13px;
+
+    background: #C94B32;
+    border-radius: 5px;
+
+    align-self: center;
+
+    /* Inside auto layout */
+
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+
+    /* text */
+
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    /* or 112% */
+
+    display: flex;
+    align-items: center;
+    text-align: center;
+    letter-spacing: -0.011em;
+    text-transform: uppercase;
+
+    color: #FFFFFF;
+
+    justify-content: center;
 }

@@ -1,8 +1,8 @@
 import { AiOutlineClose } from "react-icons/ai";
 import IconButton from "UIpack/IconButton";
 import "./Settings.css";
-import OD from "../../assets/images/drawer-icons/OD.svg";
-import { Button, Image, Input } from "@chakra-ui/react";
+import DiscordIcon from "../../assets/images/drawer-icons/DiscordIcon.svg";
+import { Button, Image } from "@chakra-ui/react";
 
 const DiscordModal = ({ toggleModal, toggleDiscord }) => {
   return (
@@ -46,7 +46,7 @@ const DiscordModal = ({ toggleModal, toggleDiscord }) => {
             }}
           >
             <Image
-              src={OD}
+              src={DiscordIcon}
               alt="Organisation details icon"
               style={{ marginTop: "100px", width: "94.48px", height: "50px" }}
             />
@@ -60,7 +60,84 @@ const DiscordModal = ({ toggleModal, toggleDiscord }) => {
               padding: "0 50px",
             }}
           >
-            Content
+            <div id="membership-policy-section">
+              <div id="text-type">Project Notifications</div>
+
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginTop: "15px",
+                  marginBottom: "15px",
+                }}
+              >
+                <label class="switch">
+                  <input type="checkbox" />
+                  <span class="slider check round"></span>
+                </label>
+                <div id="switch-title">When a new member is added</div>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: "35px",
+                }}
+              >
+                <label class="switch">
+                  <input type="checkbox" />
+                  <span class="slider check round"></span>
+                </label>
+                <div id="switch-title">
+                  When a project is marked as complete
+                </div>
+              </div>
+
+              <div id="text-type">Task Notifications</div>
+
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: "15px",
+                }}
+              >
+                <label class="switch">
+                  <input type="checkbox" />
+                  <span class="slider check round"></span>
+                </label>
+                <div id="switch-title">When a task is created</div>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: "15px",
+                }}
+              >
+                <label class="switch">
+                  <input type="checkbox" />
+                  <span class="slider check round"></span>
+                </label>
+                <div id="switch-title">When someone is assigned a task</div>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: "15px",
+                }}
+              >
+                <label class="switch">
+                  <input type="checkbox" />
+                  <span class="slider check round"></span>
+                </label>
+                <div id="switch-title">When a submission is accepted</div>
+              </div>
+            </div>
           </div>
           {/* //! FOOTER */}
           <div className="button-section">

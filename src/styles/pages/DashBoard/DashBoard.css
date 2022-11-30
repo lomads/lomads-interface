@@ -473,6 +473,7 @@ body.active-modal {
 }
 
 .SideModal {
+    overflow-y: scroll;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -485,6 +486,24 @@ body.active-modal {
     position: absolute;
     height: 100vh;
     width: 40vw;
+    right: 0;
+    top: 0;
+}
+
+.SideModalTerminology {
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 43px 23px;
+    gap: 35px;
+    background: #FFFFFF;
+    ;
+    border-radius: 20px 0px 0px 20px;
+    position: absolute;
+    height: 100vh;
+    width: 575px;
     right: 0;
     top: 0;
 }

@@ -177,15 +177,17 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
             </div>
             {/* //! FOOTER */}
             <div className="button-section">
+              <br />
+              <br />
+              <br />
               <Button
-                variant="outline"
-                mr={3}
+                id="button-cancel"
                 onClick={() => {
                   toggleModal();
                   togglePassToken();
                 }}
               >
-                Cancel
+                CANCEL
               </Button>
               <Button id="button-save">SAVE CHANGES</Button>
             </div>

@@ -133,14 +133,13 @@ const OrganisationDetails = ({
             {/* //! FOOTER */}
             <div className="button-section">
               <Button
-                variant="outline"
-                mr={3}
+                id="button-cancel"
                 onClick={() => {
                   toggleModal();
                   toggleOrganisationDetailsModal();
                 }}
               >
-                Cancel
+                CANCEL
               </Button>
               <Button id="button-save">SAVE CHANGES</Button>
             </div>
