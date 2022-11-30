@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import './MyProject.css';
-import { get as _get, find as _find } from 'lodash';
+import { get as _get, find as _find, groupBy as _groupBy, orderBy as _orderBy } from 'lodash';
 
 import SafeButton from "UIpack/SafeButton";
 
@@ -13,6 +13,7 @@ import { useParams } from 'react-router-dom';
 import archiveIcon from '../../../assets/svg/archiveIcon.svg';
 
 import useRole from 'hooks/useRole';
+import moment from 'moment';
 
 const MyProject = () => {
     const navigate = useNavigate();
@@ -25,10 +26,39 @@ const MyProject = () => {
     const [initialCheck, setInitialCheck] = useState(false);
     const { myRole, can } = useRole(DAO, account)
 
+
+    const notificationCount = (project) => {
+        let count = [];
+        let links = project.links.map(l => {
+            return { ...l, provider: new URL(l.link).hostname }
+        })
+        let grp = _groupBy(links, l => l.provider)
+        for (let index = 0; index < Object.keys(grp).length; index++) {
+            const provider = Object.keys(grp)[index];
+            count.push({ provider, count: grp[provider].reduce((p, c) => (p + (+_get(c, 'notification', 0))), 0) })
+        }
+        console.log(count)
+        return count
+    }
+
     useEffect(() => {
         if (DAO && DAO.url === daoURL) {
-            setMyProjects(_get(DAO, 'projects', []).filter(project => !project.deletedAt && !project.archivedAt && _find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase())))
-            setOtherProjects(_get(DAO, 'projects', []).filter(project => !project.deletedAt && !project.archivedAt && !_find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase())))
+            let myProjects = _get(DAO, 'projects', []).filter(project => !project.deletedAt && !project.archivedAt && _find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase()));
+            myProjects = myProjects.map(p => {
+                let prj = {...p, notification: 0}
+                if(notificationCount(prj) > 0)
+                    prj.notification = 1
+                return prj;
+            })
+            setMyProjects(_orderBy(myProjects, ['notification', p => moment(p.createdAt).unix()], ['desc', 'desc']))
+            let otherProjects = _get(DAO, 'projects', []).filter(project => !project.deletedAt && !project.archivedAt && !_find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase()))
+            otherProjects = otherProjects.map(p => {
+                let prj = {...p, notification: 0}
+                if(notificationCount(prj) > 0)
+                    prj.notification = 1
+                return prj;
+            })
+            setOtherProjects(_orderBy(otherProjects, p => moment(p.createdAt).unix(), 'desc'))
         }
     }, [DAO, tab]);
 
