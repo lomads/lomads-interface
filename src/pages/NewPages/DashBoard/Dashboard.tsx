@@ -51,6 +51,7 @@ import { switchChain } from "utils/switchChain";
 import { SupportedChainId, SUPPORTED_CHAIN_IDS, CHAIN_IDS_TO_NAMES } from 'constants/chains'
 import Tasks from "./Tasks";
 import CreateTask from "./Task/CreateTask";
+import CreateRecurring from "./TreasuryCard/CreateRecurring";
 import axiosHttp from 'api'
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
@@ -77,6 +78,7 @@ const Dashboard = () => {
 	const [showAddMember, setShowAddMember] = useState<boolean>(false);
 	const [showEditMember, setShowEditMember] = useState<boolean>(false);
 	const [showCreateTask, setShowCreateTask] = useState<boolean>(false);
+	const [showCreateRecurring, setShowCreateRecurring] = useState<boolean>(false);
 	const [showNavBar, setShowNavBar] = useState<boolean>(false);
 	const [manualChainSwitch, setManualChainSwitch] = useState<boolean>(false);
 	const [safeOwners, setSafeOwners] = useState<any>(null);
@@ -119,6 +121,10 @@ const Dashboard = () => {
 	const toggleShowCreateTask = () => {
 		setShowCreateTask(!showCreateTask);
 	};
+
+	const toggleShowCreateRecurring = () => {
+		setShowCreateRecurring(!showCreateRecurring);
+	}
 
 	const showSideBar = (_choice: boolean) => {
 		setShowNavBar(_choice);
@@ -459,6 +465,7 @@ const Dashboard = () => {
 						account={account}
 						onChangePendingTransactions={(tx: any) => setPendingTransactions(tx)}
 						tokens={safeTokens}
+						toggleShowCreateRecurring={toggleShowCreateRecurring}
 					/>
 				}
 				{can(myRole, 'members.view') &&
@@ -491,6 +498,9 @@ const Dashboard = () => {
 
 			{/* create task side modal */}
 			{showCreateTask && <CreateTask toggleShowCreateTask={toggleShowCreateTask} selectedProject={null} />}
+
+			{/* Create recurring payment side modal */}
+			{showCreateRecurring && <CreateRecurring toggleShowCreateRecurring={toggleShowCreateRecurring} />}
 
 		</>
 	);

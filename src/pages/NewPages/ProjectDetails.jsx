@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { get as _get, find as _find, uniqBy as _uniqBy } from 'lodash';
 import SideBar from "./DashBoard/SideBar";
 import SafeButton from "UIpack/SafeButton";
@@ -41,6 +41,8 @@ import SimpleInputField from "UIpack/SimpleInputField";
 import Tasks from "./DashBoard/Tasks";
 import CreateTask from "./DashBoard/Task/CreateTask";
 
+import { Editor } from '@tinymce/tinymce-react';
+
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
     const { provider, account, chainId } = useWeb3React();
@@ -59,6 +61,8 @@ const ProjectDetails = () => {
     const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
     console.log(contractName)
     console.log("myRole", myRole)
+    const editorRef = useRef(null);
+
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
 
@@ -99,10 +103,10 @@ const ProjectDetails = () => {
         let creator = _get(Project, 'creator', '').toLowerCase() === account.toLowerCase();
         let inProject = _find(_uniqBy(Project?.members, '_id'), m => m.wallet.toLowerCase() === account.toLowerCase())
         let p = permission;
-        if(inProject)
+        if (inProject)
             p = `${permission}.inproject`
-        if(creator)
-            p = `${permission}.creator` 
+        if (creator)
+            p = `${permission}.creator`
         console.log(p)
         return (can(myRole, p) || can(myRole, permission))
     }, [Project])
@@ -368,10 +372,8 @@ const ProjectDetails = () => {
         setDescription(Project.description);
         setEditMode(true);
     }
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter') {
-            dispatch(updateProject({ projectId, daoUrl: daoURL, payload: { name, description } }))
-        }
+    const handleSaveChanges = (e) => {
+        dispatch(updateProject({ projectId, daoUrl: daoURL, payload: { name, description } }))
     }
 
     const toggleShowCreateTask = () => {
@@ -575,7 +577,7 @@ const ProjectDetails = () => {
                                             placeholder="Project name"
                                             value={name}
                                             onchange={(e) => { setName(e.target.value) }}
-                                            onKeyDown={(e) => handleKeyDown(e)}
+                                            // onKeyDown={(e) => handleKeyDown(e)}
                                             onClick={(e) => e.stopPropagation()}
                                         />
                                         :
@@ -585,10 +587,10 @@ const ProjectDetails = () => {
                             </div>
                             {
                                 <div>
-                                    { canMyrole('project.edit') &&
-                                    <button onClick={handleEditMode}>
-                                        <img src={editToken} alt="hk-logo" />
-                                    </button>
+                                    {canMyrole('project.edit') &&
+                                        <button onClick={handleEditMode}>
+                                            <img src={editToken} alt="hk-logo" />
+                                        </button>
                                     }
                                     {canMyrole('project.delete') && <button onClick={() => setDeletePrompt(true)}>
                                         <img src={deleteIcon} alt="hk-logo" />
@@ -618,18 +620,45 @@ const ProjectDetails = () => {
                             {
                                 editMode
                                     ?
-                                    <SimpleInputField
-                                        className="inputField"
-                                        height={50}
-                                        width={'50%'}
-                                        placeholder="Project description"
-                                        value={description}
-                                        onchange={(e) => { setDescription(e.target.value) }}
-                                        onKeyDown={(e) => handleKeyDown(e)}
-                                        onClick={(e) => e.stopPropagation()}
-                                    />
+                                    <>
+                                        <Editor
+                                            onInit={(evt, editor) => editorRef.current = editor}
+                                            init={{
+                                                height: 500,
+                                                // menubar: false,
+                                                branding: false,
+                                                default_link_target: "_blank",
+                                                plugins: [
+                                                    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                                                    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                                                    'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                                                ],
+                                                toolbar: 'undo redo | blocks | ' +
+                                                    'bold italic forecolor | alignleft aligncenter ' +
+                                                    'alignright alignjustify | bullist numlist outdent indent | ' +
+                                                    'removeformat | help',
+                                                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+                                            }}
+                                            value={description}
+                                            // onKeyDown={(e) => handleKeyDown(e)}
+                                            onClick={(e) => e.stopPropagation()}
+                                            onEditorChange={(text) => { setDescription(text) }}
+                                        />
+                                        <SafeButton
+                                            height={40}
+                                            width={150}
+                                            titleColor="#FFF"
+                                            title="SAVE CHANGES"
+                                            bgColor="#C94B32"
+                                            opacity="1"
+                                            disabled={false}
+                                            fontweight={400}
+                                            fontsize={16}
+                                            onClick={handleSaveChanges}
+                                        />
+                                    </>
                                     :
-                                    <p>{Project?.description}</p>
+                                    <p dangerouslySetInnerHTML={{ __html: Project?.description }}></p>
                             }
 
                         </div>
@@ -690,92 +719,92 @@ const ProjectDetails = () => {
                                 </div>
                             </div>
                         </div>
-                        { canMyrole('project.links.view') &&
-                        <div className="projectDetails-right">
-                            <div className="add-link-section">
-                                <p className="link-header-text">Links</p>
-                                <div>
-                                    {/* <button>
+                        {canMyrole('project.links.view') &&
+                            <div className="projectDetails-right">
+                                <div className="add-link-section">
+                                    <p className="link-header-text">Links</p>
+                                    <div>
+                                        {/* <button>
                                         <img src={editPen} alt="hk-logo" />
                                     </button> */}
-                                    {canMyrole('project.link.add') &&
-                                        <button onClick={toggleShowLink}>
-                                            <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
-                                            LINK
-                                        </button>}
+                                        {canMyrole('project.link.add') &&
+                                            <button onClick={toggleShowLink}>
+                                                <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
+                                                LINK
+                                            </button>}
 
+                                    </div>
                                 </div>
-                            </div>
-                            {
-                                lockedLinks.length > 0
-                                    ?
-                                    <div>
-                                        <div className="link-unlocked-section">
-                                            <div className="locked">
-                                                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                                                    <img src={lock} alt="lock-icon" />
-                                                    <p style={{ marginLeft: "6px", fontStyle: "normal", fontSize: "16px", color: "#FFFFFF" }}>Links to unlock:</p>
-                                                </div>
-                                                <div className="container">
-                                                    {
-                                                        lockedLinks.map((item, index) => {
-                                                            return (
-                                                                <div onClick={() => unlock(item)} className="link-button" style={{ position: 'relative' }} key={index}>
-                                                                    {handleParseUrl(item.link)}
-                                                                    <p>{item.title.length > 8 ? item.title.slice(0, 8) + "..." : item.title}</p>
-                                                                    {unlockLoading === item.id ?
-                                                                        <div style={{ position: 'absolute', top: 10, right: 20 }}>
-                                                                            <LeapFrog size={20} color="#B12F15" />
-                                                                        </div> : null
-                                                                    }
-                                                                </div>
-                                                            )
-                                                        })
-                                                    }
+                                {
+                                    lockedLinks.length > 0
+                                        ?
+                                        <div>
+                                            <div className="link-unlocked-section">
+                                                <div className="locked">
+                                                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                                                        <img src={lock} alt="lock-icon" />
+                                                        <p style={{ marginLeft: "6px", fontStyle: "normal", fontSize: "16px", color: "#FFFFFF" }}>Links to unlock:</p>
+                                                    </div>
+                                                    <div className="container">
+                                                        {
+                                                            lockedLinks.map((item, index) => {
+                                                                return (
+                                                                    <div onClick={() => unlock(item)} className="link-button" style={{ position: 'relative' }} key={index}>
+                                                                        {handleParseUrl(item.link)}
+                                                                        <p>{item.title.length > 25 ? item.title.slice(0, 25) + "..." : item.title}</p>
+                                                                        {unlockLoading === item.id ?
+                                                                            <div style={{ position: 'absolute', top: 10, right: 20 }}>
+                                                                                <LeapFrog size={20} color="#B12F15" />
+                                                                            </div> : null
+                                                                        }
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        }
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    :
-                                    null
-                            }
+                                        :
+                                        null
+                                }
 
-                            {
-                                openLinks.length > 0
-                                    ?
-                                    <div className="link-unlocked-section">
-                                        {
-                                            openLinks.map((item, index) => {
-                                                return (
-                                                    <div onClick={() => {
-                                                        if (!item.accessControl)
-                                                            window.open(item.link, '_blank')
-                                                        else
-                                                            unlock(item, false)
-                                                    }} className="link-button" style={{ position: 'relative' }} key={index}>
-                                                        {handleParseUrl(item.link)}
-                                                        <p>{item.title.length > 8 ? item.title.slice(0, 8) + "..." : item.title}</p>
-                                                        {unlockLoading === item.id ?
-                                                            <div style={{ position: 'absolute', top: 10, right: 20 }}>
-                                                                <LeapFrog size={20} color="#B12F15" />
-                                                            </div> : null
-                                                        }
-                                                    </div>
-                                                )
-                                            })
-                                        }
-                                    </div>
-                                    :
-                                    null
-                            }
-                        </div> }
+                                {
+                                    openLinks.length > 0
+                                        ?
+                                        <div className="link-unlocked-section">
+                                            {
+                                                openLinks.map((item, index) => {
+                                                    return (
+                                                        <div onClick={() => {
+                                                            if (!item.accessControl)
+                                                                window.open(item.link, '_blank')
+                                                            else
+                                                                unlock(item, false)
+                                                        }} className="link-button" style={{ position: 'relative' }} key={index}>
+                                                            {handleParseUrl(item.link)}
+                                                            <p>{item.title.length > 25 ? item.title.slice(0, 25) + "..." : item.title}</p>
+                                                            {unlockLoading === item.id ?
+                                                                <div style={{ position: 'absolute', top: 10, right: 20 }}>
+                                                                    <LeapFrog size={20} color="#B12F15" />
+                                                                </div> : null
+                                                            }
+                                                        </div>
+                                                    )
+                                                })
+                                            }
+                                        </div>
+                                        :
+                                        null
+                                }
+                            </div>}
                     </div>
                 </div>
 
                 {/* Tasks section */}
-                { canMyrole('project.task.view') && <div style={{ width: '80%', marginTop: '20px' }}>
+                {canMyrole('project.task.view') && <div style={{ width: '80%', marginTop: '20px' }}>
                     <Tasks toggleShowCreateTask={toggleShowCreateTask} onlyProjects={true} />
-                </div> }
+                </div>}
                 <div style={{ width: '80%' }}>
                     <Footer theme="dark" />
                 </div>

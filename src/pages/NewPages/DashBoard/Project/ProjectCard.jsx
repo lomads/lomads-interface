@@ -45,11 +45,11 @@ const ProjectCard = ({ project, daoUrl, tab }) => {
                     <div className='myproject-card-icons'>
                         {
                             notifications.map(notification => {
-                                if(notification.provider.indexOf('discord') > -1 && notification.count) {
-                                    return ( <div className='icon-container'>
-                                    <BsDiscord color='#FFF' size={20} />
-                                    <p>+{notification.count}</p>
-                                    </div> )
+                                if (notification.provider.indexOf('discord') > -1 && notification.count) {
+                                    return (<div className='icon-container'>
+                                        <BsDiscord color='#FFF' size={20} />
+                                        <p>+{notification.count}</p>
+                                    </div>)
                                 }
                             })
                         }
@@ -75,8 +75,8 @@ const ProjectCard = ({ project, daoUrl, tab }) => {
                     null
             }
             <div>
-                <p>{project.name}</p>
-                <span>{project.description.length > 25 ? project.description.substring(0, 25) + "..." : project.description}</span>
+                <p className="project-name">{project.name}</p>
+                <div className="project-desc" dangerouslySetInnerHTML={{ __html: project.description.length > 25 ? project.description.substring(0, 25) + "..." : project.description }}></div>
             </div>
             {
                 project.archivedAt

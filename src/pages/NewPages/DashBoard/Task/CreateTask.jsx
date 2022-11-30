@@ -313,19 +313,20 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                             <Editor
                                                 onInit={(evt, editor) => editorRef.current = editor}
                                                 init={{
-                                                    height: 300,
-                                                    menubar: false,
+                                                    height: 400,
+                                                    // menubar: false,
                                                     branding: false,
-                                                    // plugins: [
-                                                    //     'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                                                    //     'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                                                    //     'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
-                                                    // ],
-                                                    // toolbar: 'undo redo | blocks | ' +
-                                                    //     'bold italic forecolor | alignleft aligncenter ' +
-                                                    //     'alignright alignjustify | bullist numlist outdent indent | ' +
-                                                    //     'removeformat | help',
-                                                    // content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+                                                    default_link_target: "_blank",
+                                                    plugins: [
+                                                        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                                                        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                                                        'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                                                    ],
+                                                    toolbar: 'undo redo | blocks | ' +
+                                                        'bold italic forecolor | alignleft aligncenter ' +
+                                                        'alignright alignjustify | bullist numlist outdent indent | ' +
+                                                        'removeformat | help',
+                                                    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
                                                 }}
                                                 value={description}
                                                 onEditorChange={(text) => { setDescription(text); document.getElementById('error-desc').innerHTML = '' }}
@@ -581,7 +582,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                     step={0.01}
                                                     onChange={(e) => setAmount(parseFloat(e.target.value))}
                                                 /> */}
-                                                <NumberInput onChange={(e) => setAmount(parseFloat(e))}  style={{ marginTop: 10, width: 350, height: 50, borderRadius: '10px 10px 10px 10px', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)' }} step={1} min={0}>
+                                                <NumberInput onChange={(e) => setAmount(parseFloat(e))} style={{ marginTop: 10, width: 350, height: 50, borderRadius: '10px 10px 10px 10px', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)' }} step={1} min={0}>
                                                     <NumberInputField placeholder='Amount' className='input' style={{ padding: 0, width: 130, textAlign: "center", height: 50, backgroundColor: '#F5F5F5', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)', borderRadius: '10px 0px 0px 10px', borderWidth: 0 }} />
                                                     <NumberInputStepper style={{ width: 50, backgroundColor: '#FFF', borderRadius: '0px 10px 10px 0px' }}>
                                                         <NumberIncrementStepper color="#C94B32" />

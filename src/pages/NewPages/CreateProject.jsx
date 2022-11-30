@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect, useCallback, useMemo } from 'react';
+import { useState, useContext, useEffect, useCallback, useMemo, useRef } from 'react';
 import { find as _find, get as _get, debounce as _debounce } from 'lodash';
 import '../../styles/pages/CreateProject.css';
 import AddMember from "./DashBoard/MemberCard/AddMember";
@@ -30,12 +30,16 @@ import AddDiscordLink from 'components/AddDiscordLink';
 import AddNotionLink from 'components/AddNotionLink';
 import { nanoid } from '@reduxjs/toolkit';
 
+import { Editor } from '@tinymce/tinymce-react';
+
 const CreateProject = () => {
 
     const { provider, account, chainId } = useWeb3React();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const { DAO, createProjectLoading } = useAppSelector((state) => state.dashboard);
+
+    const editorRef = useRef(null);
 
     const [name, setName] = useState('');
     const [desc, setDesc] = useState('');
@@ -58,9 +62,9 @@ const CreateProject = () => {
 
     const daoName = _get(DAO, 'name', '').split(" ");
 
-    useEffect(() => { 
-        if(DAO)
-            setMemberList(DAO.members) 
+    useEffect(() => {
+        if (DAO)
+            setMemberList(DAO.members)
     }, [DAO])
 
     useEffect(() => {
@@ -75,10 +79,10 @@ const CreateProject = () => {
 
     useEffect(() => {
         try {
-            if(link && link.length > 8 && link.indexOf('notion.') > -1) {
+            if (link && link.length > 8 && link.indexOf('notion.') > -1) {
                 let lnk = new URL(link).pathname;
                 lnk = lnk.split('/')
-                if(lnk && lnk.length > 2)
+                if (lnk && lnk.length > 2)
                     setSpaceDomain(lnk[1])
             }
         } catch (e) {
@@ -101,7 +105,7 @@ const CreateProject = () => {
     }, []);
 
     useEffect(() => {
-        if(link && link.indexOf('notion.') > -1 && _get(DAO, 'sbt.contactDetail', []).indexOf('email') === -1){
+        if (link && link.indexOf('notion.') > -1 && _get(DAO, 'sbt.contactDetail', []).indexOf('email') === -1) {
             setAccessControlError('Notion gated access not possible (No email in SBT)')
         } else {
             setAccessControlError(null)
@@ -127,7 +131,7 @@ const CreateProject = () => {
     // }, [link]);
 
     const accesscontrolDisabled = useMemo(() => {
-        return (!link || (link && link.length <=8) || (link.indexOf('discord.') == -1 && link.indexOf('notion.') == -1))
+        return (!link || (link && link.length <= 8) || (link.indexOf('discord.') == -1 && link.indexOf('notion.') == -1))
     }, [link])
 
     useEffect(() => {
@@ -227,7 +231,7 @@ const CreateProject = () => {
             if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
                 tempLink = 'https://' + tempLink;
             }
-            if(link.indexOf('discord.') > -1) {
+            if (link.indexOf('discord.') > -1) {
                 let resource = {};
                 resource.id = nanoid(16);
                 resource.title = title;
@@ -246,8 +250,8 @@ const CreateProject = () => {
                 setLink('');
                 setRoleName(null)
                 setSpaceDomain(null)
-            } else if(link.indexOf('notion.') > -1) {
-                if(status.status) {
+            } else if (link.indexOf('notion.') > -1) {
+                if (status.status) {
                     let resource = {};
                     resource.id = nanoid(16);
                     resource.title = title;
@@ -286,7 +290,7 @@ const CreateProject = () => {
 
     const linkHasDomain = useMemo(() => {
         try {
-            if(link && link.indexOf('notion.') > -1)
+            if (link && link.indexOf('notion.') > -1)
                 return (new URL(link).pathname).split('/').length > 2
             return false;
         } catch (e) {
@@ -302,13 +306,13 @@ const CreateProject = () => {
         project.links = resourceList;
         project.daoId = DAO?._id;
         console.log(project)
-       dispatch(createProject({ payload: project }))
+        dispatch(createProject({ payload: project }))
     }
 
     const LinkBtn = (props) => {
-        if(link && link.indexOf('discord.') > -1)
+        if (link && link.indexOf('discord.') > -1)
             return <AddDiscordLink {...props} />
-        if(link && link.indexOf('notion.') > -1)
+        if (link && link.indexOf('notion.') > -1)
             return <AddNotionLink {...props} />
     }
 
@@ -360,9 +364,31 @@ const CreateProject = () => {
                                                 onChange={(e) => setName(e.target.value)}
                                             />
                                         </div>
-                                        <div className='input-div'>
+
+                                        <div className='input-div' style={{ width: '880px' }}>
                                             <label>Short description</label>
-                                            <textarea
+                                            <Editor
+                                                onInit={(evt, editor) => editorRef.current = editor}
+                                                init={{
+                                                    height: 500,
+                                                    branding: false,
+                                                    default_link_target: "_blank",
+                                                    plugins: [
+                                                        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                                                        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                                                        'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                                                    ],
+                                                    toolbar: 'undo redo | blocks | ' +
+                                                        'bold italic forecolor | alignleft aligncenter ' +
+                                                        'alignright alignjustify | bullist numlist outdent indent | ' +
+                                                        'removeformat | help',
+                                                    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+                                                }}
+                                                value={desc}
+                                                onEditorChange={(text) => { setDesc(text) }}
+                                            />
+
+                                            {/* <textarea
                                                 className='text-area'
                                                 rows="4"
                                                 cols="50"
@@ -370,9 +396,10 @@ const CreateProject = () => {
                                                 name='desc'
                                                 value={desc}
                                                 onChange={(e) => setDesc(e.target.value)}
-                                            ></textarea>
+                                            ></textarea> */}
                                         </div>
                                         <button
+                                            className='input-btn'
                                             style={name !== '' && desc !== '' ? { background: '#C94B32' } : { background: 'rgba(27, 43, 65, 0.2)' }}
                                             onClick={handleNext}
                                         >NEXT</button>
@@ -383,7 +410,7 @@ const CreateProject = () => {
                                         <div className="projectName-container">
                                             <div className="projectName-box">
                                                 <p>{name}</p>
-                                                <span>{desc.length > 25 ? desc.substring(0, 25) + "..." : desc}</span>
+                                                <div dangerouslySetInnerHTML={{ __html: desc.length > 25 ? desc.substring(0, 25) + "..." : desc }}></div>
                                             </div>
                                             <div className="projectName-btn">
                                                 <button onClick={() => setNext(false)}>
@@ -552,47 +579,47 @@ const CreateProject = () => {
                                                         </div>
                                                         {accessControl && link && link.indexOf('discord.') > -1 ? <div className='resource-body'>
                                                             <div>
-                                                            <input
-                                                                type="text"
-                                                                placeholder="Role name"
-                                                                className="input2"
-                                                                style={{ marginTop: 16 }}
-                                                                name="rolename"
-                                                                value={roleName}
-                                                                onChange={(e) => setRoleName(e.target.value)}
-                                                            />
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="Role name"
+                                                                    className="input2"
+                                                                    style={{ marginTop: 16 }}
+                                                                    name="rolename"
+                                                                    value={roleName}
+                                                                    onChange={(e) => setRoleName(e.target.value)}
+                                                                />
                                                             </div>
                                                         </div> : null}
                                                         {accessControl && link && link.indexOf('notion.') > -1 && !linkHasDomain ? <div className='resource-body'>
                                                             <div>
-                                                            <input
-                                                                type="text"
-                                                                placeholder="Notion Domain"
-                                                                className="input2"
-                                                                style={{ marginTop: 16 }}
-                                                                name="spaceDomain"
-                                                                value={spaceDomain}
-                                                                onChange={(e) => setSpaceDomain(e.target.value)}
-                                                            />
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="Notion Domain"
+                                                                    className="input2"
+                                                                    style={{ marginTop: 16 }}
+                                                                    name="spaceDomain"
+                                                                    value={spaceDomain}
+                                                                    onChange={(e) => setSpaceDomain(e.target.value)}
+                                                                />
                                                             </div>
                                                         </div> : null}
                                                         {
                                                             accessControl && link && link.indexOf('notion.') > -1 &&
-                                                            <div style={{ fontSize: 14, fontStyle:'italic', color: "rgba(118, 128, 141, 0.5)" }}>Invite <span style={{ color: "#76808D" }}>{ process.env.REACT_APP_NOTION_ADMIN_EMAIL }</span> to be an Admin of your workspace</div>
+                                                            <div style={{ fontSize: 14, fontStyle: 'italic', color: "rgba(118, 128, 141, 0.5)" }}>Invite <span style={{ color: "#76808D" }}>{process.env.REACT_APP_NOTION_ADMIN_EMAIL}</span> to be an Admin of your workspace</div>
                                                         }
-                                                        { DAO?.sbt && 
-                                                                <div className='resource-footer'>
-                                                        { 
-                                                            ( link && link.indexOf('notion.') > -1 && _get(DAO, 'sbt.contactDetail', '').indexOf('email') > -1) ||
-                                                            ( link && link.indexOf('discord.') > -1 && _get(DAO, 'sbt.contactDetail', '').indexOf('discord') > -1)
-                                                            ?
-                                                                    <input id="accessControl" type="checkbox" checked={accessControl} value={accessControl} disabled={accessControlError || accesscontrolDisabled} onChange={e => setAccessControl(prev => !prev)} /> : null }
-                                                                    <div>
-                                                                        <p>ACCESS CONTROL</p>
-                                                                        <span>Currently available for discord & notion only</span>
-                                                                        { accessControlError && <div><span style={{ color: 'red' }}>{ accessControlError }</span></div> }
-                                                                    </div>
+                                                        {DAO?.sbt &&
+                                                            <div className='resource-footer'>
+                                                                {
+                                                                    (link && link.indexOf('notion.') > -1 && _get(DAO, 'sbt.contactDetail', '').indexOf('email') > -1) ||
+                                                                        (link && link.indexOf('discord.') > -1 && _get(DAO, 'sbt.contactDetail', '').indexOf('discord') > -1)
+                                                                        ?
+                                                                        <input id="accessControl" type="checkbox" checked={accessControl} value={accessControl} disabled={accessControlError || accesscontrolDisabled} onChange={e => setAccessControl(prev => !prev)} /> : null}
+                                                                <div>
+                                                                    <p>ACCESS CONTROL</p>
+                                                                    <span>Currently available for discord & notion only</span>
+                                                                    {accessControlError && <div><span style={{ color: 'red' }}>{accessControlError}</span></div>}
                                                                 </div>
+                                                            </div>
 
                                                         }
                                                     </div>
