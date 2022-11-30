@@ -311,6 +311,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                         <div className='createTask-inputRow'>
                                             <span>Description</span>
                                             <Editor
+                                                apiKey='p0turvzgbtf8rr24txekw7sgjye6xunw2near38hwoohdg13'
                                                 onInit={(evt, editor) => editorRef.current = editor}
                                                 init={{
                                                     height: 400,

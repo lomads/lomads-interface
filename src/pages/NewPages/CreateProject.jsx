@@ -368,6 +368,7 @@ const CreateProject = () => {
                                         <div className='input-div' style={{ width: '880px' }}>
                                             <label>Short description</label>
                                             <Editor
+                                                apiKey='p0turvzgbtf8rr24txekw7sgjye6xunw2near38hwoohdg13'
                                                 onInit={(evt, editor) => editorRef.current = editor}
                                                 init={{
                                                     height: 500,
