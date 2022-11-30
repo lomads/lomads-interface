@@ -121,7 +121,7 @@
     margin-bottom: 25px;
 }
 
-.myproject-card div p {
+.myproject-card div .project-name {
     font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 400;
@@ -130,12 +130,13 @@
     color: #B12F15;
 }
 
-.myproject-card div span {
+.myproject-card div .project-desc p {
     font-style: normal;
     font-weight: 400;
     font-size: 16px;
     line-height: 18px;
     color: #76808D;
+    margin-top: 10px;
 }
 
 .myproject-card .myproject-card-icons {

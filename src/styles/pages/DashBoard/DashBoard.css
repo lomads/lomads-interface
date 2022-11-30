@@ -222,6 +222,16 @@ body.active-modal {
     color: #76808D;
 }
 
+.treasuryDivider {
+    width: 35px;
+    height: 0px;
+
+    /* Light3 */
+    border: 1px solid rgba(118, 128, 141, 0.5);
+    transform: rotate(90deg);
+    margin: 0 30px;
+}
+
 #treasuryCardTitle {
     font-family: 'Inter', sans-serif;
     font-style: normal;
@@ -233,6 +243,7 @@ body.active-modal {
     display: flex;
     flex-direction: row;
     align-items: center;
+    opacity: 0.4;
 }
 
 #treasuryCardTitle:hover {
@@ -321,9 +332,10 @@ body.active-modal {
 
 .treasuryTokens {
     width: 100%;
+    height: 72px;
     background: #FFFFFF;
     border-radius: 5px;
-    padding: 26px 22px;
+    padding: 0 22px;
     margin: 2px 0;
     display: flex;
     align-items: center;
@@ -377,6 +389,22 @@ body.active-modal {
     letter-spacing: -0.011em;
     color: rgba(118, 128, 141, 0.5);
     margin-left: 5px;
+}
+
+.treasuryTokens .treasuryTokens-right .recurring-btn {
+    width: 276px;
+    height: 40px;
+    background: #FFFFFF;
+    /* Color-drop */
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #C94B32;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
 }
 
 #treasuryTransactions {

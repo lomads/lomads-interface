@@ -164,9 +164,9 @@ const EditTask = ({ close, task, daoURL }) => {
         }
     }
 
-    const eligibleContributors = useMemo(() => {
-        return _get(DAO, 'members', []).filter(m => (reviewer || "").toLowerCase() !== m.member._id && m.member._id !== user._id)
-    }, [DAO, selectedUser, reviewer])
+    // const eligibleContributors = useMemo(() => {
+    //     return _get(DAO, 'members', []).filter(m => (reviewer || "").toLowerCase() !== m.member._id && m.member._id !== user._id)
+    // }, [DAO, selectedUser, reviewer])
 
     const eligibleReviewers = useMemo(() => {
         return _get(DAO, 'members', []).filter(m => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase())
@@ -223,18 +223,19 @@ const EditTask = ({ close, task, daoURL }) => {
                                                 onInit={(evt, editor) => editorRef.current = editor}
                                                 init={{
                                                     height: 300,
-                                                    menubar: false,
+                                                    // menubar: false,
                                                     branding: false,
-                                                    // plugins: [
-                                                    //     'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                                                    //     'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                                                    //     'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
-                                                    // ],
-                                                    // toolbar: 'undo redo | blocks | ' +
-                                                    //     'bold italic forecolor | alignleft aligncenter ' +
-                                                    //     'alignright alignjustify | bullist numlist outdent indent | ' +
-                                                    //     'removeformat | help',
-                                                    // content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+                                                    default_link_target: "_blank",
+                                                    plugins: [
+                                                        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                                                        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                                                        'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                                                    ],
+                                                    toolbar: 'undo redo | blocks | ' +
+                                                        'bold italic forecolor | alignleft aligncenter ' +
+                                                        'alignright alignjustify | bullist numlist outdent indent | ' +
+                                                        'removeformat | help',
+                                                    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
                                                 }}
                                                 value={description}
                                                 onEditorChange={(text) => { setDescription(text); document.getElementById('error-desc').innerHTML = '' }}

@@ -5,7 +5,7 @@
     top: 0;
     left: 0;
     background: rgba(27, 43, 65, 0.25);
-    z-index: 999999;
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -14,7 +14,7 @@
 .createTaskOverlay .createTaskContainer {
     height: 100%;
     /* width: 100vw; */
-    width: 575px;
+    width: 600px;
     background-color: #FFF;
     border-radius: 20px 0px 0px 20px;
     padding: 36px 27px;
