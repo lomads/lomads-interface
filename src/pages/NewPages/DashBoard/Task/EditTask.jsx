@@ -232,7 +232,7 @@ const EditTask = ({ close, task, daoURL }) => {
                                             <Editor
                                                 onInit={(evt, editor) => editorRef.current = editor}
                                                 init={{
-                                                    height: 300,
+                                                    height: 400,
                                                     // menubar: false,
                                                     branding: false,
                                                     default_link_target: "_blank",
@@ -514,7 +514,7 @@ const EditTask = ({ close, task, daoURL }) => {
                                                     type="number"
                                                     onchange={(e) => setAmount(parseFloat(e.target.value))}
                                                 /> */}
-                                                <NumberInput value={amount} onChange={(e) => setAmount(parseFloat(e))}  style={{ marginTop: 10, width: 350, height: 50, borderRadius: '10px 10px 10px 10px', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)' }} step={1} min={0}>
+                                                <NumberInput value={amount} onChange={(e) => setAmount(parseFloat(e))} style={{ marginTop: 10, width: 350, height: 50, borderRadius: '10px 10px 10px 10px', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)' }} step={1} min={0}>
                                                     <NumberInputField placeholder='Amount' className='input' style={{ padding: 0, width: 130, textAlign: "center", height: 50, backgroundColor: '#F5F5F5', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)', borderRadius: '10px 0px 0px 10px', borderWidth: 0 }} />
                                                     <NumberInputStepper style={{ width: 50, backgroundColor: '#FFF', borderRadius: '0px 10px 10px 0px' }}>
                                                         <NumberIncrementStepper color="#C94B32" />
