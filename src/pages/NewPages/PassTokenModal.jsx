@@ -40,12 +40,12 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
 		}
 	}
 
-	useEffect(() => {
-		if (updateContractLoading === false) {
-			toggleModal();
-			togglePassToken();
-		}
-	}, [updateContractLoading])
+	// useEffect(() => {
+	// 	if (updateContractLoading === false) {
+	// 		toggleModal();
+	// 		togglePassToken();
+	// 	}
+	// }, [updateContractLoading])
 
 	const handleSave = () => {
 		dispatch(updateContract({

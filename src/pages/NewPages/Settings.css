@@ -748,22 +748,11 @@ td {
 
 /* ! Main Compopent */
 .MainComponent {
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 100px 0px 200px;
-    gap: 35px;
-
-    width: 529px;
-    height: 1134px;
-    /* overflow-y: scroll; */
-
-
-    /* Inside auto layout */
-
-    flex: none;
-    order: 0;
-    flex-grow: 0;
+    justify-content: center;
 }
 
 .MainComponent-rolesPermissions {
