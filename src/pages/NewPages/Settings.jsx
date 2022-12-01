@@ -265,7 +265,9 @@ const Settings = () => {
 									</Link>
 								</div>
 							</div>
-							<div className="settings-organisation-child disabled">
+							<div className="settings-organisation-child disabled"
+
+							>
 								<div
 									style={{
 										padding: "20px",
@@ -282,7 +284,9 @@ const Settings = () => {
 								</div>
 							</div>
 
-							<div className="settings-organisation-child disabled">
+							<div className="settings-organisation-child disabled"
+
+							>
 								<div
 									style={{
 										padding: "20px",

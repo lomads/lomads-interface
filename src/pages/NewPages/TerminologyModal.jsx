@@ -1,10 +1,19 @@
 import { AiOutlineClose } from "react-icons/ai";
 import IconButton from "UIpack/IconButton";
 import "./Settings.css";
-import OD from "../../assets/images/drawer-icons/OD.svg";
+import OD from "../../assets/images/drawer-icons/Frameterminology.svg";
 import { Button, Image, Input } from "@chakra-ui/react";
+import EditTerminologyModal from "./EditTerminologyModal";
+import { useState } from "react";
+import editIcon from 'assets/svg/editButton.svg';
 
 const TerminologyModal = ({ toggleModal, toggleTerminology }) => {
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  let toggleEditModal = () => {
+    setShowEditModal(!showEditModal);
+  };
+
   return (
     <>
       <div className="sidebarModal">
@@ -15,8 +24,17 @@ const TerminologyModal = ({ toggleModal, toggleTerminology }) => {
           }}
           className="overlay"
         ></div>
-        <div className="SideModal">
+        <div className="SideModalTerminology">
           <div className="closeButtonArea">
+            <button
+              style={{ marginRight: "22px" }}
+              onClick={() => toggleEditModal()}
+            >
+              <img
+                src={editIcon}
+                alt="edit-icon"
+              />
+            </button>
             <IconButton
               Icon={
                 <AiOutlineClose
@@ -56,28 +74,68 @@ const TerminologyModal = ({ toggleModal, toggleTerminology }) => {
           {/* //! BODY */}
           <div
             style={{
-              marginTop: "30px",
               padding: "0 50px",
             }}
           >
-            Content
+            <p className="terminology-label">
+              Labels used in all your organisation’s interface.
+            </p>
+
+            <div className="terminology-group1">
+              <div style={{ display: "flex" }}>
+                <div id="text-type">Projects:</div>
+                <p className="description">Pods</p>
+              </div>
+              <div style={{ display: "flex" }}>
+                <div id="text-type">Tasks:</div>
+                <p className="description">Bounties</p>
+              </div>
+
+              <hr
+                style={{
+                  height: "1px",
+                  width: 288,
+                  background: "#C94B32",
+                  margin: "33px auto 35px",
+                }}
+              />
+
+              <div style={{ display: "flex" }}>
+                <div id="text-type">Admin:</div>
+                <p className="description">Admin</p>
+              </div>
+              <div style={{ display: "flex" }}>
+                <div id="text-type">Core Contributor:</div>
+                <p className="description">Core Contributor</p>
+              </div>
+              <div style={{ display: "flex" }}>
+                <div id="text-type">Active Contributor:</div>
+                <p className="description">Active Contributor</p>
+              </div>
+              <div style={{ display: "flex" }}>
+                <div id="text-type">Contributor:</div>
+                <p className="description">Contributor</p>
+              </div>
+            </div>
           </div>
           {/* //! FOOTER */}
           <div className="button-section">
             <Button
-              variant="outline"
-              mr={3}
+              id="button-cancel"
               onClick={() => {
                 toggleModal();
                 toggleTerminology();
               }}
             >
-              Cancel
+              CANCEL
             </Button>
             <Button id="button-save">SAVE CHANGES</Button>
           </div>
         </div>
       </div>
+      {showEditModal && (
+        <EditTerminologyModal toggleEditModal={toggleEditModal} />
+      )}
     </>
   );
 };
