@@ -2,8 +2,11 @@ import { useState, useEffect } from "react";
 import { BigNumber, Contract } from "ethers";
 import MultiCall from "@indexed-finance/multicall";
 import SBT_ABI from "../../abis/SBT.json"
+import SBT_ABI_POLYGON from '../../abisPolygon/SBT.json';
+import { useWeb3Contract } from "react-moralis";
+import { SupportedChainId } from "constants/chains";
 
-export const useSBTStats = (library: any, account: string, refresh: number, contractAddr: string) => {
+export const useSBTStats = (library: any, account: string, refresh: number, contractAddr: string, chainId: number | undefined = SupportedChainId.GOERLI) => {
     console.log(account);
     console.log(contractAddr);
     const [stats, setStats] = useState({
@@ -45,7 +48,7 @@ export const useSBTStats = (library: any, account: string, refresh: number, cont
                         args: []
                     },
                 ];
-                const [, res] = await multicall.multiCall(SBT_ABI, calls);
+                const [, res] = await multicall.multiCall(chainId === SupportedChainId.POLYGON ? SBT_ABI_POLYGON : SBT_ABI, calls);
                 console.log("RES : ", res);
                 setStats({
                     needWhitelist: res[0],

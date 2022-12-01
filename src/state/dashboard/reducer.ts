@@ -3,8 +3,13 @@ import { DAOType } from "types/UItype";
 import {
 	getDao,
 	loadDao,
+	updateDao,
 	addDaoMember,
+	addDaoMemberList,
 	updateDaoMember,
+	manageDaoMember,
+	addDaoLinks,
+	updateDaoLinks,
 	createProject,
 	addProjectMember,
 	updateProjectMember,
@@ -13,18 +18,40 @@ import {
 	deleteProject,
 	updateProjectLink,
 	getProject,
-	addProjectLinks
+	addProjectLinks,
+	updateProject,
+	getCurrentUser,
+	updateCurrentUser,
+	createTask,
+	editTask,
+	draftTask,
+	getTask,
+	applyTask,
+	assignTask,
+	rejectTaskMember,
+	submitTaskAction,
+	rejectTask,
+	archiveTask,
+	deleteTask,
+	toggleXPPoints,
+	updateContract
 } from "./actions";
 import { createContract } from "state/contract/actions";
 import { get as _get, find as _find } from "lodash";
 
 export interface DashboardState {
-	// DAO: DAOType | null;
+	user: any;
 	DAO: any;
 	DAOLoading: boolean | null;
 	DAOList: Array<DAOType> | null;
+	updateDaoLoading: boolean | null;
 	addMemberLoading: boolean | null;
+	addMemberListLoading: boolean | null;
 	updateMemberLoading: boolean | null;
+	manageMemberLoading: boolean | null;
+	addDaoLinksLoading: boolean | null;
+	updateDaoLinksLoading: boolean | null;
+	rejectTaskMemberLoading: boolean | null;
 	Project: any;
 	ProjectLoading: boolean | null;
 	createProjectLoading: boolean | null;
@@ -34,14 +61,34 @@ export interface DashboardState {
 	archiveProjectLoading: boolean | null;
 	deleteProjectLoading: boolean | null;
 	addProjectLinksLoading: boolean | null;
+	updateProjectLoading: boolean | null;
+	createTaskLoading: boolean | null;
+	editTaskLoading: boolean | null;
+	Task: any;
+	TaskLoading: boolean | null;
+	draftTaskLoading: boolean | null;
+	applyTaskLoading: boolean | null;
+	assignTaskLoading: boolean | null;
+	submitTaskLoading: boolean | null;
+	rejectTaskLoading: boolean | null;
+	archiveTaskLoading: boolean | null;
+	deleteTaskLoading: boolean | null;
+	updateContractLoading: boolean | null;
 }
 
 const initialState: DashboardState = {
+	user: null,
 	DAO: null,
 	DAOLoading: false,
 	DAOList: null,
+	updateDaoLoading: null,
 	addMemberLoading: null,
+	addMemberListLoading: null,
 	updateMemberLoading: null,
+	manageMemberLoading: null,
+	addDaoLinksLoading: null,
+	updateDaoLinksLoading: null,
+	rejectTaskMemberLoading: null,
 	Project: null,
 	ProjectLoading: null,
 	createProjectLoading: null,
@@ -51,23 +98,57 @@ const initialState: DashboardState = {
 	archiveProjectLoading: null,
 	deleteProjectLoading: null,
 	addProjectLinksLoading: null,
+	updateProjectLoading: null,
+	createTaskLoading: null,
+	editTaskLoading: null,
+	Task: null,
+	TaskLoading: null,
+	draftTaskLoading: null,
+	applyTaskLoading: null,
+	assignTaskLoading: null,
+	submitTaskLoading: null,
+	rejectTaskLoading: null,
+	archiveTaskLoading: null,
+	deleteTaskLoading: null,
+	updateContractLoading: null
 };
 
 const dashboardSlice = createSlice({
 	name: "dashboard",
 	initialState,
 	reducers: {
+		setUser(state, action) {
+			state.user = action.payload
+		},
 		resetCreateDAOLoader(state) {
 			state.DAOLoading = null
+		},
+		resetUpdateDAOLoader(state) {
+			state.updateDaoLoading = null
 		},
 		resetAddMemberLoader(state) {
 			state.addMemberLoading = null
 		},
+		resetAddMemberListLoader(state) {
+			state.addMemberListLoading = null
+		},
 		resetUpdateMemberLoader(state) {
 			state.updateMemberLoading = null
 		},
+		resetManageMemberLoader(state) {
+			state.manageMemberLoading = null
+		},
+		resetAddDaoLinksLoader(state) {
+			state.addDaoLinksLoading = null
+		},
+		resetUpdateDaoLinksLoader(state) {
+			state.updateDaoLinksLoading = null
+		},
 		resetCreateProjectLoader(state) {
 			state.createProjectLoading = null
+		},
+		resetUpdateProjectLoader(state) {
+			state.updateProjectLoading = null
 		},
 		resetAddProjectMemberLoader(state) {
 			state.addProjectMemberLoading = null
@@ -87,11 +168,44 @@ const dashboardSlice = createSlice({
 		resetAddProjectLinksLoader(state) {
 			state.addProjectLinksLoading = null
 		},
+		resetCreateTaskLoader(state) {
+			state.createTaskLoading = null
+		},
+		resetEditTaskLoader(state) {
+			state.editTaskLoading = null
+		},
+		resetDraftTaskLoader(state) {
+			state.draftTaskLoading = null
+		},
+		resetSubmitTaskLoading(state) {
+			state.submitTaskLoading = null
+		},
+		resetApplyTaskLoader(state) {
+			state.applyTaskLoading = null
+		},
+		resetAssignTaskLoader(state) {
+			state.assignTaskLoading = null
+		},
+		resetRejectTaskMemberLoader(state) {
+			state.rejectTaskMemberLoading = null
+		},
+		resetRejectTaskLoader(state) {
+			state.rejectTaskLoading = null
+		},
+		resetArchiveTaskLoader(state) {
+			state.archiveTaskLoading = null
+		},
+		resetDeleteTaskLoader(state) {
+			state.deleteTaskLoading = null
+		},
 		setDAOList(state, action) {
 			state.DAOList = action.payload
 		},
 		setDAO(state, action) {
 			state.DAO = action.payload
+		},
+		setTask(state, action) {
+			state.Task = action.payload
 		},
 		updateSafeTransaction(state, action) {
 			console.log(action.payload)
@@ -121,6 +235,20 @@ const dashboardSlice = createSlice({
 		},
 	},
 	extraReducers: {
+		[`${updateCurrentUser.fulfilled}`]: (state, action) => {
+			state.user = action.payload;
+			state.DAO = {
+				...state.DAO,
+				members: state.DAO.members.map((m: any) => {
+					if (m.member._id === action.payload._id)
+						return { ...m, member: action.payload }
+					return m
+				})
+			}
+		},
+		[`${getCurrentUser.fulfilled}`]: (state, action) => {
+			state.user = action.payload;
+		},
 		[`${getDao.fulfilled}`]: (state, action) => {
 			state.DAOLoading = false;
 			state.DAO = action.payload
@@ -134,6 +262,15 @@ const dashboardSlice = createSlice({
 		[`${loadDao.pending}`]: (state) => {
 
 		},
+		// update dao details
+		[`${updateDao.fulfilled}`]: (state, action) => {
+			state.updateDaoLoading = false
+			state.DAO = action.payload
+		},
+		[`${updateDao.pending}`]: (state) => {
+			state.updateDaoLoading = true
+		},
+		// add dao members
 		[`${addDaoMember.fulfilled}`]: (state, action) => {
 			state.addMemberLoading = false
 			state.DAO = action.payload
@@ -141,6 +278,17 @@ const dashboardSlice = createSlice({
 		[`${addDaoMember.pending}`]: (state) => {
 			state.addMemberLoading = true
 		},
+
+		// add dao members list
+		[`${addDaoMemberList.fulfilled}`]: (state, action) => {
+			state.addMemberListLoading = false
+			state.DAO = action.payload
+		},
+		[`${addDaoMemberList.pending}`]: (state) => {
+			state.addMemberListLoading = true
+		},
+
+		// update dao members
 		[`${updateDaoMember.fulfilled}`]: (state, action) => {
 			state.updateMemberLoading = false
 			state.DAO = {
@@ -155,6 +303,33 @@ const dashboardSlice = createSlice({
 		[`${updateDaoMember.pending}`]: (state) => {
 			state.updateMemberLoading = true
 		},
+		// delete dao members
+		[`${manageDaoMember.fulfilled}`]: (state, action) => {
+			state.manageMemberLoading = false
+			state.DAO = action.payload
+		},
+		[`${manageDaoMember.pending}`]: (state) => {
+			state.manageMemberLoading = true
+		},
+		// add dao links
+		[`${addDaoLinks.fulfilled}`]: (state, action) => {
+			state.addDaoLinksLoading = false;
+			state.DAO = action.payload;
+		},
+		[`${addDaoLinks.pending}`]: (state) => {
+			state.addDaoLinksLoading = true;
+		},
+
+		// udpate dao links
+		[`${updateDaoLinks.fulfilled}`]: (state, action) => {
+			state.updateDaoLinksLoading = false;
+			state.DAO = action.payload;
+		},
+		[`${updateDaoLinks.pending}`]: (state) => {
+			state.updateDaoLinksLoading = true;
+		},
+
+		// create contract
 		[`${createContract.fulfilled}`]: (state, action) => {
 			state.DAO = action.payload
 		},
@@ -172,6 +347,15 @@ const dashboardSlice = createSlice({
 		},
 		[`${getProject.pending}`]: (state) => {
 			state.ProjectLoading = true;
+		},
+		// update project details
+		[`${updateProject.fulfilled}`]: (state, action) => {
+			state.updateProjectLoading = false;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
+		},
+		[`${updateProject.pending}`]: (state) => {
+			state.updateProjectLoading = true;
 		},
 		// add project members
 		[`${addProjectMember.fulfilled}`]: (state, action) => {
@@ -232,21 +416,151 @@ const dashboardSlice = createSlice({
 		[`${updateProjectLink.pending}`]: (state) => {
 
 		},
+		// task creation
+		[`${createTask.fulfilled}`]: (state, action) => {
+			state.createTaskLoading = false;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
+		},
+		[`${createTask.pending}`]: (state) => {
+			state.createTaskLoading = true;
+		},
+		// edit task
+		[`${editTask.fulfilled}`]: (state, action) => {
+			state.editTaskLoading = false;
+			state.Task = action.payload.task;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
+		},
+		[`${editTask.pending}`]: (state) => {
+			state.editTaskLoading = true;
+		},
+		// draft a task
+		[`${draftTask.fulfilled}`]: (state, action) => {
+			state.draftTaskLoading = false;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
+		},
+		[`${draftTask.pending}`]: (state) => {
+			state.draftTaskLoading = true;
+		},
+		// get task
+		[`${getTask.fulfilled}`]: (state, action) => {
+			state.TaskLoading = false;
+			state.Task = action.payload;
+		},
+		[`${getTask.pending}`]: (state) => {
+			state.TaskLoading = true;
+		},
+		// apply task
+		[`${applyTask.fulfilled}`]: (state, action) => {
+			state.applyTaskLoading = false;
+			state.Task = action.payload.task;
+			state.DAO = action.payload.dao;
+		},
+		[`${applyTask.pending}`]: (state) => {
+			state.applyTaskLoading = true;
+		},
+		// assign task
+		[`${assignTask.fulfilled}`]: (state, action) => {
+			state.assignTaskLoading = false;
+			state.Task = action.payload.task;
+			state.DAO = action.payload.dao;
+		},
+		[`${assignTask.pending}`]: (state) => {
+			state.assignTaskLoading = true;
+		},
+		// reject task member
+		[`${rejectTaskMember.fulfilled}`]: (state, action) => {
+			state.rejectTaskMemberLoading = false;
+			state.Task = action.payload.task;
+			state.DAO = action.payload.dao;
+		},
+		[`${rejectTaskMember.pending}`]: (state) => {
+			state.rejectTaskMemberLoading = true;
+		},
+
+		// submit task
+		[`${submitTaskAction.fulfilled}`]: (state, action) => {
+			state.submitTaskLoading = false;
+			state.Task = action.payload.task;
+			state.DAO = action.payload.dao;
+		},
+		[`${submitTaskAction.pending}`]: (state) => {
+			state.submitTaskLoading = true;
+		},
+		// reject task submission
+		[`${rejectTask.fulfilled}`]: (state, action) => {
+			state.rejectTaskLoading = false;
+			state.Task = action.payload.task;
+			state.DAO = action.payload.dao;
+		},
+		[`${rejectTask.pending}`]: (state) => {
+			state.rejectTaskLoading = true;
+		},
+		// archive task
+		[`${archiveTask.fulfilled}`]: (state, action) => {
+			state.archiveTaskLoading = false;
+			state.Task = action.payload.task;
+			state.DAO = action.payload.dao;
+			state.Project = action.payload.project;
+		},
+		[`${archiveTask.pending}`]: (state) => {
+			state.archiveTaskLoading = true;
+		},
+		// Delete task
+		[`${deleteTask.fulfilled}`]: (state, action) => {
+			state.deleteTaskLoading = false;
+			state.Task = action.payload.task;
+			state.DAO = action.payload.dao;
+		},
+		[`${deleteTask.pending}`]: (state) => {
+			state.deleteTaskLoading = true;
+		},
+		[`${toggleXPPoints.fulfilled}`]: (state, action) => {
+			state.DAO = action.payload;
+		},
+		[`${updateContract.fulfilled}`]: (state, action) => {
+			state.updateContractLoading = false
+			state.DAO = action.payload;
+		},
+		[`${updateContract.pending}`]: (state, action) => {
+			state.updateContractLoading = true
+		}
 	},
 });
 
 export const {
 	setDAOList,
 	setDAO,
+	setTask,
+	setUser,
 	resetCreateDAOLoader,
+	resetUpdateDAOLoader,
 	resetAddMemberLoader,
+	resetAddMemberListLoader,
+	resetUpdateMemberLoader,
+	resetManageMemberLoader,
+	resetAddDaoLinksLoader,
+	resetUpdateDaoLinksLoader,
 	resetCreateProjectLoader,
 	resetAddProjectMemberLoader,
 	resetUpdateProjectMemberLoader,
+	resetUpdateProjectLoader,
 	resetDeleteProjectMemberLoader,
 	resetArchiveProjectLoader,
 	resetDeleteProjectLoader,
 	resetAddProjectLinksLoader,
-	updateSafeTransaction
+	updateSafeTransaction,
+	resetCreateTaskLoader,
+	resetEditTaskLoader,
+	resetDraftTaskLoader,
+	resetApplyTaskLoader,
+	resetAssignTaskLoader,
+	resetRejectTaskMemberLoader,
+	resetSubmitTaskLoading,
+	resetRejectTaskLoader,
+	resetArchiveTaskLoader,
+	resetDeleteTaskLoader,
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

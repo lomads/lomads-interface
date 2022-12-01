@@ -5,6 +5,7 @@ import OD from "../../assets/images/drawer-icons/Frameterminology.svg";
 import { Button, Image, Input } from "@chakra-ui/react";
 import EditTerminologyModal from "./EditTerminologyModal";
 import { useState } from "react";
+import editIcon from 'assets/svg/editButton.svg';
 
 const TerminologyModal = ({ toggleModal, toggleTerminology }) => {
   const [showEditModal, setShowEditModal] = useState(false);
@@ -30,7 +31,7 @@ const TerminologyModal = ({ toggleModal, toggleTerminology }) => {
               onClick={() => toggleEditModal()}
             >
               <img
-                src="/static/media/editButton.9b815ae7429c6ecf7af2e6ec13499ecb.svg"
+                src={editIcon}
                 alt="edit-icon"
               />
             </button>

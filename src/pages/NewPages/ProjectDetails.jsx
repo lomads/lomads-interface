@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { get as _get, find as _find } from 'lodash';
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { get as _get, find as _find, uniqBy as _uniqBy } from 'lodash';
 import SideBar from "./DashBoard/SideBar";
 import SafeButton from "UIpack/SafeButton";
 import '../../styles/pages/ProjectDetails.css';
@@ -21,17 +21,28 @@ import { useAppSelector, useAppDispatch } from "state/hooks";
 import { SiNotion } from "react-icons/si";
 import { HiOutlinePlus } from "react-icons/hi";
 import { CgClose } from 'react-icons/cg'
-import { BsDiscord, BsGoogle, BsGithub, BsLink } from "react-icons/bs";
+import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe } from "react-icons/bs";
 import AddMember from "./DashBoard/MemberCard/AddMember";
 
-import { getProject, updateProjectLink, getDao, updateProjectMember, deleteProjectMember, archiveProject, deleteProject } from "state/dashboard/actions";
-import { resetUpdateProjectMemberLoader, resetDeleteProjectMemberLoader, resetArchiveProjectLoader, resetDeleteProjectLoader } from 'state/dashboard/reducer';
+import { getProject, updateProjectLink, getDao, updateProjectMember, deleteProjectMember, archiveProject, deleteProject, updateProject } from "state/dashboard/actions";
+import { resetUpdateProjectMemberLoader, resetDeleteProjectMemberLoader, resetArchiveProjectLoader, resetDeleteProjectLoader, resetUpdateProjectLoader } from 'state/dashboard/reducer';
 import AddLink from "./DashBoard/Project/AddLink";
 import Footer from "components/Footer";
 
 import { useWeb3React } from "@web3-react/core";
 import { guild, role, user, setProjectName } from "@guildxyz/sdk";
 import { getSigner } from 'utils'
+import useRole from "hooks/useRole";
+import { useSBTStats } from "hooks/SBT/sbt";
+import axiosHttp from '../../api';
+import { updateCurrentUser } from "state/dashboard/actions";
+
+import SimpleInputField from "UIpack/SimpleInputField";
+import Tasks from "./DashBoard/Tasks";
+import CreateTask from "./DashBoard/Task/CreateTask";
+
+import { Editor } from '@tinymce/tinymce-react';
+import SimpleLoadButton from "UIpack/SimpleLoadButton";
 
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
@@ -43,21 +54,33 @@ const ProjectDetails = () => {
     const [showAddMember, setShowAddMember] = useState(false);
     const [showList, setShowList] = useState(false);
     const [showAddLink, setShowAddLink] = useState(false);
-    const { DAO, Project, ProjectLoading, updateProjectMemberLoading, deleteProjectMemberLoading, archiveProjectLoading, deleteProjectLoading } = useAppSelector((state) => state.dashboard);
+    const [update, setUpdate] = useState(0);
+    const { DAO, Project, ProjectLoading, updateProjectMemberLoading, deleteProjectMemberLoading, archiveProjectLoading, deleteProjectLoading, updateProjectLoading } = useAppSelector((state) => state.dashboard);
     console.log("Project : ", Project)
     const daoName = _get(DAO, 'name', '').split(" ");
+    const { myRole, can } = useRole(DAO, account);
+    const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
+    console.log(contractName)
+    console.log("myRole", myRole)
+    const editorRef = useRef(null);
+
+    const [name, setName] = useState("");
+    const [description, setDescription] = useState("");
 
     const [lockedLinks, setLockedLinks] = useState([]);
     const [openLinks, setOpenLinks] = useState([]);
 
     const [extraMembers, setExtraMembers] = useState([]);
-    const [newAddress, setNewAddress] = useState('');
+    const [newAddress, setNewAddress] = useState([]);
 
     const [editMember, setEditMember] = useState(false);
+    const [editMode, setEditMode] = useState(false);
 
     const [deleteMembers, setDeleteMembers] = useState([]);
     const [deletePrompt, setDeletePrompt] = useState(false);
     const [closePrompt, setClosePrompt] = useState(false);
+
+    const [showCreateTask, setShowCreateTask] = useState(false);
 
     useEffect(() => {
         if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
@@ -75,6 +98,20 @@ const ProjectDetails = () => {
             setOpenLinks(_get(Project, 'links', []).filter(link => ((!link.accessControl) || (_get(link, 'accessControl', null) && _get(link, 'unlocked', []).indexOf(account.toLowerCase()) > -1))))
         }
     }, [Project]);
+
+    const canMyrole = useCallback((permission) => {
+        if (!Project) return false;
+        let creator = _get(Project, 'creator', '').toLowerCase() === account.toLowerCase();
+        let inProject = _find(_uniqBy(Project?.members, '_id'), m => m.wallet.toLowerCase() === account.toLowerCase())
+        let p = permission;
+        if (inProject)
+            p = `${permission}.inproject`
+        if (creator)
+            p = `${permission}.creator`
+        console.log(p)
+        return (can(myRole, p) || can(myRole, permission))
+    }, [Project])
+
 
     // Runs after adding new members in project
     useEffect(() => {
@@ -112,30 +149,46 @@ const ProjectDetails = () => {
         }
     }, [deleteProjectLoading]);
 
+    // runs after updating project name & description
     useEffect(() => {
-        if (newAddress !== '') {
-            const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === newAddress.toLowerCase());
-            setExtraMembers([...extraMembers, user.member._id])
+        if (updateProjectLoading === false) {
+            dispatch(resetUpdateProjectLoader());
+            setName('');
+            setDescription('');
+            setEditMode(false);
+        }
+    }, [updateProjectLoading]);
+
+    useEffect(() => {
+        console.log("new address : ", newAddress);
+        if (newAddress.length > 0) {
+            newAddress.map((value) => {
+                const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === value.toLowerCase());
+                setExtraMembers((oldValue) => [...oldValue, user.member._id]);
+            })
         }
     }, [DAO]);
 
     const handleParseUrl = (url) => {
         try {
             const link = new URL(url);
-            if (link.hostname === 'notion.com') {
+            if (link.hostname.indexOf('notion.') > -1) {
                 return <SiNotion color='#B12F15' size={20} />
             }
-            else if (link.hostname === 'discord.com') {
+            else if (link.hostname.indexOf('discord.') > -1) {
                 return <BsDiscord color='#B12F15' size={20} />
             }
-            else if (link.hostname === 'github.com') {
+            else if (link.hostname.indexOf('github.') > -1) {
                 return <BsGithub color='#B12F15' size={20} />
             }
-            else if (link.hostname === 'google.com') {
+            else if (link.hostname.indexOf('google.') > -1) {
                 return <BsGoogle color='#B12F15' size={20} />
             }
+            else if (link.hostname.indexOf('twitter.') > -1) {
+                return <BsTwitter color='#B12F15' size={20} />
+            }
             else {
-                return <BsLink color='#B12F15' size={20} />
+                return <span><BsGlobe size={20} /></span>
             }
         }
         catch (e) {
@@ -163,39 +216,94 @@ const ProjectDetails = () => {
         }))
     }
 
-    const unlock = async (link, update = true) => {
+    const unlock = useCallback(async (link, update = true) => {
         if (unlockLoading) return;
-        try {
-            setUnlockLoading(link.id)
-            const g = await guild.get(link.guildId)
-            let inviteLink = _get(_find(_get(g, 'guildPlatforms'), gp => gp.platformId == 1), 'invite', null)
-            if (!inviteLink) return setUnlockLoading(null);
+        setUnlockLoading(link.id)
+        console.log(_uniqBy(Project?.members, '_id'))
+        let memberExists = _find(_uniqBy(Project?.members, '_id'), member => member.wallet.toLowerCase() === account.toLowerCase())
+        if (!memberExists)
+            return setUnlockLoading(null);
+        if (link.link.indexOf('discord.') > -1) {
+            try {
+                const g = await guild.get(link.guildId)
+                let inviteLink = _get(_find(_get(g, 'guildPlatforms'), gp => gp.platformId == 1), 'invite', null)
+                if (!inviteLink) return setUnlockLoading(null);
 
-            let access = await guild.getUserAccess(link.guildId, account)
-            access = access?.some?.(({ access }) => access)
-            if (access) {
-                const membership = await guild.getUserMemberships(link.guildId, account);
-                if (!membership?.some?.(({ access }) => access)) {
-                    const success = await user.join(link.guildId, account, signerFunction)
-                    if (success) {
+                let access = await guild.getUserAccess(link.guildId, account)
+                access = access?.some?.(({ access }) => access)
+                if (access) {
+                    const membership = await guild.getUserMemberships(link.guildId, account);
+                    if (!membership?.some?.(({ access }) => access)) {
+                        const success = await user.join(link.guildId, account, signerFunction)
+                        if (success) {
+                            if (update)
+                                unlockLink(link)
+                            setUnlockLoading(null)
+                            window.open(inviteLink, '_blank')
+                        }
+                    } else {
                         if (update)
                             unlockLink(link)
                         setUnlockLoading(null)
                         window.open(inviteLink, '_blank')
                     }
                 } else {
-                    if (update)
-                        unlockLink(link)
                     setUnlockLoading(null)
-                    window.open(inviteLink, '_blank')
                 }
-            } else {
-                unlockLoading(null)
+            } catch (e) {
+                console.log(e)
+                setUnlockLoading(null)
             }
-        } catch (e) {
-            unlockLoading(null)
+        } else if (link.link.indexOf('notion.') > -1) {
+            if (_get(DAO, 'sbt.contactDetail', []).indexOf('email') === -1) {
+                return;
+            }
+            setUnlockLoading(link.id)
+            try {
+                axiosHttp.get(`/project/notion/space-admin-status?domain=${link.spaceDomain}`)
+                    .then(async res => {
+                        if (res.data) {
+                            console.log(res.data)
+                            console.log("BALANCEOF:", parseInt(balanceOf._hex, 16), contractName)
+                            if (contractName !== '' && parseInt(balanceOf._hex, 16) === 1) {
+                                if (parseInt(balanceOf._hex, 16) === 1) {
+                                    const metadata = await axiosHttp.get(`/metadata/${_get(DAO, 'sbt._id', '')}`)
+                                    console.log("metadata", metadata)
+                                    if (metadata && metadata.data) {
+                                        console.log(metadata.data)
+                                        const notion_email = _get(_find(metadata.data.attributes, attr => attr.trait_type === "Email"), 'value', null)
+                                        console.log(notion_email)
+                                        //const notion_email = 'rish6ix@gmail.com'
+                                        if (notion_email) {
+                                            const notionUser = await axiosHttp.get(`project/notion/notion-user?email=${notion_email}`).then(res => res.data)
+                                            console.log(notionUser)
+                                            if (_get(notionUser, 'value.value.id', null)) {
+                                                const notionUserId = _get(notionUser, 'value.value.id', null);
+                                                dispatch(updateCurrentUser({ notionUserId }))
+                                                axiosHttp.post(`project/notion/add-role`, { notionUserId, linkId: link.id, projectId, account })
+                                                    .then(res => {
+                                                        if (update)
+                                                            unlockLink(link)
+                                                        window.open(link.link, '_blank')
+                                                    })
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    })
+                    .catch(e => {
+                        setUnlockLoading(null)
+                        console.log(e)
+                    })
+                    .finally(() => setUnlockLoading(null))
+            } catch (e) {
+                console.log(e)
+                setUnlockLoading(null)
+            }
         }
-    }
+    }, [contractName, balanceOf, unlockLoading, Project, account])
 
     const handleAddMember = (user) => {
         if (extraMembers.includes(user.member._id)) {
@@ -216,7 +324,7 @@ const ProjectDetails = () => {
     }
 
     const handleUsers = (item, index) => {
-        if (Project.members.some(m => m.wallet === item.member.wallet) === false) {
+        if (_uniqBy(Project?.members, '_id').some(m => m.wallet === item.member.wallet) === false) {
             return (
                 <div className="member-li" key={index}>
                     <div className="member-img-name">
@@ -240,10 +348,7 @@ const ProjectDetails = () => {
 
     const handleRenderRole = (item) => {
         const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === item.wallet.toLowerCase());
-        if (user.role === 'CORE_CONTRIBUTOR' || user.role === 'MEMBER') {
-            return 'core contributor';
-        }
-        return user.role;
+        return _get(user, 'role', '').replaceAll('_', ' ').toLowerCase();
     }
 
     const handleSubmit = () => {
@@ -262,6 +367,20 @@ const ProjectDetails = () => {
         dispatch(deleteProject({ projectId, daoUrl: daoURL }));
     }
 
+    const handleEditMode = (e) => {
+        e.stopPropagation();
+        setName(Project.name);
+        setDescription(Project.description);
+        setEditMode(true);
+    }
+    const handleSaveChanges = (e) => {
+        dispatch(updateProject({ projectId, daoUrl: daoURL, payload: { name, description } }))
+    }
+
+    const toggleShowCreateTask = () => {
+        setShowCreateTask(!showCreateTask);
+    };
+
     return (
         <>
             {
@@ -278,9 +397,7 @@ const ProjectDetails = () => {
                     :
                     null
             }
-            <div
-                className='projectDetails-container'
-            >
+            <div className='projectDetails-container' onClick={() => setEditMode(false)}>
                 <div className="info">
                     {
                         showList
@@ -289,7 +406,7 @@ const ProjectDetails = () => {
                                 <div className='project-members'>
                                     <div className='project-members-header'>
                                         <p>Invite members</p>
-                                        <button onClick={toggleShowMember}>ADD NEW MEMBER</button>
+                                        {/* <button onClick={toggleShowMember}>ADD NEW MEMBER</button> */}
                                     </div>
                                     <div className="member-list">
                                         {
@@ -322,7 +439,7 @@ const ProjectDetails = () => {
                                         ?
                                         <AddMember
                                             toggleShowMember={toggleShowMember}
-                                            addToList={(address) => setNewAddress(address)}
+                                            addToList={(addressArr) => setNewAddress(addressArr)}
                                         />
                                         :
                                         null
@@ -356,7 +473,7 @@ const ProjectDetails = () => {
                                     </div>
                                     <div className="editMember-body">
                                         {
-                                            Project?.members.map((item, index) => (
+                                            _uniqBy(Project?.members, '_id').map((item, index) => (
                                                 <div className="editMember-row" key={index}>
                                                     <div>
                                                         <img src={memberIcon} alt="memberIcon" />
@@ -399,7 +516,7 @@ const ProjectDetails = () => {
                                         <CgClose size={20} color="#C94B32" />
                                     </button>
                                     <img src={iconSvg} alt="frame-icon" />
-                                    <h1>Close project name</h1>
+                                    <h1>Close {Project?.name}</h1>
                                     <p>This action <span>is irreversible</span> for now.<br />You will find closed projects in the archives.</p>
                                     <div>
                                         <button onClick={() => setClosePrompt(false)}>NO</button>
@@ -421,7 +538,7 @@ const ProjectDetails = () => {
                                         <CgClose size={20} color="#C94B32" />
                                     </button>
                                     <img src={iconSvg} alt="frame-icon" />
-                                    <h1>Delete project name</h1>
+                                    <h1>Delete {Project?.name}</h1>
                                     <p>This action <span>is irreversible</span>.</p>
                                     <div>
                                         <button onClick={() => setDeletePrompt(false)}>NO</button>
@@ -432,6 +549,9 @@ const ProjectDetails = () => {
                             :
                             null
                     }
+
+                    {/* create task side modal */}
+                    {showCreateTask && <CreateTask toggleShowCreateTask={toggleShowCreateTask} selectedProject={Project} />}
 
                     <div className="home-btn" onClick={() => navigate(-1)}>
                         <div className="invertedBox">
@@ -448,17 +568,36 @@ const ProjectDetails = () => {
                     <div className="projectDetails-top">
                         <div className="projectDetails-name">
                             <div>
-                                <h1>{Project?.name}</h1>
-                            </div>
-                            <div>
-                                {/* <button>
-                                    <img src={editToken} alt="hk-logo" />
-                                </button> */}
-                                <button onClick={() => setDeletePrompt(true)}>
-                                    <img src={deleteIcon} alt="hk-logo" />
-                                </button>
                                 {
-                                    Project?.archivedAt === null
+                                    editMode
+                                        ?
+                                        <SimpleInputField
+                                            className="inputField"
+                                            height={50}
+                                            width={180}
+                                            placeholder="Project name"
+                                            value={name}
+                                            onchange={(e) => { setName(e.target.value) }}
+                                            // onKeyDown={(e) => handleKeyDown(e)}
+                                            onClick={(e) => e.stopPropagation()}
+                                        />
+                                        :
+                                        <h1>{Project?.name}</h1>
+                                }
+
+                            </div>
+                            {
+                                <div>
+                                    {canMyrole('project.edit') &&
+                                        <button onClick={handleEditMode}>
+                                            <img src={editToken} alt="hk-logo" />
+                                        </button>
+                                    }
+                                    {canMyrole('project.delete') && <button onClick={() => setDeletePrompt(true)}>
+                                        <img src={deleteIcon} alt="hk-logo" />
+                                    </button>}
+                                    {canMyrole('project.archive') &&
+                                        Project?.archivedAt === null
                                         ?
                                         <SafeButton
                                             height={40}
@@ -474,11 +613,60 @@ const ProjectDetails = () => {
                                         />
                                         :
                                         null
-                                }
-                            </div>
+                                    }
+                                </div>
+                            }
                         </div>
                         <div className="projectDetails-description">
-                            <p>{Project?.description}</p>
+                            {
+                                editMode
+                                    ?
+                                    <>
+                                        <div style={{ width: '480px' }}>
+                                            <Editor
+                                                apiKey='p0turvzgbtf8rr24txekw7sgjye6xunw2near38hwoohdg13'
+                                                onInit={(evt, editor) => editorRef.current = editor}
+                                                init={{
+                                                    height: 400,
+                                                    // menubar: false,
+                                                    branding: false,
+                                                    default_link_target: "_blank",
+                                                    extended_valid_elements: "a[href|target=_blank]",
+                                                    link_assume_external_targets: true,
+                                                    plugins: [
+                                                        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                                                        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                                                        'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                                                    ],
+                                                    toolbar: 'undo redo | blocks | ' +
+                                                        'bold italic forecolor | alignleft aligncenter ' +
+                                                        'alignright alignjustify | bullist numlist outdent indent | ' +
+                                                        'removeformat | help',
+                                                    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+                                                }}
+                                                value={description}
+                                                // onKeyDown={(e) => handleKeyDown(e)}
+                                                onClick={(e) => e.stopPropagation()}
+                                                onEditorChange={(text) => { setDescription(text) }}
+                                            />
+                                        </div>
+                                        <div style={{ marginLeft: '1rem' }}>
+                                            <SimpleLoadButton
+                                                title="SAVE CHANGES"
+                                                height={40}
+                                                width={180}
+                                                fontsize={16}
+                                                fontweight={400}
+                                                onClick={handleSaveChanges}
+                                                bgColor={"#C94B32"}
+                                                condition={updateProjectLoading}
+                                            />
+                                        </div>
+                                    </>
+                                    :
+                                    <p dangerouslySetInnerHTML={{ __html: Project?.description }}></p>
+                            }
+
                         </div>
                     </div>
 
@@ -490,16 +678,18 @@ const ProjectDetails = () => {
                                     <div className="divider"></div>
                                     <div className="member-count">
                                         <img src={membersGroup} alt="membersGroup" />
-                                        <p>{Project?.members.length} members</p>
+                                        <p>{_uniqBy(Project?.members, '_id').length} members</p>
                                     </div>
                                     <div>
-                                        <button onClick={() => setEditMember(true)}>
-                                            <img src={editToken} alt="hk-logo" />
-                                        </button>
-                                        <button onClick={toggleMemberList}>
-                                            <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
-                                            MEMBER
-                                        </button>
+                                        {canMyrole('project.member.edit') &&
+                                            <button onClick={() => setEditMember(true)}>
+                                                <img src={editToken} alt="hk-logo" />
+                                            </button>}
+                                        {canMyrole('project.member.add') &&
+                                            <button onClick={toggleMemberList}>
+                                                <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
+                                                MEMBER
+                                            </button>}
                                     </div>
                                 </div>
                                 <div className="members-list">
@@ -513,7 +703,7 @@ const ProjectDetails = () => {
                                     </div>
                                     <div className="members-list-body">
                                         {
-                                            Project?.members.map((item, index) => (
+                                            _uniqBy(Project?.members, '_id').map((item, index) => (
                                                 <div className="members-row" key={index}>
                                                     <div className="members-row-name">
                                                         <div>
@@ -535,35 +725,71 @@ const ProjectDetails = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="projectDetails-right">
-                            <div className="add-link-section">
-                                <p className="link-header-text">Links</p>
-                                <div>
-                                    {/* <button>
+                        {canMyrole('project.links.view') &&
+                            <div className="projectDetails-right">
+                                <div className="add-link-section">
+                                    <p className="link-header-text">Links</p>
+                                    <div>
+                                        {/* <button>
                                         <img src={editPen} alt="hk-logo" />
                                     </button> */}
-                                    <button onClick={toggleShowLink}>
-                                        <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
-                                        LINK
-                                    </button>
+                                        {canMyrole('project.link.add') &&
+                                            <button onClick={toggleShowLink}>
+                                                <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
+                                                LINK
+                                            </button>}
 
+                                    </div>
                                 </div>
-                            </div>
-                            {
-                                lockedLinks.length > 0
-                                    ?
-                                    <div className="link-locked-section">
+                                {
+                                    lockedLinks.length > 0
+                                        ?
                                         <div>
-                                            <img src={lock} alt="lock-icon" />
-                                            <p>Links to unlock:</p>
+                                            <div className="link-unlocked-section">
+                                                <div className="locked">
+                                                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                                                        <img src={lock} alt="lock-icon" />
+                                                        <p style={{ marginLeft: "6px", fontStyle: "normal", fontSize: "16px", color: "#FFFFFF" }}>Links to unlock:</p>
+                                                    </div>
+                                                    <div className="container">
+                                                        {
+                                                            lockedLinks.map((item, index) => {
+                                                                return (
+                                                                    <div onClick={() => unlock(item)} className="link-button" style={{ position: 'relative' }} key={index}>
+                                                                        {handleParseUrl(item.link)}
+                                                                        <p>{item.title.length > 25 ? item.title.slice(0, 25) + "..." : item.title}</p>
+                                                                        {unlockLoading === item.id ?
+                                                                            <div style={{ position: 'absolute', top: 10, right: 20 }}>
+                                                                                <LeapFrog size={20} color="#B12F15" />
+                                                                            </div> : null
+                                                                        }
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        {
-                                            lockedLinks.map((item, index) => {
-                                                if (item.accessControl) {
+                                        :
+                                        null
+                                }
+
+                                {
+                                    openLinks.length > 0
+                                        ?
+                                        <div className="link-unlocked-section">
+                                            {
+                                                openLinks.map((item, index) => {
                                                     return (
-                                                        <div onClick={() => unlock(item)} className="link-button" style={{ position: 'relative' }} key={index}>
+                                                        <div onClick={() => {
+                                                            if (!item.accessControl)
+                                                                window.open(item.link, '_blank')
+                                                            else
+                                                                unlock(item, false)
+                                                        }} className="link-button" style={{ position: 'relative' }} key={index}>
                                                             {handleParseUrl(item.link)}
-                                                            <p style={{ flexGrow: 1 }}>{item.title}</p>
+                                                            <p>{item.title.length > 25 ? item.title.slice(0, 25) + "..." : item.title}</p>
                                                             {unlockLoading === item.id ?
                                                                 <div style={{ position: 'absolute', top: 10, right: 20 }}>
                                                                     <LeapFrog size={20} color="#B12F15" />
@@ -571,47 +797,20 @@ const ProjectDetails = () => {
                                                             }
                                                         </div>
                                                     )
-                                                }
-                                            })
-                                        }
-                                    </div>
-                                    :
-                                    null
-                            }
-
-                            {/* unlocked section */}
-
-                            {
-                                openLinks.length > 0
-                                    ?
-                                    <div className="link-unlocked-section">
-                                        {
-                                            openLinks.map((item, index) => {
-                                                return (
-                                                    <div onClick={() => {
-                                                        if (!item.accessControl)
-                                                            window.open(item.link, '_blank')
-                                                        else
-                                                            unlock(item, false)
-                                                    }} className="link-button" style={{ position: 'relative' }} key={index}>
-                                                        {handleParseUrl(item.link)}
-                                                        <p>{item.title.length > 8 ? item.title.slice(0, 8) + "..." : item.title}</p>
-                                                        {unlockLoading === item.id ?
-                                                            <div style={{ position: 'absolute', top: 10, right: 20 }}>
-                                                                <LeapFrog size={20} color="#B12F15" />
-                                                            </div> : null
-                                                        }
-                                                    </div>
-                                                )
-                                            })
-                                        }
-                                    </div>
-                                    :
-                                    null
-                            }
-                        </div>
+                                                })
+                                            }
+                                        </div>
+                                        :
+                                        null
+                                }
+                            </div>}
                     </div>
                 </div>
+
+                {/* Tasks section */}
+                {canMyrole('project.task.view') && <div style={{ width: '80%', marginTop: '20px' }}>
+                    <Tasks toggleShowCreateTask={toggleShowCreateTask} onlyProjects={true} />
+                </div>}
                 <div style={{ width: '80%' }}>
                     <Footer theme="dark" />
                 </div>

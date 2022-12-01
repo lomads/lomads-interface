@@ -7,29 +7,26 @@
   RINKEBY = 4,
   GOERLI = 5,
   KOVAN = 42,
-
   ARBITRUM_ONE = 42161,
   ARBITRUM_RINKEBY = 421611,
-
   OPTIMISM = 10,
   OPTIMISTIC_KOVAN = 69,
-
   POLYGON = 137,
   POLYGON_MUMBAI = 80001,
 }
 
 export const CHAIN_IDS_TO_NAMES = {
-  [SupportedChainId.MAINNET]: 'mainnet',
-  [SupportedChainId.ROPSTEN]: 'ropsten',
-  [SupportedChainId.RINKEBY]: 'rinkeby',
-  [SupportedChainId.GOERLI]: 'goerli',
-  [SupportedChainId.KOVAN]: 'kovan',
-  [SupportedChainId.POLYGON]: 'polygon',
-  [SupportedChainId.POLYGON_MUMBAI]: 'polygon_mumbai',
-  [SupportedChainId.ARBITRUM_ONE]: 'arbitrum',
-  [SupportedChainId.ARBITRUM_RINKEBY]: 'arbitrum_rinkeby',
-  [SupportedChainId.OPTIMISM]: 'optimism',
-  [SupportedChainId.OPTIMISTIC_KOVAN]: 'optimistic_kovan',
+  [`${SupportedChainId.MAINNET}`]: 'mainnet',
+  [`${SupportedChainId.ROPSTEN}`]: 'ropsten',
+  [`${SupportedChainId.RINKEBY}`]: 'rinkeby',
+  [`${SupportedChainId.GOERLI}`]: 'goerli',
+  [`${SupportedChainId.KOVAN}`]: 'kovan',
+  [`${SupportedChainId.POLYGON}`]: 'polygon',
+  [`${SupportedChainId.POLYGON_MUMBAI}`]: 'polygon mumbai',
+  [`${SupportedChainId.ARBITRUM_ONE}`]: 'arbitrum',
+  [`${SupportedChainId.ARBITRUM_RINKEBY}`]: 'arbitrum_rinkeby',
+  [`${SupportedChainId.OPTIMISM}`]: 'optimism',
+  [`${SupportedChainId.OPTIMISTIC_KOVAN}`]: 'optimistic_kovan',
 }
 
 /**
@@ -41,7 +38,7 @@ export const ALL_SUPPORTED_CHAIN_IDS: SupportedChainId[] = Object.values(Support
 
 export const SUPPORTED_CHAIN_IDS: SupportedChainId[] = [
   // SupportedChainId.MAINNET,
-  // SupportedChainId.POLYGON_MUMBAI,
+  SupportedChainId.POLYGON,
   SupportedChainId.GOERLI,
 ]
 
@@ -88,3 +85,16 @@ export const L2_CHAIN_IDS = [
 ] as const
 
 export type SupportedL2ChainId = typeof L2_CHAIN_IDS[number]
+
+export const GNOSIS_SAFE_BASE_URLS:any = {
+  [SupportedChainId.GOERLI]: 'https://safe-transaction.goerli.gnosis.io',
+  [SupportedChainId.POLYGON]: 'https://safe-transaction-polygon.safe.global'
+}
+
+export const CHAIN_GAS_STATION :any = {
+  [SupportedChainId.POLYGON]: {
+    url: 'https://gasstation-mainnet.matic.network/v2',
+    symbol: 'GWei'
+  },
+  [SupportedChainId.GOERLI]: ''
+}

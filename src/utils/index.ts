@@ -3,6 +3,10 @@ import { AddressZero } from '@ethersproject/constants'
 import { Contract } from '@ethersproject/contracts'
 import { JsonRpcProvider, JsonRpcSigner } from '@ethersproject/providers'
 import { FeeAmount } from '@uniswap/v3-sdk'
+import axios from 'axios'
+import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
+import { SupportedChainId } from "constants/chains";
+import { get as _get } from 'lodash'
 
 // returns the checksummed address if the address is valid, otherwise returns false
 export function isAddress(value: any): string | false {
@@ -23,7 +27,7 @@ export const isValidUrl = (urlString: string) => {
   return !!urlPattern.test(urlString);
 }
 
-export const formatAddress = (address: string ) => {
+export const formatAddress = (address: string) => {
   return address.slice(0, 8) + '...' + address.slice(-6);
 }
 
@@ -63,6 +67,31 @@ export function formattedFeeAmount(feeAmount: FeeAmount): number {
   return feeAmount / 10000
 }
 
-export function beautifyHexToken (token: string): string {
-  return  (token.slice(0, 6) + "..." + token.slice(-4))
+export function beautifyHexToken(token: string): string {
+  return (token.slice(0, 6) + "..." + token.slice(-4))
 }
+
+
+export async function getSafeTokens(chainId: number, safeAddress: string): Promise<any> {
+  if(safeAddress && chainId){
+    return axios
+    .get(
+        `${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`
+    )
+    .then((tokens) => {
+        let tkns = tokens.data;
+        tkns = tkns.map((tkn: any) => {
+            return {
+                ...tkn, 
+                tokenAddress: tkn.tokenAddress ? tkn.tokenAddress : chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS,
+                token: {
+                    ...(tkn.token ? { ...tkn.token } : {
+                        symbol: _get(tkn, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')
+                    })
+                }
+            }
+        })
+        return tokens.data
+    });
+  }
+};

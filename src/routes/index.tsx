@@ -9,6 +9,7 @@ import AddExistingSafe from "../pages/NewPages/AddExistingSafe";
 import AddNewSafe from "../pages/NewPages/AddNewSafe";
 import Dashboard from "../pages/NewPages/DashBoard/Dashboard";
 import Settings from "../pages/NewPages/Settings";
+import SettingsOlder from "../pages/NewPages/SettingsOlder";
 import DCAuth from '../pages/NewPages/DCAuth';
 import CreatePassToken from "../pages/NewPages/CreatePassToken";
 import MintPassToken from "../pages/NewPages/MintPassToken";
@@ -17,6 +18,10 @@ import CreateProject from "../pages/NewPages/CreateProject";
 import ProjectDetails from "../pages/NewPages/ProjectDetails";
 import OnlyWhitelisted from "pages/NewPages/OnlyWhitelisted";
 import ArchiveProjects from "../pages/NewPages/ArchiveProjects";
+import TaskDetails from "pages/NewPages/TaskDetails";
+import AllTasks from "pages/NewPages/AllTasks";
+import ArchiveTasks from "pages/NewPages/ArchiveTasks";
+import ArchiveProjectTasks from "pages/NewPages/ArchiveProjectTasks";
 
 export default [
     {
@@ -28,7 +33,7 @@ export default [
         component: LoginPage
     },
     {
-        path: '/namedao',
+        path: '/createorg',
         component: NameDAO
     },
     {
@@ -88,12 +93,28 @@ export default [
         component: ProjectDetails
     },
     {
-        path: '/settings',
+        path: '/:daoURL/task/:taskId',
+        component: TaskDetails
+    },
+    {
+        path: '/:daoURL/settings',
         component: Settings
     },
     {
         path: '/archives',
         component: ArchiveProjects
+    },
+    {
+        path: '/:daoURL/archiveTasks',
+        component: ArchiveTasks
+    },
+    {
+        path: '/:daoURL/archiveTasks/:projectId',
+        component: ArchiveProjectTasks
+    },
+    {
+        path: '/tasks',
+        component: AllTasks
     },
     {
         path: '/:daoURL',

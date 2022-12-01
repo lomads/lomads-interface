@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import _ from "lodash";
 import "../../styles/pages/AddNewSafe.css";
@@ -16,7 +16,9 @@ import {
 	updatesafeName,
 	updateThreshold,
 	updateTotalMembers,
-	resetCreateDAOLoader
+	resetCreateDAOLoader,
+	updateDaoName,
+	updateInvitedGang
 } from "state/flow/reducer";
 import daoMember2 from "../../assets/svg/daoMember2.svg";
 import { updateHolder } from "state/proposal/reducer";
@@ -27,11 +29,13 @@ import { ethers } from "ethers";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import { createDAO } from '../../state/flow/actions';
 import { loadDao } from '../../state/dashboard/actions';
+import { CHAIN_GAS_STATION, SupportedChainId } from "constants/chains";
+import axios from "axios";
 
 const AddNewSafe = () => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
-	const { provider, account } = useWeb3React();
+	const { provider, account, chainId } = useWeb3React();
 	const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
 	const [myowers, setMyOwers] = useState<InviteGangType[]>(invitedMembers);
 	const [showContinue, setshowContinue] = useState<boolean>(true);
@@ -45,24 +49,36 @@ const AddNewSafe = () => {
 	const { DAOList } = useAppSelector((state) => state.dashboard);
 	const flow = useAppSelector((state) => state.flow);
 	let Myvalue = useRef<Array<InviteGangType>>([]);
+	const [polygonGasEstimate, setPolygonGasEstimate] = useState<any>(null)
+	let retries = 0;
 
 	//let thresholdValue = useRef<string>("");
 	const [thresholdValue, setThresholdValue] = useState<number>(1);
 
 	useEffect(() => {
-		const { name, address } = invitedMembers[0];
-		const creator = { name: name, address: address };
-		const check = Myvalue.current.some(
-			(owner) => owner.address === creator.address
-		);
-		if (!check) {
-			Myvalue.current.push(creator);
+		if(invitedMembers && invitedMembers.length > 0) {
+			const { name, address } = invitedMembers[0];
+			const creator = { name: name, address: address };
+			const check = Myvalue.current.some(
+				(owner) => owner.address === creator.address
+			);
+			if (!check) {
+				Myvalue.current.push(creator);
+			}
 		}
 	}, [invitedMembers]);
 
 	useEffect(() => {
-		dispatch(loadDao({}))
-	}, [])
+		if(chainId && +chainId === SupportedChainId.POLYGON){
+			axios.get(CHAIN_GAS_STATION[`${chainId}`].url)
+			.then(res => setPolygonGasEstimate(res.data))
+		}
+	}, [chainId])
+
+	useEffect(() => {
+		if(chainId)
+			dispatch(loadDao({ chainId }))
+	}, [chainId])
 
 	const handleCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
 		// const index: number = parseInt(event.target.value);
@@ -84,7 +100,12 @@ const AddNewSafe = () => {
 	useEffect(() => {
 		if (createDAOLoading == false) {
 			setisLoading(false)
-			resetCreateDAOLoader()
+			dispatch(updateSafeAddress(''))
+			dispatch(updatesafeName(''))
+			dispatch(updateDaoName(''))
+			dispatch(updateInvitedGang([]))
+			dispatch(updateTotalMembers([]))
+			dispatch(resetCreateDAOLoader())
 			return navigate(`/success?dao=${flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, '')}`);
 		}
 		if (createDAOLoading == true)
@@ -102,6 +123,63 @@ const AddNewSafe = () => {
 			setErrors(terrors);
 		}
 	};
+
+
+	const runAfterCreation = async (addr:string, owners: any) => {
+		console.log("runAfterCreation", "safe addr", addr)
+		if(!addr) return;
+		dispatch(updateSafeAddress(addr as string));
+		const totalAddresses = [...invitedMembers, ...Myvalue.current];
+		const value = totalAddresses.reduce((final: any, current: any) => {
+			let object = final.find(
+				(item: any) => item.address === current.address
+			);
+			if (object) {
+				return final;
+			}
+			return final.concat([current]);
+		}, []);
+		dispatch(updateTotalMembers(value));
+		//setisLoading(false);
+		const payload: any = {
+			contractAddress: '',
+			chainId,
+			name: flow.daoName,
+			url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
+			image: null,
+			members: value.map((m: any) => {
+				return {
+					...m, creator: m.address.toLowerCase() === account?.toLowerCase()
+				}
+			}),
+			safe: {
+				name: safeName,
+				address: addr,
+				owners: owners,
+			}
+		}
+		dispatch(createDAO(payload))
+		setisLoading(false);
+	}
+
+
+	const checkNewSafe = (currentSafes:any, owners: any) => {
+		setTimeout(async () => {
+			const latestSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
+			console.log("latestSafes", latestSafes)
+			if(latestSafes.length === currentSafes.length && retries < 5) {
+				retries = retries + 1;
+				checkNewSafe(currentSafes, owners)
+			}
+			let newSafeAddr = _.find(latestSafes, ls => currentSafes.indexOf(ls) === -1)
+			console.log("FOUND NEW SAFE", newSafeAddr)
+			if(newSafeAddr)
+				runAfterCreation(newSafeAddr, owners)
+			else
+				console.log("checkNewSafe", "Could not find new safe")
+		}, 1000)
+	}
+
 
 	const deployNewSafe = async () => {
 		setisLoading(true);
@@ -126,6 +204,12 @@ const AddNewSafe = () => {
 			threshold,
 		};
 
+		let currentSafes: Array<string> = []
+		if(chainId === SupportedChainId.POLYGON)
+			currentSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
+		
+		console.log("currentSafes", currentSafes)
+
 		await safeFactory
 			.deploySafe({ safeAccountConfig })
 			.then(async (tx) => {
@@ -144,12 +228,13 @@ const AddNewSafe = () => {
 				//setisLoading(false);
 				const payload: any = {
 					contractAddress: '',
+					chainId,
 					name: flow.daoName,
 					url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
 					image: null,
 					members: value.map((m: any) => {
 						return {
-							...m, creator: m.address.toLowerCase() === account?.toLowerCase()
+							...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: owners.map((a:any) => a.toLowerCase()).indexOf(m.address.toLowerCase()) > -1  ? 'ADMIN' : m.role ? m.role : 'CONTRIBUTOR'
 						}
 					}),
 					safe: {
@@ -160,11 +245,18 @@ const AddNewSafe = () => {
 				}
 				dispatch(createDAO(payload))
 			})
-			.catch((err) => {
+			.catch(async (err) => {
 				console.log("An error occured while creating safe", err);
-				setisLoading(false);
+				if(chainId === SupportedChainId.POLYGON) {
+					checkNewSafe(currentSafes, owners)
+				} else {
+					setisLoading(false);
+				}
 			});
 	};
+
+	const deployNewSafeDelayed = useCallback(_.debounce(deployNewSafe, 1000), [deployNewSafe])
+
 	const AddOwners = () => {
 		return (
 			<>
@@ -320,18 +412,19 @@ const AddNewSafe = () => {
 					You’re about to create a new safe and will have to confirm a
 					transaction with your curentry connected wallet.
 					<span className="boldText">
-						The creation will cost approximately 0.01256 GOR.
+						{ chainId && +chainId === SupportedChainId.POLYGON && polygonGasEstimate ? `The creation will cost approximately ${polygonGasEstimate?.standard?.maxFee} GWei.` : `The creation will cost approximately 0.01256 GOR.` }
 					</span>
 					The exact amount will be determinated by your wallet.
 				</div>
 				<div className="createButton">
 					<SimpleLoadButton
 						title="CREATE SAFE"
-						bgColor="#C94B32"
+						bgColor={isLoading ? 'grey' : "#C94B32" }
 						height={50}
 						width={250}
 						fontsize={20}
-						onClick={deployNewSafe}
+						disabled={isLoading}
+						onClick={deployNewSafeDelayed}
 						condition={isLoading}
 					/>
 				</div>

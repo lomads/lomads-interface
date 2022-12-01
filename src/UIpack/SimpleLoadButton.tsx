@@ -6,7 +6,7 @@ const SimpleLoadButton = (props: LoadingButtonType) => {
   return (
     <>
       <button
-        {...props}
+        
         id="nextButtonToken"
         ref={props.ref}
         className={"button"}

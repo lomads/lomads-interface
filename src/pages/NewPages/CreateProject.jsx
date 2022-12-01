@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect, useCallback } from 'react';
+import { useState, useContext, useEffect, useCallback, useMemo, useRef } from 'react';
 import { find as _find, get as _get, debounce as _debounce } from 'lodash';
 import '../../styles/pages/CreateProject.css';
 import AddMember from "./DashBoard/MemberCard/AddMember";
@@ -8,10 +8,10 @@ import memberIcon from '../../assets/svg/memberIcon.svg';
 import notionIcon from '../../assets/svg/Notion-logo.svg';
 import { AiOutlinePlus } from "react-icons/ai";
 import { SiNotion } from "react-icons/si";
-import { BsDiscord, BsGoogle, BsGithub, BsLink } from "react-icons/bs";
+import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe } from "react-icons/bs";
 import { toast, ToastContainer } from "react-toastify";
 import { ProjectContext } from "context/ProjectContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import { createProject } from 'state/dashboard/actions'
 import { isValidUrl } from 'utils';
@@ -27,7 +27,10 @@ import { guild } from "@guildxyz/sdk";
 import { useWeb3React } from "@web3-react/core";
 import { getSigner } from 'utils'
 import AddDiscordLink from 'components/AddDiscordLink';
+import AddNotionLink from 'components/AddNotionLink';
 import { nanoid } from '@reduxjs/toolkit';
+
+import { Editor } from '@tinymce/tinymce-react';
 
 const CreateProject = () => {
 
@@ -35,6 +38,8 @@ const CreateProject = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const { DAO, createProjectLoading } = useAppSelector((state) => state.dashboard);
+
+    const editorRef = useRef(null);
 
     const [name, setName] = useState('');
     const [desc, setDesc] = useState('');
@@ -46,13 +51,21 @@ const CreateProject = () => {
     const [showMore, setShowMore] = useState(false);
     const [success, setSuccess] = useState(false);
     const [link, setLink] = useState('');
+    const [linkError, setLinkError] = useState(null);
+    const [roleName, setRoleName] = useState(null);
+    const [spaceDomain, setSpaceDomain] = useState(null);
     const [accessControl, setAccessControl] = useState(false);
+    const [accessControlError, setAccessControlError] = useState(null);
     const [title, setTitle] = useState('');
-    const [newAddress, setNewAddress] = useState('');
+    const [titleError, setTitleError] = useState(null);
+    const [newAddress, setNewAddress] = useState([]);
 
     const daoName = _get(DAO, 'name', '').split(" ");
 
-    useEffect(() => setMemberList(DAO.members), [DAO])
+    useEffect(() => {
+        if (DAO)
+            setMemberList(DAO.members)
+    }, [DAO])
 
     useEffect(() => {
         if (createProjectLoading === false) {
@@ -63,6 +76,19 @@ const CreateProject = () => {
             }, 2000);
         }
     }, [createProjectLoading])
+
+    useEffect(() => {
+        try {
+            if (link && link.length > 8 && link.indexOf('notion.') > -1) {
+                let lnk = new URL(link).pathname;
+                lnk = lnk.split('/')
+                if (lnk && lnk.length > 2)
+                    setSpaceDomain(lnk[1])
+            }
+        } catch (e) {
+            console.log(e)
+        }
+    }, [link])
 
     useEffect(() => {
         const memberList = DAO?.members;
@@ -79,29 +105,45 @@ const CreateProject = () => {
     }, []);
 
     useEffect(() => {
-        let accessControlElement = document.getElementById('accessControl');
-        if (link.length > 8 && accessControlElement) {
-            try {
-                const url = new URL(link);
-                if (url.hostname === 'discord.com' || url.hostname === 'discord.gg')
-                    accessControlElement.disabled = false;
-                else
-                    accessControlElement.disabled = true;
-            } catch (e) {
-                console.log(e)
-            }
+        if (link && link.indexOf('notion.') > -1 && _get(DAO, 'sbt.contactDetail', []).indexOf('email') === -1) {
+            setAccessControlError('Notion gated access not possible (No email in SBT)')
+        } else {
+            setAccessControlError(null)
         }
-    }, [link]);
+    }, [link, DAO])
+
+    // useEffect(() => {
+    //     let accessControlElement = document.getElementById('accessControl');
+    //     if (link && link.length > 8 && accessControlElement) {
+    //         try {
+    //             const url = new URL(link);
+    //             if (url.hostname.indexOf('discord.') > -1 || url.hostname.indexOf('notion.') > -1 )
+    //                 accessControlElement.disabled = false;
+    //             else
+    //                 accessControlElement.disabled = true;
+    //         } catch (e) {
+    //             console.log(e)
+    //         }
+    //     }
+    //     if((!link || (link && link.length <=8)) && accessControlElement) {
+    //         accessControlElement.disabled = false;
+    //     }
+    // }, [link]);
+
+    const accesscontrolDisabled = useMemo(() => {
+        return (!link || (link && link.length <= 8) || (link.indexOf('discord.') == -1 && link.indexOf('notion.') == -1))
+    }, [link])
 
     useEffect(() => {
-        if (newAddress !== '') {
-
-            const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === newAddress.toLowerCase());
-            let memberOb = {};
-            memberOb.name = user.member.name;
-            memberOb.address = user.member.wallet;
-            console.log("new member ob : ", memberOb);
-            setSelectedMembers([...selectedMembers, memberOb]);
+        console.log("new address : ", newAddress);
+        if (newAddress.length > 0) {
+            newAddress.map((value) => {
+                const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === value.toLowerCase());
+                let memberOb = {};
+                memberOb.name = user.member.name;
+                memberOb.address = user.member.wallet;
+                setSelectedMembers((oldValue) => [...oldValue, memberOb]);
+            })
         }
     }, [DAO]);
 
@@ -118,20 +160,24 @@ const CreateProject = () => {
     const handleParseUrl = (url) => {
         try {
             const link = new URL(url);
-            if (link.hostname === 'notion.com') {
-                return <span><SiNotion size={20} /></span>
+            console.log("lnk", link)
+            if (link.hostname.indexOf('notion.') > -1) {
+                return <SiNotion color='#B12F15' size={20} />
             }
-            else if (link.hostname === 'discord.com' || link.hostname === 'discord.gg') {
-                return <span><BsDiscord size={20} /></span>
+            else if (link.hostname.indexOf('discord.') > -1) {
+                return <BsDiscord color='#B12F15' size={20} />
             }
-            else if (link.hostname === 'github.com') {
-                return <span><BsGithub size={20} /></span>
+            else if (link.hostname.indexOf('github.') > -1) {
+                return <BsGithub color='#B12F15' size={20} />
             }
-            else if (link.hostname === 'google.com') {
-                return <span><BsGoogle size={20} /></span>
+            else if (link.hostname.indexOf('google.') > -1) {
+                return <BsGoogle color='#B12F15' size={20} />
+            }
+            else if (link.hostname.indexOf('twitter.') > -1) {
+                return <BsTwitter color='#B12F15' size={20} />
             }
             else {
-                return <span><BsLink size={20} /></span>
+                return <span><BsGlobe size={20} /></span>
             }
         }
         catch (e) {
@@ -141,21 +187,21 @@ const CreateProject = () => {
 
 
     const handleAddMember = (member) => {
-        let found = false;
-        for (let i = 0; i < selectedMembers.length; i++) {
-            if (selectedMembers[i].name === member.name) {
-                found = true;
-                break;
-            }
-        }
-        if (found) {
-            setSelectedMembers(selectedMembers.filter((item) => item.name !== member.name));
-        }
+        // let found = false;
+        // for (let i = 0; i < selectedMembers.length; i++) {
+        //     if (selectedMembers[i].name === member.name) {
+        //         found = true;
+        //         break;
+        //     }
+        // }
+        const memberExists = _find(selectedMembers, m => m.address.toLowerCase() === member.wallet.toLowerCase())
+        if (memberExists)
+            setSelectedMembers(prev => prev.filter((item) => item.address.toLowerCase() !== member.wallet.toLowerCase()));
         else {
             let memberOb = {};
             memberOb.name = member.name;
             memberOb.address = member.wallet;
-            setSelectedMembers([...selectedMembers, memberOb]);
+            setSelectedMembers(prev => [...prev, memberOb]);
         }
     }
 
@@ -164,34 +210,93 @@ const CreateProject = () => {
     }
 
 
-    const handleAddResource = async (guildId = undefined) => {
+    const handleAddResource = async (status = undefined) => {
         if (title === '') {
-            return toast.error("Please enter title");
+            setTitleError('Please enter a title')
+            return;
         }
         else if (link === '') {
-            return toast.error("Please enter link");
+            setLinkError("Please enter a link")
+            return;
         }
         else if (!isValidUrl(link)) {
-            return toast.error("Please enter a valid link");
+            setLinkError("Please enter a valid link")
+            return;
         }
+        // else if (!link.match(/^(http(s)?:\/\/)[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/)) {
+        //     return toast.error("Please enter a valid link");
+        // }
         else {
-            let resource = {};
-            resource.id = nanoid(16);
-            resource.title = title;
-            resource.link = link;
-            resource.accessControl = accessControl;
-            if (guildId)
-                resource.guildId = guildId;
-            setResourceList([...resourceList, resource]);
-            setTitle('');
-            setLink('');
-            setAccessControl(false);
+            let tempLink = link;
+            if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
+                tempLink = 'https://' + tempLink;
+            }
+            if (link.indexOf('discord.') > -1) {
+                let resource = {};
+                resource.id = nanoid(16);
+                resource.title = title;
+                resource.link = tempLink;
+                resource.provider = new URL(tempLink).hostname;
+                let dcserverid = undefined;
+                if (status)
+                    dcserverid = new URL(tempLink).pathname.split('/')[2]
+                resource.platformId = dcserverid;
+                resource.accessControl = accessControl;
+                if (status)
+                    resource.guildId = status;
+                setResourceList([...resourceList, resource]);
+                setAccessControl(false);
+                setTitle('');
+                setLink('');
+                setRoleName(null)
+                setSpaceDomain(null)
+            } else if (link.indexOf('notion.') > -1) {
+                if (status.status) {
+                    let resource = {};
+                    resource.id = nanoid(16);
+                    resource.title = title;
+                    resource.link = tempLink;
+                    resource.provider = new URL(tempLink).hostname;
+                    resource.spaceDomain = spaceDomain;
+                    resource.accessControl = accessControl;
+                    setResourceList([...resourceList, resource]);
+                    setAccessControl(false);
+                    setTitle('');
+                    setLink('');
+                    setRoleName(null)
+                    setSpaceDomain(null)
+                } else {
+                    setLinkError(status.message || 'Something went wrong.')
+                }
+            } else {
+                let resource = {};
+                resource.id = nanoid(16);
+                resource.title = title;
+                resource.link = tempLink;
+                resource.accessControl = false
+                setResourceList([...resourceList, resource]);
+                setAccessControl(false);
+                setTitle('');
+                setLink('');
+                setRoleName(null)
+                setSpaceDomain(null)
+            }
         }
     }
 
     const handleRemoveResource = (position) => {
         setResourceList(resourceList.filter((_, index) => index !== position));
     }
+
+    const linkHasDomain = useMemo(() => {
+        try {
+            if (link && link.indexOf('notion.') > -1)
+                return (new URL(link).pathname).split('/').length > 2
+            return false;
+        } catch (e) {
+            return false
+        }
+    }, [link])
 
     const handleCreateProject = () => {
         let project = {};
@@ -200,7 +305,15 @@ const CreateProject = () => {
         project.members = selectedMembers;
         project.links = resourceList;
         project.daoId = DAO?._id;
+        console.log(project)
         dispatch(createProject({ payload: project }))
+    }
+
+    const LinkBtn = (props) => {
+        if (link && link.indexOf('discord.') > -1)
+            return <AddDiscordLink {...props} />
+        if (link && link.indexOf('notion.') > -1)
+            return <AddNotionLink {...props} />
     }
 
     return (
@@ -221,7 +334,7 @@ const CreateProject = () => {
                 {showAddMember &&
                     <AddMember
                         toggleShowMember={toggleShowMember}
-                        addToList={(address) => setNewAddress(address)}
+                        addToList={(addressArr) => setNewAddress(addressArr)}
                     />
                 }
                 {
@@ -251,22 +364,40 @@ const CreateProject = () => {
                                                 onChange={(e) => setName(e.target.value)}
                                             />
                                         </div>
-                                        <div className='input-div'>
+
+                                        <div className='input-div' style={{ width: '480px' }}>
                                             <label>Short description</label>
-                                            <textarea
-                                                className='text-area'
-                                                rows="4"
-                                                cols="50"
-                                                placeholder='Enter short description'
-                                                name='desc'
+                                            <Editor
+                                                apiKey='p0turvzgbtf8rr24txekw7sgjye6xunw2near38hwoohdg13'
+                                                onInit={(evt, editor) => editorRef.current = editor}
+                                                init={{
+                                                    height: 300,
+                                                    branding: false,
+                                                    default_link_target: "_blank",
+                                                    extended_valid_elements: "a[href|target=_blank]",
+                                                    link_assume_external_targets: true,
+                                                    plugins: [
+                                                        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                                                        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                                                        'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                                                    ],
+                                                    toolbar: 'undo redo | blocks | ' +
+                                                        'bold italic forecolor | alignleft aligncenter ' +
+                                                        'alignright alignjustify | bullist numlist outdent indent | ' +
+                                                        'removeformat | help',
+                                                    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+                                                }}
                                                 value={desc}
-                                                onChange={(e) => setDesc(e.target.value)}
-                                            ></textarea>
+                                                onEditorChange={(text) => { setDesc(text) }}
+                                            />
                                         </div>
-                                        <button
-                                            style={name !== '' && desc !== '' ? { background: '#C94B32' } : { background: 'rgba(27, 43, 65, 0.2)' }}
-                                            onClick={handleNext}
-                                        >NEXT</button>
+                                        <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                                            <button
+                                                className='input-btn'
+                                                style={name !== '' && desc !== '' ? { background: '#C94B32' } : { background: 'rgba(27, 43, 65, 0.2)' }}
+                                                onClick={handleNext}
+                                            >NEXT</button>
+                                        </div>
                                     </div>
                                     :
                                     <>
@@ -274,7 +405,7 @@ const CreateProject = () => {
                                         <div className="projectName-container">
                                             <div className="projectName-box">
                                                 <p>{name}</p>
-                                                <span>{desc.length > 25 ? desc.substring(0, 25) + "..." : desc}</span>
+                                                <div dangerouslySetInnerHTML={{ __html: desc.length > 25 ? desc.substring(0, 25) + "..." : desc }}></div>
                                             </div>
                                             <div className="projectName-btn">
                                                 <button onClick={() => setNext(false)}>
@@ -305,7 +436,7 @@ const CreateProject = () => {
                                                                             <div className="member-address">
                                                                                 <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
                                                                                 {
-                                                                                    selectedMembers.some((m) => m.address === item.member.wallet) === false
+                                                                                    selectedMembers.some((m) => m.address.toLowerCase() === item.member.wallet.toLowerCase()) === false
                                                                                         ?
                                                                                         <input type="checkbox" onChange={() => handleAddMember(item.member)} />
                                                                                         :
@@ -383,7 +514,7 @@ const CreateProject = () => {
                                                     </button>
                                                     <button
                                                         style={{ background: '#C94B32', color: '#FFF' }}
-                                                        onClick={handleCreateProject}
+                                                        onClick={() => handleCreateProject()}
                                                     >
                                                         CREATE PROJECT
                                                     </button>
@@ -407,47 +538,84 @@ const CreateProject = () => {
                                                             </div>
                                                         </div>
                                                         <div className="resource-body">
-                                                            <input
-                                                                type="text"
-                                                                placeholder="Title"
-                                                                className="input1"
-                                                                name="title"
-                                                                value={title}
-                                                                onChange={(e) => setTitle(e.target.value)}
-                                                            />
-                                                            <input
-                                                                type="text"
-                                                                placeholder="Link"
-                                                                className="input2"
-                                                                name="link"
-                                                                value={link}
-                                                                onChange={(e) => setLink(e.target.value)}
-                                                            />
+                                                            <div>
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="Title"
+                                                                    className="input1"
+                                                                    name="title"
+                                                                    value={title}
+                                                                    onChange={(e) => { setTitle(e.target.value); setTitleError(null) }}
+                                                                />
+                                                                <span style={{ fontSize: '13px', color: '#C84A32' }}>{titleError}</span>
+                                                            </div>
+                                                            <div>
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="Link"
+                                                                    className="input2"
+                                                                    name="link"
+                                                                    value={link}
+                                                                    onChange={(e) => { setLink(e.target.value); setLinkError(null) }}
+                                                                />
+                                                                <span style={{ fontSize: '13px', color: '#C84A32' }}>{linkError}</span>
+                                                            </div>
                                                             {
-                                                                link && link.indexOf('discord.com') > -1
-                                                                    ?
-                                                                    <AddDiscordLink onGuildCreateSuccess={handleAddResource} title={title} link={link} accessControl={accessControl} />
+                                                                link && (link.indexOf('discord.') > -1 || link.indexOf('notion.') > -1) ?
+                                                                    <LinkBtn spaceDomain={spaceDomain} onNotionCheckStatus={handleAddResource} onGuildCreateSuccess={handleAddResource} title={title} link={link} roleName={roleName} accessControl={accessControl} />
                                                                     :
                                                                     <button
                                                                         style={link !== '' && title !== '' ? { background: '#C84A32' } : null}
-                                                                        onClick={handleAddResource}
+                                                                        onClick={() => handleAddResource()}
                                                                     >
                                                                         <AiOutlinePlus color="#FFF" size={25} />
                                                                     </button>
                                                             }
                                                         </div>
+                                                        {accessControl && link && link.indexOf('discord.') > -1 ? <div className='resource-body'>
+                                                            <div>
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="Role name"
+                                                                    className="input2"
+                                                                    style={{ marginTop: 16 }}
+                                                                    name="rolename"
+                                                                    value={roleName}
+                                                                    onChange={(e) => setRoleName(e.target.value)}
+                                                                />
+                                                            </div>
+                                                        </div> : null}
+                                                        {accessControl && link && link.indexOf('notion.') > -1 && !linkHasDomain ? <div className='resource-body'>
+                                                            <div>
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="Notion Domain"
+                                                                    className="input2"
+                                                                    style={{ marginTop: 16 }}
+                                                                    name="spaceDomain"
+                                                                    value={spaceDomain}
+                                                                    onChange={(e) => setSpaceDomain(e.target.value)}
+                                                                />
+                                                            </div>
+                                                        </div> : null}
                                                         {
-                                                            DAO?.sbt
-                                                                ?
-                                                                <div className='resource-footer'>
-                                                                    <input id="accessControl" type="checkbox" value={accessControl} disabled={true} onChange={e => setAccessControl(prev => !prev)} />
-                                                                    <div>
-                                                                        <p>ACCESS CONTROL</p>
-                                                                        <span>Currently available for discord only</span>
-                                                                    </div>
+                                                            accessControl && link && link.indexOf('notion.') > -1 &&
+                                                            <div style={{ fontSize: 14, fontStyle: 'italic', color: "rgba(118, 128, 141, 0.5)" }}>Invite <span style={{ color: "#76808D" }}>{process.env.REACT_APP_NOTION_ADMIN_EMAIL}</span> to be an Admin of your workspace</div>
+                                                        }
+                                                        {DAO?.sbt &&
+                                                            <div className='resource-footer'>
+                                                                {
+                                                                    (link && link.indexOf('notion.') > -1 && _get(DAO, 'sbt.contactDetail', '').indexOf('email') > -1) ||
+                                                                        (link && link.indexOf('discord.') > -1 && _get(DAO, 'sbt.contactDetail', '').indexOf('discord') > -1)
+                                                                        ?
+                                                                        <input id="accessControl" type="checkbox" checked={accessControl} value={accessControl} disabled={accessControlError || accesscontrolDisabled} onChange={e => setAccessControl(prev => !prev)} /> : null}
+                                                                <div>
+                                                                    <p>ACCESS CONTROL</p>
+                                                                    <span>Currently available for discord & notion only</span>
+                                                                    {accessControlError && <div><span style={{ color: 'red' }}>{accessControlError}</span></div>}
                                                                 </div>
-                                                                :
-                                                                null
+                                                            </div>
+
                                                         }
                                                     </div>
                                                     {
@@ -460,7 +628,7 @@ const CreateProject = () => {
                                                                             <div className="member-li" key={index}>
                                                                                 <div className="member-img-name">
                                                                                     {handleParseUrl(item.link)}
-                                                                                    <p>{item.title}</p>
+                                                                                    <p style={{ marginLeft: '5px' }}>{item.title}</p>
                                                                                 </div>
                                                                                 <div className="member-address">
                                                                                     <p>{item.link.length > 30 ? item.link.slice(0, 30) + "..." : item.link}</p>

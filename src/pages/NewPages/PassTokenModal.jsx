@@ -3,16 +3,57 @@ import IconButton from "UIpack/IconButton";
 import "./Settings.css";
 import PT from "../../assets/images/drawer-icons/PT.svg";
 import { Button, Image, Input } from "@chakra-ui/react";
-import { AddIcon } from "@chakra-ui/icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CreateMorePassTokenModal from "./CreateMorePassTokenModal";
+import { useAppDispatch, useAppSelector } from "state/hooks";
+import coin from '../../assets/svg/coin.svg';
+import { get as _get, find as _find } from 'lodash';
+import { updateContract } from "state/dashboard/actions";
+import { useWeb3React } from "@web3-react/core";
+import { SupportedChainId } from 'constants/chains'
+import GOERLI_LOGO from 'assets/images/goerli.png';
+import POLYGON_LOGO from 'assets/images/polygon.png';
+
 
 const PassTokenModal = ({ toggleModal, togglePassToken }) => {
+
+  const dispatch = useAppDispatch()
+  const { provider, account, chainId, connector } = useWeb3React();
   const [openCreatePassToken, setOpenCreatePassToken] = useState(false);
+
+  const { DAO, updateContractLoading } = useAppSelector((state) => state.dashboard);
+
+  const [dWhiteListed, setDWhiteListed] = useState(_get(DAO?.sbt, 'whitelisted', false));
+  const [contactDetail, setContactDetail] = useState(_get(DAO?.sbt, 'contactDetail', []));
 
   let toggleCreatePassTokenModal = () => {
     setOpenCreatePassToken(!openCreatePassToken);
   };
+
+  let changeContactDetails = (contact) => {
+    if (contactDetail.indexOf(contact) > -1) {
+      let newDetailsArray = contactDetail.filter(l => !(l === contact))
+      setContactDetail(newDetailsArray)
+    } else {
+      let newDetailsArray = [...contactDetail, contact]
+      setContactDetail(newDetailsArray)
+    }
+  }
+
+  const handleSave = () => {
+    dispatch(updateContract({
+      contractAddress: _get(DAO, 'sbt.address', ''),
+      payload: {
+        daoId: _get(DAO, '_id', ''),
+        whitelisted: dWhiteListed,
+        contactDetail
+      }
+    }))
+  }
+
+  // useEffect(()=>{
+  //   console.log(contactDetail)
+  // },[contactDetail])
 
   return (
     <>
@@ -52,7 +93,7 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
               style={{
                 display: "flex",
                 flexDirection: "column",
-                alignItems: "center",
+                alignItems: "center"
               }}
             >
               <Image
@@ -71,8 +112,17 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
               }}
             >
               {/* logo container  */}
-              <div id="pass-tokens-logo-container">
-                <p>hk</p>
+              <div id="pass-tokens-logo-container"
+                onClick={() => {
+                  return (
+                    chainId === SupportedChainId.POLYGON ?
+                      window.open(`https://polygonscan.com/address/${_get(DAO, 'sbt.address', '')}`, '_blank') :
+                      chainId === SupportedChainId.GOERLI ?
+                        window.open(`https://etherscan.io/address/${_get(DAO, 'sbt.address', '')}`, '_blank') :
+                        undefined)
+                }}
+              >
+                {DAO?.sbt?.image ? <img style={{ width: 24, height: 24 }} src={DAO?.sbt?.image} alt="asset" /> : <img src={coin} alt="asset" />}
               </div>
               <div
                 style={{
@@ -83,11 +133,19 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
                   justifyContent: "end",
                 }}
               >
-                <div id="token-title">Token name</div>
-                <div id="#number-100">x100</div>
+                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }} id="token-title">{_get(DAO, 'sbt.token', _get(DAO, 'sbt.name', ''))}
+                  <span onClick={() => {
+                    window.open(
+                      chainId === SupportedChainId.GOERLI ?
+                        `https://goerli.etherscan.io/address/${_get(DAO, 'sbt.address')}` :
+                        `https://polygonscan.com/address/${_get(DAO, 'sbt.address')}`
+                    )
+                  }}><img style={{ width: 20, height: 20, objectFit: 'contain', marginLeft: 16 }} src={chainId === SupportedChainId.GOERLI ? GOERLI_LOGO : POLYGON_LOGO} /></span>
+                </div>
+                {DAO?.sbt?.tokenSupply && <div id="#number-100">X{DAO?.sbt?.tokenSupply}</div>}
               </div>
             </div>
-            <div id="create-more-section">
+            {/* <div id="create-more-section">
               <Button
                 id="button-create-more"
                 onClick={toggleCreatePassTokenModal}
@@ -95,21 +153,21 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
                 <AddIcon id="add-icon" />
                 CREATE MORE
               </Button>
-              <div id="hr" />
-            </div>
+            </div> */}
+            <div id="hr" />
             <div
               id="membership-policy-section"
-              // style={{
-              //   display: "flex",
-              //   flexDirection: "column",
-              //   justifyContent: "start",
-              // }}
+            // style={{
+            //   display: "flex",
+            //   flexDirection: "column",
+            //   justifyContent: "start",
+            // }}
             >
               <div id="text-type">Membership policy:</div>
 
               <div style={{ display: "flex", alignItems: "center" }}>
                 <label class="switch">
-                  <input type="checkbox" />
+                  <input defaultChecked={dWhiteListed} onChange={(e, d) => setDWhiteListed(e.target.checked)} type="checkbox" />
                   <span class="slider round"></span>
                 </label>
                 <div id="switch-title">WHITELISTED</div>
@@ -129,7 +187,7 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
                 }}
               >
                 <label class="switch">
-                  <input type="checkbox" />
+                  <input defaultChecked={contactDetail.indexOf('email') > -1} onChange={(e, d) => changeContactDetails("email")} type="checkbox" />
                   <span class="slider check round"></span>
                 </label>
                 <div id="switch-title">Email</div>
@@ -147,7 +205,7 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
                 }}
               >
                 <label class="switch">
-                  <input type="checkbox" />
+                  <input defaultChecked={contactDetail.indexOf('discord') > -1} onChange={(e, d) => changeContactDetails("discord")} type="checkbox" />
                   <span class="slider check round"></span>
                 </label>
                 <div id="switch-title">Discord user-id</div>
@@ -165,7 +223,7 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
                 }}
               >
                 <label class="switch">
-                  <input type="checkbox" />
+                  <input defaultChecked={contactDetail.indexOf('telegram') > -1} onChange={(e, d) => changeContactDetails("telegram")} type="checkbox" />
                   <span class="slider check round"></span>
                 </label>
                 <div id="switch-title">Telegram user-id</div>
@@ -189,7 +247,7 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
               >
                 CANCEL
               </Button>
-              <Button id="button-save">SAVE CHANGES</Button>
+              <Button disabled={updateContractLoading == true} onClick={() => handleSave()} id="button-save">SAVE CHANGES</Button>
             </div>
           </div>
         </div>
@@ -197,6 +255,7 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
 
       {openCreatePassToken && (
         <CreateMorePassTokenModal
+          navFromSetting={false}
           toggleCreatePassTokenModal={toggleCreatePassTokenModal}
         />
       )}
