@@ -1204,6 +1204,7 @@ td {
 .terminology-edit .terminology-edit-content .dropdown-terminology button {
     width: 219px;
     height: 50px;
+    padding-left: 18px;
 
     /* Light1 */
 
