@@ -46,7 +46,6 @@ const CreateMorePassTokenModal = ({navFromSetting, toggleModal, toggleCreatePass
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                marginTop: "35%",
               }}
             >
               <Image src={PT} alt="configure pass token icon" />
