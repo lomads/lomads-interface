@@ -1,6 +1,7 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
 import { makeStyles } from '@mui/styles';
+import { Container } from '@mui/system';
 
 const useStyles = makeStyles((theme: any) => ({
   root: {
@@ -16,7 +17,9 @@ export default ({ children } : any) => {
   return (
       <Grid container component="main" className={classes.root}>
         <CssBaseline />
-        { children }
+        <Container maxWidth="lg">
+          { children }
+        </Container>
       </Grid>
   );
 }
