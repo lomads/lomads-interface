@@ -58,7 +58,7 @@ const MyProject = () => {
                     prj.notification = 1
                 return prj;
             })
-            setOtherProjects(_orderBy(otherProjects, p => moment(p.createdAt).unix(), 'desc'))
+            setOtherProjects(_orderBy(myProjects.concat(otherProjects), p => moment(p.createdAt).unix(), 'desc'))
         }
     }, [DAO, tab]);
 

@@ -169,7 +169,7 @@ const MintPassToken = () => {
                         const req = await APInewSBTtoken(metadataJSON);
                         if (req) {
                             dispatch(updateCurrentUser({ name: userName.value }))
-                            dispatch(addDaoMember({ url: DAO?.url, payload: { name: '', address: account } }))
+                            dispatch(addDaoMember({ url: DAO?.url, payload: { name: '', address: account, role: 'CONTRIBUTOR' } }))
                             dispatch(getDao(DAO.url));
                             setLoading(false);
                             //toast.success("SBT mint successfuly !");
