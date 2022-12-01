@@ -22,6 +22,7 @@ import TaskDetails from "pages/NewPages/TaskDetails";
 import AllTasks from "pages/NewPages/AllTasks";
 import ArchiveTasks from "pages/NewPages/ArchiveTasks";
 import ArchiveProjectTasks from "pages/NewPages/ArchiveProjectTasks";
+import AllProjectTasks from "pages/NewPages/AllProjectTasks";
 
 export default [
     {
@@ -113,8 +114,12 @@ export default [
         component: ArchiveProjectTasks
     },
     {
-        path: '/tasks',
+        path: '/:daoURL/tasks',
         component: AllTasks
+    },
+    {
+        path: '/:daoURL/tasks/:projectId',
+        component: AllProjectTasks
     },
     {
         path: '/:daoURL',
