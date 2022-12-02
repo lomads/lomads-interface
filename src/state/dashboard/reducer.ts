@@ -24,6 +24,8 @@ import {
 	updateCurrentUser,
 	createTask,
 	editTask,
+	editDraftTask,
+	convertDraftTask,
 	draftTask,
 	getTask,
 	applyTask,
@@ -64,6 +66,8 @@ export interface DashboardState {
 	updateProjectLoading: boolean | null;
 	createTaskLoading: boolean | null;
 	editTaskLoading: boolean | null;
+	editDraftTaskLoading: boolean | null;
+	convertDraftTaskLoading: boolean | null;
 	Task: any;
 	TaskLoading: boolean | null;
 	draftTaskLoading: boolean | null;
@@ -101,6 +105,8 @@ const initialState: DashboardState = {
 	updateProjectLoading: null,
 	createTaskLoading: null,
 	editTaskLoading: null,
+	editDraftTaskLoading: null,
+	convertDraftTaskLoading: null,
 	Task: null,
 	TaskLoading: null,
 	draftTaskLoading: null,
@@ -173,6 +179,12 @@ const dashboardSlice = createSlice({
 		},
 		resetEditTaskLoader(state) {
 			state.editTaskLoading = null
+		},
+		resetEditDraftTaskLoader(state) {
+			state.editDraftTaskLoading = null
+		},
+		resetConvertDraftTaskLoader(state) {
+			state.convertDraftTaskLoading = null
 		},
 		resetDraftTaskLoader(state) {
 			state.draftTaskLoading = null
@@ -435,6 +447,26 @@ const dashboardSlice = createSlice({
 		[`${editTask.pending}`]: (state) => {
 			state.editTaskLoading = true;
 		},
+		// edit draft task
+		[`${editDraftTask.fulfilled}`]: (state, action) => {
+			state.editDraftTaskLoading = false;
+			state.Task = action.payload.task;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
+		},
+		[`${editDraftTask.pending}`]: (state) => {
+			state.editDraftTaskLoading = true;
+		},
+		// convert draft task
+		[`${convertDraftTask.fulfilled}`]: (state, action) => {
+			state.convertDraftTaskLoading = false;
+			state.Task = action.payload.task;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
+		},
+		[`${convertDraftTask.pending}`]: (state) => {
+			state.convertDraftTaskLoading = true;
+		},
 		// draft a task
 		[`${draftTask.fulfilled}`]: (state, action) => {
 			state.draftTaskLoading = false;
@@ -554,6 +586,8 @@ export const {
 	updateSafeTransaction,
 	resetCreateTaskLoader,
 	resetEditTaskLoader,
+	resetEditDraftTaskLoader,
+	resetConvertDraftTaskLoader,
 	resetDraftTaskLoader,
 	resetApplyTaskLoader,
 	resetAssignTaskLoader,
