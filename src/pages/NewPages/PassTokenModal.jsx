@@ -242,9 +242,9 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
 							<br />
 							<br />
 							<Button
-							    variant="outline"
-								style={{ marginRight: 8 }}
 								id="button-cancel"
+								style={{ marginRight: 6 }}
+								variant="outline"
 								onClick={() => {
 									toggleModal();
 									togglePassToken();

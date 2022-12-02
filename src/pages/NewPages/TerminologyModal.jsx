@@ -122,6 +122,8 @@ const TerminologyModal = ({ toggleModal, toggleTerminology }) => {
           <div className="button-section">
             <Button
               id="button-cancel"
+              style={{ marginRight: 6 }}
+								variant="outline"
               onClick={() => {
                 toggleModal();
                 toggleTerminology();
