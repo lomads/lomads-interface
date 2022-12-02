@@ -551,7 +551,15 @@ body.active-modal {
     justify-content: flex-start;
     align-items: center;
     width: 146px;
+}
 
+.avatarAndName,
+#recipientAvatarAndName .nameText {
+    width: 60px;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .avatarAndName {
@@ -627,7 +635,6 @@ body.active-modal {
 }
 
 .SideModal {
-    overflow-y: scroll;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -639,25 +646,7 @@ body.active-modal {
     border-radius: 20px 0px 0px 20px;
     position: absolute;
     height: 100vh;
-    width: 575px;
-    right: 0;
-    top: 0;
-}
-
-.SideModalTerminology {
-    overflow-y: scroll;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    padding: 43px 23px;
-    gap: 35px;
-    background: #FFFFFF;
-    ;
-    border-radius: 20px 0px 0px 20px;
-    position: absolute;
-    height: 100vh;
-    width: 575px;
+    width: 40vw;
     right: 0;
     top: 0;
 }
@@ -820,7 +809,7 @@ body.active-modal {
 }
 
 #amountInputFields {
-    width: 104px;
+    /* width: 104px; */
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
@@ -987,7 +976,7 @@ body.active-modal {
     justify-content: center;
     align-items: stretch;
     gap: 20px;
-    /* margin-left: 5%; */
+    margin-left: 5%;
 }
 
 #transactionSendButton {
@@ -1169,13 +1158,13 @@ body.active-modal {
     max-height: 60%;
     width: 100%;
     overflow-y: auto;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     gap: 35px;
     align-items: center;
 }
-
 .multiSendDivider {
     /* border-bottom: 1px solid #76808D;
     border-right: 1px solid #76808D; */
@@ -1362,9 +1351,4 @@ body.active-modal {
     background: #C94B32;
     color: #FFF;
     width: 210px;
-}
-
-/* tinymce */
-.tox-editor-header {
-    display: none !important;
 }

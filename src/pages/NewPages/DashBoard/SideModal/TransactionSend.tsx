@@ -167,7 +167,8 @@ const TransactionSend = (props: IselectTransactionSend) => {
 							);
 						})}
 					</div>
-					<div id="addMember">
+				</div>
+				<div id="addMember">
 						<div>
 							<SafeButton
 								bgColor="#FFFFFF"
@@ -201,7 +202,6 @@ const TransactionSend = (props: IselectTransactionSend) => {
 							condition={props.isLoading}
 						/>
 					</div>
-				</div>
 			</div>
 			{props.addNewRecipient && (
 				<AddRecipient toggleAddNewRecipient={props.toggleAddNewRecipient} />
