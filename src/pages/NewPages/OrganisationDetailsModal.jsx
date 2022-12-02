@@ -240,6 +240,8 @@ const OrganisationDetails = ({
             {/* //! FOOTER */}
             <div className="button-section">
               <Button
+                variant="outline"
+                style={{ marginRight: 8 }}
                 id="button-cancel"
                 onClick={() => {
                   toggleModal();

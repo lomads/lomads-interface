@@ -646,7 +646,7 @@ body.active-modal {
     border-radius: 20px 0px 0px 20px;
     position: absolute;
     height: 100vh;
-    width: 40vw;
+    width: 575px;
     right: 0;
     top: 0;
 }
@@ -970,7 +970,7 @@ body.active-modal {
 }
 
 #recipientList {
-    width: 90%;
+    /* width: 90%; */
     display: flex;
     flex-direction: column;
     justify-content: center;
