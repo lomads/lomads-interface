@@ -550,16 +550,20 @@ body.active-modal {
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    width: 146px;
+    min-width: 45%;
 }
 
 .avatarAndName,
 #recipientAvatarAndName .nameText {
-    width: 60px;
     text-align: left;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+#recipientAvatarAndName.sendToken {
+    width: 145px;
+    min-width: 145px;
 }
 
 .avatarAndName {
@@ -577,6 +581,7 @@ body.active-modal {
     border: 1px solid;
     border-color: inherit;
 }
+
 
 .Joined {
     display: flex;

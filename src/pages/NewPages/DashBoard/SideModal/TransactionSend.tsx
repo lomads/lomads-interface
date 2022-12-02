@@ -96,7 +96,7 @@ const TransactionSend = (props: IselectTransactionSend) => {
 						{showInput.map((result: IsetRecipientType, index: number) => {
 							return (
 								<div id="assignAmount">
-									<div id="recipientAvatarAndName">
+									<div id="recipientAvatarAndName" className="sendToken">
 										<img src={daoMember2} alt={result.recipient} />
 										<p className="nameText">
 											{result.name.length < 1
