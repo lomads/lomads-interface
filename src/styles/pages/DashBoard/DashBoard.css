@@ -550,7 +550,7 @@ body.active-modal {
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    min-width: 45%;
+    width: 146px;
 
 }
 
@@ -639,7 +639,7 @@ body.active-modal {
     border-radius: 20px 0px 0px 20px;
     position: absolute;
     height: 100vh;
-    width: 40vw;
+    width: 575px;
     right: 0;
     top: 0;
 }
@@ -820,7 +820,7 @@ body.active-modal {
 }
 
 #amountInputFields {
-    width: 100%;
+    width: 104px;
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
@@ -987,7 +987,7 @@ body.active-modal {
     justify-content: center;
     align-items: stretch;
     gap: 20px;
-    margin-left: 5%;
+    /* margin-left: 5%; */
 }
 
 #transactionSendButton {
