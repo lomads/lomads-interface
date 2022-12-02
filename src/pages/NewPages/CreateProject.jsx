@@ -365,13 +365,16 @@ const CreateProject = () => {
                                             />
                                         </div>
 
-                                        <div className='input-div' style={{ width: '480px' }}>
+                                        <div className='input-div'>
                                             <label>Short description</label>
                                             <Editor
                                                 apiKey='p0turvzgbtf8rr24txekw7sgjye6xunw2near38hwoohdg13'
                                                 onInit={(evt, editor) => editorRef.current = editor}
                                                 init={{
-                                                    height: 300,
+                                                    height: 150,
+                                                    menubar: false,
+                                                    statusbar: false,
+                                                    toolbar: false,
                                                     branding: false,
                                                     default_link_target: "_blank",
                                                     extended_valid_elements: "a[href|target=_blank]",

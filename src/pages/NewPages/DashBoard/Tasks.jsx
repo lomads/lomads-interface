@@ -92,17 +92,17 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
             let manageTasks = _get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id));
             manageTasks = manageTasks.map(t => {
                 let tsk = { ...t, notification: 0 };
-                if(((t.contributionType === 'open' && !t.isSingleContributor) || t.contributionType === 'assign') && taskSubmissionCount(t) > 0 ) {
+                if (((t.contributionType === 'open' && !t.isSingleContributor) || t.contributionType === 'assign') && taskSubmissionCount(t) > 0) {
                     tsk['notification'] = 1
                 } else {
-                    if(taskApplicationCount(t) > 0) {
+                    if (taskApplicationCount(t) > 0) {
                         tsk['notification'] = 1
                     }
                 }
                 return tsk
             })
             setManageTasks(_orderBy(manageTasks, ['notification', i => moment(i.deadline).unix()], ['desc', 'desc']));
-            setDraftTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
+            setDraftTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null && task.creator === user._id));
             const otherTasks = _get(Project, 'tasks', []).filter(task => !_find(myTasks, t => t._id === task._id) && !task.deletedAt && !task.archivedAt && !task.draftedAt && !(task.creator === user._id || task.reviewer === user._id))
             setOtherTasks([..._orderBy(otherTasks, i => moment(i.deadline).unix(), 'desc'), ..._orderBy(myTasks.concat(manageTasks), i => moment(i.deadline).unix(), 'desc')]);
         }
@@ -116,17 +116,17 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
             let manageTasks = _get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id));
             manageTasks = manageTasks.map(t => {
                 let tsk = { ...t, notification: 0 };
-                if(((t.contributionType === 'open' && !t.isSingleContributor) || t.contributionType === 'assign') && taskSubmissionCount(t) > 0 ) {
+                if (((t.contributionType === 'open' && !t.isSingleContributor) || t.contributionType === 'assign') && taskSubmissionCount(t) > 0) {
                     tsk['notification'] = 1
                 } else {
-                    if(taskApplicationCount(t) > 0) {
+                    if (taskApplicationCount(t) > 0) {
                         tsk['notification'] = 1
                     }
                 }
                 return tsk
             })
             setManageTasks(_orderBy(manageTasks, ['notification', i => moment(i.deadline).unix()], ['desc', 'desc']));
-            setDraftTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
+            setDraftTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null && task.creator === user._id));
             const otherTasks = _get(DAO, 'tasks', []).filter(task => !_find(myTasks, t => t._id === task._id) && !task.deletedAt && !task.archivedAt && !task.draftedAt && !(task.creator === user._id || task.reviewer === user._id))
             setOtherTasks([..._orderBy(otherTasks, i => moment(i.deadline).unix(), 'desc'), ..._orderBy(myTasks.concat(manageTasks), i => moment(i.deadline).unix(), 'desc')]);
         }
@@ -226,7 +226,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                 </div>
                 <div className="tasks-buttons">
                     <div style={{ marginRight: '20px' }}>
-                        <button className='archive-btn' onClick={() => navigate('/tasks', { state: { activeTab: tab } })}>
+                        <button className='archive-btn' onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { activeTab: tab } }) : navigate(`/${DAO.url}/tasks`, { state: { activeTab: tab } }) }}>
                             <img src={expandIcon} alt="archive-icon" />
                         </button>
                     </div>
@@ -273,7 +273,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                         }
                         else {
                             return (
-                                <div className='all-tasks' onClick={() => navigate('/tasks', { state: { activeTab: tab } })}>
+                                <div className='all-tasks' onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { activeTab: tab } }) : navigate(`/${DAO.url}/tasks`, { state: { activeTab: tab } }) }}>
                                     <p>Show All</p>
                                 </div>
                             )
@@ -294,7 +294,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                         }
                         else {
                             return (
-                                <div className='all-tasks' onClick={() => navigate('/tasks', { state: { activeTab: tab } })}>
+                                <div className='all-tasks' onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { activeTab: tab } }) : navigate(`/${DAO.url}/tasks`, { state: { activeTab: tab } }) }}>
                                     <p>Show All</p>
                                 </div>
                             )
@@ -315,7 +315,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                         }
                         else {
                             return (
-                                <div className='all-tasks' onClick={() => navigate('/tasks', { state: { activeTab: tab } })}>
+                                <div className='all-tasks' onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { activeTab: tab } }) : navigate(`/${DAO.url}/tasks`, { state: { activeTab: tab } }) }}>
                                     <p>Show All</p>
                                 </div>
                             )
@@ -336,7 +336,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                         }
                         else {
                             return (
-                                <div className='all-tasks' onClick={() => navigate('/tasks', { state: { activeTab: tab } })}>
+                                <div className='all-tasks' onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { activeTab: tab } }) : navigate(`/${DAO.url}/tasks`, { state: { activeTab: tab } }) }}>
                                     <p>Show All</p>
                                 </div>
                             )

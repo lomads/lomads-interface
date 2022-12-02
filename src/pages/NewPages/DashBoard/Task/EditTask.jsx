@@ -236,8 +236,10 @@ const EditTask = ({ close, task, daoURL }) => {
                                                 apiKey='p0turvzgbtf8rr24txekw7sgjye6xunw2near38hwoohdg13'
                                                 onInit={(evt, editor) => editorRef.current = editor}
                                                 init={{
-                                                    height: 400,
-                                                    // menubar: false,
+                                                    height: 150,
+                                                    menubar: false,
+                                                    statusbar: false,
+                                                    toolbar: false,
                                                     branding: false,
                                                     default_link_target: "_blank",
                                                     extended_valid_elements: "a[href|target=_blank]",
@@ -346,7 +348,7 @@ const EditTask = ({ close, task, daoURL }) => {
                                         <div className='createTask-inputRow'>
                                             <span>Contribution</span>
                                             <div className='createTask-buttonRow'>
-                                                <button onClick={() => { setContributionType('assign'); setIsFilterRoles(false) }} className={contributionType === 'assign' ? 'active' : null} disabled style={{ cursor: 'not-allowed' }}>ASSIGN MEMBER</button>
+                                                <button onClick={() => { setContributionType('assign'); setIsFilterRoles(false); setValidRoles([]); setIsSingleContributor(false); }} className={contributionType === 'assign' ? 'active' : null} disabled style={{ cursor: 'not-allowed' }}>ASSIGN MEMBER</button>
                                                 <button onClick={() => { setContributionType('open'); setSelectedUser(null) }} className={contributionType === 'open' ? 'active' : null} disabled style={{ cursor: 'not-allowed' }}>OPEN</button>
                                             </div>
                                         </div>
@@ -359,11 +361,12 @@ const EditTask = ({ close, task, daoURL }) => {
                                                     name="member"
                                                     id="member"
                                                     className="tokenDropdown"
-                                                    style={{ width: '100%' }}
+                                                    style={{ width: '100%', cursor: 'not-allowed' }}
                                                     onChange={(e) => handleSetApplicant(e.target.value)}
                                                     disabled
                                                 >
-                                                    <option value={null}>{task.members[0].member.name && task.members[0].member.name !== "" ? `${task.members[0].member.name}  (${beautifyHexToken(task.members[0].member.wallet)})` : beautifyHexToken(task.members[0].member.wallet)}</option>
+
+                                                    <option value={null}>{_find(_get(task, 'members', []), m => m.status === 'approved').member.name && _find(_get(task, 'members', []), m => m.status === 'approved').member.name !== "" ? `${_find(_get(task, 'members', []), m => m.status === 'approved').member.name}  (${beautifyHexToken(_find(_get(task, 'members', []), m => m.status === 'approved').member.wallet)})` : beautifyHexToken(_find(_get(task, 'members', []), m => m.status === 'approved').member.wallet)}</option>
                                                     {/* {
                                                         eligibleContributors.map((item, index) => {
                                                             return (
@@ -380,26 +383,20 @@ const EditTask = ({ close, task, daoURL }) => {
                                             contributionType === 'open' &&
                                             <div className='contributor-section'>
                                                 <div className='contributor-check'>
-                                                    {
-                                                        isSingleContributor
-                                                            ?
-                                                            <input type="checkbox" onChange={(e) => setIsSingleContributor(!isSingleContributor)} checked disabled style={{ cursor: 'not-allowed' }} />
-                                                            :
-                                                            <input type="checkbox" onChange={(e) => setIsSingleContributor(!isSingleContributor)} disabled style={{ cursor: 'not-allowed' }} />
-                                                    }
+                                                    <label class="switch">
+                                                        <input disabled style={{ cursor: 'not-allowed' }} defaultChecked={isSingleContributor} onChange={(e) => setIsSingleContributor(!isSingleContributor)} type="checkbox" />
+                                                        <span class="slider check round"></span>
+                                                    </label>
                                                     <div>
                                                         <h1>SINGLE CONTRIBUTOR</h1>
                                                         <span>The reviewer will pick a contributor from the applicants (if unchecked, everyone can contribute)</span>
                                                     </div>
                                                 </div>
                                                 <div className='contributor-check'>
-                                                    {
-                                                        isFilterRoles
-                                                            ?
-                                                            <input type="checkbox" onChange={(e) => setIsFilterRoles(!isFilterRoles)} checked disabled style={{ cursor: 'not-allowed' }} />
-                                                            :
-                                                            <input type="checkbox" onChange={(e) => setIsFilterRoles(!isFilterRoles)} disabled style={{ cursor: 'not-allowed' }} />
-                                                    }
+                                                    <label class="switch">
+                                                        <input disabled style={{ cursor: 'not-allowed' }} defaultChecked={isFilterRoles} onChange={(e) => setIsFilterRoles(!isFilterRoles)} type="checkbox" />
+                                                        <span class="slider check round"></span>
+                                                    </label>
 
                                                     <div>
                                                         <h1>FILTER BY ROLES</h1>

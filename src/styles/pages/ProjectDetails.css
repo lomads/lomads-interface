@@ -438,6 +438,10 @@
     margin-top: 0.2rem;
 }
 
+.projectDetails-container .info .projectDetails-top .projectDetails-description .tinyMCE-textBody {
+    background-color: #B12F15 !important;
+}
+
 .projectDetails-container .info .projectDetails-top .projectDetails-description p {
     font-family: Inter;
     font-style: normal;

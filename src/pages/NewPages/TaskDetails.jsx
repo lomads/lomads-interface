@@ -45,6 +45,7 @@ import TaskReview from "./DashBoard/Task/TaskReview";
 import { CgClose } from 'react-icons/cg'
 import useRole from "hooks/useRole";
 import EditTask from "./DashBoard/Task/EditTask";
+import EditDraftTask from "./DashBoard/Task/EditDraftTask";
 
 const TaskDetails = () => {
     const dispatch = useAppDispatch();
@@ -63,6 +64,7 @@ const TaskDetails = () => {
     const [deletePrompt, setDeletePrompt] = useState(false);
     const [closePrompt, setClosePrompt] = useState(false);
     const [openEditTask, setOpenEditTask] = useState(false);
+    const [openEditDraftedTask, setOpenEditDraftedTask] = useState(false);
 
     useEffect(() => {
         if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
@@ -204,7 +206,7 @@ const TaskDetails = () => {
     }, [Task]);
 
     const assignedUser = useMemo(() => {
-        let user = _find(_get(Task, 'members', []), m => m.status === 'approved' || m.status === 'submission_accepted' )
+        let user = _find(_get(Task, 'members', []), m => m.status === 'approved' || m.status === 'submission_accepted')
         if (user)
             return user.member.name
     }, [Task]);
@@ -265,6 +267,11 @@ const TaskDetails = () => {
                         {/* show edit task side modal */}
                         {
                             openEditTask && <EditTask task={Task} close={() => setOpenEditTask(false)} daoURL />
+                        }
+
+                        {/* show edit drafted task side modal */}
+                        {
+                            openEditDraftedTask && <EditDraftTask task={Task} close={() => setOpenEditDraftedTask(false)} daoURL />
                         }
 
                         <div className="info">
@@ -546,7 +553,7 @@ const TaskDetails = () => {
                                                         ?
                                                         <>
                                                             {(amICreator || can(myRole, 'task.edit')) &&
-                                                                <button style={{ marginRight: '25px' }} onClick={() => setOpenEditTask(true)}>
+                                                                <button style={{ marginRight: '25px' }} onClick={() => { Task.draftedAt ? setOpenEditDraftedTask(true) : setOpenEditTask(true) }}>
                                                                     <img src={editToken} alt="hk-logo" />
                                                                 </button>
                                                             }
@@ -650,7 +657,7 @@ const TaskDetails = () => {
 
                                     {/* if task status is open then users can apply */}
                                     {
-                                        Task.taskStatus === 'open' && !Task.archivedAt && !Task.deletedAt 
+                                        Task.taskStatus === 'open' && !Task.archivedAt && !Task.deletedAt
                                             ?
                                             <>
                                                 {/* if user is the creator --- display applicants*/}
@@ -824,7 +831,7 @@ const TaskDetails = () => {
                                     }
 
                                     {
-                                        Task.taskStatus === 'submitted' && !Task.archivedAt && !Task.deletedAt 
+                                        Task.taskStatus === 'submitted' && !Task.archivedAt && !Task.deletedAt
                                             ?
                                             <>
                                                 {
@@ -869,7 +876,7 @@ const TaskDetails = () => {
                                     }
 
                                     {
-                                        Task.taskStatus === 'rejected' && !Task.archivedAt && !Task.deletedAt 
+                                        Task.taskStatus === 'rejected' && !Task.archivedAt && !Task.deletedAt
                                             ?
                                             <>
                                                 {

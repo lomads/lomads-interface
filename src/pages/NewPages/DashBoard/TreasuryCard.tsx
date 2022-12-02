@@ -554,7 +554,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 							<img style={{ width: 24, height: 24, objectFit: 'contain', marginLeft: 8 }} src={chainId === SupportedChainId.GOERLI ? GOERLI_LOGO : POLYGON_LOGO} />
 						</span>
 					</div>
-					<div className="treasuryDivider"></div>
+					{/* <div className="treasuryDivider"></div>
 					<div
 						id="treasuryCardTitle"
 						style={tab === 2 ? { opacity: '1' } : { opacity: '0.4' }}
@@ -563,7 +563,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 						}}
 					>
 						Recurring payments
-					</div>
+					</div> */}
 				</div>
 				<div className="headerDetails">
 					<div className="copyArea" onClick={() => setCopy(true)} onMouseOut={() => setCopy(false)}>

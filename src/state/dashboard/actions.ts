@@ -357,6 +357,26 @@ export const editTask = createAsyncThunk(
 	}
 )
 
+export const editDraftTask = createAsyncThunk(
+	'dao/editDraftTask',
+	async (params: any, thunkApi) => {
+		console.log("Task ID : ", params.taskId);
+		return axiosHttp.patch(`task/${params.taskId}/editDraft?daoUrl=${params.daoUrl}`, params.payload)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+)
+
+export const convertDraftTask = createAsyncThunk(
+	'dao/convertDraftTask',
+	async (params: any, thunkApi) => {
+		console.log("Task ID : ", params.taskId);
+		return axiosHttp.patch(`task/${params.taskId}/convertDraft?daoUrl=${params.daoUrl}`, params.payload)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+)
+
 
 export const updateContract = createAsyncThunk(
 	'contract/update',
