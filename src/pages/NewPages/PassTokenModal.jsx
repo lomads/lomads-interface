@@ -13,6 +13,7 @@ import { useWeb3React } from "@web3-react/core";
 import { SupportedChainId } from 'constants/chains'
 import GOERLI_LOGO from 'assets/images/goerli.png';
 import POLYGON_LOGO from 'assets/images/polygon.png';
+import { resetUpdateContractLoading } from "state/dashboard/reducer";
 
 
 const PassTokenModal = ({ toggleModal, togglePassToken }) => {
@@ -40,12 +41,13 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
 		}
 	}
 
-	// useEffect(() => {
-	// 	if (updateContractLoading === false) {
-	// 		toggleModal();
-	// 		togglePassToken();
-	// 	}
-	// }, [updateContractLoading])
+	useEffect(() => {
+		if (updateContractLoading === false) {
+			dispatch(resetUpdateContractLoading())
+			toggleModal();
+			togglePassToken();
+		}
+	}, [updateContractLoading])
 
 	const handleSave = () => {
 		dispatch(updateContract({

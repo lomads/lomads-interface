@@ -219,6 +219,9 @@ const dashboardSlice = createSlice({
 		setTask(state, action) {
 			state.Task = action.payload
 		},
+		resetUpdateContractLoading(state, action) {
+			state.updateContractLoading = null
+		},
 		updateSafeTransaction(state, action) {
 			console.log(action.payload)
 			const tx = _find(state.DAO.safe.transactions, t => t.safeTxHash === action.payload.safeTxHash);
@@ -596,5 +599,6 @@ export const {
 	resetRejectTaskLoader,
 	resetArchiveTaskLoader,
 	resetDeleteTaskLoader,
+	resetUpdateContractLoading
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;
