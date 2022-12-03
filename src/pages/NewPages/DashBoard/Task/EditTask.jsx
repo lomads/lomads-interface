@@ -241,6 +241,7 @@ const EditTask = ({ close, task, daoURL }) => {
                                                     statusbar: false,
                                                     toolbar: false,
                                                     branding: false,
+                                                    body_class: "mceBlackBody",
                                                     default_link_target: "_blank",
                                                     extended_valid_elements: "a[href|target=_blank]",
                                                     link_assume_external_targets: true,
@@ -249,10 +250,10 @@ const EditTask = ({ close, task, daoURL }) => {
                                                         'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
                                                         'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
                                                     ],
-                                                    toolbar: 'undo redo | blocks | ' +
-                                                        'bold italic forecolor | alignleft aligncenter ' +
-                                                        'alignright alignjustify | bullist numlist outdent indent | ' +
-                                                        'removeformat | help',
+                                                    // toolbar: 'undo redo | blocks | ' +
+                                                    //     'bold italic forecolor | alignleft aligncenter ' +
+                                                    //     'alignright alignjustify | bullist numlist outdent indent | ' +
+                                                    //     'removeformat | help',
                                                     content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
                                                 }}
                                                 value={description}
