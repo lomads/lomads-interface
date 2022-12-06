@@ -44,7 +44,7 @@ export default {
 		light: red[400]
 	},
 	text: {
-		primary: '#1B2B41;',
+		primary: '#76808D',
 		secondary: '#6f7894',
 		light1: '#fafbff',
 		light2: '#f3f5f9 ',

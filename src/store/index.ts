@@ -1,12 +1,11 @@
-import { createStore, applyMiddleware, compose } from 'redux';
+import { applyMiddleware, compose } from 'redux';
+import { legacy_createStore as createStore} from 'redux'
 import rootReducer from 'store/reducers';
 import createSagaMiddleware from 'redux-saga';
 import sessionSaga from 'store/sagas/session.saga';
-//import monitorReducerEnhancer from '@store/enhancers/monitorReducer';
 import { persistStore } from 'redux-persist';
-// import { defaultRestClient } from '../utils/restClient';
 
-export let persistor: any = null;
+//export let persistor: any = null;
 
 const configureStore = (initialState: any = {}) => {
   const middlewares = [];
@@ -19,8 +18,8 @@ const configureStore = (initialState: any = {}) => {
   const composedEnhancers: any = compose(...enhancers)
   const store = createStore(rootReducer, initialState, composedEnhancers);
   sagaMiddleware.run(sessionSaga);
-  persistor = persistStore(store);
-  return store;
+  const persistor = persistStore(store);
+  return { persistor, store };
 };
 
 export default configureStore

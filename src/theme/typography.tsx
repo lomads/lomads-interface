@@ -3,11 +3,11 @@ import palette from './palette';
 export default {
 	fontFamily: [
 		'Inter',
-		'Open Sans',
+		'sans-serif',
 	].join(','),
 	h1: {
 		color: palette.text.primary,
-		fontFamily: 'Inter, sans-serif',
+		fontFamily: "Insignia",
 		fontWeight: 500,
 		fontSize: '2.5rem',
 		letterSpacing: '-0.24px',
@@ -15,15 +15,14 @@ export default {
 	},
 	h2: {
 		color: palette.text.primary,
-		fontFamily: 'Inter, sans-serif',
-		fontWeight: 500,
-		fontSize: '2.2rem',
-		letterSpacing: '-0.24px',
-		lineHeight: '2.5rem'
+		fontFamily: "Insignia",
+		fontWeight: 400,
+		fontSize: '35px',
+		lineHeight: '35px'
 	},
 	h3: {
 		color: palette.text.primary,
-		fontFamily: 'Inter, sans-serif',
+		fontFamily: "Insignia",
 		fontWeight: 500,
 		fontSize: '1.75rem',
 		letterSpacing: '-0.06px',
@@ -31,7 +30,7 @@ export default {
 	},
 	h4: {
 		color: palette.text.primary,
-		fontFamily: 'Inter, sans-serif',
+		fontFamily: "Insignia",
 		fontWeight: 600,
 		fontSize: '1.3rem',
 		letterSpacing: '-0.06px',
@@ -40,7 +39,7 @@ export default {
 	},
 	h5: {
 		color: palette.text.primary,
-		fontFamily: 'Inter, sans-serif',
+		fontFamily: "Insignia",
 		fontWeight: 600,
 		fontSize: '1rem',
 		letterSpacing: '-0.05px',
@@ -59,10 +58,11 @@ export default {
 	subtitle1: {
 		color: palette.text.primary,
 		fontFamily: 'Inter, sans-serif',
-		fontWeight: 500,
-		fontSize: '1rem',
-		letterSpacing: '-0.05px',
-		lineHeight: '1.334rem'
+		fontStyle: 'normal',
+		fontWeight: 400,
+		fontSize: '22px',
+		lineHeight: '25px',
+		letterSpacing: '-0.011em'
 	},
 	subtitle2: {
 		color: palette.text.primary,

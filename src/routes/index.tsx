@@ -19,7 +19,7 @@ export default [
 		component: LoginPage
 	},
 	{
-		path: '/elements',
+		path: '/',
 		exact: true,
 		layout: RootLayout,
 		private: false,
