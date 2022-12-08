@@ -20,7 +20,7 @@ export default ({ required, fullWidth, label, ...props }: any) => {
     const classes = useStyles();
     return (
         <FormControl fullWidth={fullWidth}>
-            <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
+			<Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between" style={{ marginBottom: '10px' }}>
                 <FormLabel error={props.error} component="legend">{ label }</FormLabel>
                 { required && <Chip className={classes.chip} label="Required" size="small" /> }
             </Box>
