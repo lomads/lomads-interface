@@ -2,7 +2,7 @@
 import { LandingLayout, RootLayout } from 'layouts';
 import LoginPage from 'views/Login';
 import ElementsPage from 'views/Elements';
-
+import CreateOrganization from 'views/Create-Organization';
 export default [
 	// {
 	// 	path: '/',
@@ -25,4 +25,11 @@ export default [
 		private: false,
 		component: ElementsPage
 	},
+	{
+		path:'/create-organization',
+		exact: true,
+		layout: LandingLayout,
+		private: false,
+		component: CreateOrganization
+	}
 ];

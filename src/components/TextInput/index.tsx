@@ -24,7 +24,11 @@ export default ({ required, fullWidth, label, ...props }: any) => {
                 <FormLabel error={props.error} component="legend">{ label }</FormLabel>
                 { required && <Chip className={classes.chip} label="Required" size="small" /> }
             </Box>
-            <TextField { ...props }/>
+            <TextField { ...props }
+				inputProps={{
+					style: { cursor: props.disabled === true ? 'no-drop' : '' },
+				}}
+			/>
         </FormControl>
     )
 }
