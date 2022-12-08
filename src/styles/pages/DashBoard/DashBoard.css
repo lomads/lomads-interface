@@ -1170,6 +1170,7 @@ body.active-modal {
     gap: 35px;
     align-items: center;
 }
+
 .multiSendDivider {
     /* border-bottom: 1px solid #76808D;
     border-right: 1px solid #76808D; */
@@ -1357,3 +1358,80 @@ body.active-modal {
     color: #FFF;
     width: 210px;
 }
+
+
+.checkbox {
+    height: 30px;
+    width: 30px;
+    position: relative;
+    display: inline-block;
+}
+
+/* .checkbox input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+} */
+
+.checkbox .inner-check {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #F0F0F0;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 10px;
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+}
+
+.checkbox .inner-check:before {
+    position: absolute;
+    content: "";
+    color: #FFFFFF;
+    height: 12px;
+    width: 12px;
+    top: 50%;
+    right: 50%;
+    transform: translate(50%, -50%);
+    background-color: #FFF;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.checkbox input:checked+.inner-check:before {
+    height: 24px;
+    width: 24px;
+    background-color: #C94B32;
+    content: url(../../../assets/images/drawer-icons/ico-hidden.svg);
+}
+
+.checkbox input:checked+.inner-check.check:before {
+    height: 24px;
+    width: 24px;
+    background-color: #C94B32;
+    content: url(../../../assets/images/drawer-icons/ico-check.svg);
+}
+
+/* 
+input:checked+.inner-check:before {
+    -webkit-transform: translateX(35px);
+    -ms-transform: translateX(35px);
+    transform: translateX(35px);
+    background-color: #C94B32;
+    content: url(../../../assets/images/drawer-icons/ico-hidden.svg);
+}
+
+input:checked+.inner-check.check:before {
+    -webkit-transform: translateX(35px);
+    -ms-transform: translateX(35px);
+    transform: translateX(35px);
+    background-color: #C94B32;
+    content: url(../../../assets/images/drawer-icons/ico-check.svg);
+} */

@@ -557,7 +557,7 @@ const EditTask = ({ close, task, daoURL }) => {
                                             SAVE AS DRAFT
                                         </button> */}
                                         <SimpleLoadButton
-                                            title="EDIT"
+                                            title="SAVE"
                                             height={40}
                                             width={180}
                                             fontsize={20}
