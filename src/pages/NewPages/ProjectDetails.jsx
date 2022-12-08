@@ -225,31 +225,36 @@ const ProjectDetails = () => {
             return setUnlockLoading(null);
         if (link.link.indexOf('discord.') > -1) {
             try {
-                const g = await guild.get(link.guildId)
-                let inviteLink = _get(_find(_get(g, 'guildPlatforms'), gp => gp.platformId == 1), 'invite', null)
-                if (!inviteLink) return setUnlockLoading(null);
-
-                let access = await guild.getUserAccess(link.guildId, account)
-                access = access?.some?.(({ access }) => access)
-                if (access) {
-                    const membership = await guild.getUserMemberships(link.guildId, account);
-                    if (!membership?.some?.(({ access }) => access)) {
-                        const success = await user.join(link.guildId, account, signerFunction)
-                        if (success) {
-                            if (update)
-                                unlockLink(link)
-                            setUnlockLoading(null)
-                            window.open(inviteLink, '_blank')
-                        }
-                    } else {
-                        if (update)
-                            unlockLink(link)
-                        setUnlockLoading(null)
-                        window.open(inviteLink, '_blank')
+                if (contractName !== '' && parseInt(balanceOf._hex, 16) === 1) {
+                    if (parseInt(balanceOf._hex, 16) === 1) {
+                        
                     }
-                } else {
-                    setUnlockLoading(null)
                 }
+                // const g = await guild.get(link.guildId)
+                // let inviteLink = _get(_find(_get(g, 'guildPlatforms'), gp => gp.platformId == 1), 'invite', null)
+                // if (!inviteLink) return setUnlockLoading(null);
+
+                // let access = await guild.getUserAccess(link.guildId, account)
+                // access = access?.some?.(({ access }) => access)
+                // if (access) {
+                //     const membership = await guild.getUserMemberships(link.guildId, account);
+                //     if (!membership?.some?.(({ access }) => access)) {
+                //         const success = await user.join(link.guildId, account, signerFunction)
+                //         if (success) {
+                //             if (update)
+                //                 unlockLink(link)
+                //             setUnlockLoading(null)
+                //             window.open(inviteLink, '_blank')
+                //         }
+                //     } else {
+                //         if (update)
+                //             unlockLink(link)
+                //         setUnlockLoading(null)
+                //         window.open(inviteLink, '_blank')
+                //     }
+                // } else {
+                //     setUnlockLoading(null)
+                // }
             } catch (e) {
                 console.log(e)
                 setUnlockLoading(null)
