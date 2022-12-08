@@ -160,6 +160,26 @@
     flex-direction: column;
 }
 
+.createProject-container .createProject-body .projectName-container .projectName-box .name-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.createProject-container .createProject-body .projectName-container .projectName-box .name-btn button {
+    background: #FFFFFF;
+    /* Color-drop */
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    width: 120px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #C94B32;
+}
+
 .createProject-container .createProject-body .projectName-container .projectName-box p {
     font-style: normal;
     font-weight: 400;
@@ -170,15 +190,16 @@
     margin-bottom: 0.5rem;
 }
 
-.createProject-container .createProject-body .projectName-container .projectName-box div p {
-    font-style: normal;
+.createProject-container .createProject-body .projectName-container .projectName-box span {
+    font-style: italic;
     font-weight: 400;
     font-size: 14px;
-    line-height: 16px;
-    /* identical to box height, or 114% */
+    line-height: 18px;
+    /* or 129% */
+    letter-spacing: -0.011em;
 
-    /* DARK */
-    color: #1B2B41;
+    /* Grey */
+    color: #76808D;
 }
 
 .createProject-container .createProject-body .projectName-container .projectName-btn {

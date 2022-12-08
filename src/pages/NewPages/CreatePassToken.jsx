@@ -360,7 +360,7 @@ const CreatePassToken = () => {
                                                     <ReactS3Uploader
                                                         droppedfiles={droppedfiles}
                                                         getSignedUrl={getSignedUploadUrl}
-                                                        accept="image/*"
+                                                        accept="image/png,image/jpeg,image/jpg"
                                                         className={{ display: 'none' }}
                                                         onProgress={onUploadProgress}
                                                         onError={onUploadError}

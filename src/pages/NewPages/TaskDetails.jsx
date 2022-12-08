@@ -13,6 +13,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { IoIosArrowBack } from 'react-icons/io'
 import { GoKebabVertical } from 'react-icons/go'
 import { SiNotion } from "react-icons/si";
+import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe } from "react-icons/bs";
 import lomadsfulllogo from "../../assets/svg/lomadsfulllogo.svg";
 
 import editToken from '../../assets/svg/editToken.svg';
@@ -227,6 +228,34 @@ const TaskDetails = () => {
 
     const handleDeleteTask = () => {
         dispatch(deleteTask({ taskId, daoUrl: daoURL }));
+    }
+
+    const handleParseUrl = (url) => {
+        try {
+            const link = new URL(url);
+            console.log("lnk", link)
+            if (link.hostname.indexOf('notion.') > -1) {
+                return <SiNotion color='#B12F15' size={20} style={{ marginRight: '5px' }} />
+            }
+            else if (link.hostname.indexOf('discord.') > -1) {
+                return <BsDiscord color='#B12F15' size={20} style={{ marginRight: '5px' }} />
+            }
+            else if (link.hostname.indexOf('github.') > -1) {
+                return <BsGithub color='#B12F15' size={20} style={{ marginRight: '5px' }} />
+            }
+            else if (link.hostname.indexOf('google.') > -1) {
+                return <BsGoogle color='#B12F15' size={20} style={{ marginRight: '5px' }} />
+            }
+            else if (link.hostname.indexOf('twitter.') > -1) {
+                return <BsTwitter color='#B12F15' size={20} style={{ marginRight: '5px' }} />
+            }
+            else {
+                return <span><BsGlobe size={20} style={{ marginRight: '5px' }} /></span>
+            }
+        }
+        catch (e) {
+            console.error(e);
+        }
     }
 
     return (
@@ -598,7 +627,8 @@ const TaskDetails = () => {
                                                 Task.discussionChannel && Task.discussionChannel !== ''
                                                     ?
                                                     <button className="other-btn" onClick={() => window.open(Task.discussionChannel, '_blank', 'noopener,noreferrer')}>
-                                                        <SiNotion color="#B12F15" size={20} style={{ marginRight: '5px' }} />
+                                                        {/* <SiNotion color="#B12F15" size={20} style={{ marginRight: '5px' }} /> */}
+                                                        {handleParseUrl(Task.discussionChannel)}
                                                         CHAT
                                                     </button>
                                                     :
