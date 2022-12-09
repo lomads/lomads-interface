@@ -3,6 +3,9 @@ import { LandingLayout, RootLayout } from 'layouts';
 import LoginPage from 'views/Login';
 import ElementsPage from 'views/Elements';
 import CreateOrganization from 'views/Create-Organization';
+import InviteGang from 'views/Invite-Gang';
+import StartSafe from 'views/Start-Safe';
+import CreateSafe from 'views/Create-Safe';
 export default [
 	// {
 	// 	path: '/',
@@ -31,5 +34,26 @@ export default [
 		layout: LandingLayout,
 		private: false,
 		component: CreateOrganization
+	},
+	{
+		path:'/invitegang',
+		exact: true,
+		layout: LandingLayout,
+		private: false,
+		component: InviteGang
+	},
+	{
+		path: '/startsafe',
+		exact: true,
+		layout: LandingLayout,
+		private: false,
+		component: StartSafe
+	},
+	{
+		path: '/newsafe',
+		exact: true,
+		layout: LandingLayout,
+		private: false,
+		component: CreateSafe
 	}
 ];

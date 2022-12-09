@@ -1,9 +1,9 @@
 
-import { throttle as _throttle, debounce as _debounce, get as _get } from 'lodash'
 import { Container, Grid, Typography, Box, Paper,} from "@mui/material"
 import { makeStyles } from '@mui/styles';
 import TextInput from 'components/TextInput';
 import Button from 'components/Button';
+import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
@@ -37,6 +37,11 @@ const useStyles = makeStyles((theme: any) => ({
 
 export default () => {
 	const classes = useStyles();
+	const navigate = useNavigate();
+
+	const goToInviteGang = () => {
+		navigate('/invitegang');
+	}
 
 	return (
 		<>
@@ -60,7 +65,7 @@ export default () => {
 						>
 						</TextInput>
 					</Box>
-					<Button variant='contained' color='primary' className={classes.buttonStyle}>
+					<Button variant='contained' color='primary' className={classes.buttonStyle} onClick={goToInviteGang}>
 						Create Public Address
 					</Button>
 				</Grid>
