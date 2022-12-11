@@ -6,7 +6,6 @@ import "./ProjectResources.css";
 import OD from "../../../../assets/images/drawer-icons-project/keyResults.svg";
 
 import { Button, Image, Input } from "@chakra-ui/react";
-import { AddIcon } from "@chakra-ui/icons";
 
 const KeyResults = ({ toggleModal, toggleKeyResults }) => {
   return (

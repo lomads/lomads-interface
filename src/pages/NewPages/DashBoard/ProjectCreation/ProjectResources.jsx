@@ -8,7 +8,6 @@ import AddButton from "../../../../assets/images/drawer-icons-project/ADD.svg";
 import NotionLogo from "../../../../assets/images/drawer-icons-project/notion-logo.svg";
 
 import { Button, Image, Input } from "@chakra-ui/react";
-import { AddIcon } from "@chakra-ui/icons";
 
 const ProjectResources = ({ toggleModal, toggleProjectResources }) => {
   return (

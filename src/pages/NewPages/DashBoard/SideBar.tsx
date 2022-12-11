@@ -2,26 +2,41 @@ import React, { useState } from "react";
 import { get as _get } from 'lodash'
 import "../../../styles/pages/DashBoard/DashBoard.css";
 import plus from "../../../assets/svg/plus.svg";
-import { useAppSelector } from "state/hooks";
+import { useAppSelector, useAppDispatch } from "state/hooks";
 import { useNavigate } from "react-router-dom";
+import { setDAO } from "state/dashboard/reducer";
+import { getDao } from "state/dashboard/actions";
 
 const SideBar = (props: any) => {
 	const navigate = useNavigate();
-	const { DAOList } = useAppSelector((state) => state.dashboard);
-	const name = props.name.split(" ");
+	const dispatch = useAppDispatch()
+	const { DAOList, DAO } = useAppSelector((state) => state.dashboard);
+	const name = props.name ? props.name.split(" ") : 'Sample Dao';
+
+	const navigateTo = (url:string|undefined) => {
+		if(!url) return;
+		if(DAO && DAO.url === url) {
+			dispatch(getDao(url))
+		} else {
+			dispatch(setDAO(null))
+			navigate(`/${url}`);
+		}
+	}
+
 	const SideBarStrip = () => {
 		return (
 			<>
 				<div className="sideBarStrip">
 					{
 						DAOList && DAOList.map(dao => {
-							const daoName = _get(dao, 'name', '').split(" ");
+							console.log("const daoName", dao)
+							const daoName = _get(dao, 'name', '') ? _get(dao, 'name', '').split(" ") : '';
 							return (
 								<div className="sideBarStripItem">
 									<div
 										className="stripInvertedBoxOutline"
 										onClick={() => {
-											navigate(`/${dao.url}`);
+											navigateTo(dao?.url)
 										}}
 									>
 										<div className="navbarText" style={{ color: '#FFF' }}>
@@ -39,14 +54,14 @@ const SideBar = (props: any) => {
 						<div
 							className="stripInvertedBoxOutline"
 							onClick={() => {
-								navigate("/namedao");
+								navigate("/createorg");
 							}}
 						>
 							<div className="navbarText">
 								<img src={plus} alt="add" />
 							</div>
 						</div>
-						<div id="createADAOText">Create a DAO</div>
+						<div id="createADAOText">Create</div>
 					</div>
 				</div>
 			</>

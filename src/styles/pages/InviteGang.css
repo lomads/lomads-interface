@@ -4,7 +4,144 @@
     align-items: center;
     justify-content: center;
     height: 100vh;
+    position: relative;
 }
+
+.membersModal {
+    width: 768px;
+    height: 768px;
+    background-color: white;
+    position: absolute;
+    top: 50%;
+    right: 50%;
+    transform: translate(50%, -50%);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 65px 65px 0 65px;
+}
+
+.membersModal .membersModal-header {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.membersModal .membersModal-header h1 {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 33px;
+    color: #C94B32;
+    margin-top: 20px;
+}
+
+.membersModal .membersModal-body {
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    overflow-y: scroll;
+    margin-bottom: 100px;
+}
+
+.membersModal .membersModal-body .membersModal-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.membersModal .membersModal-body .membersModal-row .row-overcast {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.5);
+    position: absolute;
+    z-index: 998;
+}
+
+.membersModal .membersModal-body .membersModal-row div {
+    display: flex;
+    align-items: center;
+}
+
+.membersModal .membersModal-body .membersModal-row div img {
+    margin-right: 10px;
+}
+
+.membersModal .membersModal-body .membersModal-row div p {
+    width: 135px;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    color: #76808D;
+}
+
+.membersModal .membersModal-body .membersModal-row span {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    color: #76808D;
+    margin: 0 20px;
+}
+
+.membersModal .membersModal-body .membersModal-row button {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
+    border-radius: 3px;
+    z-index: 999;
+}
+
+.membersModal .membersModal-body .membersModal-row button.selected {
+    background: #B12F15;
+}
+
+
+.membersModal .membersModal-footer {
+    width: 768px;
+    height: 100px;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.membersModal .membersModal-footer button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    height: 40px;
+}
+
+.membersModal .membersModal-footer .cancel-btn {
+    background: #FFFFFF;
+    border: 1px solid #C94B32;
+    color: #C94B32;
+    width: 130px;
+    margin-right: 20px;
+}
+
+.membersModal .membersModal-footer .confirm-btn {
+    background: #C94B32;
+    color: #FFF;
+    width: 210px;
+}
+
+
 
 .centerInputCard {
     display: flex;
@@ -15,7 +152,6 @@
     box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
     border-radius: 5px;
     max-height: fit-content;
-    width: 541.13px;
     padding: 26px 22px 30px 22px;
     gap: 10px;
 }
@@ -48,8 +184,10 @@
     background-color: rgba(118, 128, 141, 0.09);
     box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
     border-radius: 0px 0px 5px 5px;
-    width: 460px;
-    height: fit-content;
+    width: 500px;
+    max-height: 500px;
+    overflow: hidden;
+    overflow-y: auto;
 }
 
 .owner {
@@ -58,7 +196,7 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    margin: 1vh 0vh 1vh 0vh;
+    margin: 1vh 0vh;
 }
 
 .avatarPlusName {
@@ -66,6 +204,27 @@
     justify-content: flex-start;
     align-items: center;
     width: 30%;
+}
+
+.avatarAddress {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 25%;
+}
+
+.avatarRole {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 35%;
+}
+
+.avatarBtn {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 10%;
 }
 
 .text {
@@ -140,4 +299,25 @@
     justify-content: center;
     align-items: center;
     color: #FFFFFF;
+}
+
+.uploadBtn {
+    width: 185px;
+    height: 40px;
+    background: #FFFFFF;
+    /* Color-drop */
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    color: #76808D;
+}
+
+.uploadBtn img {
+    margin-right: 10px;
 }

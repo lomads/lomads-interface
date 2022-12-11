@@ -126,7 +126,7 @@
 .projectDetails-container .editMemberOverlay {
     width: 100%;
     height: 100%;
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     background: rgba(27, 43, 65, 0.25);
@@ -192,6 +192,7 @@
 .projectDetails-container .editMemberOverlay .editMemberContainer .editMember-body .editMember-row div {
     display: flex;
     align-items: center;
+    min-width: 33.33%;
 }
 
 .projectDetails-container .editMemberOverlay .editMemberContainer .editMember-body .editMember-row div img {
@@ -271,6 +272,8 @@
     border-radius: 5px;
     padding: 26px 22px;
     opacity: 1;
+    max-height: 75vh;
+    position: relative;
 }
 
 .projectDetails-container .addMemberOverlay .project-members .project-members-header {
@@ -311,6 +314,9 @@
 
 .projectDetails-container .addMemberOverlay .project-members .member-list {
     width: 100%;
+    max-height: 50vh;
+    overflow: hidden;
+    overflow-y: auto;
 }
 
 .projectDetails-container .addMemberOverlay .project-members .member-list .member-li {
@@ -427,18 +433,34 @@
     background: #FFFFFF;
     border-radius: 5px;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    align-items: flex-end;
+    /* justify-content: space-between; */
     margin-top: 0.2rem;
 }
 
+.projectDetails-container .info .projectDetails-top .projectDetails-description .tinyMCE-textBody {
+    background-color: #B12F15 !important;
+}
+
 .projectDetails-container .info .projectDetails-top .projectDetails-description p {
+    font-family: Inter;
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
     color: #1B2B41;
 }
 
+
+.projectDetails-container .info .projectDetails-top .projectDetails-description .save-btn {
+    height: 40px;
+    width: 150px;
+    font-size: 16px;
+    font-weight: 400;
+    color: rgb(201, 75, 50);
+    background-color: rgb(255, 255, 255);
+    opacity: 1;
+    margin-left: 1rem !important;
+}
 
 
 .projectDetails-container .info .projectDetails-body {
@@ -758,12 +780,28 @@
     width: 100%;
     margin-top: 30px;
     display: flex;
+    flex-direction: column;
+}
+
+.projectDetails-container .info .projectDetails-body .projectDetails-right .link-unlocked-section .locked {
+    width: 100%;
+    background: linear-gradient(178.31deg, #C94B32 0.74%, #A54536 63.87%);
+    border-radius: 5px;
+    padding: 26px 22px;
+}
+
+.projectDetails-container .info .projectDetails-body .projectDetails-right .link-unlocked-section .locked .container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    display: flex;
     flex-wrap: wrap;
 }
 
 .projectDetails-container .info .projectDetails-body .projectDetails-right .link-unlocked-section .link-button {
     padding: 10px 13px;
-    width: 145px;
+    width: 100%;
+    /* width: 145px; */
     height: 40px;
     display: flex;
     align-items: center;

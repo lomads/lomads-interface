@@ -8,8 +8,10 @@ import { Colorstype } from "types/UItype";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import { loadDao } from 'state/dashboard/actions';
+import { useWeb3React } from "@web3-react/core";
 
 const DAOsuccess = () => {
+	const { chainId } = useWeb3React();
 	const navigate = useNavigate();
 	const dispatch = useAppDispatch();
 
@@ -17,8 +19,9 @@ const DAOsuccess = () => {
 	const { DAOList } = useAppSelector((state) => state.dashboard);
 
 	useEffect(() => {
-		dispatch(loadDao({}))
-	}, [])
+		if(chainId)
+			dispatch(loadDao({chainId}))
+	}, [chainId])
 
 	const handleClick = async () => {
 		const dao = searchParams.get("dao")

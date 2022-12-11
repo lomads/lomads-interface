@@ -1,0 +1,598 @@
+.task-review-overlay {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(27, 43, 65, 0.25);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.task-review-overlay .task-review-container {
+    width: 575px;
+    height: 100vh;
+    background-color: #FFF;
+    border-radius: 20px 0px 0px 20px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.task-review-overlay .task-review-container .task-review-header {
+    width: 100%;
+    height: 10vh;
+    padding: 0 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.task-review-overlay .task-review-container .task-review-header button {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
+    border-radius: 3px;
+}
+
+.task-review-overlay .task-review-container .task-review-header span {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+    /* or 129% */
+    display: flex;
+    align-items: center;
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+}
+
+
+.task-review-overlay .task-review-container .task-review-slider {
+    width: 100%;
+    height: 80vh;
+    display: flex;
+    align-items: center;
+}
+
+.task-review-overlay .task-review-container .task-review-slider .slider-controls {
+    width: 10%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.task-review-overlay .task-review-container .task-review-slider .slider-controls .control-btn {
+    width: 100%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    box-shadow: 5px 5px 4px rgba(27, 43, 65, 0.05), 3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 0px 20px 20px 0px;
+}
+
+.task-review-overlay .task-review-container .task-review-slider .slider-content {
+    width: 95%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center !important;
+    padding: 0 35px;
+    background-color: white;
+}
+
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body {
+    width: 100%;
+    height: 95%;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .wallet-address {
+    font-family: 'Inter', sans-serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+    text-align: center;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body h1 {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    color: #C94B32;
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body p {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+    /* or 129% */
+    text-align: center;
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+}
+
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container {
+    width: 95%;
+    margin: 30px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container:last-child {
+    margin: 0 0 30px 0;
+}
+
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container span {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
+    /* identical to box height, or 112% */
+    text-align: center;
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+}
+
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container textarea {
+    resize: none;
+    margin-top: 16px;
+    height: 75px;
+    resize: none;
+    padding: 15px;
+}
+
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container .note {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    text-align: left;
+    color: #1B2B41;
+    margin-top: 16px;
+    min-height: 120px;
+}
+
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container button {
+    background: #FFFFFF;
+    /* Color-drop */
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    /* or 112% */
+    display: flex;
+    align-items: center;
+    text-align: center;
+    letter-spacing: -0.011em;
+    text-transform: uppercase;
+
+    /* RED */
+    color: #C94B32;
+    width: 100%;
+    height: 40px;
+    margin-top: 10px;
+}
+
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container .submitLink-btn {
+    background: #FFFFFF;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    width: 200px;
+    margin-top: 16px;
+}
+
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-foot {
+    width: 100%;
+    height: 10%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-foot button {
+    height: 50px;
+    width: 184px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+}
+
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-foot button:first-child {
+    margin: 0 20px;
+    border: 1px solid #C94B32;
+    background-color: white;
+    color: #C94B32;
+}
+
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-foot button:last-child {
+    margin-right: 20px;
+    background-color: #C94B32;
+    color: #FFF;
+}
+
+.task-review-overlay .task-review-container .task-review-footer {
+    width: 100%;
+    height: 10vh;
+    display: flex;
+    align-items: center;
+}
+
+.task-review-overlay .task-review-container .task-review-footer .dots-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.task-review-overlay .task-review-container .task-review-footer .dots-container .dots {
+    height: 10px;
+    width: 10px;
+    border-radius: 5px;
+    margin-right: 10px;
+    background-color: #f0f0f0;
+}
+
+.task-review-compensation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.task-review-compensation-main {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 15px 22px;
+    gap: 10px;
+    background: #FFFFFF;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    width: 95%;
+}
+
+.task-review-compensation .container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.task-review-compensation .container div {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    margin: 0 4px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+
+.task-review-compensation .container .amount,
+.task-review-compensation .container .extra {
+    font-weight: bold;
+}
+
+.task-review-compensation .container .extra {
+    color: red;
+}
+
+.task-review-compensation .container img {
+    margin-left: 16px;
+}
+
+.task-review-edit-compensation {
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.task-review-edit-compensation .container {
+    width: 95%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.task-review-edit-compensation .container .task-review-foot {
+    width: 100%;
+    margin: 20px 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.task-review-edit-compensation .container .task-review-foot button {
+    height: 50px;
+    width: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+}
+
+.task-review-edit-compensation .container .task-review-foot button:first-child {
+    margin: 0 20px;
+    border: 1px solid #C94B32;
+    background-color: white;
+    color: #C94B32;
+}
+
+.task-review-edit-compensation .container .task-review-foot button:last-child {
+    margin-right: 20px;
+    background-color: #C94B32;
+    color: #FFF;
+}
+
+.task-review-edit-compensation .container .title {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 33px;
+    text-align: center;
+    color: #C94B32;
+    margin: 20px 0;
+}
+
+.task-review-edit-compensation .container .picker-container {
+    display: flex;
+    flex-direction: row;
+    height: 50px;
+    margin: 20px 0;
+}
+
+.task-review-edit-compensation .container .picker-container .currency {
+    background: #FFFFFF;
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 0px 10px 10px 0px;
+    transform: rotate(180deg);
+    width: 187px;
+    height: 50px;
+}
+
+.task-review-edit-compensation .container .picker-container .currency-container {
+    height: 50px;
+    transform: rotate(180deg);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-items: flex-start;
+    padding-left: 16px;
+}
+
+.task-review-edit-compensation .container .picker-container .currency-container div {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    text-transform: uppercase;
+    color: #76808D;
+    margin-left: 12px;
+}
+
+.task-review-edit-compensation .container .picker-container .currency-container {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    text-transform: uppercase;
+    color: #76808D;
+}
+
+.task-review-edit-compensation .container .picker-container .number-input {
+    background: #FFFFFF;
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 0px 10px 10px 0px;
+}
+
+.task-review-edit-compensation .container .picker-container .number-input .input {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    /* identical to box height, or 112% */
+
+    text-align: center;
+    letter-spacing: -0.011em;
+
+    color: rgba(27, 45, 65, 0.6);
+}
+
+.task-review-edit-compensation .container .picker-container .counter {
+    width: 40px;
+    height: 50px;
+    background: #FFFFFF;
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 0px 10px 10px 0px;
+}
+
+.task-reject-body {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-y: scroll;
+    padding: 0 27px;
+}
+
+.task-reject-body h1 {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 33px;
+    /* or 110% */
+    text-align: center;
+    color: #C94B32;
+    margin-top: 20px;
+}
+
+.task-reject-body .taskApply-rowInput {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.task-reject-body .taskApply-rowInput label {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
+    /* identical to box height, or 112% */
+    text-align: center;
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+}
+
+.task-reject-body .taskApply-rowInput textarea {
+    width: 300px !important;
+    height: 75px;
+    resize: none;
+    padding: 15px;
+    margin-top: 10px;
+}
+
+.task-reject-body .taskApply-inputRow {
+    width: 300px;
+    margin-bottom: 30px;
+}
+
+.task-reject-body .taskApply-inputRow.row-align {
+    display: flex;
+    align-items: flex-start;
+}
+
+.task-reject-body .taskApply-inputRow.row-align input {
+    transform: translateY(5px);
+}
+
+.task-reject-body .taskApply-inputRow.row-align div {
+    margin-left: 10px;
+}
+
+.task-reject-body .taskApply-inputRow.row-align div span {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    color: #76808D;
+    margin: 0;
+}
+
+.task-reject-body .taskApply-inputRow.row-align div p {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    color: rgba(118, 128, 141, 0.5);
+}
+
+.task-reject-body .taskApply-inputRow span {
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    color: #76808D;
+}
+
+.task-reject-body .taskApply-inputRow .taskApply-optionalDiv {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.task-reject-body .taskApply-inputRow .taskApply-optionalDiv .option-div {
+    width: 110px;
+    height: 25px;
+    background: rgba(118, 128, 141, 0.05);
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 16px;
+    /* identical to box height, or 114% */
+
+    /* Light3 */
+    color: rgba(118, 128, 141, 0.5);
+}
+
+.task-reject-body .taskApply-btn-container {
+    display: flex;
+    align-items: center;
+}
+
+.task-reject-body .taskApply-btn-container button {
+    width: 185px;
+    height: 50px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.task-reject-body .taskApply-btn-container button:first-child {
+    background: #FFFFFF;
+    /* RED */
+    border: 1px solid #C94B32;
+    color: #C94B32;
+    margin-right: 20px;
+}
+
+.task-reject-body .taskApply-btn-container button:last-child {
+    background: #C94B32;
+    color: #FFF;
+}

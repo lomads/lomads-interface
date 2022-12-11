@@ -18,7 +18,7 @@ import { toast, ToastContainer } from "react-toastify";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import { setDAO } from "state/dashboard/reducer";
-import { getDao } from "state/dashboard/actions";
+import { getCurrentUser, getDao, updateCurrentUser } from "state/dashboard/actions";
 import Footer from "components/Footer";
 import { addDaoMember } from 'state/dashboard/actions'
 
@@ -38,10 +38,17 @@ const MintPassToken = () => {
     const [discordError, setDiscordError] = useState(false);
     const [emailError, setEmailError] = useState(false);
     const [telegramError, setTelegramError] = useState(false);
-    const { account, provider } = useWeb3React();
-    const { DAO, DAOLoading } = useAppSelector((state) => state.dashboard);
-    const { needWhitelist, isWhitelisted, balanceOf, contractName, currentIndex } = useSBTStats(provider, account, update, contractAddr ? contractAddr : '');
+    const { account, chainId, provider } = useWeb3React();
+    console.log("MY_ACCOUNT", account);
+    const { user, DAO, DAOLoading } = useAppSelector((state) => state.dashboard);
+    const { needWhitelist, isWhitelisted, balanceOf, contractName, currentIndex } = useSBTStats(provider, account, update, contractAddr ? contractAddr : '', chainId);
     const sbtContract = useSBTContract(contractAddr ? contractAddr : null);
+
+    useEffect(() => {
+		if(account && chainId && ( !user || ( user && user.wallet.toLowerCase() !== account.toLowerCase() ) )) {
+			dispatch(getCurrentUser({}))
+		}
+	}, [account, chainId, user])
 
     useEffect(() => {
         if((!DAO || (DAO && DAO.url !== daoURL)) && !DAOLoading) 
@@ -139,7 +146,7 @@ const MintPassToken = () => {
                             daoUrl: DAO.url,
                             description: "SBT TOKEN",
                             name: userName.value,
-                            image: 'url',
+                            image: _get(DAO, 'sbt.image', ''),
                             attributes: [{
                                 trait_type: "Wallet Address/ENS Domain",
                                 value: account
@@ -161,13 +168,12 @@ const MintPassToken = () => {
     
                         const req = await APInewSBTtoken(metadataJSON);
                         if (req) {
-                            dispatch(addDaoMember({ url: DAO?.url, payload: { name: '', address: account } }))
+                            dispatch(updateCurrentUser({ name: userName.value }))
+                            dispatch(addDaoMember({ url: DAO?.url, payload: { name: '', address: account, role: 'CONTRIBUTOR' } }))
+                            dispatch(getDao(DAO.url));
                             setLoading(false);
-                            toast.success("SBT mint successfuly !");
-                            dispatch(setDAO(req.data));
-                            setTimeout(() => {
-                                navigate(`/${DAO.url}`)
-                            }, 1000);
+                            //toast.success("SBT mint successfuly !");
+                            setTimeout(() => navigate(`/${DAO.url}`), 1500);
                             return;
                         }
                         return;
@@ -222,6 +228,7 @@ const MintPassToken = () => {
                                         <input
                                             className="text-input"
                                             id="user-name"
+                                            defaultValue={_get(user, 'name', null)}
                                             placeholder="Enter your name"
                                             onChange={() => setNameError(false)}
                                         />

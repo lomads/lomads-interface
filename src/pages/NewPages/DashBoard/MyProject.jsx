@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import './MyProject.css';
-import { get as _get, find as _find } from 'lodash';
+import { get as _get, find as _find, groupBy as _groupBy, orderBy as _orderBy } from 'lodash';
 
 import SafeButton from "UIpack/SafeButton";
 
@@ -9,30 +9,67 @@ import { useAppSelector } from "state/hooks";
 
 import ProjectCard from './Project/ProjectCard';
 import { useWeb3React } from "@web3-react/core";
-
+import { useParams } from 'react-router-dom';
 import archiveIcon from '../../../assets/svg/archiveIcon.svg';
+
+import useRole from 'hooks/useRole';
+import moment from 'moment';
 
 const MyProject = () => {
     const navigate = useNavigate();
+    const { daoURL } = useParams();
     const { DAO } = useAppSelector((state) => state.dashboard);
     const { account } = useWeb3React();
     const [tab, setTab] = useState(2);
     const [myProjects, setMyProjects] = useState([]);
     const [otherProjects, setOtherProjects] = useState([]);
     const [initialCheck, setInitialCheck] = useState(false);
+    const { myRole, can } = useRole(DAO, account)
+
+
+    const notificationCount = (project) => {
+        let count = [];
+        let links = project.links.map(l => {
+            return { ...l, provider: new URL(l.link).hostname }
+        })
+        let grp = _groupBy(links, l => l.provider)
+        for (let index = 0; index < Object.keys(grp).length; index++) {
+            const provider = Object.keys(grp)[index];
+            count.push({ provider, count: grp[provider].reduce((p, c) => (p + (+_get(c, 'notification', 0))), 0) })
+        }
+        console.log(count)
+        return count
+    }
 
     useEffect(() => {
-        if (DAO) {
-            setMyProjects(_get(DAO, 'projects', []).filter(project => _find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase())))
-            setOtherProjects(_get(DAO, 'projects', []).filter(project => !_find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase())))
+        if (DAO && DAO.url === daoURL) {
+            let myProjects = _get(DAO, 'projects', []).filter(project => !project.deletedAt && !project.archivedAt && _find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase()));
+            myProjects = myProjects.map(p => {
+                let prj = {...p, notification: 0}
+                if(notificationCount(prj) > 0)
+                    prj.notification = 1
+                return prj;
+            })
+            setMyProjects(_orderBy(myProjects, ['notification', p => moment(p.createdAt).unix()], ['desc', 'desc']))
+            let otherProjects = _get(DAO, 'projects', []).filter(project => !project.deletedAt && !project.archivedAt && !_find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase()))
+            otherProjects = otherProjects.map(p => {
+                let prj = {...p, notification: 0}
+                if(notificationCount(prj) > 0)
+                    prj.notification = 1
+                return prj;
+            })
+            setOtherProjects(_orderBy(myProjects.concat(otherProjects), p => moment(p.createdAt).unix(), 'desc'))
         }
     }, [DAO, tab]);
 
     useEffect(() => {
+        console.log("myProjects", myProjects)
         if (!initialCheck) {
             if (myProjects.length > 0) {
                 setInitialCheck(true)
                 setTab(1);
+            } else {
+                setTab(2)
             }
         }
     }, [myProjects, initialCheck]);
@@ -51,31 +88,28 @@ const MyProject = () => {
         <div className="myproject-container">
             <div className="myproject-header">
                 <div className="myproject-title">
-                    {
-                        myProjects.length > 0
-                            ?
-                            <>
-                                <button className={tab === 1 ? 'active' : null} onClick={() => setTab(1)}>
-                                    My projects
-                                </button>
-                                <div className="divider"></div>
-                            </>
-                            :
-                            null
-                    }
-
+                    <>
+                        <button className={tab === 1 ? 'active' : null} onClick={() => setTab(1)}>
+                            My projects
+                        </button>
+                        <div className="divider"></div>
+                    </>
                     <button className={tab === 2 ? 'active' : null} onClick={() => setTab(2)}>
                         All projects
                     </button>
                 </div>
                 <div className="myproject-buttons">
-                    <div style={{ marginRight: '20px' }}>
-                        <button className='archive-btn' onClick={() => navigate('/archives')}>
+                    {can(myRole, 'project.view.archives') && <div style={{ marginRight: '20px' }}>
+                        <button
+                            className='archive-btn'
+                            onClick={() => navigate('/archives')}
+                            disabled={_get(DAO, 'projects', []).filter(project => !project.deletedAt && project.archivedAt).length > 0 ? false : true}
+                        >
                             <img src={archiveIcon} alt="archive-icon" />
                         </button>
-                    </div>
+                    </div>}
                     {
-                        amIAdmin && <div>
+                        can(myRole, 'project.create') && <div>
                             <SafeButton
                                 height={40}
                                 width={150}
@@ -126,7 +160,7 @@ const MyProject = () => {
                         {
                             otherProjects.length > 0
                                 ?
-                                <div className='myproject-body-fixed' style={DAO?.projects.length > 9 ? { overflow: 'scroll', height: '375px' } : null}>
+                                <div className='myproject-body-fixed' style={otherProjects.length > 9 ? { overflow: 'scroll', height: '375px' } : { height: 'auto' }}>
                                     {
                                         otherProjects.map((item, index) => {
                                             if (item.deletedAt === null && item.archivedAt === null) {
@@ -143,10 +177,10 @@ const MyProject = () => {
                                         })
                                     }
                                 </div>
-                                :
-                                <div className='myproject-body-nocontent'>
-                                    <p>No projects</p>
-                                </div>
+                                : null
+                            // <div className='myproject-body-nocontent'>
+                            //     <p>No projects</p>
+                            // </div>
                         }
                     </>
                     :

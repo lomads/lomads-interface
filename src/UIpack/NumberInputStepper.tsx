@@ -16,7 +16,7 @@ import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 const SimpleInputField = (props: InputFieldType) => {
   return (
     <FormControl isInvalid={!props.value && props.isInvalid}>
-      <NumberInput min={0}>
+      <NumberInput step={1} min={0}>
         <NumberInputField
           id={props.id}
           className={props.className}
@@ -28,10 +28,10 @@ const SimpleInputField = (props: InputFieldType) => {
           type={props.type}
           bg="#F5F5F5"
         />
-        <NumberInputStepper>
+        {/* <NumberInputStepper>
           <NumberIncrementStepper color="#C94B32" />
           <NumberDecrementStepper color="#C94B32" />
-        </NumberInputStepper>
+        </NumberInputStepper> */}
       </NumberInput>
       {!props.value && props.isInvalid && (
         <FormErrorMessage style={{ marginTop: 0, fontSize: "x-small" }}>

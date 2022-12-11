@@ -11,6 +11,7 @@ export const tokenCall = async (provider: any, _tokenAddress: string) => {
 };
 
 export const tokenCallSafe = async (_tokenAddress: string) => {
+  console.log(_tokenAddress)
   const token = new ethers.Contract(_tokenAddress, TOKEN_ABI);
   return token;
 };

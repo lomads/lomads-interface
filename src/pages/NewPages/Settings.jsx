@@ -1,34 +1,33 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./Settings.css";
 import { get as _get, find as _find } from "lodash";
 import settingIcon from "../../assets/svg/settingsXL.svg";
 import { CgClose } from "react-icons/cg";
-import { Link, useNavigate } from "react-router-dom";
-import { AddIcon, CheckCircleIcon } from "@chakra-ui/icons";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Table from "react-bootstrap/Table";
 
 import {
-  Button,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerFooter,
-  DrawerOverlay,
-  FormLabel,
-  IconButton,
-  Image,
-  Input,
-  Switch,
-  TableContainer,
-  Tbody,
-  Td,
-  Text,
-  Tfoot,
-  Th,
-  Thead,
-  Tooltip,
-  Tr,
+	Button,
+	Drawer,
+	DrawerBody,
+	DrawerCloseButton,
+	DrawerContent,
+	DrawerFooter,
+	DrawerOverlay,
+	FormLabel,
+	IconButton,
+	Image,
+	Input,
+	Switch,
+	TableContainer,
+	Tbody,
+	Td,
+	Text,
+	Tfoot,
+	Th,
+	Thead,
+	Tooltip,
+	Tr,
 } from "@chakra-ui/react";
 import copyIcon from "../../assets/svg/copyIcon.svg";
 import { isChainAllowed } from "utils/switchChain";
@@ -54,252 +53,313 @@ import XpPointsModal from "./XpPointsModal";
 import PassTokenModal from "./PassTokenModal";
 import TerminologyModal from "./TerminologyModal";
 import DiscordModal from "./DiscordModal";
+import { useAppDispatch, useAppSelector } from "state/hooks";
+import CreateMorePassTokenModal from "./CreateMorePassTokenModal";
+import { getDao } from "state/dashboard/actions";
+import CompensateMembersModal from "./CompensateMembersModal";
+import CompensateMembersDescriptionModal from "./CompensateMembersDescriptionModal";
+import CompensateMembersDoneModal from "./CompensateMembersDoneModal";
+import DisableXpPointDailog from "./DisableXpPointDailog";
+import eventEmitter from "utils/eventEmmiter";
 
 const Settings = () => {
-  const navigate = useNavigate();
+	const navigate = useNavigate();
+	const { daoURL } = useParams();
 
-  //! CONST DECLARATION
-  const [showModal, setShowModal] = useState(false);
-  const [openOrganisationDetails, setOpenOrganisationDetails] = useState(false);
-  const [openRolesPermissions, setOpenRolesPermissions] = useState(false);
-  const [openSafe, setOpenSafe] = useState(false);
-  const [openPassToken, setOpenPassToken] = useState(false);
-  const [openXpPoints, setOpenXpPoints] = useState(false);
-  const [openTerminology, setOpenTerminology] = useState(false);
-  const [openDiscord, setOpenDiscord] = useState(false);
-  //! TOGGLE FUNCTIONS
-  let toggleModal = () => {
-    setShowModal(!showModal);
-  };
-  let toggleOrganisationDetailsModal = () => {
-    setOpenOrganisationDetails(!openOrganisationDetails);
-  };
-  let toggleRP = () => {
-    setOpenRolesPermissions(!openRolesPermissions);
-  };
-  let toggleS = () => {
-    setOpenSafe(!openSafe);
-  };
-  let togglePassToken = () => {
-    setOpenPassToken(!openPassToken);
-  };
-  let toggleXp = () => {
-    setOpenXpPoints(!openXpPoints);
-  };
-  let toggleTerminology = () => {
-    setOpenTerminology(!openTerminology);
-  };
-  let toggleDiscord = () => {
-    setOpenDiscord(!openDiscord);
-  };
+	const dispatch = useAppDispatch();
 
-  return (
-    <>
-      <div className="settings-page">
-        <div className="settings-left-bar">
-          <div onClick={() => navigate(-1)} className="logo-container">
-            <p>HG</p>
-          </div>
-          <img src={settingIcon} />
-        </div>
-        <div className="settings-center">
-          <div className="settings-header">
-            <h1>Fashion Fusion</h1>
-            <h2>Settings</h2>
-          </div>
-          <div className="settings-organisation">
-            <div>
-              <img src={OrganistionDetails} style={{ height: "35px" }} />
-              <Link
-                className="style-content"
-                style={{ color: "#C94B32" }}
-                onClick={() => {
-                  toggleModal();
-                  setOpenOrganisationDetails(true);
-                }}
-              >
-                Organisation Details
-                <ChevronRight />
-              </Link>
-            </div>
-          </div>
+	//! CONST DECLARATION
+	const [showModal, setShowModal] = useState(false);
+	const [openOrganisationDetails, setOpenOrganisationDetails] = useState(false);
+	const [openRolesPermissions, setOpenRolesPermissions] = useState(false);
+	const [openSafe, setOpenSafe] = useState(false);
+	const [openPassToken, setOpenPassToken] = useState(false);
+	const [openXpPoints, setOpenXpPoints] = useState(false);
+	const [openTerminology, setOpenTerminology] = useState(false);
+	const [openDiscord, setOpenDiscord] = useState(false);
+	const [openCreatePassToken, setOpenCreatePassToken] = useState(false);
 
-          <div className="settings-organisation-flexbox">
-            <div className="settings-organisation-child">
-              <div
-                style={{
-                  padding: "20px",
-                }}
-              >
-                <img src={RolesPermissions} style={{ height: "35px" }} />
-                <Link
-                  className="style-content"
-                  style={{ color: "#C94B32" }}
-                  onClick={() => {
-                    toggleModal();
-                    setOpenRolesPermissions(true);
-                  }}
-                >
-                  Roles & Permissions
-                  <ChevronRight />
-                </Link>
-              </div>
-            </div>
-            <div className="settings-organisation-child">
-              <div
-                style={{
-                  padding: "20px",
-                }}
-              >
-                <img src={Safe} style={{ height: "35px" }} />
-                <Link
-                  className="style-content"
-                  style={{ color: "#C94B32" }}
-                  onClick={() => {
-                    toggleModal();
-                    setOpenSafe(true);
-                  }}
-                >
-                  Safe
-                  <ChevronRight />
-                </Link>
-              </div>
-            </div>
 
-            <div className="settings-organisation-child">
-              <div
-                style={{
-                  padding: "20px",
-                }}
-              >
-                <img src={PassTokens} style={{ height: "35px" }} />
-                <Link
-                  className="style-content"
-                  style={{ color: "#C94B32" }}
-                  onClick={() => {
-                    toggleModal();
-                    togglePassToken();
-                  }}
-                >
-                  Pass Tokens
-                  <ChevronRight />
-                </Link>
-              </div>
-            </div>
-          </div>
+	const { DAO, updateDaoLoading, updateDaoLinksLoading } = useAppSelector((state) => state.dashboard);
 
-          <div className="settings-organisation-flexbox">
-            <div className="settings-organisation-child">
-              <div
-                style={{
-                  padding: "20px",
-                }}
-              >
-                <img src={XpPoints} style={{ height: "35px" }} />
-                <Link
-                  className="style-content"
-                  style={{ color: "#C94B32" }}
-                  onClick={() => {
-                    toggleModal();
-                    setOpenXpPoints(true);
-                  }}
-                >
-                  XP points
-                  <ChevronRight />
-                </Link>
-              </div>
-            </div>
-            <div className="settings-organisation-child">
-              <div
-                style={{
-                  padding: "20px",
-                }}
-              >
-                <img src={Terminology} style={{ height: "35px" }} />
-                <Link
-                  className="style-content"
-                  style={{ color: "#C94B32" }}
-                  onClick={() => {
-                    toggleModal();
-                    setOpenTerminology(true);
-                  }}
-                >
-                  Terminology
-                  <ChevronRight />
-                </Link>
-              </div>
-            </div>
+	console.log("DAO data : ", DAO);
 
-            <div className="settings-organisation-child">
-              <div
-                style={{
-                  padding: "20px",
-                }}
-              >
-                <img src={Discord} style={{ height: "35px" }} />
-                <Link
-                  className="style-content"
-                  style={{ color: "#C94B32" }}
-                  onClick={() => {
-                    toggleModal();
-                    setOpenDiscord(true);
-                  }}
-                >
-                  Discord
-                  <ChevronRight />
-                </Link>
-              </div>
-            </div>
-          </div>
+	const [name, setName] = useState(_get(DAO, 'name', ''));
 
-          <Footer theme="light" />
-        </div>
-        <div className="settings-right-bar">
-          <button onClick={() => navigate(-1)}>
-            <CgClose color="#FFF" size={24} />
-          </button>
-        </div>
-      </div>
+	useEffect(() => {
+		setName(_get(DAO, 'name', ''))
+	}, [DAO])
 
-      {/* // !-------------  Organisation Details ------------ */}
-      {showModal && openOrganisationDetails && (
-        <OrganisationDetailsModal
-          toggleModal={toggleModal}
-          toggleOrganisationDetailsModal={toggleOrganisationDetailsModal}
-        />
-      )}
-      {/* // !-------------  Roles & Permissions ------------ */}
-      {showModal && openRolesPermissions && (
-        <RolesPermissionsModal toggleModal={toggleModal} toggleRP={toggleRP} />
-      )}
-      {/* // !-------------  Safe ------------ */}
-      {showModal && openSafe && (
-        <SafeModal toggleModal={toggleModal} toggleS={toggleS} />
-      )}
-      {/* // !-------------  Pass Token ------------ */}
-      {showModal && openPassToken && (
-        <PassTokenModal
-          toggleModal={toggleModal}
-          togglePassToken={togglePassToken}
-        />
-      )}
-      {/* // !-------------  XP Points ------------ */}
-      {showModal && openXpPoints && (
-        <XpPointsModal toggleModal={toggleModal} toggleXp={toggleXp} />
-      )}
-      {/* // !-------------  Terminology ------------ */}
-      {showModal && openTerminology && (
-        <TerminologyModal
-          toggleModal={toggleModal}
-          toggleTerminology={toggleTerminology}
-        />
-      )}
-      {/* // !-------------  Discord ------------ */}
-      {showModal && openDiscord && (
-        <DiscordModal toggleModal={toggleModal} toggleDiscord={toggleDiscord} />
-      )}
-    </>
-  );
+	useEffect(() => {
+		if (!DAO || (DAO && DAO.url !== daoURL))
+			dispatch(getDao(daoURL))
+	}
+		, [DAO])
+
+	useEffect(() => {
+		eventEmitter.on('close-xp-modal', () => {
+			setShowModal(false)
+			setOpenXpPoints(false)
+		})
+		return () => {
+			eventEmitter.off('close-xp-modal', () => {
+				setShowModal(false)
+				setOpenXpPoints(false)
+			})
+		}
+	}, [])
+
+
+
+
+	//! TOGGLE FUNCTIONS
+	let toggleModal = () => {
+		setShowModal(!showModal);
+	};
+	let toggleOrganisationDetailsModal = () => {
+		setOpenOrganisationDetails(!openOrganisationDetails);
+	};
+	let toggleRP = () => {
+		setOpenRolesPermissions(!openRolesPermissions);
+	};
+	let toggleS = () => {
+		setOpenSafe(!openSafe);
+	};
+	let togglePassToken = () => {
+		setOpenPassToken(!openPassToken);
+	};
+	let toggleXp = () => {
+		setOpenXpPoints(!openXpPoints);
+	};
+	let toggleTerminology = () => {
+		setOpenTerminology(!openTerminology);
+	};
+	let toggleDiscord = () => {
+		setOpenDiscord(!openDiscord);
+	};
+
+	let toggleCreatePassTokenModal = () => {
+		setOpenCreatePassToken(!openCreatePassToken);
+	};
+	const daoName = name.split(" ");
+	return (
+		<>
+			<div className="settings-page">
+				{/* <DisableXpPointDailog
+                    toggleShowLink={toggleCreatePassTokenModal}
+                    daoUrl={_get(DAO, 'url', '')}
+                /> */}
+				<div className="settings-left-bar">
+					<div onClick={() => navigate(-1)} className="logo-container">
+						<p style={{ textTransform: "capitalize" }}>{daoName.length === 1
+							? daoName[0].charAt(0)
+							: daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)}</p>
+					</div>
+					<img src={settingIcon} />
+				</div>
+				<div className="settings-center">
+					<div>
+						<div className="settings-header">
+							<h1>{name}</h1>
+							<h2>Settings</h2>
+						</div>
+						<div className="settings-organisation"
+							onClick={() => {
+								toggleModal();
+								setOpenOrganisationDetails(true);
+							}}
+						>
+							<div>
+								<img src={OrganistionDetails} style={{ height: "35px" }} />
+								<Link
+									className="style-content"
+									style={{ color: "#C94B32" }}
+								>
+									Organisation Details
+									<ChevronRight />
+								</Link>
+							</div>
+						</div>
+
+						<div className="settings-organisation-flexbox">
+							<div className="settings-organisation-child"
+								onClick={() => {
+									toggleModal();
+									setOpenRolesPermissions(true);
+								}}
+							>
+								<div
+									style={{
+										padding: "20px",
+									}}
+								>
+									<img src={RolesPermissions} style={{ height: "35px" }} />
+									<Link
+										className="style-content"
+										style={{ color: "#C94B32" }}
+									>
+										Roles & Permissions
+										<ChevronRight />
+									</Link>
+								</div>
+							</div>
+							<div className="settings-organisation-child disabled">
+								<div
+									style={{
+										padding: "20px",
+									}}
+								>
+									<img src={Safe} style={{ height: "35px" }} />
+									<Link
+										className="style-content"
+										style={{ color: "#C94B32" }}
+									>
+										Safe
+										<ChevronRight />
+									</Link>
+								</div>
+							</div>
+
+							<div className="settings-organisation-child"
+								onClick={() => {
+									toggleModal();
+									DAO?.sbt?.name ? togglePassToken() : toggleCreatePassTokenModal()
+								}}
+							>
+								<div
+									style={{
+										padding: "20px",
+									}}
+								>
+									<img src={PassTokens} style={{ height: "35px" }} />
+									<Link
+										className="style-content"
+										style={{ color: "#C94B32" }}
+									>
+										Pass Tokens
+										<ChevronRight />
+									</Link>
+								</div>
+							</div>
+						</div>
+
+						<div className="settings-organisation-flexbox">
+							<div className="settings-organisation-child"
+								onClick={() => {
+									toggleModal();
+									setOpenXpPoints(true);
+								}}
+							>
+								<div
+									style={{
+										padding: "20px",
+									}}
+								>
+									<img src={XpPoints} style={{ height: "35px" }} />
+									<Link
+										className="style-content"
+										style={{ color: "#C94B32" }}
+									>
+										SWEAT points
+										<ChevronRight />
+									</Link>
+								</div>
+							</div>
+							<div className="settings-organisation-child disabled"
+
+							>
+								<div
+									style={{
+										padding: "20px",
+									}}
+								>
+									<img src={Terminology} style={{ height: "35px" }} />
+									<Link
+										className="style-content"
+										style={{ color: "#C94B32" }}
+									>
+										Terminology
+										<ChevronRight />
+									</Link>
+								</div>
+							</div>
+
+							<div className="settings-organisation-child disabled"
+
+							>
+								<div
+									style={{
+										padding: "20px",
+									}}
+								>
+									<img src={Discord} style={{ height: "35px" }} />
+									<Link
+										className="style-content"
+										style={{ color: "#C94B32" }}
+									>
+										Discord
+										<ChevronRight />
+									</Link>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<Footer theme="light" />
+				</div>
+				<div className="settings-right-bar">
+					<button onClick={() => navigate(-1)}>
+						<CgClose color="#FFF" size={24} />
+					</button>
+				</div>
+			</div>
+
+			{/* // !-------------  Organisation Details ------------ */}
+			{showModal && openOrganisationDetails && (
+				<OrganisationDetailsModal
+					toggleModal={toggleModal}
+					toggleOrganisationDetailsModal={toggleOrganisationDetailsModal}
+				/>
+			)}
+			{/* // !-------------  Roles & Permissions ------------ */}
+			{showModal && openRolesPermissions && (
+				<RolesPermissionsModal toggleModal={toggleModal} toggleRP={toggleRP} />
+			)}
+			{/* // !-------------  Safe ------------ */}
+			{showModal && openSafe && (
+				<SafeModal toggleModal={toggleModal} toggleS={toggleS} />
+			)}
+			{/* // !-------------  Pass Token ------------ */}
+			{showModal && openPassToken && (
+				<PassTokenModal
+					toggleModal={toggleModal}
+					togglePassToken={togglePassToken}
+				/>
+			)}
+			{showModal && openCreatePassToken && (
+				<CreateMorePassTokenModal
+					toggleModal={toggleModal}
+					navFromSetting={true}
+					toggleCreatePassTokenModal={toggleCreatePassTokenModal}
+				/>
+			)}
+			{/* // !-------------  SWEAT Points ------------ */}
+			{showModal && openXpPoints && (
+				<XpPointsModal toggleModal={toggleModal} toggleXp={toggleXp} />
+			)}
+			{/* // !-------------  Terminology ------------ */}
+			{showModal && openTerminology && (
+				<TerminologyModal
+					toggleModal={toggleModal}
+					toggleTerminology={toggleTerminology}
+				/>
+			)}
+			{/* // !-------------  Discord ------------ */}
+			{showModal && openDiscord && (
+				<DiscordModal toggleModal={toggleModal} toggleDiscord={toggleDiscord} />
+			)}
+		</>
+	);
 };
 
 export default Settings;

@@ -77,6 +77,7 @@ const SelectRecipient = (props: IselectRecipientType) => {
 						/>
 					</div>
 				</div>
+				<div className="SelectNewRecipientPageList">
 				{props.totalMembers &&
 					props.totalMembers.map((result: any, index: any) => {
 						return (
@@ -104,6 +105,7 @@ const SelectRecipient = (props: IselectRecipientType) => {
 							</div>
 						);
 					})}
+				</div>
 				<div id="recipientButtonArea">
 					<OutlineButton
 						title="CANCEL"

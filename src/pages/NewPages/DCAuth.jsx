@@ -73,7 +73,7 @@ const DCAuth = () => {
       )
       return
     } else {
-      setCsrfToken(undefined)
+      //setCsrfToken(undefined)
     }
 
     window.opener.postMessage(

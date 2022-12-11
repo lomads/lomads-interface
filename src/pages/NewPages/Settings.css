@@ -43,7 +43,8 @@
     width: 97px;
     height: 61px;
     top: 16px;
-    font-family: 'Inter', sans-serif;
+
+    font-family: var(--chakra-fonts-body);
     font-style: normal;
     font-weight: 600;
     font-size: 35px;
@@ -75,6 +76,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: space-between;
     padding-top: 4rem;
     padding-left: 4rem;
 
@@ -82,7 +84,7 @@
 }
 
 .settings-page .settings-center .settings-header {
-    width: 70%;
+    width: 947px;
     display: flex;
     flex-direction: column;
     /* justify-content: space-between; */
@@ -95,7 +97,6 @@
     font-size: 30px;
     line-height: 33px;
     color: #FFFFFF;
-    margin-left: -100px;
     margin-bottom: 20px;
 }
 
@@ -105,7 +106,6 @@
     font-size: 30px;
     line-height: 33px;
     color: #FFFFFF;
-    margin-left: -100px;
     margin-bottom: 40px;
 }
 
@@ -135,7 +135,7 @@
 }
 
 .settings-page .settings-center .settings-organisation-child {
-
+    cursor: pointer;
     height: 130px;
     width: 300px;
     background-color: #FFF;
@@ -145,6 +145,11 @@
     flex-direction: column;
     margin-bottom: 20px;
     color: #C94B32;
+}
+
+.settings-page .settings-center .settings-organisation-child.disabled {
+    background-color: #fff;
+    opacity: 0.8;
 }
 
 .settings-page .settings-organisation-flexbox {
@@ -269,6 +274,36 @@
     margin-bottom: 10px;
 }
 
+.settings-page .settings-center .settings-links .links-header div {
+    display: flex;
+    align-items: center;
+}
+
+.settings-page .settings-center .settings-links .links-header div .addLink-btn {
+    margin-left: 22px;
+    width: 140px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    font-style: normal;
+    /* font-weight: 400; */
+    font-size: 16px;
+    line-height: 18px;
+    /* or 112% */
+    display: flex;
+    align-items: center;
+    text-align: center;
+    letter-spacing: -0.011em;
+    text-transform: uppercase;
+
+    /* RED */
+    color: #C94B32;
+}
+
 .settings-page .settings-center .settings-links .links-header h1 {
     font-style: normal;
     font-weight: 400;
@@ -295,6 +330,44 @@
 
 }
 
+.settings-page .settings-center .settings-links .link-body .editLinkSection {
+    width: 420px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 0;
+}
+
+.settings-page .settings-center .settings-links .link-body .editLinkSection .editLinkCol {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 8px;
+    margin-bottom: 0 !important;
+    height: 85px;
+}
+
+.settings-page .settings-center .settings-links .link-body .editLinkSection .editLinkCol span {
+    margin-bottom: 0;
+    margin-top: -13px !important;
+    font-size: 13px;
+    color: #C94B32;
+}
+
+.settings-page .settings-center .settings-links .link-body .editLinkSection .linkDeleteBtn {
+    background-color: #FFF;
+    padding: 5px;
+    min-width: 50px;
+    border-radius: 5px;
+    color: #FFFFFF;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px !important;
+    margin-left: 15px;
+}
+
 .settings-page .settings-center .settings-links .link-body div {
     width: 100%;
     display: flex;
@@ -304,16 +377,24 @@
 
 .settings-page .settings-center .settings-links .link-body div button {
     height: 40px;
-    width: 145px;
+    width: 150px;
+    padding: 0 20px;
     filter: drop-shadow(0px 3px 3px rgba(27, 43, 65, 0.1)) drop-shadow(-1px -2px 3px rgba(201, 75, 50, 0.05));
     border-radius: 5px;
     background: #FFFFFF;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     text-transform: capitalize;
     color: #B12F15;
     margin-right: 10px;
+}
+
+.settings-page .settings-center .settings-links .link-body div button span {
+    color: #B12F15;
+    margin: 0;
+    margin-left: 5px;
+    font-style: normal;
 }
 
 .settings-page .settings-center .settings-links .link-body div p {
@@ -407,19 +488,45 @@
 }
 
 
-#title-type {
-    margin-top: 6.9px;
-    font-size: "22px";
-    color: #C94B32;
+#cm-info {
+    width: 400px;
+    height: 18px;
+
+    /* Note */
+    font-family: 'Inter', sans-serif;
+    font-style: italic;
     font-weight: 400;
-    font-size: 22px;
-    line-height: 25px;
+    font-size: 14px;
+    line-height: 18px;
+    /* identical to box height, or 129% */
     text-align: center;
     letter-spacing: -0.011em;
+    margin-top: 35px;
+    /* Grey */
+    color: #76808D;
+}
+
+#title-type {
+    width: 529px;
+    height: 37px;
+
+    /* Med-title */
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 33px;
+    /* or 110% */
+    text-align: center;
+
+    /* RED */
+    color: #C94B32;
+
+
 }
 
 #text-type {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--chakra-fonts-body);
     font-weight: 700;
     font-size: 16px;
     line-height: 18px;
@@ -430,7 +537,7 @@
 
 #notes-type {
     margin-top: 35px;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--chakra-fonts-body);
     font-weight: 700;
     font-size: 16px;
     line-height: 18px;
@@ -441,7 +548,7 @@
 
 #text-type-od {
     margin-top: 35px;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--chakra-fonts-body);
     font-weight: 700;
     font-size: 16px;
     line-height: 18px;
@@ -451,27 +558,18 @@
 }
 
 
-#button-cancel {
-    width: 129px;
-    height: 40px;
-    border-radius: 5px;
-    font-weight: 400;
-    color: #C94B32;
-    margin-right: 20px;
-    background: #FFFFFF;
-    border: 1px solid #C94B32;
-}
-
 #button-save {
     color: #FFFFFF;
     font-weight: 400;
     background: #C94B32;
     border-radius: 5px;
+
+
 }
 
 .button-section {
 
-    /* margin-top: 35px; */
+    margin-top: 35px;
     flex: none;
     order: 5;
     flex-grow: 0;
@@ -480,7 +578,7 @@
 #rp-text {
     width: 400px;
     height: 80px;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--chakra-fonts-body);
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
@@ -500,8 +598,31 @@
     flex-grow: 0;
 }
 
-#paragraph-type {
+#xp-text {
     font-family: 'Inter', sans-serif;
+    width: 400px;
+    height: 112px;
+
+    /* corps */
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    /* or 114% */
+    text-align: center;
+
+    /* Grey */
+    color: #76808D;
+
+
+    /* Inside auto layout */
+    /* flex: none;
+    order: 2;
+    flex-grow: 0; */
+}
+
+#paragraph-type {
+    font-family: var(--chakra-fonts-body);
     font-style: italic;
     font-weight: 400;
     font-size: 14px;
@@ -576,7 +697,7 @@ input:checked+.slider.check:before {
 
 /* SWITCH TITLES */
 #switch-title {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--chakra-fonts-body);
     font-weight: 400;
     font-size: 16px;
     line-height: 18px;
@@ -676,6 +797,7 @@ td {
 /* PASS TOKEN SECTION */
 
 .MainComponent #pass-token-title {
+    font-family: 'Inter', sans-serif;
     margin-top: 6.9px;
     color: #C94B32;
     font-weight: 400;
@@ -687,15 +809,21 @@ td {
 
 .MainComponent #pass-tokens-logo-container {
     /* position: absolute; */
+    cursor: pointer;
     width: 39.63px;
     height: 39.63px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+    ;
 
-    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
-    border-radius: 10px;
-    transform: rotate(45deg);
+    /* box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 10px; */
+    /* transform: rotate(45deg); */
 
-    border: 1px solid #76808D;
-    transform: matrix(0.71, -0.7, 0.71, 0.71, 0, 0);
+    /* border: 1px solid #76808D; */
+    /* transform: matrix(0.71, -0.7, 0.71, 0.71, 0, 0); */
 
 }
 
@@ -712,7 +840,9 @@ td {
     /* position: absolute; */
     width: 40px;
     height: 36px;
+
     font-family: 'Inter', sans-serif;
+    ;
     font-style: normal;
 
     text-align: center;
@@ -749,6 +879,7 @@ td {
 }
 
 .MainComponent #token-title {
+    font-family: 'Inter', sans-serif;
     width: 126px;
     height: 25px;
     position: relative;
@@ -758,8 +889,6 @@ td {
     /* bottom: 65.19%; */
 
     /* Corps Title */
-
-    font-family: 'Open Sans';
     font-style: normal;
     font-weight: 400;
     font-size: 22px;
@@ -872,7 +1001,7 @@ td {
     flex-grow: 0;
 }
 
-.MainComponent #membership-policy-section {
+.MainComponent #membersship-policy-section {
     /* Auto layout */
 
     display: flex;
@@ -916,7 +1045,8 @@ td {
 
 
 .MainComponent #contact-details-section #paragraph-type-1 {
-    font-family: 'Inter', sans-serif;
+
+    font-family: var(--chakra-fonts-body);
     font-weight: 400;
     font-size: 14px;
     line-height: 16px;
@@ -930,7 +1060,8 @@ td {
 
 
 .MainComponent #contact-details-section #paragraph-type {
-    font-family: 'Inter', sans-serif;
+
+    font-family: var(--chakra-fonts-body);
     font-style: italic;
     font-weight: 400;
     font-size: 14px;
@@ -943,338 +1074,92 @@ td {
 
 }
 
-#discord-section {
-    /* Auto layout */
+
+.main-picker-container {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    height: 50px;
+    margin: 20px 0;
     align-items: center;
-    padding: 0px;
-    gap: 45px;
-
-    width: 400px;
-    height: 296px;
-
-
-    /* Inside auto layout */
-
-    flex: none;
-    order: 1;
-    flex-grow: 0;
+    justify-content: center;
 }
 
-/* //! TERMINOLOGY  */
 
-.terminology-label {
-    /* Labels used in all your organisation’s interface. */
-
-
-    width: 300px;
-    height: 18px;
-    margin-bottom: 35px;
-
-    /* Note */
-
-    font-family: 'Inter', sans-serif;
-    font-style: italic;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 18px;
-    /* identical to box height, or 129% */
-
-    text-align: center;
-    letter-spacing: -0.011em;
-
-    /* Grey */
-
-    color: #76808D;
-
-
-    /* Inside auto layout */
-
-    flex: none;
-    order: 2;
-    flex-grow: 0;
+.picker-container {
+    display: flex;
+    flex-direction: row;
+    height: 50px;
+    margin: 20px 0;
 }
 
-.terminology-group1 {
-    /* Group 617 */
-
-    /* 
-    width: 300px;
-    height: 42px; */
-
-
-    /* Inside auto layout */
-    /* margin-top: 35px; */
-    flex: none;
-    order: 1;
-    flex-grow: 0;
+.main-picker-container .currency {
+    background: #FFFFFF;
+    /* box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1); */
+    /* border-radius: 0px 10px 10px 0px; */
+    transform: rotate(180deg);
+    /* width: 187px; */
+    height: 50px;
 }
 
-.terminology-group1 .terminology-projects {
-    /* Projects: */
+.main-picker-container .currency-container {
+    height: 50px;
+    transform: rotate(180deg);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-items: flex-start;
+    padding-right: 20px;
+}
 
-
-    width: 68px;
-    height: 18px;
-
+.main-picker-container .currency-container div {
     font-family: 'Inter', sans-serif;
     font-style: normal;
-    font-weight: 700;
     font-size: 16px;
     line-height: 18px;
-    /* identical to box height, or 112% */
-
-    letter-spacing: -0.011em;
-
-    /* Grey */
-
-    color: #76808D;
-
-
-    /* Inside auto layout */
-
-    flex: none;
-    order: 0;
-    flex-grow: 0;
-}
-
-.terminology-group1 .description {
-    /* Pods */
-
-
-    /* width: 34px; */
-    height: 18px;
-
-    font-family: 'Inter', sans-serif;
-    font-style: italic;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 18px;
-    /* identical to box height, or 112% */
-
-    letter-spacing: -0.011em;
-    margin-left: 5px;
-
-    /* Grey */
-
-    color: #76808D;
-
-
-    /* Inside auto layout */
-
-    flex: none;
-    order: 1;
-    flex-grow: 0;
-}
-
-.terminology-group1 .text-type {
-    width: 217px;
-    height: 50px;
-    /* Light1 */
-
-    background: #F5F5F5;
-    /* SMALL-inputs */
-
-    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
-    border-radius: 10px;
-
-}
-
-
-.terminology-edit {
-    width: 387px;
-
-
-}
-
-.terminology-edit .terminology-edit-content {
-    display: flex;
-    width: 387px;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 15px;
-}
-
-.terminology-edit .terminology-edit-content .button-style {
-
-    width: 217px;
-    height: 50px;
-    /* position: absolute;
-    left: 43.93%;
-    right: 0%;
-    top: 0%;
-    bottom: 0%; */
-
-    /* Light1 */
-
-    background: #F5F5F5;
-    /* SMALL-inputs */
-
-    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
-    border-radius: 10px;
-
-
-    /* Inside auto layout */
-
-    flex: none;
-    order: 2;
-    flex-grow: 0;
-}
-
-/* //! EDIT TERMINOLOGY DROPDOWN */
-.select-dropdown {
-    position: absolute;
-    /* left: 43.26%;
-    right: 0%;
-    top: 0%;
-    bottom: 80.77%; */
-
-    /* Light1 */
-
-    background: #F5F5F5;
-    border-radius: 10px;
-}
-
-.terminology-edit .terminology-edit-content .dropdown-terminology {
-    display: inline-block;
-    position: relative;
-    width: 219px;
-}
-
-.terminology-edit .terminology-edit-content .dropdown-terminology .dropdown-content {
-    display: none;
-    position: absolute;
-    width: 100%;
-    overflow: auto;
-    /* Light2 */
-
-    background: #F0F0F0;
-    border-radius: 10px;
-
-
-}
-
-.terminology-edit .terminology-edit-content .dropdown-terminology:hover .dropdown-content {
-    display: flex;
-    flex-direction: column;
-    z-index: 1;
-
-    align-items: flex-start;
-    padding: 13px;
-    gap: 20px;
-
-    height: 210px;
-
-    overflow-x: hidden;
-
-
-}
-
-.terminology-edit .terminology-edit-content .dropdown-terminology .dropdown-content a {
-    display: block;
-    /* Joko */
-
-
-    /* position: absolute; */
-    /* left: 5.99%;
-    right: 66.82%;
-    top: 34.76%;
-    bottom: 57.62%; */
-
-    /* corps */
-    font-family: 'Inter', sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 16px;
-    /* identical to box height, or 114% */
-
-
-    /* Grey */
-
-    color: #76808D;
-}
-
-.terminology-edit .terminology-edit-content .dropdown-terminology .dropdown-content a:hover {
-    color: #FFFFFF;
-    background-color: #C94B32;
-}
-
-.terminology-edit .terminology-edit-content .dropdown-terminology button {
-    width: 219px;
-    height: 50px;
-    padding-left: 18px;
-
-    /* Light1 */
-
-    /* GRADIENT-light */
-
-    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
-    border-radius: 10px;
-
-    align-self: center;
-
-    /* Inside auto layout */
-
-    flex: none;
-    order: 0;
-    flex-grow: 0;
-
-    /* text */
-
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 18px;
-    /* or 112% */
-
-    display: flex;
-    align-items: center;
-    text-align: center;
-
-    /* identical to box height, or 112% */
-
-    letter-spacing: -0.011em;
-
-    /* Grey */
-
-    color: rgba(27, 45, 65, 0.6);
-
-
-    justify-content: flex-start;
-}
-
-.terminology-edit .terminology-edit-content .dropdown-terminology .dropdown-content button {
-    width: 191px;
-    height: 40px;
-
-    margin-top: 13px;
-
-    background: #C94B32;
-    border-radius: 5px;
-
-    align-self: center;
-
-    /* Inside auto layout */
-
-    flex: none;
-    order: 0;
-    flex-grow: 0;
-
-    /* text */
-
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 18px;
-    /* or 112% */
-
-    display: flex;
-    align-items: center;
-    text-align: center;
     letter-spacing: -0.011em;
     text-transform: uppercase;
+    color: #76808D;
+    font-weight: 700;
+    margin-left: 12px;
+}
 
-    color: #FFFFFF;
+.main-picker-container .currency-container {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    text-transform: uppercase;
+    color: #76808D;
+}
 
-    justify-content: center;
+.picker-container .number-input {
+    background: #FFFFFF;
+    /* box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1); */
+    /* border-radius: 0px 10px 10px 0px; */
+}
+
+.picker-container .number-input .input {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    /* border-radius: 10px 10px 10px 10px; */
+    /* identical to box height, or 112% */
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+
+    text-align: center;
+    letter-spacing: -0.011em;
+
+    color: rgba(27, 45, 65, 0.6);
+}
+
+.picker-container .counter {
+    width: 40px;
+    height: 50px;
+    background: #FFFFFF;
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    /* border-radius: 0px 10px 10px 0px; */
 }

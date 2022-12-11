@@ -110,16 +110,16 @@ const NameDAO = () => {
       </div> : null
       }
       <div className="NameDAO">
-        <div className="headerText">1/3 Name your new DAO</div>
+        <div className="headerText">1/3 Name of your Organisation</div>
         <div className="centerCard">
           <div>
             <div>
-              <div className="inputFieldTitle">Name Your DAO</div>
+              <div className="inputFieldTitle">Name Your Organisation</div>
               <SimpleInputField
                 className="inputField"
                 height={50}
                 width={460}
-                placeholder="Epic DAO"
+                placeholder="Epic Organisation"
                 value={daoName}
                 onchange={(event) => {
                   checkAvailabilityAsync(event)
@@ -130,7 +130,7 @@ const NameDAO = () => {
             </div>
             <div>
               <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                <div className="inputFieldTitle" style={{ marginRight: '16px' }}>DAO address</div>
+                <div className="inputFieldTitle" style={{ marginRight: '16px' }}>Organisation address</div>
                 { urlCheckLoading && <LeapFrog size={20} color="#C94B32" /> }
               </div>
               <SimpleInputField
@@ -139,7 +139,7 @@ const NameDAO = () => {
                 width={460}
                 disabled
                 value={daoAddress}
-                placeholder="https://app.lomads.xyz/Name_of_the_DAO"
+                placeholder="https://app.lomads.xyz/Name_of_the_Organisation"
                 onchange={(e) => {
                   dispatch(updateDaoAddress(e.target.value));
                 }}

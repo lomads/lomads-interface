@@ -1,0 +1,247 @@
+.applicant-overlay {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(27, 43, 65, 0.25);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.applicant-overlay .applicant-container {
+    width: 575px;
+    height: 100vh;
+    background-color: #FFF;
+    border-radius: 20px 0px 0px 20px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.applicant-overlay .applicant-container .applicant-header {
+    width: 100%;
+    height: 10vh;
+    padding: 0 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.applicant-overlay .applicant-container .applicant-header button {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
+    border-radius: 3px;
+}
+
+.applicant-overlay .applicant-container .applicant-header span {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+    /* or 129% */
+    display: flex;
+    align-items: center;
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+}
+
+
+.applicant-overlay .applicant-container .applicant-slider {
+    width: 100%;
+    height: 80vh;
+    display: flex;
+    align-items: center;
+}
+
+.applicant-overlay .applicant-container .applicant-slider .slider-controls {
+    width: 10%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.applicant-overlay .applicant-container .applicant-slider .slider-controls .control-btn {
+    width: 100%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    box-shadow: 5px 5px 4px rgba(27, 43, 65, 0.05), 3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 0px 20px 20px 0px;
+}
+
+.applicant-overlay .applicant-container .applicant-slider .slider-content {
+    width: 80%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center !important;
+    padding: 0 35px;
+    background-color: white;
+}
+
+.applicant-overlay .applicant-container .applicant-slider .slider-content .applicant-card {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.applicant-overlay .applicant-container .applicant-slider .slider-content .applicant-card .applicant-body {
+    width: 100%;
+    height: 90%;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.applicant-overlay .applicant-container .applicant-slider .slider-content .applicant-card .applicant-body h1 {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    color: #C94B32;
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.applicant-overlay .applicant-container .applicant-slider .slider-content .applicant-card .applicant-body p {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+    /* or 129% */
+    text-align: center;
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+}
+
+.applicant-overlay .applicant-container .applicant-slider .slider-content .applicant-card .applicant-body .detail-container {
+    width: 80%;
+    margin: 30px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1
+}
+
+.applicant-overlay .applicant-container .applicant-slider .slider-content .applicant-card .applicant-body .detail-container:last-child {
+    margin: 0;
+}
+
+.applicant-overlay .applicant-container .applicant-slider .slider-content .applicant-card .applicant-body .detail-container span {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
+    /* identical to box height, or 112% */
+    text-align: center;
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+}
+
+.applicant-overlay .applicant-container .applicant-slider .slider-content .applicant-card .applicant-body .detail-container p {
+    font-family: Arial, Helvetica, sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    color: #1B2B41;
+    margin-top: 15px;
+    text-align: left;
+}
+
+.applicant-overlay .applicant-container .applicant-slider .slider-content .applicant-card .applicant-body .detail-container button {
+    background: #FFFFFF;
+    /* Color-drop */
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    /* or 112% */
+    display: flex;
+    align-items: center;
+    text-align: center;
+    letter-spacing: -0.011em;
+    text-transform: uppercase;
+
+    /* RED */
+    color: #C94B32;
+    width: 300px;
+    height: 40px;
+    margin-top: 10px;
+}
+
+.applicant-overlay .applicant-container .applicant-slider .slider-content .applicant-card .applicant-foot {
+    width: 100%;
+    height: 10%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.applicant-overlay .applicant-container .applicant-slider .slider-content .applicant-card .applicant-foot button {
+    height: 50px;
+    width: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+}
+
+.applicant-overlay .applicant-container .applicant-slider .slider-content .applicant-card .applicant-foot button:first-child {
+    margin-right: 20px;
+    border: 1px solid #C94B32;
+    background-color: white;
+    color: #C94B32;
+}
+
+.applicant-overlay .applicant-container .applicant-slider .slider-content .applicant-card .applicant-foot button:last-child {
+    margin-right: 20px;
+    background-color: #C94B32;
+    color: #FFF;
+}
+
+.applicant-overlay .applicant-container .applicant-footer {
+    width: 100%;
+    height: 10vh;
+    display: flex;
+    align-items: center;
+}
+
+.applicant-overlay .applicant-container .applicant-footer .dots-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.applicant-overlay .applicant-container .applicant-footer .dots-container .dots {
+    height: 10px;
+    width: 10px;
+    border-radius: 5px;
+    margin-right: 10px;
+    background-color: #f0f0f0;
+}

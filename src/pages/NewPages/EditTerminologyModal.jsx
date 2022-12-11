@@ -193,6 +193,8 @@ const EditTerminologyModal = ({ toggleEditModal }) => {
           {/* //! FOOTER */}
           <div className="button-section">
             <Button
+              style={{ marginRight: 6 }}
+              variant="outline"
               id="button-cancel"
               onClick={() => {
                 toggleEditModal();
