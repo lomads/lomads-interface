@@ -6,6 +6,7 @@ import CreateOrganization from 'views/Create-Organization';
 import InviteGang from 'views/Invite-Gang';
 import StartSafe from 'views/Start-Safe';
 import CreateSafe from 'views/Create-Safe';
+import AddExistingSafe from 'views/Add-Existing-Safe';
 export default [
 	// {
 	// 	path: '/',
@@ -55,5 +56,12 @@ export default [
 		layout: LandingLayout,
 		private: false,
 		component: CreateSafe
+	},
+	{
+		path:'/addsafe',
+		exact: true,
+		layout: LandingLayout,
+		private: false,
+		component: AddExistingSafe
 	}
 ];

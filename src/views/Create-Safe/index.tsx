@@ -4,6 +4,11 @@ import { makeStyles } from '@mui/styles';
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import TextInput from 'components/TextInput';
+import daoMember2 from "../../assets/svg/daoMember2.svg";
+import Checkbox from '@mui/material/Checkbox';
+import Select from '@mui/material/Select';
+import FormControl from '@mui/material/FormControl';
+import MenuItem from '@mui/material/MenuItem';
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
@@ -13,7 +18,7 @@ const useStyles = makeStyles((theme: any) => ({
 		flexDirection: 'column',
 		alignItems: 'center',
 		justifyContent: 'center',
-		overflow: 'hidden !important'
+		overflowY: 'scroll'
 	},
 	headingText: {
 		color: '#C94B32 !important'
@@ -45,13 +50,59 @@ const useStyles = makeStyles((theme: any) => ({
 	buttonStyle: {
 		borderRadius: '5px',
 	},
+	ownerButton: {
+		display: 'flex',
+	},
+	tncBox: {
+		lineHeight: '35px',
+		marginBottom: '3rem',
+		width: '50%',
+		textAlign: 'center'
+	}
 
 }));
 
 export default () => {
 	const classes = useStyles();
 	const navigate = useNavigate();
+	const [showContinueBtn, setShowContinueBtn] = useState(true);
+	const [showNextBtn, setShowNextBtn] = useState(true);
+	const [newSafe, setNewSafe] = useState(true);
+	const [existingSafe, setExistingSafe] = useState(false);
 
+	const contributor = [
+		{ name: 'Test1', contributor: 'Active Contributor' },
+		{ name: 'Test2', contributor: 'Contributor' }
+
+	]
+	const continueHandler = () => {
+		setShowContinueBtn(false);
+	}
+
+	const nextHandler = () => {
+		setShowNextBtn(false);
+	}
+
+	const selectSafeClicked = (val: any) => () => {
+		if (val == 'new') {
+			setNewSafe(true);
+			setExistingSafe(false);
+			if(!newSafe){
+				navigate('/newsafe')
+			}
+		}
+		else {
+			setNewSafe(false);
+			setExistingSafe(true);
+			if(!existingSafe){
+				navigate('/addsafe')
+			}
+		}
+	}
+	const options = [
+		{ value: 1, label: '1' },
+		{ value: 2, label: '2' },
+	];
 	return (
 		<>
 			<Grid container className={classes.root}>
@@ -63,14 +114,16 @@ export default () => {
 						<Button style={{
 							backgroundColor: '#FFFFFF',
 							boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
-							borderRadius: '5px'
-						}}>Create New Safe</Button>
+							borderRadius: '5px',
+							color: newSafe ? 'rgb(201, 75, 50)' : 'rgba(201, 75, 50, 0.6)'
+						}} onClick={selectSafeClicked('new')}>Create New Safe</Button>
 						<Typography style={{ marginLeft: '1rem', marginRight: '1rem', color: '#C94B32', fontSize: '20px' }}>or</Typography>
 						<Button style={{
 							backgroundColor: '#FFFFFF',
 							boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
-							borderRadius: '5px'
-						}}>Add Existing Safe</Button>
+							borderRadius: '5px',
+							color: existingSafe ? 'rgb(201, 75, 50)' : 'rgba(201, 75, 50, 0.6)'
+						}} onClick={selectSafeClicked('existing')}>Add Existing Safe</Button>
 					</Box>
 					<hr className={classes.divider} />
 					<Box className={classes.formBox}>
@@ -82,9 +135,66 @@ export default () => {
 						>
 						</TextInput>
 					</Box>
-					<Button variant='contained' color='primary' className={classes.buttonStyle}>
+					{showContinueBtn && <Button variant='contained' color='primary' className={classes.buttonStyle} onClick={continueHandler}>
 						Continue
-					</Button>
+					</Button>}
+
+					{!showContinueBtn && <hr className={classes.divider} />}
+					{!showContinueBtn &&
+						<Box className={classes.formBox}>
+							{showNextBtn && <Typography variant={"subtitle2"} style={{ fontWeight: 700, marginBottom: '1rem', fontSize: '16px' }}>Select Owners</Typography>}
+							{!showNextBtn && <Typography variant={"subtitle2"} style={{ fontWeight: 700, marginBottom: '1rem', fontSize: '16px' }}>Owners</Typography>}
+							{contributor.map(item => {
+								return <Box display="flex" justifyContent={'space-between'}>
+									<img src={daoMember2} />
+									<Typography style={{ marginTop: '0.5rem' }}>{item.name}</Typography>
+									<Checkbox defaultChecked />
+								</Box>
+							})
+							}
+							{showNextBtn && <Box>
+								<Button variant='contained' color='primary' size={"small"} style={{ left: '35%', marginTop: '1rem' }} onClick={nextHandler}>
+									Next
+								</Button>
+							</Box>}
+						</Box>
+					}
+					{!showNextBtn && <hr className={classes.divider} />}
+					{
+						!showNextBtn &&
+						<Box className={classes.formBox}>
+							<Typography>Any transaction requires the confirmation of</Typography>
+							<Box style={{ display: 'flex', alignItems: 'center' }}>
+								<FormControl sx={{ m: 1, minWidth: 80 }}>
+									<Select
+										defaultValue={1}
+										displayEmpty
+										inputProps={{ 'aria-label': 'Without label' }}
+									>
+										{options.map(item => {
+											return <MenuItem value={item.value}>{item.label}</MenuItem>
+										})}
+
+									</Select>
+								</FormControl>
+								<Typography>of {options.length} owner(s)</Typography>
+							</Box>
+
+
+						</Box>
+					}
+					{!showNextBtn &&
+						<Box className={classes.tncBox}>
+							<Typography>By continuing you consent to the terms of use and privacy policy of Gnosis Safe</Typography>
+							<Typography style={{ marginTop: '0.5rem' }}>You’re about to create a new safe and will have to confirm a transaction with your currently connected wallet.
+								<b>The creation will cost approximately 0.01256 GOR.</b>
+								The exact amount will be determinated by your wallet.
+							</Typography>
+							<Button variant='contained' color='primary' size={"small"} style={{ marginTop: '1.5rem' }} onClick={nextHandler}>
+								Create Safe
+							</Button>
+						</Box>
+					}
 				</Grid>
 			</Grid>
 		</>
