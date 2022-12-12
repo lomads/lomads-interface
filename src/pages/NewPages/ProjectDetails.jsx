@@ -785,7 +785,7 @@ const ProjectDetails = () => {
                                                 <div className="status">
                                                     <div style={{ width: '300px' }}>
                                                         <ProgressBar
-                                                            percent={80}
+                                                            percent={60}
                                                             filledBackground="#188C7C"
                                                             unfilledBackground="#F0F0F0"
                                                             height="5px"
