@@ -7,6 +7,7 @@ import InviteGang from 'views/Invite-Gang';
 import StartSafe from 'views/Start-Safe';
 import CreateSafe from 'views/Create-Safe';
 import AddExistingSafe from 'views/Add-Existing-Safe';
+import DAOLive from 'views/DAO-Live';
 export default [
 	// {
 	// 	path: '/',
@@ -63,5 +64,12 @@ export default [
 		layout: LandingLayout,
 		private: false,
 		component: AddExistingSafe
+	},
+	{
+		path: '/success',
+		exact: true,
+		layout: LandingLayout,
+		private: false,
+		component: DAOLive
 	}
 ];

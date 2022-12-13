@@ -81,6 +81,7 @@ export default () => {
 
 	const nextHandler = () => {
 		setShowNextBtn(false);
+		navigate('/success');
 	}
 
 	const selectSafeClicked = (val: any) => () => {

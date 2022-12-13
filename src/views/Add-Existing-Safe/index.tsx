@@ -99,6 +99,9 @@ export default () => {
 	const [findSafeBtnClicked, setFindSafeBtnClicked] = useState(true);
 	const ownersAvailable = ['0x248C...3974', '0xbd06...e404'];
 
+	const goToDAOSuccess = () => {
+		navigate('/success');
+	}
 	const selectSafeClicked = (val: any) => () => {
 		if (val == 'new') {
 			setNewSafe(true);
@@ -200,7 +203,7 @@ export default () => {
 								<Button variant='outlined' color='primary' size={"medium"} style={{ marginTop: '1.5rem', marginRight:'1rem', backgroundColor:'white' }}>
 									Change Safe
 								</Button>
-							<Button variant='contained' color='primary' size={"medium"} style={{ marginTop: '1.5rem' }}>
+								<Button variant='contained' color='primary' size={"medium"} style={{ marginTop: '1.5rem' }} onClick={goToDAOSuccess}>
 									Add Safe
 								</Button>
 							</Box>
