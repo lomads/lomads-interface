@@ -32,6 +32,10 @@ import AddNotionLink from 'components/AddNotionLink';
 import { nanoid } from '@reduxjs/toolkit';
 
 import { Editor } from '@tinymce/tinymce-react';
+import ProjectMilestone from './DashBoard/Project/ProjectMilestone';
+import ProjectKRA from './DashBoard/Project/ProjectKRA';
+import moment from 'moment';
+import ProjectResource from './DashBoard/Project/ProjectResource';
 
 const CreateProject = () => {
 
@@ -51,15 +55,15 @@ const CreateProject = () => {
     const [resourceList, setResourceList] = useState([]);
     const [showMore, setShowMore] = useState(false);
     const [success, setSuccess] = useState(false);
-    const [link, setLink] = useState('');
-    const [linkError, setLinkError] = useState(null);
-    const [roleName, setRoleName] = useState(null);
-    const [spaceDomain, setSpaceDomain] = useState(null);
-    const [accessControl, setAccessControl] = useState(false);
-    const [accessControlError, setAccessControlError] = useState(null);
-    const [title, setTitle] = useState('');
-    const [titleError, setTitleError] = useState(null);
     const [newAddress, setNewAddress] = useState([]);
+
+    const [openResource, setOpenResource] = useState(false);
+    const [openMilestone, setOpenMilestone] = useState(false);
+    const [openKRA, setOpenKRA] = useState(false);
+
+    const [milestones, setMilestones] = useState([]);
+    const [results, setResults] = useState([]);
+    const [frequency, setFrequency] = useState('');
 
     const daoName = _get(DAO, 'name', '').split(" ");
 
@@ -79,19 +83,6 @@ const CreateProject = () => {
     }, [createProjectLoading])
 
     useEffect(() => {
-        try {
-            if (link && link.length > 8 && link.indexOf('notion.') > -1) {
-                let lnk = new URL(link).pathname;
-                lnk = lnk.split('/')
-                if (lnk && lnk.length > 2)
-                    setSpaceDomain(lnk[1])
-            }
-        } catch (e) {
-            console.log(e)
-        }
-    }, [link])
-
-    useEffect(() => {
         const memberList = DAO?.members;
         if (memberList.length > 0 && selectedMembers.length === 0) {
             for (let i = 0; i < memberList.length; i++) {
@@ -104,14 +95,6 @@ const CreateProject = () => {
             }
         }
     }, []);
-
-    useEffect(() => {
-        if (link && link.indexOf('notion.') > -1 && _get(DAO, 'sbt.contactDetail', []).indexOf('email') === -1) {
-            setAccessControlError('Notion gated access not possible (No email in SBT)')
-        } else {
-            setAccessControlError(null)
-        }
-    }, [link, DAO])
 
     // useEffect(() => {
     //     let accessControlElement = document.getElementById('accessControl');
@@ -130,10 +113,6 @@ const CreateProject = () => {
     //         accessControlElement.disabled = false;
     //     }
     // }, [link]);
-
-    const accesscontrolDisabled = useMemo(() => {
-        return (!link || (link && link.length <= 8) || (link.indexOf('discord.') == -1 && link.indexOf('notion.') == -1))
-    }, [link])
 
     useEffect(() => {
         console.log("new address : ", newAddress);
@@ -161,31 +140,29 @@ const CreateProject = () => {
     const handleParseUrl = (url) => {
         try {
             const link = new URL(url);
-            console.log("lnk", link)
             if (link.hostname.indexOf('notion.') > -1) {
-                return <SiNotion color='#B12F15' size={20} />
+                return <SiNotion color='#76808D' size={20} />
             }
             else if (link.hostname.indexOf('discord.') > -1) {
-                return <BsDiscord color='#B12F15' size={20} />
+                return <BsDiscord color='#76808D' size={20} />
             }
             else if (link.hostname.indexOf('github.') > -1) {
-                return <BsGithub color='#B12F15' size={20} />
+                return <BsGithub color='#76808D' size={20} />
             }
             else if (link.hostname.indexOf('google.') > -1) {
-                return <BsGoogle color='#B12F15' size={20} />
+                return <BsGoogle color='#76808D' size={20} />
             }
             else if (link.hostname.indexOf('twitter.') > -1) {
-                return <BsTwitter color='#B12F15' size={20} />
+                return <BsTwitter color='#76808D' size={20} />
             }
             else {
-                return <span><BsGlobe size={20} /></span>
+                return <span><BsGlobe color="#76808D" size={20} /></span>
             }
         }
         catch (e) {
             console.error(e);
         }
     }
-
 
     const handleAddMember = (member) => {
         // let found = false;
@@ -210,111 +187,20 @@ const CreateProject = () => {
         setSelectedMembers(selectedMembers.filter((_, index) => index !== position));
     }
 
-
-    const handleAddResource = async (status = undefined) => {
-        if (title === '') {
-            setTitleError('Please enter a title')
-            return;
-        }
-        else if (link === '') {
-            setLinkError("Please enter a link")
-            return;
-        }
-        else if (!isValidUrl(link)) {
-            setLinkError("Please enter a valid link")
-            return;
-        }
-        // else if (!link.match(/^(http(s)?:\/\/)[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/)) {
-        //     return toast.error("Please enter a valid link");
-        // }
-        else {
-            let tempLink = link;
-            if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
-                tempLink = 'https://' + tempLink;
-            }
-            if (link.indexOf('discord.') > -1) {
-                let resource = {};
-                resource.id = nanoid(16);
-                resource.title = title;
-                resource.link = tempLink;
-                resource.provider = new URL(tempLink).hostname;
-                let dcserverid = undefined;
-                if (status)
-                    dcserverid = new URL(tempLink).pathname.split('/')[2]
-                resource.platformId = dcserverid;
-                resource.accessControl = accessControl;
-                if (status)
-                    resource.guildId = status;
-                setResourceList([...resourceList, resource]);
-                setAccessControl(false);
-                setTitle('');
-                setLink('');
-                setRoleName(null)
-                setSpaceDomain(null)
-            } else if (link.indexOf('notion.') > -1) {
-                if (status.status) {
-                    let resource = {};
-                    resource.id = nanoid(16);
-                    resource.title = title;
-                    resource.link = tempLink;
-                    resource.provider = new URL(tempLink).hostname;
-                    resource.spaceDomain = spaceDomain;
-                    resource.accessControl = accessControl;
-                    setResourceList([...resourceList, resource]);
-                    setAccessControl(false);
-                    setTitle('');
-                    setLink('');
-                    setRoleName(null)
-                    setSpaceDomain(null)
-                } else {
-                    setLinkError(status.message || 'Something went wrong.')
-                }
-            } else {
-                let resource = {};
-                resource.id = nanoid(16);
-                resource.title = title;
-                resource.link = tempLink;
-                resource.accessControl = false
-                setResourceList([...resourceList, resource]);
-                setAccessControl(false);
-                setTitle('');
-                setLink('');
-                setRoleName(null)
-                setSpaceDomain(null)
-            }
-        }
-    }
-
-    const handleRemoveResource = (position) => {
-        setResourceList(resourceList.filter((_, index) => index !== position));
-    }
-
-    const linkHasDomain = useMemo(() => {
-        try {
-            if (link && link.indexOf('notion.') > -1)
-                return (new URL(link).pathname).split('/').length > 2
-            return false;
-        } catch (e) {
-            return false
-        }
-    }, [link])
-
     const handleCreateProject = () => {
         let project = {};
         project.name = name;
         project.description = desc;
         project.members = selectedMembers;
         project.links = resourceList;
+        project.milestones = milestones;
+        project.kra = {
+            frequency,
+            results
+        };
         project.daoId = DAO?._id;
         console.log(project)
         dispatch(createProject({ payload: project }))
-    }
-
-    const LinkBtn = (props) => {
-        if (link && link.indexOf('discord.') > -1)
-            return <AddDiscordLink {...props} />
-        if (link && link.indexOf('notion.') > -1)
-            return <AddNotionLink {...props} />
     }
 
     return (
@@ -338,6 +224,34 @@ const CreateProject = () => {
                         addToList={(addressArr) => setNewAddress(addressArr)}
                     />
                 }
+
+                {/* open project resource modal */}
+                {
+                    openResource
+                    &&
+                    <ProjectResource
+                        toggleShowResource={() => setOpenResource(false)}
+                        getResources={(value) => setResourceList(value)}
+                    />
+                }
+                {/* open milestone modal */}
+                {
+                    openMilestone
+                    &&
+                    <ProjectMilestone
+                        toggleShowMilestone={() => setOpenMilestone(false)}
+                        getMilestones={(value) => setMilestones(value)}
+                    />
+                }
+                {/* open key result modal*/}
+                {
+                    openKRA
+                    &&
+                    <ProjectKRA
+                        toggleShowKRA={() => setOpenKRA(false)}
+                        getResults={(value1, value2) => { setResults(value1); setFrequency(value2) }}
+                    />
+                }
                 {
                     success
                         ?
@@ -358,12 +272,26 @@ const CreateProject = () => {
                                         <div className="projectName-container" style={{ width: '450px' }}>
                                             <div className="projectName-box" style={{ width: '100%' }}>
                                                 <div className='name-btn'>
-                                                    <p>Project ressources</p>
-                                                    <button><HiOutlinePlus size={20} style={{ marginRight: '10px' }} /> ADD</button>
+                                                    <p>Project resources</p>
+                                                    <button onClick={() => setOpenResource(true)}><HiOutlinePlus size={20} style={{ marginRight: '10px' }} /> ADD</button>
                                                 </div>
-                                                <span>Add links for your team to access </span>
+                                                <span style={{ marginBottom: '20px' }}>Add links for your team to access </span>
+                                                {
+                                                    resourceList && resourceList.map((item, index) => {
+                                                        return (
+                                                            <div className="link-li" key={index}>
+                                                                <div className="link-icon-name">
+                                                                    {handleParseUrl(item.link)}
+                                                                    <span style={{ marginLeft: '5px' }}>{item.title}</span>
+                                                                </div>
+                                                                <div className="link-address">
+                                                                    <span>{item.link.length > 30 ? item.link.slice(0, 30) + "..." : item.link}</span>
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
                                             </div>
-
                                         </div>
 
                                         <div className="divider"></div>
@@ -372,10 +300,27 @@ const CreateProject = () => {
                                             <div className="projectName-box" style={{ width: '100%' }}>
                                                 <div className='name-btn'>
                                                     <p>Milestones</p>
-                                                    <button><HiOutlinePlus size={20} style={{ marginRight: '10px' }} /> ADD</button>
+                                                    <button onClick={() => setOpenMilestone(true)}><HiOutlinePlus size={20} style={{ marginRight: '10px' }} /> ADD</button>
                                                 </div>
 
-                                                <span>Organise and link payments to milestones</span>
+                                                <span style={{ marginBottom: '20px' }}>Organise and link payments to milestones</span>
+
+                                                {
+                                                    milestones && milestones.map((item, index) => {
+                                                        return (
+                                                            <div className="milestone-card">
+                                                                <div>
+                                                                    <span>{index + 1}</span>
+                                                                    <h1>{item.name}</h1>
+                                                                </div>
+                                                                <div>
+                                                                    <h1>{moment(item.deadline).format('L')}</h1>
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
+
                                             </div>
 
                                         </div>
@@ -386,10 +331,22 @@ const CreateProject = () => {
                                             <div className="projectName-box" style={{ width: '100%' }}>
                                                 <div className='name-btn'>
                                                     <p>Key results</p>
-                                                    <button><HiOutlinePlus size={20} style={{ marginRight: '10px' }} /> ADD</button>
+                                                    <button onClick={() => setOpenKRA(true)}><HiOutlinePlus size={20} style={{ marginRight: '10px' }} /> ADD</button>
                                                 </div>
 
-                                                <span>Set objective for your team </span>
+                                                <span style={{ marginBottom: '20px' }}>Set objective for your team </span>
+
+                                                {
+                                                    results && results.map((item, index) => {
+                                                        return (
+                                                            <div className="milestone-card">
+                                                                <div>
+                                                                    <h1>{item.name}</h1>
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
                                             </div>
 
                                         </div>

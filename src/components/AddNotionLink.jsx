@@ -38,18 +38,18 @@ export default ({ title, desc, link, spaceDomain, accessControl, okButton, onNot
             return toast.error("Valid notion domain required");
         }
         else {
-            if(accessControl){
+            if (accessControl) {
                 setLinkLoading(true)
                 axiosHttp.get(`/project/notion/space-admin-status?domain=${spaceDomain}`)
-                .then(res => { 
-                    console.log(res)
-                    onNotionCheckStatus(res.data) 
-                })
-                .catch(e => {
-                    console.log(e)
-                    onNotionCheckStatus({ status:false, message: 'Something went wrong. Try again' })
-                })
-                .finally(() => setLinkLoading(false))
+                    .then(res => {
+                        console.log(res)
+                        onNotionCheckStatus(res.data)
+                    })
+                    .catch(e => {
+                        console.log(e)
+                        onNotionCheckStatus({ status: false, message: 'Something went wrong. Try again' })
+                    })
+                    .finally(() => setLinkLoading(false))
             } else {
                 onNotionCheckStatus({ status: true })
             }
@@ -58,19 +58,19 @@ export default ({ title, desc, link, spaceDomain, accessControl, okButton, onNot
 
     return (
         <>
-            { 
-                okButton ? 
-                <SimpleLoadButton disabled={linkLoading} title="OK" bgColor={link !== '' && title !== '' && !linkLoading ? '#C84A32' : 'rgba(27, 43, 65, 0.2)'} className="button" fontsize={16} fontweight={400} height={40} width={129} onClick={() => handleAddResource()} /> : 
-                <button
-                    disabled={link === '' || title === '' || linkLoading}
-                    style={{ background: link !== '' && title !== '' && !linkLoading ? '#C84A32' : 'rgba(27, 43, 65, 0.2)', width: 50, height: 50, display: 'flex', alignItems: 'center', justifyContent: 'center'}}
-                    onClick={() => handleAddResource() }
-                >   {
-                    <AiOutlinePlus color="#FFF" size={25} />
-                    }
-                </button>
+            {
+                okButton ?
+                    <SimpleLoadButton disabled={linkLoading} title="OK" bgColor={link !== '' && title !== '' && !linkLoading ? '#C84A32' : 'rgba(27, 43, 65, 0.2)'} className="button" fontsize={16} fontweight={400} height={40} width={129} onClick={() => handleAddResource()} /> :
+                    <button
+                        disabled={link === '' || title === '' || linkLoading}
+                        style={{ background: link !== '' && title !== '' && !linkLoading ? '#C84A32' : 'rgba(27, 43, 65, 0.2)', width: 50, height: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        onClick={() => handleAddResource()}
+                    >   {
+                            <AiOutlinePlus color="#FFF" size={25} />
+                        }
+                    </button>
             }
         </>
 
-    )   
+    )
 }
