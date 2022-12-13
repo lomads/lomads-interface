@@ -18,7 +18,7 @@ import AddNotionLink from 'components/AddNotionLink';
 
 import { nanoid } from '@reduxjs/toolkit';
 
-const ProjectResource = ({ toggleShowResource, getResources }) => {
+const ProjectResource = ({ toggleShowResource, getResources, list }) => {
     const { DAO } = useAppSelector((state) => state.dashboard);
 
     const [title, setTitle] = useState('');
@@ -29,7 +29,7 @@ const ProjectResource = ({ toggleShowResource, getResources }) => {
     const [spaceDomain, setSpaceDomain] = useState(null);
     const [accessControl, setAccessControl] = useState(false);
     const [accessControlError, setAccessControlError] = useState(null);
-    const [resourceList, setResourceList] = useState([]);
+    const [resourceList, setResourceList] = useState(list);
 
     useEffect(() => {
         try {
@@ -183,8 +183,8 @@ const ProjectResource = ({ toggleShowResource, getResources }) => {
 
     const handleSubmit = () => {
         console.log("resource list : ", resourceList);
-        // getResources(resourceList);
-        // toggleShowResource();
+        getResources(resourceList);
+        toggleShowResource();
     }
 
     return (

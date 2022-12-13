@@ -6,10 +6,11 @@ import createTaskSvg from '../../../../assets/svg/kra.svg';
 
 import SimpleInputField from "UIpack/SimpleInputField";
 
-const ProjectKRA = ({ toggleShowKRA, getResults }) => {
+const ProjectKRA = ({ toggleShowKRA, getResults, list, freq }) => {
 
-    const [frequency, setFrequency] = useState('daily');
-    const [results, setResults] = useState([0]);
+    const [frequency, setFrequency] = useState(freq ? freq : 'daily');
+    const [resultCount, setResultCount] = useState(list.length > 0 ? list.length : 1);
+    const [results, setResults] = useState(list.length > 0 ? list : [{ name: '' }]);
 
     const handleChangeFrequency = (e) => {
         setFrequency(e.target.value);
@@ -17,20 +18,57 @@ const ProjectKRA = ({ toggleShowKRA, getResults }) => {
 
     const onChangeNumberOfResults = (e) => {
         let n = parseInt(e.target.value);
-        let array = [];
-        for (var i = 0; i < n; i++) {
-            array.push({ name: '' });
+        setResultCount(n);
+        let array = results;
+
+        if (array.length === 0) {
+            for (var i = 0; i < n; i++) {
+                array.push({ name: '' });
+            }
+        }
+        else if (n > array.length) {
+            let count = n - array.length;
+            for (var i = 0; i < count; i++) {
+                array.push({ name: '' });
+            }
+        }
+        else if (n < array.length) {
+            let count = array.length - n;
+            for (var i = 0; i < count; i++) {
+                array.pop();
+            }
         }
         setResults(array);
     };
 
     const handleChangeName = (e, index) => {
-        results[index].name = e;
+        let element = document.getElementById(`name${index}`);
+        element.innerHTML = "";
+        const newArray = results.map((item, i) => {
+            if (i === index) {
+                return { ...item, name: e };
+            } else {
+                return item;
+            }
+        });
+        setResults(newArray);
     }
 
     const handleSubmit = () => {
-        getResults(results, frequency);
-        toggleShowKRA();
+        let flag = 0;
+        for (let i = 0; i < results.length; i++) {
+            let ob = results[i];
+            if (ob.name === '') {
+                flag = -1;
+                let e = document.getElementById(`name${i}`);
+                e.innerHTML = "Enter name";
+                return;
+            }
+        }
+        if (flag !== -1) {
+            getResults(results, frequency);
+            toggleShowKRA();
+        }
     }
 
     return (
@@ -54,6 +92,7 @@ const ProjectKRA = ({ toggleShowKRA, getResults }) => {
                                 id="project"
                                 className="tokenDropdown"
                                 style={{ width: '100%' }}
+                                defaultValue={frequency}
                                 onChange={handleChangeFrequency}
                             >
                                 <option value="daily">Daily</option>
@@ -69,6 +108,7 @@ const ProjectKRA = ({ toggleShowKRA, getResults }) => {
                                 id="project"
                                 className="tokenDropdown"
                                 style={{ width: '100%' }}
+                                defaultValue={resultCount}
                                 onChange={onChangeNumberOfResults}
                             >
                                 <option value={1}>1</option>
@@ -94,9 +134,12 @@ const ProjectKRA = ({ toggleShowKRA, getResults }) => {
                                                 id="nameInput"
                                                 height={50}
                                                 width={'100%'}
+                                                value={item.name}
                                                 onchange={(e) => handleChangeName(e.target.value, index)}
                                             />
+                                            <span id={`name${index}`} style={{ fontSize: '13px', color: '#C84A32', fontStyle: 'normal' }}></span>
                                         </div>
+
                                     </div>
                                 )
                             })

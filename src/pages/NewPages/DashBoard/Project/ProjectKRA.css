@@ -142,7 +142,7 @@
 
 .kraOverlay .kraContainer .kra-body .kra-inputRow {
     width: 100%;
-    margin-bottom: 30px;
+    height: 100px;
 }
 
 .kraOverlay .kraContainer .kra-body .kra-inputRow .error-msg {

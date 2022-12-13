@@ -573,14 +573,6 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                     })}
                                                     {can(myRole, 'task.create.sweat') && _get(DAO, 'sweatPoints', false) && <option value="SWEAT">SWEAT</option>}
                                                 </select>
-                                                {/* <input
-                                                    className="inputField"
-                                                    type={'number'}
-                                                    style={{ height: '55px' }}
-                                                    value={amount}
-                                                    step={0.01}
-                                                    onChange={(e) => setAmount(parseFloat(e.target.value))}
-                                                /> */}
                                                 <NumberInput onChange={(e) => setAmount(parseFloat(e))} style={{ marginTop: 10, width: 350, height: 50, borderRadius: '10px 10px 10px 10px', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)' }} step={1} min={0}>
                                                     <NumberInputField placeholder='Amount' className='input' style={{ padding: 0, width: 130, textAlign: "center", height: 50, backgroundColor: '#F5F5F5', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)', borderRadius: '10px 0px 0px 10px', borderWidth: 0 }} />
                                                     <NumberInputStepper style={{ width: 50, backgroundColor: '#FFF', borderRadius: '0px 10px 10px 0px' }}>
@@ -588,15 +580,6 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                         <NumberDecrementStepper color="#C94B32" style={{ borderTopWidth: 0 }} />
                                                     </NumberInputStepper>
                                                 </NumberInput>
-                                                {/* <NumberInputStepper
-                                                    className="inputField"
-                                                    height={55}
-                                                    step={0.01}
-                                                    value={amount}
-                                                    placeholder="Amount"
-                                                    type="number"
-                                                    onchange={(e) => setAmount(parseFloat(e.target.value))}
-                                                /> */}
                                             </div>
                                             <span className='error-msg' id="error-compensation"></span>
                                         </div>

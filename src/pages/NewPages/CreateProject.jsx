@@ -165,13 +165,6 @@ const CreateProject = () => {
     }
 
     const handleAddMember = (member) => {
-        // let found = false;
-        // for (let i = 0; i < selectedMembers.length; i++) {
-        //     if (selectedMembers[i].name === member.name) {
-        //         found = true;
-        //         break;
-        //     }
-        // }
         const memberExists = _find(selectedMembers, m => m.address.toLowerCase() === member.wallet.toLowerCase())
         if (memberExists)
             setSelectedMembers(prev => prev.filter((item) => item.address.toLowerCase() !== member.wallet.toLowerCase()));
@@ -230,6 +223,7 @@ const CreateProject = () => {
                     openResource
                     &&
                     <ProjectResource
+                        list={resourceList}
                         toggleShowResource={() => setOpenResource(false)}
                         getResources={(value) => setResourceList(value)}
                     />
@@ -239,6 +233,7 @@ const CreateProject = () => {
                     openMilestone
                     &&
                     <ProjectMilestone
+                        list={milestones}
                         toggleShowMilestone={() => setOpenMilestone(false)}
                         getMilestones={(value) => setMilestones(value)}
                     />
@@ -248,6 +243,8 @@ const CreateProject = () => {
                     openKRA
                     &&
                     <ProjectKRA
+                        list={results}
+                        freq={frequency}
                         toggleShowKRA={() => setOpenKRA(false)}
                         getResults={(value1, value2) => { setResults(value1); setFrequency(value2) }}
                     />
@@ -273,7 +270,14 @@ const CreateProject = () => {
                                             <div className="projectName-box" style={{ width: '100%' }}>
                                                 <div className='name-btn'>
                                                     <p>Project resources</p>
-                                                    <button onClick={() => setOpenResource(true)}><HiOutlinePlus size={20} style={{ marginRight: '10px' }} /> ADD</button>
+                                                    {
+                                                        resourceList.length > 0
+                                                            ?
+                                                            <img src={editToken} alt="hk-logo" onClick={() => setOpenResource(true)} style={{ cursor: 'pointer' }} />
+                                                            :
+                                                            <button onClick={() => setOpenResource(true)}><HiOutlinePlus size={20} style={{ marginRight: '10px' }} /> ADD</button>
+                                                    }
+
                                                 </div>
                                                 <span style={{ marginBottom: '20px' }}>Add links for your team to access </span>
                                                 {
@@ -300,7 +304,13 @@ const CreateProject = () => {
                                             <div className="projectName-box" style={{ width: '100%' }}>
                                                 <div className='name-btn'>
                                                     <p>Milestones</p>
-                                                    <button onClick={() => setOpenMilestone(true)}><HiOutlinePlus size={20} style={{ marginRight: '10px' }} /> ADD</button>
+                                                    {
+                                                        milestones.length > 0
+                                                            ?
+                                                            <img src={editToken} alt="hk-logo" onClick={() => setOpenMilestone(true)} style={{ cursor: 'pointer' }} />
+                                                            :
+                                                            <button onClick={() => setOpenMilestone(true)}><HiOutlinePlus size={20} style={{ marginRight: '10px' }} /> ADD</button>
+                                                    }
                                                 </div>
 
                                                 <span style={{ marginBottom: '20px' }}>Organise and link payments to milestones</span>
@@ -331,7 +341,13 @@ const CreateProject = () => {
                                             <div className="projectName-box" style={{ width: '100%' }}>
                                                 <div className='name-btn'>
                                                     <p>Key results</p>
-                                                    <button onClick={() => setOpenKRA(true)}><HiOutlinePlus size={20} style={{ marginRight: '10px' }} /> ADD</button>
+                                                    {
+                                                        results.length > 0
+                                                            ?
+                                                            <img src={editToken} alt="hk-logo" onClick={() => setOpenKRA(true)} style={{ cursor: 'pointer' }} />
+                                                            :
+                                                            <button onClick={() => setOpenKRA(true)}><HiOutlinePlus size={20} style={{ marginRight: '10px' }} /> ADD</button>
+                                                    }
                                                 </div>
 
                                                 <span style={{ marginBottom: '20px' }}>Set objective for your team </span>
@@ -455,17 +471,17 @@ const CreateProject = () => {
                                                                                 </div>
                                                                                 <div className="member-address">
                                                                                     <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
-                                                                                    {/* {
-                                                                                    selectedMembers.some((m) => m.address.toLowerCase() === item.member.wallet.toLowerCase()) === false
-                                                                                        ?
-                                                                                        <input type="checkbox" onChange={() => handleAddMember(item.member)} />
-                                                                                        :
-                                                                                        <input type="checkbox" onChange={() => handleAddMember(item.member)} checked />
-                                                                                } */}
-                                                                                    <div className='checkbox'>
+                                                                                    {
+                                                                                        selectedMembers.some((m) => m.address.toLowerCase() === item.member.wallet.toLowerCase()) === false
+                                                                                            ?
+                                                                                            <input type="checkbox" onChange={() => handleAddMember(item.member)} />
+                                                                                            :
+                                                                                            <input type="checkbox" onChange={() => handleAddMember(item.member)} checked />
+                                                                                    }
+                                                                                    {/* <div className='checkbox'>
                                                                                         <input type="checkbox" onChange={(e) => alert("dfdf")} />
                                                                                         <span className='inner-check check'></span>
-                                                                                    </div>
+                                                                                    </div> */}
                                                                                 </div>
                                                                             </div>
                                                                         )
