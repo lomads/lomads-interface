@@ -1,17 +1,19 @@
 
-import { Container, Grid, Typography, Box,  Button, IconButton } from "@mui/material"
+import { Container, Grid, Typography, Box, Button, IconButton } from "@mui/material"
 import { makeStyles } from '@mui/styles';
 import TextInput from 'components/TextInput';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import Tooltip from '@mui/material/Tooltip';
 import React, { useRef, useState } from "react";
 import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import AddIcon from '@mui/icons-material/Add';
 import daoMember2 from "../../assets/svg/daoMember2.svg";
 import { useNavigate } from 'react-router-dom';
 import Link from '@mui/material/Link';
+import { ethers } from "ethers";
+
 const useStyles = makeStyles((theme: any) => ({
 	root: {
 		height: "100vh",
@@ -76,6 +78,11 @@ const useStyles = makeStyles((theme: any) => ({
 export default () => {
 	const classes = useStyles();
 	const hiddenFileInput = useRef<any>(null);
+	const [selectContributor, setSelectedContributor] = useState('CONTRIBUTOR');
+	const [ownerAddress, setOwnerAddress] = useState("");
+	const [ownerName, setOwnerName] = useState("");
+	const [errors, setErrors] = useState<any>({});
+
 	const navigate = useNavigate();
 	const handleClick = () => {
 		hiddenFileInput?.current?.click();
@@ -96,6 +103,27 @@ export default () => {
 		navigate('/startsafe');
 
 	}
+
+	const handleContributorChange = (event: SelectChangeEvent) => {
+		setSelectedContributor(event.target.value);
+	}
+
+	const isAddressValid = (holderAddress: string) => {
+		const ENSdomain = holderAddress.slice(-4);
+		if (ENSdomain === ".eth") {
+			return true;
+		} else {
+			const isValid: boolean = ethers.utils.isAddress(holderAddress);
+			return isValid;
+		}
+	};
+
+	const addMember = () => {
+		if (!isAddressValid(ownerAddress)) {
+			setErrors({ ownerAddress: "* Please enter valid address" })
+		}
+	}
+
 	return (
 		<>
 			<Grid container className={classes.root}>
@@ -124,26 +152,36 @@ export default () => {
 								fullWidth
 								sx={{ marginRight: 1 }}
 								placeholder={"Name"}
+								value={ownerName}
+								onChange={(event: any) => {
+									setOwnerName(event.target.value);
+								}}
 							/>
 							<TextInput
 								fullWidth
 								placeholder={"ENS Domain and Wallet Address"}
+								onChange={(event: any) => {
+									setOwnerAddress(event.target.value);
+									setErrors({ ownerAddress: "" });
+								}}
+								error={errors.ownerAddress ? true : false}
+								helperText={errors.ownerAddress}
 							/>
 							<FormControl sx={{ m: 1, minWidth: 120 }} fullWidth>
 								<Select
-									value={"CONTRIBUTOR"}
-									displayEmpty
+									value={selectContributor}
+									onChange={handleContributorChange}
 									inputProps={{ 'aria-label': 'Without label' }}
 								>
 									{options.map(item => {
-										return <MenuItem value={item.value}>{item.label}</MenuItem>
+										return <MenuItem value={item.value} key={item.value}>{item.label}</MenuItem>
 									})}
 
 								</Select>
 							</FormControl>
 							<IconButton style={{
-								backgroundColor: 'rgba(27, 43, 65, 0.2)', borderRadius: '5px', height: '50px', width: '55px', marginTop: '9px'
-							}}>
+								backgroundColor: isAddressValid(ownerAddress) ? '#C94B32' : 'rgba(27, 43, 65, 0.2)', borderRadius: '5px', height: '50px', width: '55px', marginTop: '9px'
+							}} onClick={addMember}>
 								<AddIcon
 									fontSize="large"
 									sx={{

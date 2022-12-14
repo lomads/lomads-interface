@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import TextInput from 'components/TextInput';
 import TextField from '@mui/material/TextField';
 import coin from '../../assets/svg/coin.svg'
+import { ethers } from "ethers";
 const useStyles = makeStyles((theme: any) => ({
 	root: {
 		height: "100vh",
@@ -97,6 +98,9 @@ export default () => {
 	const [newSafe, setNewSafe] = useState(false);
 	const [existingSafe, setExistingSafe] = useState(true);
 	const [findSafeBtnClicked, setFindSafeBtnClicked] = useState(true);
+	const [safeAddress, setSafeAddress] = useState("");
+	const [errors, setErrors] = useState<any>({});
+
 	const ownersAvailable = ['0x248C...3974', '0xbd06...e404'];
 
 	const goToDAOSuccess = () => {
@@ -119,8 +123,27 @@ export default () => {
 		}
 	}
 	const findSafeHandler = () => {
-		setFindSafeBtnClicked(false);
+		if (isAddressValid(safeAddress))
+			setFindSafeBtnClicked(false);
+		else {
+			setErrors({ safeAddress: '* Enter valid safe address' })
+		}
 	}
+
+	const changeSafeHandler = () =>{
+		setFindSafeBtnClicked(true);
+		setSafeAddress("");
+	}
+
+	const isAddressValid = (holderAddress: string) => {
+		const ENSdomain = holderAddress.slice(-4);
+		if (ENSdomain === ".eth") {
+			return true;
+		} else {
+			const isValid: boolean = ethers.utils.isAddress(holderAddress);
+			return isValid;
+		}
+	};
 
 	return (
 		<>
@@ -156,14 +179,21 @@ export default () => {
 							</TextInput>
 							<TextInput
 								style={{ marginRight: '1rem' }}
+								value={safeAddress}
 								fullWidth
 								label={"Safe Address"}
 								placeholder={"0xbeee39"}
+								onChange={(event: any) => {
+									setSafeAddress(event.target.value);
+									setErrors({ safeAddress: "" })
+								}}
+								error={errors.safeAddress ? true : false}
+								helperText={errors.safeAddress}
 							>
 							</TextInput>
 						</Box>}
 					{findSafeBtnClicked &&
-						<Button variant='contained' color='primary' size={"medium"} onClick={findSafeHandler}>
+						<Button variant='contained' color='primary' size={"medium"} onClick={findSafeHandler} style={{ backgroundColor: isAddressValid(safeAddress) ? "#C94B32" : "rgba(27, 43, 65, 0.2)" }}>
 							Find Safe
 						</Button>
 					}
@@ -199,8 +229,8 @@ export default () => {
 							<Box style={{ textAlign: 'center', marginTop: '1rem' }}>
 								<Typography>By continuing you consent to the terms of use and privacy policy of Gnosis Safe</Typography>
 							</Box>
-							<Box style={{display:'flex', justifyContent:'space-between'}}>
-								<Button variant='outlined' color='primary' size={"medium"} style={{ marginTop: '1.5rem', marginRight:'1rem', backgroundColor:'white' }}>
+							<Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+								<Button variant='outlined' color='primary' size={"medium"} style={{ marginTop: '1.5rem', marginRight: '1rem', backgroundColor: 'white' }} onClick={changeSafeHandler}>
 									Change Safe
 								</Button>
 								<Button variant='contained' color='primary' size={"medium"} style={{ marginTop: '1.5rem' }} onClick={goToDAOSuccess}>

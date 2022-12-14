@@ -1,9 +1,10 @@
 
-import { Container, Grid, Typography, Box, Paper,} from "@mui/material"
+import { Container, Grid, Typography, Box, Paper, } from "@mui/material"
 import { makeStyles } from '@mui/styles';
 import TextInput from 'components/TextInput';
 import Button from 'components/Button';
 import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
@@ -38,7 +39,7 @@ const useStyles = makeStyles((theme: any) => ({
 export default () => {
 	const classes = useStyles();
 	const navigate = useNavigate();
-
+	const [orgName, setOrgName]= useState("");
 	const goToInviteGang = () => {
 		navigate('/invitegang');
 	}
@@ -56,12 +57,17 @@ export default () => {
 							fullWidth
 							label={"Name Your Organisation"}
 							placeholder={"Epic Organisation"}
+							value={orgName}
+							onChange={(event: any) => {
+								setOrgName(event.target.value);
+							}}
 						>
 						</TextInput>
 						<TextInput
 							fullWidth
 							label={"Organisation Address"}
 							disabled
+							placeholder="https://app.lomads.xyz/Name_of_the_Organisation"
 						>
 						</TextInput>
 					</Box>

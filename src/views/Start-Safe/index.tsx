@@ -35,7 +35,7 @@ export default () => {
 	}
 
 	const addExistingSafe = () => {
-
+		navigate('/addsafe');
 	}
 
 	return (

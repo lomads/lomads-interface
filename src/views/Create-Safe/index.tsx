@@ -32,11 +32,11 @@ const useStyles = makeStyles((theme: any) => ({
 	divider: {
 		border: '1.3px solid #c94b32',
 		width: '210px',
-		height:'0px',
+		height: '0px',
 		backgroundColor: '#c94b32',
 		flex: 'none',
 		flexGrow: 0,
-		marginBottom:'35px'
+		marginBottom: '35px'
 	},
 	formBox: {
 		background: '#FFFFFF',
@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme: any) => ({
 		padding: '26px 22px 30px',
 		lineHeight: '35px',
 		marginBottom: '3rem',
-		width:'55%'
+		width: '55%'
 	},
 	buttonStyle: {
 		borderRadius: '5px',
@@ -69,6 +69,8 @@ export default () => {
 	const [showNextBtn, setShowNextBtn] = useState(true);
 	const [newSafe, setNewSafe] = useState(true);
 	const [existingSafe, setExistingSafe] = useState(false);
+	const [safeName, setSafeName] = useState('');
+	const [errors, setErrors] = useState<any>({});
 
 	const contributor = [
 		{ name: 'Test1', contributor: 'Active Contributor' },
@@ -76,11 +78,18 @@ export default () => {
 
 	]
 	const continueHandler = () => {
-		setShowContinueBtn(false);
+		if (safeName.length > 0)
+			setShowContinueBtn(false);
+		else {
+			setErrors({ safeName: '* Safe Name is required' })
+		}
 	}
 
 	const nextHandler = () => {
 		setShowNextBtn(false);
+	}
+
+	const confirmBtnHandler = () => {
 		navigate('/success');
 	}
 
@@ -88,14 +97,14 @@ export default () => {
 		if (val == 'new') {
 			setNewSafe(true);
 			setExistingSafe(false);
-			if(!newSafe){
+			if (!newSafe) {
 				navigate('/newsafe')
 			}
 		}
 		else {
 			setNewSafe(false);
 			setExistingSafe(true);
-			if(!existingSafe){
+			if (!existingSafe) {
 				navigate('/addsafe')
 			}
 		}
@@ -133,10 +142,17 @@ export default () => {
 							fullWidth
 							label={"Safe Name"}
 							placeholder={"Pied Piper"}
+							value={safeName}
+							onChange={(event: any) => {
+								setSafeName(event.target.value);
+								setErrors({ safeName: '' })
+							}}
+							error={errors.safeName ? true : false}
+							helperText={errors.safeName}
 						>
 						</TextInput>
 					</Box>
-					{showContinueBtn && <Button variant='contained' color='primary' className={classes.buttonStyle} onClick={continueHandler}>
+					{showContinueBtn && <Button variant='contained' className={classes.buttonStyle} onClick={continueHandler} style={{ backgroundColor: safeName.length > 0 ? "#C94B32" : "rgba(27, 43, 65, 0.2)" }}>
 						Continue
 					</Button>}
 
@@ -191,7 +207,7 @@ export default () => {
 								<b>The creation will cost approximately 0.01256 GOR.</b>
 								The exact amount will be determinated by your wallet.
 							</Typography>
-							<Button variant='contained' color='primary' size={"small"} style={{ marginTop: '1.5rem' }} onClick={nextHandler}>
+							<Button variant='contained' color='primary' size={"small"} style={{ marginTop: '1.5rem' }} onClick={confirmBtnHandler}>
 								Create Safe
 							</Button>
 						</Box>
