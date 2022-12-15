@@ -181,6 +181,7 @@
 
 .resourceOverlay .resourceContainer .resource-body .rsrc-list .link-li .link-icon-name {
     display: flex;
+    width: 40%;
 }
 
 .resourceOverlay .resourceContainer .resource-body .rsrc-list .link-li .link-icon-name span {
@@ -197,6 +198,7 @@
 
 .resourceOverlay .resourceContainer .resource-body .rsrc-list .link-li .link-address {
     display: flex;
+    width: 60%;
 }
 
 .resourceOverlay .resourceContainer .resource-body .rsrc-list .link-li .link-address span {
@@ -209,6 +211,7 @@
 
     /* Grey */
     color: #76808D;
+    margin-right: 10px;
 }
 
 .resourceOverlay .resourceContainer .resource-body .rsrc-access {

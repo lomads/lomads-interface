@@ -35,7 +35,7 @@ import { useWeb3React } from "@web3-react/core";
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import { SupportedChainId } from "constants/chains";
 
-const ProjectMilestone = ({ toggleShowMilestone, getMilestones, list }) => {
+const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation, list }) => {
 
     const { DAO } = useAppSelector((state) => state.dashboard);
     const { chainId, account } = useWeb3React();
@@ -57,6 +57,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, list }) => {
 
     const getTokens = async (safeAddress) => {
         const tokens = await getSafeTokens(chainId, safeAddress)
+        console.log("Tokens : ", tokens);
         setSafeTokens(tokens)
     };
 
@@ -183,14 +184,14 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, list }) => {
             }
         }
         if (flag !== -1) {
-            console.log("milestones : ", milestones);
-            let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
+            let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
             symbol = _get(symbol, 'token.symbol', null)
             if (!symbol)
-                symbol = currency.currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ? 'MATIC' : currency.currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? 'GOR' : 'SWEAT'
-            console.log({ currency: currency.currency, amount, symbol });
-            // getMilestones(milestones);
-            // toggleShowMilestone();
+                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ? 'MATIC' : currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? 'GOR' : 'SWEAT'
+
+            getCompensation({ currency: currency, amount, symbol })
+            getMilestones(milestones);
+            toggleShowMilestone();
         }
     }
 
@@ -211,7 +212,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, list }) => {
                         <div className='milestone-inputRow' style={{ marginBottom: '20px', width: '320px' }}>
                             <span>Total Project Value</span>
                             <div className='picker-container'>
-                                <Select defaultValue={currency} onChange={e => setCurrency(e.target.value)} bg='#FFFF' color='#76808D' variant='unstyled' style={{ borderRadius: '10px 0px 0px 10px', borderWidth: 1, borderRightWidth: 0, borderColor: 'rgba(27, 43, 65, 0.1)', height: 50, padding: '0px 50px 0px 20px' }} iconSize={15} icon={<ArrowDown />}>
+                                <Select defaultValue={currency} onChange={e => { setCurrency(e.target.value); console.log(e.target.value) }} bg='#FFFF' color='#76808D' variant='unstyled' style={{ borderRadius: '10px 0px 0px 10px', borderWidth: 1, borderRightWidth: 0, borderColor: 'rgba(27, 43, 65, 0.1)', height: 50, padding: '0px 50px 0px 20px' }} iconSize={15} icon={<ArrowDown />}>
                                     <option value="" selected disabled>Select currency</option>
                                     {
                                         safeTokens.map((result, index) => {

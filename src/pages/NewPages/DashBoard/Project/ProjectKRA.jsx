@@ -23,13 +23,13 @@ const ProjectKRA = ({ toggleShowKRA, getResults, list, freq }) => {
 
         if (array.length === 0) {
             for (var i = 0; i < n; i++) {
-                array.push({ name: '' });
+                array.push({ name: '', progress: '' });
             }
         }
         else if (n > array.length) {
             let count = n - array.length;
             for (var i = 0; i < count; i++) {
-                array.push({ name: '' });
+                array.push({ name: '', progress: '' });
             }
         }
         else if (n < array.length) {

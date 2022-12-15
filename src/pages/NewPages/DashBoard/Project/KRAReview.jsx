@@ -1,0 +1,80 @@
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { find as _find, get as _get, debounce as _debounce } from 'lodash';
+import './ProjectKRA.css';
+import { CgClose } from 'react-icons/cg'
+import createTaskSvg from '../../../../assets/svg/kra.svg';
+
+const colors = ['#e67c40', '#e99a37', '#ebaf30', '#edcd27', '#becd33', '#8ecc3e', '#63c359', '#4fbf65', '#2ab87c', '#21a284', '#188c8c'];
+
+const KRAReview = ({ toggleShowKRA, list }) => {
+
+    const handleSlider = (e, index) => {
+        const slider = document.getElementById(`slider-rc${index}`);
+        const thumb = document.getElementById(`slider-thumb${index}`);
+        const progress = document.getElementById(`progress${index}`);
+        const percent = document.getElementById(`percent${index}`);
+
+        const maxVal = slider.getAttribute("max");
+        const x = (slider.value / maxVal) * 10;
+        const val = (slider.value / maxVal) * 100 + "%";
+        thumb.style.backgroundColor = colors[x + 1];
+        percent.innerHTML = val + " done";
+        percent.style.color = colors[x + 1];
+        progress.style.setProperty('width', `calc(100% - ${val})`);
+        thumb.style.left = val;
+    }
+
+    return (
+        <div className="kraOverlay">
+            <div className="kraContainer">
+                <div className='kra-header'>
+                    <button onClick={() => toggleShowKRA()}>
+                        <CgClose size={20} color="#C94B32" />
+                    </button>
+                </div>
+                <div style={{ width: '100%', height: '100%', overflow: 'scroll' }}>
+                    <div className='kra-body'>
+                        <img src={createTaskSvg} alt="frame-icon" />
+                        <h1>Key Results</h1>
+                        <span>It’s time to evaluate your scores</span>
+
+                        <div className='kra-section'>
+                            {
+                                list && list.map((item, index) => {
+                                    return (
+                                        <div className='review-card'>
+                                            <h1>{item.name}</h1>
+                                            <div className='review-slider-section'>
+                                                {/* custom slider */}
+                                                <div className='range-slider'>
+                                                    <input type="range" min={0} max={100} step={10} class="slider-rc" id={`slider-rc${index}`} onChange={(e) => handleSlider(e, index)} />
+                                                    <div className='slider-thumb' id={`slider-thumb${index}`}>
+                                                        <div className='thumb-bar'></div>
+                                                    </div>
+                                                    <div className='progress' id={`progress${index}`}></div>
+                                                </div>
+
+                                                <h1 id={`percent${index}`}>0% done!</h1>
+                                            </div>
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>
+
+                    </div>
+                    <div className='kra-footer'>
+                        <button onClick={() => toggleShowKRA()}>
+                            CANCEL
+                        </button>
+                        <button>
+                            ADD
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default KRAReview;

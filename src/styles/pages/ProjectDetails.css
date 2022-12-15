@@ -707,7 +707,7 @@
     width: 15px;
     height: 15px;
     font-size: 12px;
-    background-color: rgba(211, 211, 211, 0.8);
+    background-color: rgba(211, 211, 211, 1);
     border-radius: 50%;
     display: flex;
     justify-content: center;

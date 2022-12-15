@@ -167,6 +167,18 @@
     justify-content: space-between;
 }
 
+.createProject-container .createProject-body .projectName-container .projectName-box .name-btn h1 {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 25px;
+    /* identical to box height, or 114% */
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+}
+
 .createProject-container .createProject-body .projectName-container .projectName-box .name-btn button {
     background: #FFFFFF;
     /* Color-drop */
@@ -180,14 +192,28 @@
     color: #C94B32;
 }
 
-.createProject-container .createProject-body .projectName-container .projectName-box p {
+.createProject-container .createProject-body .projectName-container .projectName-box .project-name {
     font-style: normal;
     font-weight: 400;
     font-size: 22px;
     line-height: 25px;
+    /* identical to box height, or 114% */
     letter-spacing: -0.011em;
+
+    /* Grey */
     color: #76808D;
-    margin-bottom: 0.5rem;
+    margin-bottom: 10px;
+}
+
+.createProject-container .createProject-body .projectName-container .projectName-box p {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    /* identical to box height, or 114% */
+
+    /* DARK */
+    color: #1B2B41;
 }
 
 .createProject-container .createProject-body .projectName-container .projectName-box span {
@@ -222,6 +248,7 @@
 
 .createProject-container .createProject-body .projectName-container .projectName-box .link-li .link-icon-name {
     display: flex;
+    width: 50%;
 }
 
 .createProject-container .createProject-body .projectName-container .projectName-box .link-li .link-icon-name span {
@@ -238,6 +265,7 @@
 
 .createProject-container .createProject-body .projectName-container .projectName-box .link-li .link-address {
     display: flex;
+    width: 50%;
 }
 
 .createProject-container .createProject-body .projectName-container .projectName-box .link-li .link-address span {
@@ -250,6 +278,7 @@
 
     /* Grey */
     color: #76808D;
+    margin-right: 10px;
 }
 
 

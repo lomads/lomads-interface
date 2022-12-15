@@ -7,7 +7,7 @@ import createTaskSvg from '../../../../assets/svg/milestone.svg';
 import SimpleInputField from "UIpack/SimpleInputField";
 import { SiNotion } from "react-icons/si";
 import { BsDiscord, BsGoogle, BsGithub, BsTwitter, BsGlobe } from "react-icons/bs";
-import { AiOutlinePlus, AiFillQuestionCircle } from "react-icons/ai";
+import { AiOutlinePlus, AiFillQuestionCircle, AiOutlineLock } from "react-icons/ai";
 
 import { useAppSelector } from "state/hooks"
 
@@ -182,7 +182,6 @@ const ProjectResource = ({ toggleShowResource, getResources, list }) => {
     }
 
     const handleSubmit = () => {
-        console.log("resource list : ", resourceList);
         getResources(resourceList);
         toggleShowResource();
     }
@@ -301,7 +300,7 @@ const ProjectResource = ({ toggleShowResource, getResources, list }) => {
                                             type="checkbox"
                                             checked={accessControl}
                                             value={accessControl}
-                                            disabled={accessControlError || accesscontrolDisabled}
+                                            // disabled={accessControlError || accesscontrolDisabled}
                                             onChange={e => setAccessControl(prev => !prev)}
                                         />
                                         :
@@ -324,16 +323,17 @@ const ProjectResource = ({ toggleShowResource, getResources, list }) => {
                             <div className='rsrc-list'>
                                 {
                                     resourceList.map((item, index) => {
+                                        console.log("Item : ", item)
                                         return (
                                             <div className="link-li" key={index}>
                                                 <div className="link-icon-name">
                                                     {handleParseUrl(item.link)}
-                                                    <span style={{ marginLeft: '5px' }}>{item.title}</span>
+                                                    <span style={{ marginLeft: '5px' }}>{item.title.length > 10 ? item.title.slice(0, 10) + "..." : item.title}</span>
                                                 </div>
                                                 <div className="link-address">
-                                                    <span>{item.link.length > 30 ? item.link.slice(0, 30) + "..." : item.link}</span>
+                                                    <span>{item.link.length > 20 ? item.link.slice(0, 20) + "..." : item.link}</span>
+                                                    {item.accessControl && <AiOutlineLock color='#C94B32' />}
                                                 </div>
-
                                                 <button onClick={() => handleRemoveResource(index)}>X</button>
                                             </div>
                                         )

@@ -6,7 +6,7 @@ import createProjectSvg from '../../assets/svg/createProject.svg';
 import editToken from '../../assets/svg/editToken.svg';
 import memberIcon from '../../assets/svg/memberIcon.svg';
 import notionIcon from '../../assets/svg/Notion-logo.svg';
-import { AiOutlinePlus } from "react-icons/ai";
+import { AiOutlineLock } from "react-icons/ai";
 import { SiNotion } from "react-icons/si";
 import { HiOutlinePlus } from "react-icons/hi";
 import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe } from "react-icons/bs";
@@ -64,6 +64,8 @@ const CreateProject = () => {
     const [milestones, setMilestones] = useState([]);
     const [results, setResults] = useState([]);
     const [frequency, setFrequency] = useState('');
+
+    const [compensation, setCompensation] = useState(null);
 
     const daoName = _get(DAO, 'name', '').split(" ");
 
@@ -187,6 +189,7 @@ const CreateProject = () => {
         project.members = selectedMembers;
         project.links = resourceList;
         project.milestones = milestones;
+        project.compensation = compensation;
         project.kra = {
             frequency,
             results
@@ -234,6 +237,7 @@ const CreateProject = () => {
                     &&
                     <ProjectMilestone
                         list={milestones}
+                        getCompensation={(value) => setCompensation(value)}
                         toggleShowMilestone={() => setOpenMilestone(false)}
                         getMilestones={(value) => setMilestones(value)}
                     />
@@ -269,7 +273,7 @@ const CreateProject = () => {
                                         <div className="projectName-container" style={{ width: '450px' }}>
                                             <div className="projectName-box" style={{ width: '100%' }}>
                                                 <div className='name-btn'>
-                                                    <p>Project resources</p>
+                                                    <h1>Project resources</h1>
                                                     {
                                                         resourceList.length > 0
                                                             ?
@@ -286,10 +290,11 @@ const CreateProject = () => {
                                                             <div className="link-li" key={index}>
                                                                 <div className="link-icon-name">
                                                                     {handleParseUrl(item.link)}
-                                                                    <span style={{ marginLeft: '5px' }}>{item.title}</span>
+                                                                    <span style={{ marginLeft: '5px' }}>{item.title.length > 20 ? item.title.slice(0, 20) + "..." : item.title}</span>
                                                                 </div>
                                                                 <div className="link-address">
-                                                                    <span>{item.link.length > 30 ? item.link.slice(0, 30) + "..." : item.link}</span>
+                                                                    <span>{item.link.length > 20 ? item.link.slice(0, 20) + "..." : item.link}</span>
+                                                                    {item.accessControl && <AiOutlineLock color='#C94B32' />}
                                                                 </div>
                                                             </div>
                                                         )
@@ -303,7 +308,7 @@ const CreateProject = () => {
                                         <div className="projectName-container" style={{ width: '450px' }}>
                                             <div className="projectName-box" style={{ width: '100%' }}>
                                                 <div className='name-btn'>
-                                                    <p>Milestones</p>
+                                                    <h1>Milestones</h1>
                                                     {
                                                         milestones.length > 0
                                                             ?
@@ -340,7 +345,7 @@ const CreateProject = () => {
                                         <div className="projectName-container" style={{ width: '450px' }}>
                                             <div className="projectName-box" style={{ width: '100%' }}>
                                                 <div className='name-btn'>
-                                                    <p>Key results</p>
+                                                    <h1>Key results</h1>
                                                     {
                                                         results.length > 0
                                                             ?
@@ -441,7 +446,7 @@ const CreateProject = () => {
                                                     {/* show invite members */}
                                                     <div className="projectName-container">
                                                         <div className="projectName-box">
-                                                            <p>{name}</p>
+                                                            <span className='project-name'>{name}</span>
                                                             <div dangerouslySetInnerHTML={{ __html: desc.length > 25 ? desc.substring(0, 25) + "..." : desc }}></div>
                                                         </div>
                                                         <div className="projectName-btn">

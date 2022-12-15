@@ -84,6 +84,62 @@
     padding: 0 27px;
 }
 
+.milestoneOverlay .milestoneContainer .milestone-body .members-section {
+    width: 285px;
+    display: flex;
+    flex-direction: column;
+    margin: 20px 0;
+    padding: 20px 0;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .members-section .member-row {
+    width: 100%;
+    height: 50px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .members-section .member-row:last-child {
+    margin: 0;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .members-section .member-row div {
+    display: flex;
+    align-items: center;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .members-section .member-row div img {
+    margin: 0;
+    margin-right: 10px;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .members-section .member-row div span {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    /* identical to box height, or 107% */
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+    margin: 0;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .members-section .member-row div h1 {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    /* identical to box height, or 107% */
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+}
+
 .milestoneOverlay .milestoneContainer .milestone-body img {
     margin-bottom: 18px;
 }
