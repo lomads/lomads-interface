@@ -104,7 +104,7 @@ const AddLink = (props) => {
                     console.log(new URL(link).pathname.split('/')[2])
                     platformId = new URL(link).pathname.split('/')[2]
                 }
-                const resource = { id: nanoid(16), title, link: tempLink, provider: new URL(link).hostname, platformId, accessControl, ...(status ? { guildId: status } : {}) };
+                const resource = { id: nanoid(16), title, link: tempLink, provider: new URL(link).hostname, platformId, accessControl, ...(status ? { roleId: status } : {}) };
                 console.log(resource)
                 dispatch(addProjectLinks({ projectId: props.projectId, daoUrl: props.daoUrl, payload: resource }))
                 setAddLoading(false)

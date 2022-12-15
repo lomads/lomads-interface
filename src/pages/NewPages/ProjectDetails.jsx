@@ -8,7 +8,7 @@ import lomadsfulllogo from "../../assets/svg/lomadsfulllogo.svg";
 
 import membersGroup from '../../assets/svg/membersGroup.svg'
 import iconSvg from '../../assets/svg/createProject.svg';
-
+import axios from "axios";
 import editToken from '../../assets/svg/editToken.svg';
 import editPen from '../../assets/svg/editPen.svg';
 import deleteIcon from '../../assets/svg/deleteIcon.svg';
@@ -43,9 +43,12 @@ import CreateTask from "./DashBoard/Task/CreateTask";
 
 import { Editor } from '@tinymce/tinymce-react';
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
+import useDCAuth from 'hooks/useDCAuth';
+import { usePrevious } from 'hooks/usePrevious';
 
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
+    const { onOpen, onResetAuth, authorization, isAuthenticating } = useDCAuth("identify guilds")
     const { provider, account, chainId } = useWeb3React();
     const signerFunction = useCallback((signableMessage) => getSigner(provider, account).signMessage(signableMessage), [provider, account]);
     const { projectId, daoURL } = useParams();
@@ -81,6 +84,7 @@ const ProjectDetails = () => {
     const [closePrompt, setClosePrompt] = useState(false);
 
     const [showCreateTask, setShowCreateTask] = useState(false);
+    const [hasClickedAuth, setHasClickedAuth] = useState(false)
 
     useEffect(() => {
         if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
@@ -169,6 +173,34 @@ const ProjectDetails = () => {
         }
     }, [DAO]);
 
+    const prevAuth = usePrevious(authorization)
+    useEffect(() => {
+        console.log("prevAut", prevAuth, authorization, hasClickedAuth)
+        if(((prevAuth == undefined && authorization) || ( prevAuth && authorization && prevAuth !== authorization ) ) && hasClickedAuth){
+           console.log("prevAut", "unlock(hasClickedAuth)")
+           unlock(hasClickedAuth)
+        }
+    }, [prevAuth, authorization, hasClickedAuth])
+
+    const getPlatformMemberId = () => {
+        return axios.get(`https://discord.com/api/users/@me`, { headers: { Authorization: authorization } })
+        .then(res => res.data.id)  
+        .catch(e => {
+            if(e.response.status === 401){
+                console.log(e)
+                //setHasClickedAuth(true)
+                onResetAuth()
+                setTimeout(() => onOpen(), 1000) 
+            }
+            return null;
+        }) 
+    }
+
+    const getGuilds = () => {
+        return axios.get(`https://discord.com/api/users/@me/guilds`, { headers: { Authorization: authorization } })
+        .then(res => res.data)   
+    }
+
     const handleParseUrl = (url) => {
         try {
             const link = new URL(url);
@@ -216,45 +248,49 @@ const ProjectDetails = () => {
         }))
     }
 
+    const addGuildRole = async (guildId, memberId, roleId) => {
+       return axiosHttp.get(`discord/guild/${guildId}/member/${memberId}/role/${roleId}/add`)
+    }
+
     const unlock = useCallback(async (link, update = true) => {
-        if (unlockLoading) return;
+        //if (unlockLoading) return;
         setUnlockLoading(link.id)
         console.log(_uniqBy(Project?.members, '_id'))
         let memberExists = _find(_uniqBy(Project?.members, '_id'), member => member.wallet.toLowerCase() === account.toLowerCase())
+        console.log("memberExists", memberExists)
         if (!memberExists)
             return setUnlockLoading(null);
         if (link.link.indexOf('discord.') > -1) {
             try {
                 if (contractName !== '' && parseInt(balanceOf._hex, 16) === 1) {
                     if (parseInt(balanceOf._hex, 16) === 1) {
-                        
+                        const url = new URL(link.link)
+                        const dcserverid = url.pathname.split('/')[2]
+                        const dcchannelid = url.pathname.split('/')[3]
+                        setHasClickedAuth(link)
+                        console.log("prevAut", "authorization", authorization)
+                        if(!authorization) 
+                            return onOpen();
+                        const discordMemberId = await getPlatformMemberId();
+                        const guilds = await getGuilds();
+                        const guildExists = _find(guilds, g => g.id === dcserverid)
+                        if(guildExists) {
+                            await addGuildRole(dcserverid, discordMemberId, link.roleId)
+                            if (update)
+                                unlockLink(link)
+                            setUnlockLoading(null)
+                            setHasClickedAuth(null)
+                            window.open(`https://discord.com/channels/${dcserverid}/${dcchannelid}`, '_blank')
+                        } else {
+                            if (update)
+                                unlockLink(link)
+                            setUnlockLoading(null)
+                            setHasClickedAuth(null)
+                            const { code } = await axiosHttp.get(`/discord/guild/${dcserverid}/${dcchannelid}/invite-code`).then(res => res.data)
+                            window.open(`https://discord.gg/${code}`, '_blank')
+                        }
                     }
                 }
-                // const g = await guild.get(link.guildId)
-                // let inviteLink = _get(_find(_get(g, 'guildPlatforms'), gp => gp.platformId == 1), 'invite', null)
-                // if (!inviteLink) return setUnlockLoading(null);
-
-                // let access = await guild.getUserAccess(link.guildId, account)
-                // access = access?.some?.(({ access }) => access)
-                // if (access) {
-                //     const membership = await guild.getUserMemberships(link.guildId, account);
-                //     if (!membership?.some?.(({ access }) => access)) {
-                //         const success = await user.join(link.guildId, account, signerFunction)
-                //         if (success) {
-                //             if (update)
-                //                 unlockLink(link)
-                //             setUnlockLoading(null)
-                //             window.open(inviteLink, '_blank')
-                //         }
-                //     } else {
-                //         if (update)
-                //             unlockLink(link)
-                //         setUnlockLoading(null)
-                //         window.open(inviteLink, '_blank')
-                //     }
-                // } else {
-                //     setUnlockLoading(null)
-                // }
             } catch (e) {
                 console.log(e)
                 setUnlockLoading(null)
@@ -308,7 +344,7 @@ const ProjectDetails = () => {
                 setUnlockLoading(null)
             }
         }
-    }, [contractName, balanceOf, unlockLoading, Project, account])
+    }, [contractName, balanceOf, unlockLoading, Project, account, authorization])
 
     const handleAddMember = (user) => {
         if (extraMembers.includes(user.member._id)) {

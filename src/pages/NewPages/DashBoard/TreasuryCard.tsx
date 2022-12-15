@@ -36,9 +36,12 @@ import useSafeTokens from "hooks/useSafeTokens";
 import useSafeTransaction from "hooks/useSafeTransaction";
 import axios from "axios";
 import { GNOSIS_SAFE_BASE_URLS, SupportedChainId } from 'constants/chains';
+import { GNOSIS_SAFE_ALLOWANCE_MODULE_CONTRACT } from 'constants/chains';
+
 
 const TreasuryCard = (props: ItreasuryCardType) => {
 	const { provider, account, chainId, ...rest } = useWeb3React();
+
 	console.log("useWeb3React", chainId, rest)
 	const { daoURL } = useParams()
 	const dispatch = useAppDispatch()
@@ -56,7 +59,6 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	const [offChainPendingTxn, setOffChainPendingTxn] = useState<Array<any>>();
 	const [offChainExecutedTxn, setOffChainExecutedTxn] = useState<Array<any>>();
 	const [labels, setLabels] = useState<Array<any>>();
-
 	const { DAO } = useAppSelector(store => store.dashboard);
 
 	//const { safeTokens, tokenBalance } = useSafeTokens(_get(DAO, 'safeAddress', ''))
@@ -499,6 +501,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	// 	return 0
 	// }, [props.fiatBalance]);
 
+
 	const hasValidToken = useMemo(() => {
 		if (props.tokens && props.tokens.length > 0) {
 			let valid = props.tokens.some((t: any) => +t.balance > 0)
@@ -554,7 +557,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 							<img style={{ width: 24, height: 24, objectFit: 'contain', marginLeft: 8 }} src={chainId === SupportedChainId.GOERLI ? GOERLI_LOGO : POLYGON_LOGO} />
 						</span>
 					</div>
-					{/* <div className="treasuryDivider"></div>
+					<div className="treasuryDivider"></div>
 					<div
 						id="treasuryCardTitle"
 						style={tab === 2 ? { opacity: '1' } : { opacity: '0.4' }}
@@ -563,7 +566,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 						}}
 					>
 						Recurring payments
-					</div> */}
+					</div>
 				</div>
 				<div className="headerDetails">
 					<div className="copyArea" onClick={() => setCopy(true)} onMouseOut={() => setCopy(false)}>

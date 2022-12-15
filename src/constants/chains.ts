@@ -91,6 +91,11 @@ export const GNOSIS_SAFE_BASE_URLS:any = {
   [SupportedChainId.POLYGON]: 'https://safe-transaction-polygon.safe.global'
 }
 
+export const GNOSIS_SAFE_ALLOWANCE_MODULE_CONTRACT :any = {
+  [SupportedChainId.GOERLI]: '0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134',
+  //[SupportedChainId.POLYGON]: 'https://safe-transaction-polygon.safe.global'
+}
+
 export const CHAIN_GAS_STATION :any = {
   [SupportedChainId.POLYGON]: {
     url: 'https://gasstation-mainnet.matic.network/v2',

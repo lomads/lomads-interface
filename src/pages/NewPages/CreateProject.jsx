@@ -8,7 +8,6 @@ import memberIcon from '../../assets/svg/memberIcon.svg';
 import notionIcon from '../../assets/svg/Notion-logo.svg';
 import { AiOutlinePlus } from "react-icons/ai";
 import { SiNotion } from "react-icons/si";
-import { HiOutlinePlus } from "react-icons/hi";
 import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe } from "react-icons/bs";
 import { toast, ToastContainer } from "react-toastify";
 import { ProjectContext } from "context/ProjectContext";
@@ -347,195 +346,320 @@ const CreateProject = () => {
                             <span style={{ textAlign: 'center', fontStyle: 'italic', color: ' #76808D' }}>The new project is created. <br /> You will be redirected in a few seconds.</span>
                         </div>
                         :
-                        <>
+                        <div className='createProject-body'>
+                            <img src={createProjectSvg} alt="frame-icon" />
+                            <p className="heading-text">Create New Project</p>
+
                             {
-                                showMore
+                                !next
                                     ?
-                                    <div className='createProject-body'>
-                                        <img src={createProjectSvg} alt="frame-icon" />
-                                        <p className="heading-text">Project details</p>
-
-                                        <div className="projectName-container" style={{ width: '450px' }}>
-                                            <div className="projectName-box" style={{ width: '100%' }}>
-                                                <div className='name-btn'>
-                                                    <p>Project ressources</p>
-                                                    <button><HiOutlinePlus size={20} style={{ marginRight: '10px' }} /> ADD</button>
-                                                </div>
-                                                <span>Add links for your team to access </span>
-                                            </div>
-
+                                    <div className='createProject-form-container'>
+                                        <div className='input-div'>
+                                            <label>Name of the project</label>
+                                            <input
+                                                className="text-input"
+                                                placeholder="Enter project name"
+                                                value={name}
+                                                name="name"
+                                                onChange={(e) => setName(e.target.value)}
+                                            />
                                         </div>
 
-                                        <div className="divider"></div>
-
-                                        <div className="projectName-container" style={{ width: '450px' }}>
-                                            <div className="projectName-box" style={{ width: '100%' }}>
-                                                <div className='name-btn'>
-                                                    <p>Milestones</p>
-                                                    <button><HiOutlinePlus size={20} style={{ marginRight: '10px' }} /> ADD</button>
-                                                </div>
-
-                                                <span>Organise and link payments to milestones</span>
-                                            </div>
-
+                                        <div className='input-div'>
+                                            <label>Short description</label>
+                                            <Editor
+                                                apiKey='p0turvzgbtf8rr24txekw7sgjye6xunw2near38hwoohdg13'
+                                                onInit={(evt, editor) => editorRef.current = editor}
+                                                init={{
+                                                    height: 150,
+                                                    menubar: false,
+                                                    statusbar: false,
+                                                    toolbar: false,
+                                                    branding: false,
+                                                    body_class: "mceBlackBody",
+                                                    default_link_target: "_blank",
+                                                    extended_valid_elements: "a[href|target=_blank]",
+                                                    link_assume_external_targets: true,
+                                                    plugins: [
+                                                        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                                                        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                                                        'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                                                    ],
+                                                    // toolbar: 'undo redo | blocks | ' +
+                                                    //     'bold italic forecolor | alignleft aligncenter ' +
+                                                    //     'alignright alignjustify | bullist numlist outdent indent | ' +
+                                                    //     'removeformat | help',
+                                                    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+                                                }}
+                                                value={desc}
+                                                onEditorChange={(text) => { setDesc(text) }}
+                                            />
                                         </div>
-
-                                        <div className="divider"></div>
-
-                                        <div className="projectName-container" style={{ width: '450px' }}>
-                                            <div className="projectName-box" style={{ width: '100%' }}>
-                                                <div className='name-btn'>
-                                                    <p>Key results</p>
-                                                    <button><HiOutlinePlus size={20} style={{ marginRight: '10px' }} /> ADD</button>
-                                                </div>
-
-                                                <span>Set objective for your team </span>
-                                            </div>
-
-                                        </div>
-
-                                        <div className='project-buttons'>
+                                        <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
                                             <button
-                                                style={{ background: '#C94B32', color: '#FFF' }}
-                                                onClick={() => handleCreateProject()}
-                                            >
-                                                CREATE PROJECT
-                                            </button>
+                                                className='input-btn'
+                                                style={name !== '' && desc !== '' ? { background: '#C94B32' } : { background: 'rgba(27, 43, 65, 0.2)' }}
+                                                onClick={handleNext}
+                                            >NEXT</button>
                                         </div>
-
                                     </div>
                                     :
-                                    <div className='createProject-body'>
-                                        <img src={createProjectSvg} alt="frame-icon" />
-                                        <p className="heading-text">Create New Project</p>
+                                    <>
+                                        {/* show invite members */}
+                                        <div className="projectName-container">
+                                            <div className="projectName-box">
+                                                <p>{name}</p>
+                                                <div dangerouslySetInnerHTML={{ __html: desc.length > 25 ? desc.substring(0, 25) + "..." : desc }}></div>
+                                            </div>
+                                            <div className="projectName-btn">
+                                                <button onClick={() => setNext(false)}>
+                                                    <img src={editToken} alt="hk-logo" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className="divider"></div>
+                                        {/* If add more details button is not clicked then show add members else show list of already added members*/}
                                         {
-                                            !next
+                                            !showMore
                                                 ?
-                                                <div className='createProject-form-container'>
-                                                    <div className='input-div'>
-                                                        <label>Name of the project</label>
-                                                        <input
-                                                            className="text-input"
-                                                            placeholder="Enter project name"
-                                                            value={name}
-                                                            name="name"
-                                                            onChange={(e) => setName(e.target.value)}
-                                                        />
+                                                <div className='project-members'>
+                                                    <div className='project-members-header'>
+                                                        <p>Invite members</p>
+                                                        <button onClick={toggleShowMember}>ADD NEW MEMBER</button>
                                                     </div>
-
-                                                    <div className='input-div'>
-                                                        <label>Short description</label>
-                                                        <Editor
-                                                            apiKey='p0turvzgbtf8rr24txekw7sgjye6xunw2near38hwoohdg13'
-                                                            onInit={(evt, editor) => editorRef.current = editor}
-                                                            init={{
-                                                                height: 150,
-                                                                menubar: false,
-                                                                statusbar: false,
-                                                                toolbar: false,
-                                                                branding: false,
-                                                                body_class: "mceBlackBody",
-                                                                default_link_target: "_blank",
-                                                                extended_valid_elements: "a[href|target=_blank]",
-                                                                link_assume_external_targets: true,
-                                                                plugins: [
-                                                                    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                                                                    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                                                                    'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
-                                                                ],
-                                                                // toolbar: 'undo redo | blocks | ' +
-                                                                //     'bold italic forecolor | alignleft aligncenter ' +
-                                                                //     'alignright alignjustify | bullist numlist outdent indent | ' +
-                                                                //     'removeformat | help',
-                                                                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-                                                            }}
-                                                            value={desc}
-                                                            onEditorChange={(text) => { setDesc(text) }}
-                                                        />
-                                                    </div>
-                                                    <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-                                                        <button
-                                                            className='input-btn'
-                                                            style={name !== '' && desc !== '' ? { background: '#C94B32' } : { background: 'rgba(27, 43, 65, 0.2)' }}
-                                                            onClick={handleNext}
-                                                        >
-                                                            NEXT
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                :
-                                                <>
-                                                    {/* show invite members */}
-                                                    <div className="projectName-container">
-                                                        <div className="projectName-box">
-                                                            <p>{name}</p>
-                                                            <div dangerouslySetInnerHTML={{ __html: desc.length > 25 ? desc.substring(0, 25) + "..." : desc }}></div>
-                                                        </div>
-                                                        <div className="projectName-btn">
-                                                            <button onClick={() => setNext(false)}>
-                                                                <img src={editToken} alt="hk-logo" />
-                                                            </button>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="divider"></div>
-
-                                                    {/* project members */}
-                                                    <div className='project-members'>
-                                                        <div className='project-members-header'>
-                                                            <p>Invite members</p>
-                                                            <button onClick={toggleShowMember}>ADD NEW MEMBER</button>
-                                                        </div>
-                                                        <div className="member-list">
-                                                            {
-                                                                memberList.map((item, index) => {
-                                                                    if (item.member.wallet.toLowerCase() !== account.toLowerCase()) {
-                                                                        return (
-                                                                            <div className="member-li" key={index}>
-                                                                                <div className="member-img-name">
-                                                                                    <img src={memberIcon} alt="member-icon" />
-                                                                                    <p>{item.member.name}</p>
-                                                                                </div>
-                                                                                <div className="member-address">
-                                                                                    <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
-                                                                                    {/* {
+                                                    <div className="member-list">
+                                                        {
+                                                            memberList.map((item, index) => {
+                                                                if (item.member.wallet.toLowerCase() !== account.toLowerCase()) {
+                                                                    return (
+                                                                        <div className="member-li" key={index}>
+                                                                            <div className="member-img-name">
+                                                                                <img src={memberIcon} alt="member-icon" />
+                                                                                <p>{item.member.name}</p>
+                                                                            </div>
+                                                                            <div className="member-address">
+                                                                                <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
+                                                                                {
                                                                                     selectedMembers.some((m) => m.address.toLowerCase() === item.member.wallet.toLowerCase()) === false
                                                                                         ?
                                                                                         <input type="checkbox" onChange={() => handleAddMember(item.member)} />
                                                                                         :
                                                                                         <input type="checkbox" onChange={() => handleAddMember(item.member)} checked />
-                                                                                } */}
-                                                                                    <div className='checkbox'>
-                                                                                        <input type="checkbox" onChange={(e) => alert("dfdf")} />
-                                                                                        <span className='inner-check check'></span>
+                                                                                }
+                                                                            </div>
+                                                                        </div>
+                                                                    )
+                                                                }
+                                                            })
+                                                        }
+                                                    </div>
+                                                </div>
+                                                :
+                                                <>
+                                                    <div className='project-members2'>
+                                                        <p>Project members</p>
+                                                        <button onClick={() => setShowMore(false)}>
+                                                            <img src={editToken} alt="hk-logo" />
+                                                        </button>
+                                                    </div>
+                                                    {
+                                                        selectedMembers.length > 0
+                                                            ?
+                                                            <div className='transparent-list' style={{ width: '420px' }}>
+                                                                {
+                                                                    selectedMembers.map((item, index) => {
+                                                                        if (item.address.toLowerCase() === account.toLowerCase()) {
+                                                                            return (
+                                                                                <div className="member-li" key={index}>
+                                                                                    <div className="member-img-name">
+                                                                                        <img src={memberIcon} alt="member-icon" />
+                                                                                        <p>{item.name}</p>
                                                                                     </div>
+                                                                                    <div className="member-address">
+                                                                                        <p>{item.address.slice(0, 6) + "..." + item.address.slice(-4)}</p>
+                                                                                        {/* <button onClick={() => handleRemoveMember(index)}>X</button> */}
+                                                                                    </div>
+                                                                                </div>
+                                                                            )
+                                                                        }
+                                                                        else {
+                                                                            return (
+                                                                                <div className="member-li" key={index}>
+                                                                                    <div className="member-img-name">
+                                                                                        <img src={memberIcon} alt="member-icon" />
+                                                                                        <p>{item.name}</p>
+                                                                                    </div>
+                                                                                    <div className="member-address">
+                                                                                        <p>{item.address.slice(0, 6) + "..." + item.address.slice(-4)}</p>
+                                                                                        <button onClick={() => handleRemoveMember(index)}>X</button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            )
+                                                                        }
+
+                                                                    })
+                                                                }
+                                                            </div>
+                                                            :
+                                                            null
+                                                    }
+                                                </>
+                                        }
+                                        {/* If add more detail is clicked then show add resources section else show buttons */}
+                                        {
+                                            !showMore
+                                                ?
+                                                <div className='project-buttons'>
+                                                    <button
+                                                        style={{ marginRight: '35px', background: '#FFF', color: '#C94B32' }}
+                                                        onClick={() => setShowMore(true)}
+                                                    >
+                                                        ADD MORE DETAIL
+                                                    </button>
+                                                    <button
+                                                        style={{ background: '#C94B32', color: '#FFF' }}
+                                                        onClick={() => handleCreateProject()}
+                                                    >
+                                                        CREATE PROJECT
+                                                    </button>
+                                                </div>
+                                                :
+                                                null
+                                        }
+
+
+                                        {/* If add more detail is clicked then show section for adding project resources */}
+                                        {
+                                            showMore
+                                                ?
+                                                <>
+                                                    <div className="divider"></div>
+                                                    <div className="resource-container">
+                                                        <div className="resource-header">
+                                                            <h1>Add project resources</h1>
+                                                            <div>
+                                                                <p>Optional</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="resource-body">
+                                                            <div>
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="Title"
+                                                                    className="input1"
+                                                                    name="title"
+                                                                    value={title}
+                                                                    onChange={(e) => { setTitle(e.target.value); setTitleError(null) }}
+                                                                />
+                                                                <span style={{ fontSize: '13px', color: '#C84A32' }}>{titleError}</span>
+                                                            </div>
+                                                            <div>
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="Link"
+                                                                    className="input2"
+                                                                    name="link"
+                                                                    value={link}
+                                                                    onChange={(e) => { setLink(e.target.value); setLinkError(null) }}
+                                                                />
+                                                                <span style={{ fontSize: '13px', color: '#C84A32' }}>{linkError}</span>
+                                                            </div>
+                                                            {
+                                                                link && (link.indexOf('discord.') > -1 || link.indexOf('notion.') > -1) ?
+                                                                    <LinkBtn spaceDomain={spaceDomain} onNotionCheckStatus={handleAddResource} onGuildCreateSuccess={handleAddResource} title={title} link={link} roleName={roleName} accessControl={accessControl} />
+                                                                    :
+                                                                    <button
+                                                                        style={link !== '' && title !== '' ? { background: '#C84A32' } : null}
+                                                                        onClick={() => handleAddResource()}
+                                                                    >
+                                                                        <AiOutlinePlus color="#FFF" size={25} />
+                                                                    </button>
+                                                            }
+                                                        </div>
+                                                        {accessControl && link && link.indexOf('discord.') > -1 ? <div className='resource-body'>
+                                                            <div>
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="Role name"
+                                                                    className="input2"
+                                                                    style={{ marginTop: 16 }}
+                                                                    name="rolename"
+                                                                    value={roleName}
+                                                                    onChange={(e) => setRoleName(e.target.value)}
+                                                                />
+                                                            </div>
+                                                        </div> : null}
+                                                        {accessControl && link && link.indexOf('notion.') > -1 && !linkHasDomain ? <div className='resource-body'>
+                                                            <div>
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="Notion Domain"
+                                                                    className="input2"
+                                                                    style={{ marginTop: 16 }}
+                                                                    name="spaceDomain"
+                                                                    value={spaceDomain}
+                                                                    onChange={(e) => setSpaceDomain(e.target.value)}
+                                                                />
+                                                            </div>
+                                                        </div> : null}
+                                                        {
+                                                            accessControl && link && link.indexOf('notion.') > -1 &&
+                                                            <div style={{ fontSize: 14, fontStyle: 'italic', color: "rgba(118, 128, 141, 0.5)" }}>Invite <span style={{ color: "#76808D" }}>{process.env.REACT_APP_NOTION_ADMIN_EMAIL}</span> to be an Admin of your workspace</div>
+                                                        }
+                                                        {DAO?.sbt &&
+                                                            <div className='resource-footer'>
+                                                                {
+                                                                    (link && link.indexOf('notion.') > -1 && _get(DAO, 'sbt.contactDetail', '').indexOf('email') > -1) ||
+                                                                        (link && link.indexOf('discord.') > -1 && _get(DAO, 'sbt.contactDetail', '').indexOf('discord') > -1)
+                                                                        ?
+                                                                        <input id="accessControl" type="checkbox" checked={accessControl} value={accessControl} disabled={accessControlError || accesscontrolDisabled} onChange={e => setAccessControl(prev => !prev)} /> : null}
+                                                                <div>
+                                                                    <p>ACCESS CONTROL</p>
+                                                                    <span>Currently available for discord & notion only</span>
+                                                                    {accessControlError && <div><span style={{ color: 'red' }}>{accessControlError}</span></div>}
+                                                                </div>
+                                                            </div>
+
+                                                        }
+                                                    </div>
+                                                    {
+                                                        resourceList.length > 0
+                                                            ?
+                                                            <div className='transparent-list' style={{ width: '500px' }}>
+                                                                {
+                                                                    resourceList.map((item, index) => {
+                                                                        return (
+                                                                            <div className="member-li" key={index}>
+                                                                                <div className="member-img-name">
+                                                                                    {handleParseUrl(item.link)}
+                                                                                    <p style={{ marginLeft: '5px' }}>{item.title}</p>
+                                                                                </div>
+                                                                                <div className="member-address">
+                                                                                    <p>{item.link.length > 30 ? item.link.slice(0, 30) + "..." : item.link}</p>
+                                                                                    <button onClick={() => handleRemoveResource(index)}>X</button>
                                                                                 </div>
                                                                             </div>
                                                                         )
-                                                                    }
-                                                                })
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                    <div className='project-buttons'>
-                                                        <button
-                                                            style={{ marginRight: '35px', background: '#FFF', color: '#C94B32' }}
-                                                            onClick={() => setShowMore(true)}
-                                                        >
-                                                            ADD MORE DETAIL
-                                                        </button>
-                                                        <button
-                                                            style={{ background: '#C94B32', color: '#FFF' }}
-                                                            onClick={() => handleCreateProject()}
-                                                        >
-                                                            CREATE PROJECT
-                                                        </button>
-                                                    </div>
+                                                                    })
+                                                                }
+                                                            </div>
+                                                            :
+                                                            null
+                                                    }
+                                                    <button
+                                                        className='create-project-button'
+                                                        onClick={handleCreateProject}
+                                                    >
+                                                        CREATE PROJECT
+                                                    </button>
                                                 </>
+                                                :
+                                                null
                                         }
-                                    </div>
+
+                                    </>
                             }
-                        </>
+                        </div>
                 }
             </div>
             <ToastContainer

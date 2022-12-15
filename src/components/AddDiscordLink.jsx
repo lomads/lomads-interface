@@ -23,7 +23,7 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
 
     const { provider, account, chainId } = useWeb3React();
     const signerFunction = useCallback((signableMessage) => getSigner(provider, account).signMessage(signableMessage), [provider, account]);
-    const { onOpen, onResetAuth, authorization, isAuthenticating } = useDCAuth("guilds")
+    const { onOpen, onResetAuth, authorization, isAuthenticating } = useDCAuth("identify guilds")
 
     const { onOpen: openAddBotPopup, windowInstance: activeAddBotPopup } = usePopupWindow()
 
@@ -106,11 +106,13 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                 if(guildRole) 
                     return guildRole.id
                 else {
-                    guildRole = await axiosHttp.post(`discord/guild/${server.id}/role`, { name: roleName })
+                    guildRole = await axiosHttp.post(`discord/guild/${server.id}/role`, { name: roleName }).then(res => res.data)
+                    console.log("guildRole.id", guildRole.id)
                     return guildRole.id
                 }
             }
         })
+        console.log("attachRoleId", attachRoleId)
         finish(attachRoleId)
     }
     const onGuildBotAddedDelayed = useCallback(_debounce(onGuildBotAdded, 1000), [onGuildBotAdded, link, server])
@@ -151,7 +153,7 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                                    if(!discordGuild){
                                        const redirectUri = typeof window !== "undefined" && `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
                                        setPoll(dcserverid)
-                                       openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=1049724741306564669&guild_id=${dcserverid}&permissions=268782673&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
+                                       openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=1049724741306564669&guild_id=${dcserverid}&permissions=8&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
                                    } else {
                                         onGuildBotAddedDelayed(validServer)
                                    }
@@ -164,7 +166,7 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                                if(!discordGuild){
                                    const redirectUri = typeof window !== "undefined" && `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
                                    setPoll(dcserverid)
-                                   openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=1049724741306564669&guild_id=${dcserverid}&permissions=268782673&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
+                                   openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=1049724741306564669&guild_id=${dcserverid}&permissions=8&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
                                } else {
                                    onGuildBotAddedDelayed(validServer)
                                }
@@ -183,7 +185,7 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                     setAddLinkLoading(null);
                 }
             } else {
-                onGuildCreateSuccess()
+                finish()
             }
         }
     }

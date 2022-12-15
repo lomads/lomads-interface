@@ -29,14 +29,16 @@ import useRole from '../../../../hooks/useRole'
 
 import axios from "axios";
 import { isValidUrl } from 'utils';
+import useGnosisAllowance from "hooks/useGnosisAllowance";
 
 const CreateRecurring = ({ toggleShowCreateRecurring }) => {
 
     const dispatch = useAppDispatch();
     const { DAO, user, } = useAppSelector((state) => state.dashboard);
-    const { chainId, account } = useWeb3React();
-
+    const { chainId, provider, account } = useWeb3React();
     const { myRole, can } = useRole(DAO, account);
+
+    const { setAllowance } = useGnosisAllowance(_get(DAO, 'safe.address', null));
 
     const [showSuccess, setShowSuccess] = useState(false);
 
@@ -46,6 +48,10 @@ const CreateRecurring = ({ toggleShowCreateRecurring }) => {
     const eligibleContributors = useMemo(() => {
         return _get(DAO, 'members', []).filter(m => m.member._id !== user._id);
     }, [DAO, selectedUser])
+
+    const handleCreateRecurringPayment = () => {
+
+    }
 
     return (
         <div className="recurringOverlay">
@@ -147,7 +153,7 @@ const CreateRecurring = ({ toggleShowCreateRecurring }) => {
                                 <button>
                                     CANCEL
                                 </button>
-                                <button>
+                                <button onClick={() => handleCreateRecurringPayment()}>
                                     SAVE
                                 </button>
                             </div>
