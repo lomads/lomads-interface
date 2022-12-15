@@ -30,7 +30,8 @@ import { useAppSelector, useAppDispatch } from "state/hooks";
 import { SupportedChainId } from "constants/chains";
 
 import SafeButton from "UIpack/SafeButton";
-import SimpleInputField from "UIpack/SimpleInputField";
+
+import useSafeTransaction from "hooks/useSafeTransaction";
 
 const AssignContributions = ({ toggleShowAssign, data }) => {
 
@@ -38,6 +39,9 @@ const AssignContributions = ({ toggleShowAssign, data }) => {
     const { chainId, account } = useWeb3React();
 
     const [compensation, setCompensation] = useState(_get(data, 'compensation', null));
+    const [error, setError] = useState(null);
+
+    const { createSafeTransaction, createSafeTxnLoading } = useSafeTransaction(_get(DAO, 'safe.address', ''))
 
     const handleFocusInput = (index) => {
         const e = document.getElementById(`input${index}`);
@@ -61,6 +65,25 @@ const AssignContributions = ({ toggleShowAssign, data }) => {
             amountElement.innerHTML = amount;
         })
     }
+
+    const createTransaction = async () => {
+        setError(null)
+        if (selectedToken === 'SWEAT') {
+            return createOffChainTxn()
+        }
+        try {
+            const txnResponse = await createSafeTransaction({ tokenAddress: selectedToken, send: setRecipient.current });
+            if (txnResponse?.safeTxHash) {
+                dispatch(getDao(DAO.url))
+                await props.getPendingTransactions();
+                showNavigation(false, true, false);
+                setisLoading(false);
+            }
+        } catch (e) {
+            console.log(e)
+            setError(e)
+        }
+    };
 
     return (
         <div className="milestoneOverlay">
