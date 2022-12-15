@@ -92,6 +92,29 @@
     flex-wrap: wrap;
 }
 
+.myproject-container .myproject-body-fixed .all-project {
+    width: 320px;
+    height: 100px;
+    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 25px;
+    margin-bottom: 26px;
+    position: relative;
+    cursor: pointer;
+}
+
+.myproject-container .myproject-body-fixed .all-project span {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    text-transform: uppercase;
+    color: #B12F15;
+}
+
 .myproject-container .myproject-body-nocontent {
     width: 100%;
     padding: 26px 22px;

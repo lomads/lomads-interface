@@ -45,16 +45,16 @@ const MyProject = () => {
         if (DAO && DAO.url === daoURL) {
             let myProjects = _get(DAO, 'projects', []).filter(project => !project.deletedAt && !project.archivedAt && _find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase()));
             myProjects = myProjects.map(p => {
-                let prj = {...p, notification: 0}
-                if(notificationCount(prj) > 0)
+                let prj = { ...p, notification: 0 }
+                if (notificationCount(prj) > 0)
                     prj.notification = 1
                 return prj;
             })
             setMyProjects(_orderBy(myProjects, ['notification', p => moment(p.createdAt).unix()], ['desc', 'desc']))
             let otherProjects = _get(DAO, 'projects', []).filter(project => !project.deletedAt && !project.archivedAt && !_find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase()))
             otherProjects = otherProjects.map(p => {
-                let prj = {...p, notification: 0}
-                if(notificationCount(prj) > 0)
+                let prj = { ...p, notification: 0 }
+                if (notificationCount(prj) > 0)
                     prj.notification = 1
                 return prj;
             })
@@ -132,17 +132,26 @@ const MyProject = () => {
             {
                 tab === 1
                     ?
-                    <div className='myproject-body'>
+                    <div className='myproject-body-fixed'>
                         {
-                            myProjects.length > 0 && myProjects.map((item, index) => {
-                                if (item.deletedAt === null && item.archivedAt === null) {
+                            myProjects.length > 0 && myProjects.filter((item, index) => index < 6).map((item, index) => {
+                                if (index <= 4) {
+                                    if (item.deletedAt === null && item.archivedAt === null) {
+                                        return (
+                                            <div key={index}>
+                                                <ProjectCard
+                                                    project={item}
+                                                    daoUrl={DAO?.url}
+                                                    tab={tab}
+                                                />
+                                            </div>
+                                        )
+                                    }
+                                }
+                                else {
                                     return (
-                                        <div key={index}>
-                                            <ProjectCard
-                                                project={item}
-                                                daoUrl={DAO?.url}
-                                                tab={tab}
-                                            />
+                                        <div className='all-project'>
+                                            <span>Show All</span>
                                         </div>
                                     )
                                 }
@@ -160,17 +169,26 @@ const MyProject = () => {
                         {
                             otherProjects.length > 0
                                 ?
-                                <div className='myproject-body-fixed' style={otherProjects.length > 9 ? { overflow: 'scroll', height: '375px' } : { height: 'auto' }}>
+                                <div className='myproject-body-fixed'>
                                     {
-                                        otherProjects.map((item, index) => {
-                                            if (item.deletedAt === null && item.archivedAt === null) {
+                                        otherProjects.filter((item, index) => index < 6).map((item, index) => {
+                                            if (index <= 4) {
+                                                if (item.deletedAt === null && item.archivedAt === null) {
+                                                    return (
+                                                        <div key={index}>
+                                                            <ProjectCard
+                                                                project={item}
+                                                                daoUrl={DAO?.url}
+                                                                tab={tab}
+                                                            />
+                                                        </div>
+                                                    )
+                                                }
+                                            }
+                                            else {
                                                 return (
-                                                    <div key={index}>
-                                                        <ProjectCard
-                                                            project={item}
-                                                            daoUrl={DAO?.url}
-                                                            tab={tab}
-                                                        />
+                                                    <div className='all-project'>
+                                                        <span>Show All</span>
                                                     </div>
                                                 )
                                             }

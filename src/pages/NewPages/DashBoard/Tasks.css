@@ -90,7 +90,7 @@
     cursor: pointer;
 }
 
-.tasks-container .tasks-body .all-tasks p {
+.tasks-container .tasks-body .all-tasks span {
     font-style: normal;
     font-weight: 400;
     font-size: 16px;

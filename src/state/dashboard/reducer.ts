@@ -36,7 +36,8 @@ import {
 	archiveTask,
 	deleteTask,
 	toggleXPPoints,
-	updateContract
+	updateContract,
+	updateKRA
 } from "./actions";
 import { createContract } from "state/contract/actions";
 import { get as _get, find as _find } from "lodash";
@@ -78,6 +79,7 @@ export interface DashboardState {
 	archiveTaskLoading: boolean | null;
 	deleteTaskLoading: boolean | null;
 	updateContractLoading: boolean | null;
+	updateKraLoading: boolean | null;
 }
 
 const initialState: DashboardState = {
@@ -116,7 +118,8 @@ const initialState: DashboardState = {
 	rejectTaskLoading: null,
 	archiveTaskLoading: null,
 	deleteTaskLoading: null,
-	updateContractLoading: null
+	updateContractLoading: null,
+	updateKraLoading: null,
 };
 
 const dashboardSlice = createSlice({
@@ -221,6 +224,9 @@ const dashboardSlice = createSlice({
 		},
 		resetUpdateContractLoading(state, action) {
 			state.updateContractLoading = null
+		},
+		resetUpdateKraLoader(state) {
+			state.updateKraLoading = null
 		},
 		updateSafeTransaction(state, action) {
 			console.log(action.payload)
@@ -555,13 +561,23 @@ const dashboardSlice = createSlice({
 		[`${toggleXPPoints.fulfilled}`]: (state, action) => {
 			state.DAO = action.payload;
 		},
+		// Update contract
 		[`${updateContract.fulfilled}`]: (state, action) => {
 			state.updateContractLoading = false
 			state.DAO = action.payload;
 		},
 		[`${updateContract.pending}`]: (state, action) => {
 			state.updateContractLoading = true
-		}
+		},
+		// update kra
+		[`${updateKRA.fulfilled}`]: (state, action) => {
+			state.updateKraLoading = false;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
+		},
+		[`${updateKRA.pending}`]: (state) => {
+			state.updateKraLoading = true;
+		},
 	},
 });
 
@@ -599,6 +615,7 @@ export const {
 	resetRejectTaskLoader,
 	resetArchiveTaskLoader,
 	resetDeleteTaskLoader,
+	resetUpdateKraLoader,
 	resetUpdateContractLoading
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

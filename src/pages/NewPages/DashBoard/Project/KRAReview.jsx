@@ -4,9 +4,49 @@ import './ProjectKRA.css';
 import { CgClose } from 'react-icons/cg'
 import createTaskSvg from '../../../../assets/svg/kra.svg';
 
+import SimpleLoadButton from "UIpack/SimpleLoadButton";
+
+import { useAppSelector, useAppDispatch } from "state/hooks";
+
+import { updateKRA } from "state/dashboard/actions";
+import { resetUpdateKraLoader } from 'state/dashboard/reducer';
+
 const colors = ['#e67c40', '#e99a37', '#ebaf30', '#edcd27', '#becd33', '#8ecc3e', '#63c359', '#4fbf65', '#2ab87c', '#21a284', '#188c8c'];
 
-const KRAReview = ({ toggleShowKRA, list }) => {
+const KRAReview = ({ toggleShowKRA, data, daoURL }) => {
+    const dispatch = useAppDispatch();
+    const { updateKraLoading } = useAppSelector((state) => state.dashboard);
+
+    const [list, setList] = useState(_get(data, 'kra.results', []));
+
+    // runs after updating kra
+    useEffect(() => {
+        if (updateKraLoading === false) {
+            dispatch(resetUpdateKraLoader());
+            toggleShowKRA();
+        }
+    }, [updateKraLoading]);
+
+    useEffect(() => {
+        if (list.length > 0) {
+            list.map((_, index) => {
+                const slider = document.getElementById(`slider-rc${index}`);
+                const thumb = document.getElementById(`slider-thumb${index}`);
+                const progress = document.getElementById(`progress${index}`);
+                const percent = document.getElementById(`percent${index}`);
+
+                const maxVal = slider.getAttribute("max");
+                const x = (_.progress / maxVal) * 10;
+                const val = (_.progress / maxVal) * 100 + "%";
+
+                thumb.style.backgroundColor = colors[x + 1];
+                percent.innerHTML = val + " done";
+                percent.style.color = colors[x + 1];
+                progress.style.setProperty('width', `calc(100% - ${val})`);
+                thumb.style.left = val;
+            })
+        }
+    }, []);
 
     const handleSlider = (e, index) => {
         const slider = document.getElementById(`slider-rc${index}`);
@@ -22,6 +62,22 @@ const KRAReview = ({ toggleShowKRA, list }) => {
         percent.style.color = colors[x + 1];
         progress.style.setProperty('width', `calc(100% - ${val})`);
         thumb.style.left = val;
+
+        const newArray = list.map((item, i) => {
+            if (i === index) {
+                return { ...item, progress: x * 10 };
+            } else {
+                return item;
+            }
+        });
+        setList(newArray);
+    }
+
+    const handleSubmit = () => {
+        const kra = {};
+        kra.frequency = _get(data, 'kra.frequency', '');
+        kra.results = list;
+        dispatch(updateKRA({ projectId: data._id, daoUrl: daoURL, payload: { kra } }));
     }
 
     return (
@@ -47,7 +103,7 @@ const KRAReview = ({ toggleShowKRA, list }) => {
                                             <div className='review-slider-section'>
                                                 {/* custom slider */}
                                                 <div className='range-slider'>
-                                                    <input type="range" min={0} max={100} step={10} class="slider-rc" id={`slider-rc${index}`} onChange={(e) => handleSlider(e, index)} />
+                                                    <input type="range" min={0} max={100} step={10} value={item.progress} className="slider-rc" id={`slider-rc${index}`} onChange={(e) => handleSlider(e, index)} />
                                                     <div className='slider-thumb' id={`slider-thumb${index}`}>
                                                         <div className='thumb-bar'></div>
                                                     </div>
@@ -65,11 +121,18 @@ const KRAReview = ({ toggleShowKRA, list }) => {
                     </div>
                     <div className='kra-footer'>
                         <button onClick={() => toggleShowKRA()}>
-                            CANCEL
+                            LATER
                         </button>
-                        <button>
-                            ADD
-                        </button>
+                        <SimpleLoadButton
+                            title="SUBMIT"
+                            height={40}
+                            width={180}
+                            fontsize={16}
+                            fontweight={400}
+                            onClick={handleSubmit}
+                            bgColor={"#C94B32"}
+                            condition={updateKraLoading}
+                        />
                     </div>
                 </div>
             </div>

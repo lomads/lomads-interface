@@ -32,10 +32,33 @@ import { SupportedChainId } from "constants/chains";
 import SafeButton from "UIpack/SafeButton";
 import SimpleInputField from "UIpack/SimpleInputField";
 
-const AssignContributions = ({ toggleShowAssign }) => {
+const AssignContributions = ({ toggleShowAssign, data }) => {
 
     const { DAO, Project } = useAppSelector((state) => state.dashboard);
     const { chainId, account } = useWeb3React();
+
+    const [compensation, setCompensation] = useState(_get(data, 'compensation', null));
+
+    const handleFocusInput = (index) => {
+        const e = document.getElementById(`input${index}`);
+        e.focus();
+    }
+
+    const handleChange = (e, index) => {
+        let num = parseFloat(e.target.value);
+        const amountElement = document.getElementById(`amount${index}`);
+
+        amountElement.innerHTML = ((num / 100) * compensation?.amount).toFixed(2);
+    }
+
+    const handleSplitEqually = () => {
+        _uniqBy(Project?.members, '_id').map((_, index) => {
+            const amountElement = document.getElementById(`amount${index}`);
+            const percentElement = document.getElementById(`input${index}`);
+            percentElement.value = ((compensation?.amount / Project?.members?.length) * 10).toFixed(2);
+            amountElement.innerHTML = ((compensation?.amount / Project?.members?.length)).toFixed(2);
+        })
+    }
 
     return (
         <div className="milestoneOverlay">
@@ -61,7 +84,7 @@ const AssignContributions = ({ toggleShowAssign }) => {
                             disabled={false}
                             fontweight={400}
                             fontsize={16}
-                            onClick={() => { }}
+                            onClick={handleSplitEqually}
                         />
 
                         <div className='members-section'>
@@ -73,15 +96,12 @@ const AssignContributions = ({ toggleShowAssign }) => {
                                             <span>{item.name}</span>
                                         </div>
                                         <div>
-                                            <SimpleInputField
-                                                className="inputField"
-                                                height={50}
-                                                width={100}
-                                                placeholder="%"
-                                            />
+                                            <div className='input-wrapper' onClick={() => handleFocusInput(index)}>
+                                                <input type={"number"} min={0} max={100} id={`input${index}`} onClick={(e) => e.stopPropagation()} onChange={(e) => handleChange(e, index)} /> %
+                                            </div>
                                         </div>
                                         <div>
-                                            <h1>= <span style={{ fontWeight: 'bold' }}>10</span> Eth</h1>
+                                            <h1> = <span style={{ fontWeight: 'bold' }} id={`amount${index}`}>0</span> {compensation?.symbol}</h1>
                                         </div>
                                     </div>
                                 ))
@@ -94,7 +114,7 @@ const AssignContributions = ({ toggleShowAssign }) => {
                             CANCEL
                         </button>
                         <button>
-                            ADD
+                            COMPLETE
                         </button>
                     </div>
                 </div>

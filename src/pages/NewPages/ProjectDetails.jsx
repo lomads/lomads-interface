@@ -565,10 +565,10 @@ const ProjectDetails = () => {
                     {showCreateTask && <CreateTask toggleShowCreateTask={toggleShowCreateTask} selectedProject={Project} />}
 
                     {/* complete milestone and assign contributions side modal*/}
-                    {showAssign && <AssignContributions toggleShowAssign={() => setShowAssign(false)} />}
+                    {showAssign && <AssignContributions toggleShowAssign={() => setShowAssign(false)} data={Project} />}
 
                     {/* Show KRA review side modal */}
-                    {showKRAReview && <KRAReview toggleShowKRA={() => setShowKRAReview(false)} list={_get(Project, 'kra.results', [])} />}
+                    {showKRAReview && <KRAReview toggleShowKRA={() => setShowKRAReview(false)} data={Project} daoURL={daoURL} />}
 
                     <div className="home-btn" onClick={() => navigate(-1)}>
                         <div className="invertedBox">
