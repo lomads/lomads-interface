@@ -187,6 +187,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                 }
             }
 
+            console.log("currency : ", currency);
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
             symbol = _get(symbol, 'token.symbol', null)
             if (!symbol)
@@ -231,7 +232,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                 tempSub = 'https://' + tempSub;
             }
         }
-        let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
+        let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
         symbol = _get(symbol, 'token.symbol', 'SWEAT')
         if (!symbol)
             symbol = currency.currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ? 'MATIC' : currency.currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? 'GOR' : 'SWEAT'

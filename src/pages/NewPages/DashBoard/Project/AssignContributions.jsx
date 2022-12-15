@@ -55,8 +55,10 @@ const AssignContributions = ({ toggleShowAssign, data }) => {
         _uniqBy(Project?.members, '_id').map((_, index) => {
             const amountElement = document.getElementById(`amount${index}`);
             const percentElement = document.getElementById(`input${index}`);
-            percentElement.value = ((compensation?.amount / Project?.members?.length) * 10).toFixed(2);
-            amountElement.innerHTML = ((compensation?.amount / Project?.members?.length)).toFixed(2);
+            let amount = (compensation?.amount / Project?.members?.length).toFixed(2);
+            let percent = ((amount / compensation?.amount) * 100).toFixed(2);
+            percentElement.value = percent;
+            amountElement.innerHTML = amount;
         })
     }
 

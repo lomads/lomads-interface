@@ -39,9 +39,9 @@ const KRAReview = ({ toggleShowKRA, data, daoURL }) => {
                 const x = (_.progress / maxVal) * 10;
                 const val = (_.progress / maxVal) * 100 + "%";
 
-                thumb.style.backgroundColor = colors[x + 1];
+                thumb.style.backgroundColor = colors[x];
                 percent.innerHTML = val + " done";
-                percent.style.color = colors[x + 1];
+                percent.style.color = colors[x];
                 progress.style.setProperty('width', `calc(100% - ${val})`);
                 thumb.style.left = val;
             })
@@ -57,9 +57,9 @@ const KRAReview = ({ toggleShowKRA, data, daoURL }) => {
         const maxVal = slider.getAttribute("max");
         const x = (slider.value / maxVal) * 10;
         const val = (slider.value / maxVal) * 100 + "%";
-        thumb.style.backgroundColor = colors[x + 1];
+        thumb.style.backgroundColor = colors[x];
         percent.innerHTML = val + " done";
-        percent.style.color = colors[x + 1];
+        percent.style.color = colors[x];
         progress.style.setProperty('width', `calc(100% - ${val})`);
         thumb.style.left = val;
 
