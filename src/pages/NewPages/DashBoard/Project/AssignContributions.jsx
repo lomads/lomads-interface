@@ -89,12 +89,12 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone }) => {
         let userAmount = (allotedAmt / Project?.members?.length).toFixed(5);
         let percentAmt = ((userAmount / allotedAmt) * 100).toFixed(2);
 
-        let arr = temp;
-        for (let i = 0; i < arr.length; i++) {
-            const amountElement = document.getElementById(`amount${i}`);
+        let arr = temp.map((item, index) => {
+            let e = item;
+            const amountElement = document.getElementById(`amount${index}`);
             amountElement.innerHTML = userAmount;
-            arr[i].percent = parseFloat(percentAmt);
-        }
+            return { ...e, percent: parseFloat(percentAmt) };
+        })
 
         setTemp(arr);
     }
@@ -254,7 +254,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone }) => {
                         <div className='members-section'>
                             {
                                 temp && temp.map((item, index) => (
-                                    <div className='member-row'>
+                                    <div className='member-row' key={item.wallet}>
                                         <div>
                                             <img src={memberIcon} alt="memberIcon" />
                                             <span>{item.name}</span>
@@ -267,7 +267,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone }) => {
                                                     max={100}
                                                     placeholder="0"
                                                     id={`input${index}`}
-                                                    value={item.percent}
+                                                    value={+item.percent}
                                                     onClick={(e) => e.stopPropagation()}
                                                     onChange={(e) => handleChange(e.target.value, index)}
                                                 /> %
