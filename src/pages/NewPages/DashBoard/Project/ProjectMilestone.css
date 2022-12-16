@@ -85,7 +85,7 @@
 }
 
 .milestoneOverlay .milestoneContainer .milestone-body .members-section {
-    width: 300px;
+    width: 320px;
     display: flex;
     flex-direction: column;
     margin: 20px 0;
@@ -139,6 +139,7 @@
 
     /* Grey */
     color: #76808D;
+    margin: 0;
 }
 
 .milestoneOverlay .milestoneContainer .milestone-body .members-section .member-row div .input-wrapper {
