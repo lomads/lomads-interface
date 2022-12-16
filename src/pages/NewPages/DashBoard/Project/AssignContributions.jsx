@@ -21,6 +21,8 @@ import axiosHttp from '../../../../api';
 
 import { getDao } from "state/dashboard/actions";
 
+import SimpleLoadButton from "UIpack/SimpleLoadButton";
+
 const AssignContributions = ({ toggleShowAssign, data, selectedMilestone }) => {
     const dispatch = useAppDispatch();
     const { DAO, Project } = useAppSelector((state) => state.dashboard);
@@ -43,11 +45,28 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone }) => {
 
     const handleChange = (e, index) => {
         let num = parseFloat(e.target.value);
+        console.log("num : ", num)
         const amountElement = document.getElementById(`amount${index}`);
+        const percentElement = document.getElementById(`input${index}`);
 
         const allotedAmt = (((parseFloat(selectedMilestone.amount) * compensation?.amount)) / 100).toFixed(2);
+        let total = 0;
+        for (var i = 0; i < _get(Project, 'members', []).length; i++) {
+            if (i !== index) {
+                const amt = document.getElementById(`input${i}`);
+                console.log("amt of id : ", amt.id, amt.value)
+                total += parseFloat(amt.value);
+            }
+        }
+        console.log("Total : ", total);
 
-        amountElement.innerHTML = ((num / 100) * allotedAmt).toFixed(2);
+        if (parseFloat(num) > (100 - total)) {
+            console.log("Big")
+        }
+        else {
+            percentElement.value = num;
+            amountElement.innerHTML = ((num / 100) * allotedAmt).toFixed(2);
+        }
     }
 
     const handleSplitEqually = () => {
@@ -225,7 +244,6 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone }) => {
                                             <div className='input-wrapper' onClick={() => handleFocusInput(index)}>
                                                 <input
                                                     type={"number"}
-                                                    // value={0} 
                                                     min={0}
                                                     max={100}
                                                     placeholder="0"
@@ -245,12 +263,19 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone }) => {
 
                     </div>
                     <div className='milestone-footer'>
-                        <button onClick={() => toggleShowAssign()}>
+                        <button onClick={() => toggleShowAssign()} disabled={isLoading} style={isLoading ? { cursor: 'not-allowed' } : null}>
                             CANCEL
                         </button>
-                        <button onClick={handleSubmit}>
-                            COMPLETE
-                        </button>
+                        <SimpleLoadButton
+                            title="COMPLETE"
+                            height={40}
+                            width={180}
+                            fontsize={16}
+                            fontweight={400}
+                            onClick={handleSubmit}
+                            bgColor={"#C94B32"}
+                            condition={isLoading}
+                        />
                     </div>
                 </div>
             </div>

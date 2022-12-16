@@ -14,6 +14,7 @@ export interface InputFieldType {
   type?: string;
   onBlur?: any;
   min?: any;
+  max?: any;
 }
 
 export interface ButtonType {

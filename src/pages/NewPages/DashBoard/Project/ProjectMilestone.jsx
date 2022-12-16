@@ -43,7 +43,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
 
     const [milestoneCount, setMilestoneCount] = useState(list.length > 0 ? list.length : 1);
 
-    const [milestones, setMilestones] = useState(list.length > 0 ? list : [{ name: '', amount: '', deadline: '', deliverables: '', complete: false }]);
+    const [milestones, setMilestones] = useState(list.length > 0 ? list : [{ name: '', amount: '0', deadline: '', deliverables: '', complete: false }]);
 
     const [safeTokens, setSafeTokens] = useState([]);
 
@@ -83,13 +83,13 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
 
         if (array.length === 0) {
             for (var i = 0; i < n; i++) {
-                array.push({ name: '', amount: '', deadline: '', deliverables: '', complete: false });
+                array.push({ name: '', amount: '0', deadline: '', deliverables: '', complete: false });
             }
         }
         else if (n > array.length) {
             let count = n - array.length;
             for (var i = 0; i < count; i++) {
-                array.push({ name: '', amount: '', deadline: '', deliverables: '', complete: false });
+                array.push({ name: '', amount: '0', deadline: '', deliverables: '', complete: false });
             }
         }
         else if (n < array.length) {
@@ -115,16 +115,25 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
     }
 
     const handleChangeAmount = (e, index) => {
-        let element = document.getElementById(`amount${index}`);
-        element.innerHTML = "";
-        const newArray = milestones.map((item, i) => {
-            if (i === index) {
-                return { ...item, amount: e };
-            } else {
-                return item;
+        let total = 0;
+        for (let i = 0; i < milestones.length; i++) {
+            if (i !== index) {
+                total += parseFloat(milestones[i].amount)
             }
-        });
-        setMilestones(newArray);
+        }
+        if (parseFloat(e) > (100 - total)) {
+            console.log("Big")
+        }
+        else {
+            const newArray = milestones.map((item, i) => {
+                if (i === index) {
+                    return { ...item, amount: e };
+                } else {
+                    return item;
+                }
+            });
+            setMilestones(newArray);
+        }
     }
 
     const handleChangeDeadline = (e, index) => {
@@ -155,6 +164,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
     }
 
     const handleSubmit = () => {
+        console.log("milestones : ", milestones)
         let flag = 0;
         for (let i = 0; i < milestones.length; i++) {
             let ob = milestones[i];
@@ -292,6 +302,9 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                                                         height={50}
                                                         width={'100%'}
                                                         value={item.amount}
+                                                        type="number"
+                                                        min={0}
+                                                        max={100}
                                                         onchange={(e) => handleChangeAmount(e.target.value, index)}
                                                         placeholder={`${100 / milestoneCount}`}
                                                     />
