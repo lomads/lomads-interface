@@ -92,6 +92,29 @@
     flex-wrap: wrap;
 }
 
+.myproject-container .myproject-body-fixed .all-project {
+    width: 320px;
+    height: 120px;
+    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 25px;
+    margin-bottom: 26px;
+    position: relative;
+    cursor: pointer;
+}
+
+.myproject-container .myproject-body-fixed .all-project span {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    text-transform: uppercase;
+    color: #B12F15;
+}
+
 .myproject-container .myproject-body-nocontent {
     width: 100%;
     padding: 26px 22px;
@@ -104,8 +127,8 @@
 
 .myproject-card {
     width: 320px;
-    height: 100px;
-    padding: 26px 22px;
+    height: 120px;
+    padding: 22px;
     background: #FFFFFF;
     box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
     border-radius: 5px;
@@ -121,7 +144,43 @@
     margin-bottom: 25px;
 }
 
-.myproject-card div .project-name {
+.myproject-card .container {
+    width: 100%;
+    height: 100%;
+}
+
+.myproject-card .container .milestone-progress {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.myproject-card .container .milestone-progress span {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    color: #76808D;
+    margin: 0;
+}
+
+.myproject-card .container .milestone-progress div .indexedStep {
+    color: white;
+    width: 11px;
+    height: 11px;
+    font-size: 12px;
+    background-color: rgba(211, 211, 211, 1);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.myproject-card .container .milestone-progress div .indexedStep.accomplished {
+    background-color: #76808D;
+}
+
+.myproject-card .container .project-name {
     font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 400;
@@ -130,13 +189,15 @@
     color: #B12F15;
 }
 
-.myproject-card div .project-desc p {
+.myproject-card .container .project-desc p {
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 400;
     font-size: 16px;
     line-height: 18px;
     color: #76808D;
-    margin-top: 10px;
+    margin-top: 7px;
+    margin-bottom: 10px;
 }
 
 .myproject-card .myproject-card-icons {

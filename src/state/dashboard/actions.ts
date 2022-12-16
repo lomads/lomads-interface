@@ -387,3 +387,15 @@ export const updateContract = createAsyncThunk(
 	}
 )
 
+export const updateKRA = createAsyncThunk(
+	'dao/updateKRA',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`project/${params.projectId}/update-kra?daoUrl=${params.daoUrl}`, params.payload)
+			.then(res => res.data)
+			.catch(e => {
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
+	}
+);
+

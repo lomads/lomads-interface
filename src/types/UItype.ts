@@ -13,6 +13,8 @@ export interface InputFieldType {
   onchange?: (e: any) => void;
   type?: string;
   onBlur?: any;
+  min?: any;
+  max?: any;
 }
 
 export interface ButtonType {

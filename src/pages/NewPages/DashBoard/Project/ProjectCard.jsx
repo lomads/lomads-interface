@@ -2,26 +2,12 @@ import { useEffect, useState, useMemo } from "react";
 import { get as _get, groupBy as _groupBy } from 'lodash'
 import { useNavigate } from "react-router-dom";
 
-import { MdKeyboardArrowRight } from 'react-icons/md';
 import { BsDiscord } from 'react-icons/bs';
-import { SiNotion } from 'react-icons/si';
+
+import { ProgressBar, Step } from "react-step-progress-bar";
 
 const ProjectCard = ({ project, daoUrl, tab }) => {
     const navigate = useNavigate();
-
-    // let arr = { 'notion.com': 0, 'discord.com': 0, 'more': 0 };
-    // project.links.forEach((item) => {
-    //     let link = new URL(item.link);
-    //     if (link.hostname === 'notion.com') {
-    //         arr[link.hostname] += 1;
-    //     }
-    //     else if (link.hostname === 'discord.com') {
-    //         arr[link.hostname] += 1;
-    //     }
-    //     else {
-    //         arr['more'] += 1;
-    //     }
-    // });
 
     const notifications = useMemo(() => {
         let count = [];
@@ -53,38 +39,45 @@ const ProjectCard = ({ project, daoUrl, tab }) => {
                                 }
                             })
                         }
-                        {/* {
-                            arr['notion.'] > 0 && <div className='icon-container'>
-                                <SiNotion color='#FFF' size={20} />
-                                <p>+{arr['notion.com']}</p>
-                            </div>
-                        }
-                        {
-                            arr['discord.'] > 0 && <div className='icon-container'>
-                                <BsDiscord color='#FFF' size={20} />
-                                <p>+{arr['discord.com']}</p>
-                            </div>
-                        }
-                        {
-                            arr['more'] > 0 && <div className='icon-container'>
-                                <p>More</p>
-                            </div>
-                        } */}
                     </div>
                     :
                     null
             }
-            <div>
-                <p className="project-name">{project.name}</p>
+            <div className="container">
+                <p className="project-name">{project.name.length > 25 ? project.name.substring(0, 20) + "..." : project.name}</p>
                 <div className="project-desc" dangerouslySetInnerHTML={{ __html: project.description.length > 25 ? project.description.substring(0, 25) + "..." : project.description }}></div>
+                {
+                    _get(project, 'milestones', []).length > 0 &&
+                    <div className="milestone-progress">
+                        <div style={{ width: '200px' }}>
+                            <ProgressBar
+                                percent={((_get(project, 'milestones', []).filter((item) => item.complete === true).length) / (_get(project, 'milestones', []).length)) * 100}
+                                filledBackground="#76808D"
+                                unfilledBackground="#F0F0F0"
+                                height="5px"
+                            >
+                                <Step transition="scale">
+                                    {({ accomplished, index }) => (
+                                        <div className={`indexedStep ${accomplished ? "accomplished" : ""}`}></div>
+                                    )}
+                                </Step>
+                                {
+                                    _get(project, 'milestones', []).map((item, index) => {
+                                        return (
+                                            <Step transition="scale">
+                                                {({ accomplished, index }) => (
+                                                    <div className={`indexedStep ${accomplished ? "accomplished" : ""}`}></div>
+                                                )}
+                                            </Step>
+                                        )
+                                    })
+                                }
+                            </ProgressBar>
+                        </div>
+                        <span className="percent-text">{(((_get(project, 'milestones', []).filter((item) => item.complete === true).length) / (_get(project, 'milestones', []).length)) * 100).toFixed(2)}%</span>
+                    </div>
+                }
             </div>
-            {
-                project.archivedAt
-                    ?
-                    null
-                    :
-                    <MdKeyboardArrowRight color='#B12F15' size={24} />
-            }
         </div>
     )
 }

@@ -11,13 +11,13 @@ import axiosHttp from 'api'
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
 const useSafeTransaction = (safeAddress: string) => {
-    
+
     const { provider, chainId, account } = useWeb3React();
     const { safeTokens, tokenBalance } = useSafeTokens(safeAddress)
     //const currentNonce = useAppSelector((state) => state.flow.currentNonce);
     const [createSafeTxnLoading, setCreateSafeTxnLoading] = useState(false);
 
-    const createNativeSingleTxn = async (send:any, token: any) => {
+    const createNativeSingleTxn = async (send: any, token: any) => {
         const safeTransactionData: SafeTransactionDataPartial[] = [{
             to: toChecksumAddress(_get(send, '[0].recipient')),
             data: "0x",
@@ -26,22 +26,22 @@ const useSafeTransaction = (safeAddress: string) => {
         return safeTransactionData;
     }
 
-    const createNativeMultiTxn = async (send:any, token: any) => {
-        const safeTransactionData: SafeTransactionDataPartial[]  = 
+    const createNativeMultiTxn = async (send: any, token: any) => {
+        const safeTransactionData: SafeTransactionDataPartial[] =
             send.map((result: any, index: number) => {
-                    return {
-                        to: toChecksumAddress(result.recipient),
-                        data: "0x",
-                        value: `${BigInt(parseFloat(result.amount) * 10 ** _get(token, 'token.decimals', 18))}`
-                    };
-                }
+                return {
+                    to: toChecksumAddress(result.recipient),
+                    data: "0x",
+                    value: `${BigInt(parseFloat(result.amount) * 10 ** _get(token, 'token.decimals', 18))}`
+                };
+            }
             )
-            return safeTransactionData;
+        return safeTransactionData;
     }
 
-    const createMultiTxn = async ( send:any, safeToken: any) => {
+    const createMultiTxn = async (send: any, safeToken: any) => {
         const token = await tokenCallSafe(safeToken.tokenAddress);
-        const safeTransactionData: SafeTransactionDataPartial[]  = await Promise.all(
+        const safeTransactionData: SafeTransactionDataPartial[] = await Promise.all(
             send.map(
                 async (result: any, index: number) => {
                     const unsignedTransaction = await token.populateTransaction.transfer(
@@ -60,20 +60,21 @@ const useSafeTransaction = (safeAddress: string) => {
         return safeTransactionData;
     }
 
-    const createSafeTransaction = async ({ tokenAddress, send, confirm = true, createLabel = true}: any) => {
-        if(!safeAddress) return null;
+    const createSafeTransaction = async ({ tokenAddress, send, confirm = true, createLabel = true }: any) => {
+        console.log("send ob : ", send, tokenAddress);
+        if (!safeAddress) return null;
         let signature = null;
         try {
             const safeToken = _find(safeTokens, t => _get(t, 'tokenAddress', null) === tokenAddress)
             let total = send.reduce((pv: any, cv: any) => pv + (+cv.amount), 0);
-            if(total == 0) throw 'Cannot send 0'
+            if (total == 0) throw 'Cannot send 0'
             if (tokenBalance(tokenAddress) < total)
                 throw 'Low token balance'
             setCreateSafeTxnLoading(true);
             let safeTransactionData = null;
             const safeSDK = await ImportSafe(provider, safeAddress);
-            if(tokenAddress === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || tokenAddress === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS) {
-                if(send.length == 1)
+            if (tokenAddress === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || tokenAddress === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS) {
+                if (send.length == 1)
                     safeTransactionData = await createNativeSingleTxn(send, safeToken)
                 else
                     safeTransactionData = await createNativeMultiTxn(send, safeToken)
@@ -88,27 +89,27 @@ const useSafeTransaction = (safeAddress: string) => {
                 safeTransactionData,
                 options,
             });
-   
+
             const safeTxHash = await safeSDK.getTransactionHash(safeTransaction);
-			signature = await safeSDK.signTransactionHash(safeTxHash);
+            signature = await safeSDK.signTransactionHash(safeTxHash);
             const senderAddress = account as string;
             await (await safeService(provider, `${chainId}`))
-            .proposeTransaction({ safeAddress, safeTransactionData: safeTransaction.data, safeTxHash, senderAddress, senderSignature: signature.data })
+                .proposeTransaction({ safeAddress, safeTransactionData: safeTransaction.data, safeTxHash, senderAddress, senderSignature: signature.data })
             console.log("transaction has been proposed");
-            if(confirm){
+            if (confirm) {
                 await (await safeService(provider, `${chainId}`))
-                .confirmTransaction(safeTxHash, signature.data)
-                .then(async () => {
-                    if(createLabel) {
-                        let payload: any[] = [];
-                        send.map((r: any) => {
-                            payload.push({ safeAddress, safeTxHash, recipient: r.recipient, label: _get(r, 'reason', null) })
-                        })
-                        await axiosHttp.post(`transaction/label`, payload)
-                    }
-                })
+                    .confirmTransaction(safeTxHash, signature.data)
+                    .then(async () => {
+                        if (createLabel) {
+                            let payload: any[] = [];
+                            send.map((r: any) => {
+                                payload.push({ safeAddress, safeTxHash, recipient: r.recipient, label: _get(r, 'reason', null) })
+                            })
+                            await axiosHttp.post(`transaction/label`, payload)
+                        }
+                    })
             } else {
-                if(createLabel) {
+                if (createLabel) {
                     let payload: any[] = [];
                     send.map((r: any) => {
                         payload.push({ safeAddress, safeTxHash, recipient: r.recipient, label: _get(r, 'reason', null) })

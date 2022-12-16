@@ -20,19 +20,19 @@ import { SupportedChainId } from "constants/chains";
 import { useWeb3React } from "@web3-react/core";
 import { useAppSelector } from "state/hooks";
 import {
-    Input,
-    FormControl,
-    FormErrorMessage,
-    NumberInput,
-    NumberInputField,
-    NumberInputStepper,
-    NumberDecrementStepper,
-    NumberIncrementStepper,
+	Input,
+	FormControl,
+	FormErrorMessage,
+	NumberInput,
+	NumberInputField,
+	NumberInputStepper,
+	NumberDecrementStepper,
+	NumberIncrementStepper,
 } from "@chakra-ui/react";
 
 
 const TransactionSend = (props: IselectTransactionSend) => {
-	console.log(props.selectedToken)
+	console.log("error : ", props.error)
 	const { DAO } = useAppSelector((state) => state.dashboard);
 	const { chainId } = useWeb3React();
 	const managePreviousNavigation = () => {
@@ -77,16 +77,16 @@ const TransactionSend = (props: IselectTransactionSend) => {
 							{props.tokens.map((result: any, index: any) => {
 								return (
 									(
-									<>
-										<option value={result?.tokenAddress ? result.tokenAddress : chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS} key={index}>
-										{ _get(result, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR') }
-										</option>
-									</>
+										<>
+											<option value={result?.tokenAddress ? result.tokenAddress : chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS} key={index}>
+												{_get(result, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}
+											</option>
+										</>
 									)
 								);
 							})}
-							{ _get(DAO, 'sweatPoints', false) &&
-							<option value="SWEAT">SWEAT</option> }
+							{_get(DAO, 'sweatPoints', false) &&
+								<option value="SWEAT">SWEAT</option>}
 						</select>
 					</div>
 				</div>
@@ -120,15 +120,15 @@ const TransactionSend = (props: IselectTransactionSend) => {
 														e.target.value;
 												}}
 											/> */}
-										<NumberInput onChange={(e) => {
-													props.setRecipient.current[index].amount = `${+e}`;
-												}}  style={{ width: (54 + 50), height: 50, borderRadius: '10px 10px 10px 10px', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)' }} step={1} min={0}>
-											<NumberInputField className='input' style={{ padding: 0, textAlign: "center", height: 50, width: 54, backgroundColor: '#F5F5F5', borderRadius: '10px 0px 0px 10px', borderWidth: 0 }} />
-											<NumberInputStepper style={{ width: 50, backgroundColor: 'transparent', borderRadius: '10px 10px 10px 10px' }}>
-												<NumberIncrementStepper color="#C94B32" />
-												<NumberDecrementStepper color="#C94B32" style={{ borderTopWidth: 0 }} />
-											</NumberInputStepper>
-										</NumberInput>
+											<NumberInput onChange={(e) => {
+												props.setRecipient.current[index].amount = `${+e}`;
+											}} style={{ width: (54 + 50), height: 50, borderRadius: '10px 10px 10px 10px', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)' }} step={1} min={0}>
+												<NumberInputField className='input' style={{ padding: 0, textAlign: "center", height: 50, width: 54, backgroundColor: '#F5F5F5', borderRadius: '10px 0px 0px 10px', borderWidth: 0 }} />
+												<NumberInputStepper style={{ width: 50, backgroundColor: 'transparent', borderRadius: '10px 10px 10px 10px' }}>
+													<NumberIncrementStepper color="#C94B32" />
+													<NumberDecrementStepper color="#C94B32" style={{ borderTopWidth: 0 }} />
+												</NumberInputStepper>
+											</NumberInput>
 										</div>
 										<div>
 											<SimpleInputField
@@ -169,39 +169,39 @@ const TransactionSend = (props: IselectTransactionSend) => {
 					</div>
 				</div>
 				<div id="addMember">
-						<div>
-							<SafeButton
-								bgColor="#FFFFFF"
-								disabled={false}
-								title="ADD A MEMBER"
-								titleColor="#76808D"
-								fontsize={16}
-								fontweight={400}
-								height={40}
-								width={162}
-								onClick={() => {
-									managePreviousNavigation();
-								}}
-							/>
-						</div>
-					</div>
-					{props.error && <div style={{ fontSize: 14, color: 'red' }}>{props.error}</div>}
-					<div id="transactionSendDivider2"></div>
-					<div id="transactionSendButton">
-						<SimpleLoadButton
-							title="SEND TOKENS"
-							height={50}
-							width={180}
-							bgColor="#C94B32"
-							className="button"
-							fontsize={20}
+					<div>
+						<SafeButton
+							bgColor="#FFFFFF"
+							disabled={false}
+							title="ADD A MEMBER"
+							titleColor="#76808D"
+							fontsize={16}
 							fontweight={400}
+							height={40}
+							width={162}
 							onClick={() => {
-								props.createTransaction();
+								managePreviousNavigation();
 							}}
-							condition={props.isLoading}
 						/>
 					</div>
+				</div>
+				{props.error && <div style={{ fontSize: 14, color: 'red' }}>{props.error}</div>}
+				<div id="transactionSendDivider2"></div>
+				<div id="transactionSendButton">
+					<SimpleLoadButton
+						title="SEND TOKENS"
+						height={50}
+						width={180}
+						bgColor="#C94B32"
+						className="button"
+						fontsize={20}
+						fontweight={400}
+						onClick={() => {
+							props.createTransaction();
+						}}
+						condition={props.isLoading}
+					/>
+				</div>
 			</div>
 			{props.addNewRecipient && (
 				<AddRecipient toggleAddNewRecipient={props.toggleAddNewRecipient} />

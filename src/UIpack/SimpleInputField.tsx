@@ -19,6 +19,8 @@ const SimpleInputField = (props: InputFieldType) => {
         onKeyDown={props.onKeyDown}
         type={props.type}
         bg="#F5F5F5"
+        min={props.min}
+        max={props.max}
       />
       {!props.value && props.isInvalid && (
         <FormErrorMessage style={{ marginTop: 0, fontSize: "x-small" }}>

@@ -6,7 +6,7 @@ import createProjectSvg from '../../assets/svg/createProject.svg';
 import editToken from '../../assets/svg/editToken.svg';
 import memberIcon from '../../assets/svg/memberIcon.svg';
 import notionIcon from '../../assets/svg/Notion-logo.svg';
-import { AiOutlinePlus } from "react-icons/ai";
+import { AiOutlineLock } from "react-icons/ai";
 import { SiNotion } from "react-icons/si";
 import { HiOutlinePlus } from "react-icons/hi";
 import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe } from "react-icons/bs";
@@ -32,6 +32,12 @@ import AddNotionLink from 'components/AddNotionLink';
 import { nanoid } from '@reduxjs/toolkit';
 
 import { Editor } from '@tinymce/tinymce-react';
+import ProjectMilestone from './DashBoard/Project/ProjectMilestone';
+import ProjectKRA from './DashBoard/Project/ProjectKRA';
+import moment from 'moment';
+import ProjectResource from './DashBoard/Project/ProjectResource';
+
+import SimpleLoadButton from "UIpack/SimpleLoadButton";
 
 const CreateProject = () => {
 
@@ -51,15 +57,17 @@ const CreateProject = () => {
     const [resourceList, setResourceList] = useState([]);
     const [showMore, setShowMore] = useState(false);
     const [success, setSuccess] = useState(false);
-    const [link, setLink] = useState('');
-    const [linkError, setLinkError] = useState(null);
-    const [roleName, setRoleName] = useState(null);
-    const [spaceDomain, setSpaceDomain] = useState(null);
-    const [accessControl, setAccessControl] = useState(false);
-    const [accessControlError, setAccessControlError] = useState(null);
-    const [title, setTitle] = useState('');
-    const [titleError, setTitleError] = useState(null);
     const [newAddress, setNewAddress] = useState([]);
+
+    const [openResource, setOpenResource] = useState(false);
+    const [openMilestone, setOpenMilestone] = useState(false);
+    const [openKRA, setOpenKRA] = useState(false);
+
+    const [milestones, setMilestones] = useState([]);
+    const [results, setResults] = useState([]);
+    const [frequency, setFrequency] = useState('');
+
+    const [compensation, setCompensation] = useState(null);
 
     const daoName = _get(DAO, 'name', '').split(" ");
 
@@ -79,19 +87,6 @@ const CreateProject = () => {
     }, [createProjectLoading])
 
     useEffect(() => {
-        try {
-            if (link && link.length > 8 && link.indexOf('notion.') > -1) {
-                let lnk = new URL(link).pathname;
-                lnk = lnk.split('/')
-                if (lnk && lnk.length > 2)
-                    setSpaceDomain(lnk[1])
-            }
-        } catch (e) {
-            console.log(e)
-        }
-    }, [link])
-
-    useEffect(() => {
         const memberList = DAO?.members;
         if (memberList.length > 0 && selectedMembers.length === 0) {
             for (let i = 0; i < memberList.length; i++) {
@@ -104,14 +99,6 @@ const CreateProject = () => {
             }
         }
     }, []);
-
-    useEffect(() => {
-        if (link && link.indexOf('notion.') > -1 && _get(DAO, 'sbt.contactDetail', []).indexOf('email') === -1) {
-            setAccessControlError('Notion gated access not possible (No email in SBT)')
-        } else {
-            setAccessControlError(null)
-        }
-    }, [link, DAO])
 
     // useEffect(() => {
     //     let accessControlElement = document.getElementById('accessControl');
@@ -130,10 +117,6 @@ const CreateProject = () => {
     //         accessControlElement.disabled = false;
     //     }
     // }, [link]);
-
-    const accesscontrolDisabled = useMemo(() => {
-        return (!link || (link && link.length <= 8) || (link.indexOf('discord.') == -1 && link.indexOf('notion.') == -1))
-    }, [link])
 
     useEffect(() => {
         console.log("new address : ", newAddress);
@@ -161,24 +144,23 @@ const CreateProject = () => {
     const handleParseUrl = (url) => {
         try {
             const link = new URL(url);
-            console.log("lnk", link)
             if (link.hostname.indexOf('notion.') > -1) {
-                return <SiNotion color='#B12F15' size={20} />
+                return <SiNotion color='#76808D' size={20} />
             }
             else if (link.hostname.indexOf('discord.') > -1) {
-                return <BsDiscord color='#B12F15' size={20} />
+                return <BsDiscord color='#76808D' size={20} />
             }
             else if (link.hostname.indexOf('github.') > -1) {
-                return <BsGithub color='#B12F15' size={20} />
+                return <BsGithub color='#76808D' size={20} />
             }
             else if (link.hostname.indexOf('google.') > -1) {
-                return <BsGoogle color='#B12F15' size={20} />
+                return <BsGoogle color='#76808D' size={20} />
             }
             else if (link.hostname.indexOf('twitter.') > -1) {
-                return <BsTwitter color='#B12F15' size={20} />
+                return <BsTwitter color='#76808D' size={20} />
             }
             else {
-                return <span><BsGlobe size={20} /></span>
+                return <span><BsGlobe color="#76808D" size={20} /></span>
             }
         }
         catch (e) {
@@ -186,15 +168,7 @@ const CreateProject = () => {
         }
     }
 
-
     const handleAddMember = (member) => {
-        // let found = false;
-        // for (let i = 0; i < selectedMembers.length; i++) {
-        //     if (selectedMembers[i].name === member.name) {
-        //         found = true;
-        //         break;
-        //     }
-        // }
         const memberExists = _find(selectedMembers, m => m.address.toLowerCase() === member.wallet.toLowerCase())
         if (memberExists)
             setSelectedMembers(prev => prev.filter((item) => item.address.toLowerCase() !== member.wallet.toLowerCase()));
@@ -210,111 +184,21 @@ const CreateProject = () => {
         setSelectedMembers(selectedMembers.filter((_, index) => index !== position));
     }
 
-
-    const handleAddResource = async (status = undefined) => {
-        if (title === '') {
-            setTitleError('Please enter a title')
-            return;
-        }
-        else if (link === '') {
-            setLinkError("Please enter a link")
-            return;
-        }
-        else if (!isValidUrl(link)) {
-            setLinkError("Please enter a valid link")
-            return;
-        }
-        // else if (!link.match(/^(http(s)?:\/\/)[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/)) {
-        //     return toast.error("Please enter a valid link");
-        // }
-        else {
-            let tempLink = link;
-            if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
-                tempLink = 'https://' + tempLink;
-            }
-            if (link.indexOf('discord.') > -1) {
-                let resource = {};
-                resource.id = nanoid(16);
-                resource.title = title;
-                resource.link = tempLink;
-                resource.provider = new URL(tempLink).hostname;
-                let dcserverid = undefined;
-                if (status)
-                    dcserverid = new URL(tempLink).pathname.split('/')[2]
-                resource.platformId = dcserverid;
-                resource.accessControl = accessControl;
-                if (status)
-                    resource.guildId = status;
-                setResourceList([...resourceList, resource]);
-                setAccessControl(false);
-                setTitle('');
-                setLink('');
-                setRoleName(null)
-                setSpaceDomain(null)
-            } else if (link.indexOf('notion.') > -1) {
-                if (status.status) {
-                    let resource = {};
-                    resource.id = nanoid(16);
-                    resource.title = title;
-                    resource.link = tempLink;
-                    resource.provider = new URL(tempLink).hostname;
-                    resource.spaceDomain = spaceDomain;
-                    resource.accessControl = accessControl;
-                    setResourceList([...resourceList, resource]);
-                    setAccessControl(false);
-                    setTitle('');
-                    setLink('');
-                    setRoleName(null)
-                    setSpaceDomain(null)
-                } else {
-                    setLinkError(status.message || 'Something went wrong.')
-                }
-            } else {
-                let resource = {};
-                resource.id = nanoid(16);
-                resource.title = title;
-                resource.link = tempLink;
-                resource.accessControl = false
-                setResourceList([...resourceList, resource]);
-                setAccessControl(false);
-                setTitle('');
-                setLink('');
-                setRoleName(null)
-                setSpaceDomain(null)
-            }
-        }
-    }
-
-    const handleRemoveResource = (position) => {
-        setResourceList(resourceList.filter((_, index) => index !== position));
-    }
-
-    const linkHasDomain = useMemo(() => {
-        try {
-            if (link && link.indexOf('notion.') > -1)
-                return (new URL(link).pathname).split('/').length > 2
-            return false;
-        } catch (e) {
-            return false
-        }
-    }, [link])
-
     const handleCreateProject = () => {
         let project = {};
         project.name = name;
         project.description = desc;
         project.members = selectedMembers;
         project.links = resourceList;
+        project.milestones = milestones;
+        project.compensation = compensation;
+        project.kra = {
+            frequency,
+            results
+        };
         project.daoId = DAO?._id;
         console.log(project)
         dispatch(createProject({ payload: project }))
-    }
-
-    const LinkBtn = (props) => {
-        if (link && link.indexOf('discord.') > -1)
-            return <AddDiscordLink {...props} />
-        if (link && link.indexOf('notion.') > -1)
-            return <AddNotionLink {...props} />
     }
 
     return (
@@ -338,6 +222,39 @@ const CreateProject = () => {
                         addToList={(addressArr) => setNewAddress(addressArr)}
                     />
                 }
+
+                {/* open project resource modal */}
+                {
+                    openResource
+                    &&
+                    <ProjectResource
+                        list={resourceList}
+                        toggleShowResource={() => setOpenResource(false)}
+                        getResources={(value) => setResourceList(value)}
+                    />
+                }
+                {/* open milestone modal */}
+                {
+                    openMilestone
+                    &&
+                    <ProjectMilestone
+                        list={milestones}
+                        getCompensation={(value) => setCompensation(value)}
+                        toggleShowMilestone={() => setOpenMilestone(false)}
+                        getMilestones={(value) => setMilestones(value)}
+                    />
+                }
+                {/* open key result modal*/}
+                {
+                    openKRA
+                    &&
+                    <ProjectKRA
+                        list={results}
+                        freq={frequency}
+                        toggleShowKRA={() => setOpenKRA(false)}
+                        getResults={(value1, value2) => { setResults(value1); setFrequency(value2) }}
+                    />
+                }
                 {
                     success
                         ?
@@ -358,10 +275,69 @@ const CreateProject = () => {
                                         <div className="projectName-container" style={{ width: '450px' }}>
                                             <div className="projectName-box" style={{ width: '100%' }}>
                                                 <div className='name-btn'>
-                                                    <p>Project ressources</p>
-                                                    <button><HiOutlinePlus size={20} style={{ marginRight: '10px' }} /> ADD</button>
+                                                    <h1>Project resources</h1>
+                                                    {
+                                                        resourceList.length > 0
+                                                            ?
+                                                            <img src={editToken} alt="hk-logo" onClick={() => setOpenResource(true)} style={{ cursor: 'pointer' }} />
+                                                            :
+                                                            <button onClick={() => setOpenResource(true)}><HiOutlinePlus size={20} style={{ marginRight: '10px' }} /> ADD</button>
+                                                    }
+
                                                 </div>
-                                                <span>Add links for your team to access </span>
+                                                <span style={{ marginBottom: '20px' }}>Add links for your team to access </span>
+                                                {
+                                                    resourceList && resourceList.map((item, index) => {
+                                                        return (
+                                                            <div className="link-li" key={index}>
+                                                                <div className="link-icon-name">
+                                                                    {handleParseUrl(item.link)}
+                                                                    <span style={{ marginLeft: '5px' }}>{item.title.length > 20 ? item.title.slice(0, 20) + "..." : item.title}</span>
+                                                                </div>
+                                                                <div className="link-address">
+                                                                    <span>{item.link.length > 20 ? item.link.slice(0, 20) + "..." : item.link}</span>
+                                                                    {item.accessControl && <AiOutlineLock color='#C94B32' />}
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
+                                            </div>
+                                        </div>
+
+                                        <div className="divider"></div>
+
+                                        <div className="projectName-container" style={{ width: '450px' }}>
+                                            <div className="projectName-box" style={{ width: '100%' }}>
+                                                <div className='name-btn'>
+                                                    <h1>Milestones</h1>
+                                                    {
+                                                        milestones.length > 0
+                                                            ?
+                                                            <img src={editToken} alt="hk-logo" onClick={() => setOpenMilestone(true)} style={{ cursor: 'pointer' }} />
+                                                            :
+                                                            <button onClick={() => setOpenMilestone(true)}><HiOutlinePlus size={20} style={{ marginRight: '10px' }} /> ADD</button>
+                                                    }
+                                                </div>
+
+                                                <span style={{ marginBottom: '20px' }}>Organise and link payments to milestones</span>
+
+                                                {
+                                                    milestones && milestones.map((item, index) => {
+                                                        return (
+                                                            <div className="milestone-card">
+                                                                <div>
+                                                                    <span>{index + 1}</span>
+                                                                    <h1>{item.name}</h1>
+                                                                </div>
+                                                                <div>
+                                                                    <h1>{moment(item.deadline).format('L')}</h1>
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
+
                                             </div>
 
                                         </div>
@@ -371,41 +347,50 @@ const CreateProject = () => {
                                         <div className="projectName-container" style={{ width: '450px' }}>
                                             <div className="projectName-box" style={{ width: '100%' }}>
                                                 <div className='name-btn'>
-                                                    <p>Milestones</p>
-                                                    <button><HiOutlinePlus size={20} style={{ marginRight: '10px' }} /> ADD</button>
+                                                    <h1>Key results</h1>
+                                                    {
+                                                        results.length > 0
+                                                            ?
+                                                            <img src={editToken} alt="hk-logo" onClick={() => setOpenKRA(true)} style={{ cursor: 'pointer' }} />
+                                                            :
+                                                            <button onClick={() => setOpenKRA(true)}><HiOutlinePlus size={20} style={{ marginRight: '10px' }} /> ADD</button>
+                                                    }
                                                 </div>
 
-                                                <span>Organise and link payments to milestones</span>
-                                            </div>
+                                                <span style={{ marginBottom: '20px' }}>Set objective for your team </span>
 
-                                        </div>
-
-                                        <div className="divider"></div>
-
-                                        <div className="projectName-container" style={{ width: '450px' }}>
-                                            <div className="projectName-box" style={{ width: '100%' }}>
-                                                <div className='name-btn'>
-                                                    <p>Key results</p>
-                                                    <button><HiOutlinePlus size={20} style={{ marginRight: '10px' }} /> ADD</button>
-                                                </div>
-
-                                                <span>Set objective for your team </span>
+                                                {
+                                                    results && results.map((item, index) => {
+                                                        return (
+                                                            <div className="milestone-card">
+                                                                <div>
+                                                                    <h1>{item.name}</h1>
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
                                             </div>
 
                                         </div>
 
                                         <div className='project-buttons'>
-                                            <button
-                                                style={{ background: '#C94B32', color: '#FFF' }}
+                                            <SimpleLoadButton
+                                                title="CREATE PROJECT"
+                                                height={50}
+                                                width={225}
+                                                fontsize={16}
+                                                fontweight={400}
                                                 onClick={() => handleCreateProject()}
-                                            >
-                                                CREATE PROJECT
-                                            </button>
+                                                bgColor={"#C94B32"}
+                                                condition={createProjectLoading}
+                                            />
+
                                         </div>
 
                                     </div>
                                     :
-                                    <div className='createProject-body'>
+                                    <div className='createProject-body' style={{ height: '90vh' }}>
                                         <img src={createProjectSvg} alt="frame-icon" />
                                         <p className="heading-text">Create New Project</p>
                                         {
@@ -468,7 +453,7 @@ const CreateProject = () => {
                                                     {/* show invite members */}
                                                     <div className="projectName-container">
                                                         <div className="projectName-box">
-                                                            <p>{name}</p>
+                                                            <span className='project-name'>{name}</span>
                                                             <div dangerouslySetInnerHTML={{ __html: desc.length > 25 ? desc.substring(0, 25) + "..." : desc }}></div>
                                                         </div>
                                                         <div className="projectName-btn">
@@ -498,17 +483,17 @@ const CreateProject = () => {
                                                                                 </div>
                                                                                 <div className="member-address">
                                                                                     <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
-                                                                                    {/* {
-                                                                                    selectedMembers.some((m) => m.address.toLowerCase() === item.member.wallet.toLowerCase()) === false
-                                                                                        ?
-                                                                                        <input type="checkbox" onChange={() => handleAddMember(item.member)} />
-                                                                                        :
-                                                                                        <input type="checkbox" onChange={() => handleAddMember(item.member)} checked />
-                                                                                } */}
-                                                                                    <div className='checkbox'>
+                                                                                    {
+                                                                                        selectedMembers.some((m) => m.address.toLowerCase() === item.member.wallet.toLowerCase()) === false
+                                                                                            ?
+                                                                                            <input type="checkbox" onChange={() => handleAddMember(item.member)} />
+                                                                                            :
+                                                                                            <input type="checkbox" onChange={() => handleAddMember(item.member)} checked />
+                                                                                    }
+                                                                                    {/* <div className='checkbox'>
                                                                                         <input type="checkbox" onChange={(e) => alert("dfdf")} />
                                                                                         <span className='inner-check check'></span>
-                                                                                    </div>
+                                                                                    </div> */}
                                                                                 </div>
                                                                             </div>
                                                                         )
@@ -524,12 +509,22 @@ const CreateProject = () => {
                                                         >
                                                             ADD MORE DETAIL
                                                         </button>
-                                                        <button
+                                                        <SimpleLoadButton
+                                                            title="CREATE PROJECT"
+                                                            height={50}
+                                                            width={225}
+                                                            fontsize={16}
+                                                            fontweight={400}
+                                                            onClick={() => handleCreateProject()}
+                                                            bgColor={"#C94B32"}
+                                                            condition={createProjectLoading}
+                                                        />
+                                                        {/* <button
                                                             style={{ background: '#C94B32', color: '#FFF' }}
                                                             onClick={() => handleCreateProject()}
                                                         >
                                                             CREATE PROJECT
-                                                        </button>
+                                                        </button> */}
                                                     </div>
                                                 </>
                                         }

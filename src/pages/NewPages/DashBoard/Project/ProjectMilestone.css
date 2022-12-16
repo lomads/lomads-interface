@@ -1,0 +1,462 @@
+.milestoneOverlay {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(27, 43, 65, 0.25);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.milestoneOverlay .milestoneContainer {
+    height: 100vh;
+    width: 575px;
+    background-color: #FFF;
+    border-radius: 20px 0px 0px 20px;
+    padding: 36px 27px;
+    /* overflow-y: scroll; */
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-header button {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
+    border-radius: 3px;
+}
+
+.milestoneOverlay .milestoneContainer .createTask-success {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.milestoneOverlay .milestoneContainer .createTask-success h1 {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 33px;
+    /* or 110% */
+    text-align: center;
+
+    /* RED */
+    color: #C94B32;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.milestoneOverlay .milestoneContainer .createTask-success span {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+    /* or 129% */
+    text-align: center;
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 27px;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .members-section {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    margin: 20px 0;
+    padding: 20px 0;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .members-section .member-row {
+    width: 100%;
+    height: 50px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .members-section .member-row:last-child {
+    margin: 0;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .members-section .member-row div {
+    display: flex;
+    align-items: center;
+    width: 30%;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .members-section .member-row div img {
+    margin: 0;
+    margin-right: 10px;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .members-section .member-row div span {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    /* identical to box height, or 107% */
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+    margin: 0;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .members-section .member-row div h1 {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    /* identical to box height, or 107% */
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .members-section .member-row div .input-wrapper {
+    width: 100px;
+    height: 50px;
+    background: #F5F5F5;
+    border-radius: 10px;
+    box-shadow: inset 1px 1px 4px rgba(27, 43, 65, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .members-section .member-row div input {
+    height: 30px;
+    width: 50px;
+    padding-left: 5px;
+    background: transparent;
+    outline: none;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body img {
+    margin-bottom: 18px;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body h1 {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 33px;
+    color: #C94B32;
+    margin-bottom: 8px;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body span {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+    /* or 129% */
+    text-align: center;
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+    margin-bottom: 30px;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .hr-line {
+    width: 208px;
+    height: 0px;
+    border: 1.5px solid #C94B32;
+    margin: 35px 0;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .milestone-card {
+    width: 320px;
+    padding: 20px 22.5px;
+    background: #FFFFFF;
+    /* Color-drop-fade */
+    box-shadow: 0px 3px 3px rgba(27, 43, 65, 0.1), -1px -2px 3px rgba(201, 75, 50, 0.05);
+    border-radius: 5px;
+    margin-bottom: 30px;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .milestone-card h1 {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
+    /* or 112% */
+    letter-spacing: -0.011em;
+
+    /* Dark-red */
+    color: #B12F15;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .milestone-inputRow {
+    width: 100%;
+    height: 100px;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .milestone-inputRow .error-msg {
+    margin-bottom: 0;
+    font-size: 13px;
+    color: #C94B32;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .milestone-inputRow.row-align {
+    display: flex;
+    /* align-items: center; */
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .milestone-inputRow span {
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    color: #76808D;
+    margin-bottom: 10px;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .milestone-inputRow p {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+    /* or 129% */
+    letter-spacing: -0.011em;
+
+    /* Light3 */
+    color: rgba(118, 128, 141, 0.5);
+
+
+    /* Inside auto layout */
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+    margin: 15px 0;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .milestone-inputRow textarea {
+    resize: none;
+    padding: 10px;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .milestone-inputRow .createTask-optionalDiv {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .milestone-inputRow .createTask-optionalDiv .option-div {
+    width: 110px;
+    height: 25px;
+    background: rgba(118, 128, 141, 0.05);
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 16px;
+    /* identical to box height, or 114% */
+
+    /* Light3 */
+    color: rgba(118, 128, 141, 0.5);
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .milestone-inputRow .milestone-inputRow-half {
+    width: 48%;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .milestone-inputRow .createTask-compensation {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .milestone-inputRow .createTask-buttonRow {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .milestone-inputRow .createTask-buttonRow button {
+    height: 50px;
+    width: 48%;
+    background: #FFFFFF;
+    border-radius: 5px;
+    color: rgba(201, 75, 50, 0.5);
+    /* Color-drop-HOVER */
+    box-shadow: 1px 2px 5px rgba(27, 43, 65, 0.12), 0px 0px 5px rgba(201, 75, 50, 0.18);
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .milestone-inputRow .createTask-buttonRow button.active {
+    /* Color-drop-HOVER */
+    box-shadow: 3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18);
+    color: rgba(201, 75, 50, 1);
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .contributor-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .contributor-section .contributor-check {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 24px;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .contributor-section .contributor-check div {
+    width: 100%;
+    margin-left: 15px;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .contributor-section .contributor-check div h1 {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    margin: 0;
+    color: #76808D;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .contributor-section .contributor-check div span {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    color: rgba(118, 128, 141, 0.5);
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .selected-roles {
+    width: 100%;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    background: rgba(118, 128, 141, 0.05);
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .selected-roles .roles-right button {
+    height: 40px;
+    width: 40px;
+    background: #FFFFFF;
+    /* Color-drop */
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .selected-roles .roles-left .roles-li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .selected-roles .roles-left .roles-li:last-child {
+    margin: 0;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .selected-roles .roles-left .roles-li .roles-pill {
+    width: 200px;
+    height: 30px;
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    padding: 3.75px;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .selected-roles .roles-left .roles-li .roles-pill .roles-circle {
+    height: 22.5px;
+    width: 22.5px;
+    border-radius: 50%;
+    margin-right: 8.25px;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .selected-roles .roles-left .roles-li .roles-pill span {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    /* or 114% */
+
+    /* Grey */
+    color: #76808D;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-body .selected-roles .roles-left .roles-li .roles-close {
+    height: 20px;
+    width: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    background: rgba(27, 43, 65, 0.2);
+    margin-left: 18px;
+    cursor: pointer;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-footer {
+    width: 100%;
+    padding: 0 54px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-footer button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    height: 40px;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-footer button:first-child {
+    background: #FFFFFF;
+    border: 1px solid #C94B32;
+    color: #C94B32;
+    width: 169px;
+    margin-right: 20px;
+}
+
+.milestoneOverlay .milestoneContainer .milestone-footer button:last-child {
+    background: #C94B32;
+    color: #FFF;
+    width: 180px;
+}
