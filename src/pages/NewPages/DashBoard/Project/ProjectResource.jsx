@@ -283,10 +283,10 @@ const ProjectResource = ({ toggleShowResource, getResources, list }) => {
                             </div>
                         }
 
-                        {
+                        {/* {
                             accessControl && link && link.indexOf('notion.') > -1 &&
                             <div style={{ fontSize: 14, fontStyle: 'italic', color: "rgba(118, 128, 141, 0.5)" }}>Invite <span style={{ color: "#76808D" }}>{process.env.REACT_APP_NOTION_ADMIN_EMAIL}</span> to be an Admin of your workspace</div>
-                        }
+                        } */}
 
                         {
                             DAO?.sbt &&
@@ -295,14 +295,18 @@ const ProjectResource = ({ toggleShowResource, getResources, list }) => {
                                     (link && link.indexOf('notion.') > -1 && _get(DAO, 'sbt.contactDetail', '').indexOf('email') > -1) ||
                                         (link && link.indexOf('discord.') > -1 && _get(DAO, 'sbt.contactDetail', '').indexOf('discord') > -1)
                                         ?
-                                        <input
-                                            id="accessControl"
-                                            type="checkbox"
-                                            checked={accessControl}
-                                            value={accessControl}
-                                            // disabled={accessControlError || accesscontrolDisabled}
-                                            onChange={e => setAccessControl(prev => !prev)}
-                                        />
+                                        <label class="switch">
+                                            <input defaultChecked={accessControl} onChange={e => setAccessControl(prev => !prev)} type="checkbox" />
+                                            <span style={{ margin: '0' }} class="slider check round"></span>
+                                        </label>
+                                        // <input
+                                        //     id="accessControl"
+                                        //     type="checkbox"
+                                        //     checked={accessControl}
+                                        //     value={accessControl}
+                                        //     disabled={accessControlError || accesscontrolDisabled}
+                                        //     onChange={e => setAccessControl(prev => !prev)}
+                                        // />
                                         :
                                         null
                                 }

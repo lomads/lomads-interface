@@ -38,63 +38,82 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone }) => {
 
     const { isSafeOwner } = useRole(DAO, account);
 
+    const [temp, setTemp] = useState([]);
+
+    useEffect(() => {
+        if (Project) {
+            let arr = [];
+            for (var i = 0; i < _get(Project, 'members', []).length; i++) {
+                const item = Project?.members[i];
+                arr.push({ name: item.name, wallet: item.wallet, percent: 0 });
+            }
+            setTemp(arr);
+        }
+    }, []);
+
     const handleFocusInput = (index) => {
         const e = document.getElementById(`input${index}`);
         e.focus();
     }
 
     const handleChange = (e, index) => {
-        let num = parseFloat(e.target.value);
-        console.log("num : ", num)
         const amountElement = document.getElementById(`amount${index}`);
-        const percentElement = document.getElementById(`input${index}`);
+        const allotedAmt = (((parseFloat(selectedMilestone.amount) * parseFloat(compensation?.amount))) / 100).toFixed(5);
 
-        const allotedAmt = (((parseFloat(selectedMilestone.amount) * compensation?.amount)) / 100).toFixed(2);
         let total = 0;
-        for (var i = 0; i < _get(Project, 'members', []).length; i++) {
+        for (let i = 0; i < temp.length; i++) {
             if (i !== index) {
-                const amt = document.getElementById(`input${i}`);
-                console.log("amt of id : ", amt.id, amt.value)
-                total += parseFloat(amt.value);
+                total += parseFloat(temp[i].percent)
             }
         }
-        console.log("Total : ", total);
 
-        if (parseFloat(num) > (100 - total)) {
+        if (parseFloat(e) > (100 - total)) {
             console.log("Big")
         }
         else {
-            percentElement.value = num;
-            amountElement.innerHTML = ((num / 100) * allotedAmt).toFixed(2);
+            amountElement.innerHTML = ((parseFloat(e) / 100) * allotedAmt).toFixed(5);
+            const newArray = temp.map((item, i) => {
+                if (i === index) {
+                    return { ...item, percent: parseFloat(e) };
+                } else {
+                    return item;
+                }
+            });
+            setTemp(newArray);
         }
     }
 
     const handleSplitEqually = () => {
-        _uniqBy(Project?.members, '_id').map((_, index) => {
+
+        const allotedAmt = (((parseFloat(selectedMilestone.amount) * parseFloat(compensation?.amount))) / 100).toFixed(5);
+        let userAmount = (allotedAmt / Project?.members?.length).toFixed(5);
+        let percentAmt = ((userAmount / allotedAmt) * 100).toFixed(2);
+
+        let arr = temp.map((item, index) => {
+            let e = item;
             const amountElement = document.getElementById(`amount${index}`);
-            const percentElement = document.getElementById(`input${index}`);
-            const allotedAmt = (((parseFloat(selectedMilestone.amount) * compensation?.amount)) / 100).toFixed(2);
-            let userAmount = (allotedAmt / Project?.members?.length).toFixed(2);
-            let percent = ((userAmount / allotedAmt) * 100).toFixed(2);
-            percentElement.value = percent;
             amountElement.innerHTML = userAmount;
+            return { ...e, percent: parseFloat(percentAmt) };
         })
+
+        setTemp(arr);
     }
 
     const handleSubmit = async () => {
         let sendArray = [];
-        const allotedAmt = (((parseFloat(selectedMilestone.amount) * compensation?.amount)) / 100).toFixed(2)
-        for (var i = 0; i < _get(Project, 'members', []).length; i++) {
-            const item = Project.members[i];
-            let amt = document.getElementById(`input${i}`).value;
+        const allotedAmt = (((parseFloat(selectedMilestone.amount) * parseFloat(compensation?.amount))) / 100).toFixed(5);
+
+        let total = 0;
+        for (var i = 0; i < temp.length; i++) {
+            const item = temp[i];
+            total += item.percent;
             sendArray.push({
-                amount: ((amt * allotedAmt) / 100).toFixed(2),
+                amount: ((item.percent * allotedAmt) / 100).toFixed(5),
                 name: item.name,
                 recipient: item.wallet,
                 reason: `${item.name} - ${selectedMilestone.name}`
             })
         }
-        console.log("SendArray : ", sendArray);
         await createTransaction(_get(Project, 'compensation.currency', ''), sendArray);
     }
 
@@ -234,8 +253,8 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone }) => {
 
                         <div className='members-section'>
                             {
-                                _uniqBy(Project?.members, '_id').map((item, index) => (
-                                    <div className='member-row'>
+                                temp && temp.map((item, index) => (
+                                    <div className='member-row' key={item.wallet}>
                                         <div>
                                             <img src={memberIcon} alt="memberIcon" />
                                             <span>{item.name}</span>
@@ -248,17 +267,21 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone }) => {
                                                     max={100}
                                                     placeholder="0"
                                                     id={`input${index}`}
+                                                    value={+item.percent}
                                                     onClick={(e) => e.stopPropagation()}
-                                                    onChange={(e) => handleChange(e, index)}
+                                                    onChange={(e) => handleChange(e.target.value, index)}
                                                 /> %
                                             </div>
                                         </div>
                                         <div>
-                                            <h1> = <span style={{ fontWeight: 'bold' }} id={`amount${index}`}>0</span> {compensation?.symbol}</h1>
+                                            <h1>=&nbsp;</h1>
+                                            <span style={{ fontWeight: 'bold' }} id={`amount${index}`}>0</span>
+                                            <h1>&nbsp;{compensation?.symbol}</h1>
                                         </div>
                                     </div>
                                 ))
                             }
+
                         </div>
 
                     </div>
