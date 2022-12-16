@@ -252,35 +252,6 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone }) => {
                         />
 
                         <div className='members-section'>
-                            {/* {
-                                _uniqBy(Project?.members, '_id').map((item, index) => (
-                                    <div className='member-row'>
-                                        <div>
-                                            <img src={memberIcon} alt="memberIcon" />
-                                            <span>{item.name}</span>
-                                        </div>
-                                        <div>
-                                            <div className='input-wrapper' onClick={() => handleFocusInput(index)}>
-                                                <input
-                                                    type={"number"}
-                                                    min={0}
-                                                    max={100}
-                                                    placeholder="0"
-                                                    id={`input${index}`}
-                                                    onClick={(e) => e.stopPropagation()}
-                                                    onChange={(e) => handleChange(e, index)}
-                                                /> %
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <h1>=&nbsp;</h1>
-                                            <span style={{ fontWeight: 'bold' }} id={`amount${index}`}>0</span>
-                                            <h1>&nbsp;{compensation?.symbol}</h1>
-                                        </div>
-                                    </div>
-                                ))
-                            } */}
-
                             {
                                 temp && temp.map((item, index) => (
                                     <div className='member-row'>
