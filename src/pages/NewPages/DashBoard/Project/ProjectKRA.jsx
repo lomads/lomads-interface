@@ -62,6 +62,7 @@ const ProjectKRA = ({ toggleShowKRA, getResults, list, freq }) => {
                 flag = -1;
                 let e = document.getElementById(`name${i}`);
                 e.innerHTML = "Enter name";
+                e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
                 return;
             }
         }

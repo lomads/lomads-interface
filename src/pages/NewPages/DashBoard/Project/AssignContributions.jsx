@@ -1,29 +1,10 @@
+/* global BigInt */
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { find as _find, get as _get, debounce as _debounce, uniqBy as _uniqBy } from 'lodash';
 import './ProjectMilestone.css';
 import { CgClose } from 'react-icons/cg'
 import createTaskSvg from '../../../../assets/svg/milestone.svg';
 import memberIcon from '../../../../assets/svg/memberIcon.svg';
-
-import { ReactComponent as ArrowDown } from "../../../../assets/images/dropdown.svg";
-import { ReactComponent as PolygonIcon } from '../../../../assets/svg/polygon.svg';
-import { ReactComponent as StarIcon } from '../../../../assets/svg/star.svg';
-import { ReactComponent as DropdownRed } from '../../../../assets/images/dropdown-red.svg';
-import { ReactComponent as DropupRed } from '../../../../assets/images/dropup-red.svg';
-
-import { Editor } from '@tinymce/tinymce-react';
-
-import {
-    Input,
-    FormControl,
-    FormErrorMessage,
-    NumberInput,
-    NumberInputField,
-    NumberInputStepper,
-    NumberDecrementStepper,
-    NumberIncrementStepper,
-    Select
-} from "@chakra-ui/react";
 
 import { useWeb3React } from "@web3-react/core";
 import { useAppSelector, useAppDispatch } from "state/hooks";
@@ -32,16 +13,28 @@ import { SupportedChainId } from "constants/chains";
 import SafeButton from "UIpack/SafeButton";
 
 import useSafeTransaction from "hooks/useSafeTransaction";
+import useRole from "hooks/useRole";
 
-const AssignContributions = ({ toggleShowAssign, data }) => {
+import { nanoid } from "@reduxjs/toolkit";
+import moment from "moment";
+import axiosHttp from '../../../../api';
 
+import { getDao } from "state/dashboard/actions";
+
+const AssignContributions = ({ toggleShowAssign, data, selectedMilestone }) => {
+    const dispatch = useAppDispatch();
     const { DAO, Project } = useAppSelector((state) => state.dashboard);
     const { chainId, account } = useWeb3React();
 
     const [compensation, setCompensation] = useState(_get(data, 'compensation', null));
     const [error, setError] = useState(null);
+    const [isLoading, setisLoading] = useState(false);
 
     const { createSafeTransaction, createSafeTxnLoading } = useSafeTransaction(_get(DAO, 'safe.address', ''))
+
+    const safeAddress = useAppSelector((state) => state.flow.safeAddress);
+
+    const { isSafeOwner } = useRole(DAO, account);
 
     const handleFocusInput = (index) => {
         const e = document.getElementById(`input${index}`);
@@ -52,31 +45,139 @@ const AssignContributions = ({ toggleShowAssign, data }) => {
         let num = parseFloat(e.target.value);
         const amountElement = document.getElementById(`amount${index}`);
 
-        amountElement.innerHTML = ((num / 100) * compensation?.amount).toFixed(2);
+        const allotedAmt = (((parseFloat(selectedMilestone.amount) * compensation?.amount)) / 100).toFixed(2);
+
+        amountElement.innerHTML = ((num / 100) * allotedAmt).toFixed(2);
     }
 
     const handleSplitEqually = () => {
         _uniqBy(Project?.members, '_id').map((_, index) => {
             const amountElement = document.getElementById(`amount${index}`);
             const percentElement = document.getElementById(`input${index}`);
-            let amount = (compensation?.amount / Project?.members?.length).toFixed(2);
-            let percent = ((amount / compensation?.amount) * 100).toFixed(2);
+            const allotedAmt = (((parseFloat(selectedMilestone.amount) * compensation?.amount)) / 100).toFixed(2);
+            let userAmount = (allotedAmt / Project?.members?.length).toFixed(2);
+            let percent = ((userAmount / allotedAmt) * 100).toFixed(2);
             percentElement.value = percent;
-            amountElement.innerHTML = amount;
+            amountElement.innerHTML = userAmount;
         })
     }
 
-    const createTransaction = async () => {
+    const handleSubmit = async () => {
+        let sendArray = [];
+        const allotedAmt = (((parseFloat(selectedMilestone.amount) * compensation?.amount)) / 100).toFixed(2)
+        for (var i = 0; i < _get(Project, 'members', []).length; i++) {
+            const item = Project.members[i];
+            let amt = document.getElementById(`input${i}`).value;
+            sendArray.push({
+                amount: ((amt * allotedAmt) / 100).toFixed(2),
+                name: item.name,
+                recipient: item.wallet,
+                reason: `${item.name} - ${selectedMilestone.name}`
+            })
+        }
+        console.log("SendArray : ", sendArray);
+        await createTransaction(_get(Project, 'compensation.currency', ''), sendArray);
+    }
+
+    const createOffChainTxn = (setRecipient) => {
+        setisLoading(true);
+        const nonce = moment().unix();
+        let payload = {}
+        // Multi transaction for multi user
+        if (setRecipient.length > 1) {
+            payload = {
+                daoId: _get(DAO, '_id', undefined),
+                safe: safeAddress,
+                safeTxHash: nanoid(32),
+                nonce,
+                executor: account,
+                submissionDate: moment().utc().toDate(),
+                token: {
+                    symbol: 'SWEAT',
+                    tokenAddress: 'SWEAT',
+                },
+                confirmations: isSafeOwner ? [{
+                    owner: account,
+                    submissionDate: moment().utc().toDate()
+                }] : [],
+                dataDecoded: {
+                    method: "multiSend",
+                    parameters: [{
+                        valueDecoded: setRecipient.map(r => {
+                            return {
+                                dataDecoded: {
+                                    method: 'transfer',
+                                    parameters: [
+                                        { name: 'to', type: "address", value: r.recipient },
+                                        { name: 'value', type: "uint256", value: `${BigInt(parseFloat(r.amount) * 10 ** 18)}` },
+                                    ]
+                                }
+                            }
+                        })
+                    }]
+                }
+            }
+        }
+        // Single transaction for single user in the array
+        else {
+            payload = {
+                daoId: _get(DAO, '_id', undefined),
+                safe: safeAddress,
+                nonce,
+                safeTxHash: nanoid(32),
+                executor: account,
+                submissionDate: moment().utc().toDate(),
+                token: {
+                    symbol: 'SWEAT',
+                    tokenAddress: 'SWEAT',
+                },
+                confirmations: isSafeOwner ? [{
+                    owner: account,
+                    submissionDate: moment().utc().toDate()
+                }] : [],
+                dataDecoded: {
+                    method: 'transfer',
+                    parameters: [
+                        { name: 'to', type: "address", value: setRecipient[0].recipient },
+                        { name: 'value', type: "uint256", value: `${BigInt(parseFloat(setRecipient[0].amount) * 10 ** 18)}` },
+                    ]
+                }
+            }
+        }
+        axiosHttp.post('transaction/off-chain', payload)
+            .then(res => {
+                console.log(res);
+                let payload = [];
+                setRecipient.map(r => {
+                    payload.push({
+                        safeAddress: _get(DAO, 'safe.address', null),
+                        safeTxHash: res.data.safeTxHash,
+                        recipient: r.recipient,
+                        label: _get(r, 'reason', null)
+                    })
+                })
+                axiosHttp.post(`transaction/label`, payload)
+                    .then(async () => {
+                        dispatch(getDao(DAO.url))
+                        // await props.getPendingTransactions();
+                        // showNavigation(false, true, false);
+                        setisLoading(false);
+                    })
+            })
+            .finally(() => setisLoading(false))
+    }
+
+    const createTransaction = async (selectedToken, setRecipient) => {
         setError(null)
         if (selectedToken === 'SWEAT') {
-            return createOffChainTxn()
+            return createOffChainTxn(setRecipient)
         }
         try {
-            const txnResponse = await createSafeTransaction({ tokenAddress: selectedToken, send: setRecipient.current });
+            const txnResponse = await createSafeTransaction({ tokenAddress: selectedToken, send: setRecipient });
             if (txnResponse?.safeTxHash) {
                 dispatch(getDao(DAO.url))
-                await props.getPendingTransactions();
-                showNavigation(false, true, false);
+                // await props.getPendingTransactions();
+                // showNavigation(false, true, false);
                 setisLoading(false);
             }
         } catch (e) {
@@ -122,7 +223,16 @@ const AssignContributions = ({ toggleShowAssign, data }) => {
                                         </div>
                                         <div>
                                             <div className='input-wrapper' onClick={() => handleFocusInput(index)}>
-                                                <input type={"number"} min={0} max={100} id={`input${index}`} onClick={(e) => e.stopPropagation()} onChange={(e) => handleChange(e, index)} /> %
+                                                <input
+                                                    type={"number"}
+                                                    // value={0} 
+                                                    min={0}
+                                                    max={100}
+                                                    placeholder="0"
+                                                    id={`input${index}`}
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    onChange={(e) => handleChange(e, index)}
+                                                /> %
                                             </div>
                                         </div>
                                         <div>
@@ -138,7 +248,7 @@ const AssignContributions = ({ toggleShowAssign, data }) => {
                         <button onClick={() => toggleShowAssign()}>
                             CANCEL
                         </button>
-                        <button>
+                        <button onClick={handleSubmit}>
                             COMPLETE
                         </button>
                     </div>

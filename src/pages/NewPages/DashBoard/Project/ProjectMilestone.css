@@ -85,7 +85,7 @@
 }
 
 .milestoneOverlay .milestoneContainer .milestone-body .members-section {
-    width: 285px;
+    width: 300px;
     display: flex;
     flex-direction: column;
     margin: 20px 0;
@@ -108,6 +108,7 @@
 .milestoneOverlay .milestoneContainer .milestone-body .members-section .member-row div {
     display: flex;
     align-items: center;
+    width: 30%;
 }
 
 .milestoneOverlay .milestoneContainer .milestone-body .members-section .member-row div img {

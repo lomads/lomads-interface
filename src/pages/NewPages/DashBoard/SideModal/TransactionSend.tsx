@@ -32,7 +32,7 @@ import {
 
 
 const TransactionSend = (props: IselectTransactionSend) => {
-	console.log(props.selectedToken)
+	console.log("error : ", props.error)
 	const { DAO } = useAppSelector((state) => state.dashboard);
 	const { chainId } = useWeb3React();
 	const managePreviousNavigation = () => {

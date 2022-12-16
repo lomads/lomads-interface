@@ -93,6 +93,8 @@ const ProjectDetails = () => {
 
     const [tab, setTab] = useState(1);
 
+    const [selectedMilestone, setSelectedMilestone] = useState(null);
+
     useEffect(() => {
         if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
             dispatch(getDao(daoURL))
@@ -392,6 +394,14 @@ const ProjectDetails = () => {
         setShowCreateTask(!showCreateTask);
     };
 
+    const selectMilestone = (item) => {
+        console.log("item : ", item)
+        if (!item.complete) {
+            setSelectedMilestone(item);
+            setShowAssign(true)
+        }
+    }
+
     return (
         <>
             {
@@ -565,7 +575,7 @@ const ProjectDetails = () => {
                     {showCreateTask && <CreateTask toggleShowCreateTask={toggleShowCreateTask} selectedProject={Project} />}
 
                     {/* complete milestone and assign contributions side modal*/}
-                    {showAssign && <AssignContributions toggleShowAssign={() => setShowAssign(false)} data={Project} />}
+                    {showAssign && <AssignContributions toggleShowAssign={() => setShowAssign(false)} data={Project} selectedMilestone={selectedMilestone} />}
 
                     {/* Show KRA review side modal */}
                     {showKRAReview && <KRAReview toggleShowKRA={() => setShowKRAReview(false)} data={Project} daoURL={daoURL} />}
@@ -647,7 +657,10 @@ const ProjectDetails = () => {
                         </div> */}
 
                         <div className="projectDetails-imp">
-                            <div className="left">
+                            <div
+                                className="left"
+                                style={_get(Project, 'milestones', []).length > 0 ? { width: '49%' } : { width: '100%' }}
+                            >
                                 <div className="projectDetails-description">
                                     <h1>Description</h1>
                                     {
@@ -777,111 +790,114 @@ const ProjectDetails = () => {
                                 }
                             </div>
 
-                            <div className="right">
-                                <div className="milestone-kra">
-                                    <div onClick={() => setTab(1)}>
-                                        <h1 style={tab === 1 ? { opacity: '1' } : { opacity: '0.4' }}>Milestones</h1>
+                            {
+                                _get(Project, 'milestones', []).length > 0 &&
+                                <div className="right">
+                                    <div className="milestone-kra">
+                                        <div onClick={() => setTab(1)}>
+                                            <h1 style={tab === 1 ? { opacity: '1' } : { opacity: '0.4' }}>Milestones</h1>
+                                        </div>
+                                        <div className="divider"></div>
+                                        <div onClick={() => setTab(2)}>
+                                            <h1 style={tab === 2 ? { opacity: '1' } : { opacity: '0.4' }}>Key results</h1>
+                                        </div>
                                     </div>
-                                    <div className="divider"></div>
-                                    <div onClick={() => setTab(2)}>
-                                        <h1 style={tab === 2 ? { opacity: '1' } : { opacity: '0.4' }}>Key results</h1>
-                                    </div>
-                                </div>
 
-                                <div className="milestone-kra-status">
-                                    {
-                                        tab === 1
-                                            ?
-                                            <>
-                                                <div className="status">
-                                                    <div style={{ width: '300px' }}>
-                                                        <ProgressBar
-                                                            percent={((_get(Project, 'milestones', []).filter((item) => item.complete === true).length) / (_get(Project, 'milestones', []).length)) * 100}
-                                                            filledBackground="#188C7C"
-                                                            unfilledBackground="#F0F0F0"
-                                                            height="5px"
-                                                        >
-                                                            <Step transition="scale">
-                                                                {({ accomplished, index }) => (
-                                                                    <div className={`indexedStep ${accomplished ? "accomplished" : ""}`}></div>
-                                                                )}
-                                                            </Step>
-                                                            {
-                                                                _get(Project, 'milestones', []).map((item, index) => {
-                                                                    return (
-                                                                        <Step transition="scale">
-                                                                            {({ accomplished, index }) => (
-                                                                                <div className={`indexedStep ${accomplished ? "accomplished" : ""}`}></div>
-                                                                            )}
-                                                                        </Step>
-                                                                    )
-                                                                })
-                                                            }
-                                                        </ProgressBar>
+                                    <div className="milestone-kra-status">
+                                        {
+                                            tab === 1
+                                                ?
+                                                <>
+                                                    <div className="status">
+                                                        <div style={{ width: '300px' }}>
+                                                            <ProgressBar
+                                                                percent={((_get(Project, 'milestones', []).filter((item) => item.complete === true).length) / (_get(Project, 'milestones', []).length)) * 100}
+                                                                filledBackground="#188C7C"
+                                                                unfilledBackground="#F0F0F0"
+                                                                height="5px"
+                                                            >
+                                                                <Step transition="scale">
+                                                                    {({ accomplished, index }) => (
+                                                                        <div className={`indexedStep ${accomplished ? "accomplished" : ""}`}></div>
+                                                                    )}
+                                                                </Step>
+                                                                {
+                                                                    _get(Project, 'milestones', []).map((item, index) => {
+                                                                        return (
+                                                                            <Step transition="scale">
+                                                                                {({ accomplished, index }) => (
+                                                                                    <div className={`indexedStep ${accomplished ? "accomplished" : ""}`}></div>
+                                                                                )}
+                                                                            </Step>
+                                                                        )
+                                                                    })
+                                                                }
+                                                            </ProgressBar>
+                                                        </div>
+                                                        <span className="percent-text">{(((_get(Project, 'milestones', []).filter((item) => item.complete === true).length) / (_get(Project, 'milestones', []).length)) * 100).toFixed(2)}%</span>
                                                     </div>
-                                                    <span className="percent-text">{(((_get(Project, 'milestones', []).filter((item) => item.complete === true).length) / (_get(Project, 'milestones', []).length)) * 100).toFixed(2)}%</span>
-                                                </div>
-                                                <button>
-                                                    <img src={editToken} alt="hk-logo" />
-                                                </button>
-                                            </>
-                                            :
-                                            <div className="status" style={{ justifyContent: 'space-between' }}>
-                                                <span>Review frequency : {_get(Project, 'kra.frequency', [])}</span>
-                                                <div style={{ width: '50%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                                                     <button>
-                                                        <img src={archiveIcon} alt="archive-icon" />
-                                                    </button>
-                                                    <button className='archive-btn'>
                                                         <img src={editToken} alt="hk-logo" />
                                                     </button>
-                                                    <button className="review-btn" onClick={() => setShowKRAReview(true)}>
-                                                        REVIEW
-                                                    </button>
+                                                </>
+                                                :
+                                                <div className="status" style={{ justifyContent: 'space-between' }}>
+                                                    <span>Review frequency : {_get(Project, 'kra.frequency', [])}</span>
+                                                    <div style={{ width: '50%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                                                        <button>
+                                                            <img src={archiveIcon} alt="archive-icon" />
+                                                        </button>
+                                                        <button className='archive-btn'>
+                                                            <img src={editToken} alt="hk-logo" />
+                                                        </button>
+                                                        <button className="review-btn" onClick={() => setShowKRAReview(true)}>
+                                                            REVIEW
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                    }
-                                </div>
+                                        }
+                                    </div>
 
-                                <div className="milestone-kra-body">
-                                    {
-                                        tab === 1
-                                            ?
-                                            <>
-                                                {
-                                                    _get(Project, 'milestones', []).map((item, index) => {
-                                                        return (
-                                                            <div className={item.complete ? "milestone-card done" : "milestone-card"}>
-                                                                <div>
-                                                                    <span>{index + 1}</span>
-                                                                    <h1>{item.name}</h1>
-                                                                </div>
-                                                                <div>
-                                                                    <h1>{item.deadline}</h1>
-                                                                    <div className="check-circle" onClick={() => { item.complete === false && setShowAssign(true) }}>
-                                                                        <FiCheck size={20} />
+                                    <div className="milestone-kra-body">
+                                        {
+                                            tab === 1
+                                                ?
+                                                <>
+                                                    {
+                                                        _get(Project, 'milestones', []).map((item, index) => {
+                                                            return (
+                                                                <div className={item.complete ? "milestone-card done" : "milestone-card"}>
+                                                                    <div>
+                                                                        <span>{index + 1}</span>
+                                                                        <h1>{item.name}</h1>
+                                                                    </div>
+                                                                    <div>
+                                                                        <h1>{item.deadline}</h1>
+                                                                        <div className="check-circle" onClick={() => selectMilestone(item)}>
+                                                                            <FiCheck size={20} />
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        )
-                                                    })
-                                                }
-                                            </>
-                                            :
-                                            <>
-                                                {
-                                                    _get(Project, 'kra.results', []).map((item, index) => {
-                                                        return (
-                                                            <div className="milestone-card">
-                                                                <div><h1>{item.name}</h1></div>
-                                                            </div>
-                                                        )
-                                                    })
-                                                }
-                                            </>
-                                    }
+                                                            )
+                                                        })
+                                                    }
+                                                </>
+                                                :
+                                                <>
+                                                    {
+                                                        _get(Project, 'kra.results', []).map((item, index) => {
+                                                            return (
+                                                                <div className="milestone-card">
+                                                                    <div><h1>{item.name}</h1></div>
+                                                                </div>
+                                                            )
+                                                        })
+                                                    }
+                                                </>
+                                        }
+                                    </div>
                                 </div>
-                            </div>
+                            }
                         </div>
                     </div>
 

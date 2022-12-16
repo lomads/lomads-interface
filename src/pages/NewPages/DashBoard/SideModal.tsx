@@ -168,6 +168,7 @@ const SideModal = (props: IsideModal) => {
 			return createOffChainTxn()
 		}
 		try {
+
 			const txnResponse = await createSafeTransaction({ tokenAddress: selectedToken, send: setRecipient.current });
 			if (txnResponse?.safeTxHash) {
 				dispatch(getDao(DAO.url))

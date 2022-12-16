@@ -162,24 +162,28 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                 flag = -1;
                 let e = document.getElementById(`name${i}`);
                 e.innerHTML = "Enter name";
+                e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
                 return;
             }
             else if (ob.amount === '') {
                 flag = -1;
                 let e = document.getElementById(`amount${i}`);
                 e.innerHTML = "Enter amount in %";
+                e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
                 return;
             }
             else if (ob.deadline === '') {
                 flag = -1;
                 let e = document.getElementById(`deadline${i}`);
                 e.innerHTML = "Enter deadline";
+                e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
                 return;
             }
             else if (ob.deliverables === '') {
                 flag = -1;
                 let e = document.getElementById(`deliverables${i}`);
                 e.innerHTML = "Enter deliverables";
+                e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
                 return;
             }
         }

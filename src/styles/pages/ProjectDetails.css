@@ -580,7 +580,7 @@
 .projectDetails-container .info .projectDetails-top .projectDetails-imp .left .links-section .links-body .link-unlocked-section {
     width: 100%;
     display: flex;
-    flex-direction: column;
+    /* flex-direction: column; */
 }
 
 .projectDetails-container .info .projectDetails-top .projectDetails-imp .left .links-section .links-body .link-unlocked-section .locked {

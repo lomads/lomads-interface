@@ -37,6 +37,8 @@ import ProjectKRA from './DashBoard/Project/ProjectKRA';
 import moment from 'moment';
 import ProjectResource from './DashBoard/Project/ProjectResource';
 
+import SimpleLoadButton from "UIpack/SimpleLoadButton";
+
 const CreateProject = () => {
 
     const { provider, account, chainId } = useWeb3React();
@@ -373,17 +375,22 @@ const CreateProject = () => {
                                         </div>
 
                                         <div className='project-buttons'>
-                                            <button
-                                                style={{ background: '#C94B32', color: '#FFF' }}
+                                            <SimpleLoadButton
+                                                title="CREATE PROJECT"
+                                                height={50}
+                                                width={225}
+                                                fontsize={16}
+                                                fontweight={400}
                                                 onClick={() => handleCreateProject()}
-                                            >
-                                                CREATE PROJECT
-                                            </button>
+                                                bgColor={"#C94B32"}
+                                                condition={createProjectLoading}
+                                            />
+
                                         </div>
 
                                     </div>
                                     :
-                                    <div className='createProject-body'>
+                                    <div className='createProject-body' style={{ height: '90vh' }}>
                                         <img src={createProjectSvg} alt="frame-icon" />
                                         <p className="heading-text">Create New Project</p>
                                         {
@@ -502,12 +509,22 @@ const CreateProject = () => {
                                                         >
                                                             ADD MORE DETAIL
                                                         </button>
-                                                        <button
+                                                        <SimpleLoadButton
+                                                            title="CREATE PROJECT"
+                                                            height={50}
+                                                            width={225}
+                                                            fontsize={16}
+                                                            fontweight={400}
+                                                            onClick={() => handleCreateProject()}
+                                                            bgColor={"#C94B32"}
+                                                            condition={createProjectLoading}
+                                                        />
+                                                        {/* <button
                                                             style={{ background: '#C94B32', color: '#FFF' }}
                                                             onClick={() => handleCreateProject()}
                                                         >
                                                             CREATE PROJECT
-                                                        </button>
+                                                        </button> */}
                                                     </div>
                                                 </>
                                         }
