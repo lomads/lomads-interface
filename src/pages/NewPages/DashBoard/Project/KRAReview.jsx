@@ -11,7 +11,7 @@ import { useAppSelector, useAppDispatch } from "state/hooks";
 import { updateKRA } from "state/dashboard/actions";
 import { resetUpdateKraLoader } from 'state/dashboard/reducer';
 
-const colors = ['#e67c40', '#e99a37', '#ebaf30', '#edcd27', '#becd33', '#8ecc3e', '#63c359', '#4fbf65', '#2ab87c', '#21a284', '#188c8c'];
+const colors = ['#e67c40', '#e99a37', '#ebaf30', '#edcd27', '#becd33', '#8ecc3e', '#63c359', '#4fbf65', '#2ab87c', '#21a284', '#1AC1C1'];
 
 const KRAReview = ({ toggleShowKRA, data, daoURL }) => {
     console.log("data : ", _get(data, 'kra.results', []))
