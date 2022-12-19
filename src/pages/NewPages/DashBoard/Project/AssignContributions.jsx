@@ -19,13 +19,17 @@ import { nanoid } from "@reduxjs/toolkit";
 import moment from "moment";
 import axiosHttp from '../../../../api';
 
-import { getDao } from "state/dashboard/actions";
+import { getDao, updateMilestone } from "state/dashboard/actions";
 
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 
-const AssignContributions = ({ toggleShowAssign, data, selectedMilestone }) => {
+import { resetUpdateMilestoneLoader } from 'state/dashboard/reducer';
+
+const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL }) => {
+    console.log("data : ", data);
+    console.log("selectedMilestone : ", selectedMilestone);
     const dispatch = useAppDispatch();
-    const { DAO, Project } = useAppSelector((state) => state.dashboard);
+    const { DAO, Project, updateMilestoneLoading } = useAppSelector((state) => state.dashboard);
     const { chainId, account } = useWeb3React();
 
     const [compensation, setCompensation] = useState(_get(data, 'compensation', null));
@@ -40,6 +44,10 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone }) => {
 
     const [temp, setTemp] = useState([]);
 
+    const [showSuccess, setShowSuccess] = useState(false);
+
+    const [isSplit, setIsSplit] = useState(false);
+
     useEffect(() => {
         if (Project) {
             let arr = [];
@@ -51,6 +59,19 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone }) => {
         }
     }, []);
 
+    // runs after updating milestone
+    useEffect(() => {
+        if (updateMilestoneLoading === false) {
+            dispatch(resetUpdateMilestoneLoader());
+            setShowSuccess(true);
+
+            setTimeout(() => {
+                setShowSuccess(false);
+                toggleShowAssign();
+            }, 3000);
+        }
+    }, [updateMilestoneLoading]);
+
     const handleFocusInput = (index) => {
         const e = document.getElementById(`input${index}`);
         e.focus();
@@ -60,18 +81,11 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone }) => {
         const amountElement = document.getElementById(`amount${index}`);
         const allotedAmt = (((parseFloat(selectedMilestone.amount) * parseFloat(compensation?.amount))) / 100).toFixed(5);
 
-        let total = 0;
-        for (let i = 0; i < temp.length; i++) {
-            if (i !== index) {
-                total += parseFloat(temp[i].percent)
-            }
-        }
+        var el = document.getElementById(`inputBox${index}`);
+        el.style.background = '';
 
-        if (parseFloat(e) > (100 - total)) {
-            console.log("Big")
-        }
-        else {
-            amountElement.innerHTML = ((parseFloat(e) / 100) * allotedAmt).toFixed(5);
+        if (e <= 100) {
+            amountElement.innerHTML = e ? ((parseFloat(e) / 100) * allotedAmt).toFixed(5) : '0';
             const newArray = temp.map((item, i) => {
                 if (i === index) {
                     return { ...item, percent: parseFloat(e) };
@@ -80,7 +94,30 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone }) => {
                 }
             });
             setTemp(newArray);
+            setIsSplit(false);
         }
+
+        // let total = 0;
+        // for (let i = 0; i < temp.length; i++) {
+        //     if (i !== index) {
+        //         total += parseFloat(temp[i].percent)
+        //     }
+        // }
+
+        // if (parseFloat(e) > (100 - total)) {
+        //     console.log("Big")
+        // }
+        // else {
+        //     amountElement.innerHTML = ((parseFloat(e) / 100) * allotedAmt).toFixed(5);
+        //     const newArray = temp.map((item, i) => {
+        //         if (i === index) {
+        //             return { ...item, percent: parseFloat(e) };
+        //         } else {
+        //             return item;
+        //         }
+        //     });
+        //     setTemp(newArray);
+        // }
     }
 
     const handleSplitEqually = () => {
@@ -92,11 +129,13 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone }) => {
         let arr = temp.map((item, index) => {
             let e = item;
             const amountElement = document.getElementById(`amount${index}`);
+            var el = document.getElementById(`inputBox${index}`);
+            el.style.background = '';
             amountElement.innerHTML = userAmount;
             return { ...e, percent: parseFloat(percentAmt) };
         })
-
         setTemp(arr);
+        setIsSplit(true);
     }
 
     const handleSubmit = async () => {
@@ -111,8 +150,15 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone }) => {
                 amount: ((item.percent * allotedAmt) / 100).toFixed(5),
                 name: item.name,
                 recipient: item.wallet,
-                reason: `${item.name} - ${selectedMilestone.name}`
+                reason: `${item.name} | ${_get(data, 'name', '')} | ${selectedMilestone.name}`
             })
+        }
+        if (total !== 100 && !isSplit) {
+            for (var i = 0; i < temp.length; i++) {
+                var el = document.getElementById(`inputBox${i}`);
+                el.style.background = 'rgba(217, 83, 79, 0.75)';
+            }
+            return;
         }
         await createTransaction(_get(Project, 'compensation.currency', ''), sendArray);
     }
@@ -196,10 +242,18 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone }) => {
                 })
                 axiosHttp.post(`transaction/label`, payload)
                     .then(async () => {
-                        dispatch(getDao(DAO.url))
-                        // await props.getPendingTransactions();
-                        // showNavigation(false, true, false);
+
+                        const newArray = _get(data, 'milestones', []).map((item, i) => {
+                            if (i === _get(selectedMilestone, 'pos', '')) {
+                                return { ...item, complete: true };
+                            } else {
+                                return item;
+                            }
+                        });
+
+                        dispatch(updateMilestone({ projectId: data._id, daoUrl: daoURL, payload: { milestones: newArray } }));
                         setisLoading(false);
+
                     })
             })
             .finally(() => setisLoading(false))
@@ -213,9 +267,16 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone }) => {
         try {
             const txnResponse = await createSafeTransaction({ tokenAddress: selectedToken, send: setRecipient });
             if (txnResponse?.safeTxHash) {
-                dispatch(getDao(DAO.url))
-                // await props.getPendingTransactions();
-                // showNavigation(false, true, false);
+
+                const newArray = _get(data, 'milestones', []).map((item, i) => {
+                    if (i === _get(selectedMilestone, 'pos', '')) {
+                        return { ...item, complete: true };
+                    } else {
+                        return item;
+                    }
+                });
+
+                dispatch(updateMilestone({ projectId: data._id, daoUrl: daoURL, payload: { milestones: newArray } }));
                 setisLoading(false);
             }
         } catch (e) {
@@ -227,80 +288,97 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone }) => {
     return (
         <div className="milestoneOverlay">
             <div className="milestoneContainer">
-                <div className='milestone-header'>
-                    <button onClick={() => toggleShowAssign()}>
-                        <CgClose size={20} color="#C94B32" />
-                    </button>
-                </div>
-                <div style={{ width: '100%', height: '100%', overflow: 'scroll' }}>
-                    <div className='milestone-body'>
-                        <img src={createTaskSvg} alt="frame-icon" />
-                        <h1>Assign Contributions</h1>
-                        <span>Mark the milestone as completed and reward the contributors</span>
-
-                        <SafeButton
-                            height={40}
-                            width={260}
-                            titleColor="#C94B32"
-                            title="SPLIT EQUALLY"
-                            bgColor="#FFFFFF"
-                            opacity="1"
-                            disabled={false}
-                            fontweight={400}
-                            fontsize={16}
-                            onClick={handleSplitEqually}
-                        />
-
-                        <div className='members-section'>
-                            {
-                                temp && temp.map((item, index) => (
-                                    <div className='member-row' key={item.wallet}>
-                                        <div>
-                                            <img src={memberIcon} alt="memberIcon" />
-                                            <span>{item.name}</span>
-                                        </div>
-                                        <div>
-                                            <div className='input-wrapper' onClick={() => handleFocusInput(index)}>
-                                                <input
-                                                    type={"number"}
-                                                    min={0}
-                                                    max={100}
-                                                    placeholder="0"
-                                                    id={`input${index}`}
-                                                    value={+item.percent}
-                                                    onClick={(e) => e.stopPropagation()}
-                                                    onChange={(e) => handleChange(e.target.value, index)}
-                                                /> %
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <h1>=&nbsp;</h1>
-                                            <span style={{ fontWeight: 'bold' }} id={`amount${index}`}>0</span>
-                                            <h1>&nbsp;{compensation?.symbol}</h1>
-                                        </div>
-                                    </div>
-                                ))
-                            }
-
+                {
+                    showSuccess
+                        ?
+                        <div className='milestone-body' style={{ height: '100%', justifyContent: 'center' }}>
+                            <img src={createTaskSvg} alt="frame-icon" />
+                            <h1>Success</h1>
+                            <span>This milestone is completed</span>
                         </div>
+                        :
+                        <>
+                            <div className='milestone-header'>
+                                <button onClick={() => toggleShowAssign()}>
+                                    <CgClose size={20} color="#C94B32" />
+                                </button>
+                            </div>
+                            <div style={{ width: '100%', height: '100%', overflow: 'scroll' }}>
+                                <div className='milestone-body'>
+                                    <img src={createTaskSvg} alt="frame-icon" />
+                                    <h1>Assign Contributions</h1>
+                                    <span>Mark the milestone as completed and reward the contributors</span>
 
-                    </div>
-                    <div className='milestone-footer'>
-                        <button onClick={() => toggleShowAssign()} disabled={isLoading} style={isLoading ? { cursor: 'not-allowed' } : null}>
-                            CANCEL
-                        </button>
-                        <SimpleLoadButton
-                            title="COMPLETE"
-                            height={40}
-                            width={180}
-                            fontsize={16}
-                            fontweight={400}
-                            onClick={handleSubmit}
-                            bgColor={"#C94B32"}
-                            condition={isLoading}
-                        />
-                    </div>
-                </div>
+                                    <SafeButton
+                                        height={40}
+                                        width={260}
+                                        titleColor="#C94B32"
+                                        title="SPLIT EQUALLY"
+                                        bgColor="#FFFFFF"
+                                        opacity="1"
+                                        disabled={false}
+                                        fontweight={400}
+                                        fontsize={16}
+                                        onClick={handleSplitEqually}
+                                    />
+
+                                    <div className='members-section'>
+                                        {
+                                            temp && temp.map((item, index) => (
+                                                <div className='member-row' key={item.wallet}>
+                                                    <div>
+                                                        <img src={memberIcon} alt="memberIcon" />
+                                                        <span>{item.name}</span>
+                                                    </div>
+                                                    <div>
+                                                        <div
+                                                            id={`inputBox${index}`}
+                                                            className='input-wrapper'
+                                                            onClick={() => handleFocusInput(index)}
+                                                        // style={{ background: 'rgba(217, 83, 79, 0.75)' }}
+                                                        >
+                                                            <input
+                                                                type={"number"}
+                                                                min={0}
+                                                                max={100}
+                                                                placeholder="0"
+                                                                id={`input${index}`}
+                                                                value={+item.percent}
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                onChange={(e) => handleChange(e.target.value, index)}
+                                                            /> %
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <h1>=&nbsp;</h1>
+                                                        <span style={{ fontWeight: 'bold' }} id={`amount${index}`}>0</span>
+                                                        <h1>&nbsp;{compensation?.symbol}</h1>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        }
+
+                                    </div>
+
+                                </div>
+                                <div className='milestone-footer'>
+                                    <button onClick={() => toggleShowAssign()} disabled={isLoading} style={isLoading ? { cursor: 'not-allowed' } : null}>
+                                        CANCEL
+                                    </button>
+                                    <SimpleLoadButton
+                                        title="COMPLETE"
+                                        height={40}
+                                        width={180}
+                                        fontsize={16}
+                                        fontweight={400}
+                                        onClick={handleSubmit}
+                                        bgColor={"#C94B32"}
+                                        condition={isLoading}
+                                    />
+                                </div>
+                            </div>
+                        </>
+                }
             </div>
         </div>
     )

@@ -14,6 +14,7 @@ import { resetUpdateKraLoader } from 'state/dashboard/reducer';
 const colors = ['#e67c40', '#e99a37', '#ebaf30', '#edcd27', '#becd33', '#8ecc3e', '#63c359', '#4fbf65', '#2ab87c', '#21a284', '#188c8c'];
 
 const KRAReview = ({ toggleShowKRA, data, daoURL }) => {
+    console.log("data : ", _get(data, 'kra.results', []))
     const dispatch = useAppDispatch();
     const { updateKraLoading } = useAppSelector((state) => state.dashboard);
 
@@ -28,8 +29,8 @@ const KRAReview = ({ toggleShowKRA, data, daoURL }) => {
     }, [updateKraLoading]);
 
     useEffect(() => {
-        if (list.length > 0) {
-            list.map((_, index) => {
+        if (_get(data, 'kra.results', []).length > 0) {
+            _get(data, 'kra.results', []).map((_, index) => {
                 const slider = document.getElementById(`slider-rc${index}`);
                 const thumb = document.getElementById(`slider-thumb${index}`);
                 const progress = document.getElementById(`progress${index}`);
@@ -46,7 +47,7 @@ const KRAReview = ({ toggleShowKRA, data, daoURL }) => {
                 thumb.style.left = val;
             })
         }
-    }, []);
+    }, [data]);
 
     const handleSlider = (e, index) => {
         const slider = document.getElementById(`slider-rc${index}`);
@@ -61,7 +62,7 @@ const KRAReview = ({ toggleShowKRA, data, daoURL }) => {
         percent.innerHTML = val + " done";
         percent.style.color = colors[x];
         progress.style.setProperty('width', `calc(100% - ${val})`);
-        thumb.style.left = val;
+        thumb.style.setProperty('left', `calc(${val})`);
 
         const newArray = list.map((item, i) => {
             if (i === index) {

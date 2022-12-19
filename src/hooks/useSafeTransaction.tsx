@@ -61,7 +61,6 @@ const useSafeTransaction = (safeAddress: string) => {
     }
 
     const createSafeTransaction = async ({ tokenAddress, send, confirm = true, createLabel = true }: any) => {
-        console.log("send ob : ", send, tokenAddress);
         if (!safeAddress) return null;
         let signature = null;
         try {
