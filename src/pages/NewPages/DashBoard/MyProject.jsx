@@ -135,23 +135,34 @@ const MyProject = () => {
                     <div className='myproject-body-fixed'>
                         {
                             myProjects.length > 0 && myProjects.filter((item, index) => index < 6).map((item, index) => {
-                                if (index <= 4) {
-                                    if (item.deletedAt === null && item.archivedAt === null) {
-                                        return (
-                                            <div key={index}>
-                                                <ProjectCard
-                                                    project={item}
-                                                    daoUrl={DAO?.url}
-                                                    tab={tab}
-                                                />
-                                            </div>
-                                        )
-                                    }
-                                }
-                                else {
+                                // if (index <= 4) {
+                                //     if (item.deletedAt === null && item.archivedAt === null) {
+                                //         return (
+                                //             <div key={index}>
+                                //                 <ProjectCard
+                                //                     project={item}
+                                //                     daoUrl={DAO?.url}
+                                //                     tab={tab}
+                                //                 />
+                                //             </div>
+                                //         )
+                                //     }
+                                // }
+                                // else {
+                                //     return (
+                                //         <div className='all-project'>
+                                //             <span>Show All</span>
+                                //         </div>
+                                //     )
+                                // }
+                                if (item.deletedAt === null && item.archivedAt === null) {
                                     return (
-                                        <div className='all-project'>
-                                            <span>Show All</span>
+                                        <div key={index}>
+                                            <ProjectCard
+                                                project={item}
+                                                daoUrl={DAO?.url}
+                                                tab={tab}
+                                            />
                                         </div>
                                     )
                                 }

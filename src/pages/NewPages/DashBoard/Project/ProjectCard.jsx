@@ -44,8 +44,10 @@ const ProjectCard = ({ project, daoUrl, tab }) => {
                     null
             }
             <div className="container">
-                <p className="project-name">{project.name.length > 25 ? project.name.substring(0, 20) + "..." : project.name}</p>
-                <div className="project-desc" dangerouslySetInnerHTML={{ __html: project.description.length > 25 ? project.description.substring(0, 25) + "..." : project.description }}></div>
+                <div className="project-name">
+                    <p>{project.name}</p>
+                </div>
+                {/* <div className="project-desc" dangerouslySetInnerHTML={{ __html: project.description.length > 25 ? project.description.substring(0, 25) + "..." : project.description }}></div> */}
                 {
                     _get(project, 'milestones', []).length > 0 &&
                     <div className="milestone-progress">

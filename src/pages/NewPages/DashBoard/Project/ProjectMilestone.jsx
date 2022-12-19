@@ -115,16 +115,26 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
     }
 
     const handleChangeAmount = (e, index) => {
-        let total = 0;
-        for (let i = 0; i < milestones.length; i++) {
-            if (i !== index) {
-                total += parseFloat(milestones[i].amount)
-            }
-        }
-        if (parseFloat(e) > (100 - total)) {
-            console.log("Big")
-        }
-        else {
+        // let total = 0;
+        // for (let i = 0; i < milestones.length; i++) {
+        //     if (i !== index) {
+        //         total += parseFloat(milestones[i].amount)
+        //     }
+        // }
+        // if (parseFloat(e) > (100 - total)) {
+        //     console.log("Big")
+        // }
+        // else {
+        //     const newArray = milestones.map((item, i) => {
+        //         if (i === index) {
+        //             return { ...item, amount: e };
+        //         } else {
+        //             return item;
+        //         }
+        //     });
+        //     setMilestones(newArray);
+        // }
+        if (e <= 100) {
             const newArray = milestones.map((item, i) => {
                 if (i === index) {
                     return { ...item, amount: e };
@@ -163,11 +173,41 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
         setMilestones(newArray);
     }
 
+    const handleChangeCompensationAmount = (e) => {
+        setAmount(parseFloat(e));
+        let element = document.getElementById('currency-amt');
+        element.innerHTML = "";
+    }
+
+    const handleChangeCurrency = (e) => {
+        setCurrency(e.target.value);
+        let element = document.getElementById('currency-amt');
+        element.innerHTML = "";
+    }
+
     const handleSubmit = () => {
-        console.log("milestones : ", milestones)
         let flag = 0;
+        let total = 0;
+        if (currency === null) {
+            let e = document.getElementById('currency-amt');
+            e.innerHTML = "Please select a currency";
+            e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+            return;
+        }
+        if (amount === 0) {
+            let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
+            symbol = _get(symbol, 'token.symbol', null)
+            if (!symbol)
+                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ? 'MATIC' : currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? 'GOR' : 'SWEAT'
+            let e = document.getElementById('currency-amt');
+            e.innerHTML = `Compensation amount cannot be 0 ${symbol}`;
+            e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+            return;
+        }
+
         for (let i = 0; i < milestones.length; i++) {
             let ob = milestones[i];
+            total += parseFloat(ob.amount);
             if (ob.name === '') {
                 flag = -1;
                 let e = document.getElementById(`name${i}`);
@@ -189,13 +229,9 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                 e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
                 return;
             }
-            else if (ob.deliverables === '') {
-                flag = -1;
-                let e = document.getElementById(`deliverables${i}`);
-                e.innerHTML = "Enter deliverables";
-                e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
-                return;
-            }
+        }
+        if (total !== 100) {
+            return alert("error");
         }
         if (flag !== -1) {
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
@@ -223,10 +259,10 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                         <h1>Project Milestones</h1>
                         <span>Organise and link payments to milestones</span>
 
-                        <div className='milestone-inputRow' style={{ marginBottom: '20px', width: '320px' }}>
+                        <div className='milestone-inputRow' style={{ width: '320px', marginBottom: '5px' }}>
                             <span>Total Project Value</span>
-                            <div className='picker-container'>
-                                <Select defaultValue={currency} onChange={e => { setCurrency(e.target.value); console.log(e.target.value) }} bg='#FFFF' color='#76808D' variant='unstyled' style={{ borderRadius: '10px 0px 0px 10px', borderWidth: 1, borderRightWidth: 0, borderColor: 'rgba(27, 43, 65, 0.1)', height: 50, padding: '0px 50px 0px 20px' }} iconSize={15} icon={<ArrowDown />}>
+                            <div className='picker-container' style={{ margin: '0', marginTop: '5px' }}>
+                                <Select defaultValue={currency} onChange={handleChangeCurrency} bg='#FFFF' color='#76808D' variant='unstyled' style={{ borderRadius: '10px 0px 0px 10px', borderWidth: 1, borderRightWidth: 0, borderColor: 'rgba(27, 43, 65, 0.1)', height: 50, padding: '0px 50px 0px 20px' }} iconSize={15} icon={<ArrowDown />}>
                                     <option value="" selected disabled>Select currency</option>
                                     {
                                         safeTokens.map((result, index) => {
@@ -241,7 +277,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                                         })}
                                 </Select>
                                 <div className='number-input'>
-                                    <NumberInput onChange={(e) => setAmount(parseFloat(e))} defaultValue={0} style={{ width: (64 + 50), height: 50, borderWidth: 1, borderColor: 'rgba(27, 43, 65, 0.1)', borderRightWidth: 0, borderRadius: '0px 10px 10px 0px' }} step={1} min={0}>
+                                    <NumberInput onChange={handleChangeCompensationAmount} defaultValue={0} style={{ width: (64 + 50), height: 50, borderWidth: 1, borderColor: 'rgba(27, 43, 65, 0.1)', borderRightWidth: 0, borderRadius: '0px 10px 10px 0px' }} step={1} min={0}>
                                         <NumberInputField className='input' style={{ padding: 0, textAlign: "center", height: 50, width: 64, borderWidth: 0, background: '#F5F5F5' }} />
                                         <NumberInputStepper style={{ width: 50, backgroundColor: 'transparent' }}>
                                             <NumberIncrementStepper color="#C94B32" children={<DropupRed />} />
@@ -249,8 +285,8 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                                         </NumberInputStepper>
                                     </NumberInput>
                                 </div>
-
                             </div>
+                            <span id={`currency-amt`} style={{ fontSize: '13px', color: '#C84A32', fontStyle: 'normal' }}></span>
                         </div>
 
                         <div className='milestone-inputRow' style={{ marginBottom: '0', width: '320px' }}>
