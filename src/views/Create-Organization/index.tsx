@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme: any) => ({
 export default () => {
 	const classes = useStyles();
 	const navigate = useNavigate();
-	const [orgName, setOrgName]= useState("");
+	const [orgName, setOrgName] = useState("");
 	const goToInviteGang = () => {
 		navigate('/invitegang');
 	}
@@ -74,6 +74,15 @@ export default () => {
 					<Button variant='contained' color='primary' className={classes.buttonStyle} onClick={goToInviteGang}>
 						Create Public Address
 					</Button>
+
+					<Typography style={{
+						fontStyle: 'italic',
+						fontWeight: 400,
+						textAlign: 'center',
+						letterSpacing: '-0.011em',
+						color: '#76808D',
+						marginTop:'1rem'
+					}}>This infomation is permanent</Typography>
 				</Grid>
 			</Grid>
 		</>

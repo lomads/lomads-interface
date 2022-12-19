@@ -8,6 +8,7 @@ import StartSafe from 'views/Start-Safe';
 import CreateSafe from 'views/Create-Safe';
 import AddExistingSafe from 'views/Add-Existing-Safe';
 import DAOLive from 'views/DAO-Live';
+import Dashboard from 'views/Dashboard';
 export default [
 	// {
 	// 	path: '/',
@@ -71,5 +72,12 @@ export default [
 		layout: LandingLayout,
 		private: false,
 		component: DAOLive
+	},
+	{
+		path: '/dashboard',
+		exact: true,
+		layout: RootLayout,
+		private: false,
+		component: Dashboard
 	}
 ];

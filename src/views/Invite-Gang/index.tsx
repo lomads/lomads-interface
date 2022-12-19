@@ -1,5 +1,5 @@
 
-import { Container, Grid, Typography, Box, Button, IconButton } from "@mui/material"
+import { Container, Grid, Typography, Box, IconButton } from "@mui/material"
 import { makeStyles } from '@mui/styles';
 import TextInput from 'components/TextInput';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
@@ -13,6 +13,9 @@ import daoMember2 from "../../assets/svg/daoMember2.svg";
 import { useNavigate } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import { ethers } from "ethers";
+import Button from 'components/Button';
+import { ExpandMoreOutlined } from '@mui/icons-material';
+
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
@@ -46,7 +49,7 @@ const useStyles = makeStyles((theme: any) => ({
 		marginBottom: '1rem'
 	},
 	uploadButtonBox: {
-		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.15), -3px -3px 8px rgba(201, 75, 50, 0.25)',
+		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.10)',
 		fontStyle: 'normal',
 		fontWeight: 400,
 		lineHeight: '18px',
@@ -68,11 +71,14 @@ const useStyles = makeStyles((theme: any) => ({
 	},
 	contributorDetailsBox: {
 		display: 'flex',
-		justifyContent: 'space-between',
+		// justifyContent: 'space-between',
+		columnGap:'8rem',
 		alignItems: 'center',
 		width: '100%',
-		marginBottom: '0.875rem'
-	}
+		marginBottom: '0.875rem',
+		
+	},
+
 }));
 
 export default () => {
@@ -126,6 +132,7 @@ export default () => {
 
 	return (
 		<>
+			<Container maxWidth="lg">
 			<Grid container className={classes.root}>
 				<Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
 					<Box style={{ marginBottom: '40px' }}>
@@ -136,14 +143,14 @@ export default () => {
 							<Typography style={{ color: '#76808D', fontWeight: 700, fontSize: '16px' }}>Add Member :</Typography>
 							<Box className={classes.uploadButtonBox}>
 								<Tooltip title="Please upload .xlsx file with columns containing member name and wallet address" placement="top-start">
-									<Button startIcon={<FileDownloadOutlinedIcon sx={{ fontSize: '5rem' }} />} size={"small"} style={{ color: '#76808d', backgroundColor: 'transparent' }} onClick={handleClick}>
-										OR UPLOAD FILE
+									<Button variant='contained' color='secondary' size="small" onClick={handleClick}>
+										<FileDownloadOutlinedIcon sx={{ fontSize: '1.5rem' }} />OR UPLOAD FILE
 										<input
 											ref={hiddenFileInput}
 											type="file"
 											hidden
-										/>
-									</Button>
+										/></Button>
+
 								</Tooltip>
 							</Box>
 						</Box>
@@ -169,9 +176,9 @@ export default () => {
 							/>
 							<FormControl sx={{ m: 1, minWidth: 120 }} fullWidth>
 								<Select
+									IconComponent={(props) => (<ExpandMoreOutlined {...props} />)}
 									value={selectContributor}
 									onChange={handleContributorChange}
-									inputProps={{ 'aria-label': 'Without label' }}
 								>
 									{options.map(item => {
 										return <MenuItem value={item.value} key={item.value}>{item.label}</MenuItem>
@@ -193,10 +200,11 @@ export default () => {
 					</Box>
 					<Box display="flex" flexDirection="column" alignItems="center" className={classes.bottomBox}>
 						{contributor.map(item => {
-							return <Box className={classes.contributorDetailsBox}>
+							return <Box 
+							className={classes.contributorDetailsBox}>
 								<img src={daoMember2} />
-								<Typography>{item.name}</Typography>
-								<Typography>{item.contributor}</Typography>
+								<Typography style={{ textAlign: 'left' }}>{item.name}</Typography>
+								<Typography style={{ textAlign: 'left' }}>{item.contributor}</Typography>
 							</Box>
 						})
 						}
@@ -207,6 +215,7 @@ export default () => {
 					<Link href="/startsafe" underline="always" style={{ marginTop: '1rem' }}>Skip</Link>
 				</Grid>
 			</Grid>
+			</Container>
 		</>
 	)
 }

@@ -8,14 +8,15 @@ export default {
 			},
 			"'&:hover $notchedOutline'": {
 				borderColor: palette.primary.main
-			}
+			},
 		},
 		input: {
 			background: '#F5F5F5',
 			borderColor: 'transparent',
+			borderRadius: 10,
 			"&::placeholder": {
 				fontFamily: 'Inter, sans-serif',
-				fontStyle: 'normal',
+				fontStyle: 'italic',
 				fontWeight: 400,
 				fontSize: '16px',
 				lineHeight: '18px',

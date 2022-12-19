@@ -9,16 +9,16 @@ import Checkbox from '@mui/material/Checkbox';
 import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
+import Link from '@mui/material/Link';
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
-		height: "100vh",
+		minHeight: "100vh",
 		maxHeight: 'fit-content',
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'center',
 		justifyContent: 'center',
-		overflowY: 'scroll'
 	},
 	headingText: {
 		color: '#C94B32 !important'
@@ -54,10 +54,10 @@ const useStyles = makeStyles((theme: any) => ({
 		display: 'flex',
 	},
 	tncBox: {
-		lineHeight: '35px',
 		marginBottom: '3rem',
-		width: '50%',
-		textAlign: 'center'
+		width: '55%',
+		textAlign: 'center',
+		fontStyle: 'italic'
 	}
 
 }));
@@ -115,105 +115,107 @@ export default () => {
 	];
 	return (
 		<>
-			<Grid container className={classes.root}>
-				<Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
-					<Box style={{ marginBottom: '40px' }}>
-						<Typography variant="h1" className={classes.headingText}>3/3 DAO Treasury</Typography>
-					</Box>
-					<Box className={classes.detailBox}>
-						<Button style={{
-							backgroundColor: '#FFFFFF',
-							boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
-							borderRadius: '5px',
-							color: newSafe ? 'rgb(201, 75, 50)' : 'rgba(201, 75, 50, 0.6)'
-						}} onClick={selectSafeClicked('new')}>Create New Safe</Button>
-						<Typography style={{ marginLeft: '1rem', marginRight: '1rem', color: '#C94B32', fontSize: '20px' }}>or</Typography>
-						<Button style={{
-							backgroundColor: '#FFFFFF',
-							boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
-							borderRadius: '5px',
-							color: existingSafe ? 'rgb(201, 75, 50)' : 'rgba(201, 75, 50, 0.6)'
-						}} onClick={selectSafeClicked('existing')}>Add Existing Safe</Button>
-					</Box>
-					<hr className={classes.divider} />
-					<Box className={classes.formBox}>
-						<TextInput
-							style={{ marginBottom: '1.5rem' }}
-							fullWidth
-							label={"Safe Name"}
-							placeholder={"Pied Piper"}
-							value={safeName}
-							onChange={(event: any) => {
-								setSafeName(event.target.value);
-								setErrors({ safeName: '' })
-							}}
-							error={errors.safeName ? true : false}
-							helperText={errors.safeName}
-						>
-						</TextInput>
-					</Box>
-					{showContinueBtn && <Button variant='contained' className={classes.buttonStyle} onClick={continueHandler} style={{ backgroundColor: safeName.length > 0 ? "#C94B32" : "rgba(27, 43, 65, 0.2)" }}>
-						Continue
-					</Button>}
-
-					{!showContinueBtn && <hr className={classes.divider} />}
-					{!showContinueBtn &&
-						<Box className={classes.formBox}>
-							{showNextBtn && <Typography variant={"subtitle2"} style={{ fontWeight: 700, marginBottom: '1rem', fontSize: '16px' }}>Select Owners</Typography>}
-							{!showNextBtn && <Typography variant={"subtitle2"} style={{ fontWeight: 700, marginBottom: '1rem', fontSize: '16px' }}>Owners</Typography>}
-							{contributor.map(item => {
-								return <Box display="flex" justifyContent={'space-between'}>
-									<img src={daoMember2} />
-									<Typography style={{ marginTop: '0.5rem' }}>{item.name}</Typography>
-									<Checkbox defaultChecked />
-								</Box>
-							})
-							}
-							{showNextBtn && <Box>
-								<Button variant='contained' color='primary' size={"small"} style={{ left: '35%', marginTop: '1rem' }} onClick={nextHandler}>
-									Next
-								</Button>
-							</Box>}
+			<Container maxWidth="lg">
+				<Grid container className={classes.root}>
+					<Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
+						<Box style={{ marginBottom: '40px' }}>
+							<Typography variant="h1" className={classes.headingText}>3/3 DAO Treasury</Typography>
 						</Box>
-					}
-					{!showNextBtn && <hr className={classes.divider} />}
-					{
-						!showNextBtn &&
+						<Box className={classes.detailBox}>
+							<Button style={{
+								backgroundColor: '#FFFFFF',
+								boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
+								borderRadius: '5px',
+								color: newSafe ? 'rgb(201, 75, 50)' : 'rgba(201, 75, 50, 0.6)'
+							}} onClick={selectSafeClicked('new')}>Create New Safe</Button>
+							<Typography style={{ marginLeft: '1rem', marginRight: '1rem', color: '#C94B32', fontSize: '20px' }}>or</Typography>
+							<Button style={{
+								backgroundColor: '#FFFFFF',
+								boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
+								borderRadius: '5px',
+								color: existingSafe ? 'rgb(201, 75, 50)' : 'rgba(201, 75, 50, 0.6)'
+							}} onClick={selectSafeClicked('existing')}>Add Existing Safe</Button>
+						</Box>
+						<hr className={classes.divider} />
 						<Box className={classes.formBox}>
-							<Typography>Any transaction requires the confirmation of</Typography>
-							<Box style={{ display: 'flex', alignItems: 'center' }}>
-								<FormControl sx={{ m: 1, minWidth: 80 }}>
-									<Select
-										defaultValue={1}
-										displayEmpty
-										inputProps={{ 'aria-label': 'Without label' }}
-									>
-										{options.map(item => {
-											return <MenuItem value={item.value}>{item.label}</MenuItem>
-										})}
+							<TextInput
+								style={{ marginBottom: '1.5rem' }}
+								fullWidth
+								label={"Safe Name"}
+								placeholder={"Pied Piper"}
+								value={safeName}
+								onChange={(event: any) => {
+									setSafeName(event.target.value);
+									setErrors({ safeName: '' })
+								}}
+								error={errors.safeName ? true : false}
+								helperText={errors.safeName}
+							>
+							</TextInput>
+						</Box>
+						{showContinueBtn && <Button variant='contained' className={classes.buttonStyle} onClick={continueHandler} style={{ backgroundColor: safeName.length > 0 ? "#C94B32" : "rgba(27, 43, 65, 0.2)" }}>
+							Continue
+						</Button>}
 
-									</Select>
-								</FormControl>
-								<Typography>of {options.length} owner(s)</Typography>
+						{!showContinueBtn && <hr className={classes.divider} />}
+						{!showContinueBtn &&
+							<Box className={classes.formBox}>
+								{showNextBtn && <Typography variant={"subtitle2"} style={{ fontWeight: 700, marginBottom: '1rem', fontSize: '16px' }}>Select Owners</Typography>}
+								{!showNextBtn && <Typography variant={"subtitle2"} style={{ fontWeight: 700, marginBottom: '1rem', fontSize: '16px' }}>Owners</Typography>}
+								{contributor.map(item => {
+									return <Box display="flex" justifyContent={'space-between'} style={{ marginBottom: '1rem' }}>
+										<img src={daoMember2} />
+										<Typography style={{ marginTop: '0.5rem' }}>{item.name}</Typography>
+										<Checkbox defaultChecked />
+									</Box>
+								})
+								}
+								{showNextBtn && <Box>
+									<Button variant='contained' color='primary' size={"small"} style={{ left: '35%', marginTop: '1rem' }} onClick={nextHandler}>
+										Next
+									</Button>
+								</Box>}
 							</Box>
+						}
+						{!showNextBtn && <hr className={classes.divider} />}
+						{
+							!showNextBtn &&
+							<Box className={classes.formBox}>
+								<Typography>Any transaction requires the confirmation of</Typography>
+								<Box style={{ display: 'flex', alignItems: 'center' }}>
+									<FormControl sx={{ m: 1, minWidth: 80 }}>
+										<Select
+											defaultValue={1}
+											displayEmpty
+											inputProps={{ 'aria-label': 'Without label' }}
+										>
+											{options.map(item => {
+												return <MenuItem value={item.value}>{item.label}</MenuItem>
+											})}
+
+										</Select>
+									</FormControl>
+									<Typography>of {options.length} owner(s)</Typography>
+								</Box>
 
 
-						</Box>
-					}
-					{!showNextBtn &&
-						<Box className={classes.tncBox}>
-							<Typography>By continuing you consent to the terms of use and privacy policy of Gnosis Safe</Typography>
-							<Typography style={{ marginTop: '0.5rem' }}>You’re about to create a new safe and will have to confirm a transaction with your currently connected wallet.
-								<b>The creation will cost approximately 0.01256 GOR.</b>
-								The exact amount will be determinated by your wallet.
-							</Typography>
-							<Button variant='contained' color='primary' size={"small"} style={{ marginTop: '1.5rem' }} onClick={confirmBtnHandler}>
-								Create Safe
-							</Button>
-						</Box>
-					}
+							</Box>
+						}
+						{!showNextBtn &&
+							<Box className={classes.tncBox}>
+								<Typography>By continuing you consent to the terms of use and privacy policy of <Link href="https://gnosis-safe.io/" style={{ color: '#76808D', textDecorationColor: "#76808D" }}>Gnosis Safe</Link></Typography>
+								<Typography style={{ marginTop: '0.5rem', lineHeight: '1.56rem' }}>You’re about to create a new safe and will have to confirm a transaction with your currently connected wallet.
+									<b>The creation will cost approximately 0.01256 GOR.</b>
+									The exact amount will be determinated by your wallet.
+								</Typography>
+								<Button variant='contained' color='primary' size={"small"} style={{ marginTop: '1.5rem' }} onClick={confirmBtnHandler}>
+									Create Safe
+								</Button>
+							</Box>
+						}
+					</Grid>
 				</Grid>
-			</Grid>
+			</Container>
 		</>
 	)
 }

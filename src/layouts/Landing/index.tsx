@@ -6,7 +6,10 @@ import { Container } from '@mui/system';
 const useStyles = makeStyles((theme: any) => ({
   root: {
     height: '100vh',
-    background: 'linear-gradient(169.22deg,#fdf7f7 12.19%,#efefef 92%);'
+    background: 'linear-gradient(169.22deg,#fdf7f7 12.19%,#efefef 92%)',
+	position:'fixed',
+	overflow:'auto'
+
   },
 }));
 
@@ -17,9 +20,9 @@ export default ({ children } : any) => {
   return (
       <Grid container component="main" className={classes.root}>
         <CssBaseline />
-        <Container maxWidth="lg">
+        {/* <Container maxWidth="lg"> */}
           { children }
-        </Container>
+        {/* </Container> */}
       </Grid>
   );
 }
