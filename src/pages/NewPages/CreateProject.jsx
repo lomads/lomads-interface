@@ -270,12 +270,12 @@ const CreateProject = () => {
                                     ?
                                     <div className='createProject-body'>
                                         <img src={createProjectSvg} alt="frame-icon" />
-                                        <p className="heading-text">Project details</p>
+                                        <p className="heading-text">Workspace details</p>
 
                                         <div className="projectName-container" style={{ width: '450px' }}>
                                             <div className="projectName-box" style={{ width: '100%' }}>
                                                 <div className='name-btn'>
-                                                    <h1>Project resources</h1>
+                                                    <h1>Workspace resources</h1>
                                                     {
                                                         resourceList.length > 0
                                                             ?
@@ -376,7 +376,7 @@ const CreateProject = () => {
 
                                         <div className='project-buttons'>
                                             <SimpleLoadButton
-                                                title="CREATE PROJECT"
+                                                title="CREATE WORKSPACE"
                                                 height={50}
                                                 width={225}
                                                 fontsize={16}
@@ -392,16 +392,16 @@ const CreateProject = () => {
                                     :
                                     <div className='createProject-body' style={{ height: '90vh' }}>
                                         <img src={createProjectSvg} alt="frame-icon" />
-                                        <p className="heading-text">Create New Project</p>
+                                        <p className="heading-text">Create New Workspace</p>
                                         {
                                             !next
                                                 ?
                                                 <div className='createProject-form-container'>
                                                     <div className='input-div'>
-                                                        <label>Name of the project</label>
+                                                        <label>Name of the workspace</label>
                                                         <input
                                                             className="text-input"
-                                                            placeholder="Enter project name"
+                                                            placeholder="Enter workspace name"
                                                             value={name}
                                                             name="name"
                                                             onChange={(e) => setName(e.target.value)}
@@ -510,7 +510,7 @@ const CreateProject = () => {
                                                             ADD MORE DETAIL
                                                         </button>
                                                         <SimpleLoadButton
-                                                            title="CREATE PROJECT"
+                                                            title="CREATE WORKSPACE"
                                                             height={50}
                                                             width={225}
                                                             fontsize={16}

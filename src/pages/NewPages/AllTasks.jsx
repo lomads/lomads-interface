@@ -560,18 +560,22 @@ const AllTasks = () => {
 
                 {/* other tasks */}
                 {
-                    tab === 4 && currentTasks && currentTasks.map((item, index) => {
-                        return (
-                            <div key={index}>
-                                <TaskCard
-                                    task={item}
-                                    daoUrl={DAO?.url}
-                                />
-                            </div>
-                        )
-                    })
+                    tab === 4 &&
+                    <div className='allTask-container'>
+                        {
+                            currentTasks && currentTasks.map((item, index) => {
+                                return (
+                                    <div key={index}>
+                                        <TaskCard
+                                            task={item}
+                                            daoUrl={DAO?.url}
+                                        />
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
                 }
-
 
             </div>
 

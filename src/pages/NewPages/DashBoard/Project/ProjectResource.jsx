@@ -197,7 +197,7 @@ const ProjectResource = ({ toggleShowResource, getResources, list }) => {
                 <div style={{ width: '100%', height: '100%', overflow: 'scroll' }}>
                     <div className='resource-body'>
                         <img src={createTaskSvg} alt="frame-icon" />
-                        <h1>Project Resources</h1>
+                        <h1>Workspace Resources</h1>
                         <span>Add links for online ressources </span>
 
                         <div className='resource-inputRow' style={{ marginBottom: '0', width: '410px' }}>
