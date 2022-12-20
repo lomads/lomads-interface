@@ -271,7 +271,8 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
     }
 
     const createTransaction = async (selectedToken, setRecipient) => {
-        setError(null)
+        setError(null);
+        setisLoading(true);
         if (selectedToken === 'SWEAT') {
             return createOffChainTxn(setRecipient)
         }
@@ -293,6 +294,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
         } catch (e) {
             console.log(e)
             setError(e)
+            setisLoading(false);
         }
     };
 

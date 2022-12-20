@@ -94,7 +94,7 @@ const MyProject = () => {
                         <div className="divider"></div>
                     </>
                     <button className={tab === 2 ? 'active' : null} onClick={() => setTab(2)}>
-                        All workspace
+                        All workspaces
                     </button>
                 </div>
                 <div className="myproject-buttons">

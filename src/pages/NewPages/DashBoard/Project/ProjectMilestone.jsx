@@ -134,7 +134,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
         //     });
         //     setMilestones(newArray);
         // }
-        var x = document.getElementById(`amount${index}`);
+        var x = document.getElementById(`amount${milestones.length - 1}`);
         x.innerHTML = '';
         var el = document.getElementById(`inputBox${index}`);
         el.style.background = '';

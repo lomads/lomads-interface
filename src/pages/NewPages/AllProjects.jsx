@@ -136,46 +136,43 @@ const AllProjects = () => {
                 </div>
             </div>
 
-            <div className='allTasks-body'>
-                {
-                    tab === 1 &&
-                    <div className='allTask-container'>
-                        {
-                            currentProjects && currentProjects.map((item, index) => {
-                                return (
-                                    <div key={index}>
-                                        <ProjectCard
-                                            project={item}
-                                            daoUrl={DAO?.url}
-                                            tab={tab}
-                                        />
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
-                }
+            {
+                tab === 1 &&
+                <div className='allTask-container' style={{ padding: '25px' }}>
+                    {
+                        currentProjects && currentProjects.map((item, index) => {
+                            return (
+                                <div key={index} style={{ marginBottom: '25px' }}>
+                                    <ProjectCard
+                                        project={item}
+                                        daoUrl={DAO?.url}
+                                        tab={tab}
+                                    />
+                                </div>
+                            )
+                        })
+                    }
+                </div>
+            }
 
-                {
-                    tab === 2 &&
-                    <div className='allTask-container'>
-                        {
-                            currentProjects && currentProjects.map((item, index) => {
-                                return (
-                                    <div key={index}>
-                                        <ProjectCard
-                                            project={item}
-                                            daoUrl={DAO?.url}
-                                            tab={tab}
-                                        />
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
-                }
-
-            </div>
+            {
+                tab === 2 &&
+                <div className='allTask-container' style={{ padding: '25px' }}>
+                    {
+                        currentProjects && currentProjects.map((item, index) => {
+                            return (
+                                <div key={index} style={{ marginBottom: '25px' }}>
+                                    <ProjectCard
+                                        project={item}
+                                        daoUrl={DAO?.url}
+                                        tab={tab}
+                                    />
+                                </div>
+                            )
+                        })
+                    }
+                </div>
+            }
 
         </div>
     )

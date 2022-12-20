@@ -153,9 +153,9 @@
     border-right: 1px solid rgba(118, 128, 141, 0.25);
 }
 
-.allTasks-container .allTasks-body .allTask-container {
+.allTasks-container .allTask-container {
     width: 100%;
-    padding-left: 10px;
+    /* padding: 10px; */
     display: flex;
     flex-wrap: wrap;
 }
