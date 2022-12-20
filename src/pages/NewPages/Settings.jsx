@@ -265,11 +265,11 @@ const Settings = () => {
 									</Link>
 								</div>
 							</div>
-							<div className="settings-organisation-child"
-								onClick={() => {
-									toggleModal();
-									setOpenTerminology(true);
-								}}
+							<div className="settings-organisation-child disabled"
+							// onClick={() => {
+							// 	toggleModal();
+							// 	setOpenTerminology(true);
+							// }}
 							>
 								<div
 									style={{
