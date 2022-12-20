@@ -63,7 +63,6 @@ const MyProject = () => {
     }, [DAO, tab]);
 
     useEffect(() => {
-        console.log("myProjects", myProjects)
         if (!initialCheck) {
             if (myProjects.length > 0) {
                 setInitialCheck(true)
@@ -90,12 +89,12 @@ const MyProject = () => {
                 <div className="myproject-title">
                     <>
                         <button className={tab === 1 ? 'active' : null} onClick={() => setTab(1)}>
-                            My projects
+                            My workspace
                         </button>
                         <div className="divider"></div>
                     </>
                     <button className={tab === 2 ? 'active' : null} onClick={() => setTab(2)}>
-                        All projects
+                        All workspace
                     </button>
                 </div>
                 <div className="myproject-buttons">
@@ -135,34 +134,26 @@ const MyProject = () => {
                     <div className='myproject-body-fixed'>
                         {
                             myProjects.length > 0 && myProjects.filter((item, index) => index < 6).map((item, index) => {
-                                // if (index <= 4) {
-                                //     if (item.deletedAt === null && item.archivedAt === null) {
-                                //         return (
-                                //             <div key={index}>
-                                //                 <ProjectCard
-                                //                     project={item}
-                                //                     daoUrl={DAO?.url}
-                                //                     tab={tab}
-                                //                 />
-                                //             </div>
-                                //         )
-                                //     }
-                                // }
-                                // else {
-                                //     return (
-                                //         <div className='all-project'>
-                                //             <span>Show All</span>
-                                //         </div>
-                                //     )
-                                // }
-                                if (item.deletedAt === null && item.archivedAt === null) {
+                                if (index <= 4) {
+                                    if (item.deletedAt === null && item.archivedAt === null) {
+                                        return (
+                                            <div key={index}>
+                                                <ProjectCard
+                                                    project={item}
+                                                    daoUrl={DAO?.url}
+                                                    tab={tab}
+                                                />
+                                            </div>
+                                        )
+                                    }
+                                }
+                                else {
                                     return (
-                                        <div key={index}>
-                                            <ProjectCard
-                                                project={item}
-                                                daoUrl={DAO?.url}
-                                                tab={tab}
-                                            />
+                                        <div
+                                            className='all-project'
+                                            onClick={() => { navigate(`/${DAO.url}/projects`, { state: { activeTab: tab } }) }}
+                                        >
+                                            <span>Show All</span>
                                         </div>
                                     )
                                 }
@@ -198,7 +189,7 @@ const MyProject = () => {
                                             }
                                             else {
                                                 return (
-                                                    <div className='all-project'>
+                                                    <div className='all-project' onClick={() => { navigate(`/${DAO.url}/projects`, { state: { activeTab: tab } }) }}>
                                                         <span>Show All</span>
                                                     </div>
                                                 )

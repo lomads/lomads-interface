@@ -81,6 +81,9 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
         const amountElement = document.getElementById(`amount${index}`);
         const allotedAmt = (((parseFloat(selectedMilestone.amount) * parseFloat(compensation?.amount))) / 100).toFixed(5);
 
+        var x = document.getElementById(`amountError`);
+        x.innerHTML = '';
+
         var el = document.getElementById(`inputBox${index}`);
         el.style.background = '';
 
@@ -126,6 +129,9 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
         let userAmount = (allotedAmt / Project?.members?.length).toFixed(5);
         let percentAmt = ((userAmount / allotedAmt) * 100).toFixed(2);
 
+        var x = document.getElementById(`amountError`);
+        x.innerHTML = '';
+
         let arr = temp.map((item, index) => {
             let e = item;
             const amountElement = document.getElementById(`amount${index}`);
@@ -146,21 +152,26 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
         for (var i = 0; i < temp.length; i++) {
             const item = temp[i];
             total += item.percent;
-            sendArray.push({
-                amount: ((item.percent * allotedAmt) / 100).toFixed(5),
-                name: item.name,
-                recipient: item.wallet,
-                reason: `${item.name} | ${_get(data, 'name', '')} | ${selectedMilestone.name}`
-            })
+            if (item.percent > 0) {
+                sendArray.push({
+                    amount: ((item.percent * allotedAmt) / 100).toFixed(5),
+                    name: item.name,
+                    recipient: item.wallet,
+                    reason: `${item.name} | ${_get(data, 'name', '')} | ${selectedMilestone.name}`
+                })
+            }
         }
+        console.log("Send array : ", sendArray);
         if (total !== 100 && !isSplit) {
+            var x = document.getElementById(`amountError`);
+            x.innerHTML = 'Total Project Value should be 100 %';
             for (var i = 0; i < temp.length; i++) {
                 var el = document.getElementById(`inputBox${i}`);
                 el.style.background = 'rgba(217, 83, 79, 0.75)';
             }
             return;
         }
-        await createTransaction(_get(Project, 'compensation.currency', ''), sendArray);
+        // await createTransaction(_get(Project, 'compensation.currency', ''), sendArray);
     }
 
     const createOffChainTxn = (setRecipient) => {
@@ -335,7 +346,6 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                                                             id={`inputBox${index}`}
                                                             className='input-wrapper'
                                                             onClick={() => handleFocusInput(index)}
-                                                        // style={{ background: 'rgba(217, 83, 79, 0.75)' }}
                                                         >
                                                             <input
                                                                 type={"number"}
@@ -348,6 +358,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                                                                 onChange={(e) => handleChange(e.target.value, index)}
                                                             /> %
                                                         </div>
+
                                                     </div>
                                                     <div>
                                                         <h1>=&nbsp;</h1>
@@ -357,6 +368,8 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                                                 </div>
                                             ))
                                         }
+
+                                        <span id={`amountError`} style={{ fontSize: '13px', color: '#C84A32', fontStyle: 'normal', margin: '0' }}></span>
 
                                     </div>
 

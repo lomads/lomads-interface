@@ -134,6 +134,10 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
         //     });
         //     setMilestones(newArray);
         // }
+        var x = document.getElementById(`amount${index}`);
+        x.innerHTML = '';
+        var el = document.getElementById(`inputBox${index}`);
+        el.style.background = '';
         if (e <= 100) {
             const newArray = milestones.map((item, i) => {
                 if (i === index) {
@@ -231,7 +235,13 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
             }
         }
         if (total !== 100) {
-            return alert("error");
+            var x = document.getElementById(`amount${milestones.length - 1}`);
+            x.innerHTML = 'Total Project Value should be 100 %';
+            for (var i = 0; i < milestones.length; i++) {
+                var el = document.getElementById(`inputBox${i}`);
+                el.style.background = 'rgba(217, 83, 79, 0.75)';
+            }
+            return;
         }
         if (flag !== -1) {
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
@@ -256,11 +266,11 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                 <div style={{ width: '100%', height: '100%', overflow: 'scroll' }}>
                     <div className='milestone-body'>
                         <img src={createTaskSvg} alt="frame-icon" />
-                        <h1>Project Milestones</h1>
+                        <h1>Workspace Milestones</h1>
                         <span>Organise and link payments to milestones</span>
 
                         <div className='milestone-inputRow' style={{ width: '320px', marginBottom: '5px' }}>
-                            <span>Total Project Value</span>
+                            <span>Total Workspace Value</span>
                             <div className='picker-container' style={{ margin: '0', marginTop: '5px' }}>
                                 <Select defaultValue={currency} onChange={handleChangeCurrency} bg='#FFFF' color='#76808D' variant='unstyled' style={{ borderRadius: '10px 0px 0px 10px', borderWidth: 1, borderRightWidth: 0, borderColor: 'rgba(27, 43, 65, 0.1)', height: 50, padding: '0px 50px 0px 20px' }} iconSize={15} icon={<ArrowDown />}>
                                     <option value="" selected disabled>Select currency</option>
@@ -334,7 +344,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                                                 <div style={{ width: '70px' }}>
                                                     <SimpleInputField
                                                         className="inputField"
-                                                        id="nameInput"
+                                                        id={`inputBox${index}`}
                                                         height={50}
                                                         width={'100%'}
                                                         value={item.amount}
@@ -345,7 +355,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                                                         placeholder={`${100 / milestoneCount}`}
                                                     />
                                                 </div>
-                                                <span style={{ margin: '0', marginLeft: '14px' }}>% of Project value</span>
+                                                <span style={{ margin: '0', marginLeft: '14px' }}>% of workspace value</span>
                                             </div>
                                             <span id={`amount${index}`} style={{ fontSize: '13px', color: '#C84A32', fontStyle: 'normal' }}></span>
                                         </div>

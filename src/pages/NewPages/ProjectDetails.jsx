@@ -50,6 +50,8 @@ import { ProgressBar, Step } from "react-step-progress-bar";
 import AssignContributions from "./DashBoard/Project/AssignContributions";
 import KRAReview from "./DashBoard/Project/KRAReview";
 
+import moment from "moment";
+
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
     const { provider, account, chainId } = useWeb3React();
@@ -91,7 +93,7 @@ const ProjectDetails = () => {
     const [showAssign, setShowAssign] = useState(false);
     const [showKRAReview, setShowKRAReview] = useState(false);
 
-    const [tab, setTab] = useState(1);
+    const [tab, setTab] = useState(null);
 
     const [selectedMilestone, setSelectedMilestone] = useState(null);
 
@@ -123,7 +125,18 @@ const ProjectDetails = () => {
             p = `${permission}.creator`
         console.log(p)
         return (can(myRole, p) || can(myRole, permission))
-    }, [Project])
+    }, [Project]);
+
+    useEffect(() => {
+        if (Project) {
+            if (_get(Project, 'milestones', []).length > 0) {
+                setTab(1);
+            }
+            else if (_get(Project, 'milestones', []).length === 0 && _get(Project, 'kra.results', []).length > 0) {
+                setTab(2);
+            }
+        }
+    }, [Project]);
 
 
     // Runs after adding new members in project
@@ -619,11 +632,11 @@ const ProjectDetails = () => {
                                 </div>
                                 {
                                     <div>
-                                        {canMyrole('project.edit') &&
+                                        {/* {canMyrole('project.edit') &&
                                             <button onClick={handleEditMode}>
                                                 <img src={editToken} alt="hk-logo" />
                                             </button>
-                                        }
+                                        } */}
                                         {canMyrole('project.delete') && <button onClick={() => setDeletePrompt(true)}>
                                             <img src={deleteIcon} alt="hk-logo" />
                                         </button>}
@@ -632,9 +645,9 @@ const ProjectDetails = () => {
                                             ?
                                             <SafeButton
                                                 height={40}
-                                                width={150}
+                                                width={180}
                                                 titleColor="#C94B32"
-                                                title="CLOSE PROJECT"
+                                                title="CLOSE WORKSPACE"
                                                 bgColor="#FFFFFF"
                                                 opacity="1"
                                                 disabled={false}
@@ -714,7 +727,7 @@ const ProjectDetails = () => {
                                     }
                                 </div>
                                 {
-                                    canMyrole('project.links.view') &&
+                                    (lockedLinks.lnegth > 0 || openLinks.length > 0) && canMyrole('project.links.view') &&
                                     <div className="links-section">
                                         <div className="links-header">
                                             <div>
@@ -724,9 +737,9 @@ const ProjectDetails = () => {
                                                 canMyrole('project.link.add') &&
                                                 <>
                                                     <div>
-                                                        <button onClick={toggleShowLink}>
+                                                        {/* <button onClick={toggleShowLink}>
                                                             <img src={editToken} alt="hk-logo" />
-                                                        </button>
+                                                        </button> */}
                                                         <button onClick={toggleShowLink}>
                                                             <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
                                                             LINK
@@ -796,13 +809,34 @@ const ProjectDetails = () => {
                                     ?
                                     <div className="right">
                                         <div className="milestone-kra">
-                                            <div onClick={() => setTab(1)}>
-                                                <h1 style={tab === 1 ? { opacity: '1' } : { opacity: '0.4' }}>Milestones</h1>
-                                            </div>
-                                            <div className="divider"></div>
-                                            <div onClick={() => setTab(2)}>
-                                                <h1 style={tab === 2 ? { opacity: '1' } : { opacity: '0.4' }}>Key results</h1>
-                                            </div>
+                                            {
+                                                _get(Project, 'milestones', []).length > 0 && _get(Project, 'kra.results', []).length > 0
+                                                    ?
+                                                    <>
+                                                        <div onClick={() => setTab(1)}>
+                                                            <h1 style={tab === 1 ? { opacity: '1' } : { opacity: '0.4' }}>Milestones</h1>
+                                                        </div>
+                                                        <div className="divider"></div>
+                                                        <div onClick={() => setTab(2)}>
+                                                            <h1 style={tab === 2 ? { opacity: '1' } : { opacity: '0.4' }}>Key results</h1>
+                                                        </div>
+                                                    </>
+                                                    :
+                                                    <>
+                                                        {
+                                                            _get(Project, 'milestones', []).length > 0 && !_get(Project, 'kra.results', []).length > 0
+                                                                ?
+                                                                <div>
+                                                                    <h1 style={{ opacity: '1' }}>Milestones</h1>
+                                                                </div>
+                                                                :
+                                                                <div>
+                                                                    <h1 style={{ opacity: '1' }}>Key results</h1>
+                                                                </div>
+                                                        }
+                                                    </>
+                                            }
+
                                         </div>
 
                                         <div className="milestone-kra-status">
@@ -844,20 +878,20 @@ const ProjectDetails = () => {
                                                                     <span className="percent-text">0%</span>
                                                             }
                                                         </div>
-                                                        <button>
+                                                        {/* <button>
                                                             <img src={editToken} alt="hk-logo" />
-                                                        </button>
+                                                        </button> */}
                                                     </>
                                                     :
                                                     <div className="status" style={{ justifyContent: 'space-between' }}>
                                                         <span>Review frequency : {_get(Project, 'kra.frequency', [])}</span>
                                                         <div style={{ width: '50%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                                            <button>
+                                                            <button className='archive-btn'>
                                                                 <img src={archiveIcon} alt="archive-icon" />
                                                             </button>
-                                                            <button className='archive-btn'>
+                                                            {/* <button className='archive-btn'>
                                                                 <img src={editToken} alt="hk-logo" />
-                                                            </button>
+                                                            </button> */}
                                                             <button className="review-btn" onClick={() => setShowKRAReview(true)}>
                                                                 REVIEW
                                                             </button>
@@ -959,7 +993,7 @@ const ProjectDetails = () => {
                                                         <span>{item.wallet.slice(0, 6) + "..." + item.wallet.slice(-4)}</span>
                                                     </div>
                                                     <div className="members-row-date">
-                                                        <p>10/10/2023 </p>
+                                                        <p>{moment.utc(item.joined).local().format('MM/DD/YYYY')} </p>
                                                     </div>
                                                     <div className="members-row-status">
                                                         <span>{handleRenderRole(item)}</span>
