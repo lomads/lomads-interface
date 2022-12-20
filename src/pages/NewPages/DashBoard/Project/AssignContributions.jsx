@@ -171,7 +171,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
             }
             return;
         }
-        // await createTransaction(_get(Project, 'compensation.currency', ''), sendArray);
+        await createTransaction(_get(Project, 'compensation.currency', ''), sendArray);
     }
 
     const createOffChainTxn = (setRecipient) => {

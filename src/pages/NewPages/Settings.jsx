@@ -265,8 +265,11 @@ const Settings = () => {
 									</Link>
 								</div>
 							</div>
-							<div className="settings-organisation-child disabled"
-
+							<div className="settings-organisation-child"
+								onClick={() => {
+									toggleModal();
+									setOpenTerminology(true);
+								}}
 							>
 								<div
 									style={{
