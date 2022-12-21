@@ -269,6 +269,12 @@
     border-radius: 0px 10px 10px 0px;
 }
 
+.recurringOverlay .recurringContainer .recurring-body .recurring-inputRow .picker-container .number-input-occurance {
+    background: #FFFFFF;
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 10px 0px 0px 10px;
+}
+
 .recurringOverlay .recurringContainer .recurring-body .recurring-inputRow .picker-container .number-input .input {
     font-family: 'Inter', sans-serif;
     font-style: normal;
@@ -431,4 +437,22 @@
     background: #C94B32;
     color: #FFF;
     width: 180px;
+}
+
+.recurringOverlay .recurringContainer .recurring-body .recurring-inputRow .stop-payments {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.recurringOverlay .recurringContainer .recurring-body .recurring-inputRow .stop-payments .info {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+    margin-top: 16px;
+    letter-spacing: -0.011em;
+    color: rgba(118, 128, 141, 0.5);
+    text-align: center;
 }

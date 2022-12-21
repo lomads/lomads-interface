@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { SafeTransactionDataPartial } from "@gnosis.pm/safe-core-sdk-types";
+import { SafeTransactionDataPartial, MetaTransactionData } from "@gnosis.pm/safe-core-sdk-types";
 import { SafeTransactionOptionalProps } from "@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/types";
 import useSafeTokens from "./useSafeTokens";
 import { get as _get, find as _find } from 'lodash';
@@ -9,6 +9,7 @@ import { useWeb3React } from "@web3-react/core";
 import { useAppSelector } from "state/hooks";
 import axiosHttp from 'api'
 const { toChecksumAddress } = require('ethereum-checksum-address')
+
 
 const useSafeTransaction = (safeAddress: string) => {
 
@@ -48,6 +49,7 @@ const useSafeTransaction = (safeAddress: string) => {
                         toChecksumAddress(result.recipient),
                         BigInt(parseFloat(result.amount) * 10 ** _get(safeToken, 'token.decimals', 18))
                     );
+                    console.log("unsignedTransaction", unsignedTransaction)
                     const transactionData = {
                         to: safeToken.tokenAddress,
                         data: unsignedTransaction.data as string,

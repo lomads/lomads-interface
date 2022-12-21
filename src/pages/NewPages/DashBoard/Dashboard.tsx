@@ -81,6 +81,7 @@ const Dashboard = () => {
 	const [showCreateRecurring, setShowCreateRecurring] = useState<boolean>(false);
 	const [showNavBar, setShowNavBar] = useState<boolean>(false);
 	const [manualChainSwitch, setManualChainSwitch] = useState<boolean>(false);
+	const [recurringTxn, setRecurringTxn] = useState<any>(null);
 	const [safeOwners, setSafeOwners] = useState<any>(null);
 	const [checkLoading, setCheckLoading] = useState<boolean>(true);
 	const currentNonce = useAppSelector((state) => state.flow.currentNonce);
@@ -123,7 +124,11 @@ const Dashboard = () => {
 	};
 
 	const toggleShowCreateRecurring = () => {
-		setShowCreateRecurring(!showCreateRecurring);
+		setShowCreateRecurring((prev:boolean) => {
+			if(prev)
+				setRecurringTxn(null)
+			return !prev
+		});
 	}
 
 	const showSideBar = (_choice: boolean) => {
@@ -366,6 +371,11 @@ const Dashboard = () => {
 		return 0
 	}, [user, safeTokens, DAO])
 
+	const handleOnRecurringEdit = (txn: any) => {
+		setRecurringTxn(txn)
+		setShowCreateRecurring(true)
+	}
+
 	return (
 		<>
 			{!validDaoChain || !DAO || DAOLoading || (daoURL && (DAO && DAO.url !== daoURL)) ?
@@ -456,6 +466,7 @@ const Dashboard = () => {
 				{(can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') &&
 					<TreasuryCard
 						innerRef={treasuryRef}
+						onRecurringEdit={handleOnRecurringEdit}
 						safeAddress={safeAddress}
 						pendingTransactions={pendingTransactions}
 						executedTransactions={executedTransactions}
@@ -500,7 +511,7 @@ const Dashboard = () => {
 			{showCreateTask && <CreateTask toggleShowCreateTask={toggleShowCreateTask} selectedProject={null} />}
 
 			{/* Create recurring payment side modal */}
-			{showCreateRecurring && <CreateRecurring toggleShowCreateRecurring={toggleShowCreateRecurring} />}
+			{showCreateRecurring && <CreateRecurring transaction={recurringTxn} onRecurringPaymentCreated={() => treasuryRef?.current?.reload()} toggleShowCreateRecurring={toggleShowCreateRecurring} />}
 
 		</>
 	);

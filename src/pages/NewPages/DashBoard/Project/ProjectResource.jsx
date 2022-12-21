@@ -133,7 +133,7 @@ const ProjectResource = ({ toggleShowResource, getResources, list }) => {
                 resource.platformId = dcserverid;
                 resource.accessControl = accessControl;
                 if (status)
-                    resource.guildId = status;
+                    resource.roleId = status;
                 setResourceList([...resourceList, resource]);
                 setAccessControl(false);
                 setTitle('');

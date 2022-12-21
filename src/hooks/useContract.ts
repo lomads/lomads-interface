@@ -56,6 +56,7 @@ export function useContract<T extends Contract = Contract>(
     else address = addressOrAddressMap[chainId]
     if (!address) return null
     try {
+      console.log("useContract", addressOrAddressMap)
       return getContract(address, ABI, provider, withSignerIfPossible && account ? account : undefined)
     } catch (error) {
       console.error('Failed to get contract', error)
@@ -141,5 +142,11 @@ export function useSBTContract(contractAddr : String) {
   let path = require('../abis/SBT.json')
   if(chainId === SupportedChainId.POLYGON)
     path = require('../abisPolygon/SBT.json')
+  return useContract(contractAddr, path, true);
+}
+
+export function useAllowanceContract(contractAddr : String) {
+  console.log("useContract", contractAddr)
+  let path = require('../allowanceAbis/AllowanceModule.json')
   return useContract(contractAddr, path, true);
 }

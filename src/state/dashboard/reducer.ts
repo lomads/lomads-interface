@@ -37,6 +37,7 @@ import {
 	deleteTask,
 	toggleXPPoints,
 	updateContract,
+	loadRecurringPayments,
 	updateKRA,
 	updateMilestone,
 } from "./actions";
@@ -80,6 +81,8 @@ export interface DashboardState {
 	archiveTaskLoading: boolean | null;
 	deleteTaskLoading: boolean | null;
 	updateContractLoading: boolean | null;
+	recurringPayments: any;
+	recurringPaymentsLoading: boolean | null;
 	updateKraLoading: boolean | null;
 	updateMilestoneLoading: boolean | null;
 }
@@ -121,6 +124,8 @@ const initialState: DashboardState = {
 	archiveTaskLoading: null,
 	deleteTaskLoading: null,
 	updateContractLoading: null,
+	recurringPayments: null,
+	recurringPaymentsLoading: null,
 	updateKraLoading: null,
 	updateMilestoneLoading: null,
 };
@@ -260,6 +265,9 @@ const dashboardSlice = createSlice({
 				}
 			}
 		},
+		setRecurringPayments(state, action) {
+			state.recurringPayments = action.payload
+		}
 	},
 	extraReducers: {
 		[`${updateCurrentUser.fulfilled}`]: (state, action) => {
@@ -575,6 +583,13 @@ const dashboardSlice = createSlice({
 		[`${updateContract.pending}`]: (state, action) => {
 			state.updateContractLoading = true
 		},
+		[`${loadRecurringPayments.fulfilled}`]: (state, action) => {
+			state.recurringPaymentsLoading = false
+			state.recurringPayments = action.payload;
+		},
+		[`${loadRecurringPayments.pending}`]: (state, action) => {
+			state.recurringPaymentsLoading = true
+		},
 		// update kra
 		[`${updateKRA.fulfilled}`]: (state, action) => {
 			state.updateKraLoading = false;
@@ -630,8 +645,9 @@ export const {
 	resetRejectTaskLoader,
 	resetArchiveTaskLoader,
 	resetDeleteTaskLoader,
+	resetUpdateContractLoading,
+	setRecurringPayments,
 	resetUpdateKraLoader,
-	resetUpdateMilestoneLoader,
-	resetUpdateContractLoading
+	resetUpdateMilestoneLoader
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

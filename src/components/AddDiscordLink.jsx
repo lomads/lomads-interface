@@ -23,21 +23,17 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
 
     const { provider, account, chainId } = useWeb3React();
     const signerFunction = useCallback((signableMessage) => getSigner(provider, account).signMessage(signableMessage), [provider, account]);
-    const { onOpen, onResetAuth, authorization, isAuthenticating } = useDCAuth("guilds")
+    const { onOpen, onResetAuth, authorization, isAuthenticating } = useDCAuth("identify guilds")
 
     const { onOpen: openAddBotPopup, windowInstance: activeAddBotPopup } = usePopupWindow()
-    const { onOpen: openAddLomadsBotPopup, windowInstance: activeAddLomadsBotPopup } = useLomadsBotPopupWindow()
 
     const { DAO, createProjectLoading } = useAppSelector((state) => state.dashboard);
 
     const [server, setServer] = useState(null);
     const [channels, setChannels] = useState(null);
     const [poll, setPoll] = useState(null);
-    const [lomadsPoll, setLomadsPoll] = useState(null);
     const [addLinkLoading, setAddLinkLoading] = useState(null);
     const [hasClickedAuth, setHasClickedAuth] = useState(false)
-    const [lomadsBotStatus, setLomadsBotStatus] = useState(false)
-    const [guildxyz, setGuildXyz] = useState(null)
 
     const getDiscordServers = useCallback(async () => {
         console.log("getDiscordServers", authorization)
@@ -63,19 +59,11 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
     }, [prevAuth, authorization, hasClickedAuth])
 
     useInterval(async () => {
-        axios.post(`https://api.guild.xyz/v1/discord/server/${poll}`)
+        axiosHttp.get(`discord/guild/${poll}`)
         .then(res => setChannels(res.data.channels))
-    }, poll ? 2000 : null)
-
-    useInterval(async () => {
-        const lbotStatus = await axiosHttp.post('utility/check-lomads-bot', { server: server.id }).then(res => res.data)
-        setLomadsBotStatus(lbotStatus)
-        // axios.post(`https://api.guild.xyz/v1/discord/server/${lomadsPoll}`)
-        // .then(res => setChannels(res.data.channels))
-    }, lomadsPoll ? 2000 : null)
+    }, poll ? 5000 : null)
 
     const prevActiveAddBotPopup = usePrevious(activeAddBotPopup)
-    const prevActiveAddLomadsBotPopup = usePrevious(activeAddLomadsBotPopup)
     const prevIsAuthenticating = usePrevious(isAuthenticating)
 
     useEffect(() => {
@@ -86,12 +74,6 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
         }
     }, [prevActiveAddBotPopup, activeAddBotPopup, poll])
 
-    useEffect(() => {
-        if (!!prevActiveAddLomadsBotPopup && !activeAddLomadsBotPopup) {
-            if(lomadsPoll)
-                setLomadsPoll(null)
-        }
-    }, [prevActiveAddLomadsBotPopup, activeAddLomadsBotPopup, lomadsPoll])
 
     useEffect(() => {
         if(prevIsAuthenticating && !isAuthenticating)
@@ -106,102 +88,32 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
         }
     }, [channels, activeAddBotPopup])
 
-    useEffect(() => {
-        if (lomadsBotStatus == true && activeAddLomadsBotPopup) {
-            setLomadsPoll(null)
-            activeAddLomadsBotPopup.close()
-            if(!guildxyz)
-                createGuild();
-            else
-                finish(guildxyz.id)
-            
-        }
-    }, [lomadsBotStatus, activeAddLomadsBotPopup, guildxyz])
-
     const finish = result => {
-        console.log(result);
         setServer(null);
         setChannels(null);
         setPoll(null);
-        setLomadsPoll(null);
         setAddLinkLoading(null);
         setHasClickedAuth(false)
-        setLomadsBotStatus(false)
-        setGuildXyz(null)
         onGuildCreateSuccess(result)
     }
 
-    const createGuild = async () => {
-        try{
-            setAddLinkLoading(true)
-            const url = new URL(link)
-            let invId = url.pathname.split('/')[3]
-            await guild.create(account, signerFunction, {
-                name: title,
-                description: desc,
-                guildPlatforms: [                           
-                    {
-                        platformName: "DISCORD",
-                        platformGuildId: server?.id || url.pathname.split('/')[2],
-                        platformGuildData: {inviteChannel: invId}
-                    },
-                ],
-                roles: [
-                    {
-                        name: roleName ? roleName : nanoid(8),
-                        logic : "AND",
-                        requirements: [{
-                            type: "ERC721",
-                            chain: chainId === SupportedChainId.POLYGON ? 'POLYGON': 'GOERLI',
-                            address: _get(DAO, 'sbt.address', null),
-                            data : {
-                                minAmount: 1
-                            }
-                        }],
-                        rolePlatforms: [
-                            {
-                                guildPlatformIndex: 0
-                            },
-                        ],
-                    }
-                ]})
-                .then(async result => {
-                    finish(result.id)
-                })
-                .catch(async e => {
-                    console.log(e)
-                    setAddLinkLoading(null);
-                    if(_get(e, 'errors[0].msg').indexOf('create another guild for the same platform!') > -1){
-                       // toast.error('Server is already token gated. Please choose another server');
-                    //    await role.create(account, signerFunction, {
-                    //      guildId
-                    //    })
-                    } else {
-                        toast.error(_get(e, 'errors[0].msg'));
-                    }
-                })
-    
-            } catch (e){
-                setAddLinkLoading(null);
-                console.log(e)
+    const onGuildBotAdded = async server => {
+       const attachRoleId = await axiosHttp.get(`discord/guild/${server.id}/roles`)
+        .then(async res => {
+            if(res.data) {
+                console.log(res.data)
+                let guildRole = _find(res.data, r => r.name.toLowerCase() === roleName.toLowerCase())
+                if(guildRole) 
+                    return guildRole.id
+                else {
+                    guildRole = await axiosHttp.post(`discord/guild/${server.id}/role`, { name: roleName }).then(res => res.data)
+                    console.log("guildRole.id", guildRole.id)
+                    return guildRole.id
+                }
             }
-    }
-
-    const onGuildBotAdded = async (serv, guild = undefined) => {
-            const lbotStatus = await axiosHttp.post('utility/check-lomads-bot').then(res => res.data)
-            if(!lbotStatus) {
-                setLomadsPoll(serv.id)
-                const redirectUri = typeof window !== "undefined" && `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
-                setTimeout(() => 
-                    openAddLomadsBotPopup(`https://discord.com/api/oauth2/authorize?client_id=1036510041286639656&guild_id=${serv.id}&permissions=268782673&scope=bot%20applications.commands&redirect_uri=${redirectUri}`),
-                    1000
-                )
-            } else {
-                if(!guild)
-                    createGuild()
-                else
-                    finish(guild.id)
-            }
+        })
+        console.log("attachRoleId", attachRoleId)
+        finish(attachRoleId)
     }
     const onGuildBotAddedDelayed = useCallback(_debounce(onGuildBotAdded, 1000), [onGuildBotAdded, link, server])
 
@@ -233,44 +145,15 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                             if(guildId) {
                                 const guild = await axios.get(`https://api.guild.xyz/v1/guild/${guildId}`).then(res => res.data)
                                 if(guild) {
-                                    const r = await role.create(
-                                        account,
-                                        signerFunction,
-                                        {
-                                            guildId,
-                                            name: roleName ? roleName : nanoid(8),
-                                            logic : "AND",
-                                            requirements: [{
-                                                type: "ERC721",
-                                                chain: chainId === SupportedChainId.POLYGON ? 'POLYGON': 'GOERLI',
-                                                address: _get(DAO, 'sbt.address', null),
-                                                data : {
-                                                    minAmount: 1
-                                                }
-                                            }],
-                                            rolePlatforms: [
-                                                {
-                                                    guildPlatformId: _get(guild, 'guildPlatforms[0].id', '')
-                                                },
-                                            ],
-                                        }
-                                    )
-                                    if(r) {
-                                        setServer(validServer)
-                                        setGuildXyz({ id: guildId })
-                                        onGuildBotAddedDelayed(validServer, { id: guildId })
-                                        // setServer(null)
-                                        // setAddLinkLoading(null);
-                                        // onGuildCreateSuccess(guildId)
-                                    }
+                                    
                                 } else {
                                     setServer(validServer)
                                     // check if bot already added 
-                                   const guildChannels = await axios.post(`https://api.guild.xyz/v1/discord/server/${validServer.id}`).then(res => res.data.channels);  
-                                   if(guildChannels.length == 0){
+                                   const discordGuild = await axiosHttp.get(`discord/guild/${validServer.id}`).then(res => res.data);  
+                                   if(!discordGuild){
                                        const redirectUri = typeof window !== "undefined" && `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
                                        setPoll(dcserverid)
-                                       openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=868172385000509460&guild_id=${dcserverid}&permissions=268782673&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
+                                       openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=1049724741306564669&guild_id=${dcserverid}&permissions=8&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
                                    } else {
                                         onGuildBotAddedDelayed(validServer)
                                    }
@@ -278,23 +161,20 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                             } else {
                                 setServer(validServer)
                                 // check if bot already added 
-                               const guildChannels = await axios.post(`https://api.guild.xyz/v1/discord/server/${validServer.id}`).then(res => res.data.channels);  
-                               if(guildChannels.length == 0){
+                               const discordGuild = await axiosHttp.get(`discord/guild/${validServer.id}`).then(res => res.data).catch(e => null);  
+                               console.log("discordGuild", discordGuild)
+                               if(!discordGuild){
                                    const redirectUri = typeof window !== "undefined" && `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
                                    setPoll(dcserverid)
-                                   openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=868172385000509460&guild_id=${dcserverid}&permissions=268782673&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
+                                   openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=1049724741306564669&guild_id=${dcserverid}&permissions=8&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
                                } else {
                                    onGuildBotAddedDelayed(validServer)
                                }
                             }
                         } else {
-                            //setAddLinkLoading(null);
-                            //toast.error("Invalid discord server");
                             setHasClickedAuth(true)
                             onResetAuth()
                             return setTimeout(() => onOpen(), 2000) 
-                            // onResetAuth()
-                            // setTimeout(() => onOpen(), 1000) 
                         }
                     } else {
                         setAddLinkLoading(null);
@@ -305,7 +185,7 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                     setAddLinkLoading(null);
                 }
             } else {
-                onGuildCreateSuccess()
+                finish()
             }
         }
     }

@@ -11,6 +11,7 @@ import moment from "moment";
 import axiosHttp from '../../../../api';
 import { updateSafeTransaction } from "state/dashboard/reducer";
 import { SupportedChainId } from "constants/chains";
+import useSafeTokens from "hooks/useSafeTokens";
 
 const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress, onLoadLabels }: any) => {
 	const { chainId } = useWeb3React();
@@ -18,29 +19,45 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
     const { DAO } = useAppSelector(store => store.dashboard);
     const [reasonText, setReasonText] = useState({});
     const [editMode, setEditMode] = useState(null);
+    const {safeTokens} = useSafeTokens(safeAddress)
     const dispatch = useAppDispatch()
 
-    const { isCredit, amount, symbol, recipient, date, reason } = useMemo(() => {
+    const { isCredit, amount, tokenSymbol, symbol, recipient, date, reason, txHash, isAllowanceTransaction } = useMemo(() => {
         let isCredit = _get(transaction, 'txType', '') === 'ETHEREUM_TRANSACTION'
         let decimal = 18;
         if(_get(transaction, 'transfers[0].tokenInfo.decimals', null))
             decimal = _get(transaction, 'transfers[0].tokenInfo.decimals', 18)
-        let amount = (+(_get(transaction, 'transfers[0].value', 0)) / 10 ** decimal)
+        let amount = (+(_get(transaction, 'transfers[0].value', _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'value' || p.name === '_value'), 'value', _get(transaction, 'value', 0)))) / 10 ** decimal)
         let symbol = chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR';
         if(_get(transaction, 'transfers[0].tokenAddress', null))
             symbol = _get(transaction, 'transfers[0].tokenInfo.symbol', '')
         else
             symbol = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
-        let recipient = _get(transaction, 'transfers[0].to', '')
+        let recipient = _get(transaction, 'transfers[0].to', _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'to' || p.name === '_to'), 'value', _get(transaction, 'to', '')))
+        let tokenSymbol = undefined;
+        const setAllowance =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => _get(vd, 'dataDecoded.method', '') === "setAllowance")
+        let isAllowanceTransaction = false;
+        if(setAllowance)
+            isAllowanceTransaction = true;
+        if(transaction?.dataDecoded?.method === 'multiSend' && transaction?.dataDecoded?.parameters[0]?.name === 'transactions' && isAllowanceTransaction) {
+            const addDelegate =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => _get(vd, 'dataDecoded.method', '') === "addDelegate")
+            recipient = _get(addDelegate, 'dataDecoded.parameters[0].value', '')
+            const setAllowance =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => _get(vd, 'dataDecoded.method', '') === "setAllowance")
+            amount = _get(setAllowance, 'dataDecoded.parameters[2].value', '')
+            const tokenAddr = _get(setAllowance, 'dataDecoded.parameters[1].value', '')
+            tokenSymbol = _get(_find(safeTokens, (st:any) => st.tokenAddress === tokenAddr), 'token.symbol', '')
+            const tokenDecimal = _get(_find(safeTokens, (st:any) => st.tokenAddress === tokenAddr), 'token.decimal', _get(_find(safeTokens, (st:any) => st.tokenAddress === tokenAddr), 'token.decimals', 18))
+            amount = (amount / 10 ** tokenDecimal)
+        }
         let reason = null
         if(labels && labels.length > 0) {
-            reason = _get(_find(labels, l => l.recipient.toLowerCase() === recipient.toLowerCase() && l.safeTxHash === _get(transaction, 'safeTxHash', _get(transaction, 'txHash', ''))), "label", null)
+            reason = _get(_find(labels, l => l.recipient.toLowerCase() === recipient.toLowerCase() && l.safeTxHash === _get(transaction, 'safeTxHash', _get(transaction, 'txHash', _get(transaction, 'transactionHash', '')))), "label", null)
         }
-
+        const txHash = _get(transaction, 'safeTxHash', _get(transaction, 'txHash', _get(transaction, 'transactionHash', '')));
         let date = _get(transaction, 'executionDate', null) ? moment.utc(_get(transaction, 'executionDate', null)).local().format('MM/DD hh:mm') : moment.utc(_get(transaction, 'submissionDate', null)).local().format('MM/DD hh:mm')
         console.log('reason', reason)
-        return { isCredit, amount, symbol, recipient, date, reason }
-    }, [transaction, labels])
+        return { isCredit, amount, tokenSymbol, symbol, recipient, date, reason, txHash, isAllowanceTransaction }
+    }, [transaction, safeTokens, tokens, labels])
 
     const _handleReasonKeyDown = (safeTxHash: string, recipient: string, reasonText: string) => {
         if (reasonText && reasonText !== '') {
@@ -92,8 +109,11 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
 
         let mulReason = '';
         if(labels && labels.length > 0) {
-            mulReason = _get(_find(labels, l => l.recipient.toLowerCase() === mulRecipient.toLowerCase() && l.safeTxHash === _get(transaction, 'safeTxHash', _get(transaction, 'txHash', ''))), "label", null)
+            mulReason = _get(_find(labels, l => l.recipient.toLowerCase() === mulRecipient.toLowerCase() && l.safeTxHash === _get(transaction, 'safeTxHash', _get(transaction, 'txHash', _get(transaction, 'transactionHash', '')))), "label", null)
         }
+
+        const txHash = _get(transaction, 'safeTxHash', _get(transaction, 'txHash', _get(transaction, 'transactionHash', '')));
+
         return (
             <div className="transactionRow">
                 <div className="coinText">
@@ -104,9 +124,9 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
                 </div>
                 <div className="transactionName">
                         {
-                             mulReason && (!editMode || (editMode && editMode !== `${transaction.safeTxHash}-${mulRecipient}`))
+                             mulReason && (!editMode || (editMode && editMode !== `${txHash}-${mulRecipient}`))
                                 ?
-                                <div className="dashboardText" onClick={() => handleEnableEditMode(`${transaction.safeTxHash}-${mulRecipient}`, mulReason)}>{mulReason}</div>
+                                <div className="dashboardText" onClick={() => handleEnableEditMode(`${txHash}-${mulRecipient}`, mulReason)}>{mulReason}</div>
                                 :
                                 <>
                                     {
@@ -114,12 +134,12 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
                                             ?
                                             <SimpleInputField
                                                 disabled={!owner}
-                                                value={_get(reasonText, `${transaction.safeTxHash}-${mulRecipient}`, null)}
+                                                value={_get(reasonText, `${txHash}-${mulRecipient}`, null)}
                                                 onchange={e => {
                                                     setReasonText(prev => {
                                                         return {
                                                             ...prev,
-                                                            [`${transaction.safeTxHash}-${mulRecipient}`]: e.target.value
+                                                            [`${txHash}-${mulRecipient}`]: e.target.value
                                                         }
                                                     })
                                                 }}
@@ -160,30 +180,30 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
 
     return (
         <>
-            {_get(transaction, 'dataDecoded.method', null) !== "multiSend" ?
+            {_get(transaction, 'dataDecoded.method', null) !== "multiSend" || (_get(transaction, 'dataDecoded.method', null) === "multiSend" && isAllowanceTransaction && _get(transaction, 'dataDecoded.parameters[0].name', null) === "transactions") ?
                 <div className="transactionRow">
                     <div className="coinText">
                         <img src={isCredit ? receiveToken : sendToken} alt="" />
                         <div className="dashboardTextBold">
-                            {`${amount} ${symbol}`}
+                            {`${amount} ${tokenSymbol ? tokenSymbol : symbol}`}
                         </div>
                     </div>
                     <div className="transactionName">
                             {
-                                reason && (!editMode || (editMode && editMode !== `${transaction.safeTxHash}-${recipient}`)) ?
-                                <div className="dashboardText" onClick={() => handleEnableEditMode(`${transaction.safeTxHash}-${recipient}`, reason)}>{reason}</div> :
+                                reason && (!editMode || (editMode && editMode !== `${txHash}-${recipient}`)) ?
+                                <div className="dashboardText" onClick={() => handleEnableEditMode(`${txHash}-${recipient}`, reason)}>{reason}</div> :
                                  <>
                                         {
                                             isAdmin || owner
                                                 ?
                                                 <SimpleInputField
                                                     disabled={!owner}
-                                                    value={_get(reasonText, `${transaction.safeTxHash}-${recipient}`, null)}
+                                                    value={_get(reasonText, `${txHash}-${recipient}`, null)}
                                                     onchange={e => {
                                                         setReasonText(prev => {
                                                             return {
                                                                 ...prev,
-                                                                [`${transaction.safeTxHash}-${recipient}`]: e.target.value
+                                                                [`${txHash}-${recipient}`]: e.target.value
                                                             }
                                                         })
                                                     }}
