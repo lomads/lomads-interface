@@ -1,144 +1,185 @@
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { find as _find, get as _get, debounce as _debounce } from 'lodash';
 import { AiOutlineClose } from "react-icons/ai";
 import IconButton from "UIpack/IconButton";
-import "./Settings.css";
+import "./TerminologyModal.css";
 import OD from "../../assets/images/drawer-icons/Frameterminology.svg";
-import { Button, Image, Input } from "@chakra-ui/react";
-import EditTerminologyModal from "./EditTerminologyModal";
-import { useState } from "react";
 import editIcon from 'assets/svg/editButton.svg';
 
-const TerminologyModal = ({ toggleModal, toggleTerminology }) => {
-	const [showEditModal, setShowEditModal] = useState(false);
+import { useAppSelector, useAppDispatch } from "state/hooks";
 
-	let toggleEditModal = () => {
-		setShowEditModal(!showEditModal);
-	};
+import { updateDao } from 'state/dashboard/actions';
+import { resetUpdateDAOLoader } from 'state/dashboard/reducer';
+
+import SimpleLoadButton from "UIpack/SimpleLoadButton";
+
+const TerminologyModal = ({ toggleModal, toggleTerminology }) => {
+
+	const dispatch = useAppDispatch();
+	const { DAO, updateDaoLoading } = useAppSelector((state) => state.dashboard);
+
+	const [showEdit, setShowEdit] = useState(false);
+
+	const [ob, setOb] = useState(_get(DAO, 'terminologies', null));
+
+	useEffect(() => {
+		if (updateDaoLoading === false) {
+			dispatch(resetUpdateDAOLoader());
+			setShowEdit(false);
+		}
+	}, [updateDaoLoading]);
+
+	const handleChange = (e) => {
+		let tempOb = { ...ob };
+		tempOb[e.target.id] = e.target.value;
+		setOb(tempOb);
+	}
+
+	const handleSubmit = () => {
+		const terminologies = ob;
+		dispatch(updateDao({ url: _get(DAO, 'url', ''), payload: { terminologies } }));
+	}
 
 	return (
-		<>
-			<div className="sidebarModal">
-				<div
-					onClick={() => {
-						toggleModal();
-						toggleTerminology();
-					}}
-					className="overlay"
-				></div>
-				<div className="SideModalTerminology">
-					<div className="closeButtonArea">
-						<button
-							style={{ marginRight: "22px" }}
-							onClick={() => toggleEditModal()}
-						>
-							<img
-								src={editIcon}
-								alt="edit-icon"
-							/>
-						</button>
-						<IconButton
-							Icon={
-								<AiOutlineClose
-									style={{
-										color: "#C94B32",
-										height: "16px",
-										width: "16px",
-									}}
-								/>
-							}
-							bgColor="linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)"
-							height={37}
-							width={37}
-							className="sideModalCloseButton"
-							onClick={() => {
-								toggleModal();
-								toggleTerminology();
-							}}
-						/>
-					</div>
-
+		<div className="sidebarModal">
+			<div
+				onClick={() => {
+					toggleTerminology();
+				}}
+				style={{ opacity: '1', background: 'rgba(27, 43, 65, 0.25)' }}
+				className="overlay"
+			>
+				<div className="terminology-container">
 					<div
-						style={{
-							display: "flex",
-							flexDirection: "column",
-							alignItems: "center",
+						className="terminology-modal"
+						onClick={(e) => {
+							e.stopPropagation();
 						}}
 					>
-						<Image
-							src={OD}
-							alt="Terminology icon"
-							style={{ marginTop: "100px", width: "94.48px", height: "50px" }}
-						/>
-						<div id="title-type">Terminology</div>
-					</div>
-
-					{/* //! BODY */}
-					<div
-						style={{
-							padding: "0 50px",
-						}}
-					>
-						<p className="terminology-label">
-							Labels used in all your organisation’s interface.
-						</p>
-
-						<div className="terminology-group1">
-							<div style={{ display: "flex" }}>
-								<div id="text-type">Projects:</div>
-								<p className="description">Pods</p>
-							</div>
-							<div style={{ display: "flex" }}>
-								<div id="text-type">Tasks:</div>
-								<p className="description">Bounties</p>
-							</div>
-
-							<hr
-								style={{
-									height: "1px",
-									width: 288,
-									background: "#C94B32",
-									margin: "33px auto 35px",
-								}}
+						<div className='terminology-header'>
+							<button style={{ marginRight: '22px' }} onClick={() => setShowEdit(true)}>
+								<img src={editIcon} alt="editIcon" />
+							</button>
+							<IconButton
+								Icon={
+									<AiOutlineClose
+										style={{
+											color: "#C94B32",
+											height: "16px",
+											width: "16px",
+										}}
+									/>
+								}
+								bgColor="linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)"
+								height={37}
+								width={37}
+								className="sideModalCloseButton"
+								onClick={toggleTerminology}
 							/>
-
-							<div style={{ display: "flex" }}>
-								<div id="text-type">Admin:</div>
-								<p className="description">Admin</p>
-							</div>
-							<div style={{ display: "flex" }}>
-								<div id="text-type">Core Contributor:</div>
-								<p className="description">Core Contributor</p>
-							</div>
-							<div style={{ display: "flex" }}>
-								<div id="text-type">Active Contributor:</div>
-								<p className="description">Active Contributor</p>
-							</div>
-							<div style={{ display: "flex" }}>
-								<div id="text-type">Contributor:</div>
-								<p className="description">Contributor</p>
-							</div>
 						</div>
-					</div>
-					{/* //! FOOTER */}
-					<div className="button-section">
-						<Button
-							id="button-cancel"
-							style={{ marginRight: 6 }}
-							variant="outline"
-							onClick={() => {
-								toggleModal();
-								toggleTerminology();
-							}}
-						>
-							CANCEL
-						</Button>
-						<Button id="button-save">SAVE CHANGES</Button>
+
+						<div className="terminology-body">
+							<img src={OD} alt="frame-icon" />
+							<h1>Terminologies</h1>
+
+							{!showEdit && <p>Labels used in all your organisation’s interface.</p>}
+
+							{
+								!showEdit
+									?
+									<>
+										<div className="section" style={{ width: '320px' }}>
+											<h1>Projects : <span>{ob.Projects}</span></h1>
+											<h1>Tasks : <span>{ob.Tasks}</span></h1>
+										</div>
+										<div className="divider"></div>
+										<div className="section" style={{ width: '320px' }}>
+											<h1>Admin : <span>{ob.Admin}</span></h1>
+											<h1>Core Contributor : <span>{ob["Core Contributor"]}</span></h1>
+											<h1>Active Contributor : <span>{ob["Active Contributor"]}</span></h1>
+											<h1>Contributor : <span>{ob.Contributor}</span></h1>
+										</div>
+									</>
+									:
+									<>
+										<div className="section" style={{ width: '375px' }}>
+											<div style={{ marginBottom: '15px' }}>
+												<h1>Projects</h1>
+												<select
+													name="project"
+													className="tokenDropdown"
+													id="Projects"
+													style={{ width: '200px', margin: '0' }}
+													onChange={handleChange}
+												>
+													<option value={'Projects'} selected={ob.Projects === 'Projects'}>Projects</option>
+													<option value={'Pods'} selected={ob.Projects === 'Pods'}>Pods</option>
+													<option value={'Departments'} selected={ob.Projects === 'Departments'}>Departments</option>
+													<option value={'Functions'} selected={ob.Projects === 'Functions'}>Functions</option>
+													<option value={'Guilds'} selected={ob.Projects === 'Guilds'}>Guilds</option>
+												</select>
+											</div>
+											<div>
+												<h1>Tasks</h1>
+												<select
+													name="project"
+													id="Tasks"
+													className="tokenDropdown"
+													style={{ width: '200px', margin: '0' }}
+													onChange={handleChange}
+												>
+													<option value={'Tasks'} selected={ob.Tasks === 'Tasks'}>Tasks</option>
+													<option value={'Bounties'} selected={ob.Tasks === 'Bounties'}>Bounties</option>
+												</select>
+											</div>
+										</div>
+										<div className="divider"></div>
+										<div className="section" style={{ width: '375px' }}>
+											<div style={{ marginBottom: '15px' }}>
+												<h1>Admin</h1>
+												<input type={"text"} id={"Admin"} value={ob.Admin} onChange={handleChange} />
+											</div>
+
+											<div style={{ marginBottom: '15px' }}>
+												<h1>Core Contributor</h1>
+												<input type={"text"} id={"Core Contributor"} value={ob["Core Contributor"]} onChange={handleChange} />
+											</div>
+
+											<div style={{ marginBottom: '15px' }}>
+												<h1>Active Contributor</h1>
+												<input type={"text"} id={"Active Contributor"} value={ob["Active Contributor"]} onChange={handleChange} />
+											</div>
+
+											<div style={{ marginBottom: '15px' }}>
+												<h1>Contributor</h1>
+												<input type={"text"} id={"Contributor"} value={ob.Contributor} onChange={handleChange} />
+											</div>
+										</div>
+									</>
+							}
+
+							{showEdit &&
+								<div className="section-footer">
+									<button onClick={() => setShowEdit(false)}>
+										CANCEL
+									</button>
+									<SimpleLoadButton
+										title="SAVE CHANGES"
+										height={40}
+										width={185}
+										fontsize={16}
+										fontweight={400}
+										onClick={handleSubmit}
+										bgColor={"#C94B32"}
+										condition={updateDaoLoading}
+									/>
+								</div>
+							}
+						</div>
 					</div>
 				</div>
 			</div>
-			{showEditModal && (
-				<EditTerminologyModal toggleEditModal={toggleEditModal} />
-			)}
-		</>
+		</div>
 	);
 };
 
