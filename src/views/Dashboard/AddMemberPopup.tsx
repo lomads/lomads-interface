@@ -12,13 +12,14 @@ import { useNavigate } from 'react-router-dom';
 import { ethers } from "ethers";
 import Button from 'components/Button';
 import { ExpandMoreOutlined } from '@mui/icons-material';
-
+import UploadMemberPopup from "./UploadMemberPopup";
+import Dialog from '@mui/material/Dialog';
 
 const useStyles = makeStyles((theme: any) => ({
 	boxRoot: {
 		alignItems: 'center',
 		background: '#fff',
-		borderRadius: '5px',
+		borderRadius: '5px !important',
 		bottom: 0,
 		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), - 3px - 3px 8px rgba(201, 75, 50, 0.1)',
 		display: 'flex',
@@ -64,8 +65,11 @@ export default (props: any) => {
 	const [ownerAddress, setOwnerAddress] = useState("");
 	const [ownerName, setOwnerName] = useState("");
 	const [errors, setErrors] = useState<any>({});
+	const [openAddMemberPopup, setOpenAddMemberPopup] = useState(false);
+
 	const handleClick = () => {
 		hiddenFileInput?.current?.click();
+		setOpenAddMemberPopup(true);
 	}
 
 	const addMemberHandler = () => {
@@ -99,6 +103,9 @@ export default (props: any) => {
 
 	const closePopup = () => {
 		props.closePopup(false);
+	}
+	const closeAddMemberDialog = () => {
+		setOpenAddMemberPopup(false);
 	}
 
 	return (
@@ -158,6 +165,13 @@ export default (props: any) => {
 				<Button variant="outlined" size="small" style={{ border: '2px solid rgb(201, 75, 50)' }} onClick={closePopup}>Cancel</Button>
 				<Button variant="contained" size="small" onClick={addMemberHandler}>Ok</Button>
 			</Box>
+
+			<Dialog
+				open={openAddMemberPopup}
+				onClose={closeAddMemberDialog}
+			>
+				<UploadMemberPopup closePopup={closeAddMemberDialog} />
+			</Dialog>
 		</>
 	)
 }

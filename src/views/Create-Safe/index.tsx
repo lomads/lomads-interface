@@ -10,6 +10,7 @@ import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import Link from '@mui/material/Link';
+import { ExpandMoreOutlined } from '@mui/icons-material';
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
@@ -41,7 +42,7 @@ const useStyles = makeStyles((theme: any) => ({
 	formBox: {
 		background: '#FFFFFF',
 		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
-		borderRadius: '5px',
+		borderRadius: '5px !important',
 		padding: '26px 22px 30px',
 		lineHeight: '35px',
 		marginBottom: '3rem',
@@ -185,6 +186,7 @@ export default () => {
 								<Box style={{ display: 'flex', alignItems: 'center' }}>
 									<FormControl sx={{ m: 1, minWidth: 80 }}>
 										<Select
+											IconComponent={(props) => (<ExpandMoreOutlined {...props} />)}
 											defaultValue={1}
 											displayEmpty
 											inputProps={{ 'aria-label': 'Without label' }}

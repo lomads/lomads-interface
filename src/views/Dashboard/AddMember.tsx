@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme: any) => ({
 		width: '44rem',
 		height: 'auto',
 		background: "#FFFFFF",
-		borderRadius: '5px',
+		borderRadius: '5px !important',
 		marginBottom: '0.1rem'
 	},
 	outerBox: {
@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme: any) => ({
 		width: '44rem',
 		height: 'auto',
 		background: "#FFFFFF",
-		borderRadius: '5px',
+		borderRadius: '5px !important',
 		marginBottom: '0.1rem'
 	}
 }));
@@ -82,7 +82,7 @@ export default (props: any) => {
 										alt="asset"
 										style={{ height: 35, width: 35 }}
 									/>
-									<Typography variant="subtitle2" style={{ marginLeft: '0.8rem' }}>3 Members</Typography>
+									<Typography variant="subtitle2" style={{ marginLeft: '0.8rem' }}>2 Members</Typography>
 								</Box>
 								<Button variant='contained' color='secondary' size="small" style={{ color: "#B12F15" }} onClick={addMember}>Add Member</Button>
 								<img src={editIcon} alt="edit" style={{ cursor: 'pointer' }} onClick={editMember} />
@@ -93,9 +93,11 @@ export default (props: any) => {
 								{memberDetails.map(item => {
 									return (
 										<Box display={"flex"} flexDirection="row" columnGap={"3rem"} alignItems="center">
-											<img src={daoMember2} />
-											<Typography>{item.name}</Typography>
-											<Typography>{item.walletAddress}</Typography>
+											<Box style={{display:'flex', alignItems:'center'}}>
+												<img src={daoMember2} />
+												<Typography style={{marginLeft:'1rem'}}>{item.name}</Typography>
+											</Box>
+											<Typography style={{fontStyle:'italic'}}>{item.walletAddress}</Typography>
 											<Box style={{ display: 'flex', alignItems: 'center' }}>
 												<hr className={classes.verticalDivider} />
 												<Typography>{item.joinDate}</Typography>
@@ -113,6 +115,7 @@ export default (props: any) => {
 				</Grid>
 			</Grid >
 			<Drawer
+				style={{ zIndex: 1999 }}
 				anchor="right"
 				open={openDrawer}
 				onClose={handleCloseDrawer}

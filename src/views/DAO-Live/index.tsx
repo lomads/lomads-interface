@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme: any) => ({
 		maxHeight: 'fit-content',
 		display: 'flex',
 		flexDirection: 'column',
-		alignItems: 'center',
+		// alignItems: 'center',
 		justifyContent: 'center',
 		overflow: 'hidden !important'
 	},
@@ -37,11 +37,10 @@ export default () => {
 		<>
 			<Grid container className={classes.root}>
 				<Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
-					<img src={lomadslogodark} alt="logo" />
+					<img src={lomadslogodark} alt="logo" style={{marginTop:'2rem'}} />
 					<Typography style={{ color: '#76808D', fontSize: '22px', marginTop: '6rem', marginBottom: '2rem' }}>Well done!</Typography>
 					<Typography style={{ color: '#C94B32', fontSize: '35px', fontFamily: 'Insignia', fontStyle: 'normal', fontWeight: 400, marginBottom: '2rem' }}>Your DAO is live!</Typography>
 					<Typography style={{ color: '#76808D', fontStyle: 'italic', fontWeight: 400, lineHeight: '25px', fontSize: '16px' }}>you will be redirected to the dashboard in a few seconds</Typography>
-					<img src={GroupEnjoy} alt="Congrats" className="groupenjoy" />
 					{colors.map((result: Colorstype) => {
 						return (
 							<Box
@@ -58,7 +57,7 @@ export default () => {
 						);
 					})}
 				</Grid>
-
+				<img src={GroupEnjoy} alt="Congrats" className="groupenjoy" />
 			</Grid>
 		</>
 	)

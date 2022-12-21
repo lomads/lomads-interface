@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme: any) => ({
 	formBox: {
 		background: '#FFFFFF',
 		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
-		borderRadius: '5px',
+		borderRadius: '5px !important',
 		padding: '26px 22px 30px',
 		lineHeight: '35px',
 		marginBottom: '3rem'

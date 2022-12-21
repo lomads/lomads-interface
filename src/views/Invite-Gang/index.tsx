@@ -15,7 +15,8 @@ import Link from '@mui/material/Link';
 import { ethers } from "ethers";
 import Button from 'components/Button';
 import { ExpandMoreOutlined } from '@mui/icons-material';
-
+import UploadMemberPopup from "../Dashboard/UploadMemberPopup";
+import Dialog from '@mui/material/Dialog';
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
@@ -33,7 +34,7 @@ const useStyles = makeStyles((theme: any) => ({
 	formBox: {
 		background: '#FFFFFF',
 		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
-		borderRadius: '5px',
+		borderRadius: '5px !important',
 		padding: '26px 22px 30px',
 		lineHeight: '35px',
 		width: '60%'
@@ -72,11 +73,11 @@ const useStyles = makeStyles((theme: any) => ({
 	contributorDetailsBox: {
 		display: 'flex',
 		// justifyContent: 'space-between',
-		columnGap:'8rem',
+		columnGap: '3rem',
 		alignItems: 'center',
 		width: '100%',
 		marginBottom: '0.875rem',
-		
+
 	},
 
 }));
@@ -88,10 +89,12 @@ export default () => {
 	const [ownerAddress, setOwnerAddress] = useState("");
 	const [ownerName, setOwnerName] = useState("");
 	const [errors, setErrors] = useState<any>({});
+	const [openAddMemberPopup, setOpenAddMemberPopup] = useState(false);
 
 	const navigate = useNavigate();
 	const handleClick = () => {
 		hiddenFileInput?.current?.click();
+		setOpenAddMemberPopup(true);
 	}
 
 	const options = [
@@ -100,10 +103,7 @@ export default () => {
 		{ value: 'CORE_CONTRIBUTOR', label: 'Core Contributor' },
 	];
 
-	const contributor = [
-		{ name: 'Test1', contributor: 'Active Contributor' },
-		{ name: 'Test2', contributor: 'Core Contributor' },
-	]
+	const [contributor, setContributor] = useState<any>([]);
 
 	const handleInvite = () => {
 		navigate('/startsafe');
@@ -128,94 +128,107 @@ export default () => {
 		if (!isAddressValid(ownerAddress)) {
 			setErrors({ ownerAddress: "* Please enter valid address" })
 		}
+		else {
+			setContributor([...contributor, { name: ownerName, contributor: ownerAddress.substring(0, 10) + "....." + ownerAddress.substring(25) }])
+		}
+	}
+
+	const closeAddMemberDialog = () => {
+		setOpenAddMemberPopup(false);
 	}
 
 	return (
 		<>
 			<Container maxWidth="lg">
-			<Grid container className={classes.root}>
-				<Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
-					<Box style={{ marginBottom: '40px' }}>
-						<Typography variant="h1" className={classes.headingText}>2/3 Original Gang</Typography>
-					</Box>
-					<Box className={classes.formBox}>
-						<Box className={classes.upperTitle}>
-							<Typography style={{ color: '#76808D', fontWeight: 700, fontSize: '16px' }}>Add Member :</Typography>
-							<Box className={classes.uploadButtonBox}>
-								<Tooltip title="Please upload .xlsx file with columns containing member name and wallet address" placement="top-start">
-									<Button variant='contained' color='secondary' size="small" onClick={handleClick}>
-										<FileDownloadOutlinedIcon sx={{ fontSize: '1.5rem' }} />OR UPLOAD FILE
-										<input
-											ref={hiddenFileInput}
-											type="file"
-											hidden
-										/></Button>
-
-								</Tooltip>
-							</Box>
+				<Grid container className={classes.root}>
+					<Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
+						<Box style={{ marginBottom: '40px' }}>
+							<Typography variant="h1" className={classes.headingText}>2/3 Original Gang</Typography>
 						</Box>
-						<Box className={classes.inputBox}>
-							<TextInput
-								fullWidth
-								sx={{ marginRight: 1 }}
-								placeholder={"Name"}
-								value={ownerName}
-								onChange={(event: any) => {
-									setOwnerName(event.target.value);
-								}}
-							/>
-							<TextInput
-								fullWidth
-								placeholder={"ENS Domain and Wallet Address"}
-								onChange={(event: any) => {
-									setOwnerAddress(event.target.value);
-									setErrors({ ownerAddress: "" });
-								}}
-								error={errors.ownerAddress ? true : false}
-								helperText={errors.ownerAddress}
-							/>
-							<FormControl sx={{ m: 1, minWidth: 120 }} fullWidth>
-								<Select
-									IconComponent={(props) => (<ExpandMoreOutlined {...props} />)}
-									value={selectContributor}
-									onChange={handleContributorChange}
-								>
-									{options.map(item => {
-										return <MenuItem value={item.value} key={item.value}>{item.label}</MenuItem>
-									})}
+						<Box className={classes.formBox}>
+							<Box className={classes.upperTitle}>
+								<Typography style={{ color: '#76808D', fontWeight: 700, fontSize: '16px' }}>Add Member :</Typography>
+								<Box className={classes.uploadButtonBox}>
+									<Tooltip title="Please upload .xlsx file with columns containing member name and wallet address" placement="top-start">
+										<Button variant='contained' color='secondary' size="small" onClick={handleClick}>
+											<FileDownloadOutlinedIcon sx={{ fontSize: '1.5rem' }} />OR UPLOAD FILE
+											<input
+												ref={hiddenFileInput}
+												type="file"
+												hidden
+											/></Button>
 
-								</Select>
-							</FormControl>
-							<IconButton style={{
-								backgroundColor: isAddressValid(ownerAddress) ? '#C94B32' : 'rgba(27, 43, 65, 0.2)', borderRadius: '5px', height: '50px', width: '55px', marginTop: '9px'
-							}} onClick={addMember}>
-								<AddIcon
-									fontSize="large"
-									sx={{
-										color: '#fff'
+									</Tooltip>
+								</Box>
+							</Box>
+							<Box className={classes.inputBox}>
+								<TextInput
+									fullWidth
+									sx={{ marginRight: 1 }}
+									placeholder={"Name"}
+									value={ownerName}
+									onChange={(event: any) => {
+										setOwnerName(event.target.value);
 									}}
 								/>
-							</IconButton>
-						</Box>
-					</Box>
-					<Box display="flex" flexDirection="column" alignItems="center" className={classes.bottomBox}>
-						{contributor.map(item => {
-							return <Box 
-							className={classes.contributorDetailsBox}>
-								<img src={daoMember2} />
-								<Typography style={{ textAlign: 'left' }}>{item.name}</Typography>
-								<Typography style={{ textAlign: 'left' }}>{item.contributor}</Typography>
+								<TextInput
+									fullWidth
+									placeholder={"ENS Domain and Wallet Address"}
+									onChange={(event: any) => {
+										setOwnerAddress(event.target.value);
+										setErrors({ ownerAddress: "" });
+									}}
+									error={errors.ownerAddress ? true : false}
+									helperText={errors.ownerAddress}
+								/>
+								<FormControl sx={{ m: 1, minWidth: 120 }} fullWidth>
+									<Select
+										IconComponent={(props) => (<ExpandMoreOutlined {...props} />)}
+										value={selectContributor}
+										onChange={handleContributorChange}
+									>
+										{options.map(item => {
+											return <MenuItem value={item.value} key={item.value}>{item.label}</MenuItem>
+										})}
+
+									</Select>
+								</FormControl>
+								<IconButton style={{
+									backgroundColor: isAddressValid(ownerAddress) ? '#C94B32' : 'rgba(27, 43, 65, 0.2)', borderRadius: '5px', height: '50px', width: '55px', marginTop: '9px'
+								}} onClick={addMember}>
+									<AddIcon
+										fontSize="large"
+										sx={{
+											color: '#fff'
+										}}
+									/>
+								</IconButton>
 							</Box>
-						})
-						}
-					</Box>
-					<Button variant='contained' color='primary' className={classes.buttonStyle} onClick={handleInvite}>
-						Invite
-					</Button>
-					<Link href="/startsafe" underline="always" style={{ marginTop: '1rem' }}>Skip</Link>
+						</Box>
+						{contributor.length > 0 && <Box display="flex" flexDirection="column" alignItems="center" className={classes.bottomBox}>
+							{contributor.map((item: any) => {
+								return <Box
+									className={classes.contributorDetailsBox}>
+									<img src={daoMember2} />
+									<Typography style={{ textAlign: 'left' }}>{item.name}</Typography>
+									<Typography style={{ textAlign: 'left', fontStyle: 'italic' }}>{item.contributor}</Typography>
+								</Box>
+							})
+							}
+						</Box>}
+						<Button variant='contained' color='primary' className={classes.buttonStyle} onClick={handleInvite} style={{ marginTop: '3rem' }}>
+							Invite
+						</Button>
+						<Link href="/startsafe" underline="always" style={{ marginTop: '1rem' }}>Skip</Link>
+					</Grid>
 				</Grid>
-			</Grid>
 			</Container>
+			<Dialog
+				open={openAddMemberPopup}
+				onClose={closeAddMemberDialog}
+			>
+				<UploadMemberPopup closePopup={closeAddMemberDialog} />
+			</Dialog>
 		</>
 	)
 }

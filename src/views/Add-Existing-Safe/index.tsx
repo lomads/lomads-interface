@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme: any) => ({
 	formBox: {
 		background: '#FFFFFF',
 		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
-		borderRadius: '5px',
+		borderRadius: '5px !important',
 		padding: '26px 22px 30px',
 		lineHeight: '35px',
 		marginBottom: '3rem',
@@ -64,7 +64,7 @@ const useStyles = makeStyles((theme: any) => ({
 		padding: '25px',
 		width: '600px',
 		background: '#FFFFFF',
-		borderRadius: '5px',
+		borderRadius: '5px !important',
 		marginBottom: '5px',
 		minHeight: ''
 	},
@@ -147,100 +147,102 @@ export default () => {
 
 	return (
 		<>
-			<Grid container className={classes.root}>
-				<Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
-					<Box style={{ marginBottom: '40px' }}>
-						<Typography variant="h1" className={classes.headingText}>3/3 DAO Treasury</Typography>
-					</Box>
-					<Box className={classes.detailBox}>
-						<Button style={{
-							backgroundColor: '#FFFFFF',
-							boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
-							borderRadius: '5px',
-							color: newSafe ? 'rgb(201, 75, 50)' : 'rgba(201, 75, 50, 0.6)'
-						}} onClick={selectSafeClicked('new')}>Create New Safe</Button>
-						<Typography style={{ marginLeft: '1rem', marginRight: '1rem', color: '#C94B32', fontSize: '20px' }}>or</Typography>
-						<Button style={{
-							backgroundColor: '#FFFFFF',
-							boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
-							borderRadius: '5px',
-							color: existingSafe ? 'rgb(201, 75, 50)' : 'rgba(201, 75, 50, 0.6)'
-						}} onClick={selectSafeClicked('existing')}>Add Existing Safe</Button>
-					</Box>
-					<hr className={classes.divider} />
-					{findSafeBtnClicked &&
-						<Box className={classes.formBox}>
-							<TextInput
-								style={{ marginRight: '1rem' }}
-								fullWidth
-								label={"Safe Name"}
-								placeholder={"Pied Piper"}
-							>
-							</TextInput>
-							<TextInput
-								style={{ marginRight: '1rem' }}
-								value={safeAddress}
-								fullWidth
-								label={"Safe Address"}
-								placeholder={"0xbeee39"}
-								onChange={(event: any) => {
-									setSafeAddress(event.target.value);
-									setErrors({ safeAddress: "" })
-								}}
-								error={errors.safeAddress ? true : false}
-								helperText={errors.safeAddress}
-							>
-							</TextInput>
-						</Box>}
-					{findSafeBtnClicked &&
-						<Button variant='contained' color='primary' size={"medium"} onClick={findSafeHandler} style={{ backgroundColor: isAddressValid(safeAddress) ? "#C94B32" : "rgba(27, 43, 65, 0.2)" }}>
-							Find Safe
-						</Button>
-					}
+			<Container maxWidth="lg">
+				<Grid container className={classes.root}>
+					<Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
+						<Box style={{ marginBottom: '40px' }}>
+							<Typography variant="h1" className={classes.headingText}>3/3 DAO Treasury</Typography>
+						</Box>
+						<Box className={classes.detailBox}>
+							<Button style={{
+								backgroundColor: '#FFFFFF',
+								boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
+								borderRadius: '5px',
+								color: newSafe ? 'rgb(201, 75, 50)' : 'rgba(201, 75, 50, 0.6)'
+							}} onClick={selectSafeClicked('new')}>Create New Safe</Button>
+							<Typography style={{ marginLeft: '1rem', marginRight: '1rem', color: '#C94B32', fontSize: '20px' }}>or</Typography>
+							<Button style={{
+								backgroundColor: '#FFFFFF',
+								boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
+								borderRadius: '5px',
+								color: existingSafe ? 'rgb(201, 75, 50)' : 'rgba(201, 75, 50, 0.6)'
+							}} onClick={selectSafeClicked('existing')}>Add Existing Safe</Button>
+						</Box>
+						<hr className={classes.divider} />
+						{findSafeBtnClicked &&
+							<Box className={classes.formBox}>
+								<TextInput
+									style={{ marginRight: '1rem' }}
+									fullWidth
+									label={"Safe Name"}
+									placeholder={"Pied Piper"}
+								>
+								</TextInput>
+								<TextInput
+									style={{ marginRight: '1rem' }}
+									value={safeAddress}
+									fullWidth
+									label={"Safe Address"}
+									placeholder={"0xbeee39"}
+									onChange={(event: any) => {
+										setSafeAddress(event.target.value);
+										setErrors({ safeAddress: "" })
+									}}
+									error={errors.safeAddress ? true : false}
+									helperText={errors.safeAddress}
+								>
+								</TextInput>
+							</Box>}
+						{findSafeBtnClicked &&
+							<Button variant='contained' color='primary' size={"medium"} onClick={findSafeHandler} style={{ backgroundColor: isAddressValid(safeAddress) ? "#C94B32" : "rgba(27, 43, 65, 0.2)" }}>
+								Find Safe
+							</Button>
+						}
 
-					{!findSafeBtnClicked &&
-						<>
-							<Paper elevation={2} className={classes.safeBox}>
-								<Box className={classes.safeDetails}>
-									<TextField id="outlined-basic" label="" variant="outlined" size="small" placeholder="Pied Piper" />
-									<Box style={{ borderLeft: '1.5px solid rgba(118, 128, 141, 0.5)', height: '35px' }}></Box>
-									<Typography>https://hgghfcxdfXDFXQtreasury</Typography>
+						{!findSafeBtnClicked &&
+							<>
+								<Paper elevation={1} className={classes.safeBox}>
+									<Box className={classes.safeDetails}>
+										<TextField id="outlined-basic" label="" variant="outlined" size="small" placeholder="Pied Piper" />
+										<Box style={{ borderLeft: '1.5px solid rgba(118, 128, 141, 0.5)', height: '35px' }}></Box>
+										<Typography style={{fontStyle:'italic'}}>https://hgghfcxdfXDFXQtreasury</Typography>
+									</Box>
+								</Paper>
+								<Paper elevation={1} className={classes.safeBox}>
+									<Box className={classes.costDetails}>
+										<img src={coin} />
+										<Typography style={{ color: '#188C7C', marginLeft: '1rem' }}>$ 238.3569</Typography>
+									</Box>
+								</Paper>
+								<Paper elevation={1} className={classes.safeBox}>
+									<Typography style={{ fontSize: '18px', fontWeight: '800', marginBottom: '1rem' }}>2 owners :</Typography>
+									<Box className={classes.ownerBox}>
+										{ownersAvailable.map(item => {
+											return (
+												<Box className={classes.ownerDetails}>
+													<TextField id="outlined-basic" label="" variant="outlined" size="small" placeholder="Name" style={{ marginRight: '1rem' }} />
+													<Typography>{item}</Typography>
+												</Box>
+											)
+										})}
+									</Box>
+								</Paper>
+								<Box style={{ textAlign: 'center', marginTop: '1rem' }}>
+									<Typography>By continuing you consent to the terms of use and privacy policy of Gnosis Safe</Typography>
 								</Box>
-							</Paper>
-							<Paper elevation={2} className={classes.safeBox}>
-								<Box className={classes.costDetails}>
-									<img src={coin} />
-									<Typography style={{ color: '#188C7C', marginLeft: '1rem' }}>$ 238.3569</Typography>
+								<Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+									<Button variant='outlined' color='primary' size={"medium"} style={{ marginTop: '1.5rem', marginRight: '1rem', backgroundColor: 'white' }} onClick={changeSafeHandler}>
+										Change Safe
+									</Button>
+									<Button variant='contained' color='primary' size={"medium"} style={{ marginTop: '1.5rem' }} onClick={goToDAOSuccess}>
+										Add Safe
+									</Button>
 								</Box>
-							</Paper>
-							<Paper elevation={2} className={classes.safeBox}>
-								<Typography style={{ fontSize: '18px', fontWeight: '800', marginBottom: '1rem' }}>2 Owners :</Typography>
-								<Box className={classes.ownerBox}>
-									{ownersAvailable.map(item => {
-										return (
-											<Box className={classes.ownerDetails}>
-												<TextField id="outlined-basic" label="" variant="outlined" size="small" placeholder="Name" style={{ marginRight: '1rem' }} />
-												<Typography>{item}</Typography>
-											</Box>
-										)
-									})}
-								</Box>
-							</Paper>
-							<Box style={{ textAlign: 'center', marginTop: '1rem' }}>
-								<Typography>By continuing you consent to the terms of use and privacy policy of Gnosis Safe</Typography>
-							</Box>
-							<Box style={{ display: 'flex', justifyContent: 'space-between' }}>
-								<Button variant='outlined' color='primary' size={"medium"} style={{ marginTop: '1.5rem', marginRight: '1rem', backgroundColor: 'white' }} onClick={changeSafeHandler}>
-									Change Safe
-								</Button>
-								<Button variant='contained' color='primary' size={"medium"} style={{ marginTop: '1.5rem' }} onClick={goToDAOSuccess}>
-									Add Safe
-								</Button>
-							</Box>
-						</>
-					}
+							</>
+						}
+					</Grid>
 				</Grid>
-			</Grid>
+			</Container>
 		</>
 	)
 }
