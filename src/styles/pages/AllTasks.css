@@ -152,3 +152,10 @@
     flex-direction: column;
     border-right: 1px solid rgba(118, 128, 141, 0.25);
 }
+
+.allTasks-container .allTask-container {
+    width: 100%;
+    /* padding: 10px; */
+    display: flex;
+    flex-wrap: wrap;
+}

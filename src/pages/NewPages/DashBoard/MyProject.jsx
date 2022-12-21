@@ -45,16 +45,16 @@ const MyProject = () => {
         if (DAO && DAO.url === daoURL) {
             let myProjects = _get(DAO, 'projects', []).filter(project => !project.deletedAt && !project.archivedAt && _find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase()));
             myProjects = myProjects.map(p => {
-                let prj = {...p, notification: 0}
-                if(notificationCount(prj) > 0)
+                let prj = { ...p, notification: 0 }
+                if (notificationCount(prj) > 0)
                     prj.notification = 1
                 return prj;
             })
             setMyProjects(_orderBy(myProjects, ['notification', p => moment(p.createdAt).unix()], ['desc', 'desc']))
             let otherProjects = _get(DAO, 'projects', []).filter(project => !project.deletedAt && !project.archivedAt && !_find(project.members, m => m.wallet.toLowerCase() === account.toLowerCase()))
             otherProjects = otherProjects.map(p => {
-                let prj = {...p, notification: 0}
-                if(notificationCount(prj) > 0)
+                let prj = { ...p, notification: 0 }
+                if (notificationCount(prj) > 0)
                     prj.notification = 1
                 return prj;
             })
@@ -63,7 +63,6 @@ const MyProject = () => {
     }, [DAO, tab]);
 
     useEffect(() => {
-        console.log("myProjects", myProjects)
         if (!initialCheck) {
             if (myProjects.length > 0) {
                 setInitialCheck(true)
@@ -90,12 +89,12 @@ const MyProject = () => {
                 <div className="myproject-title">
                     <>
                         <button className={tab === 1 ? 'active' : null} onClick={() => setTab(1)}>
-                            My projects
+                            My workspace
                         </button>
                         <div className="divider"></div>
                     </>
                     <button className={tab === 2 ? 'active' : null} onClick={() => setTab(2)}>
-                        All projects
+                        All workspaces
                     </button>
                 </div>
                 <div className="myproject-buttons">
@@ -132,17 +131,29 @@ const MyProject = () => {
             {
                 tab === 1
                     ?
-                    <div className='myproject-body'>
+                    <div className='myproject-body-fixed'>
                         {
-                            myProjects.length > 0 && myProjects.map((item, index) => {
-                                if (item.deletedAt === null && item.archivedAt === null) {
+                            myProjects.length > 0 && myProjects.filter((item, index) => index < 6).map((item, index) => {
+                                if (index <= 4) {
+                                    if (item.deletedAt === null && item.archivedAt === null) {
+                                        return (
+                                            <div key={index}>
+                                                <ProjectCard
+                                                    project={item}
+                                                    daoUrl={DAO?.url}
+                                                    tab={tab}
+                                                />
+                                            </div>
+                                        )
+                                    }
+                                }
+                                else {
                                     return (
-                                        <div key={index}>
-                                            <ProjectCard
-                                                project={item}
-                                                daoUrl={DAO?.url}
-                                                tab={tab}
-                                            />
+                                        <div
+                                            className='all-project'
+                                            onClick={() => { navigate(`/${DAO.url}/projects`, { state: { activeTab: tab } }) }}
+                                        >
+                                            <span>Show All</span>
                                         </div>
                                     )
                                 }
@@ -160,17 +171,26 @@ const MyProject = () => {
                         {
                             otherProjects.length > 0
                                 ?
-                                <div className='myproject-body-fixed' style={otherProjects.length > 9 ? { overflow: 'scroll', height: '375px' } : { height: 'auto' }}>
+                                <div className='myproject-body-fixed'>
                                     {
-                                        otherProjects.map((item, index) => {
-                                            if (item.deletedAt === null && item.archivedAt === null) {
+                                        otherProjects.filter((item, index) => index < 6).map((item, index) => {
+                                            if (index <= 4) {
+                                                if (item.deletedAt === null && item.archivedAt === null) {
+                                                    return (
+                                                        <div key={index}>
+                                                            <ProjectCard
+                                                                project={item}
+                                                                daoUrl={DAO?.url}
+                                                                tab={tab}
+                                                            />
+                                                        </div>
+                                                    )
+                                                }
+                                            }
+                                            else {
                                                 return (
-                                                    <div key={index}>
-                                                        <ProjectCard
-                                                            project={item}
-                                                            daoUrl={DAO?.url}
-                                                            tab={tab}
-                                                        />
+                                                    <div className='all-project' onClick={() => { navigate(`/${DAO.url}/projects`, { state: { activeTab: tab } }) }}>
+                                                        <span>Show All</span>
                                                     </div>
                                                 )
                                             }

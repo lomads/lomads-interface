@@ -129,7 +129,7 @@ const MemberCard = (props: any) => {
 							<div className="dashboardText"></div>
 						</div>
 					</div>
-					{ _uniqBy(membersArray, (m: any) => m.member.wallet.toLowerCase()).map((result: any, index: any) => {
+					{_uniqBy(membersArray, (m: any) => m.member.wallet.toLowerCase()).map((result: any, index: any) => {
 						return (
 							<NameAndAvatar
 								name={_get(result, 'member.name', '')}

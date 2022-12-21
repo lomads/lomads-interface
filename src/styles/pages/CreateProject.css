@@ -1,7 +1,6 @@
 .createProject-container {
     width: 100%;
-    height: 100vh;
-    /* padding-top: 20vh; */
+    /* height: 100vh; */
     background: linear-gradient(180deg, #FDF7F7 0%, #F3F2F2 100%);
     display: flex;
     flex-direction: column;
@@ -73,6 +72,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     margin-top: 10vh;
     /* margin: 10vh 0; */
 }
@@ -167,6 +167,18 @@
     justify-content: space-between;
 }
 
+.createProject-container .createProject-body .projectName-container .projectName-box .name-btn h1 {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 25px;
+    /* identical to box height, or 114% */
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+}
+
 .createProject-container .createProject-body .projectName-container .projectName-box .name-btn button {
     background: #FFFFFF;
     /* Color-drop */
@@ -180,14 +192,28 @@
     color: #C94B32;
 }
 
-.createProject-container .createProject-body .projectName-container .projectName-box p {
+.createProject-container .createProject-body .projectName-container .projectName-box .project-name {
     font-style: normal;
     font-weight: 400;
     font-size: 22px;
     line-height: 25px;
+    /* identical to box height, or 114% */
     letter-spacing: -0.011em;
+
+    /* Grey */
     color: #76808D;
-    margin-bottom: 0.5rem;
+    margin-bottom: 10px;
+}
+
+.createProject-container .createProject-body .projectName-container .projectName-box p {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    /* identical to box height, or 114% */
+
+    /* DARK */
+    color: #1B2B41;
 }
 
 .createProject-container .createProject-body .projectName-container .projectName-box span {
@@ -201,6 +227,125 @@
     /* Grey */
     color: #76808D;
 }
+
+.createProject-container .createProject-body .projectName-container .projectName-box .link-li {
+    width: 100%;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(118, 128, 141, 0.05);
+    /* SMALL-inputs */
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 0 15px;
+}
+
+.createProject-container .createProject-body .projectName-container .projectName-box .link-li:last-child {
+    margin: 0;
+}
+
+.createProject-container .createProject-body .projectName-container .projectName-box .link-li .link-icon-name {
+    display: flex;
+    width: 50%;
+}
+
+.createProject-container .createProject-body .projectName-container .projectName-box .link-li .link-icon-name span {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    /* identical to box height, or 107% */
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+}
+
+.createProject-container .createProject-body .projectName-container .projectName-box .link-li .link-address {
+    display: flex;
+    width: 50%;
+}
+
+.createProject-container .createProject-body .projectName-container .projectName-box .link-li .link-address span {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    /* identical to box height, or 107% */
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+    margin-right: 10px;
+}
+
+
+.createProject-container .createProject-body .projectName-container .projectName-box .milestone-card {
+    width: 100%;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(118, 128, 141, 0.05);
+    /* SMALL-inputs */
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 0 15px;
+}
+
+.createProject-container .createProject-body .projectName-container .projectName-box .milestone-card.done {
+    background: rgba(24, 140, 124, 0.1);
+}
+
+.createProject-container .createProject-body .projectName-container .projectName-box .milestone-card div {
+    display: flex;
+    align-items: center;
+}
+
+.createProject-container .createProject-body .projectName-container .projectName-box .milestone-card div span {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 15px;
+    /* identical to box height, or 107% */
+    letter-spacing: -0.011em;
+
+    /* RED */
+    color: #C94B32;
+    margin-right: 0.5rem;
+}
+
+.createProject-container .createProject-body .projectName-container .projectName-box .milestone-card.done div span {
+    color: #188C7C;
+}
+
+.createProject-container .createProject-body .projectName-container .projectName-box .milestone-card div h1 {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 15px;
+    /* identical to box height, or 107% */
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 .createProject-container .createProject-body .projectName-container .projectName-btn {
     width: 15%;

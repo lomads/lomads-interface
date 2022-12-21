@@ -37,7 +37,9 @@ import {
 	deleteTask,
 	toggleXPPoints,
 	updateContract,
-	loadRecurringPayments
+	loadRecurringPayments,
+	updateKRA,
+	updateMilestone,
 } from "./actions";
 import { createContract } from "state/contract/actions";
 import { get as _get, find as _find } from "lodash";
@@ -81,6 +83,8 @@ export interface DashboardState {
 	updateContractLoading: boolean | null;
 	recurringPayments: any;
 	recurringPaymentsLoading: boolean | null;
+	updateKraLoading: boolean | null;
+	updateMilestoneLoading: boolean | null;
 }
 
 const initialState: DashboardState = {
@@ -121,7 +125,9 @@ const initialState: DashboardState = {
 	deleteTaskLoading: null,
 	updateContractLoading: null,
 	recurringPayments: null,
-	recurringPaymentsLoading: null
+	recurringPaymentsLoading: null,
+	updateKraLoading: null,
+	updateMilestoneLoading: null,
 };
 
 const dashboardSlice = createSlice({
@@ -226,6 +232,12 @@ const dashboardSlice = createSlice({
 		},
 		resetUpdateContractLoading(state, action) {
 			state.updateContractLoading = null
+		},
+		resetUpdateKraLoader(state) {
+			state.updateKraLoading = null
+		},
+		resetUpdateMilestoneLoader(state) {
+			state.updateMilestoneLoading = null
 		},
 		updateSafeTransaction(state, action) {
 			console.log(action.payload)
@@ -563,6 +575,7 @@ const dashboardSlice = createSlice({
 		[`${toggleXPPoints.fulfilled}`]: (state, action) => {
 			state.DAO = action.payload;
 		},
+		// Update contract
 		[`${updateContract.fulfilled}`]: (state, action) => {
 			state.updateContractLoading = false
 			state.DAO = action.payload;
@@ -576,7 +589,25 @@ const dashboardSlice = createSlice({
 		},
 		[`${loadRecurringPayments.pending}`]: (state, action) => {
 			state.recurringPaymentsLoading = true
-		}
+		},
+		// update kra
+		[`${updateKRA.fulfilled}`]: (state, action) => {
+			state.updateKraLoading = false;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
+		},
+		[`${updateKRA.pending}`]: (state) => {
+			state.updateKraLoading = true;
+		},
+		// update milestone
+		[`${updateMilestone.fulfilled}`]: (state, action) => {
+			state.updateMilestoneLoading = false;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
+		},
+		[`${updateMilestone.pending}`]: (state) => {
+			state.updateMilestoneLoading = true;
+		},
 	},
 });
 
@@ -615,6 +646,8 @@ export const {
 	resetArchiveTaskLoader,
 	resetDeleteTaskLoader,
 	resetUpdateContractLoading,
-	setRecurringPayments
+	setRecurringPayments,
+	resetUpdateKraLoader,
+	resetUpdateMilestoneLoader
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

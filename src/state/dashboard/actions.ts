@@ -404,4 +404,27 @@ export const createRecurringPayment = createAsyncThunk(
 			.catch(e => thunkApi.rejectWithValue(e))
 	}
 )
+export const updateKRA = createAsyncThunk(
+	'dao/updateKRA',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`project/${params.projectId}/update-kra?daoUrl=${params.daoUrl}`, params.payload)
+			.then(res => res.data)
+			.catch(e => {
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
+	}
+);
+
+export const updateMilestone = createAsyncThunk(
+	'dao/updateMilestone',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`project/${params.projectId}/update-milestones?daoUrl=${params.daoUrl}`, params.payload)
+			.then(res => res.data)
+			.catch(e => {
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
+	}
+);
 

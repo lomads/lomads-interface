@@ -274,7 +274,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                         else {
                             return (
                                 <div className='all-tasks' onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { activeTab: tab } }) : navigate(`/${DAO.url}/tasks`, { state: { activeTab: tab } }) }}>
-                                    <p>Show All</p>
+                                    <span>Show All</span>
                                 </div>
                             )
                         }
@@ -295,7 +295,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                         else {
                             return (
                                 <div className='all-tasks' onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { activeTab: tab } }) : navigate(`/${DAO.url}/tasks`, { state: { activeTab: tab } }) }}>
-                                    <p>Show All</p>
+                                    <span>Show All</span>
                                 </div>
                             )
                         }
@@ -316,7 +316,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                         else {
                             return (
                                 <div className='all-tasks' onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { activeTab: tab } }) : navigate(`/${DAO.url}/tasks`, { state: { activeTab: tab } }) }}>
-                                    <p>Show All</p>
+                                    <span>Show All</span>
                                 </div>
                             )
                         }
@@ -337,7 +337,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                         else {
                             return (
                                 <div className='all-tasks' onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { activeTab: tab } }) : navigate(`/${DAO.url}/tasks`, { state: { activeTab: tab } }) }}>
-                                    <p>Show All</p>
+                                    <span>Show All</span>
                                 </div>
                             )
                         }

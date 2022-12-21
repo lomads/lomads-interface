@@ -71,7 +71,7 @@ const SideModal = (props: IsideModal) => {
 		});
 	};
 	const transactionData = useRef<TransactionDataType[]>([]);
-	
+
 
 	const toggleAddNewRecipient = () => {
 		setAddNewRecipient(!addNewRecipient);
@@ -81,7 +81,7 @@ const SideModal = (props: IsideModal) => {
 		setisLoading(true);
 		const nonce = moment().unix();
 		let payload = {}
-		if(setRecipient.current.length > 1){
+		if (setRecipient.current.length > 1) {
 			payload = {
 				daoId: _get(DAO, '_id', undefined),
 				safe: props.safeAddress,
@@ -89,13 +89,13 @@ const SideModal = (props: IsideModal) => {
 				nonce,
 				executor: account,
 				submissionDate: moment().utc().toDate(),
-				token:{
+				token: {
 					symbol: 'SWEAT',
 					tokenAddress: 'SWEAT',
 				},
 				confirmations: isSafeOwner ? [{
 					owner: account,
-					submissionDate:  moment().utc().toDate()
+					submissionDate: moment().utc().toDate()
 				}] : [],
 				dataDecoded: {
 					method: "multiSend",
@@ -122,13 +122,13 @@ const SideModal = (props: IsideModal) => {
 				safeTxHash: nanoid(32),
 				executor: account,
 				submissionDate: moment().utc().toDate(),
-				token:{
+				token: {
 					symbol: 'SWEAT',
 					tokenAddress: 'SWEAT',
 				},
 				confirmations: isSafeOwner ? [{
 					owner: account,
-					submissionDate:  moment().utc().toDate()
+					submissionDate: moment().utc().toDate()
 				}] : [],
 				dataDecoded: {
 					method: 'transfer',
@@ -140,36 +140,37 @@ const SideModal = (props: IsideModal) => {
 			}
 		}
 		axiosHttp.post('transaction/off-chain', payload)
-		.then(res => {
-			console.log(res);
-			let payload: any[] = [];
-			setRecipient.current.map(r => {
-				payload.push({
-					safeAddress: _get(DAO, 'safe.address', null),
-					safeTxHash: res.data.safeTxHash,
-					recipient: r.recipient,
-					label: _get(r, 'reason', null)
+			.then(res => {
+				console.log(res);
+				let payload: any[] = [];
+				setRecipient.current.map(r => {
+					payload.push({
+						safeAddress: _get(DAO, 'safe.address', null),
+						safeTxHash: res.data.safeTxHash,
+						recipient: r.recipient,
+						label: _get(r, 'reason', null)
+					})
 				})
+				axiosHttp.post(`transaction/label`, payload)
+					.then(async () => {
+						dispatch(getDao(DAO.url))
+						await props.getPendingTransactions();
+						showNavigation(false, true, false);
+						setisLoading(false);
+					})
 			})
-			axiosHttp.post(`transaction/label`, payload)
-			.then(async () => {
-				dispatch(getDao(DAO.url))
-				await props.getPendingTransactions();
-				showNavigation(false, true, false);
-				setisLoading(false);
-			})
-		})
-		.finally(() => setisLoading(false))
+			.finally(() => setisLoading(false))
 	}
 
 	const createTransaction = async () => {
 		setError(null)
-		if(selectedToken === 'SWEAT') {
+		if (selectedToken === 'SWEAT') {
 			return createOffChainTxn()
 		}
 		try {
+
 			const txnResponse = await createSafeTransaction({ tokenAddress: selectedToken, send: setRecipient.current });
-			if(txnResponse?.safeTxHash) {
+			if (txnResponse?.safeTxHash) {
 				dispatch(getDao(DAO.url))
 				await props.getPendingTransactions();
 				showNavigation(false, true, false);

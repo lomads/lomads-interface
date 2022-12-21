@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { get as _get, find as _find, uniqBy as _uniqBy } from 'lodash';
-import SideBar from "./DashBoard/SideBar";
 import SafeButton from "UIpack/SafeButton";
 import '../../styles/pages/ProjectDetails.css';
 import { LeapFrog } from "@uiball/loaders";
@@ -9,8 +8,9 @@ import lomadsfulllogo from "../../assets/svg/lomadsfulllogo.svg";
 import membersGroup from '../../assets/svg/membersGroup.svg'
 import iconSvg from '../../assets/svg/createProject.svg';
 import axios from "axios";
+
+import archiveIcon from '../../assets/svg/archiveIcon.svg';
 import editToken from '../../assets/svg/editToken.svg';
-import editPen from '../../assets/svg/editPen.svg';
 import deleteIcon from '../../assets/svg/deleteIcon.svg';
 import memberIcon from '../../assets/svg/memberIcon.svg';
 import lock from '../../assets/svg/lock.svg';
@@ -20,6 +20,7 @@ import { useAppSelector, useAppDispatch } from "state/hooks";
 
 import { SiNotion } from "react-icons/si";
 import { HiOutlinePlus } from "react-icons/hi";
+import { FiCheck } from "react-icons/fi";
 import { CgClose } from 'react-icons/cg'
 import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe } from "react-icons/bs";
 import AddMember from "./DashBoard/MemberCard/AddMember";
@@ -37,6 +38,7 @@ import { useSBTStats } from "hooks/SBT/sbt";
 import axiosHttp from '../../api';
 import { updateCurrentUser } from "state/dashboard/actions";
 
+import { IoIosArrowBack } from 'react-icons/io'
 import SimpleInputField from "UIpack/SimpleInputField";
 import Tasks from "./DashBoard/Tasks";
 import CreateTask from "./DashBoard/Task/CreateTask";
@@ -45,6 +47,13 @@ import { Editor } from '@tinymce/tinymce-react';
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import useDCAuth from 'hooks/useDCAuth';
 import { usePrevious } from 'hooks/usePrevious';
+
+import "react-step-progress-bar/styles.css";
+import { ProgressBar, Step } from "react-step-progress-bar";
+import AssignContributions from "./DashBoard/Project/AssignContributions";
+import KRAReview from "./DashBoard/Project/KRAReview";
+
+import moment from "moment";
 
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
@@ -86,6 +95,13 @@ const ProjectDetails = () => {
     const [showCreateTask, setShowCreateTask] = useState(false);
     const [hasClickedAuth, setHasClickedAuth] = useState(false)
 
+    const [showAssign, setShowAssign] = useState(false);
+    const [showKRAReview, setShowKRAReview] = useState(false);
+
+    const [tab, setTab] = useState(null);
+
+    const [selectedMilestone, setSelectedMilestone] = useState(null);
+
     useEffect(() => {
         if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
             dispatch(getDao(daoURL))
@@ -114,7 +130,18 @@ const ProjectDetails = () => {
             p = `${permission}.creator`
         console.log(p)
         return (can(myRole, p) || can(myRole, permission))
-    }, [Project])
+    }, [Project]);
+
+    useEffect(() => {
+        if (Project) {
+            if (_get(Project, 'milestones', []).length > 0) {
+                setTab(1);
+            }
+            else if (_get(Project, 'milestones', []).length === 0 && _get(Project, 'kra.results', []).length > 0) {
+                setTab(2);
+            }
+        }
+    }, [Project]);
 
 
     // Runs after adding new members in project
@@ -422,6 +449,15 @@ const ProjectDetails = () => {
         setShowCreateTask(!showCreateTask);
     };
 
+    const selectMilestone = (item, index) => {
+        if (!item.complete) {
+            let e = { ...item };
+            e.pos = index;
+            setSelectedMilestone(e);
+            setShowAssign(true)
+        }
+    }
+
     return (
         <>
             {
@@ -594,6 +630,12 @@ const ProjectDetails = () => {
                     {/* create task side modal */}
                     {showCreateTask && <CreateTask toggleShowCreateTask={toggleShowCreateTask} selectedProject={Project} />}
 
+                    {/* complete milestone and assign contributions side modal*/}
+                    {showAssign && <AssignContributions toggleShowAssign={() => setShowAssign(false)} data={Project} selectedMilestone={selectedMilestone} daoURL={daoURL} />}
+
+                    {/* Show KRA review side modal */}
+                    {showKRAReview && <KRAReview toggleShowKRA={() => setShowKRAReview(false)} data={Project} daoURL={daoURL} />}
+
                     <div className="home-btn" onClick={() => navigate(-1)}>
                         <div className="invertedBox">
                             <div className="navbarText">
@@ -608,117 +650,353 @@ const ProjectDetails = () => {
 
                     <div className="projectDetails-top">
                         <div className="projectDetails-name">
-                            <div>
-                                {
-                                    editMode
-                                        ?
-                                        <SimpleInputField
-                                            className="inputField"
-                                            height={50}
-                                            width={180}
-                                            placeholder="Project name"
-                                            value={name}
-                                            onchange={(e) => { setName(e.target.value) }}
-                                            // onKeyDown={(e) => handleKeyDown(e)}
-                                            onClick={(e) => e.stopPropagation()}
-                                        />
-                                        :
-                                        <h1>{Project?.name}</h1>
-                                }
-
+                            <div className="left" onClick={() => navigate(-1)}>
+                                <IoIosArrowBack size={20} color="#C94B32" />
                             </div>
-                            {
+                            <div className="right">
                                 <div>
-                                    {canMyrole('project.edit') &&
-                                        <button onClick={handleEditMode}>
-                                            <img src={editToken} alt="hk-logo" />
-                                        </button>
-                                    }
-                                    {canMyrole('project.delete') && <button onClick={() => setDeletePrompt(true)}>
-                                        <img src={deleteIcon} alt="hk-logo" />
-                                    </button>}
-                                    {canMyrole('project.archive') &&
-                                        Project?.archivedAt === null
-                                        ?
-                                        <SafeButton
-                                            height={40}
-                                            width={150}
-                                            titleColor="#C94B32"
-                                            title="CLOSE PROJECT"
-                                            bgColor="#FFFFFF"
-                                            opacity="1"
-                                            disabled={false}
-                                            fontweight={400}
-                                            fontsize={16}
-                                            onClick={() => setClosePrompt(true)}
-                                        />
-                                        :
-                                        null
-                                    }
-                                </div>
-                            }
-                        </div>
-                        <div className="projectDetails-description">
-                            {
-                                editMode
-                                    ?
-                                    <>
-                                        <div style={{ width: '480px' }}>
-                                            <Editor
-                                                apiKey='p0turvzgbtf8rr24txekw7sgjye6xunw2near38hwoohdg13'
-                                                onInit={(evt, editor) => editorRef.current = editor}
-                                                init={{
-                                                    height: 150,
-                                                    menubar: false,
-                                                    statusbar: false,
-                                                    toolbar: false,
-                                                    branding: false,
-                                                    body_class: "mceBlackBody",
-                                                    default_link_target: "_blank",
-                                                    extended_valid_elements: "a[href|target=_blank]",
-                                                    link_assume_external_targets: true,
-                                                    plugins: [
-                                                        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                                                        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                                                        'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
-                                                    ],
-                                                    // toolbar: 'undo redo | blocks | ' +
-                                                    //     'bold italic forecolor | alignleft aligncenter ' +
-                                                    //     'alignright alignjustify | bullist numlist outdent indent | ' +
-                                                    //     'removeformat | help',
-                                                    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-                                                }}
-                                                value={description}
-                                                // onKeyDown={(e) => handleKeyDown(e)}
+                                    {
+                                        editMode
+                                            ?
+                                            <SimpleInputField
+                                                className="inputField"
+                                                height={50}
+                                                width={180}
+                                                placeholder="Project name"
+                                                value={name}
+                                                onchange={(e) => { setName(e.target.value) }}
                                                 onClick={(e) => e.stopPropagation()}
-                                                onEditorChange={(text) => { setDescription(text) }}
                                             />
-                                        </div>
-                                        <div style={{ marginLeft: '1rem' }}>
-                                            <SimpleLoadButton
-                                                title="SAVE CHANGES"
+                                            :
+                                            <h1>{Project?.name}</h1>
+                                    }
+
+                                </div>
+                                {
+                                    <div>
+                                        {/* {canMyrole('project.edit') &&
+                                            <button onClick={handleEditMode}>
+                                                <img src={editToken} alt="hk-logo" />
+                                            </button>
+                                        } */}
+                                        {canMyrole('project.delete') && <button onClick={() => setDeletePrompt(true)}>
+                                            <img src={deleteIcon} alt="hk-logo" />
+                                        </button>}
+                                        {canMyrole('project.archive') &&
+                                            Project?.archivedAt === null
+                                            ?
+                                            <SafeButton
                                                 height={40}
                                                 width={180}
-                                                fontsize={16}
+                                                titleColor="#C94B32"
+                                                title="CLOSE WORKSPACE"
+                                                bgColor="#FFFFFF"
+                                                opacity="1"
+                                                disabled={false}
                                                 fontweight={400}
-                                                onClick={handleSaveChanges}
-                                                bgColor={"#C94B32"}
-                                                condition={updateProjectLoading}
+                                                fontsize={16}
+                                                onClick={() => setClosePrompt(true)}
                                             />
-                                        </div>
-                                    </>
-                                    :
-                                    <p dangerouslySetInnerHTML={{ __html: Project?.description }}></p>
-                            }
+                                            :
+                                            null
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
 
+                        {/* <div className="projectDetails-chatlinks">
+                            <button className="other-btn">
+                                <SiNotion color="#B12F15" size={20} style={{ marginRight: '5px' }} />
+                                CHAT
+                            </button>
+                        </div> */}
+
+                        <div className="projectDetails-imp">
+                            <div
+                                className="left"
+                                style={_get(Project, 'milestones', []).length > 0 || _get(Project, 'kra.results', []).length > 0 ? { width: '49%' } : { width: '100%' }}
+                            >
+                                <div className="projectDetails-description">
+                                    <h1>Description</h1>
+                                    {
+                                        editMode
+                                            ?
+                                            <>
+                                                <div style={{ width: '100%', marginBottom: '1rem' }}>
+                                                    <Editor
+                                                        apiKey='p0turvzgbtf8rr24txekw7sgjye6xunw2near38hwoohdg13'
+                                                        onInit={(evt, editor) => editorRef.current = editor}
+                                                        init={{
+                                                            height: 150,
+                                                            menubar: false,
+                                                            statusbar: false,
+                                                            toolbar: false,
+                                                            branding: false,
+                                                            body_class: "mceBlackBody",
+                                                            default_link_target: "_blank",
+                                                            extended_valid_elements: "a[href|target=_blank]",
+                                                            link_assume_external_targets: true,
+                                                            plugins: [
+                                                                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                                                                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                                                                'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                                                            ],
+                                                            // toolbar: 'undo redo | blocks | ' +
+                                                            //     'bold italic forecolor | alignleft aligncenter ' +
+                                                            //     'alignright alignjustify | bullist numlist outdent indent | ' +
+                                                            //     'removeformat | help',
+                                                            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+                                                        }}
+                                                        value={description}
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        onEditorChange={(text) => { setDescription(text) }}
+                                                    />
+                                                </div>
+                                                <SimpleLoadButton
+                                                    title="SAVE CHANGES"
+                                                    height={40}
+                                                    width={180}
+                                                    fontsize={16}
+                                                    fontweight={400}
+                                                    onClick={handleSaveChanges}
+                                                    bgColor={"#C94B32"}
+                                                    condition={updateProjectLoading}
+                                                />
+                                            </>
+                                            :
+                                            <p dangerouslySetInnerHTML={{ __html: Project?.description }}></p>
+                                    }
+                                </div>
+                                {
+                                    (lockedLinks.lnegth > 0 || openLinks.length > 0) && canMyrole('project.links.view') &&
+                                    <div className="links-section">
+                                        <div className="links-header">
+                                            <div>
+                                                <h1>Links</h1>
+                                            </div>
+                                            {
+                                                canMyrole('project.link.add') &&
+                                                <>
+                                                    <div>
+                                                        {/* <button onClick={toggleShowLink}>
+                                                            <img src={editToken} alt="hk-logo" />
+                                                        </button> */}
+                                                        <button onClick={toggleShowLink}>
+                                                            <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
+                                                            LINK
+                                                        </button>
+                                                    </div>
+                                                </>
+                                            }
+                                        </div>
+                                        <div className="links-body">
+                                            {
+                                                lockedLinks.length > 0 &&
+                                                <div className="link-unlocked-section">
+                                                    <div className="locked">
+                                                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                                                            <img src={lock} alt="lock-icon" />
+                                                            <p style={{ marginLeft: "6px", fontStyle: "normal", fontSize: "16px", color: "#FFFFFF" }}>Links to unlock:</p>
+                                                        </div>
+                                                        <div className="container">
+                                                            {
+                                                                lockedLinks.map((item, index) => {
+                                                                    return (
+                                                                        <div onClick={() => unlock(item)} className="link-button" style={{ position: 'relative' }} key={index}>
+                                                                            {handleParseUrl(item.link)}
+                                                                            <p>{item.title.length > 25 ? item.title.slice(0, 25) + "..." : item.title}</p>
+                                                                            {unlockLoading === item.id ?
+                                                                                <div style={{ position: 'absolute', top: 10, right: 20 }}>
+                                                                                    <LeapFrog size={20} color="#B12F15" />
+                                                                                </div> : null
+                                                                            }
+                                                                        </div>
+                                                                    )
+                                                                })
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                            <div className="link-unlocked-section">
+                                                {
+                                                    openLinks.map((item, index) => {
+                                                        return (
+                                                            <div onClick={() => {
+                                                                if (!item.accessControl)
+                                                                    window.open(item.link, '_blank')
+                                                                else
+                                                                    unlock(item, false)
+                                                            }} className="link-button" style={{ position: 'relative' }} key={index}>
+                                                                {handleParseUrl(item.link)}
+                                                                <p>{item.title.length > 25 ? item.title.slice(0, 25) + "..." : item.title}</p>
+                                                                {unlockLoading === item.id ?
+                                                                    <div style={{ position: 'absolute', top: 10, right: 20 }}>
+                                                                        <LeapFrog size={20} color="#B12F15" />
+                                                                    </div> : null
+                                                                }
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            {
+                                _get(Project, 'milestones', []).length > 0 || _get(Project, 'kra.results', []).length > 0
+                                    ?
+                                    <div className="right">
+                                        <div className="milestone-kra">
+                                            {
+                                                _get(Project, 'milestones', []).length > 0 && _get(Project, 'kra.results', []).length > 0
+                                                    ?
+                                                    <>
+                                                        <div onClick={() => setTab(1)}>
+                                                            <h1 style={tab === 1 ? { opacity: '1' } : { opacity: '0.4' }}>Milestones</h1>
+                                                        </div>
+                                                        <div className="divider"></div>
+                                                        <div onClick={() => setTab(2)}>
+                                                            <h1 style={tab === 2 ? { opacity: '1' } : { opacity: '0.4' }}>Key results</h1>
+                                                        </div>
+                                                    </>
+                                                    :
+                                                    <>
+                                                        {
+                                                            _get(Project, 'milestones', []).length > 0 && !_get(Project, 'kra.results', []).length > 0
+                                                                ?
+                                                                <div>
+                                                                    <h1 style={{ opacity: '1' }}>Milestones</h1>
+                                                                </div>
+                                                                :
+                                                                <div>
+                                                                    <h1 style={{ opacity: '1' }}>Key results</h1>
+                                                                </div>
+                                                        }
+                                                    </>
+                                            }
+
+                                        </div>
+
+                                        <div className="milestone-kra-status">
+                                            {
+                                                tab === 1
+                                                    ?
+                                                    <>
+                                                        <div className="status">
+                                                            <div style={{ width: '300px' }}>
+                                                                <ProgressBar
+                                                                    percent={((_get(Project, 'milestones', []).filter((item) => item.complete === true).length) / (_get(Project, 'milestones', []).length)) * 100}
+                                                                    filledBackground="#188C7C"
+                                                                    unfilledBackground="#F0F0F0"
+                                                                    height="5px"
+                                                                >
+                                                                    <Step transition="scale">
+                                                                        {({ accomplished, index }) => (
+                                                                            <div className={`indexedStep ${accomplished ? "accomplished" : ""}`}></div>
+                                                                        )}
+                                                                    </Step>
+                                                                    {
+                                                                        _get(Project, 'milestones', []).map((item, index) => {
+                                                                            return (
+                                                                                <Step transition="scale">
+                                                                                    {({ accomplished, index }) => (
+                                                                                        <div className={`indexedStep ${accomplished ? "accomplished" : ""}`}></div>
+                                                                                    )}
+                                                                                </Step>
+                                                                            )
+                                                                        })
+                                                                    }
+                                                                </ProgressBar>
+                                                            </div>
+                                                            {
+                                                                _get(Project, 'milestones', []).length > 0
+                                                                    ?
+                                                                    <span className="percent-text">{(((_get(Project, 'milestones', []).filter((item) => item.complete === true).length) / (_get(Project, 'milestones', []).length)) * 100).toFixed(2)}%</span>
+                                                                    :
+                                                                    <span className="percent-text">0%</span>
+                                                            }
+                                                        </div>
+                                                        {/* <button>
+                                                            <img src={editToken} alt="hk-logo" />
+                                                        </button> */}
+                                                    </>
+                                                    :
+                                                    <div className="status" style={{ justifyContent: 'space-between' }}>
+                                                        <span>Review frequency : {_get(Project, 'kra.frequency', [])}</span>
+                                                        <div style={{ width: '50%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                                                            <button className='archive-btn'>
+                                                                <img src={archiveIcon} alt="archive-icon" />
+                                                            </button>
+                                                            {/* <button className='archive-btn'>
+                                                                <img src={editToken} alt="hk-logo" />
+                                                            </button> */}
+                                                            <button className="review-btn" onClick={() => setShowKRAReview(true)}>
+                                                                REVIEW
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                            }
+                                        </div>
+
+                                        <div className="milestone-kra-body">
+                                            {
+                                                tab === 1
+                                                    ?
+                                                    <>
+                                                        {
+                                                            _get(Project, 'milestones', []).map((item, index) => {
+                                                                return (
+                                                                    <div className={item.complete ? "milestone-card done" : "milestone-card"}>
+                                                                        <div>
+                                                                            <span>{index + 1}</span>
+                                                                            <h1>{item.name}</h1>
+                                                                        </div>
+                                                                        <div>
+                                                                            <h1>{item.deadline}</h1>
+                                                                            <div className="check-circle" onClick={() => selectMilestone(item, index)}>
+                                                                                <FiCheck size={20} />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        }
+                                                    </>
+                                                    :
+                                                    <>
+                                                        {
+                                                            _get(Project, 'kra.results', []).map((item, index) => {
+                                                                return (
+                                                                    <div className="milestone-card">
+                                                                        <div><h1>{item.name}</h1></div>
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        }
+                                                    </>
+                                            }
+                                        </div>
+                                    </div>
+                                    :
+                                    null
+                            }
                         </div>
                     </div>
+
+                    {/* Tasks section */}
+                    {canMyrole('project.task.view') && <div style={{ width: '80%' }}>
+                        <Tasks toggleShowCreateTask={toggleShowCreateTask} onlyProjects={true} />
+                    </div>}
 
                     <div className="projectDetails-body">
                         <div className="projectDetails-left">
                             <div className="projectDetails-members">
                                 <div className="members-header">
-                                    <p>Members</p>
+                                    <h1>Members</h1>
                                     <div className="divider"></div>
                                     <div className="member-count">
                                         <img src={membersGroup} alt="membersGroup" />
@@ -757,7 +1035,7 @@ const ProjectDetails = () => {
                                                         <span>{item.wallet.slice(0, 6) + "..." + item.wallet.slice(-4)}</span>
                                                     </div>
                                                     <div className="members-row-date">
-                                                        <p>10/10/2023 </p>
+                                                        <p>{moment.utc(item.joined).local().format('MM/DD/YYYY')} </p>
                                                     </div>
                                                     <div className="members-row-status">
                                                         <span>{handleRenderRole(item)}</span>
@@ -769,92 +1047,9 @@ const ProjectDetails = () => {
                                 </div>
                             </div>
                         </div>
-                        {canMyrole('project.links.view') &&
-                            <div className="projectDetails-right">
-                                <div className="add-link-section">
-                                    <p className="link-header-text">Links</p>
-                                    <div>
-                                        {/* <button>
-                                        <img src={editPen} alt="hk-logo" />
-                                    </button> */}
-                                        {canMyrole('project.link.add') &&
-                                            <button onClick={toggleShowLink}>
-                                                <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
-                                                LINK
-                                            </button>}
-
-                                    </div>
-                                </div>
-                                {
-                                    lockedLinks.length > 0
-                                        ?
-                                        <div>
-                                            <div className="link-unlocked-section">
-                                                <div className="locked">
-                                                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                                                        <img src={lock} alt="lock-icon" />
-                                                        <p style={{ marginLeft: "6px", fontStyle: "normal", fontSize: "16px", color: "#FFFFFF" }}>Links to unlock:</p>
-                                                    </div>
-                                                    <div className="container">
-                                                        {
-                                                            lockedLinks.map((item, index) => {
-                                                                return (
-                                                                    <div onClick={() => unlock(item)} className="link-button" style={{ position: 'relative' }} key={index}>
-                                                                        {handleParseUrl(item.link)}
-                                                                        <p>{item.title.length > 25 ? item.title.slice(0, 25) + "..." : item.title}</p>
-                                                                        {unlockLoading === item.id ?
-                                                                            <div style={{ position: 'absolute', top: 10, right: 20 }}>
-                                                                                <LeapFrog size={20} color="#B12F15" />
-                                                                            </div> : null
-                                                                        }
-                                                                    </div>
-                                                                )
-                                                            })
-                                                        }
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        :
-                                        null
-                                }
-
-                                {
-                                    openLinks.length > 0
-                                        ?
-                                        <div className="link-unlocked-section">
-                                            {
-                                                openLinks.map((item, index) => {
-                                                    return (
-                                                        <div onClick={() => {
-                                                            if (!item.accessControl)
-                                                                window.open(item.link, '_blank')
-                                                            else
-                                                                unlock(item, false)
-                                                        }} className="link-button" style={{ position: 'relative' }} key={index}>
-                                                            {handleParseUrl(item.link)}
-                                                            <p>{item.title.length > 25 ? item.title.slice(0, 25) + "..." : item.title}</p>
-                                                            {unlockLoading === item.id ?
-                                                                <div style={{ position: 'absolute', top: 10, right: 20 }}>
-                                                                    <LeapFrog size={20} color="#B12F15" />
-                                                                </div> : null
-                                                            }
-                                                        </div>
-                                                    )
-                                                })
-                                            }
-                                        </div>
-                                        :
-                                        null
-                                }
-                            </div>}
                     </div>
                 </div>
 
-                {/* Tasks section */}
-                {canMyrole('project.task.view') && <div style={{ width: '80%', marginTop: '20px' }}>
-                    <Tasks toggleShowCreateTask={toggleShowCreateTask} onlyProjects={true} />
-                </div>}
                 <div style={{ width: '80%' }}>
                     <Footer theme="dark" />
                 </div>
