@@ -79,22 +79,26 @@ export default (props: any) => {
 					{memberDetails.map(item => {
 						return (
 							<Box className={classes.memberDetails}>
-								<img src={daoMember2} alt="dao" style={{ marginTop: '0.75rem', marginRight: '1rem' }} />
-								<TextInput label="" value={item.name} />
-								<Typography style={{ fontStyle: 'italic', padding: '0rem 1rem 0rem 1rem' }}>{item.address}</Typography>
-								<FormControl sx={{ width: 150 }}>
-									<Select
-										onChange={handleContributorChange}
-										IconComponent={(props) => (<ExpandMoreOutlined {...props} />)}
-										value={item.role}
-									>
-										{options.map(item => {
-											return <MenuItem value={item.value} key={item.value}>{item.label}</MenuItem>
-										})}
+								<Box style={{ display: 'flex', alignItems:'center' }}>
+									<img src={daoMember2} alt="dao" style={{ marginTop: '0.75rem', marginRight: '1rem' }} />
+									<TextInput label="" value={item.name} />
+									<Typography style={{ fontStyle: 'italic', padding: '0rem 5rem 0rem 1rem' }}>{item.address}</Typography>
+								</Box>
+								<Box style={{ display: 'flex', alignItems: 'center' }}>
+									<FormControl sx={{ width: 150 }}>
+										<Select
+											onChange={handleContributorChange}
+											IconComponent={(props) => (<ExpandMoreOutlined {...props} />)}
+											value={item.role}
+										>
+											{options.map(item => {
+												return <MenuItem value={item.value} key={item.value}>{item.label}</MenuItem>
+											})}
 
-									</Select>
-								</FormControl>
-								<IconButton style={{ background: 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)', borderRadius: '5px', marginLeft: '1rem' }}><img src={bin} alt="delete" /></IconButton>
+										</Select>
+									</FormControl>
+									<IconButton style={{ background: 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)', borderRadius: '5px', marginLeft: '1rem' }}><img src={bin} alt="delete" /></IconButton>
+								</Box>
 							</Box>
 						);
 					})}

@@ -56,7 +56,6 @@ const useStyles = makeStyles((theme: any) => ({
 	},
 	selectStyle: {
 		zIndex: 9999,
-		backgroundColor: 'yellow'
 	}
 }));
 

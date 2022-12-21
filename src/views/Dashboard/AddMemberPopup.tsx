@@ -169,6 +169,7 @@ export default (props: any) => {
 			<Dialog
 				open={openAddMemberPopup}
 				onClose={closeAddMemberDialog}
+				PaperProps={{ sx: {maxWidth:'100%'} }}
 			>
 				<UploadMemberPopup closePopup={closeAddMemberDialog} />
 			</Dialog>
