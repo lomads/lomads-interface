@@ -22,20 +22,24 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
     const {safeTokens} = useSafeTokens(safeAddress)
     const dispatch = useAppDispatch()
 
-    const { isCredit, amount, tokenSymbol, symbol, recipient, date, reason, txHash } = useMemo(() => {
+    const { isCredit, amount, tokenSymbol, symbol, recipient, date, reason, txHash, isAllowanceTransaction } = useMemo(() => {
         let isCredit = _get(transaction, 'txType', '') === 'ETHEREUM_TRANSACTION'
         let decimal = 18;
         if(_get(transaction, 'transfers[0].tokenInfo.decimals', null))
             decimal = _get(transaction, 'transfers[0].tokenInfo.decimals', 18)
-        let amount = (+(_get(transaction, 'transfers[0].value', 0)) / 10 ** decimal)
+        let amount = (+(_get(transaction, 'transfers[0].value', _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'value' || p.name === '_value'), 'value', _get(transaction, 'value', 0)))) / 10 ** decimal)
         let symbol = chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR';
         if(_get(transaction, 'transfers[0].tokenAddress', null))
             symbol = _get(transaction, 'transfers[0].tokenInfo.symbol', '')
         else
             symbol = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
-        let recipient = _get(transaction, 'transfers[0].to', '')
+        let recipient = _get(transaction, 'transfers[0].to', _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'to' || p.name === '_to'), 'value', _get(transaction, 'to', '')))
         let tokenSymbol = undefined;
-        if(transaction?.dataDecoded?.method === 'multiSend' && transaction?.dataDecoded?.parameters[0]?.name === 'transactions') {
+        const setAllowance =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => vd.dataDecoded.method === "setAllowance")
+        let isAllowanceTransaction = false;
+        if(setAllowance)
+            isAllowanceTransaction = true;
+        if(transaction?.dataDecoded?.method === 'multiSend' && transaction?.dataDecoded?.parameters[0]?.name === 'transactions' && isAllowanceTransaction) {
             const addDelegate =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => vd.dataDecoded.method === "addDelegate")
             recipient = _get(addDelegate, 'dataDecoded.parameters[0].value', '')
             const setAllowance =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => vd.dataDecoded.method === "setAllowance")
@@ -52,7 +56,7 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
         const txHash = _get(transaction, 'safeTxHash', _get(transaction, 'txHash', _get(transaction, 'transactionHash', '')));
         let date = _get(transaction, 'executionDate', null) ? moment.utc(_get(transaction, 'executionDate', null)).local().format('MM/DD hh:mm') : moment.utc(_get(transaction, 'submissionDate', null)).local().format('MM/DD hh:mm')
         console.log('reason', reason)
-        return { isCredit, amount, tokenSymbol, symbol, recipient, date, reason, txHash }
+        return { isCredit, amount, tokenSymbol, symbol, recipient, date, reason, txHash, isAllowanceTransaction }
     }, [transaction, safeTokens, tokens, labels])
 
     const _handleReasonKeyDown = (safeTxHash: string, recipient: string, reasonText: string) => {
@@ -176,7 +180,7 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
 
     return (
         <>
-            {_get(transaction, 'dataDecoded.method', null) !== "multiSend" || (_get(transaction, 'dataDecoded.method', null) === "multiSend" && _get(transaction, 'dataDecoded.parameters[0].name', null) === "transactions") ?
+            {_get(transaction, 'dataDecoded.method', null) !== "multiSend" || (_get(transaction, 'dataDecoded.method', null) === "multiSend" && isAllowanceTransaction && _get(transaction, 'dataDecoded.parameters[0].name', null) === "transactions") ?
                 <div className="transactionRow">
                     <div className="coinText">
                         <img src={isCredit ? receiveToken : sendToken} alt="" />

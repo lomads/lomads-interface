@@ -93,24 +93,26 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
 			<>
 				<div style={{margin:'12px 0'}}>
 					<div className="memberRow">
-						<div className="avatarAndName">
+						<div className="avatarAndName" style={{ minWidth: "25%" }}>
 							<img src={daoMember2} alt="avatar" />
 							<div style={{marginRight:11, minWidth:92}} className="dashboardText">{name}</div>
 						</div>
-            <div>
-            <StarIcon style={{height:"18px", width:"18px", margin:'0 10px 0 12px'}}/>
-            </div>
-						<div style={{ minWidth:"65px"}} className="dashboardText">{`${_get(sweat, 'value', 0)} SWT =`}</div>
-						<div style={{marginLeft:"20px", minWidth:"28px", alignItems:'center', justifyContent:'flex-end', display:'flex'}} className="roleText">
-							{_get(sweat, 'value', 0) * sweatValue}
-						</div>
-            <div>
-              { _get(_find(safeTokens, s => s.tokenAddress === currency), 'token.symbol', '') === 'MATIC' ?
-                <PolygonIcon style={{height:"20px", width:"20px", margin:'0 0 0 8px'}}/> :
-                _get(_find(safeTokens, s => s.tokenAddress === currency), 'token.symbol', '') === 'GOR' ?
-                <img src={GoerliIcon} style={{height:"20px", width:"20px", margin:'0 0 0 8px'}}/> :
+            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
+              <div>
                 <StarIcon style={{height:"18px", width:"18px", margin:'0 10px 0 12px'}}/>
-              }
+              </div>
+              <div style={{ minWidth:"65px"}} className="dashboardText">{`${_get(sweat, 'value', 0)} SWT =`}</div>
+              <div style={{marginLeft:"20px", minWidth:"28px", alignItems:'center', justifyContent:'flex-end', display:'flex'}} className="roleText">
+                {_get(sweat, 'value', 0) * sweatValue}
+              </div>
+              <div style={{ float: 'right' }}>
+                { _get(_find(safeTokens, s => s.tokenAddress === currency), 'token.symbol', '') === 'MATIC' ?
+                  <PolygonIcon style={{height:"20px", width:"20px", margin:'0 0 0 8px'}}/> :
+                  _get(_find(safeTokens, s => s.tokenAddress === currency), 'token.symbol', '') === 'GOR' ?
+                  <img src={GoerliIcon} style={{height:"20px", width:"20px", margin:'0 0 0 8px'}}/> :
+                  <StarIcon style={{height:"18px", width:"18px", margin:'0 2px 0 12px'}}/>
+                }
+              </div>
             </div>
 					</div>
 				</div>
@@ -268,7 +270,12 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
 						);
 					})}
           <div style={{display:'flex', alignItems: 'center', flexDirection:'row', justifyContent:'flex-end', marginTop:'20px'}}>
-            <div className="dashboardText">{"Total ="}</div>
+            <div className="dashboardText" style={{
+              clear: 'both',
+              display: 'inline-block !important',
+              overflow: 'hidden',
+              whiteSpace: 'nowrap'
+            }}>{"Total ="}</div>
               {/* <div className="memberdivider">
                 <hr />
               </div> */}
@@ -280,7 +287,7 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
                   <PolygonIcon style={{height:"20px", width:"20px", margin:'0 0 0 8px'}}/> :
                   _get(_find(safeTokens, s => s.tokenAddress === currency), 'token.symbol', '') === 'GOR' ?
                   <img src={GoerliIcon} style={{height:"20px", width:"20px", margin:'0 0 0 8px'}}/> :
-                  <StarIcon style={{height:"18px", width:"18px", margin:'0 10px 0 12px'}}/>
+                  <StarIcon style={{height:"18px", width:"18px", margin:'0 2px 0 12px'}}/>
                 }
               </div>
             </div>
@@ -295,7 +302,7 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
               variant="outline"
               mr={3}
               onClick={() => {
-                toggleModal();
+               // toggleModal();
                 toggleCompensate();
               }}
             >

@@ -32,16 +32,19 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
     const {safeTokens} = useSafeTokens(safeAddress)
     //const threshold = useAppSelector((state) => state.flow.safeThreshold);
 
-    const { amount, tokenSymbol, recipient, reason, decimal } = useMemo(() => {
+    const { amount, tokenSymbol, recipient, reason, decimal, isAllowanceTransaction } = useMemo(() => {
         const tokendata = _find(tokens, t => t.tokenAddress === _get(transaction, 'to', ''))
         const decimal = _get(tokendata, 'token.decimals', _get(transaction, 'token.decimals', 18))
-        let amount = _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'value'), 'value', _get(transaction, 'value', 0))
-        let recipient = _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'to'), 'value', _get(transaction, 'to', ''))
+        let amount = _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'value' || p.name === '_value'), 'value', _get(transaction, 'value', 0))
+        let recipient = _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'to' || p.name === '_to'), 'value', _get(transaction, 'to', ''))
         let tokenSymbol = undefined;
-        if(transaction?.dataDecoded?.method === 'multiSend' && transaction?.dataDecoded?.parameters[0]?.name === 'transactions') {
+        let isAllowanceTransaction = false;
+        const setAllowance =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => vd.dataDecoded.method === "setAllowance")
+        if(setAllowance)
+            isAllowanceTransaction = true;
+        if(transaction?.dataDecoded?.method === 'multiSend' && transaction?.dataDecoded?.parameters[0]?.name === 'transactions' && isAllowanceTransaction) {
             const addDelegate =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => vd.dataDecoded.method === "addDelegate")
             recipient = _get(addDelegate, 'dataDecoded.parameters[0].value', '')
-            const setAllowance =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => vd.dataDecoded.method === "setAllowance")
             amount = _get(setAllowance, 'dataDecoded.parameters[2].value', '')
             const tokenAddr = _get(setAllowance, 'dataDecoded.parameters[1].value', '')
             tokenSymbol = _get(_find(tokens, st => st.tokenAddress === tokenAddr), 'token.symbol', '')
@@ -56,7 +59,7 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
         //     reason = _get(_find(trans.data, u => u.recipient.toLowerCase() === recipient.toLowerCase()), 'reason', null)
         // }
         console.log('reason', reason)
-        return { amount, tokenSymbol, recipient, reason, decimal }
+        return { amount, tokenSymbol, recipient, reason, decimal, isAllowanceTransaction }
     }, [transaction, labels, tokens])
 
     const { confirmReached, hasMyConfirmVote, rejectReached, hasMyRejectVote } = useMemo(() => {
@@ -256,7 +259,7 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
 
     return (
         <>
-            {_get(transaction, 'dataDecoded.method', null) !== "multiSend" || (_get(transaction, 'dataDecoded.method', null) === "multiSend" && _get(transaction, 'dataDecoded.parameters[0].name', null) === "transactions") ?
+            {_get(transaction, 'dataDecoded.method', null) !== "multiSend" || (_get(transaction, 'dataDecoded.method', null) === "multiSend" && isAllowanceTransaction && _get(transaction, 'dataDecoded.parameters[0].name', null) === "transactions") ?
                 <>
                     <div className="transactionRow">
                         <div className="coinText">
