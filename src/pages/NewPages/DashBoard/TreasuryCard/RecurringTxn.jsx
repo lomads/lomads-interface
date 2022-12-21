@@ -18,8 +18,9 @@ import moment from 'moment';
 import SimpleLoadButton from 'UIpack/SimpleLoadButton';
 import { Tooltip } from "@chakra-ui/react";
 import useGnosisAllowance from 'hooks/useGnosisAllowance';
-import { useAppSelector } from 'state/hooks';
+import { useAppDispatch, useAppSelector } from 'state/hooks';
 import axiosHttp from 'api'
+import { setRecurringPayments } from 'state/dashboard/reducer';
 
 
 const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
@@ -29,10 +30,11 @@ const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
 ))
 
 export default ({ transaction, onExecute, onRecurringEdit }) => {
-
+const dispatch = useAppDispatch()
 const { DAO } = useAppSelector(store => store.dashboard);
 const { createAllowanceTransaction } = useGnosisAllowance(_get(DAO, 'safe.address', null));
 const [loading, setLoading] = useState(false);
+const [deleteLoading, setDeleteLoading] = useState(false);
 const [showEdit, setShowEdit] = useState(false);
 
 const nextQueue = useMemo(() => {
@@ -75,6 +77,16 @@ const renderNextSection = (nextQueue, transaction) => {
         return <div className="text">Next: { `${ moment.unix(nextQueue.nonce).format('MM/DD/YYYY') }` }</div>
     else
         return <div className="text">Payment ended</div>   
+}
+
+const handleDeleteRecurringPayment = async tx => {
+    setDeleteLoading(true)
+    await axiosHttp.delete(`recurring-payment/${tx._id}`)
+    .then(res => 
+        dispatch(setRecurringPayments(res.data))
+    )
+    .catch(e => console.log(e))
+    .finally(() => setDeleteLoading(false))
 }
 
  return (
@@ -127,10 +139,8 @@ const renderNextSection = (nextQueue, transaction) => {
         <Td className='recurringtxn-row-item'>
             <div className="edit">
                 {
-                    showEdit &&
-                    <button onClick={() => onRecurringEdit(transaction)} className="edit-btn">
-                        Edit
-                    </button>
+                    showEdit && transaction.active && nextQueue &&
+                    <SimpleLoadButton bgColor={deleteLoading ? 'grey' : '#FFF'} color="#B12F15" title='STOP PAYMENTS' condition={deleteLoading} onClick={() => handleDeleteRecurringPayment(transaction)} height={40}  width={180}/>
                 }
             </div>
         </Td>

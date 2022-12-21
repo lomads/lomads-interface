@@ -502,11 +502,14 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 						}
 					}
 					)
+				} else {
+					await axiosHttp.patch(`recurring-payment/reject`, { txHash: txn.safeTxHash })
 				}
 				await loadPendingTxn()
 				await loadExecutedTxn()
 				await loadTxnLabel()
 				await fetchDao()
+				dispatch(loadRecurringPayments({}))
 				dispatch(getCurrentUser({}))
 			} catch (e) {
 				console.log(e)

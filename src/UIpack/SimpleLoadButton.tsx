@@ -6,7 +6,6 @@ const SimpleLoadButton = (props: LoadingButtonType) => {
   return (
     <>
       <button
-        
         id="nextButtonToken"
         ref={props.ref}
         className={"button"}
@@ -18,6 +17,7 @@ const SimpleLoadButton = (props: LoadingButtonType) => {
           fontSize: props.fontsize,
           fontWeight: props.fontweight,
           background: props.bgColor,
+          color: props.color ? props.color : "#FFF"
         }}
       >
         {props.condition ? (

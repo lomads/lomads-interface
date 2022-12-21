@@ -22,6 +22,7 @@ export interface ButtonType {
   height?: number | string;
   width?: number | string;
   fontsize?: number;
+  color?: string;
   fontweight?: number;
   bgColor?: string;
   className?: string;
