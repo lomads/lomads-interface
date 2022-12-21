@@ -1,0 +1,130 @@
+.terminology-container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.terminology-container .terminology-modal {
+    height: 100%;
+    /* width: 100vw; */
+    width: 575px;
+    background-color: #FFF;
+    border-radius: 20px 0px 0px 20px;
+    padding: 36px 27px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.terminology-container .terminology-modal .terminology-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.terminology-container .terminology-modal .terminology-body {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-y: scroll;
+    padding: 0 27px;
+}
+
+.terminology-container .terminology-modal .terminology-body h1 {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 33px;
+    color: #C94B32;
+    margin-bottom: 30px;
+    margin: 15px 0;
+}
+
+.terminology-container .terminology-modal .terminology-body p {
+    font-family: 'Inter', sans-serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    color: #76808D;
+}
+
+.terminology-container .terminology-modal .terminology-body .section {
+    display: flex;
+    flex-direction: column;
+    margin: 35px 0;
+}
+
+.terminology-container .terminology-modal .terminology-body .section div {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.terminology-container .terminology-modal .terminology-body .section h1 {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    color: #76808D;
+    margin: 0;
+}
+
+.terminology-container .terminology-modal .terminology-body .section h1 span {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 16px;
+    color: #76808D;
+}
+
+.terminology-container .terminology-modal .terminology-body .section input {
+    background: #F5F5F5;
+    /* SMALL-inputs */
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 10px;
+    height: 50px;
+    width: 200px;
+    padding: 0 10px;
+    color: #76808D;
+}
+
+.terminology-container .terminology-modal .terminology-body .divider {
+    width: 210px;
+    border: 1px solid #C94B32;
+}
+
+
+.terminology-container .terminology-modal .terminology-body .section-footer {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.terminology-container .terminology-modal .terminology-body .section-footer button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    height: 40px;
+}
+
+.terminology-container .terminology-modal .terminology-body .section-footer button:first-child {
+    background: #FFFFFF;
+    border: 1px solid #C94B32;
+    color: #C94B32;
+    width: 169px;
+    margin-right: 20px;
+}
+
+.terminology-container .terminology-modal .terminology-body .section-footer button:last-child {
+    background: #C94B32;
+    color: #FFF;
+    width: 180px;
+}
