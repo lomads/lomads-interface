@@ -137,11 +137,12 @@ const Settings = () => {
 	let toggleDiscord = () => {
 		setOpenDiscord(!openDiscord);
 	};
-
 	let toggleCreatePassTokenModal = () => {
 		setOpenCreatePassToken(!openCreatePassToken);
 	};
 	const daoName = name.split(" ");
+
+	console.log("showModal : ", showModal);
 	return (
 		<>
 			<div className="settings-page">
@@ -265,11 +266,11 @@ const Settings = () => {
 									</Link>
 								</div>
 							</div>
-							<div className="settings-organisation-child disabled"
-							// onClick={() => {
-							// 	toggleModal();
-							// 	setOpenTerminology(true);
-							// }}
+							<div className="settings-organisation-child"
+								onClick={() => {
+									// toggleModal();
+									setOpenTerminology(true);
+								}}
 							>
 								<div
 									style={{
@@ -287,8 +288,11 @@ const Settings = () => {
 								</div>
 							</div>
 
-							<div className="settings-organisation-child disabled"
-
+							<div className="settings-organisation-child"
+								onClick={() => {
+									// toggleModal();
+									setOpenDiscord(true);
+								}}
 							>
 								<div
 									style={{
@@ -351,14 +355,14 @@ const Settings = () => {
 				<XpPointsModal toggleModal={toggleModal} toggleXp={toggleXp} />
 			)}
 			{/* // !-------------  Terminology ------------ */}
-			{showModal && openTerminology && (
+			{openTerminology && (
 				<TerminologyModal
 					toggleModal={toggleModal}
 					toggleTerminology={toggleTerminology}
 				/>
 			)}
 			{/* // !-------------  Discord ------------ */}
-			{showModal && openDiscord && (
+			{openDiscord && (
 				<DiscordModal toggleModal={toggleModal} toggleDiscord={toggleDiscord} />
 			)}
 		</>
