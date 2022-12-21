@@ -6,6 +6,11 @@ import { useWeb3React } from "@web3-react/core";
 import { EthSignSignature } from "@gnosis.pm/safe-core-sdk";
 import { SafeTransactionData } from "@gnosis.pm/safe-core-sdk-types/dist/src/types";
 import copyIcon from "../../../assets/svg/copyIcon.svg";
+import {
+	Table,
+	TableContainer,
+	Tbody
+  } from '@chakra-ui/react'
 import { tokenCallSafe } from "connection/DaoTokenCall";
 import { getSafeTokens } from 'utils'
 import { SafeTransactionDataPartial } from "@gnosis.pm/safe-core-sdk-types";
@@ -28,8 +33,8 @@ import { usePrevious } from "hooks/usePrevious";
 import axiosHttp from 'api'
 import { nanoid } from "@reduxjs/toolkit";
 import moment from "moment";
-import { setDAO } from "state/dashboard/reducer";
-import { getCurrentUser } from "state/dashboard/actions";
+import { setDAO, setRecurringPayments } from "state/dashboard/reducer";
+import { getCurrentUser, loadRecurringPayments } from "state/dashboard/actions";
 import GOERLI_LOGO from '../../../assets/images/goerli.png';
 import POLYGON_LOGO from '../../../assets/images/polygon.png';
 import useSafeTokens from "hooks/useSafeTokens";
@@ -37,6 +42,7 @@ import useSafeTransaction from "hooks/useSafeTransaction";
 import axios from "axios";
 import { GNOSIS_SAFE_BASE_URLS, SupportedChainId } from 'constants/chains';
 import { GNOSIS_SAFE_ALLOWANCE_MODULE_CONTRACT } from 'constants/chains';
+import RecurringTxn from "./TreasuryCard/RecurringTxn";
 
 
 const TreasuryCard = (props: ItreasuryCardType) => {
@@ -58,8 +64,11 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	const [executedTxn, setExecutedTxn] = useState<Array<any>>();
 	const [offChainPendingTxn, setOffChainPendingTxn] = useState<Array<any>>();
 	const [offChainExecutedTxn, setOffChainExecutedTxn] = useState<Array<any>>();
+
+	//const [recurringTxnQueue, setRecurringTxnQueue] = useState<Array<any>>();
+
 	const [labels, setLabels] = useState<Array<any>>();
-	const { DAO } = useAppSelector(store => store.dashboard);
+	const { DAO, recurringPayments } = useAppSelector(store => store.dashboard);
 
 	//const { safeTokens, tokenBalance } = useSafeTokens(_get(DAO, 'safeAddress', ''))
 
@@ -101,13 +110,15 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 			setPendingTxn(undefined)
 		}
 	}, [DAO, prevDAO])
+	
 
 	useImperativeHandle(props.innerRef, () => ({
 		reload: (event: any) => {
 			loadPendingTxn();
 			loadExecutedTxn();
 			loadOffChainTxn();
-			loadTxnLabel()
+			loadTxnLabel();
+			loadRecurringTxnQueue();
 		}
 	}));
 
@@ -128,6 +139,20 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		setOwner(condition)
 		setThreshold(threshold)
 	};
+
+	const loadRecurringTxnQueue = () => {
+		dispatch(loadRecurringPayments({ safeAddress: _get(DAO, 'safe.address', '') }))
+		// return axiosHttp.get(`/recurring-payment?safeAddress=${_get(DAO, 'safe.address', '')}`)
+		// .then(txn => txn.data)
+		// .then(txn => {
+		// 	setRecurringTxnQueue(txn)
+		// })
+	}
+
+	useEffect(() => {
+		if(tab == 2)
+			loadRecurringTxnQueue()
+	}, [tab])
 
 	const loadOffChainTxn = async () => {
 		return axiosHttp.get(`transaction/off-chain?daoId=${DAO._id}`)
@@ -197,7 +222,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
 	useEffect(() => {
 		if (pendingTxn) {
-			pendingTxn.map((tx, i) => {
+			pendingTxn.filter(t => !t.offChain).map((tx, i) => {
 				if (i === 0)
 					setExecuteFirst(tx.nonce)
 			})
@@ -634,11 +659,11 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				tab === 2 &&
 				<div className="treasuryTokens">
 					<div className="treasuryTokens-left">
-						<img src={recurring_payment} alt="asset" />
+						{/* <img src={recurring_payment} alt="asset" />
 						<span style={{ color: '#76808D' }}>
 							$1245.00
 						</span>
-						<div className="dashboardText">per month</div>
+						<div className="dashboardText">per month</div> */}
 					</div>
 					<div className="treasuryTokens-right">
 						<button className="recurring-btn" onClick={props.toggleShowCreateRecurring}>
@@ -649,25 +674,43 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 			}
 
 			{/* Treasury card body */}
-			<>
+			{ tab === 1 ?
+				<>
+					{
+						pendingTxn !== undefined && executedTxn !== undefined &&
+						(pendingTxn && executedTxn && (pendingTxn.length !== 0 || executedTxn.length !== 0)) &&
+						<div id="treasuryTransactions">
+							<div className="dashboardText" style={{ marginBottom: '6px' }}>Last Transactions</div>
+							{
+								pendingTxn.map((ptx, index) =>
+									<PendingTxn onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} executeFirst={executeFirst} isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
+								)
+							}
+							{
+								executedTxn.map((ptx, index) =>
+									<CompleteTxn onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} isAdmin={amIAdmin} owner={owner} transaction={ptx} tokens={props.tokens} />
+								)
+							}
+						</div>
+					}
+				</> : 
+				<>
 				{
-					pendingTxn !== undefined && executedTxn !== undefined &&
-					(pendingTxn && executedTxn && (pendingTxn.length !== 0 || executedTxn.length !== 0)) &&
-					<div id="treasuryTransactions">
-						<div className="dashboardText" style={{ marginBottom: '6px' }}>Last Transactions</div>
-						{
-							pendingTxn.map((ptx, index) =>
-								<PendingTxn onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} executeFirst={executeFirst} isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
-							)
-						}
-						{
-							executedTxn.map((ptx, index) =>
-								<CompleteTxn onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} isAdmin={amIAdmin} owner={owner} transaction={ptx} tokens={props.tokens} />
-							)
-						}
-					</div>
+					recurringPayments &&
+					<TableContainer>
+						<Table variant='simple' id="treasuryTransactions" style={{ width: '100%' }}>
+							<Tbody style={{ paddingTop: 8 }}>
+								{
+									recurringPayments.map((txn: any) => 
+										<RecurringTxn onRecurringEdit={props.onRecurringEdit} onExecute={(data: any) => dispatch(setRecurringPayments(data))} transaction={txn} />
+									)
+								}
+							</Tbody>
+						</Table>
+					</TableContainer>
 				}
 			</>
+			}
 		</div>
 	)
 

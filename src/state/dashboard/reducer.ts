@@ -36,7 +36,8 @@ import {
 	archiveTask,
 	deleteTask,
 	toggleXPPoints,
-	updateContract
+	updateContract,
+	loadRecurringPayments
 } from "./actions";
 import { createContract } from "state/contract/actions";
 import { get as _get, find as _find } from "lodash";
@@ -78,6 +79,8 @@ export interface DashboardState {
 	archiveTaskLoading: boolean | null;
 	deleteTaskLoading: boolean | null;
 	updateContractLoading: boolean | null;
+	recurringPayments: any;
+	recurringPaymentsLoading: boolean | null;
 }
 
 const initialState: DashboardState = {
@@ -116,7 +119,9 @@ const initialState: DashboardState = {
 	rejectTaskLoading: null,
 	archiveTaskLoading: null,
 	deleteTaskLoading: null,
-	updateContractLoading: null
+	updateContractLoading: null,
+	recurringPayments: null,
+	recurringPaymentsLoading: null
 };
 
 const dashboardSlice = createSlice({
@@ -248,6 +253,9 @@ const dashboardSlice = createSlice({
 				}
 			}
 		},
+		setRecurringPayments(state, action) {
+			state.recurringPayments = action.payload
+		}
 	},
 	extraReducers: {
 		[`${updateCurrentUser.fulfilled}`]: (state, action) => {
@@ -561,6 +569,13 @@ const dashboardSlice = createSlice({
 		},
 		[`${updateContract.pending}`]: (state, action) => {
 			state.updateContractLoading = true
+		},
+		[`${loadRecurringPayments.fulfilled}`]: (state, action) => {
+			state.recurringPaymentsLoading = false
+			state.recurringPayments = action.payload;
+		},
+		[`${loadRecurringPayments.pending}`]: (state, action) => {
+			state.recurringPaymentsLoading = true
 		}
 	},
 });
@@ -599,6 +614,7 @@ export const {
 	resetRejectTaskLoader,
 	resetArchiveTaskLoader,
 	resetDeleteTaskLoader,
-	resetUpdateContractLoading
+	resetUpdateContractLoading,
+	setRecurringPayments
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

@@ -387,3 +387,21 @@ export const updateContract = createAsyncThunk(
 	}
 )
 
+export const loadRecurringPayments = createAsyncThunk(
+	'recurringPayment/load',
+	async (params: any, thunkApi) => {
+		return axiosHttp.get(`/recurring-payment?safeAddress=${params.safeAddress}`)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+)
+
+export const createRecurringPayment = createAsyncThunk(
+	'recurringPayment/create',
+	async (params: any, thunkApi) => {
+		return axiosHttp.post(`recurring-payment`, params)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+)
+

@@ -1,0 +1,139 @@
+.recurringtxn-row {
+    height: 40px;
+    width: 100%;
+    border-color: transparent !important;
+    
+}
+
+.recurringtxn-row-item {
+    height: 40px;
+    white-space: nowrap;
+    border-color: transparent !important;
+    padding: 8px 0 !important;
+}
+
+.recurringtxn-row-item .receiver {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 180px;
+    height: 40px;
+    padding-left: 16px;
+    border-right: 1px solid #ddd;
+}
+
+.recurringtxn-row-item .receiver .img {
+    height: 25px;
+    width: 25px;
+    border-radius: 3px;
+    background: #188C7C;
+}
+
+.recurringtxn-row-item .receiver .name {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+    margin-left: 12px;
+}
+
+.recurringtxn-row-item .frequency {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100px;
+    height: 40px;
+    padding-left: 8px;
+    padding-right: 12px;
+    text-align: start;
+    border-right: 1px solid #ddd;
+}
+
+.recurringtxn-row-item .info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 40px;
+    text-align: start;
+    padding-left: 8px;
+    padding-right: 12px;
+    border-right: 1px solid #ddd;
+}
+
+.recurringtxn-row-item .info .text {
+    font-family: 'Inter', sans-serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    color: #76808D;
+}
+
+.recurringtxn-row-item .compensation {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 40px;
+    padding-left: 8px;
+    padding-right: 12px;
+    min-width: 200px;
+    border-right: 1px solid #ddd;
+}
+
+.recurringtxn-row-item .compensation .text {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    color: #76808D;
+}
+
+.recurringtxn-row-item .status {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 40px;
+    text-align: start;
+    padding-left: 8px;
+    padding-right: 12px;
+}
+
+.recurringtxn-row-item .status .text {
+    font-family: 'Inter', sans-serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    color: #76808D;
+}
+
+.recurringtxn-row-item .edit {
+    width: 180px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 40px;
+    text-align: start;
+    padding-left: 8px;
+    padding-right: 12px;
+}
+
+.recurringtxn-row-item .edit .edit-btn {
+    width: 180px;
+    height: 40px;
+    background: #FFFFFF;
+    /* Color-drop */
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #C94B32;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+}

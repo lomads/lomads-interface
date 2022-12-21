@@ -4,7 +4,7 @@ import axios from "axios";
 import { GNOSIS_SAFE_BASE_URLS, SupportedChainId } from 'constants/chains';
 import { useWeb3React } from "@web3-react/core";
 
-const useSafeTokens = (safeAddress: string) => {
+const useSafeTokens = (safeAddress: string | null) => {
 
     const { chainId } = useWeb3React();
     const [safeTokens, setSafeTokens] = useState([]);
@@ -30,11 +30,12 @@ const useSafeTokens = (safeAddress: string) => {
                             ...t,
                             tokenAddress: chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS,
                             token: {
-                                symbol: chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'
+                                symbol: chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR',
+                                decimal: 18
                             }
                         }
                     }
-                        return t 
+                    return t 
                 })
                 setSafeTokens(tokens)
             })

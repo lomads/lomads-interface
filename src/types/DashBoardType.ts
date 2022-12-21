@@ -87,6 +87,7 @@ export interface ItreasuryCardType {
   innerRef: any,
   safeAddress: string;
   onChangePendingTransactions: any,
+  onRecurringEdit?: any,
   pendingTransactions: SafeMultisigTransactionListResponse | undefined;
   executedTransactions: AllTransactionsListResponse | undefined;
   ownerCount: number | undefined;

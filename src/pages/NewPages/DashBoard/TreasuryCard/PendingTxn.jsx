@@ -15,6 +15,7 @@ import { AiOutlineClose, AiOutlineCheck } from "react-icons/ai";
 import CloseBtn from '../../../../assets/svg/close-btn.svg';
 import CheckBtn from '../../../../assets/svg/check-btn.svg';
 import { SupportedChainId } from "constants/chains";
+import useSafeTokens from "hooks/useSafeTokens";
 
 const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
       <div style={{ flex : 1}} ref={ref} {...rest}>
@@ -28,13 +29,23 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
     const [reasonText, setReasonText] = useState({});
     const [editMode, setEditMode] = useState(null);
     const dispatch = useAppDispatch()
+    const {safeTokens} = useSafeTokens(safeAddress)
     //const threshold = useAppSelector((state) => state.flow.safeThreshold);
 
-    const { amount, recipient, reason, decimal } = useMemo(() => {
+    const { amount, tokenSymbol, recipient, reason, decimal } = useMemo(() => {
         const tokendata = _find(tokens, t => t.tokenAddress === _get(transaction, 'to', ''))
         const decimal = _get(tokendata, 'token.decimals', _get(transaction, 'token.decimals', 18))
         let amount = _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'value'), 'value', _get(transaction, 'value', 0))
         let recipient = _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'to'), 'value', _get(transaction, 'to', ''))
+        let tokenSymbol = undefined;
+        if(transaction?.dataDecoded?.method === 'multiSend' && transaction?.dataDecoded?.parameters[0]?.name === 'transactions') {
+            const addDelegate =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => vd.dataDecoded.method === "addDelegate")
+            recipient = _get(addDelegate, 'dataDecoded.parameters[0].value', '')
+            const setAllowance =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => vd.dataDecoded.method === "setAllowance")
+            amount = _get(setAllowance, 'dataDecoded.parameters[2].value', '')
+            const tokenAddr = _get(setAllowance, 'dataDecoded.parameters[1].value', '')
+            tokenSymbol = _get(_find(tokens, st => st.tokenAddress === tokenAddr), 'token.symbol', '')
+        }
         //let trans = _find(_get(DAO, 'safe.transactions', []), t => t.safeTxHash === transaction.safeTxHash)
         let reason = null
         if(labels && labels.length > 0) {
@@ -45,7 +56,7 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
         //     reason = _get(_find(trans.data, u => u.recipient.toLowerCase() === recipient.toLowerCase()), 'reason', null)
         // }
         console.log('reason', reason)
-        return { amount, recipient, reason, decimal }
+        return { amount, tokenSymbol, recipient, reason, decimal }
     }, [transaction, labels, tokens])
 
     const { confirmReached, hasMyConfirmVote, rejectReached, hasMyRejectVote } = useMemo(() => {
@@ -245,13 +256,13 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
 
     return (
         <>
-            {_get(transaction, 'dataDecoded.method', null) !== "multiSend" ?
+            {_get(transaction, 'dataDecoded.method', null) !== "multiSend" || (_get(transaction, 'dataDecoded.method', null) === "multiSend" && _get(transaction, 'dataDecoded.parameters[0].name', null) === "transactions") ?
                 <>
                     <div className="transactionRow">
                         <div className="coinText">
                             <img src={sendTokenOutline} alt="" />
                             <div className="dashboardTextBold">
-                                {`${amount / 10 ** decimal} ${_get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))}`}
+                                {`${amount / 10 ** decimal} ${tokenSymbol ? tokenSymbol : _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))}`}
                             </div>
                         </div>
                         <div className="transactionName">
