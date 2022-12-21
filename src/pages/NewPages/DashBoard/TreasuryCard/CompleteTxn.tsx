@@ -35,14 +35,14 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
             symbol = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
         let recipient = _get(transaction, 'transfers[0].to', _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'to' || p.name === '_to'), 'value', _get(transaction, 'to', '')))
         let tokenSymbol = undefined;
-        const setAllowance =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => vd.dataDecoded.method === "setAllowance")
+        const setAllowance =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => _get(vd, 'dataDecoded.method', '') === "setAllowance")
         let isAllowanceTransaction = false;
         if(setAllowance)
             isAllowanceTransaction = true;
         if(transaction?.dataDecoded?.method === 'multiSend' && transaction?.dataDecoded?.parameters[0]?.name === 'transactions' && isAllowanceTransaction) {
-            const addDelegate =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => vd.dataDecoded.method === "addDelegate")
+            const addDelegate =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => _get(vd, 'dataDecoded.method', '') === "addDelegate")
             recipient = _get(addDelegate, 'dataDecoded.parameters[0].value', '')
-            const setAllowance =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => vd.dataDecoded.method === "setAllowance")
+            const setAllowance =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => _get(vd, 'dataDecoded.method', '') === "setAllowance")
             amount = _get(setAllowance, 'dataDecoded.parameters[2].value', '')
             const tokenAddr = _get(setAllowance, 'dataDecoded.parameters[1].value', '')
             tokenSymbol = _get(_find(safeTokens, (st:any) => st.tokenAddress === tokenAddr), 'token.symbol', '')

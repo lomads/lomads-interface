@@ -39,11 +39,11 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
         let recipient = _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'to' || p.name === '_to'), 'value', _get(transaction, 'to', ''))
         let tokenSymbol = undefined;
         let isAllowanceTransaction = false;
-        const setAllowance =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => vd.dataDecoded.method === "setAllowance")
+        const setAllowance =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => _get(vd, 'dataDecoded.method', '')=== "setAllowance")
         if(setAllowance)
             isAllowanceTransaction = true;
         if(transaction?.dataDecoded?.method === 'multiSend' && transaction?.dataDecoded?.parameters[0]?.name === 'transactions' && isAllowanceTransaction) {
-            const addDelegate =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => vd.dataDecoded.method === "addDelegate")
+            const addDelegate =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => _get(vd, 'dataDecoded.method', '') === "addDelegate")
             recipient = _get(addDelegate, 'dataDecoded.parameters[0].value', '')
             amount = _get(setAllowance, 'dataDecoded.parameters[2].value', '')
             const tokenAddr = _get(setAllowance, 'dataDecoded.parameters[1].value', '')
