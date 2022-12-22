@@ -35,10 +35,11 @@ const useStyles = makeStyles((theme: any) => ({
 	memberDetails: {
 		padding: "26px 22px",
 		width: '44rem',
-		height: 'auto',
+		maxHeight: '15rem',
 		background: "#FFFFFF",
 		borderRadius: '5px !important',
-		marginBottom: '0.1rem'
+		marginBottom: '0.1rem',
+		overflow:'auto'
 	}
 }));
 

@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import { LandingLayout, RootLayout } from 'layouts';
+import { LandingLayout, RootLayout, SettingsLayout } from 'layouts';
 import LoginPage from 'views/Login';
 import ElementsPage from 'views/Elements';
 import CreateOrganization from 'views/Create-Organization';
@@ -9,6 +9,7 @@ import CreateSafe from 'views/Create-Safe';
 import AddExistingSafe from 'views/Add-Existing-Safe';
 import DAOLive from 'views/DAO-Live';
 import Dashboard from 'views/Dashboard';
+import Settings from 'views/Settings-DAO';
 export default [
 	// {
 	// 	path: '/',
@@ -79,5 +80,12 @@ export default [
 		layout: RootLayout,
 		private: false,
 		component: Dashboard
+	},
+	{
+		path: '/settings',
+		exact: true,
+		layout: SettingsLayout,
+		private: false,
+		component: Settings
 	}
 ];
