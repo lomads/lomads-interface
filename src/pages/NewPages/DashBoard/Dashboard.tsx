@@ -193,19 +193,28 @@ const Dashboard = () => {
 				if (chainId === DAO.chainId) {
 					if (DAO?.sbt?.whitelisted) {
 						if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
-							if (parseInt(balanceOf._hex, 16) === 0)
+							if (parseInt(balanceOf._hex, 16) === 0) {
 								navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
+							} else {
+								// check if data has been filled show mint page. with prefilled data. save data without minting again
+							}
 						} else {
 							navigate('/only-whitelisted')
 						}
 					} else if (!DAO?.sbt?.whitelisted) {
 						if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
-							if (parseInt(balanceOf._hex, 16) === 0)
+							if (parseInt(balanceOf._hex, 16) === 0) {
 								navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
+							}  else {
+								// check if data has been filled show mint page. with prefilled data. save data without minting again
+							}
 						} else {
 							//add to DAO
-							if (parseInt(balanceOf._hex, 16) === 0)
+							if (parseInt(balanceOf._hex, 16) === 0) {
 								navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
+							} else {
+								// check if data has been filled show mint page. with prefilled data. save data without minting again
+							}
 						}
 					}
 				} else {

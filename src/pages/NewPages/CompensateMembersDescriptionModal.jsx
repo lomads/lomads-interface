@@ -308,7 +308,7 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
             >
               Cancel
             </Button>
-            <Button disabled={loading || safeTokens.length == 0} style={{ backgroundColor: loading ? 'grey' : '#C94B32' }} onClick={() => createTransaction()} id="button-save">SAVE CHANGES</Button>
+            <Button disabled={loading || safeTokens.length == 0} style={{ backgroundColor: loading ? 'grey' : '#C94B32' }} onClick={() => createTransaction()} id="button-save">SEND TOKENS</Button>
           </div>
         </div>
       </div>
