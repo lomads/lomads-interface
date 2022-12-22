@@ -96,37 +96,38 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
     }, [DAO, selectedUser])
 
     const handleCreateRecurringPayment = async () => {
-        setError(null)
-        console.log(ends)
-        const currentAllowance = await getSpendingAllowance({ delegate: account as string, token: compensation?.currency });
-        setErrors({})
-        let err: any = {}
-        if(!selectedUser) 
-            err['receiver'] = 'Please select valid receiver'
-        if(!startDate || moment.utc(startDate, 'YYYY-MM-DD').isBefore(moment.utc().startOf('day'))) 
-            err['startDate'] = 'Please select valid startdate'
-        if(!ends || (ends && ends.key !== "NEVER" && (!ends.value || ends.value === "" || ends.value === 0 || ends.value === "0"))) 
-            err['ends'] = 'Please select valid end'
-        if(!compensation || (compensation && (!compensation?.amount || !compensation?.symbol || !compensation?.currency)))
-            err['amount'] = 'Please select valid amount'
-        if(Object.keys(err).length > 0)  {
-            setErrors(err)
-            return;
-        }
-
-        let amount = _get(compensation, 'amount');
-        let resetMins = +moment.duration(moment().startOf('day').add(30, 'days').diff(moment().startOf('day'))).asMinutes()
-        let resetBaseMins = Math.floor((moment().unix() / 60))
-        if(frequency === 'weekly')
-            amount = (amount * 4)
-        
-        if(currentAllowance && currentAllowance?.amount > 0) {
-            amount = amount + currentAllowance?.amount
-            resetMins = currentAllowance.resetTimeMin
-            resetBaseMins = currentAllowance.lastResetMin
-        }
-
         try {
+            setError(null)
+            const currentAllowance = await getSpendingAllowance({ delegate: account as string, token: compensation?.currency });
+            console.log(currentAllowance)
+            setErrors({})
+            let err: any = {}
+            if(!selectedUser) 
+                err['receiver'] = 'Please select valid receiver'
+            if(!startDate || moment.utc(startDate, 'YYYY-MM-DD').isBefore(moment.utc().startOf('day'))) 
+                err['startDate'] = 'Please select valid startdate'
+            if(!ends || (ends && ends.key !== "NEVER" && (!ends.value || ends.value === "" || ends.value === 0 || ends.value === "0"))) 
+                err['ends'] = 'Please select valid end'
+            if(!compensation || (compensation && (!compensation?.amount || !compensation?.symbol || !compensation?.currency)))
+                err['amount'] = 'Please select valid amount'
+            if(Object.keys(err).length > 0)  {
+                console.log(err)
+                setErrors(err)
+                return;
+            }
+
+            let amount = _get(compensation, 'amount');
+            let resetMins = +moment.duration(moment().startOf('day').add(30, 'days').diff(moment().startOf('day'))).asMinutes()
+            let resetBaseMins = Math.floor((moment().unix() / 60))
+            if(frequency === 'weekly')
+                amount = (amount * 4)
+            
+            if(currentAllowance && currentAllowance?.amount > 0) {
+                amount = amount + currentAllowance?.amount
+                resetMins = currentAllowance.resetTimeMin
+                resetBaseMins = currentAllowance.lastResetMin
+            }
+
             const txnHash = await setAllowance({ delegate: account as string, token: compensation?.currency, amount: `${BigInt(parseFloat(amount) * 10 ** _get(compensation, 'decimal', 18))}`, resetMins: `${resetMins}`, resetBaseMins: `${resetBaseMins}`, label: `allowance: ${amount} ${_get(compensation, 'symbol')} resets monthly`})
             const payload = {
                 daoId: _get(DAO, '_id', null),

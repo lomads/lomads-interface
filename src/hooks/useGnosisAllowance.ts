@@ -45,10 +45,18 @@ const useGnosisAllowance = (safeAddress: string | null) => {
         if(!safeAddress || !account || !chainId) return;
         setGnosisAllowanceLoading(true)
         try {  
+            const safeSDK = await ImportSafe(provider, safeAddress);
+            const isOwner = await safeSDK.isOwner(account as string);
+            if(!isOwner) {
+                setGnosisAllowanceLoading(false)
+                throw 'Not allowed operation. Only safe owner can perform setAllowance operation'
+            }
             const addDelegateData = allowanceContract?.interface.encodeFunctionData('addDelegate', [delegate])
             const allowanceData = allowanceContract?.interface.encodeFunctionData('setAllowance', [delegate, token, amount, resetMins, resetBaseMins ])
-            const safeSDK = await ImportSafe(provider, safeAddress);
             const currentNonce = await (await safeService(provider, `${chainId}`)).getNextNonce(safeAddress);
+            let onlyCalls = false;
+            if(chainId === SupportedChainId.POLYGON)
+                onlyCalls = true
             const options: SafeTransactionOptionalProps = { nonce: currentNonce };
             const moduleAddress = GNOSIS_SAFE_ALLOWANCE_MODULE_CONTRACT[`${chainId}`]
             let moduleTransactionData = undefined;
@@ -72,7 +80,7 @@ const useGnosisAllowance = (safeAddress: string | null) => {
                     value: '0'
                 }
             ]
-            const safeTransaction = await safeSDK.createTransaction({ safeTransactionData, options })
+            const safeTransaction = await safeSDK.createTransaction({ safeTransactionData, options, onlyCalls })
             const safeTxHash = await safeSDK.getTransactionHash(safeTransaction);
             const signature = await safeSDK.signTransactionHash(safeTxHash);
             await (await safeService(provider, `${chainId}`))
