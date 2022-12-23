@@ -369,4 +369,6 @@ const Settings = () => {
 	);
 };
 
+// role1: { value: 'ACTIVE_CONTRIBUTOR', label: 'Active contributor' }
+
 export default Settings;
