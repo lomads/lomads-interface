@@ -21,6 +21,8 @@ import useGnosisAllowance from 'hooks/useGnosisAllowance';
 import { useAppDispatch, useAppSelector } from 'state/hooks';
 import axiosHttp from 'api'
 import { setRecurringPayments } from 'state/dashboard/reducer';
+import { useWeb3React } from '@web3-react/core';
+const { toChecksumAddress } = require('ethereum-checksum-address')
 
 
 const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
@@ -36,6 +38,7 @@ const { createAllowanceTransaction } = useGnosisAllowance(_get(DAO, 'safe.addres
 const [loading, setLoading] = useState(false);
 const [deleteLoading, setDeleteLoading] = useState(false);
 const [showEdit, setShowEdit] = useState(false);
+const { account } = useWeb3React()
 
 const nextQueue = useMemo(() => {
     if(transaction && transaction.queue) {
@@ -53,7 +56,8 @@ const handleCreateAllowanceTxn = async (queue, transaction) => {
             tokenAddress: transaction.compensation.currency,
             to: transaction.receiver.wallet, 
             amount: transaction.compensation.amount,
-            label: `Recurring transaction on: ${moment.unix(queue.nonce).local().format('MM/DD/YYYY')}`
+            label: `${transaction.frequency} payment | ${transaction.receiver.name ? transaction.receiver.name : beautifyHexToken(transaction.receiver.wallet)} | ${moment.unix(queue.nonce).local().format('MM/DD/YYYY')}`,
+            delegate: toChecksumAddress(transaction.delegate.wallet)
         })
         await axiosHttp.post(`recurring-payment/${queue._id}/complete`, { txHash: response.transactionHash })
         .then(res => onExecute(res.data))
@@ -69,12 +73,12 @@ const renderNextSection = (nextQueue, transaction) => {
         return (
             <Tooltip placement='top' label={`Payment for ${moment.unix(nextQueue.nonce).format(`MM/DD/YYYY`)}`}>
                 <ToolTopContainer>
-                    <SimpleLoadButton onClick={() => handleCreateAllowanceTxn(nextQueue, transaction)} condition={loading} width={"100%"} height={30} title="EXECUTE" bgColor={loading ? 'grey': "#C94B32"} className="button" />
+                    <SimpleLoadButton onClick={() => handleCreateAllowanceTxn(nextQueue, transaction)} condition={loading} width={"100%"} disabled={account !== toChecksumAddress(transaction.delegate.wallet)}  height={30} title="EXECUTE" bgColor={loading || account !== toChecksumAddress(transaction.delegate.wallet) ? 'grey': "#C94B32"} className="button" />
                 </ToolTopContainer>
             </Tooltip>
     )
     else if(nextQueue)
-        return <div className="text">Next: { `${ moment.unix(nextQueue.nonce).format('MM/DD/YYYY') }` }</div>
+        return <div className="text">Next: { `${ moment.unix(nextQueue.nonce).local().format('MM/DD/YYYY') }` }</div>
     else
         return <div className="text">Payment ended</div>   
 }
@@ -136,14 +140,14 @@ const handleDeleteRecurringPayment = async tx => {
                 }
             </div>
         </Td>
-        <Td className='recurringtxn-row-item'>
-            <div className="edit">
-                {
-                    showEdit && transaction.active && nextQueue &&
-                    <SimpleLoadButton bgColor={deleteLoading ? 'grey' : '#FFF'} color="#B12F15" title='STOP PAYMENTS' condition={deleteLoading} onClick={() => handleDeleteRecurringPayment(transaction)} height={40}  width={180}/>
-                }
-            </div>
-        </Td>
+        { account ===  toChecksumAddress(transaction.delegate.wallet) &&
+            <Td className='recurringtxn-row-item'>
+                <div className="edit">
+                        { showEdit && transaction.active && nextQueue &&
+                        <SimpleLoadButton bgColor={deleteLoading ? 'grey' : '#FFF'} color="#B12F15" title='EDIT' condition={deleteLoading} onClick={() => onRecurringEdit(transaction)} height={40}  width={180}/> }
+                </div>
+            </Td>
+        }
     </Tr>
  )   
 }

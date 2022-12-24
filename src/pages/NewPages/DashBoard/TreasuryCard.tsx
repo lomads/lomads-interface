@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useImperativeHandle, useCallback } from "react";
-import { get as _get, sortBy as _sortBy, filter as _filter, map as _map, find as _find } from 'lodash';
+import { get as _get, sortBy as _sortBy, orderBy as _orderBy, filter as _filter, map as _map, find as _find } from 'lodash';
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import SafeButton from "UIpack/SafeButton";
 import { useWeb3React } from "@web3-react/core";
@@ -200,7 +200,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				const { pTxn } = await loadOffChainTxn()
 				return ptx.concat(pTxn)
 			})
-			.then(ptx => _sortBy(ptx, 'submissionDate', 'ASC'))
+			.then(ptx => _orderBy(ptx, [p => p.offChain, p => p.submissionDate], ['asc', 'asc']))
 			//.then(ptx => { console.log("loadPendingTxn", ptx); return ptx })
 			.then(ptx => setPendingTxn(ptx))
 	}
@@ -215,7 +215,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				const { eTxn } = await loadOffChainTxn()
 				return etx.concat(eTxn)
 			})
-			.then(ptx => _sortBy(ptx, 'submissionDate', 'ASC'))
+			.then(ptx => _orderBy(ptx, [(p:any) => p.offChain, (p:any) => p.submissionDate], ['asc', 'asc']))
 			.then(etx => { console.log("loadExecutedTxn", etx); return etx })
 			.then(etx => setExecutedTxn(etx))
 	}
@@ -618,7 +618,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 							})
 						}
 					</div> */}
-					{owner && <SafeButton onClick={props.toggleModal} height={40} width={150} titleColor="#B12F15" title="SEND TOKEN" bgColor={!hasValidToken ? "#f0f2f6" : "#FFFFFF"} opacity={!hasValidToken ? "0.4" : "1"} disabled={!hasValidToken} fontweight={400} fontsize={16} />}
+					{owner && tab === 1 && <SafeButton onClick={props.toggleModal} height={40} width={150} titleColor="#B12F15" title="SEND TOKEN" bgColor={!hasValidToken ? "#f0f2f6" : "#FFFFFF"} opacity={!hasValidToken ? "0.4" : "1"} disabled={!hasValidToken} fontweight={400} fontsize={16} />}
 				</div>
 			</div>
 

@@ -404,6 +404,16 @@ export const createRecurringPayment = createAsyncThunk(
 			.catch(e => thunkApi.rejectWithValue(e))
 	}
 )
+
+export const updateRecurringPayment = createAsyncThunk(
+	'recurringPayment/update',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`recurring-payment/${params.recurringTxnId}`, params.payload)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+)
+
 export const updateKRA = createAsyncThunk(
 	'dao/updateKRA',
 	async (params: any, thunkApi) => {

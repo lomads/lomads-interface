@@ -187,10 +187,10 @@ const AllTasks = () => {
                                 </button>
                                 <div className="divider"></div>
 
-                                <button className={tab === 3 ? 'active' : null} onClick={() => setTab(3)}>
+                                {/* <button className={tab === 3 ? 'active' : null} onClick={() => setTab(3)}>
                                     Drafts
                                 </button>
-                                <div className="divider"></div>
+                                <div className="divider"></div> */}
                             </>
                             :
                             null

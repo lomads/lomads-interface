@@ -8,6 +8,7 @@ const useSafeTokens = (safeAddress: string | null) => {
 
     const { chainId } = useWeb3React();
     const [safeTokens, setSafeTokens] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const tokenBalance = useCallback((token: any) => {
         if(safeTokens && safeTokens.length > 0) {
@@ -20,7 +21,7 @@ const useSafeTokens = (safeAddress: string | null) => {
     }, [safeTokens])
 
     useEffect(() => {
-        if(chainId && safeAddress){
+        if(chainId && safeAddress !== null){
             axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`, {withCredentials: false })
             .then(res => {
                 let tokens = res.data.map((t: any) => {
@@ -38,6 +39,9 @@ const useSafeTokens = (safeAddress: string | null) => {
                     return t 
                 })
                 setSafeTokens(tokens)
+            })
+            .finally(() => {
+                setLoading(false)
             })
         }
     }, [chainId, safeAddress])

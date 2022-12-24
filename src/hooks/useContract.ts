@@ -146,7 +146,6 @@ export function useSBTContract(contractAddr : String) {
 }
 
 export function useAllowanceContract(contractAddr : String) {
-  console.log("useContract", contractAddr)
   let path = require('../allowanceAbis/AllowanceModule.json')
   return useContract(contractAddr, path, true);
 }

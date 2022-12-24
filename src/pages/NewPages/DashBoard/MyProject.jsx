@@ -11,6 +11,7 @@ import ProjectCard from './Project/ProjectCard';
 import { useWeb3React } from "@web3-react/core";
 import { useParams } from 'react-router-dom';
 import archiveIcon from '../../../assets/svg/archiveIcon.svg';
+import expandIcon from '../../../assets/svg/expand.svg';
 
 import useRole from 'hooks/useRole';
 import moment from 'moment';
@@ -98,6 +99,11 @@ const MyProject = () => {
                     </button>
                 </div>
                 <div className="myproject-buttons">
+                    <div style={{ marginRight: '20px' }}>
+                        <button className='archive-btn' onClick={() => { navigate(`/${DAO.url}/projects`, { state: { activeTab: tab } }) }}>
+                            <img src={expandIcon} alt="archive-icon" />
+                        </button>
+                    </div>
                     {can(myRole, 'project.view.archives') && <div style={{ marginRight: '20px' }}>
                         <button
                             className='archive-btn'

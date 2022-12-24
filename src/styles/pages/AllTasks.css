@@ -116,6 +116,7 @@
     height: calc(100% - 180px);
     display: flex;
     overflow: auto;
+    align-items: flex-start;
     padding: 1rem;
 }
 

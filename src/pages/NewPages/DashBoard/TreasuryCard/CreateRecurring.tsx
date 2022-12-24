@@ -127,8 +127,13 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
                 resetMins = currentAllowance.resetTimeMin
                 resetBaseMins = currentAllowance.lastResetMin
             }
-
-            const txnHash = await setAllowance({ delegate: account as string, token: compensation?.currency, amount: `${BigInt(parseFloat(amount) * 10 ** _get(compensation, 'decimal', 18))}`, resetMins: `${resetMins}`, resetBaseMins: `${resetBaseMins}`, label: `allowance: ${amount} ${_get(compensation, 'symbol')} resets monthly`})
+            let memberName = eligibleContributors.filter((m:any) => m._id === selectedUser)
+            memberName = memberName.name && memberName.name !== "" ? memberName.name : beautifyHexToken(memberName.wallet)
+            const txnHash = await setAllowance({
+                allowance: [{ token: compensation?.currency, amount: `${BigInt(parseFloat(amount) * 10 ** _get(compensation, 'decimal', 18))}`, resetMins: `${resetMins}`, resetBaseMins: `${resetBaseMins}`}],
+                label: `Approval for ${frequency} payment | ${memberName} | ${amount} ${_get(compensation, 'symbol')}`,
+                delegate: account as string,
+             })
             const payload = {
                 daoId: _get(DAO, '_id', null),
                 safeAddress: _get(DAO, 'safe.address', null),
@@ -150,8 +155,145 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
             setError(e)
         }
     }
+
+    const handleUpdateRecurringPayment = async () => {
+        try {
+            setError(null)
+            setErrors({})
+            let err: any = {}
+            if(!selectedUser) 
+                err['receiver'] = 'Please select valid receiver'
+            if(!startDate) 
+                err['startDate'] = 'Please select valid startdate'
+            if(!ends || (ends && ends.key !== "NEVER" && (!ends.value || ends.value === "" || ends.value === 0 || ends.value === "0"))) 
+                err['ends'] = 'Please select valid end'
+            if(!compensation || (compensation && (!compensation?.amount || !compensation?.symbol || !compensation?.currency)))
+                err['amount'] = 'Please select valid amount'
+            if(Object.keys(err).length > 0)  {
+                console.log(err)
+                setErrors(err)
+                return;
+            }
+
+            const isReceiverChanged = _get(transaction, 'receiver._id', '') !== selectedUser
+            const isTokenChanged = _get(transaction, 'compensation.currency') !== _get(compensation, 'currency')
+            const isAmountChanged = _get(transaction, 'compensation.amount') !== _get(compensation, 'amount')
+            const isFrequencyChanged = _get(transaction, 'frequency') !== frequency
+            const isStartDateChanged = !(moment(_get(transaction, 'startDate')).startOf('day').isSame(moment(startDate).startOf('day')))
+            const isEndChanged = (_get(transaction, 'ends.key') !== ends.key || _get(transaction, 'ends.value') !== ends.value)
+
+            console.log(
+                "isReceiverChanged::", isReceiverChanged, "\n",
+                "isTokenChanged::", isTokenChanged, "\n",
+                "isAmountChanged::", isAmountChanged, "\n",
+                "isFrequencyChanged::", isFrequencyChanged, "\n",
+                "isStartDateChanged::", isStartDateChanged, "\n",
+                "isEndChanged::", isEndChanged, "\n",
+            )
+
+            let payload = {
+                daoId: _get(DAO, '_id', null),
+                safeAddress: _get(DAO, 'safe.address', null),
+                receiver: selectedUser,
+                delegate: user._id,
+                compensation,
+                frequency,
+                startDate: moment(startDate, 'YYYY-MM-DD').startOf('day').utc().toDate(),
+                ends,
+                allowanceTxnHash: transaction.allowanceTxnHash,
+            }
+    
+            if(isTokenChanged) {
+                const oldAllowance = await getSpendingAllowance({ delegate: account as string, token: transaction?.compensation?.currency });
+                // Reset old allowance
+                const resetAllowanceAmount = _get(oldAllowance, 'amount', 0) - (_get(transaction, 'compensation.amount', 0) * (transaction.frequency === 'weekly' ? 4 : 1))
+
+                const currentAllowance = await getSpendingAllowance({ delegate: account as string, token: compensation?.currency });
+                // New Allowance for new Token
+                let amount = _get(compensation, 'amount');
+                let resetMins = +moment.duration(moment().startOf('day').add(30, 'days').diff(moment().startOf('day'))).asMinutes()
+                let resetBaseMins = Math.floor((moment().unix() / 60))
+                if(frequency === 'weekly')
+                    amount = (amount * 4)
+                
+                if(currentAllowance && currentAllowance?.amount > 0) {
+                    amount = amount + currentAllowance?.amount
+                    resetMins = currentAllowance.resetTimeMin
+                    resetBaseMins = currentAllowance.lastResetMin
+                }
+                const memberName = transaction?.receiver?.name && transaction?.receiver?.name !== "" ? transaction?.receiver?.name : beautifyHexToken(transaction?.receiver?.wallet)
+                const txnHash = await setAllowance({
+                    allowance: [
+                        { token: transaction?.compensation?.currency, amount: `${BigInt(parseFloat(`${resetAllowanceAmount}`) * 10 ** _get(compensation, 'decimal', 18))}`, resetMins: `${oldAllowance?.resetTimeMin}`, resetBaseMins: `${oldAllowance?.lastResetMin}`},
+                        { token: compensation?.currency, amount: `${BigInt(parseFloat(amount) * 10 ** _get(compensation, 'decimal', 18))}`, resetMins: `${resetMins}`, resetBaseMins: `${resetBaseMins}`}
+                    ],
+                    label: `Allowance reset for ${frequency} payment | ${memberName} | ${amount} ${_get(compensation, 'symbol')}`,
+                    delegate: account as string,
+                 })
+                payload.allowanceTxnHash = txnHash?.safeTxHash
+            } else if (isAmountChanged) {
+                const currentAllowance = await getSpendingAllowance({ delegate: account as string, token: transaction?.compensation?.currency });
+                // New Allowance for new Token
+                let amount = -(transaction.compensation.amount - _get(compensation, 'amount'));
+                let resetMins = +moment.duration(moment().startOf('day').add(30, 'days').diff(moment().startOf('day'))).asMinutes()
+                let resetBaseMins = Math.floor((moment().unix() / 60))
+                if(frequency === 'weekly')
+                    amount = (amount * 4)
+                
+                if(currentAllowance && currentAllowance?.amount > 0) {
+                    amount = currentAllowance?.amount + amount
+                    resetMins = currentAllowance.resetTimeMin
+                    resetBaseMins = currentAllowance.lastResetMin
+                }
+                const memberName = transaction?.receiver?.name && transaction?.receiver?.name !== "" ? transaction?.receiver?.name : beautifyHexToken(transaction?.receiver?.wallet)
+                const txnHash = await setAllowance({
+                    allowance: [
+                        { token: compensation?.currency, amount: `${BigInt(parseFloat(`${amount}`) * 10 ** _get(compensation, 'decimal', 18))}`, resetMins: `${resetMins}`, resetBaseMins: `${resetBaseMins}`}
+                    ],
+                    label: `Allowance update for ${frequency} payment | ${memberName} | ${amount} ${_get(compensation, 'symbol')}`,
+                    delegate: account as string,
+                 })
+                payload.allowanceTxnHash = txnHash?.safeTxHash
+
+            }
+
+            console.log(payload)
+
+            await axiosHttp.patch(`recurring-payment/${transaction._id}`, payload)
+            setTimeout(() => { 
+                onRecurringPaymentCreated() 
+                toggleShowCreateRecurring()
+            }, 100)
+        } catch (e) {
+            console.log(e)
+            setError(e)
+        }
+    }
     
     const handleDeleteRecurringPayment = async  () => {
+
+        const currentAllowance = await getSpendingAllowance({ delegate: account as string, token: transaction?.compensation?.currency });
+        // New Allowance for new Token
+        let amount = transaction.compensation.amount;
+        let resetMins = +moment.duration(moment().startOf('day').add(30, 'days').diff(moment().startOf('day'))).asMinutes()
+        let resetBaseMins = Math.floor((moment().unix() / 60))
+        if(frequency === 'weekly')
+            amount = (amount * 4)
+        
+        if(currentAllowance && currentAllowance?.amount > 0) {
+            amount = currentAllowance?.amount - amount
+            resetMins = currentAllowance.resetTimeMin
+            resetBaseMins = currentAllowance.lastResetMin
+        }
+        const memberName = transaction?.receiver?.name && transaction?.receiver?.name !== "" ? transaction?.receiver?.name : beautifyHexToken(transaction?.receiver?.wallet)
+        const txnHash = await setAllowance({
+            allowance: [
+                { token: compensation?.currency, amount: `${BigInt(parseFloat(`${amount}`) * 10 ** _get(compensation, 'decimal', 18))}`, resetMins: `${resetMins}`, resetBaseMins: `${resetBaseMins}`}
+            ],
+            label: `Stopping ${frequency} payment | ${memberName} | ${amount} ${_get(compensation, 'symbol')}`,
+            delegate: account as string,
+         })
+
         await axiosHttp.delete(`recurring-payment/${transaction._id}`)
         .then(res => {
             dispatch(setRecurringPayments(res.data))
@@ -186,6 +328,7 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
                                     <select
                                         name="member"
                                         id="member"
+                                        disabled={transaction}
                                         value={selectedUser || ''}
                                         onChange={e => setSelectedUser(e?.target?.value || null)}
                                         className="tokenDropdown"
@@ -258,6 +401,7 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
                                         id="startDateInput"
                                         height={50}
                                         width={'100%'}
+                                        disabled={transaction && transaction.active && moment(transaction.startDate).isBefore(moment())}
                                         placeholder="Start Date"
                                         value={startDate}
                                         type="date"
@@ -279,7 +423,7 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                                             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', margin: '24px 0' }}>
-                                                <input checked={ends.key === 'ON'} onChange={e => setEnds((prev: any) => { return { ...prev, key: 'ON', value: moment().format('YYYY-MM-DD') } })} type="checkbox" />
+                                                <input checked={ends.key === 'ON'} onChange={e => setEnds((prev: any) => { return { ...prev, key: 'ON', value: moment().add(1, 'day').format('YYYY-MM-DD') } })} type="checkbox" />
                                                 <div style={{ marginLeft: 12 }}>On</div>
                                             </div>
                                             <div style={{ width: 189 }}>
@@ -290,7 +434,7 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
                                                     height={50}
                                                     width={'100%'}
                                                     placeholder="Start Date"
-                                                    value={ends?.value || moment().format('YYYY-MM-DD')}
+                                                    value={ends?.value || moment().add(1, 'day').format('YYYY-MM-DD')}
                                                     type="date"
                                                     onchange={e => setEnds((prev: any) => { return { ...prev, value: moment(e.target.value).isSameOrBefore(moment()) ? moment().format('YYYY-MM-DD') : e.target.value } })}
                                                 />
@@ -328,7 +472,9 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
                                     <button onClick={() => toggleShowCreateRecurring()} disabled={gnosisAllowanceLoading}>
                                         CANCEL
                                     </button>
-                                    <SimpleLoadButton bgColor={gnosisAllowanceLoading ? 'grey' : "#C94B32"} disabled={gnosisAllowanceLoading}  title={ transaction ? "SAVE" : "CREATE"} condition={gnosisAllowanceLoading} onClick={() => handleCreateRecurringPayment()} />
+                                    { transaction ?
+                                    <SimpleLoadButton bgColor={"#C94B32"}  title={"SAVE"} condition={gnosisAllowanceLoading} onClick={() => handleUpdateRecurringPayment()} /> :
+                                    <SimpleLoadButton bgColor={gnosisAllowanceLoading ? 'grey' : "#C94B32"} disabled={gnosisAllowanceLoading}  title={"CREATE"} condition={gnosisAllowanceLoading} onClick={() => handleCreateRecurringPayment()} /> }
                             </div>
                         </>
                 }

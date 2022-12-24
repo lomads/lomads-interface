@@ -40,8 +40,7 @@ const useGnosisAllowance = (safeAddress: string | null) => {
         return data
     }
 
-    const setAllowance = async ({ delegate, token, amount, resetMins, resetBaseMins, label = 'Allowance' } : { delegate: string, token: string, amount: string, resetMins: string, resetBaseMins: string, label?: string }) => {
-        console.log(delegate, token, amount, resetMins, resetBaseMins, label)
+    const setAllowance = async ({ allowance, label, delegate }: any) => {
         if(!safeAddress || !account || !chainId) return;
         setGnosisAllowanceLoading(true)
         try {  
@@ -51,8 +50,8 @@ const useGnosisAllowance = (safeAddress: string | null) => {
                 setGnosisAllowanceLoading(false)
                 throw 'Not allowed operation. Only safe owner can perform setAllowance operation'
             }
-            const addDelegateData = allowanceContract?.interface.encodeFunctionData('addDelegate', [delegate])
-            const allowanceData = allowanceContract?.interface.encodeFunctionData('setAllowance', [delegate, token, amount, resetMins, resetBaseMins ])
+            // const addDelegateData = allowanceContract?.interface.encodeFunctionData('addDelegate', [delegate])
+            // const allowanceData = allowanceContract?.interface.encodeFunctionData('setAllowance', [delegate, token, amount, resetMins, resetBaseMins ])
             const currentNonce = await (await safeService(provider, `${chainId}`)).getNextNonce(safeAddress);
             let onlyCalls = false;
             if(chainId === SupportedChainId.POLYGON)
@@ -63,6 +62,14 @@ const useGnosisAllowance = (safeAddress: string | null) => {
             const moduleEnabled = await checkModuleEnabled();
             if(!moduleEnabled)
                 moduleTransactionData = await safeSDK.createEnableModuleTx(moduleAddress)
+                
+            const setAllowanceObj = allowance.map((a:any) => {
+                return {
+                    to: GNOSIS_SAFE_ALLOWANCE_MODULE_CONTRACT[`${chainId}`],
+                    data: allowanceContract?.interface.encodeFunctionData('setAllowance', [delegate, a.token, a.amount, a.resetMins, a.resetBaseMins ]) as string,
+                    value: '0'
+                }
+            })
             const safeTransactionData: SafeTransactionDataPartial[]  = [
                 ...( !moduleEnabled ? [{   
                     to: safeAddress,
@@ -71,14 +78,10 @@ const useGnosisAllowance = (safeAddress: string | null) => {
                 }] : []),
                 {   
                     to: GNOSIS_SAFE_ALLOWANCE_MODULE_CONTRACT[`${chainId}`],
-                    data: addDelegateData as string,
+                    data: allowanceContract?.interface.encodeFunctionData('addDelegate', [delegate]) as string,
                     value: '0'
                 },
-                {   
-                    to: GNOSIS_SAFE_ALLOWANCE_MODULE_CONTRACT[`${chainId}`],
-                    data: allowanceData as string,
-                    value: '0'
-                }
+                ...setAllowanceObj
             ]
             const safeTransaction = await safeSDK.createTransaction({ safeTransactionData, options, onlyCalls })
             const safeTxHash = await safeSDK.getTransactionHash(safeTransaction);
@@ -121,13 +124,13 @@ const useGnosisAllowance = (safeAddress: string | null) => {
         return safeTransactionData;
     }
 
-    const createAllowanceTransaction = async ({ tokenAddress, amount, to, label }: { tokenAddress: string, amount: number, to: string, label: string} ) => {
+    const createAllowanceTransaction = async ({ tokenAddress, amount, to, label, delegate = account as string}: { tokenAddress: string, amount: number, to: string, label: string, delegate: string} ) => {
         if(!safeAddress || !account || !chainId || !amount || !tokenAddress) return;
         const safeToken = _find(safeTokens, t => _get(t, 'tokenAddress', null) === tokenAddress)
         if(amount == 0) throw `Cannot send 0 ${_get(safeToken, 'token.symbol', '')}`
         if (tokenBalance(tokenAddress) < amount)
             throw `Low token balance. Available balance ${tokenBalance(tokenAddress)} ${_get(safeToken, 'token.symbol', '')}`
-        const allowance = await getSpendingAllowance({ delegate: account as string, token: tokenAddress })
+        const allowance = await getSpendingAllowance({ delegate: delegate, token: tokenAddress })
         if(!allowance)
             throw 'Unable to fetch allowance'
         const balance = +allowance.amount - +allowance.spent
@@ -142,7 +145,7 @@ const useGnosisAllowance = (safeAddress: string | null) => {
                 `${BigInt(amount * 10 ** _get(safeToken, 'token.decimals', 18))}`, 
                 chainId === SupportedChainId.GOERLI ? process.env.REACT_APP_GOERLI_TOKEN_ADDRESS : process.env.REACT_APP_MATIC_TOKEN_ADDRESS, 
                 '0', 
-                account as string, 
+                delegate, 
                 "0x"
             )
             console.log("executeTxResponse", executeTxResponse);
