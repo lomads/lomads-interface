@@ -135,7 +135,7 @@ type Auth = {
       authorization,
       authData,
       error,
-      onOpen: (url: string = `https://discord.com/api/oauth2/authorize?client_id=${`1049724741306564669`}&response_type=token&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`) => {
+      onOpen: (url: string = `https://discord.com/api/oauth2/authorize?client_id=${process.env.REACT_APP_DISCORD_APP_ID}&response_type=token&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`) => {
         setError(null)
         onOpen(url)
       },

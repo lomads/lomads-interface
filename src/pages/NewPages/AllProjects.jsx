@@ -135,10 +135,10 @@ const AllProjects = () => {
                     </div>
                 </div>
             </div>
-
+            <div className='allTasks-body'>
             {
                 tab === 1 &&
-                <div className='allTask-container' style={{ padding: '25px' }}>
+                <div className='allTask-container'>
                     {
                         currentProjects && currentProjects.map((item, index) => {
                             return (
@@ -157,7 +157,7 @@ const AllProjects = () => {
 
             {
                 tab === 2 &&
-                <div className='allTask-container' style={{ padding: '25px' }}>
+                <div className='allTask-container'>
                     {
                         currentProjects && currentProjects.map((item, index) => {
                             return (
@@ -173,7 +173,7 @@ const AllProjects = () => {
                     }
                 </div>
             }
-
+        </div>
         </div>
     )
 }

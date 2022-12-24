@@ -60,8 +60,12 @@ const handleCreateAllowanceTxn = async (queue, transaction) => {
             delegate: toChecksumAddress(transaction.delegate.wallet)
         })
         await axiosHttp.post(`recurring-payment/${queue._id}/complete`, { txHash: response.transactionHash })
-        .then(res => onExecute(res.data))
-        setLoading(false);
+        .then(res =>
+            setTimeout(() => {
+                onExecute(res.data)
+                setLoading(false);
+            }, 1000)
+            )
     } catch (e) {
         console.log(e)
         setLoading(false);

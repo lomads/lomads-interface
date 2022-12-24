@@ -153,7 +153,7 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                                    if(!discordGuild){
                                        const redirectUri = typeof window !== "undefined" && `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
                                        setPoll(dcserverid)
-                                       openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=1049724741306564669&guild_id=${dcserverid}&permissions=8&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
+                                       openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=${process.env.REACT_APP_DISCORD_APP_ID}&guild_id=${dcserverid}&permissions=8&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
                                    } else {
                                         onGuildBotAddedDelayed(validServer)
                                    }
@@ -166,7 +166,7 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                                if(!discordGuild){
                                    const redirectUri = typeof window !== "undefined" && `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
                                    setPoll(dcserverid)
-                                   openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=1049724741306564669&guild_id=${dcserverid}&permissions=8&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
+                                   openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=${process.env.REACT_APP_DISCORD_APP_ID}&guild_id=${dcserverid}&permissions=8&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
                                } else {
                                    onGuildBotAddedDelayed(validServer)
                                }

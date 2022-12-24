@@ -107,12 +107,13 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
 
         console.log("muldecimal", muldecimal)
 
-        let mulReason = '';
-        if(labels && labels.length > 0) {
-            mulReason = _get(_find(labels, l => l.recipient.toLowerCase() === mulRecipient.toLowerCase() && l.safeTxHash === _get(transaction, 'safeTxHash', _get(transaction, 'txHash', _get(transaction, 'transactionHash', '')))), "label", null)
-        }
 
         const txHash = _get(transaction, 'safeTxHash', _get(transaction, 'txHash', _get(transaction, 'transactionHash', '')));
+
+        let mulReason = '';
+        if(labels && labels.length > 0) {
+            mulReason = _get(_find(labels, l => l.recipient.toLowerCase() === mulRecipient.toLowerCase() && _get(l, 'safeTxHash', _get(l, 'txHash', '')) === txHash), "label", null)
+        }
 
         return (
             <div className="transactionRow">

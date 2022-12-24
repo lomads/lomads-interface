@@ -127,11 +127,11 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
                 resetMins = currentAllowance.resetTimeMin
                 resetBaseMins = currentAllowance.lastResetMin
             }
-            let memberName = eligibleContributors.filter((m:any) => m._id === selectedUser)
-            memberName = memberName.name && memberName.name !== "" ? memberName.name : beautifyHexToken(memberName.wallet)
+            let memberName = _find(eligibleContributors, (m:any) => m.member._id === selectedUser)
+            memberName = memberName.member.name && memberName.member.name !== "" ? memberName.member.name : beautifyHexToken(memberName.member.wallet)
             const txnHash = await setAllowance({
                 allowance: [{ token: compensation?.currency, amount: `${BigInt(parseFloat(amount) * 10 ** _get(compensation, 'decimal', 18))}`, resetMins: `${resetMins}`, resetBaseMins: `${resetBaseMins}`}],
-                label: `Approval for ${frequency} payment | ${memberName} | ${amount} ${_get(compensation, 'symbol')}`,
+                label: `Approval for ${frequency} payment | ${memberName} | ${currentAllowance?.amount} ${_get(compensation, 'symbol')}`,
                 delegate: account as string,
              })
             const payload = {
@@ -227,7 +227,7 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
                         { token: transaction?.compensation?.currency, amount: `${BigInt(parseFloat(`${resetAllowanceAmount}`) * 10 ** _get(compensation, 'decimal', 18))}`, resetMins: `${oldAllowance?.resetTimeMin}`, resetBaseMins: `${oldAllowance?.lastResetMin}`},
                         { token: compensation?.currency, amount: `${BigInt(parseFloat(amount) * 10 ** _get(compensation, 'decimal', 18))}`, resetMins: `${resetMins}`, resetBaseMins: `${resetBaseMins}`}
                     ],
-                    label: `Allowance reset for ${frequency} payment | ${memberName} | ${amount} ${_get(compensation, 'symbol')}`,
+                    label: `Allowance reset for ${frequency} payment | ${memberName} | ${_get(compensation, 'amount')} ${_get(compensation, 'symbol')}`,
                     delegate: account as string,
                  })
                 payload.allowanceTxnHash = txnHash?.safeTxHash
@@ -250,7 +250,7 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
                     allowance: [
                         { token: compensation?.currency, amount: `${BigInt(parseFloat(`${amount}`) * 10 ** _get(compensation, 'decimal', 18))}`, resetMins: `${resetMins}`, resetBaseMins: `${resetBaseMins}`}
                     ],
-                    label: `Allowance update for ${frequency} payment | ${memberName} | ${amount} ${_get(compensation, 'symbol')}`,
+                    label: `Allowance update for ${frequency} payment | ${memberName} | ${_get(compensation, 'amount')} ${_get(compensation, 'symbol')}`,
                     delegate: account as string,
                  })
                 payload.allowanceTxnHash = txnHash?.safeTxHash
@@ -290,14 +290,16 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
             allowance: [
                 { token: compensation?.currency, amount: `${BigInt(parseFloat(`${amount}`) * 10 ** _get(compensation, 'decimal', 18))}`, resetMins: `${resetMins}`, resetBaseMins: `${resetBaseMins}`}
             ],
-            label: `Stopping ${frequency} payment | ${memberName} | ${amount} ${_get(compensation, 'symbol')}`,
+            label: `Stopping ${frequency} payment | ${memberName} | ${transaction.compensation.amount} ${_get(compensation, 'symbol')}`,
             delegate: account as string,
          })
 
         await axiosHttp.delete(`recurring-payment/${transaction._id}`)
         .then(res => {
-            dispatch(setRecurringPayments(res.data))
-            toggleShowCreateRecurring()
+            setTimeout(() => {
+                dispatch(setRecurringPayments(res.data))
+                toggleShowCreateRecurring()
+            }, 200)
         })
     }
 

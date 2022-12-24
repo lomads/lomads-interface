@@ -125,8 +125,10 @@ const Dashboard = () => {
 
 	const toggleShowCreateRecurring = () => {
 		setShowCreateRecurring((prev:boolean) => {
-			if(prev)
+			if(prev)  {
+				treasuryRef?.current?.reload()
 				setRecurringTxn(null)
+			}
 			return !prev
 		});
 	}
