@@ -27,6 +27,7 @@ const KRAReview = ({ toggleShowKRA, data, daoURL }) => {
             toggleShowKRA();
         }
     }, [updateKraLoading]);
+    
 
     useEffect(() => {
         if (_get(data, 'kra.results', []).length > 0) {
@@ -37,8 +38,15 @@ const KRAReview = ({ toggleShowKRA, data, daoURL }) => {
                 const percent = document.getElementById(`percent${index}`);
 
                 const maxVal = slider.getAttribute("max");
-                const x = (_.progress / maxVal) * 10;
-                const val = (_.progress / maxVal) * 100 + "%";
+
+                console.log("maxVal", _.progress)
+
+                let x = (_get(_, 'progress', 0)  / +maxVal) * 10;
+                console.log("maxVal", maxVal)
+                x = isNaN(x) ? 0 : x
+
+                const val = (_get(_, 'progress', 0) / +maxVal) * 100 + "%";
+                //console.log("nst x = (_.progress / maxVal) * 10;", x)
 
                 thumb.style.backgroundColor = colors[x];
                 percent.innerHTML = val + " done";
@@ -66,7 +74,8 @@ const KRAReview = ({ toggleShowKRA, data, daoURL }) => {
 
         const newArray = list.map((item, i) => {
             if (i === index) {
-                return { ...item, progress: x * 10 };
+                console.log(" ...item, progress:", x)
+                return { ...item, progress: x ? x * 10 : 0 };
             } else {
                 return item;
             }

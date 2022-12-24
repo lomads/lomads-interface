@@ -928,15 +928,15 @@ const ProjectDetails = () => {
                                                     <div className="status" style={{ justifyContent: 'space-between' }}>
                                                         <span>Review frequency : {_get(Project, 'kra.frequency', [])}</span>
                                                         <div style={{ width: '50%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                                            <button className='archive-btn'>
+                                                            {/* <button className='archive-btn'>
                                                                 <img src={archiveIcon} alt="archive-icon" />
-                                                            </button>
+                                                            </button> */}
                                                             {/* <button className='archive-btn'>
                                                                 <img src={editToken} alt="hk-logo" />
                                                             </button> */}
-                                                            <button className="review-btn" onClick={() => setShowKRAReview(true)}>
+                                                           { canMyrole('project.review') && <button className="review-btn" onClick={() => setShowKRAReview(true)}>
                                                                 REVIEW
-                                                            </button>
+                                                            </button> }
                                                         </div>
                                                     </div>
                                             }
@@ -957,9 +957,11 @@ const ProjectDetails = () => {
                                                                         </div>
                                                                         <div>
                                                                             <h1>{item.deadline}</h1>
+                                                                            { canMyrole('project.milestone.update') &&
                                                                             <div className="check-circle" onClick={() => selectMilestone(item, index)}>
                                                                                 <FiCheck size={20} />
                                                                             </div>
+                                                                            }
                                                                         </div>
                                                                     </div>
                                                                 )
