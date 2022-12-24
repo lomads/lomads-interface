@@ -283,11 +283,6 @@ const ProjectResource = ({ toggleShowResource, getResources, list }) => {
                             </div>
                         }
 
-                        {/* {
-                            accessControl && link && link.indexOf('notion.') > -1 &&
-                            <div style={{ fontSize: 14, fontStyle: 'italic', color: "rgba(118, 128, 141, 0.5)" }}>Invite <span style={{ color: "#76808D" }}>{process.env.REACT_APP_NOTION_ADMIN_EMAIL}</span> to be an Admin of your workspace</div>
-                        } */}
-
                         {
                             DAO?.sbt &&
                             <div className='rsrc-access'>
@@ -319,6 +314,12 @@ const ProjectResource = ({ toggleShowResource, getResources, list }) => {
                                     {accessControlError && <div><span style={{ color: 'red' }}>{accessControlError}</span></div>}
                                 </div>
                             </div>
+                        }
+
+
+{
+                            accessControl && link && link.indexOf('notion.') > -1 &&
+                            <div style={{ fontSize: 14, marginBottom:16, padding: "5px 10px", backgroundColor: "#188C7C", borderRadius:5,  fontStyle: 'italic', color: "#FFF" }}>Invite <span style={{ color: "#FFF", fontWeight:'bold' }}>{process.env.REACT_APP_NOTION_ADMIN_EMAIL}</span> to be an Admin of your workspace</div>
                         }
 
                         {/* added resource list */}

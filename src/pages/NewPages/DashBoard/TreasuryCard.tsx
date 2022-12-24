@@ -12,7 +12,6 @@ import {
 	Tbody
   } from '@chakra-ui/react'
 import { tokenCallSafe } from "connection/DaoTokenCall";
-import { getSafeTokens } from 'utils'
 import { SafeTransactionDataPartial } from "@gnosis.pm/safe-core-sdk-types";
 import {
 	AllTransactionsListResponse,
@@ -84,24 +83,21 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
 	const getSafeTokens = async () => {
 		if (!chainId) return [];
-		return axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${_get(DAO, 'safe.address')}/balances/usd/`, { withCredentials: false })
-			.then(res => {
-				let tokens = res.data.map((t: any) => {
-					let tkn = t
-					if (!tkn.tokenAddress) {
-						return {
-							...t,
-							tokenAddress: chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS,
-							token: {
-								symbol: chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR',
-								decimals: 18
-							}
+			let tokens = props.tokens.map((t: any) => {
+				let tkn = t
+				if (!tkn.tokenAddress) {
+					return {
+						...t,
+						tokenAddress: chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS,
+						token: {
+							symbol: chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR',
+							decimals: 18
 						}
 					}
-					return t
-				})
-				return tokens;
+				}
+				return t
 			})
+		return tokens
 	}
 
 	useEffect(() => {
@@ -488,17 +484,13 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				setExecuteTxLoading(null)
 				if (!reject) {
 					const safeTokens = await getSafeTokens();
-					let safeToken = _find(safeTokens || [], (st: any) => _get(st, 'tokenAddress', '') === _get(txn, 'to', ''))
+					let safeToken = _find(safeTokens, t => t.tokenAddress === _get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', '')))
 					if (!safeToken)
 						safeToken = _find(safeTokens || [], (st: any) => _get(st, 'tokenAddress', '') === (chainId === SupportedChainId.GOERLI ? process.env.REACT_APP_GOERLI_TOKEN_ADDRESS : process.env.REACT_APP_MATIC_TOKEN_ADDRESS))
 					await axiosHttp.patch(`transaction/on-chain/executed?daoId=${_get(DAO, '_id', '')}`, {
 						safeTx: {
 							..._txs,
-							token: {
-								decimals: tokenDecimal(_get(safeToken, 'tokenAddress', '')),
-								tokenAddress: _get(safeToken, 'tokenAddress', '') === '' ? chainId === SupportedChainId.GOERLI ? process.env.REACT_APP_GOERLI_TOKEN_ADDRESS : process.env.REACT_APP_MATIC_TOKEN_ADDRESS : _get(safeToken, 'tokenAddress', ''),
-								symbol: _get(_find(props.tokens, t => t.tokenAddress === _get(safeToken, 'tokenAddress', '')), 'token.symbol', _get(txn, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
-							}
+							token: { ...safeToken.token, tokenAddress: safeToken.tokenAddress }
 						}
 					}
 					)
