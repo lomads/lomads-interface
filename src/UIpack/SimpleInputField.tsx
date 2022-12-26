@@ -15,6 +15,7 @@ const SimpleInputField = (props: InputFieldType) => {
         onChange={props.onchange}
         onClick={props.onClick}
         onBlur={props.onBlur}
+        autoFocus={props.autoFocus}
         disabled={props.disabled}
         onKeyDown={props.onKeyDown}
         type={props.type}

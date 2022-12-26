@@ -769,7 +769,7 @@ const ProjectDetails = () => {
                                     }
                                 </div>
                                 {
-                                    (lockedLinks.lnegth > 0 || openLinks.length > 0) && canMyrole('project.links.view') &&
+                                    (lockedLinks.length > 0 || openLinks.length > 0) && canMyrole('project.links.view') &&
                                     <div className="links-section">
                                         <div className="links-header">
                                             <div>

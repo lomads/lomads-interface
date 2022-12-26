@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useImperativeHandle, useCallback } from "react";
+import React, { useEffect, useRef, useState, useMemo, useImperativeHandle, useCallback } from "react";
 import { get as _get, sortBy as _sortBy, orderBy as _orderBy, filter as _filter, map as _map, find as _find } from 'lodash';
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import SafeButton from "UIpack/SafeButton";
@@ -24,6 +24,7 @@ import recurring_payment from "../../../assets/svg/recurring_payment.svg";
 import { useParams } from "react-router-dom";
 import { ItreasuryCardType } from "types/DashBoardType";
 import { ImportSafe, safeService } from "connection/SafeCall";
+import { useOnClickOutside } from 'hooks/useOnClickOutside'
 import { Tooltip } from "@chakra-ui/react";
 import PendingTxn from './TreasuryCard/PendingTxn';
 import CompleteTxn from './TreasuryCard/CompleteTxn';
@@ -63,7 +64,10 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	const [executedTxn, setExecutedTxn] = useState<Array<any>>();
 	const [offChainPendingTxn, setOffChainPendingTxn] = useState<Array<any>>();
 	const [offChainExecutedTxn, setOffChainExecutedTxn] = useState<Array<any>>();
-
+	const node = useRef<HTMLDivElement>()
+	const [editMode, setEditMode] = useState<any>();
+	useOnClickOutside(node, () => editMode ? setEditMode(null) : undefined)
+useState<Array<any>>();
 	//const [recurringTxnQueue, setRecurringTxnQueue] = useState<Array<any>>();
 
 	const [labels, setLabels] = useState<Array<any>>();
@@ -197,7 +201,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				return ptx.concat(pTxn)
 			})
 			.then(ptx => _orderBy(ptx, [p => p.offChain, p => p.submissionDate], ['asc', 'asc']))
-			//.then(ptx => { console.log("loadPendingTxn", ptx); return ptx })
+			.then(ptx => { console.log("loadPendingTxn", ptx); return ptx })
 			.then(ptx => setPendingTxn(ptx))
 	}
 
@@ -211,7 +215,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				const { eTxn } = await loadOffChainTxn()
 				return etx.concat(eTxn)
 			})
-			.then(ptx => _orderBy(ptx, [(p:any) => p.offChain, (p:any) => p.submissionDate], ['asc', 'asc']))
+			.then(ptx => _orderBy(ptx, [(p:any) => p.offChain, (p:any) => p.executionDate ?  p.executionDate : p.submissionDate], ['asc', 'asc']))
 			.then(etx => { console.log("loadExecutedTxn", etx); return etx })
 			.then(etx => setExecutedTxn(etx))
 	}
@@ -277,9 +281,19 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		return new Promise(async (resolve, reject) => {
 			try {
 				if (!chainId) return;
-				const amountValue = _get(txn, 'dataDecoded.parameters[1].value')
-				const receiver = _get(txn, 'dataDecoded.parameters[0].value')
-				const send = [{ recipient: receiver, amount: amountValue }]
+				let send: Array<{ recipient: string, amount: string }> = [];
+				if(txn.dataDecoded.method === 'transfer') {
+					const amountValue = _get(txn, 'dataDecoded.parameters[1].value')
+					const receiver = _get(txn, 'dataDecoded.parameters[0].value')
+					send = [{ recipient: receiver, amount: amountValue }]
+				} else if (txn.dataDecoded.method === 'multiSend') {
+					send = _get(txn, 'dataDecoded.parameters[0].valueDecoded').map((operation: any) => {
+						return {
+							recipient: _get(operation, 'dataDecoded.parameters[0].value'),
+							amount: _get(operation, 'dataDecoded.parameters[1].value') / 10 ** _get(txn, 'token.decimals', 18)
+						}
+					})
+				}
 				const txnResponse = await createSafeTransaction({ tokenAddress: _get(txn, 'token.tokenAddress', null), send, confirm: action === 'confirm' });
 				if (txnResponse) {
 					await axiosHttp.patch(`transaction/off-chain/${txn.safeTxHash}/move-on-chain`, {
@@ -288,6 +302,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 					})
 					return resolve({ safeTxHash: txnResponse.safeTxHash, signature: txnResponse.signature, nonce: txnResponse.currentNonce })
 				} else {
+
 					reject(null)
 				}
 			} catch (e) {
@@ -312,9 +327,13 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				.catch(e => console.log(e))
 				.finally(() => setConfirmTxLoading(null))
 		} else if (txn.offChain && _get(txn, 'token.symbol') !== 'SWEAT') {
-			await createOnChainTxn(txn, 'confirm')
-			loadPendingTxn();
-			loadTxnLabel();
+			try {
+				await createOnChainTxn(txn, 'confirm')
+				loadPendingTxn();
+				loadTxnLabel();
+			} catch (e) {
+				console.log(e)
+			}
 		} else {
 			try {
 				setConfirmTxLoading(_safeTxHashs);
@@ -681,12 +700,12 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 							<div className="dashboardText" style={{ marginBottom: '6px' }}>Last Transactions</div>
 							{
 								pendingTxn.map((ptx, index) =>
-									<PendingTxn onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} executeFirst={executeFirst} isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
+									<PendingTxn editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} executeFirst={executeFirst} isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
 								)
 							}
 							{
 								executedTxn.map((ptx, index) =>
-									<CompleteTxn onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} isAdmin={amIAdmin} owner={owner} transaction={ptx} tokens={props.tokens} />
+									<CompleteTxn editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} isAdmin={amIAdmin} owner={owner} transaction={ptx} tokens={props.tokens} />
 								)
 							}
 						</div>
@@ -700,7 +719,10 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 							<Tbody style={{ paddingTop: 8 }}>
 								{
 									recurringPayments.map((txn: any) => 
-										<RecurringTxn onRecurringEdit={props.onRecurringEdit} onExecute={(data: any) => dispatch(setRecurringPayments(data))} transaction={txn} />
+										<RecurringTxn onRecurringEdit={props.onRecurringEdit} onExecute={async (data: any) => { 
+											await loadTxnLabel()
+											dispatch(setRecurringPayments(data)) 
+										}} transaction={txn} />
 									)
 								}
 							</Tbody>

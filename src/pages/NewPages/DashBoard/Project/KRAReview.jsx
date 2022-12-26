@@ -11,10 +11,11 @@ import { useAppSelector, useAppDispatch } from "state/hooks";
 import { updateKRA } from "state/dashboard/actions";
 import { resetUpdateKraLoader } from 'state/dashboard/reducer';
 
+import RangeSlider from 'components/RangeSlider';
+
 const colors = ['#e67c40', '#e99a37', '#ebaf30', '#edcd27', '#becd33', '#8ecc3e', '#63c359', '#4fbf65', '#2ab87c', '#21a284', '#1AC1C1'];
 
 const KRAReview = ({ toggleShowKRA, data, daoURL }) => {
-    console.log("data : ", _get(data, 'kra.results', []))
     const dispatch = useAppDispatch();
     const { updateKraLoading } = useAppSelector((state) => state.dashboard);
 
@@ -31,56 +32,17 @@ const KRAReview = ({ toggleShowKRA, data, daoURL }) => {
 
     useEffect(() => {
         if (_get(data, 'kra.results', []).length > 0) {
-            _get(data, 'kra.results', []).map((_, index) => {
-                const slider = document.getElementById(`slider-rc${index}`);
-                const thumb = document.getElementById(`slider-thumb${index}`);
-                const progress = document.getElementById(`progress${index}`);
-                const percent = document.getElementById(`percent${index}`);
-
-                const maxVal = slider.getAttribute("max");
-
-                console.log("maxVal", _.progress)
-
-                let x = (_get(_, 'progress', 0)  / +maxVal) * 10;
-                console.log("maxVal", maxVal)
-                x = isNaN(x) ? 0 : x
-
-                const val = (_get(_, 'progress', 0) / +maxVal) * 100 + "%";
-                //console.log("nst x = (_.progress / maxVal) * 10;", x)
-
-                thumb.style.backgroundColor = colors[x];
-                percent.innerHTML = val + " done";
-                percent.style.color = colors[x];
-                progress.style.setProperty('width', `calc(100% - ${val})`);
-                thumb.style.left = val;
-            })
+            setList(_get(data, 'kra.results', []))
         }
     }, [data]);
 
-    const handleSlider = (e, index) => {
-        const slider = document.getElementById(`slider-rc${index}`);
-        const thumb = document.getElementById(`slider-thumb${index}`);
-        const progress = document.getElementById(`progress${index}`);
-        const percent = document.getElementById(`percent${index}`);
-
-        const maxVal = slider.getAttribute("max");
-        const x = (slider.value / maxVal) * 10;
-        const val = (slider.value / maxVal) * 100 + "%";
-        thumb.style.backgroundColor = colors[x];
-        percent.innerHTML = val + " done";
-        percent.style.color = colors[x];
-        progress.style.setProperty('width', `calc(100% - ${val})`);
-        thumb.style.setProperty('left', `calc(${val})`);
-
-        const newArray = list.map((item, i) => {
-            if (i === index) {
-                console.log(" ...item, progress:", x)
-                return { ...item, progress: x ? x * 10 : 0 };
-            } else {
-                return item;
-            }
-        });
-        setList(newArray);
+    const handleSlider = (item, value, color) => {
+        setList(prev => prev.map((r, i) => {
+            if (r._id === item._id)
+                return { ...r, progress: value, color };
+            return r;
+         })
+        )
     }
 
     const handleSubmit = () => {
@@ -112,15 +74,21 @@ const KRAReview = ({ toggleShowKRA, data, daoURL }) => {
                                             <h1>{item.name}</h1>
                                             <div className='review-slider-section'>
                                                 {/* custom slider */}
-                                                <div className='range-slider'>
+                                                {/* <div className='range-slider'>
                                                     <input type="range" min={0} max={100} step={10} value={item.progress} className="slider-rc" id={`slider-rc${index}`} onChange={(e) => handleSlider(e, index)} />
                                                     <div className='slider-thumb' id={`slider-thumb${index}`}>
                                                         <div className='thumb-bar'></div>
                                                     </div>
                                                     <div className='progress' id={`progress${index}`}></div>
+                                                </div> */}
+                                                <div style={{ flex: 1, maxWidth: 200 }}>
+                                                    <RangeSlider defaultValue={+item.progress} onChange={({ value, color }) => {
+                                                        handleSlider(item, value, color)
+                                                    }}/>
                                                 </div>
-
-                                                <h1 id={`percent${index}`}>0% done!</h1>
+                                                <div style={{ marginLeft: '16px' }}>
+                                                    <h1 style={{ color: _get(item, 'color' , '#FFCC18') }}>{ `${item.progress}% done!` }</h1>
+                                                </div>
                                             </div>
                                         </div>
                                     )

@@ -188,6 +188,33 @@ const Dashboard = () => {
 		}
 	}, [chainId, account, DAOList, daoURL])
 
+	const validateMetaData = () => {
+		if(_get(DAO, 'sbt.contactDetail', null)) {
+			const contactdetails = _get(DAO, 'sbt.contactDetail', []);
+			for (let index = 0; index < contactdetails.length; index++) {
+				let shouldUpdate = true;
+				const contact = contactdetails[index];
+				const myMetadata  = _find(_get(DAO, 'sbt.metadata', []), m => {
+					return _find(m.attributes, a => a.value === account)
+				})
+				if(myMetadata && myMetadata.attributes){
+					for (let index = 0; index < myMetadata.attributes.length; index++) {
+						const attribute = myMetadata.attributes[index];
+						if(contact === attribute.trait_type.toLowerCase()) {
+							if(attribute.value && attribute.value !== "") {
+								shouldUpdate = false
+							}
+						}
+					}
+				}
+				if(shouldUpdate){
+					//navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
+					break;
+				}
+			}
+		}
+	}
+
 	useEffect(() => {
 		if (chainId) {
 			if (contractName !== '' && DAO && DAO.sbt && DAO.sbt && account && balanceOf) {
@@ -199,6 +226,7 @@ const Dashboard = () => {
 								navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
 							} else {
 								// check if data has been filled show mint page. with prefilled data. save data without minting again
+								validateMetaData()
 							}
 						} else {
 							navigate('/only-whitelisted')
@@ -209,6 +237,7 @@ const Dashboard = () => {
 								navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
 							}  else {
 								// check if data has been filled show mint page. with prefilled data. save data without minting again
+								validateMetaData()
 							}
 						} else {
 							//add to DAO
@@ -216,6 +245,7 @@ const Dashboard = () => {
 								navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
 							} else {
 								// check if data has been filled show mint page. with prefilled data. save data without minting again
+								validateMetaData()
 							}
 						}
 					}

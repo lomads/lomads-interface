@@ -24,6 +24,7 @@ import { getDao, updateMilestone } from "state/dashboard/actions";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 
 import { resetUpdateMilestoneLoader } from 'state/dashboard/reducer';
+import useSafeTokens from 'hooks/useSafeTokens';
 
 const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL }) => {
     console.log("data : ", data);
@@ -41,6 +42,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
     const safeAddress = useAppSelector((state) => state.flow.safeAddress);
 
     const { isSafeOwner } = useRole(DAO, account);
+    const { safeTokens } = useSafeTokens(_get(DAO, 'safe.address', ''))
 
     const [temp, setTemp] = useState([]);
 
@@ -171,115 +173,119 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
             }
             return;
         }
-        await createTransaction(_get(Project, 'compensation.currency', ''), sendArray);
+        createTxn(sendArray)
+        //await createTransaction(_get(Project, 'compensation.currency', ''), sendArray);
     }
 
-    const createOffChainTxn = (setRecipient) => {
-        setisLoading(true);
-        const nonce = moment().unix();
-        let payload = {}
-        // Multi transaction for multi user
-        if (setRecipient.length > 1) {
-            payload = {
-                daoId: _get(DAO, '_id', undefined),
-                safe: safeAddress,
-                safeTxHash: nanoid(32),
-                nonce,
-                executor: account,
-                submissionDate: moment().utc().toDate(),
-                token: {
-                    symbol: 'SWEAT',
-                    tokenAddress: 'SWEAT',
-                },
-                confirmations: isSafeOwner ? [{
-                    owner: account,
-                    submissionDate: moment().utc().toDate()
-                }] : [],
-                dataDecoded: {
-                    method: "multiSend",
-                    parameters: [{
-                        valueDecoded: setRecipient.map(r => {
-                            return {
-                                dataDecoded: {
-                                    method: 'transfer',
-                                    parameters: [
-                                        { name: 'to', type: "address", value: r.recipient },
-                                        { name: 'value', type: "uint256", value: `${BigInt(parseFloat(r.amount) * 10 ** 18)}` },
-                                    ]
-                                }
-                            }
-                        })
-                    }]
-                }
+    const tokenDecimal = useMemo(() => {
+        if(safeTokens && safeTokens.length > 0) {
+            const tokenAddr = _get(compensation, 'currency', 'SWEAT');
+            if (tokenAddr === SupportedChainId.POLYGON || tokenAddr === SupportedChainId.GOERLI || tokenAddr === 'SWEAT')
+                return 18
+            const tkn = _find(safeTokens, (stkn) => stkn.tokenAddress === tokenAddr)
+            if (tkn) {
+                return _get(tkn, 'token.decimals', 18)
             }
-        }
-        // Single transaction for single user in the array
-        else {
-            payload = {
-                daoId: _get(DAO, '_id', undefined),
-                safe: safeAddress,
-                nonce,
-                safeTxHash: nanoid(32),
-                executor: account,
-                submissionDate: moment().utc().toDate(),
-                token: {
-                    symbol: 'SWEAT',
-                    tokenAddress: 'SWEAT',
-                },
-                confirmations: isSafeOwner ? [{
-                    owner: account,
-                    submissionDate: moment().utc().toDate()
-                }] : [],
-                dataDecoded: {
-                    method: 'transfer',
-                    parameters: [
-                        { name: 'to', type: "address", value: setRecipient[0].recipient },
-                        { name: 'value', type: "uint256", value: `${BigInt(parseFloat(setRecipient[0].amount) * 10 ** 18)}` },
-                    ]
+        } 
+        return 18
+    }, [safeTokens])
+
+    const createOnChainTxn = async (send) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                if (!chainId) return;
+                const txnResponse = await createSafeTransaction({ tokenAddress: _get(compensation, 'currency', null), send, confirm: isSafeOwner, createLabel: true })
+                if(txnResponse) {
+                    resolve(txnResponse.safeTxHash)
+                } else {
+                    setisLoading(false);
                 }
+            } catch (e) {
+                setisLoading(false);
+                console.log(e)
+                reject(e)
             }
-        }
-        axiosHttp.post('transaction/off-chain', payload)
-            .then(res => {
-                console.log(res);
-                let payload = [];
-                setRecipient.map(r => {
-                    payload.push({
-                        safeAddress: _get(DAO, 'safe.address', null),
-                        safeTxHash: res.data.safeTxHash,
-                        recipient: r.recipient,
-                        label: _get(r, 'reason', null)
-                    })
-                })
-                axiosHttp.post(`transaction/label`, payload)
-                    .then(async () => {
-
-                        const newArray = _get(data, 'milestones', []).map((item, i) => {
-                            if (i === _get(selectedMilestone, 'pos', '')) {
-                                return { ...item, complete: true };
-                            } else {
-                                return item;
-                            }
-                        });
-
-                        dispatch(updateMilestone({ projectId: data._id, daoUrl: daoURL, payload: { milestones: newArray } }));
-                        setisLoading(false);
-
-                    })
-            })
-            .finally(() => setisLoading(false))
+        })
     }
 
-    const createTransaction = async (selectedToken, setRecipient) => {
+    const createTxn = async (send) => {
         setError(null);
         setisLoading(true);
-        if (selectedToken === 'SWEAT') {
-            return createOffChainTxn(setRecipient)
-        }
         try {
-            const txnResponse = await createSafeTransaction({ tokenAddress: selectedToken, send: setRecipient });
-            if (txnResponse?.safeTxHash) {
+            let onChainSafeTxHash = undefined;
+            if (isSafeOwner && _get(compensation, 'amount', 'SWEAT') !== 'SWEAT') {
+                onChainSafeTxHash = await createOnChainTxn(send);
+                    const newArray = _get(data, 'milestones', []).map((item, i) => {
+                        if (i === _get(selectedMilestone, 'pos', '')) {
+                            return { ...item, complete: true };
+                        } else {
+                            return item;
+                        }
+                    });
+                dispatch(updateMilestone({ projectId: data._id, daoUrl: daoURL, payload: { milestones: newArray } }));
+                setisLoading(false);
+                return;
+            }
 
+            const offChainPayload = {
+                daoId: _get(DAO, '_id', undefined),
+                safe: _get(DAO, 'safe.address', undefined),
+                nonce: moment().unix(),
+                safeTxHash: nanoid(32),
+                executor: account,
+                submissionDate: moment().utc().toDate(),
+                token: {
+                    decimals: tokenDecimal,
+                    symbol: _get(compensation, 'symbol', 'SWEAT'),
+                    tokenAddress: _get(compensation, 'currency', 'SWEAT')
+                },
+                confirmations: isSafeOwner && _get(compensation, 'symbol', 'SWEAT') === 'SWEAT' ? [{
+                    owner: account,
+                    submissionDate: moment().utc().toDate()
+                }] : [],
+                
+                dataDecoded: ( send.length == 1 ? {
+                    method: 'transfer',
+                    parameters: [
+                        { name: 'to', type: "address", value: send[0].recipient },
+                        { name: 'value', type: "uint256", value: `${BigInt(parseFloat(send[0].amount) * 10 ** tokenDecimal)}` },
+                    ]
+                } : {
+                    method: 'multiSend',
+                    parameters: [
+                        {
+                            name: 'transactions',
+                            valueDecoded: send.map(s => {
+                                return {
+                                    operation: 0,
+                                    to: _get(compensation, 'currency', null),
+                                    value: '0',
+                                    dataDecoded: {
+                                        method: 'transfer',
+                                        parameters: [
+                                            { name: 'to', type: "address", value: s.recipient },
+                                            { name: 'value', type: "uint256", value: `${BigInt(parseFloat(`${s.amount}`) * 10 ** tokenDecimal)}` },
+                                        ]
+                                    }
+                                }
+                            })
+                        }
+                    ]
+                })
+            }
+            await axiosHttp.post('transaction/off-chain', offChainPayload)
+            .then(async res => {
+                let payload = [];
+				send.map(r => {
+					payload.push({
+						safeAddress: _get(DAO, 'safe.address', null),
+						safeTxHash: res.data.safeTxHash,
+						recipient: r.recipient,
+						label: _get(r, 'reason', null)
+					})
+				})
+				await axiosHttp.post(`transaction/label`, payload)
+                setisLoading(false);
                 const newArray = _get(data, 'milestones', []).map((item, i) => {
                     if (i === _get(selectedMilestone, 'pos', '')) {
                         return { ...item, complete: true };
@@ -287,16 +293,43 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                         return item;
                     }
                 });
-
                 dispatch(updateMilestone({ projectId: data._id, daoUrl: daoURL, payload: { milestones: newArray } }));
-                setisLoading(false);
-            }
+            })
         } catch (e) {
             console.log(e)
             setError(e)
             setisLoading(false);
         }
-    };
+    }
+
+
+    // const createTransaction = async (selectedToken, setRecipient) => {
+    //     setError(null);
+    //     setisLoading(true);
+    //     if (selectedToken === 'SWEAT') {
+    //         return createOffChainTxn(setRecipient)
+    //     }
+    //     try {
+    //         const txnResponse = await createSafeTransaction({ tokenAddress: selectedToken, send: setRecipient });
+    //         if (txnResponse?.safeTxHash) {
+
+    //             const newArray = _get(data, 'milestones', []).map((item, i) => {
+    //                 if (i === _get(selectedMilestone, 'pos', '')) {
+    //                     return { ...item, complete: true };
+    //                 } else {
+    //                     return item;
+    //                 }
+    //             });
+
+    //             dispatch(updateMilestone({ projectId: data._id, daoUrl: daoURL, payload: { milestones: newArray } }));
+    //             setisLoading(false);
+    //         }
+    //     } catch (e) {
+    //         console.log(e)
+    //         setError(e)
+    //         setisLoading(false);
+    //     }
+    // };
 
     return (
         <div className="milestoneOverlay">

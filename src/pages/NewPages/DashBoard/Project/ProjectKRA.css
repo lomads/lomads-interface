@@ -120,6 +120,7 @@
 .kraOverlay .kraContainer .kra-body .kra-section .review-card .review-slider-section {
     width: 100%;
     height: 20px;
+    padding: 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;

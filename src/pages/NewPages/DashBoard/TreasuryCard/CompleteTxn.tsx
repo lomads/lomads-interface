@@ -13,12 +13,12 @@ import { updateSafeTransaction } from "state/dashboard/reducer";
 import { SupportedChainId } from "constants/chains";
 import useSafeTokens from "hooks/useSafeTokens";
 
-const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress, onLoadLabels }: any) => {
+const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress, onLoadLabels, editMode, onSetEditMode }: any) => {
 	const { chainId } = useWeb3React();
     const threshold = useAppSelector((state) => state.flow.safeThreshold);
     const { DAO } = useAppSelector(store => store.dashboard);
     const [reasonText, setReasonText] = useState({});
-    const [editMode, setEditMode] = useState(null);
+    //const [editMode, setEditMode] = useState(null);
     const {safeTokens} = useSafeTokens(safeAddress)
     const dispatch = useAppDispatch()
 
@@ -48,6 +48,11 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
             tokenSymbol = _get(_find(safeTokens, (st:any) => st.tokenAddress === tokenAddr), 'token.symbol', '')
             const tokenDecimal = _get(_find(safeTokens, (st:any) => st.tokenAddress === tokenAddr), 'token.decimal', _get(_find(safeTokens, (st:any) => st.tokenAddress === tokenAddr), 'token.decimals', 18))
             amount = (amount / 10 ** tokenDecimal)
+            if(labels && labels.length > 0) {
+                let am = _get(_find(labels, l => l.recipient.toLowerCase() === recipient.toLowerCase() && l.safeTxHash === transaction.safeTxHash), "recurringPaymentAmount", null)
+                if(am)
+                    amount = amount = am * 10 ** _get(transaction, 'token.decimals', 18);
+            }
         }
         let reason = null
         if(labels && labels.length > 0) {
@@ -65,7 +70,7 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
                 .then(res => { 
                     onLoadLabels(res.data)
                     if (editMode && editMode === `${safeTxHash}-${recipient}`) {
-                        setEditMode(null);
+                        onSetEditMode(null);
                         setReasonText(prev => {
                             return {
                                 ...prev,
@@ -79,7 +84,7 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
 
     const handleEnableEditMode = (text: any, reason: string) => {
         if (isAdmin || owner) {
-            setEditMode(text);
+            onSetEditMode(text);
             setReasonText(prev => {
                 return {
                     ...prev,
@@ -134,6 +139,7 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
                                         isAdmin || owner
                                             ?
                                             <SimpleInputField
+                                                autoFocus={editMode === `${txHash}-${mulRecipient}`}
                                                 disabled={!owner}
                                                 value={_get(reasonText, `${txHash}-${mulRecipient}`, null)}
                                                 onchange={e => {
@@ -198,6 +204,7 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
                                             isAdmin || owner
                                                 ?
                                                 <SimpleInputField
+                                                    autoFocus={editMode === `${txHash}-${recipient}`}
                                                     disabled={!owner}
                                                     value={_get(reasonText, `${txHash}-${recipient}`, null)}
                                                     onchange={e => {

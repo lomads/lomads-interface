@@ -6,6 +6,7 @@ export interface InputFieldType {
   width?: number | string;
   name?: string;
   onKeyDown?: any;
+  autoFocus?:boolean | undefined;
   onClick?: any;
   disabled?: any;
   value?: string | number;

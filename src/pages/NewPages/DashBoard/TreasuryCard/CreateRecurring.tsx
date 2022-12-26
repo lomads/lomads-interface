@@ -131,7 +131,8 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
             memberName = memberName.member.name && memberName.member.name !== "" ? memberName.member.name : beautifyHexToken(memberName.member.wallet)
             const txnHash = await setAllowance({
                 allowance: [{ token: compensation?.currency, amount: `${BigInt(parseFloat(amount) * 10 ** _get(compensation, 'decimal', 18))}`, resetMins: `${resetMins}`, resetBaseMins: `${resetBaseMins}`}],
-                label: `Approval for ${frequency} payment | ${memberName} | ${currentAllowance?.amount} ${_get(compensation, 'symbol')}`,
+                label: `Approval for ${frequency} payment | ${memberName} | ${_get(compensation, 'amount')} ${_get(compensation, 'symbol')}`,
+                actualAmount:  _get(compensation, 'amount'),
                 delegate: account as string,
              })
             const payload = {
@@ -227,6 +228,7 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
                         { token: transaction?.compensation?.currency, amount: `${BigInt(parseFloat(`${resetAllowanceAmount}`) * 10 ** _get(compensation, 'decimal', 18))}`, resetMins: `${oldAllowance?.resetTimeMin}`, resetBaseMins: `${oldAllowance?.lastResetMin}`},
                         { token: compensation?.currency, amount: `${BigInt(parseFloat(amount) * 10 ** _get(compensation, 'decimal', 18))}`, resetMins: `${resetMins}`, resetBaseMins: `${resetBaseMins}`}
                     ],
+                    actualAmount:  _get(compensation, 'amount'),
                     label: `Allowance reset for ${frequency} payment | ${memberName} | ${_get(compensation, 'amount')} ${_get(compensation, 'symbol')}`,
                     delegate: account as string,
                  })
@@ -250,6 +252,7 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
                     allowance: [
                         { token: compensation?.currency, amount: `${BigInt(parseFloat(`${amount}`) * 10 ** _get(compensation, 'decimal', 18))}`, resetMins: `${resetMins}`, resetBaseMins: `${resetBaseMins}`}
                     ],
+                    actualAmount:  _get(compensation, 'amount'),
                     label: `Allowance update for ${frequency} payment | ${memberName} | ${_get(compensation, 'amount')} ${_get(compensation, 'symbol')}`,
                     delegate: account as string,
                  })
@@ -290,6 +293,7 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
             allowance: [
                 { token: compensation?.currency, amount: `${BigInt(parseFloat(`${amount}`) * 10 ** _get(compensation, 'decimal', 18))}`, resetMins: `${resetMins}`, resetBaseMins: `${resetBaseMins}`}
             ],
+            actualAmount:  transaction.compensation.amount,
             label: `Stopping ${frequency} payment | ${memberName} | ${transaction.compensation.amount} ${_get(compensation, 'symbol')}`,
             delegate: account as string,
          })

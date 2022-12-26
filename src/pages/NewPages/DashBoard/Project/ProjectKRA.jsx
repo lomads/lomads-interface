@@ -5,12 +5,13 @@ import { CgClose } from 'react-icons/cg'
 import createTaskSvg from '../../../../assets/svg/kra.svg';
 
 import SimpleInputField from "UIpack/SimpleInputField";
+import { nanoid } from '@reduxjs/toolkit';
 
 const ProjectKRA = ({ toggleShowKRA, getResults, list, freq }) => {
 
     const [frequency, setFrequency] = useState(freq ? freq : 'daily');
     const [resultCount, setResultCount] = useState(list.length > 0 ? list.length : 1);
-    const [results, setResults] = useState(list.length > 0 ? list : [{ name: '' }]);
+    const [results, setResults] = useState(list.length > 0 ? list : [{ _id: nanoid(16), color: '#FFCC18', name: '', progress: 0 }]);
 
     const handleChangeFrequency = (e) => {
         setFrequency(e.target.value);
@@ -23,13 +24,13 @@ const ProjectKRA = ({ toggleShowKRA, getResults, list, freq }) => {
 
         if (array.length === 0) {
             for (var i = 0; i < n; i++) {
-                array.push({ name: '', progress: '' });
+                array.push({ name: '', color: '#FFCC18', progress: 0, _id: nanoid(16) });
             }
         }
         else if (n > array.length) {
             let count = n - array.length;
             for (var i = 0; i < count; i++) {
-                array.push({ name: '', progress: '' });
+                array.push({ name: '', color: '#FFCC18', progress: 0, _id: nanoid(16) });
             }
         }
         else if (n < array.length) {

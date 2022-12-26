@@ -77,7 +77,9 @@ const renderNextSection = (nextQueue, transaction) => {
         return (
             <Tooltip placement='top' label={`Payment for ${moment.unix(nextQueue.nonce).format(`MM/DD/YYYY`)}`}>
                 <ToolTopContainer>
-                    <SimpleLoadButton onClick={() => handleCreateAllowanceTxn(nextQueue, transaction)} condition={loading} width={"100%"} disabled={account !== toChecksumAddress(transaction.delegate.wallet)}  height={30} title="EXECUTE" bgColor={loading || account !== toChecksumAddress(transaction.delegate.wallet) ? 'grey': "#C94B32"} className="button" />
+                    { account !== toChecksumAddress(transaction.delegate.wallet) ?
+                    <div className="text">Next: { `${ moment.unix(nextQueue.nonce).local().format('MM/DD/YYYY') }` }</div> :
+                    <SimpleLoadButton onClick={() => handleCreateAllowanceTxn(nextQueue, transaction)} condition={loading} width={"100%"}  height={30} title="EXECUTE" bgColor={loading || account !== toChecksumAddress(transaction.delegate.wallet) ? 'grey': "#C94B32"} className="button" /> }
                 </ToolTopContainer>
             </Tooltip>
     )

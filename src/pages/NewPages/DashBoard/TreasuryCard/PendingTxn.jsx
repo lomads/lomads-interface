@@ -23,11 +23,11 @@ const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
       </div>
   ))
 
-const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions, confirmTxLoading, rejectTxLoading, executeTxLoading, isAdmin, onLoadLabels }) => {
+const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, executeFirst = '', threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions, confirmTxLoading, rejectTxLoading, executeTxLoading, isAdmin, onLoadLabels }) => {
     const { provider, account, chainId } = useWeb3React();
     const { DAO } = useAppSelector(store => store.dashboard);
     const [reasonText, setReasonText] = useState({});
-    const [editMode, setEditMode] = useState(null);
+    //const [editMode, setEditMode] = useState(null);
     const dispatch = useAppDispatch()
     const {safeTokens} = useSafeTokens(safeAddress)
     //const threshold = useAppSelector((state) => state.flow.safeThreshold);
@@ -48,6 +48,11 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
             amount = _get(setAllowance, 'dataDecoded.parameters[2].value', '')
             const tokenAddr = _get(setAllowance, 'dataDecoded.parameters[1].value', '')
             tokenSymbol = _get(_find(tokens, st => st.tokenAddress === tokenAddr), 'token.symbol', '')
+            if(labels && labels.length > 0) {
+                let am = _get(_find(labels, l => l.recipient.toLowerCase() === recipient.toLowerCase() && l.safeTxHash === transaction.safeTxHash), "recurringPaymentAmount", null)
+                if(am)
+                    amount = am * 10 ** _get(transaction, 'token.decimals', 18);
+            }
         }
         //let trans = _find(_get(DAO, 'safe.transactions', []), t => t.safeTxHash === transaction.safeTxHash)
         let reason = null
@@ -80,7 +85,7 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
                     //dispatch(updateSafeTransaction(res.data))
                     onLoadLabels(res.data)
                     if (editMode && editMode === `${safeTxHash}-${recipient}`) {
-                        setEditMode(null);
+                        onSetEditMode(null);
                         setReasonText(prev => {
                             return {
                                 ...prev,
@@ -94,7 +99,7 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
 
     const handleEnableEditMode = (text, reason) => {
         if (isAdmin) {
-            setEditMode(text);
+            onSetEditMode(text);
             setReasonText(prev => {
                 return {
                     ...prev,
@@ -136,6 +141,7 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
                                         isAdmin || owner
                                             ?
                                             <SimpleInputField
+                                                autoFocus={editMode === `${transaction.safeTxHash}-${mulRecipient}`}
                                                 disabled={!owner && !isAdmin}
                                                 value={_get(reasonText, `${transaction.safeTxHash}-${mulRecipient}`, null)}
                                                 onchange={e => {
@@ -196,14 +202,14 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
                         {confirmReached &&
                             <Tooltip placement='top' isDisabled={!owner || executeFirst === transaction.nonce || transaction.offChain} label={`Transaction with nonce ${executeFirst} needs to be executed first`}>
                                 <ToolTopContainer>
-                                    <SimpleLoadButton condition={executeTxLoading === _get(transaction, 'safeTxHash')} disabled={!transaction.offChain && (!owner || executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading)} onClick={() => executeTransactions(transaction)} width={"100%"} height={30} title="EXECUTE" bgColor={transaction.offChain || (owner && executeFirst === transaction.nonce) ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
+                                    <SimpleLoadButton condition={executeTxLoading === _get(transaction, 'safeTxHash')} disabled={(!transaction.offChain || !owner) && (!owner || executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading)} onClick={() => executeTransactions(transaction)} width={"100%"} height={30} title="EXECUTE" bgColor={(transaction.offChain && owner) || (owner && executeFirst === transaction.nonce) ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
                                 </ToolTopContainer>
                             </Tooltip>
                         }
                         {rejectReached &&
                             <Tooltip placement='top' isDisabled={!owner || executeFirst === transaction.nonce || transaction.offChain} label={`Transaction with nonce ${executeFirst} needs to be executed first`}>
                                 <ToolTopContainer>
-                                    <SimpleLoadButton condition={executeTxLoading === _get(transaction, 'rejectedTxn.safeTxHash', _get(transaction, 'safeTxHash', ''))} disabled={ !transaction.offChain && ( !owner || executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading )} onClick={() => executeTransactions(transaction, true)} width={"100%"} height={30} title="REJECT" bgColor={transaction.offChain || (owner && executeFirst === transaction.nonce) ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
+                                    <SimpleLoadButton condition={executeTxLoading === _get(transaction, 'rejectedTxn.safeTxHash', _get(transaction, 'safeTxHash', ''))} disabled={ (!transaction.offChain || !owner) && ( !owner || executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading )} onClick={() => executeTransactions(transaction, true)} width={"100%"} height={30} title="REJECT" bgColor={transaction.offChain || (owner && executeFirst === transaction.nonce) ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
                                 </ToolTopContainer>
                             </Tooltip>
                         }
@@ -277,6 +283,7 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
                                             isAdmin || owner
                                                 ?
                                                 <SimpleInputField
+                                                    autoFocus={editMode === `${transaction.safeTxHash}-${recipient}`}
                                                     disabled={!owner && !isAdmin}
                                                     value={_get(reasonText, `${transaction.safeTxHash}-${recipient}`, null)}
                                                     onchange={e => {
@@ -337,7 +344,7 @@ const PendingTxn = ({ safeAddress, labels, tokens, executeFirst = '', threshold,
                             {confirmReached &&
                                 <Tooltip placement='top' isDisabled={!owner || executeFirst === transaction.nonce || transaction.offChain} label={`Transaction with nonce ${executeFirst} needs to be executed first`}>
                                     <ToolTopContainer>
-                                        <SimpleLoadButton condition={executeTxLoading == _get(transaction, 'safeTxHash')} disabled={!transaction.offChain && (!owner || executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading)} onClick={() => executeTransactions(transaction)} width={"100%"} height={30} title="EXECUTE" bgColor={transaction.offChain || (owner && executeFirst === transaction.nonce) ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
+                                        <SimpleLoadButton condition={executeTxLoading == _get(transaction, 'safeTxHash')} disabled={!transaction.offChain && (!owner || executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading)} onClick={() => executeTransactions(transaction)} width={"100%"} height={30} title="EXECUTE" bgColor={(transaction.offChain && owner) || (owner && executeFirst === transaction.nonce) ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
                                     </ToolTopContainer>
                                 </Tooltip>
                             }

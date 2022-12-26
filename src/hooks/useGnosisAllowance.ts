@@ -40,7 +40,7 @@ const useGnosisAllowance = (safeAddress: string | null) => {
         return data
     }
 
-    const setAllowance = async ({ allowance, label, delegate }: any) => {
+    const setAllowance = async ({ allowance, label, delegate, actualAmount }: any) => {
         if(!safeAddress || !account || !chainId) return;
         setGnosisAllowanceLoading(true)
         try {  
@@ -89,7 +89,7 @@ const useGnosisAllowance = (safeAddress: string | null) => {
             await (await safeService(provider, `${chainId}`))
             .proposeTransaction({ safeAddress, safeTransactionData: safeTransaction.data, safeTxHash, senderAddress: account, senderSignature: signature.data })
             await (await safeService(provider, `${chainId}`)).confirmTransaction(safeTxHash, signature.data)
-            const payload = [{ safeAddress, safeTxHash, recipient: delegate, label }]
+            const payload = [{ safeAddress, safeTxHash, recipient: delegate, label, recurringPaymentAmount: actualAmount }]
             await axiosHttp.post(`transaction/label`, payload)
             setGnosisAllowanceLoading(false)
             return { safeTxHash, currentNonce, signature };
