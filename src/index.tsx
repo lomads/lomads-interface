@@ -17,6 +17,9 @@ import { MoralisProvider } from "react-moralis";
 import "./polyfill";
 import 'react-toastify/dist/ReactToastify.css';
 
+if (process.env.NODE_ENV !== "development")
+    console.log = () => {};
+
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
