@@ -25,8 +25,11 @@ export default {
 		},
 		notchedOutline: {
 			borderRadius: 10,
-            boxShadow: `inset 1px 0px 4px rgba(27, 43, 65, 0.1)`,
+			boxShadow: `inset 1px 0px 4px rgba(27, 43, 65, 0.1)`,
 			borderColor: 'transparent',
+		},
+		multiline: {
+			background: '#F5F5F5'
 		}
 	}
 };

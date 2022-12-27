@@ -5,8 +5,16 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import CloseIcon from '@mui/icons-material/Close';
 import { IconButton } from '@mui/material';
+import rolePermission from '../../assets/svg/RP.svg';
 import orgDetail from '../../assets/svg/OD.svg';
-
+import safe from '../../assets/svg/safe.svg';
+import token from '../../assets/svg/PT.svg';
+import sweat from '../../assets/svg/xp-points.svg';
+import terminology from '../../assets/svg/Frameterminology.svg';
+import discord from '../../assets/svg/DiscordIcon.svg';
+import OrganizationDetails from "./DrawerComponents/OrganizationDetails";
+import RolesPermission from "./DrawerComponents/RolesPermission";
+import Discord from "./DrawerComponents/Discord";
 const useStyles = makeStyles((theme: any) => ({
 	root: {
 		backgroundColor: '#fff',
@@ -16,7 +24,7 @@ const useStyles = makeStyles((theme: any) => ({
 		height: '100%',
 		overflow: 'hidden',
 		position: 'relative',
-		width: '600px'
+		width: '750px'
 	},
 	header: {
 		alignItems: 'center',
@@ -46,16 +54,28 @@ const useStyles = makeStyles((theme: any) => ({
 export default (props: any) => {
 	const classes = useStyles();
 	const navigate = useNavigate();
-	const [imageSource, setImageSource]= useState('');
+	const [imageSource, setImageSource] = useState('');
 
 	const closeDrawer = () => {
 		props.closeSidebar(false);
 	}
 
-	useEffect(()=>{
-		if(props.title=='Organisation Details')
+	useEffect(() => {
+		if (props.title == 'Organisation Details')
 			setImageSource(orgDetail);
-	},[]);
+		else if (props.title == 'Roles & Permissions')
+			setImageSource(rolePermission)
+		else if (props.title == 'Safe')
+			setImageSource(safe)
+		else if (props.title == 'Pass Tokens')
+			setImageSource(token)
+		else if (props.title == 'SWEAT points')
+			setImageSource(sweat)
+		else if (props.title == 'Terminology')
+			setImageSource(terminology)
+		else if (props.title == 'Discord')
+			setImageSource(discord)
+	}, []);
 
 	return (
 		<>
@@ -71,6 +91,13 @@ export default (props: any) => {
 				<Box className={classes.detailBox}>
 					<Typography style={{ color: '#c94b32', fontSize: '30px' }}>{props.title}</Typography>
 				</Box>
+				{props.title == 'Organisation Details' && <OrganizationDetails />}
+				{props.title == 'Roles & Permissions' && <RolesPermission />}
+				{props.title == 'Safe' && <></>}
+				{props.title == 'Pass Tokens' && <></>}
+				{props.title == 'SWEAT points' && <></>}
+				{props.title == 'Terminology' && <></>}
+				{props.title == 'Discord' && <Discord />}
 			</Box>
 		</>
 	)

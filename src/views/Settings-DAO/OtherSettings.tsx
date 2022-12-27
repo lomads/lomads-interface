@@ -3,6 +3,7 @@ import { Container, Grid, Typography, Box } from "@mui/material"
 import { makeStyles } from '@mui/styles';
 import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
+import orgDetail from '../../assets/svg/organisation-details.svg';
 import rolePermission from '../../assets/svg/roles-permissions.svg';
 import safe from '../../assets/svg/safe.svg';
 import token from '../../assets/svg/pass-tokens.svg';
@@ -48,7 +49,9 @@ export default (props: any) => {
 	const [imgSrc, setImgSrc] = useState('');
 
 	useEffect(() => {
-		if (props.title == 'Roles & Permissions')
+		if (props.title == 'Organisation Details')
+			setImgSrc(orgDetail);
+		else if (props.title == 'Roles & Permissions')
 			setImgSrc(rolePermission);
 		else if (props.title == 'Safe')
 			setImgSrc(safe);
@@ -85,7 +88,7 @@ export default (props: any) => {
 				open={openDrawer}
 				onClose={handleCloseDrawer}
 				variant="temporary">
-				<SideDrawer closeSidebar={handleCloseDrawer} />
+				<SideDrawer closeSidebar={handleCloseDrawer} title={props.title} />
 			</Drawer>
 		</>
 	)
