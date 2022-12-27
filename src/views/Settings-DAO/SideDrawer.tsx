@@ -24,13 +24,13 @@ const useStyles = makeStyles((theme: any) => ({
 		height: '100%',
 		overflow: 'hidden',
 		position: 'relative',
-		width: '750px'
+		width:'fit-content',
+		maxWidth:'800px'
 	},
 	header: {
 		alignItems: 'center',
 		display: 'flex',
 		justifyContent: 'flex-end',
-		marginBottom: '2rem',
 		padding: '2rem',
 		width: '100%',
 	},

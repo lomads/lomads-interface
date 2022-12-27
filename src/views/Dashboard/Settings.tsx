@@ -9,7 +9,6 @@ import settings from '../../assets/svg/settings.svg';
 const useStyles = makeStyles((theme: any) => ({
 	memberHeading: {
 		padding: '20px 15px 15px',
-		width: '44rem',
 		height: 'auto',
 		background: "#FFFFFF",
 		borderRadius: '5px !important',

@@ -12,9 +12,9 @@ import AddIcon from '@mui/icons-material/Add';
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
-		padding: '50px',
+		padding: '20px 0px 20px 90px',
 		height: '90vh',
-		overflow: 'auto'
+		overflow: 'auto',
 	},
 	visibilityBox: {
 		alignItems: 'center',
@@ -32,19 +32,22 @@ const useStyles = makeStyles((theme: any) => ({
 		backgroundColor: '#c94b32',
 		flex: 'none',
 		flexGrow: 0,
-		marginBottom: '35px'
+		marginBottom: '25px'
 	},
 	buttonBox: {
 		display: 'flex',
-		justifyContent: 'space-around',
+		justifyContent: 'center',
 		alignItems: 'center',
+		columnGap: '2rem',
 		marginTop: '1rem',
-		marginBottom: '1rem'
+		marginBottom: '1rem',
+		background: 'linear-gradient(360deg, #FFFFFF 60.12%, rgba(255, 255, 255, 0) 86.31%)'
 	},
 	linkBox: {
 		display: 'flex',
 		justifyContent: 'space-between',
-		alignItems: 'center'
+		alignItems: 'center',
+		width:'80%'
 	},
 	bottomBox: {
 		backgroundColor: 'rgba(118, 128, 141, 0.05)',
@@ -54,9 +57,9 @@ const useStyles = makeStyles((theme: any) => ({
 		overflow: 'hidden',
 		overflowY: 'auto',
 		padding: '26px 22px',
-		// width: '480px',
+		width: '80%',
 		margin: '1rem 0rem',
-		
+
 	},
 	linkDetailsBox: {
 		display: 'flex',
@@ -85,9 +88,7 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
 			'& .MuiSwitch-thumb:before': {
 				backgroundColor: '#c94b32',
 				borderRadius: '8px',
-				backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="13" height="12" viewBox="0 0 13 12"><path fill="${encodeURIComponent(
-					'#fff',
-				)}" d="M0.899902 4.83379L4.92295 10.6715L12.4126 1.09314" /></svg>')`,
+				backgroundImage: `url(../../../assets/svg/ico-hidden.svg)`,
 			},
 			'& + .MuiSwitch-track': {
 				opacity: 1,
@@ -143,36 +144,38 @@ export default (props: any) => {
 	return (
 		<>
 			<Box className={classes.root}>
-				<TextInput
-					style={{ marginBottom: '1.5rem' }}
-					fullWidth
-					label={"Name"}
-					placeholder={"Fashion Fusion"}
-					onChange={(event: any) => {
-					}}
-				/>
-				<TextInput
-					style={{ marginBottom: '1.5rem' }}
-					fullWidth
-					multiline
-					placeholder="DAO Description"
-					minRows={"3"}
-					label={"Description"}
-				/>
-				<TextInput
-					style={{ marginBottom: '1.5rem' }}
-					fullWidth
-					label={"Organisation's URL"}
-					disabled
-				/>
+				<Box style={{display:'flex', flexDirection:'column', width:'90%'}}>
+					<TextInput
+						style={{ marginBottom: '1.5rem', width:'90%'}}
+						label={"Name"}
+						placeholder={"Fashion Fusion"}
+						onChange={(event: any) => {
+						}}
+					/>
+					<TextInput
+						style={{ marginBottom: '1.5rem', width: '90%' }}
+						multiline
+						placeholder="DAO Description"
+						minRows={"3"}
+						label={"Description"}
+					/>
+					<TextInput
+						style={{ marginBottom: '1.5rem', width: '90%' }}
+						label={"Organisation's URL"}
+						disabled
+					/>
+				</Box>
 				<hr className={classes.divider} />
 
 				<Box className={classes.visibilityBox}>
 					<Typography style={{ marginBottom: '1rem', fontSize: '16px', fontWeight: 700, fontStyle: 'normal' }}>Member Visibility</Typography>
-					<Typography>
-						If unlocked, everyone in the organisation will be able to see who is part of which
-						project. Otherwise, only members part of a project sees the members they are working with.
-					</Typography>
+					<Box style={{ width: '90%' }}>
+						<Typography>
+							If unlocked, everyone in the organisation will be able to see who is part of which
+							project. Otherwise, only members part of a project sees the members they are working with.
+						</Typography>
+					</Box>
+
 					<FormControlLabel
 						control={<MaterialUISwitch sx={{ m: 1 }} />}
 						label=""
@@ -224,7 +227,6 @@ export default (props: any) => {
 			<Box className={classes.buttonBox}>
 				<Button size="small" variant="outlined">Cancel</Button>
 				<Button size="small" variant="contained">Save Changes</Button>
-
 			</Box>
 		</>
 	)

@@ -10,18 +10,14 @@ import Drawer from '@mui/material/Drawer';
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
+		marginTop: '5rem',
 		height: "100vh",
 		maxHeight: 'fit-content',
 		display: 'flex',
 		flexDirection: 'column',
-		overflow: 'hidden !important',
+		overflow: 'auto',
 		padding: '0px 25px',
 	},
-	otherSettings: {
-		display: 'flex',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-	}
 }));
 
 export default () => {
@@ -30,6 +26,7 @@ export default () => {
 
 	return (
 		<>
+
 			<Drawer
 				variant="permanent"
 				open={true}
@@ -37,31 +34,43 @@ export default () => {
 					keepMounted: true,
 				}}
 				sx={{
-					display: { xs: 'block', sm: 'block' },
-					'& .MuiDrawer-paper': { width: '100px', background: '#C94B32', borderRight: 'none' },
+					display: { xs: 'none', sm: 'none', md: 'block', lg: 'block' },
+					'& .MuiDrawer-paper': { width: '90px', background: '#C94B32', borderRight: 'none' },
 				}}
 			>
 				<Box style={{ top: '30%', position: 'absolute' }}>
 					<img src={settings} />
 				</Box>
-
 			</Drawer>
-			<Box className={classes.root}>
-				<Typography style={{ fontSize: '1.8rem', color: '#fff', marginBottom: '1.5rem', marginTop: '1rem' }}>Settings</Typography>
-				<OrganizationDetails title={"Organisation Details"} />
-				<Box className={classes.otherSettings}>
-					<OtherSettings title={"Roles & Permissions"} />
-					<OtherSettings title={"Safe"} />
-					<OtherSettings title={"Pass Tokens"} />
-				</Box>
-				<Box className={classes.otherSettings}>
-					<OtherSettings title={"SWEAT points"} />
-					<OtherSettings title={"Terminology"} />
-					<OtherSettings title={"Discord"} />
-				</Box>
+			<Container maxWidth="lg">
+				<Box className={classes.root}>
+					{/* <Typography style={{ fontSize: '1.8rem', color: '#fff', marginBottom: '1.5rem', marginTop: '1rem' }}>Settings</Typography> */}
+					<Grid container>
+						<Grid item xs={12} lg={12} md={12}>
+							<OrganizationDetails title={"Organisation Details"} />
+						</Grid>
+						<Grid item xs={12} lg={4} md={6} >
+							<OtherSettings title={"Roles & Permissions"} />
+						</Grid>
+						<Grid item xs={12} lg={4} md={6}>
+							<OtherSettings title={"Safe"} />
+						</Grid>
+						<Grid item xs={12} lg={4} md={6} >
+							<OtherSettings title={"Pass Tokens"} />
+						</Grid>
+						<Grid item xs={12} lg={4} md={6} >
+							<OtherSettings title={"SWEAT points"} />
 
-			</Box>
-
+						</Grid>
+						<Grid item xs={12} lg={4} md={6} >
+							<OtherSettings title={"Terminology"} />
+						</Grid>
+						<Grid item xs={12} lg={4} md={6} >
+							<OtherSettings title={"Discord"} />
+						</Grid>
+					</Grid>
+				</Box>
+			</Container>
 		</>
 	)
 }

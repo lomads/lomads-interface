@@ -81,17 +81,20 @@ export default ({ children }: any) => {
 			<CssBaseline />
 			<AppBar position="absolute">
 				<Toolbar
-					style={{ background: 'transparent', height: '100%', paddingLeft: 0, paddingRight: 24 }}
+					style={{ background: 'transparent', height: '100%', paddingLeft: 0, paddingRight: 24, paddingTop:24 }}
 				>
 					<Box className={classes.logoStyle}>
 						<Typography style={{ transform: 'rotate(-45deg)', color: '#C94B32', fontWeight: 600, fontSize: '2.1rem' }}>HG</Typography>
 					</Box>
 					<Container maxWidth="lg" style={{ padding: 0 }}>
 						<Box sx={{ flexGrow: 1, justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}>
-							<Typography variant='h3' style={{ color: '#fff' }}>Fashion Fusion</Typography>
+							<Typography style={{ color: '#fff', fontWeight:700, fontSize:'2rem' }}>Fashion Fusion</Typography>
 							<Box className={classes.closeIconBox} onClick={closeSettings}>
 								<CloseIcon />
 							</Box>
+						</Box>
+						<Box>
+							<Typography style={{ color: '#fff', fontWeight: 400, fontSize: '1.8rem', marginTop:'1.5rem' }}>Settings</Typography>
 						</Box>
 					</Container>
 				</Toolbar>
@@ -101,9 +104,9 @@ export default ({ children }: any) => {
 				className={classes.main}
 			>
 				<Toolbar />
-				<Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+				{/* <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}> */}
 					{children}
-				</Container>
+				{/* </Container> */}
 			</Box>
 		</Grid>
 	);
