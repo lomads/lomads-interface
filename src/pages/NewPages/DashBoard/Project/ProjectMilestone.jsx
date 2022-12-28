@@ -202,7 +202,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
             symbol = _get(symbol, 'token.symbol', null)
             if (!symbol)
-                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ? 'MATIC' : currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? 'GOR' : 'SWEAT'
+                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ||  currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
             let e = document.getElementById('currency-amt');
             e.innerHTML = `Compensation amount cannot be 0 ${symbol}`;
             e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
@@ -247,7 +247,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
             symbol = _get(symbol, 'token.symbol', null)
             if (!symbol)
-                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ? 'MATIC' : currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? 'GOR' : 'SWEAT'
+                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ||  currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
 
             getCompensation({ currency: currency, amount, symbol })
             getMilestones(milestones);

@@ -28,6 +28,7 @@ import memberIcon from '../../../../assets/svg/memberIcon.svg';
 import binRed from '../../../../assets/svg/bin-red.svg';
 import binWhite from '../../../../assets/svg/bin-white.svg';
 import { SupportedChainId } from "constants/chains";
+import useEns from 'hooks/useEns';
 
 const AddMember = (props: any) => {
 	const dispatch = useAppDispatch();
@@ -44,6 +45,7 @@ const AddMember = (props: any) => {
 	const [showModal, setShowModal] = useState(false)
 	const [deleteMembers, setDeleteMembers] = useState<string[]>([]);
 	const [validMembers, setValidMembers] = useState<{ address: string; name: string, role: string }[]>([]);
+	const { getENSAddress, getENSName }  = useEns();
 
 	const isAddressValid = (holderAddress: string) => {
 		const ENSdomain = holderAddress.slice(-4);
@@ -106,8 +108,7 @@ const AddMember = (props: any) => {
 	const addMember = async (_ownerName: string, _ownerAddress: string, _ownerRole: string) => {
 		const member = { name: _ownerName, address: _ownerAddress, role: _ownerRole };
 		if (_ownerAddress.slice(-4) === ".eth") {
-			const resolver = await provider?.getResolver(_ownerAddress);
-			const EnsAddress = await resolver?.getAddress();
+			const EnsAddress = await getENSAddress(_ownerAddress);
 			if (EnsAddress !== undefined) {
 				member.address = EnsAddress as string;
 				member.name = _ownerName !== '' ? _ownerName : _ownerAddress;
@@ -121,8 +122,7 @@ const AddMember = (props: any) => {
 		}
 		else {
 			let ENSname = null;
-			if (chainId !== SupportedChainId.POLYGON)
-				ENSname = await provider?.lookupAddress(_ownerAddress);
+			ENSname = await getENSName(_ownerAddress)
 			if (ENSname) {
 				member.name = _ownerName !== '' ? _ownerName : ENSname;
 			}

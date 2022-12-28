@@ -288,10 +288,10 @@ const Settings = () => {
 								</div>
 							</div>
 
-							<div className="settings-organisation-child"
+							<div className="settings-organisation-child disabled"
 								onClick={() => {
 									// toggleModal();
-									setOpenDiscord(true);
+									// setOpenDiscord(true);
 								}}
 							>
 								<div

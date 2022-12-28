@@ -258,6 +258,10 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                 </div>
             </div>
 
+            { ( tab === 1 && myTasks && myTasks.length > 0 ) ||
+              ( tab === 2 && manageTasks && manageTasks.length > 0 ) ||
+              ( tab === 3 && draftTasks && draftTasks.length > 0 ) ||
+              ( tab === 4 && otherTasks && otherTasks.length > 0 ) ?
             <div className='tasks-body'>
                 {
                     tab === 1 && myTasks && myTasks.filter((item, index) => index < 6).map((item, index) => {
@@ -343,7 +347,8 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                         }
                     })
                 }
-            </div>
+            </div> : null
+            }
         </div>
     )
 }

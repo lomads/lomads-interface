@@ -4,7 +4,7 @@ import { t, Trans } from "@lingui/macro";
 import { useWeb3React } from "@web3-react/core";
 import { getConnection } from "connection/utils";
 import { darken } from "polished";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Activity } from "react-feather";
 import { useAppSelector } from "state/hooks";
 import styled, { css } from "styled-components/macro";
@@ -26,7 +26,7 @@ import { RowBetween } from "../Row";
 import WalletModal from "../WalletModal";
 import { useNavigate } from "react-router-dom";
 import axiosHttp from '../../api';
-
+import useEns from 'hooks/useEns'
 import dogIcon from '../../assets/svg/dogIcon.svg';
 import { MdKeyboardArrowDown } from 'react-icons/md';
 
@@ -107,6 +107,18 @@ function Sock() {
 function Web3StatusInner() {
 	const { account, connector, chainId, ENSName } = useWeb3React();
 	const connectionType = getConnection(connector).type;
+	const { getENSAddress, getENSName } = useEns()
+	const [ens, setEns] = useState<string|null|undefined>(null)
+
+	useEffect(() => {
+		if(account) {
+			const getEns = async () => {
+				const name = await getENSName(account)
+				setEns(name)
+			}
+			getEns();
+		}
+	}, [account])
 
 	const error = useAppSelector(
 		(state) =>
@@ -202,7 +214,7 @@ function Web3StatusInner() {
 									:
 									null
 							}
-							<Text>{ENSName || shortenAddress(account)}</Text>
+							<Text>{ ens ? ens : (ENSName || shortenAddress(account))}</Text>
 						</>
 				}
 				<div style={{ height: '100%', width: '25%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderLeft: '1px solid #F0F0F0', marginLeft: '10px' }}>

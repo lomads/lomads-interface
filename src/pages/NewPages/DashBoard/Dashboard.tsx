@@ -53,6 +53,7 @@ import Tasks from "./Tasks";
 import CreateTask from "./Task/CreateTask";
 import CreateRecurring from "./TreasuryCard/CreateRecurring";
 import axiosHttp from 'api'
+import useEns from "hooks/useEns";
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
 const Dashboard = () => {
@@ -86,6 +87,7 @@ const Dashboard = () => {
 	const [checkLoading, setCheckLoading] = useState<boolean>(true);
 	const currentNonce = useAppSelector((state) => state.flow.currentNonce);
 	const { myRole, displayRole, permissions, can, isSafeOwner } = useRole(DAO, account);
+	const { getENSAddress, getENSName } = useEns()
 
 	console.log("role", myRole)
 
@@ -105,6 +107,11 @@ const Dashboard = () => {
 		const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase());
 		return _get(user, 'role', '').replaceAll('_', ' ').toLowerCase();
 	}
+
+	useEffect(() => {
+		if(account)
+			getENSName(account)
+	}, [account])
 
 	const [copy, setCopy] = useState<boolean>(false);
 	const toggleModal = () => {
@@ -208,7 +215,7 @@ const Dashboard = () => {
 					}
 				}
 				if(shouldUpdate){
-					//navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
+					navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
 					break;
 				}
 			}

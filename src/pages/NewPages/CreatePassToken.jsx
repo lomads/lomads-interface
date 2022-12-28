@@ -28,6 +28,7 @@ import imageToBase64 from "utils/imageToBase64";
 import { SupportedChainId } from "constants/chains";
 import { BigNumber } from '@ethersproject/bignumber';
 import { off } from "process";
+import useEns from 'hooks/useEns';
 
 
 const CreatePassToken = () => {
@@ -53,6 +54,7 @@ const CreatePassToken = () => {
     const [image, setImage] = useState(null);
     const [whitelisted, setWhitelisted] = useState(false);
     const [uploadLoading, setUploadLoading] = useState(false);
+    const { getENSAddress, getENSName }  = useEns();
 
     const daoName = _get(DAO, 'name', '').split(" ");
 
@@ -100,8 +102,7 @@ const CreatePassToken = () => {
     const addMember = async (_ownerName, _ownerAddress) => {
         const member = { name: _ownerName, address: _ownerAddress };
         if (_ownerAddress.slice(-4) === ".eth") {
-            const resolver = await provider?.getResolver(_ownerAddress);
-            const EnsAddress = await resolver?.getAddress();
+            const EnsAddress = await getENSAddress(_ownerAddress);
             if (EnsAddress !== undefined) {
                 member.address = EnsAddress;
                 member.name = _ownerName !== '' ? _ownerName : _ownerAddress;
@@ -117,8 +118,7 @@ const CreatePassToken = () => {
         }
         else {
             let ENSname = null;
-            if (chainId !== SupportedChainId.POLYGON)
-                ENSname = await provider?.lookupAddress(_ownerAddress);
+            ENSname = await getENSName(_ownerAddress)
             if (ENSname) {
                 member.name = _ownerName !== '' ? _ownerName : ENSname;
             }

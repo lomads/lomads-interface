@@ -23,6 +23,7 @@ import memberIcon from '../../assets/svg/memberIcon.svg';
 import binRed from '../../assets/svg/bin-red.svg';
 import binWhite from '../../assets/svg/bin-white.svg';
 import { SupportedChainId } from "constants/chains";
+import useEns from 'hooks/useEns';
 
 const InviteGang = () => {
 	const dispatch = useAppDispatch();
@@ -34,7 +35,7 @@ const InviteGang = () => {
 	const [errors, setErrors] = useState<any>({});
 	const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
 	const { account, provider, chainId } = useWeb3React();
-
+	const { getENSAddress, getENSName }  = useEns();
 	const [showModal, setShowModal] = useState(false);
 	const [deleteMembers, setDeleteMembers] = useState<string[]>([]);
 	const [validMembers, setValidMembers] = useState<{ address: string; name: string, role: string }[]>([]);
@@ -84,8 +85,7 @@ const InviteGang = () => {
 		return new Promise(async (resolve, reject) => {
 			const member = { name: _ownerName, address: _ownerAddress, role: _ownerRole };
 			if (_ownerAddress.slice(-4) === ".eth") {
-				const resolver = await provider?.getResolver(_ownerAddress);
-				const EnsAddress = await resolver?.getAddress();
+				const EnsAddress = await getENSAddress(_ownerAddress);
 				console.log("74 ensAddress : ", EnsAddress);
 				if (EnsAddress !== undefined) {
 					member.address = EnsAddress as string;
@@ -100,8 +100,7 @@ const InviteGang = () => {
 			}
 			else {
 				let ENSname = null;
-				if(chainId !== SupportedChainId.POLYGON)
-					ENSname = await provider?.lookupAddress(_ownerAddress);
+					ENSname = await getENSName(_ownerAddress)
 				if (ENSname) {
 					member.name = _ownerName !== '' ? _ownerName : ENSname;
 				}
@@ -183,16 +182,14 @@ const InviteGang = () => {
 					})
 					if (member.address && isAddressValid(member.address) && !isPresent(member.address)) {
 						if (member.address.slice(-4) === ".eth") {
-							const resolver = await provider?.getResolver(member.address);
-							const EnsAddress = await resolver?.getAddress();
+							const EnsAddress = await getENSAddress(member.address);
 							if (EnsAddress) {
 								member.name = member.name ? member.name : member.address;
 								member.address = EnsAddress as string;
 							}
 						} else {
 							let ENSname = null;
-							if(chainId !== SupportedChainId.POLYGON)
-								ENSname = await provider?.lookupAddress(member.address);
+							ENSname = await getENSName(member.address)
 							if (ENSname)
 								member.name = member.name ? member.name : ENSname
 						}

@@ -7,6 +7,7 @@
     "@coinbase/wallet-sdk": "^3.3.0",
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
+    "@ensdomains/ensjs": "^3.0.0-alpha.39",
     "@gnosis.pm/safe-apps-web3-react": "^1.5.3",
     "@gnosis.pm/safe-core-sdk": "^3.1.1",
     "@gnosis.pm/safe-core-sdk-types": "^1.6.1",
@@ -110,6 +111,7 @@
     "ua-parser-js": "^1.0.2",
     "web-vitals": "^2.1.0",
     "web3": "^1.8.0",
+    "web3-eth": "^1.8.1",
     "web3-token": "^1.0.2",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.18.12/xlsx-0.18.12.tgz"
   },

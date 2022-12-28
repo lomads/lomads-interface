@@ -135,7 +135,7 @@ const MyProject = () => {
             </div>
 
             {
-                tab === 1
+                tab === 1 && myProjects && myProjects.length > 0
                     ?
                     <div className='myproject-body-fixed'>
                         {
@@ -171,7 +171,7 @@ const MyProject = () => {
             }
 
             {
-                tab === 2
+                tab === 2 && otherProjects && otherProjects.length > 0
                     ?
                     <>
                         {
