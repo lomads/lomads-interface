@@ -7,13 +7,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import { IoIosArrowBack } from 'react-icons/io'
 import ProjectCard from './DashBoard/Project/ProjectCard';
 import TaskCard from "./DashBoard/Task/TaskCard";
+import useTerminology from 'hooks/useTerminology';
 
 const ArchiveProjectTasks = () => {
     const navigate = useNavigate();
     const { projectId } = useParams();
     const { DAO } = useAppSelector((state) => state.dashboard);
     const daoName = _get(DAO, 'name', '').split(" ");
-
+    const { transformTask, transformWorkspace } = useTerminology(_get(DAO, 'terminologies', null))
     const [archivedTasks, setArchivedTasks] = useState([]);
 
     useEffect(() => {
@@ -46,7 +47,7 @@ const ArchiveProjectTasks = () => {
                         <IoIosArrowBack size={20} color="#C94B32" />
                     </div>
                     <div className="right">
-                        <p>Archived <span>Tasks</span></p>
+                        <p>Archived <span>{ transformTask().labelPlural }</span></p>
                     </div>
                 </div>
             </div>

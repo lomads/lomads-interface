@@ -4,7 +4,7 @@ import { find as _find, get as _get, debounce as _debounce, groupBy as _groupBy,
 import { useAppSelector } from "state/hooks";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useWeb3React } from "@web3-react/core";
-
+import useTerminology from 'hooks/useTerminology';
 import { IoIosArrowBack } from 'react-icons/io';
 import SafeButton from "UIpack/SafeButton";
 
@@ -19,6 +19,7 @@ const AllProjects = () => {
     const { DAO, user } = useAppSelector((state) => state.dashboard);
     const { account } = useWeb3React();
     const daoName = _get(DAO, 'name', '').split(" ");
+    const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies', null))
 
     const [tab, setTab] = useState(location.state.activeTab);
     const [myProjects, setMyProjects] = useState([]);
@@ -91,19 +92,19 @@ const AllProjects = () => {
                 <button onClick={() => navigate(-1)}>
                     <IoIosArrowBack size={20} color="#C94B32" />
                 </button>
-                <p>Workspaces</p>
+                <p>{ transformWorkspace().labelPlural }</p>
             </div>
 
             {/* Tabs header */}
             <div className='allTasks-tabHeader'>
                 <div className="tasks-title">
                     <button className={tab === 1 ? 'active' : null} onClick={() => setTab(1)}>
-                        My Workspaces
+                        My { transformWorkspace().labelPlural  }
                     </button>
                     <div className="divider"></div>
 
                     <button className={tab === 2 ? 'active' : null} onClick={() => setTab(2)}>
-                        All Workspaces
+                        All { transformWorkspace().labelPlural  }
                     </button>
                 </div>
                 <div className="tasks-buttons">

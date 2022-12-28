@@ -11,12 +11,13 @@ import { useAppDispatch } from "state/hooks";
 import { updateDaoMember } from 'state/dashboard/actions'
 import SimpleInputField from "UIpack/SimpleInputField";
 import useRole from "hooks/useRole";
+import useTerminology from 'hooks/useTerminology';
 
 const MemberCard = (props: any) => {
 	const dispatch = useAppDispatch();
 	const { provider, account } = useWeb3React();
 	const { DAO, DAOLoading } = useAppSelector((state) => state.dashboard);
-
+	const { transformRole } = useTerminology(_get(DAO, 'terminologies'))
 	const { myRole, can } = useRole(DAO, account);
 
 	const [membersArray, setMembersArray] = useState<any>([]);
@@ -29,7 +30,7 @@ const MemberCard = (props: any) => {
 
 	const amIAdmin = useMemo(() => {
 		if (DAO) {
-			let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'ADMIN')
+			let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'role1')
 			if (user)
 				return true
 			return false
@@ -62,7 +63,7 @@ const MemberCard = (props: any) => {
 						</div>
 						<div className="roleText">
 							{
-								props.role === 'ADMIN' ? props.creator ? 'Admin (Creator)' : 'Admin' : capitalizeFirstLetter((props.role).replace('_', ' ').toLowerCase())
+								props.role === 'role1' ? props.creator ? `${transformRole(props.role).label} (Creator)` : transformRole(props.role).label : transformRole(props.role).label
 							}
 						</div>
 					</div>
@@ -136,7 +137,7 @@ const MemberCard = (props: any) => {
 								position={index}
 								joined={_get(result, 'joined')}
 								creator={_get(result, 'creator', false)}
-								role={_get(result, 'role', 'CONTRIBUTOR')}
+								role={_get(result, 'role', 'role4')}
 								address={_get(result, 'member.wallet', '')}
 							/>
 						);

@@ -52,7 +52,7 @@ const Settings = () => {
         _get(DAO, "members", []),
         (m) =>
           _get(m, "member.wallet", "").toLowerCase() ===
-            account?.toLowerCase() && m.role === "ADMIN"
+            account?.toLowerCase() && m.role === "role1"
       );
       if (user) return true;
       return false;

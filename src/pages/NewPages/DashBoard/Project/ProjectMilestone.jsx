@@ -13,7 +13,7 @@ import { ReactComponent as DropdownRed } from '../../../../assets/images/dropdow
 import { ReactComponent as DropupRed } from '../../../../assets/images/dropup-red.svg';
 
 import { Editor } from '@tinymce/tinymce-react';
-
+import useTerminology from 'hooks/useTerminology';
 import {
     Input,
     FormControl,
@@ -38,6 +38,7 @@ import { SupportedChainId } from "constants/chains";
 const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation, list }) => {
 
     const { DAO } = useAppSelector((state) => state.dashboard);
+    const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies'))
     const { chainId, account } = useWeb3React();
     const editorRef = useRef(null);
 
@@ -266,11 +267,11 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                 <div style={{ width: '100%', height: '100%', overflow: 'scroll' }}>
                     <div className='milestone-body'>
                         <img src={createTaskSvg} alt="frame-icon" />
-                        <h1>Workspace Milestones</h1>
+                        <h1>{transformWorkspace().label} Milestones</h1>
                         <span>Organise and link payments to milestones</span>
 
                         <div className='milestone-inputRow' style={{ width: '320px', marginBottom: '5px' }}>
-                            <span>Total Workspace Value</span>
+                            <span>Total {transformWorkspace().label} Value</span>
                             <div className='picker-container' style={{ margin: '0', marginTop: '5px' }}>
                                 <Select defaultValue={currency} onChange={handleChangeCurrency} bg='#FFFF' color='#76808D' variant='unstyled' style={{ borderRadius: '10px 0px 0px 10px', borderWidth: 1, borderRightWidth: 0, borderColor: 'rgba(27, 43, 65, 0.1)', height: 50, padding: '0px 50px 0px 20px' }} iconSize={15} icon={<ArrowDown />}>
                                     <option value="" selected disabled>Select currency</option>
@@ -355,7 +356,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                                                         placeholder={`${100 / milestoneCount}`}
                                                     />
                                                 </div>
-                                                <span style={{ margin: '0', marginLeft: '14px' }}>% of workspace value</span>
+                                                <span style={{ margin: '0', marginLeft: '14px' }}>% of {transformWorkspace().label.toLowerCase() } value</span>
                                             </div>
                                             <span id={`amount${index}`} style={{ fontSize: '13px', color: '#C84A32', fontStyle: 'normal' }}></span>
                                         </div>

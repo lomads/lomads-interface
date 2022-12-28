@@ -14,6 +14,7 @@ import archiveIcon from '../../../assets/svg/archiveIcon.svg';
 import expandIcon from '../../../assets/svg/expand.svg';
 
 import useRole from 'hooks/useRole';
+import useTerminology from 'hooks/useTerminology';
 import moment from 'moment';
 
 const MyProject = () => {
@@ -26,6 +27,7 @@ const MyProject = () => {
     const [otherProjects, setOtherProjects] = useState([]);
     const [initialCheck, setInitialCheck] = useState(false);
     const { myRole, can } = useRole(DAO, account)
+    const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies', null))
 
 
     const notificationCount = (project) => {
@@ -76,7 +78,7 @@ const MyProject = () => {
 
     const amIAdmin = useMemo(() => {
         if (DAO) {
-            let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'ADMIN')
+            let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'role1')
             if (user)
                 return true
             return false
@@ -90,12 +92,12 @@ const MyProject = () => {
                 <div className="myproject-title">
                     <>
                         <button className={tab === 1 ? 'active' : null} onClick={() => setTab(1)}>
-                            My workspace
+                            My { transformWorkspace().labelPlural }
                         </button>
                         <div className="divider"></div>
                     </>
                     <button className={tab === 2 ? 'active' : null} onClick={() => setTab(2)}>
-                        All workspaces
+                        All { transformWorkspace().labelPlural }
                     </button>
                 </div>
                 <div className="myproject-buttons">

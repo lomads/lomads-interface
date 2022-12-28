@@ -5,22 +5,22 @@ import IconButton from "UIpack/IconButton";
 import "./TerminologyModal.css";
 import OD from "../../assets/images/drawer-icons/Frameterminology.svg";
 import editIcon from 'assets/svg/editButton.svg';
-
 import { useAppSelector, useAppDispatch } from "state/hooks";
-
 import { updateDao } from 'state/dashboard/actions';
-import { resetUpdateDAOLoader } from 'state/dashboard/reducer';
-
+import { resetUpdateDAOLoader, setTask } from 'state/dashboard/reducer';
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
+import { TASK_OPTIONS, WORKSPACE_OPTIONS, DEFAULT_ROLES } from '../../constants/terminology'; 
+
 
 const TerminologyModal = ({ toggleModal, toggleTerminology }) => {
 
 	const dispatch = useAppDispatch();
 	const { DAO, updateDaoLoading } = useAppSelector((state) => state.dashboard);
-
 	const [showEdit, setShowEdit] = useState(false);
 
-	const [ob, setOb] = useState(_get(DAO, 'terminologies', null));
+	const [workspaceTerminology, setWorkspaceTerminology] = useState('WORKSPACE')
+	const [taskTerminology, setTaskTerminology] = useState('TASK')
+	const [roles, setRoles] = useState(DEFAULT_ROLES)
 
 	useEffect(() => {
 		if (updateDaoLoading === false) {
@@ -29,14 +29,42 @@ const TerminologyModal = ({ toggleModal, toggleTerminology }) => {
 		}
 	}, [updateDaoLoading]);
 
+	useEffect(() => {
+		if(DAO?.terminologies) {
+			setWorkspaceTerminology(_get(DAO, 'terminologies.workspace.value'))
+			setTaskTerminology(_get(DAO, 'terminologies.task.value'))
+			setRoles(_get(DAO, 'terminologies.roles'))
+		}
+	}, [DAO?.terminologies])
+
 	const handleChange = (e) => {
-		let tempOb = { ...ob };
-		tempOb[e.target.id] = e.target.value;
-		setOb(tempOb);
+		setRoles(prev => {
+			return { ...prev, 
+				[e.target.name] : { 
+					...prev[e.target.name],
+					label:  e.target.value && e.target.value !== '' ? e.target.value : ''
+				} 
+			}
+		})
 	}
 
 	const handleSubmit = () => {
-		const terminologies = ob;
+		let r = {}
+		Object.keys(roles).map(key => {
+			const role = roles[key]
+			const rv = {
+				...role,
+				label:  role.label && role.label !== '' ? (role.label).trim().replace(/ +(?= )/g,'') : DEFAULT_ROLES[key].label,
+				value: role.label&& role.label!== '' ? (role.label).trim().toUpperCase().split(' ').join('_').replace(/ +(?= )/g,'').replace(/[^a-zA-Z0-9_]/g, '') : DEFAULT_ROLES[key].value
+			}
+			r[key] = rv
+		})
+		const terminologies = {
+			workspace: _find(WORKSPACE_OPTIONS, wo => wo.value === workspaceTerminology),
+			task: _find(TASK_OPTIONS, to => to.value === taskTerminology),
+			roles: r
+		}
+		//console.log("terminologies", terminologies)
 		dispatch(updateDao({ url: _get(DAO, 'url', ''), payload: { terminologies } }));
 	}
 
@@ -89,70 +117,78 @@ const TerminologyModal = ({ toggleModal, toggleTerminology }) => {
 									?
 									<>
 										<div className="section" style={{ width: '320px' }}>
-											<h1>Projects : <span>{ob.Projects}</span></h1>
-											<h1>Tasks : <span>{ob.Tasks}</span></h1>
+											<h1>Workspaces : <span>{ _find(WORKSPACE_OPTIONS, wo => wo.value === workspaceTerminology)?.labelPlural }</span></h1>
+											<h1>Tasks : <span>{ _find(TASK_OPTIONS, wo => wo.value === taskTerminology)?.labelPlural }</span></h1>
 										</div>
 										<div className="divider"></div>
 										<div className="section" style={{ width: '320px' }}>
-											<h1>Admin : <span>{ob.Admin}</span></h1>
-											<h1>Core Contributor : <span>{ob["Core Contributor"]}</span></h1>
-											<h1>Active Contributor : <span>{ob["Active Contributor"]}</span></h1>
-											<h1>Contributor : <span>{ob.Contributor}</span></h1>
+											{
+											Object.keys(roles).map(key => {
+												return (
+													<h1>{ key } : <span>{ _get(roles, `${key}.label`) }</span></h1>
+												)
+											})
+											}
 										</div>
 									</>
 									:
 									<>
 										<div className="section" style={{ width: '375px' }}>
 											<div style={{ marginBottom: '15px' }}>
-												<h1>Projects</h1>
+												<h1>Workspaces</h1>
 												<select
-													name="project"
+													name="workspace"
 													className="tokenDropdown"
-													id="Projects"
+													id="workspace"
+													value={workspaceTerminology}
 													style={{ width: '200px', margin: '0' }}
-													onChange={handleChange}
+													onChange={e => setWorkspaceTerminology(e.target.value)}
 												>
-													<option value={'Projects'} selected={ob.Projects === 'Projects'}>Projects</option>
-													<option value={'Pods'} selected={ob.Projects === 'Pods'}>Pods</option>
-													<option value={'Departments'} selected={ob.Projects === 'Departments'}>Departments</option>
-													<option value={'Functions'} selected={ob.Projects === 'Functions'}>Functions</option>
-													<option value={'Guilds'} selected={ob.Projects === 'Guilds'}>Guilds</option>
+													{
+														WORKSPACE_OPTIONS.map(option => {
+															return <option key={option.value} value={option.value}>{ option.labelPlural }</option>
+														})
+													}
 												</select>
 											</div>
 											<div>
 												<h1>Tasks</h1>
 												<select
-													name="project"
+													name="task"
 													id="Tasks"
 													className="tokenDropdown"
+													value={taskTerminology}
 													style={{ width: '200px', margin: '0' }}
-													onChange={handleChange}
+													onChange={e => setTaskTerminology(e.target.value)}
 												>
-													<option value={'Tasks'} selected={ob.Tasks === 'Tasks'}>Tasks</option>
-													<option value={'Bounties'} selected={ob.Tasks === 'Bounties'}>Bounties</option>
+													{
+														TASK_OPTIONS.map(option => {
+															return <option key={option.value} value={option.value}>{ option.labelPlural }</option>
+														})
+													}
 												</select>
 											</div>
 										</div>
 										<div className="divider"></div>
 										<div className="section" style={{ width: '375px' }}>
 											<div style={{ marginBottom: '15px' }}>
-												<h1>Admin</h1>
-												<input type={"text"} id={"Admin"} value={ob.Admin} onChange={handleChange} />
+												<h1>Role 1</h1>
+												<input type="text" name="role1" value={_get(roles, 'role1.label')} onChange={handleChange} />
 											</div>
 
 											<div style={{ marginBottom: '15px' }}>
-												<h1>Core Contributor</h1>
-												<input type={"text"} id={"Core Contributor"} value={ob["Core Contributor"]} onChange={handleChange} />
+												<h1>Role 2</h1>
+												<input type="text" name="role2" value={_get(roles, 'role2.label')} onChange={handleChange} />
 											</div>
 
 											<div style={{ marginBottom: '15px' }}>
-												<h1>Active Contributor</h1>
-												<input type={"text"} id={"Active Contributor"} value={ob["Active Contributor"]} onChange={handleChange} />
+												<h1>Role 3</h1>
+												<input type="text" name="role3" value={_get(roles, 'role3.label')} onChange={handleChange} />
 											</div>
 
 											<div style={{ marginBottom: '15px' }}>
-												<h1>Contributor</h1>
-												<input type={"text"} id={"Contributor"} value={ob.Contributor} onChange={handleChange} />
+												<h1>Role 4</h1>
+												<input type="text" name="role4" value={_get(roles, 'role4.label')} onChange={handleChange} />
 											</div>
 										</div>
 									</>

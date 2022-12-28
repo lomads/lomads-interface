@@ -52,7 +52,7 @@ import "react-step-progress-bar/styles.css";
 import { ProgressBar, Step } from "react-step-progress-bar";
 import AssignContributions from "./DashBoard/Project/AssignContributions";
 import KRAReview from "./DashBoard/Project/KRAReview";
-
+import useTerminology from 'hooks/useTerminology';
 import moment from "moment";
 
 const ProjectDetails = () => {
@@ -68,6 +68,7 @@ const ProjectDetails = () => {
     const [showAddLink, setShowAddLink] = useState(false);
     const [update, setUpdate] = useState(0);
     const { DAO, Project, ProjectLoading, updateProjectMemberLoading, deleteProjectMemberLoading, archiveProjectLoading, deleteProjectLoading, updateProjectLoading } = useAppSelector((state) => state.dashboard);
+    const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies'))
     console.log("Project : ", Project)
     const daoName = _get(DAO, 'name', '').split(" ");
     const { myRole, can } = useRole(DAO, account);
@@ -543,7 +544,7 @@ const ProjectDetails = () => {
                             <div className="editMemberOverlay">
                                 <div className="editMemberContainer">
                                     <div className="editMember-header">
-                                        <p>Remove members from project</p>
+                                        <p>{`Remove members from ${transformWorkspace().label}`}</p>
                                         <button onClick={() => setEditMember(false)}>
                                             <CgClose size={20} color="#C94B32" />
                                         </button>
@@ -574,7 +575,7 @@ const ProjectDetails = () => {
                                             CANCEL
                                         </button>
                                         <button onClick={handleDeleteMembers}>
-                                            REMOVE FROM PROJECT
+                                            REMOVE FROM { transformWorkspace().label.toUpperCase() }
                                         </button>
                                     </div>
                                 </div>
@@ -689,7 +690,7 @@ const ProjectDetails = () => {
                                                 height={40}
                                                 width={180}
                                                 titleColor="#C94B32"
-                                                title="CLOSE WORKSPACE"
+                                                title={`CLOSE ${transformWorkspace().label.toUpperCase()}`}
                                                 bgColor="#FFFFFF"
                                                 opacity="1"
                                                 disabled={false}

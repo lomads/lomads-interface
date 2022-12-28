@@ -8,7 +8,7 @@ import SimpleInputField from "UIpack/SimpleInputField";
 import { SiNotion } from "react-icons/si";
 import { BsDiscord, BsGoogle, BsGithub, BsTwitter, BsGlobe } from "react-icons/bs";
 import { AiOutlinePlus, AiFillQuestionCircle, AiOutlineLock } from "react-icons/ai";
-
+import useTerminology from 'hooks/useTerminology';
 import { useAppSelector } from "state/hooks"
 
 import { isValidUrl } from 'utils';
@@ -20,7 +20,7 @@ import { nanoid } from '@reduxjs/toolkit';
 
 const ProjectResource = ({ toggleShowResource, getResources, list }) => {
     const { DAO } = useAppSelector((state) => state.dashboard);
-
+    const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies'))
     const [title, setTitle] = useState('');
     const [titleError, setTitleError] = useState(null);
     const [link, setLink] = useState('');
@@ -197,8 +197,8 @@ const ProjectResource = ({ toggleShowResource, getResources, list }) => {
                 <div style={{ width: '100%', height: '100%', overflow: 'scroll' }}>
                     <div className='resource-body'>
                         <img src={createTaskSvg} alt="frame-icon" />
-                        <h1>Workspace Resources</h1>
-                        <span>Add links for online ressources </span>
+                        <h1>{ transformWorkspace().label } Resources</h1>
+                        <span>Add links for online resources </span>
 
                         <div className='resource-inputRow' style={{ marginBottom: '0', width: '410px' }}>
                             <span>Add links</span>

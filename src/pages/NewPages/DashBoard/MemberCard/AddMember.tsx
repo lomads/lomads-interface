@@ -29,6 +29,8 @@ import binRed from '../../../../assets/svg/bin-red.svg';
 import binWhite from '../../../../assets/svg/bin-white.svg';
 import { SupportedChainId } from "constants/chains";
 import useEns from 'hooks/useEns';
+import useTerminology from 'hooks/useTerminology'
+import { DEFAULT_ROLES } from "constants/terminology";
 
 const AddMember = (props: any) => {
 	const dispatch = useAppDispatch();
@@ -36,12 +38,12 @@ const AddMember = (props: any) => {
 	const [uploadLoading, setUploadLoading] = useState<boolean>(false);
 	const [ownerName, setOwnerName] = useState<string>("");
 	const [ownerAddress, setOwnerAddress] = useState<string>("");
-	const [ownerRole, setOwnerRole] = useState<string>("CONTRIBUTOR");
+	const [ownerRole, setOwnerRole] = useState<string>("role4");
 	const [errors, setErrors] = useState<any>({});
-	const totalMembers = useAppSelector((state) => state.flow.totalMembers);
+	const totalMembers = useAppSelector((state:any) => state.flow.totalMembers);
 	const { DAO, addMemberLoading, addProjectMemberLoading, addMemberListLoading } = useAppSelector((state) => state.dashboard);
 	const { account, provider, chainId } = useWeb3React();
-
+	const { transformRole } = useTerminology(_.get(DAO, 'terminologies'))
 	const [showModal, setShowModal] = useState(false)
 	const [deleteMembers, setDeleteMembers] = useState<string[]>([]);
 	const [validMembers, setValidMembers] = useState<{ address: string; name: string, role: string }[]>([]);
@@ -68,7 +70,7 @@ const AddMember = (props: any) => {
 	};
 	useEffect(() => {
 		const check = totalMembers.some(
-			(member) => member.address === (account as string)
+			(member:any) => member.address === (account as string)
 		);
 		if (!check) {
 			const creator = [
@@ -197,7 +199,7 @@ const AddMember = (props: any) => {
 						}
 						if (!_.find(validMembers, m => m.address.toLowerCase() === member.address.toLowerCase())
 						) {
-							validMembers.push({ ...member, role: 'CONTRIBUTOR' });
+							validMembers.push({ ...member, role: 'role4' });
 						}
 					}
 				}
@@ -304,10 +306,17 @@ const AddMember = (props: any) => {
 								onChange={(e) => setOwnerRole(e.target.value)}
 								style={{ margin: '0' }}
 							>
-								{/* <option value="ADMIN">Admin</option> */}
-								<option value="CORE_CONTRIBUTOR">Core Contributor</option>
-								<option value="ACTIVE_CONTRIBUTOR">Active Contributor</option>
-								<option value="CONTRIBUTOR">Contributor</option>
+								{/* <option value="role1">Admin</option> */}
+								{/* <option value="role2">Core Contributor</option>
+								<option value="role3">Active Contributor</option>
+								<option value="role4">Contributor</option> */}
+								{
+									Object.keys(_.get(DAO, 'terminologies.roles', DEFAULT_ROLES)).map((key: any) => {
+										if(key !== 'role1')
+											return <option value={key}>{ _.get(transformRole(key), 'label') }</option>
+										return null
+									})
+								}
 							</select>
 						</div>
 					</div>
@@ -386,10 +395,10 @@ const AddMember = (props: any) => {
 														defaultValue={item.role}
 														onChange={(e) => handleChangeState(e, index)}
 													>
-														{/* <option value="ADMIN">Admin</option> */}
-														<option value="CORE_CONTRIBUTOR">Core Contributor</option>
-														<option value="ACTIVE_CONTRIBUTOR">Active Contributor</option>
-														<option value="CONTRIBUTOR">Contributor</option>
+														{/* <option value="role1">Admin</option> */}
+														<option value="role2">{ transformRole("role2").label }</option>
+														<option value="role3">{ transformRole("role3").label }</option>
+														<option value="role4">{ transformRole("role4").label }</option>
 													</select>
 													{
 														deleteMembers.includes(item.address)

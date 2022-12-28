@@ -126,7 +126,7 @@ useState<Array<any>>();
 
 	const amIAdmin = useMemo(() => {
 		if (DAO) {
-			let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'ADMIN')
+			let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'role1')
 			if (user)
 				return true
 			return false
