@@ -4,14 +4,13 @@ import './CreateTask.css';
 import { CgClose } from 'react-icons/cg'
 import createProjectSvg from '../../../../assets/svg/createProject.svg';
 import createTaskSvg from '../../../../assets/svg/task.svg';
-
+import useTerminology from 'hooks/useTerminology';
 import SimpleInputField from "UIpack/SimpleInputField";
 import { HiOutlinePlus } from 'react-icons/hi';
 import SelectRoles from './SelectRoles';
 
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import { getCurrentUser } from "state/dashboard/actions";
-
 import { createTask, draftTask } from 'state/dashboard/actions'
 import { resetCreateTaskLoader, resetDraftTaskLoader } from 'state/dashboard/reducer';
 
@@ -41,6 +40,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
 
     const dispatch = useAppDispatch();
     const { DAO, user, createTaskLoading, draftTaskLoading } = useAppSelector((state) => state.dashboard);
+    const { transformTask, transformWorkspace, transformRole } = useTerminology(_get(DAO, 'terminologies', null))
     const { chainId, account } = useWeb3React();
 
     const { myRole, can } = useRole(DAO, account)
@@ -191,7 +191,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
             symbol = _get(symbol, 'token.symbol', null)
             if (!symbol)
-                symbol = currency.currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ? 'MATIC' : currency.currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? 'GOR' : 'SWEAT'
+                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ||  currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
 
             let task = {};
             task.daoId = DAO?._id;
@@ -235,7 +235,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
         let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
         symbol = _get(symbol, 'token.symbol', 'SWEAT')
         if (!symbol)
-            symbol = currency.currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ? 'MATIC' : currency.currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? 'GOR' : 'SWEAT'
+            symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ||  currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
         let task = {};
         task.daoId = DAO?._id;
         task.name = name;
@@ -293,10 +293,10 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                 <>
                                     <div className='createTask-body'>
                                         <img src={createTaskSvg} alt="frame-icon" />
-                                        <h1>Create task</h1>
+                                        <h1>Create {transformTask().label}</h1>
 
                                         <div className='createTask-inputRow'>
-                                            <span>Name of the task</span>
+                                            <span>Name of the {transformTask().label}</span>
                                             <SimpleInputField
                                                 className="inputField"
                                                 id="nameInput"
@@ -304,7 +304,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                 width={'100%'}
                                                 value={name}
                                                 onchange={(e) => { setName(e.target.value); document.getElementById('error-name').innerHTML = '' }}
-                                                placeholder="Name of the task"
+                                                placeholder={`Name of the ${transformTask().label}`}
                                             />
                                             <span className='error-msg' id="error-name"></span>
                                         </div>
@@ -374,7 +374,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
 
                                         <div className='createTask-inputRow'>
                                             <div className='createTask-optionalDiv'>
-                                                <span>In project:</span>
+                                                <span>In { transformWorkspace().label }:</span>
                                                 <div className='option-div'>
                                                     Optional
                                                 </div>
@@ -393,7 +393,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                         <option value={null}>{selectedProject.name}</option>
                                                         :
                                                         <>
-                                                            <option value={null}>Select project</option>
+                                                            <option value={null}>Select { transformWorkspace().label }</option>
                                                             {
                                                                 eligibleProjects.filter(p => !p.archivedAt && !p.deletedAt).map((item, index) => {
                                                                     return (
@@ -500,7 +500,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                                                 className='roles-circle'
                                                                                 style={index === 0 ? { background: 'rgba(146, 225, 168, 1)' } : index === 1 ? { background: 'rgba(137,179,229,1)' } : index === 2 ? { background: 'rgba(234,100,71,1)' } : { background: 'rgba(146, 225, 168, 1)' }}
                                                                             ></div>
-                                                                            <span>{item}</span>
+                                                                            <span>{transformRole(item).label}</span>
                                                                         </div>
                                                                         <div className='roles-close' onClick={() => handleRemoveRole(item)}>
                                                                             <CgClose color='#FFF' />

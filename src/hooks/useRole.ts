@@ -1,10 +1,11 @@
 import { get as _get, find as _find } from 'lodash';
+import useTerminology from './useTerminology';
 
 const capitalizeFirstLetter = (string: string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-const CONTRIBUTOR: Array<string> = [
+const role4: Array<string> = [
     'members.edit', 
     'project.view', 
     'project.view.own', 
@@ -14,8 +15,8 @@ const CONTRIBUTOR: Array<string> = [
     'members.view'
 ];
 
-const ACTIVE_CONTRIBUTOR: Array<string> = [
-    ...CONTRIBUTOR, 
+const role3: Array<string> = [
+    ...role4, 
     'project.view.archives', 
     'project.create', 
     'project.edit.creator',
@@ -30,8 +31,8 @@ const ACTIVE_CONTRIBUTOR: Array<string> = [
     'project.links.view.creator'
 ];
 
-const CORE_CONTRIBUTOR: Array<string> = [
-    ...ACTIVE_CONTRIBUTOR, 
+const role2: Array<string> = [
+    ...role3, 
     'project.edit', 
     'project.view.all', 
     'project.create', 
@@ -50,21 +51,22 @@ const CORE_CONTRIBUTOR: Array<string> = [
     'task.create', 
     'task.create.sweat'
 ]
-const ADMIN: Array<string> = [...CORE_CONTRIBUTOR, 'settings', 'members.delete', 'task.edit', 'task.delete', 'task.close'];
+const role1: Array<string> = [...role2, 'settings', 'members.delete', 'task.edit', 'task.delete', 'task.close'];
 
-const permissions: any = { ADMIN, ACTIVE_CONTRIBUTOR, CORE_CONTRIBUTOR, CONTRIBUTOR, "": [] }
+const permissions: any = { "role1": role1, "role2": role2, "role3" : role3, "role4": role4, "": [] }
 
 const can = (role: string , permission: string) => {
-    return permissions[role].indexOf(permission) > -1
+    return _get(permissions, role, []).indexOf(permission) > -1
 }
 
 const useRole = (DAO: any, account: string | undefined) => {
+    const { transformRole } = useTerminology(_get(DAO, 'terminologies'))
     if(DAO && account) {
         let role = _get(_find(DAO.members, m => m.member.wallet.toLowerCase() === account?.toLowerCase()), 'role', '')
         let isSafeOwner = _find(_get(DAO, 'safe.owners'), (m: any) => m.wallet.toLowerCase() === account.toLowerCase());
         return { 
             myRole: role, 
-            displayRole: capitalizeFirstLetter(role.replace('_', ' ').toLowerCase()),
+            displayRole: _get(transformRole(role), 'label', ''),
             permissions: permissions[role],
             can,
             isSafeOwner

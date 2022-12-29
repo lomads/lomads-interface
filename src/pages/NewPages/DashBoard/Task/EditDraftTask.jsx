@@ -14,7 +14,7 @@ import { getCurrentUser } from "state/dashboard/actions";
 
 import { editDraftTask, convertDraftTask } from 'state/dashboard/actions'
 import { resetConvertDraftTaskLoader, resetEditDraftTaskLoader } from 'state/dashboard/reducer';
-
+import useTerminology from 'hooks/useTerminology';
 import { useWeb3React } from "@web3-react/core";
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
 import { SupportedChainId } from "constants/chains";
@@ -42,7 +42,7 @@ const EditDraftTask = ({ close, task, daoURL }) => {
     const dispatch = useAppDispatch();
     const { DAO, user, editDraftTaskLoading, convertDraftTaskLoading } = useAppSelector((state) => state.dashboard);
     const { chainId, account } = useWeb3React();
-
+    const { transformTask, transformWorkspace, transformRole } = useTerminology(_get(DAO, 'terminologies', null))
     const { myRole, can } = useRole(DAO, account)
 
     const editorRef = useRef(null);
@@ -186,7 +186,7 @@ const EditDraftTask = ({ close, task, daoURL }) => {
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
             symbol = _get(symbol, 'token.symbol', null)
             if (!symbol)
-                symbol = currency.currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ? 'MATIC' : currency.currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? 'GOR' : 'SWEAT'
+                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ||  currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
 
             let tsk = {};
             tsk.name = name;
@@ -230,7 +230,7 @@ const EditDraftTask = ({ close, task, daoURL }) => {
         let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
         symbol = _get(symbol, 'token.symbol', 'SWEAT')
         if (!symbol)
-            symbol = currency.currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ? 'MATIC' : currency.currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? 'GOR' : 'SWEAT'
+            symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ||  currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
         let tsk = {};
         tsk.name = name;
         tsk.description = description;
@@ -486,7 +486,7 @@ const EditDraftTask = ({ close, task, daoURL }) => {
                                                                                 className='roles-circle'
                                                                                 style={index === 0 ? { background: 'rgba(146, 225, 168, 1)' } : index === 1 ? { background: 'rgba(137,179,229,1)' } : index === 2 ? { background: 'rgba(234,100,71,1)' } : { background: 'rgba(146, 225, 168, 1)' }}
                                                                             ></div>
-                                                                            <span>{item}</span>
+                                                                            <span>{transformRole(item).label}</span>
                                                                         </div>
                                                                         <div className='roles-close' onClick={() => handleRemoveRole(item)}>
                                                                             <CgClose color='#FFF' />

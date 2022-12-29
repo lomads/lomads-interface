@@ -372,7 +372,7 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
                                         })}
                                         </Select>
                                         <div className='number-input'>
-                                            <NumberInput onChange={(e) => setCompensation((prev: any) => { return { ...prev, amount: parseFloat(e) } })} value={compensation && compensation.amount ? parseFloat(compensation.amount) : 0} style={{ width: (64 + 50), height: 50, borderColor: 'rgba(27, 43, 65, 0.1)', borderRightWidth: 0, borderWidth: 0, borderRadius: '0px 0px 0px 0px' }} step={1} min={0}>
+                                            <NumberInput step={0.01} onChange={(e) => setCompensation((prev: any) => { console.log(e); return { ...prev, amount: e } })} value={compensation && compensation.amount ? compensation.amount : 0} style={{ width: (64 + 50), height: 50, borderColor: 'rgba(27, 43, 65, 0.1)', borderRightWidth: 0, borderWidth: 0, borderRadius: '0px 0px 0px 0px' }} min={0}>
                                                 <NumberInputField className='input' style={{ padding: 0, textAlign: "center", height: 50, width: 63, backgroundColor: '#F5F5F5', borderTopRightRadius: 0, borderBottomRightRadius: 0, borderTopLeftRadius: 0, borderBottomLeftRadius: 0, borderWidth: 0 }} />
                                                 <NumberInputStepper style={{ width: 50, height: 50, borderRadius: '0px 10px 10px 0px', background: '#FFFFFF', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)' }}>
                                                     <NumberIncrementStepper color="#C94B32" children={<DropupRed />} />

@@ -77,6 +77,8 @@ useState<Array<any>>();
 
 	const { createSafeTransaction, createSafeTxnLoading } = useSafeTransaction(_get(DAO, 'safe.address', ''))
 
+	const { tokenBalance } = useSafeTokens(_get(DAO, 'safe.address', ''))
+
 	const { myRole, can, isSafeOwner } = useRole(DAO, account);
 
 	const [totalUSD, setTotalUSD] = useState<any>('0');
@@ -124,7 +126,7 @@ useState<Array<any>>();
 
 	const amIAdmin = useMemo(() => {
 		if (DAO) {
-			let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'ADMIN')
+			let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'role1')
 			if (user)
 				return true
 			return false
@@ -453,6 +455,11 @@ useState<Array<any>>();
 
 
 	const handleExecuteTransactions = async (txn: any, reject: boolean | undefined) => {
+		const safeTokens = await getSafeTokens();
+		let safeToken = _find(safeTokens, t => t.tokenAddress === _get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', '')))
+		if (!safeToken)
+			safeToken = _find(safeTokens || [], (st: any) => _get(st, 'tokenAddress', '') === (chainId === SupportedChainId.GOERLI ? process.env.REACT_APP_GOERLI_TOKEN_ADDRESS : process.env.REACT_APP_MATIC_TOKEN_ADDRESS))
+	
 		let _txs = txn;
 		if (txn.offChain && _get(txn, 'token.symbol') === 'SWEAT') {
 			setExecuteTxLoading(txn.safeTxHash)
@@ -502,10 +509,6 @@ useState<Array<any>>();
 				console.log("confirmed", receipt);
 				setExecuteTxLoading(null)
 				if (!reject) {
-					const safeTokens = await getSafeTokens();
-					let safeToken = _find(safeTokens, t => t.tokenAddress === _get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', '')))
-					if (!safeToken)
-						safeToken = _find(safeTokens || [], (st: any) => _get(st, 'tokenAddress', '') === (chainId === SupportedChainId.GOERLI ? process.env.REACT_APP_GOERLI_TOKEN_ADDRESS : process.env.REACT_APP_MATIC_TOKEN_ADDRESS))
 					await axiosHttp.patch(`transaction/on-chain/executed?daoId=${_get(DAO, '_id', '')}`, {
 						safeTx: {
 							..._txs,
@@ -713,7 +716,7 @@ useState<Array<any>>();
 				</> : 
 				<>
 				{
-					recurringPayments &&
+					recurringPayments && recurringPayments.length > 0 &&
 					<TableContainer>
 						<Table variant='simple' id="treasuryTransactions" style={{ width: '100%' }}>
 							<Tbody style={{ paddingTop: 8 }}>

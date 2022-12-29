@@ -146,9 +146,9 @@ const AddExistingSafe = () => {
       image: null,
       members: value.map((m:any) => {
 		if(m.address.toLowerCase() === account?.toLowerCase()) {
-			return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'ADMIN' : 'CORE_CONTRIBUTOR' }
+			return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : 'role2' }
 		}
-		return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'ADMIN' :  m.role ? m.role: 'CONTRIBUTOR' }
+		return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' :  m.role ? m.role: 'role4' }
 	  }),
       safe: {
         name: safeName,

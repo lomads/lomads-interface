@@ -9,7 +9,7 @@ import { useAppSelector } from "state/hooks";
 import { useWeb3React } from "@web3-react/core";
 import TaskCard from './Task/TaskCard';
 import useRole from '../../../hooks/useRole'
-
+import useTerminology from 'hooks/useTerminology';
 import archiveIcon from '../../../assets/svg/archiveIcon.svg';
 import expandIcon from '../../../assets/svg/expand.svg';
 import moment from 'moment';
@@ -17,6 +17,7 @@ import moment from 'moment';
 const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
     const navigate = useNavigate();
     const { DAO, user, Project } = useAppSelector((state) => state.dashboard);
+    const { transformTask } = useTerminology(_get(DAO, 'terminologies', null))
     const { account } = useWeb3React();
     const [tab, setTab] = useState(4);
     const [myTasks, setMyTasks] = useState([]);
@@ -177,7 +178,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
 
     const amIAdmin = useMemo(() => {
         if (DAO) {
-            let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'ADMIN')
+            let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase() && m.role === 'role1')
             if (user)
                 return true
             return false
@@ -191,12 +192,12 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
             <div className="tasks-header">
                 <div className="tasks-title">
                     <button className={tab === 1 ? 'active' : null} onClick={() => setTab(1)}>
-                        My Tasks
+                        My {transformTask().labelPlural}
                     </button>
                     <div className="divider"></div>
 
                     {
-                        myRole !== 'CONTRIBUTOR' && myRole !== 'ACTIVE_CONTRIBUTOR'
+                        myRole !== 'role4' && myRole !== 'role3'
                             ?
                             <>
                                 <button style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }} className={tab === 2 ? 'active' : null} onClick={() => setTab(2)}>
@@ -221,7 +222,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                     }
 
                     <button className={tab === 4 ? 'active' : null} onClick={() => setTab(4)}>
-                        All tasks
+                        All {transformTask().labelPlural}
                     </button>
                 </div>
                 <div className="tasks-buttons">
@@ -258,6 +259,10 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                 </div>
             </div>
 
+            { ( tab === 1 && myTasks && myTasks.length > 0 ) ||
+              ( tab === 2 && manageTasks && manageTasks.length > 0 ) ||
+              ( tab === 3 && draftTasks && draftTasks.length > 0 ) ||
+              ( tab === 4 && otherTasks && otherTasks.length > 0 ) ?
             <div className='tasks-body'>
                 {
                     tab === 1 && myTasks && myTasks.filter((item, index) => index < 6).map((item, index) => {
@@ -343,7 +348,8 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                         }
                     })
                 }
-            </div>
+            </div> : null
+            }
         </div>
     )
 }

@@ -23,6 +23,8 @@ import memberIcon from '../../assets/svg/memberIcon.svg';
 import binRed from '../../assets/svg/bin-red.svg';
 import binWhite from '../../assets/svg/bin-white.svg';
 import { SupportedChainId } from "constants/chains";
+import { DEFAULT_ROLES } from "constants/terminology";
+import useEns from 'hooks/useEns';
 
 const InviteGang = () => {
 	const dispatch = useAppDispatch();
@@ -30,11 +32,11 @@ const InviteGang = () => {
 	const [uploadLoading, setUploadLoading] = useState<boolean>(false);
 	const [ownerName, setOwnerName] = useState<string>("");
 	const [ownerAddress, setOwnerAddress] = useState<string>("");
-	const [ownerRole, setOwnerRole] = useState<string>("CONTRIBUTOR");
+	const [ownerRole, setOwnerRole] = useState<string>("role4");
 	const [errors, setErrors] = useState<any>({});
 	const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
 	const { account, provider, chainId } = useWeb3React();
-
+	const { getENSAddress, getENSName }  = useEns();
 	const [showModal, setShowModal] = useState(false);
 	const [deleteMembers, setDeleteMembers] = useState<string[]>([]);
 	const [validMembers, setValidMembers] = useState<{ address: string; name: string, role: string }[]>([]);
@@ -65,7 +67,7 @@ const InviteGang = () => {
 		if (!check) {
 			let creator = [
 				...invitedMembers,
-				{ name: "", address: account as string, role: 'CORE_CONTRIBUTOR' },
+				{ name: "", address: account as string, role: 'role2' },
 			];
 			creator = creator.filter(c => c.address !== undefined)
 			dispatch(updateInvitedGang(creator));
@@ -84,8 +86,7 @@ const InviteGang = () => {
 		return new Promise(async (resolve, reject) => {
 			const member = { name: _ownerName, address: _ownerAddress, role: _ownerRole };
 			if (_ownerAddress.slice(-4) === ".eth") {
-				const resolver = await provider?.getResolver(_ownerAddress);
-				const EnsAddress = await resolver?.getAddress();
+				const EnsAddress = await getENSAddress(_ownerAddress);
 				console.log("74 ensAddress : ", EnsAddress);
 				if (EnsAddress !== undefined) {
 					member.address = EnsAddress as string;
@@ -100,8 +101,7 @@ const InviteGang = () => {
 			}
 			else {
 				let ENSname = null;
-				if(chainId !== SupportedChainId.POLYGON)
-					ENSname = await provider?.lookupAddress(_ownerAddress);
+					ENSname = await getENSName(_ownerAddress)
 				if (ENSname) {
 					member.name = _ownerName !== '' ? _ownerName : ENSname;
 				}
@@ -183,23 +183,21 @@ const InviteGang = () => {
 					})
 					if (member.address && isAddressValid(member.address) && !isPresent(member.address)) {
 						if (member.address.slice(-4) === ".eth") {
-							const resolver = await provider?.getResolver(member.address);
-							const EnsAddress = await resolver?.getAddress();
+							const EnsAddress = await getENSAddress(member.address);
 							if (EnsAddress) {
 								member.name = member.name ? member.name : member.address;
 								member.address = EnsAddress as string;
 							}
 						} else {
 							let ENSname = null;
-							if(chainId !== SupportedChainId.POLYGON)
-								ENSname = await provider?.lookupAddress(member.address);
+							ENSname = await getENSName(member.address)
 							if (ENSname)
 								member.name = member.name ? member.name : ENSname
 						}
 						if (!_.find(validMembers, m => m.address.toLowerCase() === member.address.toLowerCase()) &&
 							!_.find(invitedMembers, m => m.address.toLowerCase() === member.address.toLowerCase())
 						) {
-							validMembers.push({ ...member, role: 'CONTRIBUTOR' });
+							validMembers.push({ ...member, role: 'role4' });
 						}
 					}
 				}
@@ -305,10 +303,10 @@ const InviteGang = () => {
 								onChange={(e) => setOwnerRole(e.target.value)}
 								style={{ margin: '0' }}
 							>
-								{/* <option value="ADMIN">Admin</option> */}
-								<option value="CORE_CONTRIBUTOR">Core Contributor</option>
-								<option value="ACTIVE_CONTRIBUTOR">Active Contributor</option>
-								<option value="CONTRIBUTOR">Contributor</option>
+								{/* <option value="role1">Admin</option> */}
+								<option value="role2">Core Contributor</option>
+								<option value="role3">Active Contributor</option>
+								<option value="role4">Contributor</option>
 							</select>
 						</div>
 						<div>
@@ -445,10 +443,17 @@ const InviteGang = () => {
 														defaultValue={item.role}
 														onChange={(e) => handleChangeState(e, index)}
 													>
-														{/* <option value="ADMIN">Admin</option> */}
-														<option value="CORE_CONTRIBUTOR">Core Contributor</option>
-														<option value="ACTIVE_CONTRIBUTOR">Active Contributor</option>
-														<option value="CONTRIBUTOR">Contributor</option>
+														{/* <option value="role1">Admin</option> */}
+														{/* <option value="role2">Core Contributor</option>
+														<option value="role3">Active Contributor</option>
+														<option value="role4">Contributor</option> */}
+														{
+															Object.keys(DEFAULT_ROLES).map((key: any) => {
+																if(key !== 'role1')
+																	return <option value={key}>{  _.get(DEFAULT_ROLES, `[${key}].label`) }</option>
+																return null
+															})
+														}
 													</select>
 													{
 														deleteMembers.includes(item.address)

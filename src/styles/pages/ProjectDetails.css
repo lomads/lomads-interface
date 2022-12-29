@@ -245,7 +245,8 @@
 .projectDetails-container .editMemberOverlay .editMemberContainer .editMember-footer button:last-child {
     background: #C94B32;
     color: #FFF;
-    width: 210px;
+    padding: 0 16px;
+    min-width: 210px;
 }
 
 /* Add new member overlay */

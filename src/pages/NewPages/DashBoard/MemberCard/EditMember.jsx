@@ -12,12 +12,12 @@ import { manageDaoMember, updateDaoMember } from 'state/dashboard/actions';
 import { resetManageMemberLoader } from 'state/dashboard/reducer';
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import { updateCurrentUser } from 'state/dashboard/actions';
-
+import useTerminology from 'hooks/useTerminology';
 import { get as _get, find as _find } from 'lodash';
 import useRole from 'hooks/useRole';
 
 const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
-
+    const { transformRole } = useTerminology(_get(DAO, 'terminologies'))
     const dispatch = useAppDispatch();
     const { manageMemberLoading } = useAppSelector((state) => state.dashboard);
     const [deleteMembers, setDeleteMembers] = useState([]);
@@ -49,8 +49,8 @@ const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
 
     const editableMembers = useMemo(() => {
         let members = []
-        if(myRole === 'ADMIN'){
-            members = _get(DAO, 'members', []).filter(m => m.role !== 'ADMIN')
+        if(myRole === 'role1'){
+            members = _get(DAO, 'members', []).filter(m => m.role !== 'role1')
         }
         let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
         members.push(user)
@@ -145,12 +145,12 @@ const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
                                     className="tokenDropdown"
                                     onChange={(e) => handleChangeRoles(item._id, e.target.value)}
                                     defaultValue={item.role}
-                                    disabled={!amIAdmin || item.role === "ADMIN"}
+                                    disabled={!amIAdmin || item.role === "role1"}
                                 >
-                                    { item.role === "ADMIN" && <option selected={item.role === "ADMIN"} value="ADMIN">Admin</option> }
-                                    <option selected={item.role === "CORE_CONTRIBUTOR"} value="CORE_CONTRIBUTOR">Core Contributor</option>
-                                    <option selected={item.role === "ACTIVE_CONTRIBUTOR"} value="ACTIVE_CONTRIBUTOR">Active Contributor</option>
-                                    <option selected={item.role === "CONTRIBUTOR"} value="CONTRIBUTOR">Contributor</option>
+                                    { item.role === "role1" && <option selected={item.role === "role1"} value="role1">{ transformRole('role1').label }</option> }
+                                    <option selected={item.role === "role2"} value="role2">{ transformRole('role2').label }</option>
+                                    <option selected={item.role === "role3"} value="role3">{ transformRole('role3').label  }</option>
+                                    <option selected={item.role === "role4"} value="role4">{ transformRole('role4').label  }</option>
                                 </select>
                                 { can(myRole, 'members.delete') && _get(item, 'member.wallet', '').toLowerCase() !== account?.toLowerCase() ? <button className={deleteMembers.includes(item.member._id) ? 'selected' : null} onClick={() => handleDeleteMembers(item.member._id)}>
                                     {

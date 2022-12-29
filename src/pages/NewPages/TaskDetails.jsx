@@ -6,10 +6,9 @@ import Footer from "components/Footer";
 import { LeapFrog } from "@uiball/loaders";
 
 import SafeButton from "UIpack/SafeButton";
-
+import useTerminology from 'hooks/useTerminology';
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import { useNavigate, useParams } from 'react-router-dom';
-
 import { IoIosArrowBack } from 'react-icons/io'
 import { GoKebabVertical } from 'react-icons/go'
 import { SiNotion } from "react-icons/si";
@@ -54,6 +53,7 @@ const TaskDetails = () => {
     const { provider, account, chainId } = useWeb3React();
     const { taskId, daoURL } = useParams();
     const { DAO, Task, TaskLoading, user, archiveTaskLoading, deleteTaskLoading } = useAppSelector((state) => state.dashboard);
+    const { transformTask } = useTerminology(_get(DAO, 'terminologies', null))
     console.log("Task : ", Task);
     const daoName = _get(DAO, 'name', '').split(" ");
     const { myRole, can } = useRole(DAO, account)
@@ -316,7 +316,7 @@ const TaskDetails = () => {
                                             </button>
                                             <img src={iconSvg} alt="frame-icon" />
                                             <h1>Close {Task?.name}</h1>
-                                            <p>This action <span>is irreversible</span> for now.<br />You will find closed tasks in the archives.</p>
+                                            <p>This action <span>is irreversible</span> for now.<br />You will find closed  { transformTask().labelPlural } in the archives.</p>
                                             <div>
                                                 <button onClick={() => setClosePrompt(false)}>NO</button>
                                                 <button onClick={handleCloseTask}>YES</button>
@@ -598,7 +598,7 @@ const TaskDetails = () => {
                                                                             height={40}
                                                                             width={150}
                                                                             titleColor="#C94B32"
-                                                                            title="CLOSE TASK"
+                                                                            title={`CLOSE ${transformTask().label.toUpperCase()}`}
                                                                             bgColor="#FFFFFF"
                                                                             opacity="1"
                                                                             disabled={false}
@@ -771,13 +771,13 @@ const TaskDetails = () => {
                                                                                                         // user need to apply --- single contributor
                                                                                                         <>
 
-                                                                                                            <h1>This task<br />fits your role.</h1>
+                                                                                                            <h1>This  { transformTask().label.toLowerCase() }<br />fits your role.</h1>
                                                                                                             {moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt ? null : <button onClick={() => setOpenApply(true)}>APPLY</button>}
                                                                                                         </>
                                                                                                         :
                                                                                                         // mulitple contributor
                                                                                                         <>
-                                                                                                            <h1>This task<br />fits your role.</h1>
+                                                                                                            <h1>This  { transformTask().label.toLowerCase() }<br />fits your role.</h1>
                                                                                                             {!Task.draftedAt && <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>}
 
                                                                                                         </>
@@ -786,7 +786,7 @@ const TaskDetails = () => {
                                                                                             </>
                                                                                             :
                                                                                             <>
-                                                                                                <h1>This task does not<br />fits your role.</h1>
+                                                                                                <h1>This  { transformTask().label.toLowerCase() } does not<br />fits your role.</h1>
                                                                                             </>
                                                                                     }
                                                                                 </>
@@ -798,7 +798,7 @@ const TaskDetails = () => {
                                                                                             // user need to apply --- single contributor
                                                                                             <>
 
-                                                                                                <h1>This task needs a<br />contributor.</h1>
+                                                                                                <h1>This { transformTask().label.toLowerCase() } needs a<br />contributor.</h1>
                                                                                                 {moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt ? null : <button onClick={() => setOpenApply(true)}>APPLY</button>}
 
                                                                                             </>
@@ -874,7 +874,7 @@ const TaskDetails = () => {
                                                         :
                                                         // for others
                                                         <>
-                                                            <h1>Task is submitted</h1>
+                                                            <h1>{ transformTask().label } is submitted</h1>
                                                             {amICreator && !Task.draftedAt && <button onClick={() => setOpenTaskReview(true)}>CHECK</button>}
                                                         </>
                                                 }
@@ -897,7 +897,7 @@ const TaskDetails = () => {
                                                         :
                                                         // for others
                                                         <>
-                                                            <h1>Task has been<br /> {Task.taskStatus}</h1>
+                                                            <h1>{ transformTask().label } has been<br /> {Task.taskStatus}</h1>
                                                         </>
                                                 }
                                             </>

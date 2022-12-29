@@ -12,6 +12,7 @@ import { updateKRA } from "state/dashboard/actions";
 import { resetUpdateKraLoader } from 'state/dashboard/reducer';
 
 import RangeSlider from 'components/RangeSlider';
+import moment from 'moment';
 
 const colors = ['#e67c40', '#e99a37', '#ebaf30', '#edcd27', '#becd33', '#8ecc3e', '#63c359', '#4fbf65', '#2ab87c', '#21a284', '#1AC1C1'];
 
@@ -20,6 +21,7 @@ const KRAReview = ({ toggleShowKRA, data, daoURL }) => {
     const { updateKraLoading } = useAppSelector((state) => state.dashboard);
 
     const [list, setList] = useState(_get(data, 'kra.results', []));
+    const [currentSlot, setCurrentSlot] = useState(null);
 
     // runs after updating kra
     useEffect(() => {
@@ -28,27 +30,71 @@ const KRAReview = ({ toggleShowKRA, data, daoURL }) => {
             toggleShowKRA();
         }
     }, [updateKraLoading]);
-    
+
+    const getSlots = useMemo(() => {
+        let slots = []
+        let freq = data.kra.frequency === 'daily' ? 'day' : data.kra.frequency === 'weekly' ? 'week' : data.kra.frequency === 'monthly' ? 'month' : 'month';
+
+        let start = moment(data.createdAt).startOf('day').unix()
+        let end = freq === 'day' ? moment.unix(start).endOf('day').unix() : moment.unix(start).endOf('day').add(1, freq).unix()
+
+        do {
+            slots.push({ start, end })
+            start = moment.unix(end).add(1, 'day').startOf('day').unix()
+            end = moment.unix(start).add(1, freq).endOf('day').unix()
+        } while (start < moment().unix())
+
+        slots = slots.map(slot => {
+            const tracker = _find(data.kra.tracker, t => t.start === slot.start && t.end === slot.end)
+            return {
+                ...slot, 
+                results: _get(tracker, 'results', data.kra.results.map(result => {
+                    return {
+                        ...result, progress: 0, color: "#FFCC18"
+                    }
+                }))
+            }
+        });
+
+        return slots
+
+    }, [data.frequency, data.kra])
 
     useEffect(() => {
-        if (_get(data, 'kra.results', []).length > 0) {
-            setList(_get(data, 'kra.results', []))
+        if(getSlots && getSlots.length > 0) {
+            const cslot = _find(getSlots, s => s.start < moment().unix() && s.end > moment().unix())
+            setCurrentSlot(cslot)
         }
-    }, [data]);
+    }, [getSlots])
+
+
 
     const handleSlider = (item, value, color) => {
-        setList(prev => prev.map((r, i) => {
-            if (r._id === item._id)
-                return { ...r, progress: value, color };
-            return r;
-         })
-        )
+        // setList(prev => prev.map((r, i) => {
+        //     if (r._id === item._id)
+        //         return { ...r, progress: value, color };
+        //     return r;
+        //  })
+        // )
+        setCurrentSlot(prev => {
+            return {
+                ...prev,
+                results: prev.results.map((r, i) => {
+                    if (r._id === item._id)
+                        return { ...r, progress: value, color };
+                    return r;
+                })
+            }
+        })
     }
 
     const handleSubmit = () => {
-        const kra = {};
-        kra.frequency = _get(data, 'kra.frequency', '');
-        kra.results = list;
+        const kra = { ...data.kra };
+        kra.tracker = getSlots.map(slot => {
+            if(slot.start === currentSlot.start && slot.end === currentSlot.end)
+                return currentSlot
+            return slot
+        })
         dispatch(updateKRA({ projectId: data._id, daoUrl: daoURL, payload: { kra } }));
     }
 
@@ -65,10 +111,11 @@ const KRAReview = ({ toggleShowKRA, data, daoURL }) => {
                         <img src={createTaskSvg} alt="frame-icon" />
                         <h1>Key Results</h1>
                         <span>It’s time to evaluate your scores</span>
-
+                        { currentSlot && data.kra.frequency !== 'daily' && <span>Review Period: {`${ moment.unix(currentSlot.start).format('DD MMM, YYYY') } - ${ moment.unix(currentSlot.end).format('DD MMM, YYYY') }`}</span> }
+                        { currentSlot && data.kra.frequency === 'daily' && <span>Review Period: {`${ moment.unix(currentSlot.start).format('DD MMM, YYYY hh:mm A') } - ${ moment.unix(currentSlot.end).format('DD MMM, YYYY hh:mm A') }`}</span> }
                         <div className='kra-section'>
                             {
-                                list && list.map((item, index) => {
+                                currentSlot && currentSlot.results.map((item, index) => {
                                     return (
                                         <div className='review-card'>
                                             <h1>{item.name}</h1>

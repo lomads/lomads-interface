@@ -1,6 +1,6 @@
 
 import "../../styles/pages/MintPassToken.css";
-import { get as _get } from 'lodash'
+import { get as _get, find as _find } from 'lodash'
 import FrameRed from '../../assets/svg/FrameRed.svg';
 import coin from '../../assets/svg/coin.svg';
 import lomadsLogo from '../../assets/svg/lomadsLogoExpandGray.svg'
@@ -8,7 +8,7 @@ import frame2 from '../../assets/svg/Frame-2.svg'
 import { AiOutlineMail } from 'react-icons/ai';
 import { FaTelegramPlane } from 'react-icons/fa';
 import { BsDiscord } from "react-icons/bs";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 import { mintSBTtoken, useSBTStats } from "hooks/SBT/sbt";
 import { useNavigate, useParams } from "react-router-dom";
@@ -21,6 +21,7 @@ import { setDAO } from "state/dashboard/reducer";
 import { getCurrentUser, getDao, updateCurrentUser } from "state/dashboard/actions";
 import Footer from "components/Footer";
 import { addDaoMember } from 'state/dashboard/actions'
+import axiosHttp from 'api'
 
 const MintPassToken = () => {
     /// temporary solution until we don't have specific routes for DAO, contract address will be passed into the url 
@@ -39,7 +40,6 @@ const MintPassToken = () => {
     const [emailError, setEmailError] = useState(false);
     const [telegramError, setTelegramError] = useState(false);
     const { account, chainId, provider } = useWeb3React();
-    console.log("MY_ACCOUNT", account);
     const { user, DAO, DAOLoading } = useAppSelector((state) => state.dashboard);
     const { needWhitelist, isWhitelisted, balanceOf, contractName, currentIndex } = useSBTStats(provider, account, update, contractAddr ? contractAddr : '', chainId);
     const sbtContract = useSBTContract(contractAddr ? contractAddr : null);
@@ -50,10 +50,31 @@ const MintPassToken = () => {
 		}
 	}, [account, chainId, user])
 
+    const myMetadata = useMemo(() => {
+        return _find(_get(DAO, 'sbt.metadata', []), m => {
+            return _find(m.attributes, a => a.value === account)
+        })
+    }, [DAO?.sbt, account])
+    
+    
     useEffect(() => {
         if((!DAO || (DAO && DAO.url !== daoURL)) && !DAOLoading) 
             dispatch(getDao(daoURL))
     }, [daoURL, DAO, DAOLoading])
+
+    const findTraitValue = useCallback(attr => {
+        if(DAO && DAO.sbt) {
+            if(myMetadata && myMetadata.attributes){
+                for (let index = 0; index < myMetadata.attributes.length; index++) {
+                    const attribute = myMetadata.attributes[index];
+                    if(attr === attribute.trait_type.toLowerCase()) {
+                        return attribute?.value;
+                    }
+                }
+                return null
+            }
+        }
+    }, [myMetadata])
 
     useEffect(() => {
         if (needWhitelist) {
@@ -103,6 +124,59 @@ const MintPassToken = () => {
         }
     }
 
+    const isUpdate = useMemo(() => {
+        if (contractName !== '' && DAO && DAO.sbt && DAO.sbt && account && balanceOf) {
+            if (parseInt(balanceOf._hex, 16) === 1) {
+                return true
+            }
+        }
+        return false
+    }, [contractAddr, balanceOf, DAO])
+
+
+    const updateMetadata = async () => {
+        const userName = document.querySelector("#user-name");
+        const userMail = document.querySelector("#user-email");
+        const userDiscord = document.querySelector("#user-discord");
+        const userTG = document.querySelector("#user-telegram");
+
+        if (userName.value === '') {
+            setNameError(true);
+            return;
+        }
+        else if (contract.contactDetail.includes('email') && userMail.value === '') {
+            setEmailError(true);
+            return;
+        }
+        else if (contract.contactDetail.includes('discord') && userDiscord.value === '') {
+            setDiscordError(true);
+            return;
+        }
+        else if (contract.contactDetail.includes('telegram') && userTG.value === '') {
+            setTelegramError(true);
+            return;
+        } else {
+            let payload = {
+                attributes : [...myMetadata.attributes].map(attribute => {
+                    if(attribute.trait_type === 'Email') {
+                        return { ...attribute, value: userMail.value }
+                    } else if (attribute.trait_type === 'Discord') {
+                        return { ...attribute, value: userDiscord.value }
+                    } else if (attribute.trait_type === 'Telegram') {
+                        return { ...attribute, value: userTG.value }
+                    } else {
+                        return attribute
+                    }
+                })
+            } 
+            axiosHttp.patch(`metadata/${_get(DAO, 'sbt._id')}`, payload)
+            .then(res => {
+                dispatch(getDao(_get(DAO, 'url', '')))
+                setTimeout(() => navigate(`/${DAO.url}`), 1500);
+            })
+            .catch(e => console.log(e))
+        }
+    }
 
     const mintSBT = async () => {
         const userName = document.querySelector("#user-name");
@@ -169,7 +243,7 @@ const MintPassToken = () => {
                         const req = await APInewSBTtoken(metadataJSON);
                         if (req) {
                             dispatch(updateCurrentUser({ name: userName.value }))
-                            dispatch(addDaoMember({ url: DAO?.url, payload: { name: '', address: account, role: 'CONTRIBUTOR' } }))
+                            dispatch(addDaoMember({ url: DAO?.url, payload: { name: '', address: account, role: 'role4' } }))
                             dispatch(getDao(DAO.url));
                             setLoading(false);
                             //toast.success("SBT mint successfuly !");
@@ -228,6 +302,7 @@ const MintPassToken = () => {
                                         <input
                                             className="text-input"
                                             id="user-name"
+                                            disabled={isUpdate}
                                             defaultValue={_get(user, 'name', null)}
                                             placeholder="Enter your name"
                                             onChange={() => setNameError(false)}
@@ -250,6 +325,8 @@ const MintPassToken = () => {
                                                         <input
                                                             type="text"
                                                             id={`user-${item}`}
+                                                            disabled={isUpdate && findTraitValue(item) && findTraitValue(item) !== ""}
+                                                            defaultValue={findTraitValue(item)}
                                                             placeholder={`Enter your ${item}`}
                                                             onChange={() => handleResetError(item)}
                                                         />
@@ -272,12 +349,12 @@ const MintPassToken = () => {
                             </div>
 
                             <SimpleLoadButton
-                                title="MINT"
+                                title={ isUpdate ? "UPDATE" : "MINT"}
                                 height={50}
                                 width={160}
                                 fontsize={20}
                                 fontweight={400}
-                                onClick={mintSBT}
+                                onClick={() => isUpdate ? updateMetadata() : mintSBT()}
                                 bgColor={"#C94B32"}
                                 condition={isLoading}
                             />

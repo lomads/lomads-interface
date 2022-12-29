@@ -36,7 +36,7 @@ import ProjectMilestone from './DashBoard/Project/ProjectMilestone';
 import ProjectKRA from './DashBoard/Project/ProjectKRA';
 import moment from 'moment';
 import ProjectResource from './DashBoard/Project/ProjectResource';
-
+import useTerminology from 'hooks/useTerminology';
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 
 const CreateProject = () => {
@@ -45,7 +45,7 @@ const CreateProject = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const { DAO, createProjectLoading } = useAppSelector((state) => state.dashboard);
-
+    const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies'))
     const editorRef = useRef(null);
 
     const [name, setName] = useState('');
@@ -270,12 +270,12 @@ const CreateProject = () => {
                                     ?
                                     <div className='createProject-body'>
                                         <img src={createProjectSvg} alt="frame-icon" />
-                                        <p className="heading-text">Workspace details</p>
+                                        <p className="heading-text">{ transformWorkspace().label } details</p>
 
                                         <div className="projectName-container" style={{ width: '450px' }}>
                                             <div className="projectName-box" style={{ width: '100%' }}>
                                                 <div className='name-btn'>
-                                                    <h1>Workspace resources</h1>
+                                                    <h1>{transformWorkspace().label} resources</h1>
                                                     {
                                                         resourceList.length > 0
                                                             ?
@@ -376,7 +376,7 @@ const CreateProject = () => {
 
                                         <div className='project-buttons'>
                                             <SimpleLoadButton
-                                                title="CREATE WORKSPACE"
+                                                title={`CREATE ${transformWorkspace().label.toUpperCase()}`}
                                                 height={50}
                                                 width={225}
                                                 fontsize={16}
@@ -392,16 +392,16 @@ const CreateProject = () => {
                                     :
                                     <div className='createProject-body' style={{ height: '90vh' }}>
                                         <img src={createProjectSvg} alt="frame-icon" />
-                                        <p className="heading-text">Create New Workspace</p>
+                                        <p className="heading-text">Create New { transformWorkspace().label }</p>
                                         {
                                             !next
                                                 ?
                                                 <div className='createProject-form-container'>
                                                     <div className='input-div'>
-                                                        <label>Name of the workspace</label>
+                                                        <label>Name of the {transformWorkspace().label}</label>
                                                         <input
                                                             className="text-input"
-                                                            placeholder="Enter workspace name"
+                                                            placeholder={`Enter ${ transformWorkspace().label } name`}
                                                             value={name}
                                                             name="name"
                                                             onChange={(e) => setName(e.target.value)}
