@@ -63,7 +63,7 @@ export default () => {
 
 						</Grid>
 						<Grid item xs={12} lg={4} md={6} >
-							<OtherSettings title={"Terminology"} />
+							<OtherSettings title={"Terminologies"} />
 						</Grid>
 						<Grid item xs={12} lg={4} md={6} >
 							<OtherSettings title={"Discord"} />

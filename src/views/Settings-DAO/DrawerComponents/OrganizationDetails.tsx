@@ -30,9 +30,9 @@ const useStyles = makeStyles((theme: any) => ({
 		width: '210px',
 		height: '0px',
 		backgroundColor: '#c94b32',
-		flex: 'none',
-		flexGrow: 0,
-		marginBottom: '25px'
+		marginBottom: '25px',
+		position:'relative',
+		right:'5%'
 	},
 	buttonBox: {
 		display: 'flex',

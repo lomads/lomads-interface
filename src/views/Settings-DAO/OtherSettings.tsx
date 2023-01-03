@@ -59,7 +59,7 @@ export default (props: any) => {
 			setImgSrc(token);
 		else if (props.title == 'SWEAT points')
 			setImgSrc(sweat);
-		else if (props.title == 'Terminology')
+		else if (props.title == 'Terminologies')
 			setImgSrc(terminology);
 		else if (props.title == 'Discord')
 			setImgSrc(discord);

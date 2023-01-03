@@ -15,6 +15,8 @@ import discord from '../../assets/svg/DiscordIcon.svg';
 import OrganizationDetails from "./DrawerComponents/OrganizationDetails";
 import RolesPermission from "./DrawerComponents/RolesPermission";
 import Discord from "./DrawerComponents/Discord";
+import PassToken from "./DrawerComponents/PassToken";
+import Terminology from "./DrawerComponents/Terminology";
 const useStyles = makeStyles((theme: any) => ({
 	root: {
 		backgroundColor: '#fff',
@@ -25,7 +27,8 @@ const useStyles = makeStyles((theme: any) => ({
 		overflow: 'hidden',
 		position: 'relative',
 		width:'fit-content',
-		maxWidth:'800px'
+		maxWidth:'800px',
+		minWidth:'570px'
 	},
 	header: {
 		alignItems: 'center',
@@ -71,7 +74,7 @@ export default (props: any) => {
 			setImageSource(token)
 		else if (props.title == 'SWEAT points')
 			setImageSource(sweat)
-		else if (props.title == 'Terminology')
+		else if (props.title == 'Terminologies')
 			setImageSource(terminology)
 		else if (props.title == 'Discord')
 			setImageSource(discord)
@@ -94,9 +97,9 @@ export default (props: any) => {
 				{props.title == 'Organisation Details' && <OrganizationDetails />}
 				{props.title == 'Roles & Permissions' && <RolesPermission />}
 				{props.title == 'Safe' && <></>}
-				{props.title == 'Pass Tokens' && <></>}
+				{props.title == 'Pass Tokens' && <PassToken />}
 				{props.title == 'SWEAT points' && <></>}
-				{props.title == 'Terminology' && <></>}
+				{props.title == 'Terminologies' && <Terminology />}
 				{props.title == 'Discord' && <Discord />}
 			</Box>
 		</>
