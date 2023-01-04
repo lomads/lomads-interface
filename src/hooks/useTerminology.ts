@@ -5,17 +5,17 @@ const useTerminology = (terminology: any) => {
     console.log(terminology)
     const transformWorkspace = () => {
         if(terminology)
-            return terminology?.workspace
+            return _get(terminology, 'workspace', _find(WORKSPACE_OPTIONS, wo => wo.value === 'WORKSPACE'))
         return _find(WORKSPACE_OPTIONS, wo => wo.value === 'WORKSPACE')
     }
     const transformTask = () => {
         if(terminology)
-            return terminology?.task
+        return _get(terminology, 'task', _find(TASK_OPTIONS, to => to.value === 'TASK'))
         return _find(TASK_OPTIONS, to => to.value === 'TASK')
     }
     const transformRole = (role: string) => {
         if(terminology)
-            return _get(terminology, `roles.${role}`)
+            return _get(terminology, `roles.${role}`, _get(DEFAULT_ROLES, role))
         return  _get(DEFAULT_ROLES, role)
     }
 

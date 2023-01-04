@@ -68,7 +68,7 @@ const ProjectDetails = () => {
     const [showAddLink, setShowAddLink] = useState(false);
     const [update, setUpdate] = useState(0);
     const { DAO, Project, ProjectLoading, updateProjectMemberLoading, deleteProjectMemberLoading, archiveProjectLoading, deleteProjectLoading, updateProjectLoading } = useAppSelector((state) => state.dashboard);
-    const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies'))
+    const { transformWorkspace, transformRole } = useTerminology(_get(DAO, 'terminologies'))
     console.log("Project : ", Project)
     const daoName = _get(DAO, 'name', '').split(" ");
     const { myRole, can } = useRole(DAO, account);
@@ -417,7 +417,8 @@ const ProjectDetails = () => {
 
     const handleRenderRole = (item) => {
         const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === item.wallet.toLowerCase());
-        return _get(user, 'role', '').replaceAll('_', ' ').toLowerCase();
+        //return _get(user, 'role', '').replaceAll('_', ' ').toLowerCase();
+        return transformRole(_get(user, 'role', '')).label
     }
 
     const handleSubmit = () => {

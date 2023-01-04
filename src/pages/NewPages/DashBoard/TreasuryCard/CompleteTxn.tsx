@@ -47,12 +47,12 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
             const tokenAddr = _get(setAllowance, 'dataDecoded.parameters[1].value', '')
             tokenSymbol = _get(_find(safeTokens, (st:any) => st.tokenAddress === tokenAddr), 'token.symbol', '')
             const tokenDecimal = _get(_find(safeTokens, (st:any) => st.tokenAddress === tokenAddr), 'token.decimal', _get(_find(safeTokens, (st:any) => st.tokenAddress === tokenAddr), 'token.decimals', 18))
-            amount = (amount / 10 ** tokenDecimal)
             if(labels && labels.length > 0) {
                 let am = _get(_find(labels, l => l.recipient.toLowerCase() === recipient.toLowerCase() && l.safeTxHash === transaction.safeTxHash), "recurringPaymentAmount", null)
                 if(am)
                     amount = amount = am * 10 ** _get(transaction, 'token.decimals', 18);
             }
+            amount = (amount / 10 ** tokenDecimal)
         }
         let reason = null
         if(labels && labels.length > 0) {
