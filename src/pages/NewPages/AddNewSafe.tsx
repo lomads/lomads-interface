@@ -50,7 +50,6 @@ const AddNewSafe = () => {
 	const flow = useAppSelector((state) => state.flow);
 	let Myvalue = useRef<Array<InviteGangType>>([]);
 	const [polygonGasEstimate, setPolygonGasEstimate] = useState<any>(null)
-	let retries = 0;
 
 	//let thresholdValue = useRef<string>("");
 	const [thresholdValue, setThresholdValue] = useState<number>(1);
@@ -162,22 +161,58 @@ const AddNewSafe = () => {
 		setisLoading(false);
 	}
 
+	const waitFor = (milliseconds: number) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
-	const checkNewSafe = (currentSafes:any, owners: any) => {
-		setTimeout(async () => {
-			const latestSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
-			console.log("latestSafes", latestSafes)
-			if(latestSafes.length === currentSafes.length && retries < 5) {
-				retries = retries + 1;
-				checkNewSafe(currentSafes, owners)
+    const retry = (promise:any, onRetry:any, maxRetries:number) => {
+        const retryWithBackoff : any = async (retries: number) => {
+            try {
+                if (retries > 0) {
+                    const timeToWait = 2 ** retries * 1000;
+                    console.log(`waiting for ${timeToWait}ms...`);
+                    await waitFor(timeToWait);
+                }
+                return await promise();
+            } catch (e) {
+                if (retries < maxRetries) {
+                    onRetry();
+                    return retryWithBackoff(retries + 1);
+                } else {
+                    console.warn("Max retries reached. Bubbling the error up");
+                    throw e;
+                }
+            }
+        }
+        return retryWithBackoff(0);
+    }
+
+	const hasNewSafe = async (currentSafes: any) => {
+		try {
+		const latestSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
+		if(latestSafes.length > currentSafes.length)
+			return latestSafes
+		else
+			throw 'SAFE NOT FOUND'
+		} catch(e) {
+			throw e
+		}
+	}
+
+	const checkNewSafe = async (currentSafes:any, owners: any) => {
+			const latestSafes = await retry(
+				() => hasNewSafe(currentSafes),
+				() => { console.log('retry called...') },
+				50
+			)
+			if(latestSafes) {
+				let newSafeAddr = _.find(latestSafes, ls => currentSafes.indexOf(ls) === -1)
+				console.log("FOUND NEW SAFE", newSafeAddr)
+				if(newSafeAddr)
+					runAfterCreation(newSafeAddr, owners)
+				else
+					console.log("checkNewSafe", "Could not find new safe")
+			} else {
+				setisLoading(false);
 			}
-			let newSafeAddr = _.find(latestSafes, ls => currentSafes.indexOf(ls) === -1)
-			console.log("FOUND NEW SAFE", newSafeAddr)
-			if(newSafeAddr)
-				runAfterCreation(newSafeAddr, owners)
-			else
-				console.log("checkNewSafe", "Could not find new safe")
-		}, 1000)
 	}
 
 
