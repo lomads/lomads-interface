@@ -25,6 +25,7 @@ import binWhite from '../../assets/svg/bin-white.svg';
 import { SupportedChainId } from "constants/chains";
 import { DEFAULT_ROLES } from "constants/terminology";
 import useEns from 'hooks/useEns';
+import useTerminology from "hooks/useTerminology";
 
 const InviteGang = () => {
 	const dispatch = useAppDispatch();
@@ -34,6 +35,8 @@ const InviteGang = () => {
 	const [ownerAddress, setOwnerAddress] = useState<string>("");
 	const [ownerRole, setOwnerRole] = useState<string>("role4");
 	const [errors, setErrors] = useState<any>({});
+	const { DAO, DAOLoading } = useAppSelector((state) => state.dashboard);
+	const { transformRole } = useTerminology(_.get(DAO, 'terminologies'))
 	const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
 	const { account, provider, chainId } = useWeb3React();
 	const { getENSAddress, getENSName }  = useEns();
@@ -350,9 +353,9 @@ const InviteGang = () => {
 												{
 													result.address !== undefined && result.address === account
 														?
-														`core contributor`
+														transformRole('role2').label
 														:
-														result.role?.replaceAll('_', ' ').toLowerCase()
+														transformRole(result?.role).label
 												}
 											</p>
 										</div>

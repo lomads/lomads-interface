@@ -22,6 +22,7 @@ import { getCurrentUser, getDao, updateCurrentUser } from "state/dashboard/actio
 import Footer from "components/Footer";
 import { addDaoMember } from 'state/dashboard/actions'
 import axiosHttp from 'api'
+import useRole from 'hooks/useRole';
 
 const MintPassToken = () => {
     /// temporary solution until we don't have specific routes for DAO, contract address will be passed into the url 
@@ -41,6 +42,7 @@ const MintPassToken = () => {
     const [telegramError, setTelegramError] = useState(false);
     const { account, chainId, provider } = useWeb3React();
     const { user, DAO, DAOLoading } = useAppSelector((state) => state.dashboard);
+    const { myRole } = useRole(DAO, account)
     const { needWhitelist, isWhitelisted, balanceOf, contractName, currentIndex } = useSBTStats(provider, account, update, contractAddr ? contractAddr : '', chainId);
     const sbtContract = useSBTContract(contractAddr ? contractAddr : null);
 
@@ -126,12 +128,14 @@ const MintPassToken = () => {
 
     const isUpdate = useMemo(() => {
         if (contractName !== '' && DAO && DAO.sbt && DAO.sbt && account && balanceOf) {
+            console.log("balanceOF", parseInt(balanceOf._hex, 16))
             if (parseInt(balanceOf._hex, 16) === 1) {
                 return true
             }
         }
         return false
     }, [contractAddr, balanceOf, DAO])
+
 
 
     const updateMetadata = async () => {
@@ -178,7 +182,7 @@ const MintPassToken = () => {
         }
     }
 
-    const mintSBT = async () => {
+    const mintSBT = async (shouldMint = true) => {
         const userName = document.querySelector("#user-name");
         const userMail = document.querySelector("#user-email");
         const userDiscord = document.querySelector("#user-discord");
@@ -205,9 +209,11 @@ const MintPassToken = () => {
                 try {
                     setLoading(true);
                     const sbtId = currentIndex.toString();
-                    const tx = await mintSBTtoken(sbtContract, account);
+                    let tx = null;
+                    if(shouldMint)
+                        tx = await mintSBTtoken(sbtContract, account);
                     console.log(tx)
-                    if (tx.error) {
+                    if (tx?.error) {
                         setLoading(false);
                         console.log(`${tx.error.message}`)
                         //toast.error(`${tx.error.message}`);
@@ -243,7 +249,7 @@ const MintPassToken = () => {
                         const req = await APInewSBTtoken(metadataJSON);
                         if (req) {
                             dispatch(updateCurrentUser({ name: userName.value }))
-                            dispatch(addDaoMember({ url: DAO?.url, payload: { name: '', address: account, role: 'role4' } }))
+                            dispatch(addDaoMember({ url: DAO?.url, payload: { name: '', address: account, role: myRole ? myRole : 'role4' } }))
                             dispatch(getDao(DAO.url));
                             setLoading(false);
                             //toast.success("SBT mint successfuly !");
@@ -354,7 +360,15 @@ const MintPassToken = () => {
                                 width={160}
                                 fontsize={20}
                                 fontweight={400}
-                                onClick={() => isUpdate ? updateMetadata() : mintSBT()}
+                                onClick={() => {
+                                    if(isUpdate) {
+                                        if(myMetadata)
+                                            updateMetadata()
+                                        else
+                                            mintSBT(false)    
+                                    } else
+                                        mintSBT()
+                                }}
                                 bgColor={"#C94B32"}
                                 condition={isLoading}
                             />
