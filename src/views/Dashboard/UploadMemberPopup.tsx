@@ -1,17 +1,15 @@
 
-import { Container, Grid, Typography, Box, Icon } from "@mui/material"
+import { Container, Grid, Typography, Box } from "@mui/material"
 import { makeStyles } from '@mui/styles';
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import daoMember2 from "../../assets/svg/daoMember2.svg";
 import TextInput from "components/TextInput";
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import FormControl from '@mui/material/FormControl';
-import MenuItem from '@mui/material/MenuItem';
+import { SelectChangeEvent } from '@mui/material/Select';
+import Select from "components/Select";
 import bin from "../../assets/svg/bin-red.svg";
 import createProject from "../../assets/svg/createProject.svg";
-import { ExpandMoreOutlined } from '@mui/icons-material';
 import Button from "components/Button";
 
 
@@ -85,18 +83,11 @@ export default (props: any) => {
 									<Typography style={{ fontStyle: 'italic', padding: '0rem 5rem 0rem 1rem' }}>{item.address}</Typography>
 								</Box>
 								<Box style={{ display: 'flex', alignItems: 'center' }}>
-									<FormControl sx={{ width: 150 }}>
-										<Select
-											onChange={handleContributorChange}
-											IconComponent={(props) => (<ExpandMoreOutlined {...props} />)}
-											value={item.role}
-										>
-											{options.map(item => {
-												return <MenuItem value={item.value} key={item.value}>{item.label}</MenuItem>
-											})}
-
-										</Select>
-									</FormControl>
+									<Select options={options}
+										value={item.role}
+										onChange={handleContributorChange}
+										fullWidth={true}
+									/>
 									<IconButton style={{ background: 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)', borderRadius: '5px', marginLeft: '1rem' }}><img src={bin} alt="delete" /></IconButton>
 								</Box>
 							</Box>

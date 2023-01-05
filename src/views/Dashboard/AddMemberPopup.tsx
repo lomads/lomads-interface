@@ -1,17 +1,14 @@
-import { Container, Grid, Typography, Box, IconButton } from "@mui/material"
+import { Container, Grid, Typography, Box} from "@mui/material"
 import { makeStyles } from '@mui/styles';
 import TextInput from 'components/TextInput';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import Tooltip from '@mui/material/Tooltip';
 import React, { useRef, useState } from "react";
-import MenuItem from '@mui/material/MenuItem';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import FormControl from '@mui/material/FormControl';
-import AddIcon from '@mui/icons-material/Add';
+import { SelectChangeEvent } from '@mui/material/Select';
+import Select from "components/Select";
 import { useNavigate } from 'react-router-dom';
 import { ethers } from "ethers";
 import Button from 'components/Button';
-import { ExpandMoreOutlined } from '@mui/icons-material';
 import UploadMemberPopup from "./UploadMemberPopup";
 import Dialog from '@mui/material/Dialog';
 
@@ -145,19 +142,12 @@ export default (props: any) => {
 						error={errors.ownerAddress ? true : false}
 						helperText={errors.ownerAddress}
 					/>
-					<FormControl sx={{ m: 1, minWidth: 120 }} fullWidth>
-						<Select
-							IconComponent={(props) => (<ExpandMoreOutlined {...props} />)}
-							value={selectContributor}
-							onChange={handleContributorChange}
-							MenuProps={{ classes: { list: classes.dropdownStyle, paper: classes.dropdownStyle } }}
-						>
-							{options.map(item => {
-								return <MenuItem value={item.value} key={item.value}>{item.label}</MenuItem>
-							})}
 
-						</Select>
-					</FormControl>
+					<Select options={options}
+						value={selectContributor}
+						onChange={handleContributorChange}
+						fullWidth={true}
+					/>
 				</Box>
 
 			</Box>
@@ -169,7 +159,7 @@ export default (props: any) => {
 			<Dialog
 				open={openAddMemberPopup}
 				onClose={closeAddMemberDialog}
-				PaperProps={{ sx: {maxWidth:'100%'} }}
+				PaperProps={{ sx: { maxWidth: '100%' } }}
 			>
 				<UploadMemberPopup closePopup={closeAddMemberDialog} />
 			</Dialog>

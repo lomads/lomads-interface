@@ -5,16 +5,14 @@ import TextInput from 'components/TextInput';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import Tooltip from '@mui/material/Tooltip';
 import React, { useRef, useState } from "react";
-import MenuItem from '@mui/material/MenuItem';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import FormControl from '@mui/material/FormControl';
+import { SelectChangeEvent } from '@mui/material/Select';
+import Select from "components/Select";
 import AddIcon from '@mui/icons-material/Add';
 import daoMember2 from "../../assets/svg/daoMember2.svg";
 import { useNavigate } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import { ethers } from "ethers";
 import Button from 'components/Button';
-import { ExpandMoreOutlined } from '@mui/icons-material';
 import UploadMemberPopup from "../Dashboard/UploadMemberPopup";
 import Dialog from '@mui/material/Dialog';
 
@@ -181,18 +179,11 @@ export default () => {
 									error={errors.ownerAddress ? true : false}
 									helperText={errors.ownerAddress}
 								/>
-								<FormControl sx={{ m: 1, minWidth: 120 }} fullWidth>
-									<Select
-										IconComponent={(props) => (<ExpandMoreOutlined {...props} />)}
-										value={selectContributor}
-										onChange={handleContributorChange}
-									>
-										{options.map(item => {
-											return <MenuItem value={item.value} key={item.value}>{item.label}</MenuItem>
-										})}
-
-									</Select>
-								</FormControl>
+								<Select options={options}
+									value={selectContributor}
+									onChange={handleContributorChange}
+									fullWidth={true}
+								/>
 								<IconButton style={{
 									backgroundColor: isAddressValid(ownerAddress) ? '#C94B32' : 'rgba(27, 43, 65, 0.2)', borderRadius: '5px', height: '50px', width: '55px', marginTop: '9px'
 								}} onClick={addMember}>

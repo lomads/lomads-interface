@@ -17,6 +17,7 @@ import RolesPermission from "./DrawerComponents/RolesPermission";
 import Discord from "./DrawerComponents/Discord";
 import PassToken from "./DrawerComponents/PassToken";
 import Terminology from "./DrawerComponents/Terminology";
+import editIcon from '../../assets/svg/editButton.svg';
 const useStyles = makeStyles((theme: any) => ({
 	root: {
 		backgroundColor: '#fff',
@@ -26,9 +27,9 @@ const useStyles = makeStyles((theme: any) => ({
 		height: '100%',
 		overflow: 'hidden',
 		position: 'relative',
-		width:'fit-content',
-		maxWidth:'800px',
-		minWidth:'570px'
+		width: 'fit-content',
+		maxWidth: '800px',
+		minWidth: '570px'
 	},
 	header: {
 		alignItems: 'center',
@@ -57,6 +58,7 @@ const useStyles = makeStyles((theme: any) => ({
 export default (props: any) => {
 	const classes = useStyles();
 	const navigate = useNavigate();
+	const [editTerminologyBtn, setEditTerminologyBtn] = useState(false);
 	const [imageSource, setImageSource] = useState('');
 
 	const closeDrawer = () => {
@@ -80,11 +82,20 @@ export default (props: any) => {
 			setImageSource(discord)
 	}, []);
 
+	const editTerminology = () => {
+		setEditTerminologyBtn(true);
+	}
+
 	return (
 		<>
 			<Box className={classes.root}>
 				<Box className={classes.header}>
-					<IconButton style={{ background: 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)', borderRadius: '2px' }} onClick={closeDrawer}>
+					{props.title == 'Terminologies' &&
+						<Box style={{ marginRight: '1rem' }}>
+							<img src={editIcon} alt="edit" style={{ cursor: 'pointer' }} onClick={editTerminology} />
+						</Box>
+					}
+					<IconButton style={{ background: 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)', borderRadius: '4px', marginBottom: 'auto', height: '38px', width: '38px' }} onClick={closeDrawer}>
 						<CloseIcon style={{ color: '#C94B32' }} />
 					</IconButton>
 				</Box>
@@ -99,7 +110,7 @@ export default (props: any) => {
 				{props.title == 'Safe' && <></>}
 				{props.title == 'Pass Tokens' && <PassToken />}
 				{props.title == 'SWEAT points' && <></>}
-				{props.title == 'Terminologies' && <Terminology />}
+				{props.title == 'Terminologies' && <Terminology editButton={editTerminologyBtn} />}
 				{props.title == 'Discord' && <Discord />}
 			</Box>
 		</>

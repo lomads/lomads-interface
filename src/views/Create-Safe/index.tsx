@@ -6,11 +6,9 @@ import { useNavigate } from 'react-router-dom';
 import TextInput from 'components/TextInput';
 import daoMember2 from "../../assets/svg/daoMember2.svg";
 import Checkbox from '@mui/material/Checkbox';
-import Select from '@mui/material/Select';
-import FormControl from '@mui/material/FormControl';
-import MenuItem from '@mui/material/MenuItem';
+import Select from "components/Select";
 import Link from '@mui/material/Link';
-import { ExpandMoreOutlined } from '@mui/icons-material';
+
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
@@ -184,19 +182,8 @@ export default () => {
 							<Box className={classes.formBox}>
 								<Typography>Any transaction requires the confirmation of</Typography>
 								<Box style={{ display: 'flex', alignItems: 'center' }}>
-									<FormControl sx={{ m: 1, minWidth: 80 }}>
-										<Select
-											IconComponent={(props) => (<ExpandMoreOutlined {...props} />)}
-											defaultValue={1}
-											displayEmpty
-											inputProps={{ 'aria-label': 'Without label' }}
-										>
-											{options.map(item => {
-												return <MenuItem value={item.value}>{item.label}</MenuItem>
-											})}
-
-										</Select>
-									</FormControl>
+										<Select options={options} defaultValue={1}
+											displayEmpty fullWidth={false} />
 									<Typography>of {options.length} owner(s)</Typography>
 								</Box>
 

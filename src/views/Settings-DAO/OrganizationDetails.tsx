@@ -56,7 +56,7 @@ export default (props: any) => {
 			</Box>
 			<Drawer
 				classes={{ paper: classes.drawerStyle }}
-				style={{ zIndex: 1999 }}
+				// style={{ zIndex: 1999 }}
 				anchor="right"
 				open={openDrawer}
 				onClose={handleCloseDrawer}
