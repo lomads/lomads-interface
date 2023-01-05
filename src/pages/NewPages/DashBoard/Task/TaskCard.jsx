@@ -92,7 +92,7 @@ const TaskCard = ({ task, daoUrl }) => {
 
     return (
         <div className='tasks-card' onClick={() => navigate(`/${daoUrl}/task/${task._id}`, { state: { task } })}>
-            {(submissionCount > 0 || applicationCount > 0) && task.creator === user._id &&
+            {( ( (task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign' && submissionCount > 0  ) || applicationCount > 0) && task.creator === user._id &&
                 <div className='tasks-card-icons'>
                     {(task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign' && submissionCount > 0 ?
                         <div className='icon-container'>
