@@ -476,20 +476,14 @@ const CreateProject = () => {
                                                                 memberList.map((item, index) => {
                                                                     if (item.member.wallet.toLowerCase() !== account.toLowerCase()) {
                                                                         return (
-                                                                            <div className="member-li" key={index}>
+                                                                            <div className="member-li" key={index} onClick={() => handleAddMember(item.member)}>
                                                                                 <div className="member-img-name">
                                                                                     <img src={memberIcon} alt="member-icon" />
                                                                                     <p>{item.member.name}</p>
                                                                                 </div>
                                                                                 <div className="member-address">
                                                                                     <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
-                                                                                    {
-                                                                                        selectedMembers.some((m) => m.address.toLowerCase() === item.member.wallet.toLowerCase()) === false
-                                                                                            ?
-                                                                                            <input type="checkbox" onChange={() => handleAddMember(item.member)} />
-                                                                                            :
-                                                                                            <input type="checkbox" onChange={() => handleAddMember(item.member)} checked />
-                                                                                    }
+                                                                                    <input type="checkbox" onChange={() => handleAddMember(item.member)} checked={!(selectedMembers.some((m) => m.address.toLowerCase() === item.member.wallet.toLowerCase()) === false)} />
                                                                                     {/* <div className='checkbox'>
                                                                                         <input type="checkbox" onChange={(e) => alert("dfdf")} />
                                                                                         <span className='inner-check check'></span>

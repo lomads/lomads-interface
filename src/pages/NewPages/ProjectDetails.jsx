@@ -68,7 +68,7 @@ const ProjectDetails = () => {
     const [showAddLink, setShowAddLink] = useState(false);
     const [update, setUpdate] = useState(0);
     const { DAO, Project, ProjectLoading, updateProjectMemberLoading, deleteProjectMemberLoading, archiveProjectLoading, deleteProjectLoading, updateProjectLoading } = useAppSelector((state) => state.dashboard);
-    const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies'))
+    const { transformWorkspace, transformRole } = useTerminology(_get(DAO, 'terminologies'))
     console.log("Project : ", Project)
     const daoName = _get(DAO, 'name', '').split(" ");
     const { myRole, can } = useRole(DAO, account);
@@ -395,20 +395,14 @@ const ProjectDetails = () => {
     const handleUsers = (item, index) => {
         if (_uniqBy(Project?.members, '_id').some(m => m.wallet === item.member.wallet) === false) {
             return (
-                <div className="member-li" key={index}>
+                <div onClick={() => handleAddMember(item)}  className="member-li" key={index}>
                     <div className="member-img-name">
                         <img src={memberIcon} alt="member-icon" />
                         <p>{item.member.name}</p>
                     </div>
                     <div className="member-address">
                         <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
-                        {
-                            extraMembers.some((m) => m === item.member._id) === false
-                                ?
-                                <input type="checkbox" onChange={() => handleAddMember(item)} />
-                                :
-                                <input type="checkbox" onChange={() => handleAddMember(item)} checked />
-                        }
+                        <input type="checkbox" onChange={() => handleAddMember(item)} checked={!(extraMembers.some((m) => m === item.member._id) === false)} />
                     </div>
                 </div>
             )
@@ -417,7 +411,8 @@ const ProjectDetails = () => {
 
     const handleRenderRole = (item) => {
         const user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === item.wallet.toLowerCase());
-        return _get(user, 'role', '').replaceAll('_', ' ').toLowerCase();
+        //return _get(user, 'role', '').replaceAll('_', ' ').toLowerCase();
+        return transformRole(_get(user, 'role', '')).label
     }
 
     const handleSubmit = () => {
@@ -552,19 +547,13 @@ const ProjectDetails = () => {
                                     <div className="editMember-body">
                                         {
                                             _uniqBy(Project?.members, '_id').map((item, index) => (
-                                                <div className="editMember-row" key={index}>
+                                                <div onClick={() => handleAddMemberDelete(item._id)} className="editMember-row" key={index}>
                                                     <div>
                                                         <img src={memberIcon} alt="memberIcon" />
                                                         <p>{item.name}</p>
                                                     </div>
                                                     <span>{item.wallet.slice(0, 6) + "..." + item.wallet.slice(-4)}</span>
-                                                    {
-                                                        deleteMembers.some((m) => m === item._id) === false
-                                                            ?
-                                                            <input type='checkbox' onChange={() => handleAddMemberDelete(item._id)} />
-                                                            :
-                                                            <input type='checkbox' onChange={() => handleAddMemberDelete(item._id)} checked />
-                                                    }
+                                                    <input type='checkbox' onChange={() => handleAddMemberDelete(item._id)} checked={!(deleteMembers.some((m) => m === item._id) === false)} />
                                                 </div>
                                             ))
                                         }

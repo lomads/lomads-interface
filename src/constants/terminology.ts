@@ -47,12 +47,12 @@ export const TASK_OPTIONS = [
 export const DEFAULT_ROLES = {
     "role1" : {
         "label": 'Admin',
-        "value": 'role1',
+        "value": 'ADMIN',
         "permissions": ["*"]
     },
     "role2" : {
         "label": 'Core Contributor',
-        "value": 'role2',
+        "value": 'CORE_CONTRIBUTOR',
         "permissions": ["*"]
     },
     "role3" : {

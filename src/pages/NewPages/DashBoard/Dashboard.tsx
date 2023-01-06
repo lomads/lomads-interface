@@ -470,27 +470,29 @@ const Dashboard = () => {
 							<div className="DAODescription">{_get(DAO, 'description', '')}</div>
 						</div>
 					</div>
-					<div className="DAOsettings">
-						<div className="DAOadminPill">
-							<p>{displayRole}</p>
-						</div>
-						<div className="tokens">
-							<div className="token">
-								<img src={tokenDashboard} />
-								<div className="text">${tokenDollarBalance}</div>
+					<div className="DAOsettings-container">
+						<div className="DAOsettings">
+							<div className="DAOadminPill">
+								<p>{displayRole}</p>
 							</div>
-							{_get(DAO, 'sweatPoints', false) === true &&
+							<div className="tokens">
 								<div className="token">
-									<img src={starDashboard} />
-									<div className="text">{swtBalance}</div>
+									<img src={tokenDashboard} />
+									<div className="text">${tokenDollarBalance}</div>
 								</div>
-							}
+								{_get(DAO, 'sweatPoints', false) === true &&
+									<div className="token">
+										<img src={starDashboard} />
+										<div className="text">{swtBalance}</div>
+									</div>
+								}
+							</div>
+							<select name="chain" id="chain" value={chainId} onChange={e => handleSwitchChain(+e.target.value)} className="chain" style={{ width: 150 }}>
+								{
+									SUPPORTED_CHAIN_IDS.map(chain => <option value={+chain}>{CHAIN_IDS_TO_NAMES[chain]}</option>)
+								}
+							</select>
 						</div>
-						<select name="chain" id="chain" value={chainId} onChange={e => handleSwitchChain(+e.target.value)} className="chain" style={{ width: 150 }}>
-							{
-								SUPPORTED_CHAIN_IDS.map(chain => <option value={+chain}>{CHAIN_IDS_TO_NAMES[chain]}</option>)
-							}
-						</select>
 					</div>
 				</div>
 
