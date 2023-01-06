@@ -395,20 +395,14 @@ const ProjectDetails = () => {
     const handleUsers = (item, index) => {
         if (_uniqBy(Project?.members, '_id').some(m => m.wallet === item.member.wallet) === false) {
             return (
-                <div className="member-li" key={index}>
+                <div onClick={() => handleAddMember(item)}  className="member-li" key={index}>
                     <div className="member-img-name">
                         <img src={memberIcon} alt="member-icon" />
                         <p>{item.member.name}</p>
                     </div>
                     <div className="member-address">
                         <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
-                        {
-                            extraMembers.some((m) => m === item.member._id) === false
-                                ?
-                                <input type="checkbox" onChange={() => handleAddMember(item)} />
-                                :
-                                <input type="checkbox" onChange={() => handleAddMember(item)} checked />
-                        }
+                        <input type="checkbox" onChange={() => handleAddMember(item)} checked={!(extraMembers.some((m) => m === item.member._id) === false)} />
                     </div>
                 </div>
             )
@@ -553,19 +547,13 @@ const ProjectDetails = () => {
                                     <div className="editMember-body">
                                         {
                                             _uniqBy(Project?.members, '_id').map((item, index) => (
-                                                <div className="editMember-row" key={index}>
+                                                <div onClick={() => handleAddMemberDelete(item._id)} className="editMember-row" key={index}>
                                                     <div>
                                                         <img src={memberIcon} alt="memberIcon" />
                                                         <p>{item.name}</p>
                                                     </div>
                                                     <span>{item.wallet.slice(0, 6) + "..." + item.wallet.slice(-4)}</span>
-                                                    {
-                                                        deleteMembers.some((m) => m === item._id) === false
-                                                            ?
-                                                            <input type='checkbox' onChange={() => handleAddMemberDelete(item._id)} />
-                                                            :
-                                                            <input type='checkbox' onChange={() => handleAddMemberDelete(item._id)} checked />
-                                                    }
+                                                    <input type='checkbox' onChange={() => handleAddMemberDelete(item._id)} checked={!(deleteMembers.some((m) => m === item._id) === false)} />
                                                 </div>
                                             ))
                                         }

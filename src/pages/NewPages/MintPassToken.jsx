@@ -18,10 +18,11 @@ import { toast, ToastContainer } from "react-toastify";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import { setDAO } from "state/dashboard/reducer";
-import { getCurrentUser, getDao, updateCurrentUser } from "state/dashboard/actions";
+import { getCurrentUser, getDao, loadDao, updateCurrentUser } from "state/dashboard/actions";
 import Footer from "components/Footer";
 import { addDaoMember } from 'state/dashboard/actions'
 import axiosHttp from 'api'
+import SideBar from "../NewPages/DashBoard/SideBar";
 import useRole from 'hooks/useRole';
 
 const MintPassToken = () => {
@@ -32,6 +33,7 @@ const MintPassToken = () => {
     /// 1 : no whitelist 
     /// 2 : whitelist user is in
     /// 3 : whitelist user isnt in
+    const [showNavBar, setShowNavBar] = useState(false);
     const [tab, setTab] = useState(3);
     const [update, setUpdate] = useState(0);
     const [isLoading, setLoading] = useState(false);
@@ -45,6 +47,15 @@ const MintPassToken = () => {
     const { myRole } = useRole(DAO, account)
     const { needWhitelist, isWhitelisted, balanceOf, contractName, currentIndex } = useSBTStats(provider, account, update, contractAddr ? contractAddr : '', chainId);
     const sbtContract = useSBTContract(contractAddr ? contractAddr : null);
+
+    const showSideBar = (_choice) => {
+		setShowNavBar(_choice);
+	};
+
+    useEffect(() => {
+        if(account && chainId)
+            dispatch(loadDao({ chainId }))
+    }, [chainId, account])
 
     useEffect(() => {
 		if(account && chainId && ( !user || ( user && user.wallet.toLowerCase() !== account.toLowerCase() ) )) {
@@ -399,6 +410,11 @@ const MintPassToken = () => {
                 closeOnClick
                 theme='dark'
                 rtl={false} />
+            <SideBar
+				name={_get(DAO, 'name', '')}
+				showSideBar={showSideBar}
+				showNavBar={showNavBar}
+			/>
         </>
     )
 }

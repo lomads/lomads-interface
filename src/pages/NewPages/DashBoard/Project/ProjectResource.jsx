@@ -352,7 +352,7 @@ const ProjectResource = ({ toggleShowResource, getResources, list }) => {
                         <button onClick={() => toggleShowResource()}>
                             CANCEL
                         </button>
-                        <button onClick={handleSubmit}>
+                        <button style={{ backgroundColor: resourceList.length == 0 ? 'grey' : '#C94B32' }} disabled={resourceList.length == 0} onClick={handleSubmit}>
                             ADD
                         </button>
                     </div>

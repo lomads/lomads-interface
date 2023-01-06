@@ -11,7 +11,7 @@ const SideBar = (props: any) => {
 	const navigate = useNavigate();
 	const dispatch = useAppDispatch()
 	const { DAOList, DAO } = useAppSelector((state) => state.dashboard);
-	const name = props.name ? props.name.split(" ") : 'Sample Dao';
+	const name = props.name ? props.name.split(" ") : _get(DAO, 'name', '');
 
 	const navigateTo = (url:string|undefined) => {
 		if(!url) return;
@@ -32,25 +32,27 @@ const SideBar = (props: any) => {
 							console.log("const daoName", dao)
 							const daoName = _get(dao, 'name', '') ? _get(dao, 'name', '').split(" ") : '';
 							return (
-								<div className="sideBarStripItem">
-									<div
-										className="stripInvertedBoxOutline"
-										onClick={() => {
-											navigateTo(dao?.url)
-										}}
-									>
-										<div className="navbarText" style={{ color: '#FFF' }}>
-											{daoName.length === 1
-												? daoName[0].charAt(0).toUpperCase()
-												: daoName[0].charAt(0).toUpperCase() + daoName[daoName.length - 1].charAt(0).toUpperCase()}
+								<>
+									<div className="sideBarStripItem">
+										<div
+											className="stripInvertedBoxOutline"
+											onClick={() => {
+												navigateTo(dao?.url)
+											}}
+										>
+											{ daoName && <div className="navbarText" style={{ color: '#FFF' }}>
+												{daoName.length === 1
+													? daoName[0].charAt(0).toUpperCase()
+													: daoName[0].charAt(0).toUpperCase() + daoName[daoName.length - 1].charAt(0).toUpperCase()}
+											</div> }
 										</div>
+										<div id="createADAOText">{_get(dao, 'name', '')}</div>
 									</div>
-									<div id="createADAOText">{_get(dao, 'name', '')}</div>
-								</div>
+								</>
 							)
 						})
 					}
-					<div className="sideBarStripItem">
+					<div className="sideBarStripItem" style={{ paddingBottom: 32 }}>
 						<div
 							className="stripInvertedBoxOutline"
 							onClick={() => {
@@ -76,11 +78,11 @@ const SideBar = (props: any) => {
 				}}
 			>
 				<div className="invertedBox">
-					<div className="navbarText">
+					{ name && <div className="navbarText">
 						{name.length === 1
 							? name[0].charAt(0)
 							: name[0].charAt(0) + name[name.length - 1].charAt(0)}
-					</div>
+					</div> }
 				</div>
 			</div>
 			{props.showNavBar && <SideBarStrip />}

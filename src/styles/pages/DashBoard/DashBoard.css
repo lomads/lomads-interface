@@ -18,7 +18,7 @@ body.active-modal {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     background: transparent;
     padding: 28px 0px;
 }
@@ -42,8 +42,13 @@ body.active-modal {
     line-height: 16px;
     color: #1B2B41;
     margin-top: 6px;
+    width: calc(100% - 300px);
 }
 
+.DAOdetails .DAOsettings-container {
+    position: relative;
+    height: 60px;
+}
 
 .DAOdetails .DAOsettings {
     display: flex;
@@ -52,9 +57,15 @@ body.active-modal {
     background-color: rgba(118, 128, 141, 0.05);
     border-radius: 30px 0 0 30px;
     padding: 12px 42px 12px 11px;
-    right: -30px;
-    position: relative;
+    right: -200px;
     height: 60px;
+    position: absolute;
+    transition: 0.5s;
+}
+
+.DAOdetails .DAOsettings:hover {
+    transition: 0.5s;
+    right: -30px;
 }
 
 .DAOdetails .tokens {
@@ -87,6 +98,7 @@ body.active-modal {
 .DAOdetails .chain {
     background: rgba(118, 128, 141, 0.05) !important;
     border-radius: 10px;
+    margin-left: 16px;
     padding: 11px 18px 11px 18px;
 }
 
@@ -307,6 +319,11 @@ body.active-modal {
     font-weight: 700;
     font-size: 14px;
     color: #76808D;
+    clear: both;
+    display: inline-block;
+    /* overflow: hidden; */
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .dashboardTextBold {
@@ -837,7 +854,7 @@ body.active-modal {
     border-radius: 0px 0px 30px 0px;
     height: 100px !important;
     width: 100px !important;
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     display: flex;
@@ -863,8 +880,8 @@ body.active-modal {
     height: 100%;
     width: 100px !important;
     max-width: 100px !important;
-    padding-top: 10%;
-    position: absolute;
+    padding-top: 100px;
+    position: fixed;
     top: 0;
     left: 0;
     display: flex;
@@ -875,7 +892,13 @@ body.active-modal {
     align-items: center;
     gap: 20px;
     transition: 0.5s;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
 }
+
+.sideBarStrip::-webkit-scrollbar {
+    display: none;
+  }
 
 .sideBarStripItem {
     margin-top: 24px;
@@ -1004,6 +1027,7 @@ body.active-modal {
     color: #FFFFFF;
     line-height: 18px;
     opacity: 0.9;
+    width: 80px;
 }
 
 #AddNewMember {
