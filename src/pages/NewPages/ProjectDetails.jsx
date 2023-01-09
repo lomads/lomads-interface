@@ -759,7 +759,7 @@ const ProjectDetails = () => {
                                     }
                                 </div>
                                 {
-                                    (lockedLinks.length > 0 || openLinks.length > 0) && canMyrole('project.links.view') &&
+                                    canMyrole('project.links.view') &&
                                     <div className="links-section">
                                         <div className="links-header">
                                             <div>
@@ -780,7 +780,7 @@ const ProjectDetails = () => {
                                                 </>
                                             }
                                         </div>
-                                        <div className="links-body">
+                                        { (lockedLinks.length > 0 || openLinks.length > 0) &&  <div className="links-body">
                                             {
                                                 lockedLinks.length > 0 &&
                                                 <div className="link-unlocked-section">
@@ -831,7 +831,7 @@ const ProjectDetails = () => {
                                                     })
                                                 }
                                             </div>
-                                        </div>
+                                        </div> }
                                     </div>
                                 }
                             </div>

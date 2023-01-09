@@ -52,14 +52,15 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
 
     useEffect(() => {
         if (Project) {
-            let arr = [];
-            for (var i = 0; i < _get(Project, 'members', []).length; i++) {
-                const item = Project?.members[i];
-                arr.push({ name: item.name, wallet: item.wallet, percent: 0 });
-            }
-            setTemp(arr);
+            // let arr = [];
+            // for (var i = 0; i < _get(Project, 'members', []).length; i++) {
+            //     const item = Project?.members[i];
+            //     arr.push({ name: item.name, wallet: item.wallet, percent: 0 });
+            // }
+            console.log("sada",_get(Project, 'members', []),  _uniqBy(_get(Project, 'members', []), m => m.id))
+            setTemp(_uniqBy(_get(Project, 'members', []), m => m._id).map(m => { console.log('asdas', m); return { ...m, percent: 0 } }));
         }
-    }, []);
+    }, [Project]);
 
     // runs after updating milestone
     useEffect(() => {
@@ -128,13 +129,13 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
     const handleSplitEqually = () => {
 
         const allotedAmt = (((parseFloat(selectedMilestone.amount) * parseFloat(compensation?.amount))) / 100).toFixed(5);
-        let userAmount = (allotedAmt / Project?.members?.length).toFixed(5);
+        let userAmount = (allotedAmt / _uniqBy(Project.members, t => t._id)?.length).toFixed(5);
         let percentAmt = ((userAmount / allotedAmt) * 100).toFixed(2);
 
         var x = document.getElementById(`amountError`);
         x.innerHTML = '';
 
-        let arr = temp.map((item, index) => {
+        let arr = _uniqBy(temp, t => t._id).map((item, index) => {
             let e = item;
             const amountElement = document.getElementById(`amount${index}`);
             var el = document.getElementById(`inputBox${index}`);
@@ -151,8 +152,8 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
         const allotedAmt = (((parseFloat(selectedMilestone.amount) * parseFloat(compensation?.amount))) / 100).toFixed(5);
 
         let total = 0;
-        for (var i = 0; i < temp.length; i++) {
-            const item = temp[i];
+        for (var i = 0; i < _uniqBy(temp, t => t._id).length; i++) {
+            const item = _uniqBy(temp, t => t._id)[i];
             total += item.percent;
             if (item.percent > 0) {
                 sendArray.push({
@@ -167,7 +168,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
         if (total !== 100 && !isSplit) {
             var x = document.getElementById(`amountError`);
             x.innerHTML = 'Total Project Value should be 100 %';
-            for (var i = 0; i < temp.length; i++) {
+            for (var i = 0; i < _uniqBy(temp, t => t._id).length; i++) {
                 var el = document.getElementById(`inputBox${i}`);
                 el.style.background = 'rgba(217, 83, 79, 0.75)';
             }
@@ -365,7 +366,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                                         disabled={false}
                                         fontweight={400}
                                         fontsize={16}
-                                        onClick={handleSplitEqually}
+                                        onClick={() => handleSplitEqually()}
                                     />
 
                                     <div className='members-section'>
