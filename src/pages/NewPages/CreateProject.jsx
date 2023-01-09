@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect, useCallback, useMemo, useRef } from 'react';
-import { find as _find, get as _get, debounce as _debounce } from 'lodash';
+import { find as _find, get as _get, debounce as _debounce, uniqBy as _uniqBy } from 'lodash';
 import '../../styles/pages/CreateProject.css';
 import AddMember from "./DashBoard/MemberCard/AddMember";
 import createProjectSvg from '../../assets/svg/createProject.svg';
@@ -188,7 +188,7 @@ const CreateProject = () => {
         let project = {};
         project.name = name;
         project.description = desc;
-        project.members = selectedMembers;
+        project.members = _uniqBy(selectedMembers, m => m.address);
         project.links = resourceList;
         project.milestones = milestones;
         project.compensation = compensation;
