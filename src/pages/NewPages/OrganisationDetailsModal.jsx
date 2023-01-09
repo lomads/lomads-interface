@@ -10,6 +10,7 @@ import { get as _get, find as _find } from 'lodash';
 import { isValidUrl } from "utils";
 import { useDispatch } from "react-redux";
 import { updateDao, updateDaoLinks } from 'state/dashboard/actions';
+import AddDiscordLink from 'components/AddDiscordLink';
 
 const OrganisationDetails = ({
 	toggleModal,
@@ -182,6 +183,8 @@ const OrganisationDetails = ({
 								/>
 								<Input value={link} placeholder="link" variant="filled" width="50%" onChange={(evt) => setLink(evt.target.value)} />
 								{/* <IconButton icon={<AddIcon />} /> */}
+								{ link && link.indexOf('discord.') > -1 ?
+								<AddDiscordLink link={link} /> : 
 								<IconButton
 									className="addButton"
 									Icon={<AiOutlinePlus style={{ height: 30, width: 30 }} />}
@@ -194,7 +197,9 @@ const OrganisationDetails = ({
 											: "rgba(27, 43, 65, 0.2)"
 									}
 								/>
+								}
 							</div>
+							{ daoLinks.length > 0 &&
 							<div
 								style={{
 									marginTop: "9px",
@@ -234,7 +239,7 @@ const OrganisationDetails = ({
 										</div>
 									)
 								})}
-							</div>
+							</div> }
 						</div>
 
 						{/* //! FOOTER */}
