@@ -9,7 +9,7 @@ import rolePermission from '../../assets/svg/RP.svg';
 import orgDetail from '../../assets/svg/OD.svg';
 import safe from '../../assets/svg/safe.svg';
 import token from '../../assets/svg/PT.svg';
-import sweat from '../../assets/svg/xp-points.svg';
+import sweat from '../../assets/svg/5-xp-points-color.svg';
 import terminology from '../../assets/svg/Frameterminology.svg';
 import discord from '../../assets/svg/DiscordIcon.svg';
 import OrganizationDetails from "./DrawerComponents/OrganizationDetails";
@@ -18,6 +18,7 @@ import Discord from "./DrawerComponents/Discord";
 import PassToken from "./DrawerComponents/PassToken";
 import Terminology from "./DrawerComponents/Terminology";
 import editIcon from '../../assets/svg/editButton.svg';
+import SweatPoints from "./DrawerComponents/SweatPoints";
 const useStyles = makeStyles((theme: any) => ({
 	root: {
 		backgroundColor: '#fff',
@@ -109,7 +110,7 @@ export default (props: any) => {
 				{props.title == 'Roles & Permissions' && <RolesPermission />}
 				{props.title == 'Safe' && <></>}
 				{props.title == 'Pass Tokens' && <PassToken />}
-				{props.title == 'SWEAT points' && <></>}
+				{props.title == 'SWEAT points' && <SweatPoints />}
 				{props.title == 'Terminologies' && <Terminology editButton={editTerminologyBtn} />}
 				{props.title == 'Discord' && <Discord />}
 			</Box>

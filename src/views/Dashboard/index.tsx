@@ -4,6 +4,7 @@ import { makeStyles } from '@mui/styles';
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import AddMember from "./AddMember";
+import CreateProject from "./CreateProject";
 import Settings from "./Settings";
 
 const useStyles = makeStyles((theme: any) => ({
@@ -18,6 +19,7 @@ export default () => {
 			<Grid container>
 				<Grid xs={12} item display="flex" flexDirection="column" rowGap={"30px"}>
 					<Settings />
+					<CreateProject />
 					<AddMember />
 				</Grid>
 			</Grid >
