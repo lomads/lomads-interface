@@ -194,12 +194,15 @@ const MintPassToken = () => {
         } else {
             let payload = {
                 attributes: [...myMetadata.attributes].map(attribute => {
-                    if (attribute.trait_type === 'Email') {
-                        return { ...attribute, value: userMail.value }
+                    if (attribute.trait_type === 'Personal Details') {
+                        return { ...attribute, value: encryptData(publicKey, JSON.stringify({ email: _get(userMail, 'value', ''), discord: _get(userDiscord, 'value', ''), telegram: _get(userTG, 'value', '') })) }
+                    }
+                    else if (attribute.trait_type === 'Email') {
+                        return { ...attribute, value: _get(userMail, 'value', '') && userMail.value !== '' ? true : null }
                     } else if (attribute.trait_type === 'Discord') {
-                        return { ...attribute, value: userDiscord.value }
+                        return { ...attribute, value: _get(userDiscord, 'value', '') && userDiscord.value !== '' ? true : null }
                     } else if (attribute.trait_type === 'Telegram') {
-                        return { ...attribute, value: userTG.value }
+                        return { ...attribute, value: _get(userTG, 'value', '') && userTG.value !== '' ? true : null }
                     } else {
                         return attribute
                     }
@@ -267,19 +270,19 @@ const MintPassToken = () => {
                                 {
                                     trait_type: "Personal Details",
                                     value: encryptData(publicKey, JSON.stringify({ email: _get(userMail, 'value', ''), discord: _get(userDiscord, 'value', ''), telegram: _get(userTG, 'value', '') }))
+                                },
+                                {
+                                    trait_type: "Email",
+                                    value: _get(userMail, 'value', '') && userMail.value !== '' ? true : null
+                                },
+                                {
+                                    trait_type: "Discord",
+                                    value: _get(userDiscord, 'value', '') && userDiscord.value !== '' ? true : null
+                                },
+                                {
+                                    trait_type: "Telegram",
+                                    value: _get(userTG, 'value', '') && userTG.value !== '' ? true : null
                                 }
-                                // {
-                                //     trait_type: "Email",
-                                //     value: _get(userMail, 'value', '')
-                                // },
-                                // {
-                                //     trait_type: "Discord",
-                                //     value: _get(userDiscord, 'value', '')
-                                // },
-                                // {
-                                //     trait_type: "Telegram",
-                                //     value: _get(userTG, 'value', '')
-                                // }
                             ],
                             contract: contractAddr,
                         }
@@ -318,8 +321,8 @@ const MintPassToken = () => {
             Buffer.from(enc.nonce, 'base64'),
             Buffer.from(enc.ciphertext, 'base64'),
         ]);
-        setEncodedData(buf);
-        return buf;
+        // setEncodedData(buf);
+        return JSON.stringify(buf);
     }
 
     const decryptData = async (account, data) => {
