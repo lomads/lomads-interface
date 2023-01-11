@@ -58,6 +58,7 @@ const TaskReview = ({ task, close }: any) => {
     const [rejectionNote, setRejectionNote] = useState('');
     const [selectedUser, setSelectedUser] = useState<any>(null);
     const [rejectUser, setRejectUser] = useState<any>(null);
+    const [error, setError] = useState<any>(null);
 
     const { createSafeTransaction } = useSafeTransaction(_get(DAO, 'safe.address', ''))
 
@@ -132,6 +133,7 @@ const TaskReview = ({ task, close }: any) => {
                     resolve(txnResponse.safeTxHash)
                 }
             } catch (e) {
+                setError(e)
                 console.log(e)
                 reject(e)
             }
@@ -153,59 +155,66 @@ const TaskReview = ({ task, close }: any) => {
     }, [safeTokens, task])
 
     const handleApproveTask = async () => {
-        setApproveLoading(true);
-        let onChainSafeTxHash: any = undefined;
-        if (isSafeOwner && _get(task, 'compensation.currency', 'SWEAT') !== 'SWEAT') {
-            onChainSafeTxHash = await createOnChainTxn();
-        }
-
-        const offChainPayload = {
-            daoId: _get(DAO, '_id', undefined),
-            taskId: _get(task, '_id', undefined),
-            safe: _get(DAO, 'safe.address', undefined),
-            nonce: moment().unix(),
-            safeTxHash: nanoid(32),
-            executor: account,
-            submissionDate: moment().utc().toDate(),
-            token: {
-                decimals: tokenDecimal,
-                symbol: _get(task, 'compensation.symbol', 'SWEAT'),
-                tokenAddress: _get(task, 'compensation.currency', 'SWEAT')
-            },
-            confirmations: isSafeOwner && _get(task, 'compensation.symbol', 'SWEAT') === 'SWEAT' ? [{
-                owner: account,
-                submissionDate: moment().utc().toDate()
-            }] : [],
-            dataDecoded: {
-                method: 'transfer',
-                parameters: [
-                    { name: 'to', type: "address", value: _get(activeSubmission, 'member.wallet', null) },
-                    { name: 'value', type: "uint256", value: `${BigInt(parseFloat(`${newCompensation}`) * 10 ** tokenDecimal)}` },
-                ]
+        try {
+            setApproveLoading(true);
+            setError(null)
+            let onChainSafeTxHash: any = undefined;
+            if (isSafeOwner && _get(task, 'compensation.currency', 'SWEAT') !== 'SWEAT') {
+                onChainSafeTxHash = await createOnChainTxn();
             }
-        }
-        const payload = {
-            daoUrl: _get(DAO, 'url', undefined),
-            compensationDelta: newCompensation - _get(task, 'compensation.amount', 0),
-            offChainPayload: !isSafeOwner || _get(task, 'compensation.symbol', 'SWEAT') == 'SWEAT' ? offChainPayload : undefined,
-            onChainSafeTxHash,
-            recipient: _get(activeSubmission, 'member._id', null)
-        }
-
-        axiosHttp.post(`task/${task._id}/approve?daoUrl=${DAO.url}`, payload)
-            .then(async res => {
-                let m = _get(activeSubmission, 'member.name', '') === '' ? _get(activeSubmission, 'member.wallet', '') : _get(activeSubmission, 'member.name', '')
-                await axiosHttp.post(`transaction/label`, {
-                    safeAddress: _get(DAO, 'safe.address', null),
-                    safeTxHash: onChainSafeTxHash ? onChainSafeTxHash : offChainPayload.safeTxHash,
-                    recipient: _get(activeSubmission, 'member.wallet', null),
-                    label: `${m} | ${_get(task, 'name', '')}`
+    
+            const offChainPayload = {
+                daoId: _get(DAO, '_id', undefined),
+                taskId: _get(task, '_id', undefined),
+                safe: _get(DAO, 'safe.address', undefined),
+                nonce: moment().unix(),
+                safeTxHash: nanoid(32),
+                executor: account,
+                submissionDate: moment().utc().toDate(),
+                token: {
+                    decimals: tokenDecimal,
+                    symbol: _get(task, 'compensation.symbol', 'SWEAT'),
+                    tokenAddress: _get(task, 'compensation.currency', 'SWEAT')
+                },
+                confirmations: isSafeOwner && _get(task, 'compensation.symbol', 'SWEAT') === 'SWEAT' ? [{
+                    owner: account,
+                    submissionDate: moment().utc().toDate()
+                }] : [],
+                dataDecoded: {
+                    method: 'transfer',
+                    parameters: [
+                        { name: 'to', type: "address", value: _get(activeSubmission, 'member.wallet', null) },
+                        { name: 'value', type: "uint256", value: `${BigInt(parseFloat(`${newCompensation}`) * 10 ** tokenDecimal)}` },
+                    ]
+                }
+            }
+            const payload = {
+                daoUrl: _get(DAO, 'url', undefined),
+                compensationDelta: newCompensation - _get(task, 'compensation.amount', 0),
+                offChainPayload: !isSafeOwner || _get(task, 'compensation.symbol', 'SWEAT') == 'SWEAT' ? offChainPayload : undefined,
+                onChainSafeTxHash,
+                recipient: _get(activeSubmission, 'member._id', null)
+            }
+    
+            axiosHttp.post(`task/${task._id}/approve?daoUrl=${DAO.url}`, payload)
+                .then(async res => {
+                    let m = _get(activeSubmission, 'member.name', '') === '' ? _get(activeSubmission, 'member.wallet', '') : _get(activeSubmission, 'member.name', '')
+                    await axiosHttp.post(`transaction/label`, {
+                        safeAddress: _get(DAO, 'safe.address', null),
+                        safeTxHash: onChainSafeTxHash ? onChainSafeTxHash : offChainPayload.safeTxHash,
+                        recipient: _get(activeSubmission, 'member.wallet', null),
+                        label: `${m} | ${_get(task, 'name', '')}`
+                    })
+                    dispatch(setDAO(res.data.dao))
+                    dispatch(setTask(res.data.task))
+                    close()
                 })
-                dispatch(setDAO(res.data.dao))
-                dispatch(setTask(res.data.task))
-                close()
-            })
-            .finally(() => setApproveLoading(false))
+                .finally(() => setApproveLoading(false))
+        } catch (e) {
+            setApproveLoading(false);
+            console.log(e)
+            setError(e)
+        }
     }
 
     const handleRejectTask = () => {
@@ -323,11 +332,12 @@ const TaskReview = ({ task, close }: any) => {
                             {(newCompensation - _get(task, 'compensation.amount', 0)) !== 0 && <div className='extra'>{`${(newCompensation - _get(task, 'compensation.amount', 0)) > 0 ? '+' : ''} ${(newCompensation - _get(task, 'compensation.amount', 0))}`}</div>}
                             <div>{_get(task, 'compensation.symbol', "SWEAT")}</div>
                         </div>
-                        <button onClick={() => setShowModifyCompensation(true)}>
+                        <button onClick={() => { setError(null); setShowModifyCompensation(true) }}>
                             <img src={editIcon} alt="edit-icon" />
                         </button>
                     </div>
                 </div>
+                { error && (typeof error === 'string') && <div style={{ color: 'red', marginBottom: 16, textAlign: 'center' }}>{ error }</div> }
                 <div className='task-review-foot'>
                     <button onClick={() => { setRejectUser(submission.member._id); setShowRejectSubmission(true) }}>REJECT</button>
                     <button disabled={approveLoading} style={{ backgroundColor: approveLoading ? 'grey' : '#C94B32' }} onClick={() => handleApproveTask()}>APPROVE</button>

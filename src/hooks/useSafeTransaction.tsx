@@ -125,7 +125,7 @@ const useSafeTransaction = (safeAddress: string) => {
         catch (e) {
             setCreateSafeTxnLoading(false)
             console.log(e)
-            return null
+            throw e;
         }
     }
 
