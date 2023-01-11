@@ -55,6 +55,11 @@ import KRAReview from "./DashBoard/Project/KRAReview";
 import useTerminology from 'hooks/useTerminology';
 import moment from "moment";
 
+import settingIcon from '../../assets/svg/settings.svg';
+import ProjectEdit from "./DashBoard/Project/ProjectEdit";
+import ProjectMilestone from "./DashBoard/Project/ProjectMilestone";
+import ProjectKRA from "./DashBoard/Project/ProjectKRA";
+
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
     const { onOpen, onResetAuth, authorization, isAuthenticating } = useDCAuth("identify guilds")
@@ -102,6 +107,12 @@ const ProjectDetails = () => {
     const [tab, setTab] = useState(null);
 
     const [selectedMilestone, setSelectedMilestone] = useState(null);
+
+    const [showEdit, setShowEdit] = useState(false);
+
+    const [openResource, setOpenResource] = useState(false);
+    const [openMilestone, setOpenMilestone] = useState(false);
+    const [openKRA, setOpenKRA] = useState(false);
 
     useEffect(() => {
         if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
@@ -204,29 +215,29 @@ const ProjectDetails = () => {
     const prevAuth = usePrevious(authorization)
     useEffect(() => {
         console.log("prevAut", prevAuth, authorization, hasClickedAuth)
-        if(((prevAuth == undefined && authorization) || ( prevAuth && authorization && prevAuth !== authorization ) ) && hasClickedAuth){
-           console.log("prevAut", "unlock(hasClickedAuth)")
-           unlock(hasClickedAuth)
+        if (((prevAuth == undefined && authorization) || (prevAuth && authorization && prevAuth !== authorization)) && hasClickedAuth) {
+            console.log("prevAut", "unlock(hasClickedAuth)")
+            unlock(hasClickedAuth)
         }
     }, [prevAuth, authorization, hasClickedAuth])
 
     const getPlatformMemberId = () => {
         return axios.get(`https://discord.com/api/users/@me`, { headers: { Authorization: authorization } })
-        .then(res => res.data.id)  
-        .catch(e => {
-            if(e.response.status === 401){
-                console.log(e)
-                //setHasClickedAuth(true)
-                onResetAuth()
-                setTimeout(() => onOpen(), 1000) 
-            }
-            return null;
-        }) 
+            .then(res => res.data.id)
+            .catch(e => {
+                if (e.response.status === 401) {
+                    console.log(e)
+                    //setHasClickedAuth(true)
+                    onResetAuth()
+                    setTimeout(() => onOpen(), 1000)
+                }
+                return null;
+            })
     }
 
     const getGuilds = () => {
         return axios.get(`https://discord.com/api/users/@me/guilds`, { headers: { Authorization: authorization } })
-        .then(res => res.data)   
+            .then(res => res.data)
     }
 
     const handleParseUrl = (url) => {
@@ -277,7 +288,7 @@ const ProjectDetails = () => {
     }
 
     const addGuildRole = async (guildId, memberId, roleId) => {
-       return axiosHttp.get(`discord/guild/${guildId}/member/${memberId}/role/${roleId}/add`)
+        return axiosHttp.get(`discord/guild/${guildId}/member/${memberId}/role/${roleId}/add`)
     }
 
     const unlock = useCallback(async (link, update = true) => {
@@ -297,12 +308,12 @@ const ProjectDetails = () => {
                         const dcchannelid = url.pathname.split('/')[3]
                         setHasClickedAuth(link)
                         console.log("prevAut", "authorization", authorization)
-                        if(!authorization) 
+                        if (!authorization)
                             return onOpen();
                         const discordMemberId = await getPlatformMemberId();
                         const guilds = await getGuilds();
                         const guildExists = _find(guilds, g => g.id === dcserverid)
-                        if(guildExists) {
+                        if (guildExists) {
                             await addGuildRole(dcserverid, discordMemberId, link.roleId)
                             if (update)
                                 unlockLink(link)
@@ -395,7 +406,7 @@ const ProjectDetails = () => {
     const handleUsers = (item, index) => {
         if (_uniqBy(Project?.members, '_id').some(m => m.wallet === item.member.wallet) === false) {
             return (
-                <div onClick={() => handleAddMember(item)}  className="member-li" key={index}>
+                <div onClick={() => handleAddMember(item)} className="member-li" key={index}>
                     <div className="member-img-name">
                         <img src={memberIcon} alt="member-icon" />
                         <p>{item.member.name}</p>
@@ -452,6 +463,10 @@ const ProjectDetails = () => {
             setSelectedMilestone(e);
             setShowAssign(true)
         }
+    }
+
+    const toggleShowEdit = () => {
+        setShowEdit(!showEdit);
     }
 
     return (
@@ -520,6 +535,37 @@ const ProjectDetails = () => {
                             </>
                     }
 
+                    {/* edit project side modal */}
+                    {
+                        showEdit &&
+                        <ProjectEdit
+                            toggleShowEdit={toggleShowEdit}
+                            toggleDeletePrompt={(value) => setDeletePrompt(value)}
+                            toggleClosePrompt={(value) => setClosePrompt(value)}
+                            toggleProjectMilestone={(value) => setOpenMilestone(value)}
+                            toggleProjectKRA={(value) => setOpenKRA(value)}
+                        />
+                    }
+
+                    {/* open milestone add & edit */}
+                    {
+                        openMilestone &&
+                        <ProjectMilestone
+                            list={_get(Project, 'milestones', [])}
+                            toggleShowMilestone={() => setOpenMilestone(false)}
+                        />
+                    }
+
+                    {/* open kra add & edit */}
+                    {
+                        openKRA &&
+                        <ProjectKRA
+                            list={_get(Project, 'kra.results', [])}
+                            freq={_get(Project, 'kra.frquency', '')}
+                            toggleShowKRA={() => setOpenKRA(false)}
+                        />
+                    }
+
                     {/* add new link */}
                     {
                         showAddLink &&
@@ -564,7 +610,7 @@ const ProjectDetails = () => {
                                             CANCEL
                                         </button>
                                         <button onClick={handleDeleteMembers}>
-                                            REMOVE FROM { transformWorkspace().label.toUpperCase() }
+                                            REMOVE FROM {transformWorkspace().label.toUpperCase()}
                                         </button>
                                     </div>
                                 </div>
@@ -660,15 +706,12 @@ const ProjectDetails = () => {
                                             :
                                             <h1>{Project?.name}</h1>
                                     }
-
                                 </div>
-                                {
+                                <button className='settings' onClick={() => { setShowEdit(true) }}>
+                                    <img src={settingIcon} alt="settings-icon" />
+                                </button>
+                                {/* {
                                     <div>
-                                        {/* {canMyrole('project.edit') &&
-                                            <button onClick={handleEditMode}>
-                                                <img src={editToken} alt="hk-logo" />
-                                            </button>
-                                        } */}
                                         {canMyrole('project.delete') && <button onClick={() => setDeletePrompt(true)}>
                                             <img src={deleteIcon} alt="hk-logo" />
                                         </button>}
@@ -691,7 +734,7 @@ const ProjectDetails = () => {
                                             null
                                         }
                                     </div>
-                                }
+                                } */}
                             </div>
                         </div>
 
@@ -780,7 +823,7 @@ const ProjectDetails = () => {
                                                 </>
                                             }
                                         </div>
-                                        { (lockedLinks.length > 0 || openLinks.length > 0) &&  <div className="links-body">
+                                        {(lockedLinks.length > 0 || openLinks.length > 0) && <div className="links-body">
                                             {
                                                 lockedLinks.length > 0 &&
                                                 <div className="link-unlocked-section">
@@ -831,7 +874,7 @@ const ProjectDetails = () => {
                                                     })
                                                 }
                                             </div>
-                                        </div> }
+                                        </div>}
                                     </div>
                                 }
                             </div>
@@ -924,9 +967,9 @@ const ProjectDetails = () => {
                                                             {/* <button className='archive-btn'>
                                                                 <img src={editToken} alt="hk-logo" />
                                                             </button> */}
-                                                           { canMyrole('project.review') && <button className="review-btn" onClick={() => setShowKRAReview(true)}>
+                                                            {canMyrole('project.review') && <button className="review-btn" onClick={() => setShowKRAReview(true)}>
                                                                 REVIEW
-                                                            </button> }
+                                                            </button>}
                                                         </div>
                                                     </div>
                                             }
@@ -947,10 +990,10 @@ const ProjectDetails = () => {
                                                                         </div>
                                                                         <div>
                                                                             <h1>{item.deadline}</h1>
-                                                                            { canMyrole('project.milestone.update') &&
-                                                                            <div className="check-circle" onClick={() => selectMilestone(item, index)}>
-                                                                                <FiCheck size={20} />
-                                                                            </div>
+                                                                            {canMyrole('project.milestone.update') &&
+                                                                                <div className="check-circle" onClick={() => selectMilestone(item, index)}>
+                                                                                    <FiCheck size={20} />
+                                                                                </div>
                                                                             }
                                                                         </div>
                                                                     </div>

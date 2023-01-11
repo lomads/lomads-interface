@@ -1,0 +1,197 @@
+.ProjectEditOverlay {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(27, 43, 65, 0.25);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.ProjectEditOverlay .ProjectEditContainer {
+    height: 100vh;
+    width: 575px;
+    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
+    /* background-color: #FFF; */
+    border-radius: 20px 0px 0px 20px;
+    padding: 36px 27px;
+    /* overflow-y: scroll; */
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.ProjectEditOverlay .ProjectEditContainer .ProjectEdit-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.ProjectEditOverlay .ProjectEditContainer .ProjectEdit-header button {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+}
+
+
+.ProjectEditOverlay .ProjectEditContainer .ProjectEdit-body {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 27px;
+}
+
+.ProjectEditOverlay .ProjectEditContainer .ProjectEdit-body img {
+    margin-bottom: 18px;
+}
+
+.ProjectEditOverlay .ProjectEditContainer .ProjectEdit-body h1 {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 33px;
+    color: #C94B32;
+    margin-bottom: 35px;
+}
+
+.ProjectEditOverlay .ProjectEditContainer .ProjectEdit-body .edit-card {
+    height: 90px;
+    width: 100%;
+    background-color: #FFF;
+    box-shadow: 0px 3px 3px rgba(27, 43, 65, 0.1), -1px -2px 3px rgba(201, 75, 50, 0.05);
+    border-radius: 5px;
+    padding: 26px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.ProjectEditOverlay .ProjectEditContainer .ProjectEdit-body .edit-card h1 {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 25px;
+    /* identical to box height, or 114% */
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+    margin: 0;
+}
+
+.ProjectEditOverlay .ProjectEditContainer .ProjectEdit-body .edit-card span {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    color: #76808D;
+}
+
+.ProjectEditOverlay .ProjectEditContainer .ProjectEdit-body .edit-card button {
+    margin: 0;
+    height: 37px;
+    width: 37px;
+}
+
+.ProjectEditOverlay .ProjectEditContainer .ProjectEdit-body .edit-card button img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.ProjectEditOverlay .ProjectEditContainer .ProjectEdit-body .edit-card .add-btn {
+    background: #FFFFFF;
+    /* Color-drop */
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    width: 125px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #C94B32;
+}
+
+.ProjectEditOverlay .ProjectEditContainer .ProjectEdit-body .delete-card {
+    /* height: 90px; */
+    width: 100%;
+    background-color: #f5f5f5;
+    box-shadow: 0px 3px 3px rgba(27, 43, 65, 0.1), -1px -2px 3px rgba(201, 75, 50, 0.05);
+    border-radius: 5px;
+    padding: 26px 22px;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 100px;
+}
+
+.ProjectEditOverlay .ProjectEditContainer .ProjectEdit-body .delete-card h1 {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 25px;
+    /* identical to box height, or 114% */
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+    margin: 0;
+}
+
+.ProjectEditOverlay .ProjectEditContainer .ProjectEdit-body .delete-card span {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    color: #76808D;
+    margin: 10px;
+}
+
+.ProjectEditOverlay .ProjectEditContainer .ProjectEdit-body .delete-card button {
+    width: 100%;
+    height: 40px;
+    background: #FFFFFF;
+    /* Color-drop */
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    text-transform: uppercase;
+    color: #C94B32;
+
+}
+
+
+
+.ProjectEditOverlay .ProjectEditContainer .ProjectEdit-footer {
+    width: 575px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+}
+
+.ProjectEditOverlay .ProjectEditContainer .ProjectEdit-footer button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    height: 50px;
+    background: #C94B32;
+    color: #FFF;
+    width: 230px;
+}

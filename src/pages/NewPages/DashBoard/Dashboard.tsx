@@ -109,7 +109,7 @@ const Dashboard = () => {
 	}
 
 	useEffect(() => {
-		if(account)
+		if (account)
 			getENSName(account)
 	}, [account])
 
@@ -131,8 +131,8 @@ const Dashboard = () => {
 	};
 
 	const toggleShowCreateRecurring = () => {
-		setShowCreateRecurring((prev:boolean) => {
-			if(prev)  {
+		setShowCreateRecurring((prev: boolean) => {
+			if (prev) {
 				treasuryRef?.current?.reload()
 				setRecurringTxn(null)
 			}
@@ -196,25 +196,25 @@ const Dashboard = () => {
 	}, [chainId, account, DAOList, daoURL])
 
 	const validateMetaData = () => {
-		if(_get(DAO, 'sbt.contactDetail', null)) {
+		if (_get(DAO, 'sbt.contactDetail', null)) {
 			const contactdetails = _get(DAO, 'sbt.contactDetail', []);
 			for (let index = 0; index < contactdetails.length; index++) {
 				let shouldUpdate = true;
 				const contact = contactdetails[index];
-				const myMetadata  = _find(_get(DAO, 'sbt.metadata', []), m => {
+				const myMetadata = _find(_get(DAO, 'sbt.metadata', []), m => {
 					return _find(m.attributes, a => a.value === account)
 				})
-				if(myMetadata && myMetadata.attributes){
+				if (myMetadata && myMetadata.attributes) {
 					for (let index = 0; index < myMetadata.attributes.length; index++) {
 						const attribute = myMetadata.attributes[index];
-						if(contact === attribute.trait_type.toLowerCase()) {
-							if(attribute.value && attribute.value !== "") {
+						if (contact === attribute.trait_type.toLowerCase()) {
+							if (attribute.value && attribute.value !== "") {
 								shouldUpdate = false
 							}
 						}
 					}
 				}
-				if(shouldUpdate){
+				if (shouldUpdate) {
 					navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
 					break;
 				}
@@ -242,7 +242,7 @@ const Dashboard = () => {
 						if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
 							if (parseInt(balanceOf._hex, 16) === 0) {
 								navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
-							}  else {
+							} else {
 								// check if data has been filled show mint page. with prefilled data. save data without minting again
 								validateMetaData()
 							}
