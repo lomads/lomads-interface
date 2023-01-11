@@ -203,6 +203,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                 }
             } catch (e) {
                 setisLoading(false);
+                setError(e)
                 console.log(e)
                 reject(e)
             }
@@ -408,8 +409,8 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                                         <span id={`amountError`} style={{ fontSize: '13px', color: '#C84A32', fontStyle: 'normal', margin: '0' }}></span>
 
                                     </div>
-
                                 </div>
+                                { error && <div style={{ color: 'red', textAlign: 'center', margin: '0 0 8px 0' }}>{ error }</div> }
                                 <div className='milestone-footer'>
                                     <button onClick={() => toggleShowAssign()} disabled={isLoading} style={isLoading ? { cursor: 'not-allowed' } : null}>
                                         CANCEL

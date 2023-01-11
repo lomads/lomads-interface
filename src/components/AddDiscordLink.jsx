@@ -19,7 +19,7 @@ import axiosHttp from '../api';
 import { nanoid } from "@reduxjs/toolkit";
 import { SupportedChainId } from "constants/chains";
 
-export default ({ title, desc, link, roleName, accessControl, okButton, onGuildCreateSuccess, ...props }) => {
+export default ({ title, desc, link, roleName, accessControl, okButton, onGuildCreateSuccess, renderButton = undefined, ...props }) => {
 
     const { provider, account, chainId } = useWeb3React();
     const signerFunction = useCallback((signableMessage) => getSigner(provider, account).signMessage(signableMessage), [provider, account]);
@@ -98,22 +98,24 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
     }
 
     const onGuildBotAdded = async server => {
-       const attachRoleId = await axiosHttp.get(`discord/guild/${server.id}/roles`)
-        .then(async res => {
-            if(res.data) {
-                console.log(res.data)
-                let guildRole = _find(res.data, r => r.name.toLowerCase() === roleName.toLowerCase())
-                if(guildRole) 
-                    return guildRole.id
-                else {
-                    guildRole = await axiosHttp.post(`discord/guild/${server.id}/role`, { name: roleName }).then(res => res.data)
-                    console.log("guildRole.id", guildRole.id)
-                    return guildRole.id
+        let attachRoleId = undefined;
+        if(roleName) {
+            attachRoleId = await axiosHttp.get(`discord/guild/${server.id}/roles`)
+            .then(async res => {
+                if(res.data) {
+                    console.log(res.data)
+                    let guildRole = _find(res.data, r => r.name.toLowerCase() === roleName.toLowerCase())
+                    if(guildRole) 
+                        return guildRole.id
+                    else {
+                        guildRole = await axiosHttp.post(`discord/guild/${server.id}/role`, { name: roleName }).then(res => res.data)
+                        console.log("guildRole.id", guildRole.id)
+                        return guildRole.id
+                    }
                 }
-            }
-        })
-        console.log("attachRoleId", attachRoleId)
-        finish(attachRoleId)
+            })
+        }
+        finish(attachRoleId ? attachRoleId : server.id)
     }
     const onGuildBotAddedDelayed = useCallback(_debounce(onGuildBotAdded, 1000), [onGuildBotAdded, link, server])
 
@@ -188,6 +190,17 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                 finish()
             }
         }
+    }
+
+    if(renderButton){
+        return (
+            <div onClick={() => { 
+                if(!(link === '' || title === '' || addLinkLoading))
+                    handleAddResource() 
+            }}>
+                { renderButton }
+            </div>
+        )
     }
 
     return (

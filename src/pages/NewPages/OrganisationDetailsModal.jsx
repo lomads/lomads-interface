@@ -9,8 +9,10 @@ import { useCallback, useEffect, useState } from "react";
 import { get as _get, find as _find } from 'lodash';
 import { isValidUrl } from "utils";
 import { useDispatch } from "react-redux";
+import axiosHttp from 'api'
 import { updateDao, updateDaoLinks } from 'state/dashboard/actions';
 import AddDiscordLink from 'components/AddDiscordLink';
+import { setDAO } from "state/dashboard/reducer";
 
 const OrganisationDetails = ({
 	toggleModal,
@@ -30,7 +32,7 @@ const OrganisationDetails = ({
 		setDaoLinks(_get(DAO, 'links', []));
 	}, [DAO])
 
-	const addLink = () => {
+	const addLink = useCallback(() => {
 		let tempLink = link
 		if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
 			tempLink = 'https://' + link;
@@ -38,7 +40,7 @@ const OrganisationDetails = ({
 		setDaoLinks([...daoLinks, { title: linkTitle, link: tempLink }]);
 		setLinkTitle("")
 		setLink("")
-	}
+	},[link])
 
 	const saveChanges = () => {
 		console.log(description)
@@ -74,6 +76,15 @@ const OrganisationDetails = ({
 		setDaoLinks(links)
 		// dispatch(updateDao({ url: DAO?.url, payload: { links } }))
 	}
+
+	const handleOnServerAdded = serverId => {
+		axiosHttp.post(`discord/guild/${serverId}/sync-roles`, { daoId: _get(DAO, '_id') })
+		.then(res => {
+			addLink()
+			//dispatch(setDAO(res.data))
+		})
+	}
+
 	return (
 		<>
 			<div className="sidebarModal">
@@ -184,7 +195,21 @@ const OrganisationDetails = ({
 								<Input value={link} placeholder="link" variant="filled" width="50%" onChange={(evt) => setLink(evt.target.value)} />
 								{/* <IconButton icon={<AddIcon />} /> */}
 								{ link && link.indexOf('discord.') > -1 ?
-								<AddDiscordLink link={link} /> : 
+								<AddDiscordLink
+								renderButton={
+									<IconButton
+									className="addButton"
+									Icon={<AiOutlinePlus style={{ height: 30, width: 30 }} />}
+									height={40}
+									width={40}
+									bgColor={
+										(linkTitle.length > 0 && isValidUrl(link))
+											? "#C94B32"
+											: "rgba(27, 43, 65, 0.2)"
+									}
+								/>
+								}
+								onGuildCreateSuccess={handleOnServerAdded} accessControl={true} link={link} /> : 
 								<IconButton
 									className="addButton"
 									Icon={<AiOutlinePlus style={{ height: 30, width: 30 }} />}
