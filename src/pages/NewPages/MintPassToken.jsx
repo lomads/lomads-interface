@@ -25,6 +25,9 @@ import axiosHttp from 'api'
 import SideBar from "../NewPages/DashBoard/SideBar";
 import useRole from 'hooks/useRole';
 
+import { encrypt } from '@metamask/eth-sig-util';
+const ascii85 = require('ascii85');
+
 const MintPassToken = () => {
     /// temporary solution until we don't have specific routes for DAO, contract address will be passed into the url 
     const { contractAddr, daoURL } = useParams();
@@ -47,40 +50,58 @@ const MintPassToken = () => {
     const { myRole } = useRole(DAO, account)
     const { needWhitelist, isWhitelisted, balanceOf, contractName, currentIndex } = useSBTStats(provider, account, update, contractAddr ? contractAddr : '', chainId);
     const sbtContract = useSBTContract(contractAddr ? contractAddr : null);
+    const [publicKey, setPublicKey] = useState(null);
+    const [encodedData, setEncodedData] = useState(null);
 
     const showSideBar = (_choice) => {
-		setShowNavBar(_choice);
-	};
+        setShowNavBar(_choice);
+    };
 
     useEffect(() => {
-        if(account && chainId)
+        if (account && chainId && user) {
+            handleGetPublicKey();
+        }
+    }, [account, chainId, user]);
+
+    const handleGetPublicKey = async () => {
+        // Key is returned as base64
+        const keyB64 = await window.ethereum.request({
+            method: 'eth_getEncryptionPublicKey',
+            params: [account],
+        });
+        const publicKey = Buffer.from(keyB64, 'base64');
+        setPublicKey(publicKey);
+    }
+
+    useEffect(() => {
+        if (account && chainId)
             dispatch(loadDao({ chainId }))
     }, [chainId, account])
 
     useEffect(() => {
-		if(account && chainId && ( !user || ( user && user.wallet.toLowerCase() !== account.toLowerCase() ) )) {
-			dispatch(getCurrentUser({}))
-		}
-	}, [account, chainId, user])
+        if (account && chainId && (!user || (user && user.wallet.toLowerCase() !== account.toLowerCase()))) {
+            dispatch(getCurrentUser({}))
+        }
+    }, [account, chainId, user])
 
     const myMetadata = useMemo(() => {
         return _find(_get(DAO, 'sbt.metadata', []), m => {
             return _find(m.attributes, a => a.value === account)
         })
     }, [DAO?.sbt, account])
-    
-    
+
+
     useEffect(() => {
-        if((!DAO || (DAO && DAO.url !== daoURL)) && !DAOLoading) 
+        if ((!DAO || (DAO && DAO.url !== daoURL)) && !DAOLoading)
             dispatch(getDao(daoURL))
     }, [daoURL, DAO, DAOLoading])
 
     const findTraitValue = useCallback(attr => {
-        if(DAO && DAO.sbt) {
-            if(myMetadata && myMetadata.attributes){
+        if (DAO && DAO.sbt) {
+            if (myMetadata && myMetadata.attributes) {
                 for (let index = 0; index < myMetadata.attributes.length; index++) {
                     const attribute = myMetadata.attributes[index];
-                    if(attr === attribute.trait_type.toLowerCase()) {
+                    if (attr === attribute.trait_type.toLowerCase()) {
                         return attribute?.value;
                     }
                 }
@@ -172,24 +193,27 @@ const MintPassToken = () => {
             return;
         } else {
             let payload = {
-                attributes : [...myMetadata.attributes].map(attribute => {
-                    if(attribute.trait_type === 'Email') {
-                        return { ...attribute, value: userMail.value }
+                attributes: [...myMetadata.attributes].map(attribute => {
+                    if (attribute.trait_type === 'Personal Details') {
+                        return { ...attribute, value: encryptData(publicKey, JSON.stringify({ email: _get(userMail, 'value', ''), discord: _get(userDiscord, 'value', ''), telegram: _get(userTG, 'value', '') })) }
+                    }
+                    else if (attribute.trait_type === 'Email') {
+                        return { ...attribute, value: _get(userMail, 'value', '') && userMail.value !== '' ? true : null }
                     } else if (attribute.trait_type === 'Discord') {
-                        return { ...attribute, value: userDiscord.value }
+                        return { ...attribute, value: _get(userDiscord, 'value', '') && userDiscord.value !== '' ? true : null }
                     } else if (attribute.trait_type === 'Telegram') {
-                        return { ...attribute, value: userTG.value }
+                        return { ...attribute, value: _get(userTG, 'value', '') && userTG.value !== '' ? true : null }
                     } else {
                         return attribute
                     }
                 })
-            } 
+            }
             axiosHttp.patch(`metadata/${_get(DAO, 'sbt._id')}`, payload)
-            .then(res => {
-                dispatch(getDao(_get(DAO, 'url', '')))
-                setTimeout(() => navigate(`/${DAO.url}`), 1500);
-            })
-            .catch(e => console.log(e))
+                .then(res => {
+                    dispatch(getDao(_get(DAO, 'url', '')))
+                    setTimeout(() => navigate(`/${DAO.url}`), 1500);
+                })
+                .catch(e => console.log(e))
         }
     }
 
@@ -221,7 +245,7 @@ const MintPassToken = () => {
                     setLoading(true);
                     const sbtId = currentIndex.toString();
                     let tx = null;
-                    if(shouldMint)
+                    if (shouldMint)
                         tx = await mintSBTtoken(sbtContract, account);
                     console.log(tx)
                     if (tx?.error) {
@@ -238,25 +262,31 @@ const MintPassToken = () => {
                             description: "SBT TOKEN",
                             name: userName.value,
                             image: _get(DAO, 'sbt.image', ''),
-                            attributes: [{
-                                trait_type: "Wallet Address/ENS Domain",
-                                value: account
-                            },
-                            {
-                                trait_type: "Email",
-                                value: _get(userMail, 'value', '')
-                            },
-                            {
-                                trait_type: "Discord",
-                                value: _get(userDiscord, 'value', '')
-                            },
-                            {
-                                trait_type: "Telegram",
-                                value: _get(userTG, 'value', '')
-                            }],
+                            attributes: [
+                                {
+                                    trait_type: "Wallet Address/ENS Domain",
+                                    value: account
+                                },
+                                {
+                                    trait_type: "Personal Details",
+                                    value: encryptData(publicKey, JSON.stringify({ email: _get(userMail, 'value', ''), discord: _get(userDiscord, 'value', ''), telegram: _get(userTG, 'value', '') }))
+                                },
+                                {
+                                    trait_type: "Email",
+                                    value: _get(userMail, 'value', '') && userMail.value !== '' ? true : null
+                                },
+                                {
+                                    trait_type: "Discord",
+                                    value: _get(userDiscord, 'value', '') && userDiscord.value !== '' ? true : null
+                                },
+                                {
+                                    trait_type: "Telegram",
+                                    value: _get(userTG, 'value', '') && userTG.value !== '' ? true : null
+                                }
+                            ],
                             contract: contractAddr,
                         }
-    
+                        console.log("metadataJSON : ", metadataJSON);
                         const req = await APInewSBTtoken(metadataJSON);
                         if (req) {
                             dispatch(updateCurrentUser({ name: userName.value }))
@@ -278,6 +308,43 @@ const MintPassToken = () => {
             return;
         }
     }
+
+    const encryptData = (publicKey, data) => {
+        const enc = encrypt({
+            publicKey: publicKey.toString('base64'),
+            data: ascii85.encode(data).toString(),
+            version: 'x25519-xsalsa20-poly1305',
+        });
+
+        const buf = Buffer.concat([
+            Buffer.from(enc.ephemPublicKey, 'base64'),
+            Buffer.from(enc.nonce, 'base64'),
+            Buffer.from(enc.ciphertext, 'base64'),
+        ]);
+        // setEncodedData(buf);
+        return JSON.stringify(buf);
+    }
+
+    const decryptData = async (account, data) => {
+        const structuredData = {
+            version: 'x25519-xsalsa20-poly1305',
+            ephemPublicKey: data.slice(0, 32).toString('base64'),
+            nonce: data.slice(32, 56).toString('base64'),
+            ciphertext: data.slice(56).toString('base64'),
+        };
+        // Convert data to hex string required by MetaMask
+        const ct = `0x${Buffer.from(JSON.stringify(structuredData), 'utf8').toString('hex')}`;
+        // Send request to MetaMask to decrypt the ciphertext
+        // Once again application must have acces to the account
+        const decrypt = await window.ethereum.request({
+            method: 'eth_decrypt',
+            params: [ct, account],
+        });
+        // Decode the base85 to final bytes
+        console.log("decoded data : ", JSON.parse(new TextDecoder("utf-8").decode(ascii85.decode(decrypt))));
+        return JSON.parse(new TextDecoder("utf-8").decode(ascii85.decode(decrypt)));
+    }
+
     return (
         <>
             <div className="mintPassToken-container">
@@ -366,23 +433,34 @@ const MintPassToken = () => {
                             </div>
 
                             <SimpleLoadButton
-                                title={ isUpdate ? "UPDATE" : "MINT"}
+                                title={isUpdate ? "UPDATE" : "MINT"}
                                 height={50}
                                 width={160}
                                 fontsize={20}
                                 fontweight={400}
                                 onClick={() => {
-                                    if(isUpdate) {
-                                        if(myMetadata)
+                                    if (isUpdate) {
+                                        if (myMetadata)
                                             updateMetadata()
                                         else
-                                            mintSBT(false)    
+                                            mintSBT(false)
                                     } else
                                         mintSBT()
                                 }}
                                 bgColor={"#C94B32"}
                                 condition={isLoading}
                             />
+
+                            {/* <SimpleLoadButton
+                                title={'DECRYPT'}
+                                height={50}
+                                width={160}
+                                fontsize={20}
+                                fontweight={400}
+                                onClick={() => decryptData(account, encodedData)}
+                                bgColor={"#C94B32"}
+                                condition={isLoading}
+                            /> */}
                         </div>
                         :
                         <div className="mintPassToken-body" style={{ height: '90vh', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 0 }}>
@@ -411,10 +489,10 @@ const MintPassToken = () => {
                 theme='dark'
                 rtl={false} />
             <SideBar
-				name={_get(DAO, 'name', '')}
-				showSideBar={showSideBar}
-				showNavBar={showNavBar}
-			/>
+                name={_get(DAO, 'name', '')}
+                showSideBar={showSideBar}
+                showNavBar={showNavBar}
+            />
         </>
     )
 }
