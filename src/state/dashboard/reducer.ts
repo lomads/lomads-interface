@@ -39,6 +39,7 @@ import {
 	updateContract,
 	loadRecurringPayments,
 	updateKRA,
+	editProjectKRA,
 	updateMilestone,
 } from "./actions";
 import { createContract } from "state/contract/actions";
@@ -84,6 +85,7 @@ export interface DashboardState {
 	recurringPayments: any;
 	recurringPaymentsLoading: boolean | null;
 	updateKraLoading: boolean | null;
+	editProjectKraLoading: boolean | null;
 	updateMilestoneLoading: boolean | null;
 }
 
@@ -127,6 +129,7 @@ const initialState: DashboardState = {
 	recurringPayments: null,
 	recurringPaymentsLoading: null,
 	updateKraLoading: null,
+	editProjectKraLoading: null,
 	updateMilestoneLoading: null,
 };
 
@@ -235,6 +238,9 @@ const dashboardSlice = createSlice({
 		},
 		resetUpdateKraLoader(state) {
 			state.updateKraLoading = null
+		},
+		resetEditProjectKraLoader(state) {
+			state.editProjectKraLoading = null
 		},
 		resetUpdateMilestoneLoader(state) {
 			state.updateMilestoneLoading = null
@@ -599,6 +605,15 @@ const dashboardSlice = createSlice({
 		[`${updateKRA.pending}`]: (state) => {
 			state.updateKraLoading = true;
 		},
+		// edit kra
+		[`${editProjectKRA.fulfilled}`]: (state, action) => {
+			state.editProjectKraLoading = false;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
+		},
+		[`${editProjectKRA.pending}`]: (state) => {
+			state.editProjectKraLoading = true;
+		},
 		// update milestone
 		[`${updateMilestone.fulfilled}`]: (state, action) => {
 			state.updateMilestoneLoading = false;
@@ -648,6 +663,7 @@ export const {
 	resetUpdateContractLoading,
 	setRecurringPayments,
 	resetUpdateKraLoader,
+	resetEditProjectKraLoader,
 	resetUpdateMilestoneLoader
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

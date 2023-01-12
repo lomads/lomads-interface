@@ -253,6 +253,7 @@ const CreateProject = () => {
                         freq={frequency}
                         toggleShowKRA={() => setOpenKRA(false)}
                         getResults={(value1, value2) => { setResults(value1); setFrequency(value2) }}
+                        editKRA={false}
                     />
                 }
                 {
@@ -270,7 +271,7 @@ const CreateProject = () => {
                                     ?
                                     <div className='createProject-body'>
                                         <img src={createProjectSvg} alt="frame-icon" />
-                                        <p className="heading-text">{ transformWorkspace().label } details</p>
+                                        <p className="heading-text">{transformWorkspace().label} details</p>
 
                                         <div className="projectName-container" style={{ width: '450px' }}>
                                             <div className="projectName-box" style={{ width: '100%' }}>
@@ -392,7 +393,7 @@ const CreateProject = () => {
                                     :
                                     <div className='createProject-body' style={{ height: '90vh' }}>
                                         <img src={createProjectSvg} alt="frame-icon" />
-                                        <p className="heading-text">Create New { transformWorkspace().label }</p>
+                                        <p className="heading-text">Create New {transformWorkspace().label}</p>
                                         {
                                             !next
                                                 ?
@@ -401,7 +402,7 @@ const CreateProject = () => {
                                                         <label>Name of the {transformWorkspace().label}</label>
                                                         <input
                                                             className="text-input"
-                                                            placeholder={`Enter ${ transformWorkspace().label } name`}
+                                                            placeholder={`Enter ${transformWorkspace().label} name`}
                                                             value={name}
                                                             name="name"
                                                             onChange={(e) => setName(e.target.value)}

@@ -8,7 +8,7 @@ import { HiOutlinePlus } from "react-icons/hi";
 
 import { useAppSelector, useAppDispatch } from "state/hooks";
 
-const ProjectEdit = ({ toggleShowEdit, toggleDeletePrompt, toggleClosePrompt, toggleProjectMilestone, toggleProjectKRA }) => {
+const ProjectEdit = ({ toggleShowEdit, toggleDeletePrompt, toggleClosePrompt, toggleWorkspaceInfo, toggleProjectMilestone, toggleProjectKRA }) => {
 
     const { DAO, Project } = useAppSelector((state) => state.dashboard);
 
@@ -28,7 +28,7 @@ const ProjectEdit = ({ toggleShowEdit, toggleDeletePrompt, toggleClosePrompt, to
 
                         <div className='edit-card'>
                             <h1>Workspace infos</h1>
-                            <button>
+                            <button onClick={() => toggleWorkspaceInfo(true)}>
                                 <img src={editTokenvg} alt="editToken" />
                             </button>
                         </div>

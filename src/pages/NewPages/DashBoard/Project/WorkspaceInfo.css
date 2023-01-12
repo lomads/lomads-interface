@@ -1,0 +1,109 @@
+.WorkspaceEditOverlay {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(27, 43, 65, 0.25);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.WorkspaceEditOverlay .WorkspaceEditContainer {
+    height: 100vh;
+    width: 575px;
+    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
+    /* background-color: #FFF; */
+    border-radius: 20px 0px 0px 20px;
+    padding: 36px 27px;
+    /* overflow-y: scroll; */
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.WorkspaceEditOverlay .WorkspaceEditContainer .WorkspaceEdit-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.WorkspaceEditOverlay .WorkspaceEditContainer .WorkspaceEdit-header button {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+}
+
+
+.WorkspaceEditOverlay .WorkspaceEditContainer .WorkspaceEdit-body {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 27px;
+}
+
+.WorkspaceEditOverlay .WorkspaceEditContainer .WorkspaceEdit-body img {
+    margin-bottom: 18px;
+}
+
+.WorkspaceEditOverlay .WorkspaceEditContainer .WorkspaceEdit-body h1 {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 33px;
+    color: #C94B32;
+    margin-bottom: 35px;
+}
+
+.WorkspaceEditOverlay .WorkspaceEditContainer .WorkspaceEdit-body .createProject-form-container {
+    background-color: #FFF;
+    border-radius: 5px;
+    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 30px 22px;
+}
+
+.WorkspaceEditOverlay .WorkspaceEditContainer .WorkspaceEdit-body .createProject-form-container .input-div {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.WorkspaceEditOverlay .WorkspaceEditContainer .WorkspaceEdit-body .createProject-form-container label {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
+    color: #76808D;
+    margin-bottom: 0.5rem;
+}
+
+.WorkspaceEditOverlay .WorkspaceEditContainer .WorkspaceEdit-body .createProject-form-container .text-input {
+    width: 350px;
+    /* width: 100%; */
+    height: 50px;
+    border-radius: 10px;
+    background: #F5F5F5;
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    padding: 0 1rem;
+    outline: none;
+    margin-bottom: 1rem;
+}
+
+.WorkspaceEditOverlay .WorkspaceEditContainer .WorkspaceEdit-body .createProject-form-container .text-area {
+    width: 350px;
+    border-radius: 10px;
+    background: #F5F5F5;
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    padding: 1rem;
+    outline: none;
+    resize: none;
+}

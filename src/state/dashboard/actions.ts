@@ -426,6 +426,18 @@ export const updateKRA = createAsyncThunk(
 	}
 );
 
+export const editProjectKRA = createAsyncThunk(
+	'dao/editProjectKRA',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`project/${params.projectId}/edit-kra?daoUrl=${params.daoUrl}`, params.payload)
+			.then(res => res.data)
+			.catch(e => {
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
+	}
+);
+
 export const updateMilestone = createAsyncThunk(
 	'dao/updateMilestone',
 	async (params: any, thunkApi) => {

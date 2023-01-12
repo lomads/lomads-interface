@@ -26,7 +26,7 @@ import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe } from "react
 import AddMember from "./DashBoard/MemberCard/AddMember";
 
 import { getProject, updateProjectLink, getDao, updateProjectMember, deleteProjectMember, archiveProject, deleteProject, updateProject } from "state/dashboard/actions";
-import { resetUpdateProjectMemberLoader, resetDeleteProjectMemberLoader, resetArchiveProjectLoader, resetDeleteProjectLoader, resetUpdateProjectLoader } from 'state/dashboard/reducer';
+import { resetUpdateProjectMemberLoader, resetDeleteProjectMemberLoader, resetArchiveProjectLoader, resetDeleteProjectLoader } from 'state/dashboard/reducer';
 import AddLink from "./DashBoard/Project/AddLink";
 import Footer from "components/Footer";
 
@@ -59,6 +59,7 @@ import settingIcon from '../../assets/svg/settings.svg';
 import ProjectEdit from "./DashBoard/Project/ProjectEdit";
 import ProjectMilestone from "./DashBoard/Project/ProjectMilestone";
 import ProjectKRA from "./DashBoard/Project/ProjectKRA";
+import WorkspaceInfo from "./DashBoard/Project/WorkspaceInfo";
 
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
@@ -72,18 +73,12 @@ const ProjectDetails = () => {
     const [showList, setShowList] = useState(false);
     const [showAddLink, setShowAddLink] = useState(false);
     const [update, setUpdate] = useState(0);
-    const { DAO, Project, ProjectLoading, updateProjectMemberLoading, deleteProjectMemberLoading, archiveProjectLoading, deleteProjectLoading, updateProjectLoading } = useAppSelector((state) => state.dashboard);
+    const { DAO, Project, ProjectLoading, updateProjectMemberLoading, deleteProjectMemberLoading, archiveProjectLoading, deleteProjectLoading } = useAppSelector((state) => state.dashboard);
     const { transformWorkspace, transformRole } = useTerminology(_get(DAO, 'terminologies'))
     console.log("Project : ", Project)
     const daoName = _get(DAO, 'name', '').split(" ");
     const { myRole, can } = useRole(DAO, account);
     const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
-    console.log(contractName)
-    console.log("myRole", myRole)
-    const editorRef = useRef(null);
-
-    const [name, setName] = useState("");
-    const [description, setDescription] = useState("");
 
     const [lockedLinks, setLockedLinks] = useState([]);
     const [openLinks, setOpenLinks] = useState([]);
@@ -92,7 +87,6 @@ const ProjectDetails = () => {
     const [newAddress, setNewAddress] = useState([]);
 
     const [editMember, setEditMember] = useState(false);
-    const [editMode, setEditMode] = useState(false);
 
     const [deleteMembers, setDeleteMembers] = useState([]);
     const [deletePrompt, setDeletePrompt] = useState(false);
@@ -113,6 +107,7 @@ const ProjectDetails = () => {
     const [openResource, setOpenResource] = useState(false);
     const [openMilestone, setOpenMilestone] = useState(false);
     const [openKRA, setOpenKRA] = useState(false);
+    const [openWorkspaceInfo, setOpenWorkspaceInfo] = useState(false);
 
     useEffect(() => {
         if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
@@ -192,16 +187,6 @@ const ProjectDetails = () => {
         }
     }, [deleteProjectLoading]);
 
-    // runs after updating project name & description
-    useEffect(() => {
-        if (updateProjectLoading === false) {
-            dispatch(resetUpdateProjectLoader());
-            setName('');
-            setDescription('');
-            setEditMode(false);
-        }
-    }, [updateProjectLoading]);
-
     useEffect(() => {
         console.log("new address : ", newAddress);
         if (newAddress.length > 0) {
@@ -259,7 +244,7 @@ const ProjectDetails = () => {
                 return <BsTwitter color='#B12F15' size={20} />
             }
             else {
-                return <span><BsGlobe size={20} /></span>
+                return <span><BsGlobe color='#B12F15' size={20} /></span>
             }
         }
         catch (e) {
@@ -442,16 +427,6 @@ const ProjectDetails = () => {
         dispatch(deleteProject({ projectId, daoUrl: daoURL }));
     }
 
-    const handleEditMode = (e) => {
-        e.stopPropagation();
-        setName(Project.name);
-        setDescription(Project.description);
-        setEditMode(true);
-    }
-    const handleSaveChanges = (e) => {
-        dispatch(updateProject({ projectId, daoUrl: daoURL, payload: { name, description } }))
-    }
-
     const toggleShowCreateTask = () => {
         setShowCreateTask(!showCreateTask);
     };
@@ -485,7 +460,7 @@ const ProjectDetails = () => {
                     :
                     null
             }
-            <div className='projectDetails-container' onClick={() => setEditMode(false)}>
+            <div className='projectDetails-container'>
                 <div className="info">
                     {
                         showList
@@ -542,8 +517,19 @@ const ProjectDetails = () => {
                             toggleShowEdit={toggleShowEdit}
                             toggleDeletePrompt={(value) => setDeletePrompt(value)}
                             toggleClosePrompt={(value) => setClosePrompt(value)}
+                            toggleWorkspaceInfo={(value) => setOpenWorkspaceInfo(value)}
                             toggleProjectMilestone={(value) => setOpenMilestone(value)}
                             toggleProjectKRA={(value) => setOpenKRA(value)}
+                        />
+                    }
+
+                    {/* open workspace info modal */}
+                    {
+                        openWorkspaceInfo &&
+                        <WorkspaceInfo
+                            toggleWorkspaceInfo={() => setOpenWorkspaceInfo(false)}
+                            projectId={projectId}
+                            daoURL={daoURL}
                         />
                     }
 
@@ -561,8 +547,9 @@ const ProjectDetails = () => {
                         openKRA &&
                         <ProjectKRA
                             list={_get(Project, 'kra.results', [])}
-                            freq={_get(Project, 'kra.frquency', '')}
+                            freq={_get(Project, 'kra.frequency', '')}
                             toggleShowKRA={() => setOpenKRA(false)}
+                            editKRA={true}
                         />
                     }
 
@@ -691,21 +678,7 @@ const ProjectDetails = () => {
                             </div>
                             <div className="right">
                                 <div>
-                                    {
-                                        editMode
-                                            ?
-                                            <SimpleInputField
-                                                className="inputField"
-                                                height={50}
-                                                width={180}
-                                                placeholder="Project name"
-                                                value={name}
-                                                onchange={(e) => { setName(e.target.value) }}
-                                                onClick={(e) => e.stopPropagation()}
-                                            />
-                                            :
-                                            <h1>{Project?.name}</h1>
-                                    }
+                                    <h1>{Project?.name}</h1>
                                 </div>
                                 <button className='settings' onClick={() => { setShowEdit(true) }}>
                                     <img src={settingIcon} alt="settings-icon" />
@@ -752,54 +725,7 @@ const ProjectDetails = () => {
                             >
                                 <div className="projectDetails-description">
                                     <h1>Description</h1>
-                                    {
-                                        editMode
-                                            ?
-                                            <>
-                                                <div style={{ width: '100%', marginBottom: '1rem' }}>
-                                                    <Editor
-                                                        apiKey='p0turvzgbtf8rr24txekw7sgjye6xunw2near38hwoohdg13'
-                                                        onInit={(evt, editor) => editorRef.current = editor}
-                                                        init={{
-                                                            height: 150,
-                                                            menubar: false,
-                                                            statusbar: false,
-                                                            toolbar: false,
-                                                            branding: false,
-                                                            body_class: "mceBlackBody",
-                                                            default_link_target: "_blank",
-                                                            extended_valid_elements: "a[href|target=_blank]",
-                                                            link_assume_external_targets: true,
-                                                            plugins: [
-                                                                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                                                                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                                                                'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
-                                                            ],
-                                                            // toolbar: 'undo redo | blocks | ' +
-                                                            //     'bold italic forecolor | alignleft aligncenter ' +
-                                                            //     'alignright alignjustify | bullist numlist outdent indent | ' +
-                                                            //     'removeformat | help',
-                                                            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-                                                        }}
-                                                        value={description}
-                                                        onClick={(e) => e.stopPropagation()}
-                                                        onEditorChange={(text) => { setDescription(text) }}
-                                                    />
-                                                </div>
-                                                <SimpleLoadButton
-                                                    title="SAVE CHANGES"
-                                                    height={40}
-                                                    width={180}
-                                                    fontsize={16}
-                                                    fontweight={400}
-                                                    onClick={handleSaveChanges}
-                                                    bgColor={"#C94B32"}
-                                                    condition={updateProjectLoading}
-                                                />
-                                            </>
-                                            :
-                                            <p dangerouslySetInnerHTML={{ __html: Project?.description }}></p>
-                                    }
+                                    <p dangerouslySetInnerHTML={{ __html: Project?.description }}></p>
                                 </div>
                                 {
                                     canMyrole('project.links.view') &&
