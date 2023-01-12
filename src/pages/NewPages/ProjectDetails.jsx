@@ -54,6 +54,7 @@ import AssignContributions from "./DashBoard/Project/AssignContributions";
 import KRAReview from "./DashBoard/Project/KRAReview";
 import useTerminology from 'hooks/useTerminology';
 import moment from "moment";
+import useEncryptDecrypt from "hooks/useEncryptDecrypt";
 
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
@@ -102,6 +103,8 @@ const ProjectDetails = () => {
     const [tab, setTab] = useState(null);
 
     const [selectedMilestone, setSelectedMilestone] = useState(null);
+
+    const { decryptMessage } = useEncryptDecrypt()
 
     useEffect(() => {
         if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
@@ -280,6 +283,26 @@ const ProjectDetails = () => {
        return axiosHttp.get(`discord/guild/${guildId}/member/${memberId}/role/${roleId}/add`)
     }
 
+    const myMetadata = useMemo(() => {
+        return _find(_get(DAO, 'sbt.metadata', []), m => {
+            return _find(m.attributes, a => a.value === account)
+        })
+    }, [DAO?.sbt, account])
+
+    const getPersonalDetails = useCallback(attr => {
+        if (DAO && DAO.sbt) {
+            if (myMetadata && myMetadata.attributes) {
+                for (let index = 0; index < myMetadata.attributes.length; index++) {
+                    const attribute = myMetadata.attributes[index];
+                    if (attr.toLowerCase() === attribute.trait_type.toLowerCase()) {
+                        return attribute?.value;
+                    }
+                }
+                return null
+            }
+        }
+    }, [DAO?.sbt, myMetadata])
+
     const unlock = useCallback(async (link, update = true) => {
         //if (unlockLoading) return;
         setUnlockLoading(link.id)
@@ -340,9 +363,15 @@ const ProjectDetails = () => {
                                     console.log("metadata", metadata)
                                     if (metadata && metadata.data) {
                                         console.log(metadata.data)
-                                        const notion_email = _get(_find(metadata.data.attributes, attr => attr.trait_type === "Email"), 'value', null)
-                                        console.log(notion_email)
-                                        //const notion_email = 'rish6ix@gmail.com'
+                                        let notion_email = null
+                                        if(getPersonalDetails("Personal Details")) {
+                                            const data = await decryptMessage(getPersonalDetails("Personal Details"))
+                                            if(data && data.email) {
+                                                notion_email =  data.email  
+                                            }
+                                        } else {
+                                            notion_email = _get(_find(myMetadata.attributes, attr => attr.trait_type === "Email"), 'value', null)
+                                        }
                                         if (notion_email) {
                                             const notionUser = await axiosHttp.get(`project/notion/notion-user?email=${notion_email}`).then(res => res.data)
                                             console.log(notionUser)

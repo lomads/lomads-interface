@@ -89,12 +89,20 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
     }, [channels, activeAddBotPopup])
 
     const finish = result => {
-        setServer(null);
         setChannels(null);
         setPoll(null);
         setAddLinkLoading(null);
         setHasClickedAuth(false)
-        onGuildCreateSuccess(result)
+        if(server) {
+            axiosHttp.post(`discord/guild/${server.id}/sync-roles`, { daoId: _get(DAO, '_id') })
+            .finally(() => {
+                onGuildCreateSuccess(result)
+                setServer(null);
+            })
+        } else {
+            onGuildCreateSuccess(result)
+            setServer(null);
+        }
     }
 
     const onGuildBotAdded = async server => {
