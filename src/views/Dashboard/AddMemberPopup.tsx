@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme: any) => ({
 	boxRoot: {
 		alignItems: 'center',
 		background: '#fff',
-		borderRadius: '5px !important',
+		borderRadius: '10px !important',
 		bottom: 0,
 		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), - 3px - 3px 8px rgba(201, 75, 50, 0.1)',
 		display: 'flex',
