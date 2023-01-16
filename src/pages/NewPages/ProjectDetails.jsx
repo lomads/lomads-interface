@@ -60,6 +60,7 @@ import ProjectEdit from "./DashBoard/Project/ProjectEdit";
 import ProjectMilestone from "./DashBoard/Project/ProjectMilestone";
 import ProjectKRA from "./DashBoard/Project/ProjectKRA";
 import WorkspaceInfo from "./DashBoard/Project/WorkspaceInfo";
+import ProjectMembers from "./DashBoard/Project/ProjectMembers";
 
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
@@ -159,15 +160,6 @@ const ProjectDetails = () => {
             setShowList(false);
         }
     }, [updateProjectMemberLoading]);
-
-    // runs after deleting selected members from the project
-    useEffect(() => {
-        if (deleteProjectMemberLoading === false) {
-            dispatch(resetDeleteProjectMemberLoader());
-            setDeleteMembers([]);
-            setEditMember(false);
-        }
-    }, [deleteProjectMemberLoading]);
 
     // runs after archiving a project
     useEffect(() => {
@@ -379,15 +371,6 @@ const ProjectDetails = () => {
         }
     }
 
-    const handleAddMemberDelete = (userId) => {
-        if (deleteMembers.includes(userId)) {
-            setDeleteMembers(deleteMembers.filter((m) => m !== userId));
-        }
-        else {
-            setDeleteMembers([...deleteMembers, userId]);
-        }
-    }
-
     const handleUsers = (item, index) => {
         if (_uniqBy(Project?.members, '_id').some(m => m.wallet === item.member.wallet) === false) {
             return (
@@ -413,10 +396,6 @@ const ProjectDetails = () => {
 
     const handleSubmit = () => {
         dispatch(updateProjectMember({ projectId, payload: { daoId: DAO._id, memberList: extraMembers } }));
-    }
-
-    const handleDeleteMembers = () => {
-        dispatch(deleteProjectMember({ projectId, payload: { daoId: _get(DAO, '_id', null), memberList: deleteMembers } }));
     }
 
     const handleCloseProject = () => {
@@ -518,6 +497,7 @@ const ProjectDetails = () => {
                             toggleDeletePrompt={(value) => setDeletePrompt(value)}
                             toggleClosePrompt={(value) => setClosePrompt(value)}
                             toggleWorkspaceInfo={(value) => setOpenWorkspaceInfo(value)}
+                            toggleProjectMembers={(value) => setEditMember(value)}
                             toggleProjectMilestone={(value) => setOpenMilestone(value)}
                             toggleProjectKRA={(value) => setOpenKRA(value)}
                         />
@@ -569,39 +549,7 @@ const ProjectDetails = () => {
                     {
                         editMember
                             ?
-                            <div className="editMemberOverlay">
-                                <div className="editMemberContainer">
-                                    <div className="editMember-header">
-                                        <p>{`Remove members from ${transformWorkspace().label}`}</p>
-                                        <button onClick={() => setEditMember(false)}>
-                                            <CgClose size={20} color="#C94B32" />
-                                        </button>
-                                    </div>
-                                    <div className="editMember-body">
-                                        {
-                                            _uniqBy(Project?.members, '_id').map((item, index) => (
-                                                <div onClick={() => handleAddMemberDelete(item._id)} className="editMember-row" key={index}>
-                                                    <div>
-                                                        <img src={memberIcon} alt="memberIcon" />
-                                                        <p>{item.name}</p>
-                                                    </div>
-                                                    <span>{item.wallet.slice(0, 6) + "..." + item.wallet.slice(-4)}</span>
-                                                    <input type='checkbox' onChange={() => handleAddMemberDelete(item._id)} checked={!(deleteMembers.some((m) => m === item._id) === false)} />
-                                                </div>
-                                            ))
-                                        }
-
-                                    </div>
-                                    <div className="editMember-footer">
-                                        <button onClick={() => setEditMember(false)}>
-                                            CANCEL
-                                        </button>
-                                        <button onClick={handleDeleteMembers}>
-                                            REMOVE FROM {transformWorkspace().label.toUpperCase()}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                            <ProjectMembers toggleEditMember={() => setEditMember(false)} />
                             :
                             null
                     }
@@ -964,10 +912,10 @@ const ProjectDetails = () => {
                                         <p>{_uniqBy(Project?.members, '_id').length} members</p>
                                     </div>
                                     <div>
-                                        {canMyrole('project.member.edit') &&
+                                        {/* {canMyrole('project.member.edit') &&
                                             <button onClick={() => setEditMember(true)}>
                                                 <img src={editToken} alt="hk-logo" />
-                                            </button>}
+                                            </button>} */}
                                         {canMyrole('project.member.add') &&
                                             <button onClick={toggleMemberList}>
                                                 <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
