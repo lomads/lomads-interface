@@ -1,0 +1,226 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+
+
+body {
+  font-family: 'Open Sans';
+}
+.container{
+
+  align-items: flex-start;
+  padding: 20px 22px 40px;
+  gap: 35px;
+  width: 800px;
+  height: 319px;
+  background: #FFFFFF;
+  border-radius: 5px;
+  margin: 0 auto;
+  border:1px solid #76808D;
+  
+}
+.container_Header{
+  width:100%;
+  float: left;
+}
+.container .date_result{
+  left: 2.75%;
+  right: 82.88%;
+  top: 6.27%;
+  bottom: 85.89%;
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 25px;
+  color: #76808D;
+  letter-spacing: -0.011em;
+  float:left;
+  width: 115px;
+    height: 25px;
+}
+.container .percent_result{
+  color: #54C466;
+  left: 85.25%;
+right: 7.3%;
+top: 6.27%;
+bottom: 85.89%;
+font-family: 'Open Sans';
+font-style: normal;
+font-weight: 700;
+font-size: 22px;
+line-height: 25px;
+/* identical to box height, or 114% */
+letter-spacing: -0.011em;
+float: right;
+}
+.container .percent_result .result{
+width:59.62px;
+height:25px;
+float: left;
+
+}
+.container .percent_result{
+  color: #54C466;
+  left: 85.25%;
+right: 7.3%;
+top: 6.27%;
+bottom: 85.89%;
+font-family: 'Open Sans';
+font-style: normal;
+font-weight: 700;
+font-size: 22px;
+line-height: 25px;
+/* identical to box height, or 114% */
+letter-spacing: 0.111em;
+float: right;
+}
+.rightarrow{
+
+  left: 96.11%;
+right: 3.14%;
+top: 9.4%;
+bottom: 87.46%;
+cursor: pointer;
+/* Grey */
+height: 19px;
+    width: 6px;
+    float: left;
+    margin-top: 5px;
+background-image: url("./assets/images/arrow_right.svg");
+ 
+
+  display: inline-block;
+  padding: 3px;
+
+  width: 6px;
+height: 10px;
+  background-position:center;
+  background-repeat: no-repeat;
+}
+.downarrow{
+  left: 96.11%;
+  right: 3.14%;
+  top: 9.4%;
+  bottom: 87.46%;
+  cursor: pointer;
+  /* Grey */
+  display: inline-block;
+  padding: 3px;
+  background-image: url("./assets/images/arrow_down.svg");
+ 
+
+  display: inline-block;
+  padding: 3px;
+
+  width: 6px;
+height: 10px;
+  background-position:center;
+  background-repeat: no-repeat;
+}
+.uparrow:hover{
+
+}
+.container_Body .subscriber_result{
+
+  left: 0%;
+ width:100%;
+  top: 0%;
+  bottom: 65.12%;
+  
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 18px;
+  /* or 112% */
+  
+  letter-spacing: 0.011em;
+  
+  /* Grey */
+  
+  color: #76808D;
+  width:239px;
+  height:15px;
+  float:left;
+ 
+}
+.container_Body .subscriber_percent{
+
+
+left: 59.33%;
+right: 0%;
+top: 58.14%;
+bottom: 0%;
+
+font-family: 'Open Sans';
+font-style: normal;
+font-weight: 700;
+font-size: 16px;
+line-height: 18px;
+/* identical to box height, or 112% */
+
+text-align: right;
+letter-spacing: -0.011em;
+
+color: #2AB87C;
+float: left;
+margin-top:10px;
+}
+.subscriber_result span{
+  float:left;
+}
+.slider{
+  width: 200px;
+  float: left;
+  height: 18px;
+  border: 1px solid red;
+}
+.percent_number{
+  width: 122px;
+  float: left;
+  height: 18px;
+  text-align:right;
+}
+.container_Body{
+  float:left;
+  width:400px;
+  margin-top:35px
+}

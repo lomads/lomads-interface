@@ -52,7 +52,7 @@ export default [
     },
     {
         path: '/addsafe',
-        component: AddExistingSafe
+        component: AddExistingSafe 
     },
     {
         path: '/newsafe',
