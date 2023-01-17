@@ -123,7 +123,7 @@ const Settings = () => {
 		setOpenRolesPermissions(!openRolesPermissions);
 	};
 	let toggleS = () => {
-		setOpenSafe(!openSafe);
+		setOpenSafe(prev => !prev);
 	};
 	let togglePassToken = () => {
 		setOpenPassToken(!openPassToken);
@@ -166,7 +166,7 @@ const Settings = () => {
 						</div>
 						<div className="settings-organisation"
 							onClick={() => {
-								toggleModal();
+								setShowModal(true)
 								setOpenOrganisationDetails(true);
 							}}
 						>
@@ -204,7 +204,12 @@ const Settings = () => {
 									</Link>
 								</div>
 							</div>
-							<div className="settings-organisation-child disabled">
+							<div  
+							onClick={() => {
+								toggleModal();
+								setOpenSafe(true)
+							}}
+							className="settings-organisation-child">
 								<div
 									style={{
 										padding: "20px",

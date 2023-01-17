@@ -9,6 +9,8 @@ import { GNOSIS_SAFE_ALLOWANCE_MODULE_CONTRACT, SupportedChainId } from 'constan
 import { SafeTransactionOptionalProps } from "@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/types";
 import { useAllowanceContract } from "hooks/useContract";
 import { Contract, utils } from "ethers"
+import { owners } from 'assets/owners';
+import { AddOwnerTxParams } from '@gnosis.pm/safe-core-sdk';
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
 

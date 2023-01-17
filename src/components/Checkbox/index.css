@@ -1,0 +1,46 @@
+.scale-div {
+    width: 15%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scale-div .form-input-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.scale-div .form-checkbox {
+    align-items: center;
+    background: #f0f0f0;
+    border-radius: 10px;
+    box-shadow: inset 1px 0 4px rgb(27 43 65 / 10%);
+    cursor: pointer;
+    display: flex;
+    height: 30px;
+    justify-content: center;
+    margin-right: 16px;
+    width: 30px;
+}
+
+
+.scale-div .form-checkbox .checked {
+    background: #C94B32;
+    border-radius: 8px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scale-div .form-checkbox .unchecked {
+    background: #FFFFFF;
+    border-radius: 2px;
+    width: 12px;
+    height: 12px;
+}
