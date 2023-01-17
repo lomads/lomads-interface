@@ -29,7 +29,6 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    background-color: yellow;
 }
 
 .editMemberOverlay .editMemberContainer .editMember-header button {
@@ -60,6 +59,7 @@
     font-size: 30px;
     line-height: 33px;
     color: #C94B32;
+    margin-bottom: 8px;
 }
 
 .editMemberOverlay .editMemberContainer .editMember-body span {
@@ -71,6 +71,95 @@
     text-align: center;
     color: #76808D;
     margin-bottom: 35px;
+}
+
+.editMemberOverlay .editMemberContainer .editMember-body .member-row {
+    width: 85%;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 25px;
+}
+
+.editMemberOverlay .editMemberContainer .editMember-body .member-row .member-name {
+    display: flex;
+    width: 35%;
+    align-items: center;
+}
+
+.editMemberOverlay .editMemberContainer .editMember-body .member-row .member-name img {
+    margin: 0;
+}
+
+
+.editMemberOverlay .editMemberContainer .editMember-body .member-row .member-name p {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    /* or 107% */
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+    margin-left: 10px;
+}
+
+.editMemberOverlay .editMemberContainer .editMember-body .member-row .member-address {
+    width: 35%;
+    display: flex;
+    align-items: center;
+    /* background-color: red; */
+}
+
+.editMemberOverlay .editMemberContainer .editMember-body .member-row .member-address p {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    /* identical to box height, or 107% */
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+}
+
+.editMemberOverlay .editMemberContainer .editMember-body .member-row .member-checkbox {
+    width: 15%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.editMemberOverlay .editMemberContainer .editMember-body .member-row .member-checkbox .checkbox {
+    width: 30px;
+    height: 30px;
+    background: #F0F0F0;
+    /* SMALL-inputs */
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.editMemberOverlay .editMemberContainer .editMember-body .member-row .member-checkbox .checkbox .inactive-box {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    background-color: #FFF;
+}
+
+.editMemberOverlay .editMemberContainer .editMember-body .member-row .member-checkbox .checkbox .active-box {
+    width: 24px;
+    height: 24px;
+    background: #C94B32;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .editMemberOverlay .editMemberContainer .editMember-footer {

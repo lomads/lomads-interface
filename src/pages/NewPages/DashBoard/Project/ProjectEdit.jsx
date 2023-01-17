@@ -8,7 +8,7 @@ import { HiOutlinePlus } from "react-icons/hi";
 
 import { useAppSelector, useAppDispatch } from "state/hooks";
 
-const ProjectEdit = ({ toggleShowEdit, toggleDeletePrompt, toggleClosePrompt, toggleWorkspaceInfo, toggleProjectMembers, toggleProjectMilestone, toggleProjectKRA }) => {
+const ProjectEdit = ({ toggleShowEdit, toggleDeletePrompt, toggleClosePrompt, toggleWorkspaceInfo, toggleProjectMembers, toggleProjectMilestone, toggleProjectKRA, toggleProjectResources }) => {
 
     const { DAO, Project } = useAppSelector((state) => state.dashboard);
 
@@ -43,9 +43,18 @@ const ProjectEdit = ({ toggleShowEdit, toggleDeletePrompt, toggleClosePrompt, to
                                 <h1>Project resources</h1>
                                 <span>Add links for your team to access</span>
                             </div>
-                            <button>
-                                <img src={editTokenvg} alt="editToken" />
-                            </button>
+                            {
+                                _get(Project, 'links', []).length === 0
+                                    ?
+                                    <button className='add-btn' onClick={() => toggleProjectResources(true)}>
+                                        <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
+                                        ADD
+                                    </button>
+                                    :
+                                    <button onClick={() => toggleProjectResources(true)}>
+                                        <img src={editTokenvg} alt="editToken" />
+                                    </button>
+                            }
                         </div>
                         <div className='edit-card'>
                             <div style={{ display: 'flex', flexDirection: 'column' }}>

@@ -182,6 +182,18 @@ export const deleteProjectMember = createAsyncThunk(
 	}
 );
 
+export const editProjectMembers = createAsyncThunk(
+	'dao/editProjectMembers',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`project/${params.projectId}/edit-members`, params.payload)
+			.then(res => res.data)
+			.catch(e => {
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
+	}
+);
+
 export const archiveProject = createAsyncThunk(
 	'dao/archiveProject',
 	async (params: any, thunkApi) => {
@@ -230,6 +242,17 @@ export const updateProjectLink = createAsyncThunk(
 	}
 );
 
+export const editProjectLinks = createAsyncThunk(
+	'dao/editProjectLinks',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`project/${params.projectId}/edit-links?daoUrl=${params.daoUrl}`, params.payload)
+			.then(res => res.data)
+			.catch(e => {
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
+	}
+);
 // TASK ACTIONS
 
 export const getTask = createAsyncThunk(

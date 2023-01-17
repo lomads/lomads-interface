@@ -24,7 +24,7 @@ const ProjectKRA = ({ toggleShowKRA, getResults, list, freq, editKRA }) => {
     // runs after editing kra
     useEffect(() => {
         if (editProjectKraLoading === false) {
-            dispatch(resetEditProjectKraLoader);
+            dispatch(resetEditProjectKraLoader());
             toggleShowKRA();
         }
     }, [editProjectKraLoading]);

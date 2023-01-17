@@ -231,6 +231,7 @@ const CreateProject = () => {
                         list={resourceList}
                         toggleShowResource={() => setOpenResource(false)}
                         getResources={(value) => setResourceList(value)}
+                        editResources={false}
                     />
                 }
                 {/* open milestone modal */}
@@ -242,6 +243,7 @@ const CreateProject = () => {
                         getCompensation={(value) => setCompensation(value)}
                         toggleShowMilestone={() => setOpenMilestone(false)}
                         getMilestones={(value) => setMilestones(value)}
+                        editMilestones={false}
                     />
                 }
                 {/* open key result modal*/}

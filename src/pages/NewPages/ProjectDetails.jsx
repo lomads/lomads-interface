@@ -21,6 +21,7 @@ import { useAppSelector, useAppDispatch } from "state/hooks";
 import { SiNotion } from "react-icons/si";
 import { HiOutlinePlus } from "react-icons/hi";
 import { FiCheck } from "react-icons/fi";
+import { BiLock } from "react-icons/bi";
 import { CgClose } from 'react-icons/cg'
 import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe } from "react-icons/bs";
 import AddMember from "./DashBoard/MemberCard/AddMember";
@@ -38,7 +39,7 @@ import { useSBTStats } from "hooks/SBT/sbt";
 import axiosHttp from '../../api';
 import { updateCurrentUser } from "state/dashboard/actions";
 
-import { IoIosArrowBack } from 'react-icons/io'
+import { IoIosArrowBack } from 'react-icons/io';
 import SimpleInputField from "UIpack/SimpleInputField";
 import Tasks from "./DashBoard/Tasks";
 import CreateTask from "./DashBoard/Task/CreateTask";
@@ -61,6 +62,7 @@ import ProjectMilestone from "./DashBoard/Project/ProjectMilestone";
 import ProjectKRA from "./DashBoard/Project/ProjectKRA";
 import WorkspaceInfo from "./DashBoard/Project/WorkspaceInfo";
 import ProjectMembers from "./DashBoard/Project/ProjectMembers";
+import ProjectResource from "./DashBoard/Project/ProjectResource";
 
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
@@ -217,26 +219,26 @@ const ProjectDetails = () => {
             .then(res => res.data)
     }
 
-    const handleParseUrl = (url) => {
+    const handleParseUrl = (url, accessControl) => {
         try {
             const link = new URL(url);
             if (link.hostname.indexOf('notion.') > -1) {
-                return <SiNotion color='#B12F15' size={20} />
+                return <SiNotion color={accessControl ? '#FFF' : '#B12F15'} size={20} />
             }
             else if (link.hostname.indexOf('discord.') > -1) {
-                return <BsDiscord color='#B12F15' size={20} />
+                return <BsDiscord color={accessControl ? '#FFF' : '#B12F15'} size={20} />
             }
             else if (link.hostname.indexOf('github.') > -1) {
-                return <BsGithub color='#B12F15' size={20} />
+                return <BsGithub color={accessControl ? '#FFF' : '#B12F15'} size={20} />
             }
             else if (link.hostname.indexOf('google.') > -1) {
-                return <BsGoogle color='#B12F15' size={20} />
+                return <BsGoogle color={accessControl ? '#FFF' : '#B12F15'} size={20} />
             }
             else if (link.hostname.indexOf('twitter.') > -1) {
-                return <BsTwitter color='#B12F15' size={20} />
+                return <BsTwitter color={accessControl ? '#FFF' : '#B12F15'} size={20} />
             }
             else {
-                return <span><BsGlobe color='#B12F15' size={20} /></span>
+                return <span><BsGlobe color={accessControl ? '#FFF' : '#B12F15'} size={20} /></span>
             }
         }
         catch (e) {
@@ -500,6 +502,7 @@ const ProjectDetails = () => {
                             toggleProjectMembers={(value) => setEditMember(value)}
                             toggleProjectMilestone={(value) => setOpenMilestone(value)}
                             toggleProjectKRA={(value) => setOpenKRA(value)}
+                            toggleProjectResources={(value) => setOpenResource(value)}
                         />
                     }
 
@@ -519,6 +522,7 @@ const ProjectDetails = () => {
                         <ProjectMilestone
                             list={_get(Project, 'milestones', [])}
                             toggleShowMilestone={() => setOpenMilestone(false)}
+                            editMilestones={true}
                         />
                     }
 
@@ -530,6 +534,16 @@ const ProjectDetails = () => {
                             freq={_get(Project, 'kra.frequency', '')}
                             toggleShowKRA={() => setOpenKRA(false)}
                             editKRA={true}
+                        />
+                    }
+
+                    {/* open resources side modal */}
+                    {
+                        openResource &&
+                        <ProjectResource
+                            list={_get(Project, 'links', [])}
+                            toggleShowResource={() => setOpenResource(false)}
+                            editResources={true}
                         />
                     }
 
@@ -628,9 +642,12 @@ const ProjectDetails = () => {
                                 <div>
                                     <h1>{Project?.name}</h1>
                                 </div>
-                                <button className='settings' onClick={() => { setShowEdit(true) }}>
-                                    <img src={settingIcon} alt="settings-icon" />
-                                </button>
+                                {
+                                    can(myRole, 'settings') &&
+                                    <button className='settings' onClick={() => { setShowEdit(true) }}>
+                                        <img src={settingIcon} alt="settings-icon" />
+                                    </button>
+                                }
                                 {/* {
                                     <div>
                                         {canMyrole('project.delete') && <button onClick={() => setDeletePrompt(true)}>
@@ -666,97 +683,64 @@ const ProjectDetails = () => {
                             </button>
                         </div> */}
 
-                        <div className="projectDetails-imp">
-                            <div
-                                className="left"
-                                style={_get(Project, 'milestones', []).length > 0 || _get(Project, 'kra.results', []).length > 0 ? { width: '49%' } : { width: '100%' }}
-                            >
-                                <div className="projectDetails-description">
-                                    <h1>Description</h1>
-                                    <p dangerouslySetInnerHTML={{ __html: Project?.description }}></p>
-                                </div>
-                                {
-                                    canMyrole('project.links.view') &&
-                                    <div className="links-section">
-                                        <div className="links-header">
-                                            <div>
-                                                <h1>Links</h1>
-                                            </div>
-                                            {
-                                                canMyrole('project.link.add') &&
-                                                <>
-                                                    <div>
-                                                        {/* <button onClick={toggleShowLink}>
-                                                            <img src={editToken} alt="hk-logo" />
-                                                        </button> */}
-                                                        <button onClick={toggleShowLink}>
-                                                            <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
-                                                            LINK
-                                                        </button>
-                                                    </div>
-                                                </>
-                                            }
-                                        </div>
-                                        {(lockedLinks.length > 0 || openLinks.length > 0) && <div className="links-body">
-                                            {
-                                                lockedLinks.length > 0 &&
-                                                <div className="link-unlocked-section">
-                                                    <div className="locked">
-                                                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                                                            <img src={lock} alt="lock-icon" />
-                                                            <p style={{ marginLeft: "6px", fontStyle: "normal", fontSize: "16px", color: "#FFFFFF" }}>Links to unlock:</p>
-                                                        </div>
-                                                        <div className="container">
+                        <div className="projectDetails-description">
+                            <h1>Description</h1>
+                            <div>
+                                <p dangerouslySetInnerHTML={{ __html: Project?.description }}></p>
+                            </div>
+                        </div>
+
+                        {/* new Links */}
+                        {
+                            _get(Project, 'links', []).length > 0 &&
+                            <div className="projectDetails-links">
+                                <div className="links-left">
+                                    {
+                                        _get(Project, 'links', []).map((item, index) => {
+                                            return (
+                                                <div
+                                                    className={item.accessControl ? "link-div locked" : "link-div"}
+                                                    onClick={() => {
+                                                        if (!item.accessControl) {
+                                                            window.open(item.link, '_blank')
+                                                        }
+                                                        else {
+                                                            unlock(item)
+                                                        }
+                                                    }}
+                                                >
+                                                    {handleParseUrl(item.link, item.accessControl)}
+                                                    <p>{item.title.length > 25 ? item.title.slice(0, 25) + "..." : item.title}</p>
+                                                    {
+                                                        item.accessControl &&
+                                                        <div className="lock-circle">
                                                             {
-                                                                lockedLinks.map((item, index) => {
-                                                                    return (
-                                                                        <div onClick={() => unlock(item)} className="link-button" style={{ position: 'relative' }} key={index}>
-                                                                            {handleParseUrl(item.link)}
-                                                                            <p>{item.title.length > 25 ? item.title.slice(0, 25) + "..." : item.title}</p>
-                                                                            {unlockLoading === item.id ?
-                                                                                <div style={{ position: 'absolute', top: 10, right: 20 }}>
-                                                                                    <LeapFrog size={20} color="#B12F15" />
-                                                                                </div> : null
-                                                                            }
-                                                                        </div>
-                                                                    )
-                                                                })
+                                                                unlockLoading === item.id
+                                                                    ?
+                                                                    <LeapFrog size={20} color="#FFF" />
+                                                                    :
+                                                                    <BiLock color="#FFF" />
                                                             }
                                                         </div>
-                                                    </div>
+                                                    }
                                                 </div>
-                                            }
-                                            <div className="link-unlocked-section">
-                                                {
-                                                    openLinks.map((item, index) => {
-                                                        return (
-                                                            <div onClick={() => {
-                                                                if (!item.accessControl)
-                                                                    window.open(item.link, '_blank')
-                                                                else
-                                                                    unlock(item, false)
-                                                            }} className="link-button" style={{ position: 'relative' }} key={index}>
-                                                                {handleParseUrl(item.link)}
-                                                                <p>{item.title.length > 25 ? item.title.slice(0, 25) + "..." : item.title}</p>
-                                                                {unlockLoading === item.id ?
-                                                                    <div style={{ position: 'absolute', top: 10, right: 20 }}>
-                                                                        <LeapFrog size={20} color="#B12F15" />
-                                                                    </div> : null
-                                                                }
-                                                            </div>
-                                                        )
-                                                    })
-                                                }
-                                            </div>
-                                        </div>}
-                                    </div>
+                                            )
+                                        })
+                                    }
+                                </div>
+                                {
+                                    canMyrole('project.link.add') &&
+                                    <div className="links-right"><button onClick={toggleShowLink}><HiOutlinePlus size={20} color="#C94B32" /></button></div>
                                 }
                             </div>
+                        }
 
-                            {
-                                _get(Project, 'milestones', []).length > 0 || _get(Project, 'kra.results', []).length > 0
-                                    ?
-                                    <div className="right">
+                        {/* project milestones & kra */}
+                        {
+                            _get(Project, 'milestones', []).length > 0 || _get(Project, 'kra.results', []).length > 0
+                                ?
+                                <>
+                                    <div className="milestone-div">
                                         <div className="milestone-kra">
                                             {
                                                 _get(Project, 'milestones', []).length > 0 && _get(Project, 'kra.results', []).length > 0
@@ -785,9 +769,7 @@ const ProjectDetails = () => {
                                                         }
                                                     </>
                                             }
-
                                         </div>
-
                                         <div className="milestone-kra-status">
                                             {
                                                 tab === 1
@@ -827,20 +809,14 @@ const ProjectDetails = () => {
                                                                     <span className="percent-text">0%</span>
                                                             }
                                                         </div>
-                                                        {/* <button>
-                                                            <img src={editToken} alt="hk-logo" />
-                                                        </button> */}
                                                     </>
                                                     :
                                                     <div className="status" style={{ justifyContent: 'space-between' }}>
                                                         <span>Review frequency : {_get(Project, 'kra.frequency', [])}</span>
                                                         <div style={{ width: '50%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                                            {/* <button className='archive-btn'>
+                                                            <button className='archive-btn'>
                                                                 <img src={archiveIcon} alt="archive-icon" />
-                                                            </button> */}
-                                                            {/* <button className='archive-btn'>
-                                                                <img src={editToken} alt="hk-logo" />
-                                                            </button> */}
+                                                            </button>
                                                             {canMyrole('project.review') && <button className="review-btn" onClick={() => setShowKRAReview(true)}>
                                                                 REVIEW
                                                             </button>}
@@ -848,51 +824,128 @@ const ProjectDetails = () => {
                                                     </div>
                                             }
                                         </div>
+                                    </div>
 
-                                        <div className="milestone-kra-body">
+                                    <div className="milestone-kra-body">
+                                        {
+                                            tab === 1
+                                                ?
+                                                <>
+                                                    {
+                                                        _get(Project, 'milestones', []).map((item, index) => {
+                                                            return (
+                                                                <div className={item.complete ? "milestone-card done" : "milestone-card"}>
+                                                                    <div className="mile-div">
+                                                                        <span>{index + 1}</span>
+                                                                        <h1>{item.name}</h1>
+                                                                    </div>
+                                                                    <div className="mile-date">
+                                                                        <h1>{item.deadline}</h1>
+                                                                    </div>
+                                                                    {canMyrole('project.milestone.update') &&
+                                                                        <div className="check-circle" onClick={() => selectMilestone(item, index)}>
+                                                                            <FiCheck size={20} />
+                                                                        </div>
+                                                                    }
+                                                                </div>
+                                                            )
+                                                        })
+                                                    }
+                                                </>
+                                                :
+                                                <>
+                                                    {
+                                                        _get(Project, 'kra.results', []).map((item, index) => {
+                                                            return (
+                                                                <div className="milestone-card">
+                                                                    <div className="kra-div"><h1>{item.name}</h1></div>
+                                                                </div>
+                                                            )
+                                                        })
+                                                    }
+                                                </>
+                                        }
+                                    </div>
+                                </>
+                                :
+                                null
+                        }
+
+                        {/* old code for links */}
+                        <div className="projectDetails-imp">
+                            {/* {
+                                canMyrole('project.links.view') &&
+                                <div className="links-section">
+                                    <div className="links-header">
+                                        <div>
+                                            <h1>Links</h1>
+                                        </div>
+                                        {
+                                            canMyrole('project.link.add') &&
+                                            <>
+                                                <div>
+                                                    <button onClick={toggleShowLink}>
+                                                        <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
+                                                        LINK
+                                                    </button>
+                                                </div>
+                                            </>
+                                        }
+                                    </div>
+                                    {(lockedLinks.length > 0 || openLinks.length > 0) && <div className="links-body">
+                                        {
+                                            lockedLinks.length > 0 &&
+                                            <div className="link-unlocked-section">
+                                                <div className="locked">
+                                                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                                                        <img src={lock} alt="lock-icon" />
+                                                        <p style={{ marginLeft: "6px", fontStyle: "normal", fontSize: "16px", color: "#FFFFFF" }}>Links to unlock:</p>
+                                                    </div>
+                                                    <div className="container">
+                                                        {
+                                                            lockedLinks.map((item, index) => {
+                                                                return (
+                                                                    <div onClick={() => unlock(item)} className="link-button" style={{ position: 'relative' }} key={index}>
+                                                                        {handleParseUrl(item.link)}
+                                                                        <p>{item.title.length > 25 ? item.title.slice(0, 25) + "..." : item.title}</p>
+                                                                        {unlockLoading === item.id ?
+                                                                            <div style={{ position: 'absolute', top: 10, right: 20 }}>
+                                                                                <LeapFrog size={20} color="#B12F15" />
+                                                                            </div> : null
+                                                                        }
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                        <div className="link-unlocked-section">
                                             {
-                                                tab === 1
-                                                    ?
-                                                    <>
-                                                        {
-                                                            _get(Project, 'milestones', []).map((item, index) => {
-                                                                return (
-                                                                    <div className={item.complete ? "milestone-card done" : "milestone-card"}>
-                                                                        <div>
-                                                                            <span>{index + 1}</span>
-                                                                            <h1>{item.name}</h1>
-                                                                        </div>
-                                                                        <div>
-                                                                            <h1>{item.deadline}</h1>
-                                                                            {canMyrole('project.milestone.update') &&
-                                                                                <div className="check-circle" onClick={() => selectMilestone(item, index)}>
-                                                                                    <FiCheck size={20} />
-                                                                                </div>
-                                                                            }
-                                                                        </div>
-                                                                    </div>
-                                                                )
-                                                            })
-                                                        }
-                                                    </>
-                                                    :
-                                                    <>
-                                                        {
-                                                            _get(Project, 'kra.results', []).map((item, index) => {
-                                                                return (
-                                                                    <div className="milestone-card">
-                                                                        <div><h1>{item.name}</h1></div>
-                                                                    </div>
-                                                                )
-                                                            })
-                                                        }
-                                                    </>
+                                                openLinks.map((item, index) => {
+                                                    return (
+                                                        <div onClick={() => {
+                                                            if (!item.accessControl)
+                                                                window.open(item.link, '_blank')
+                                                            else
+                                                                unlock(item, false)
+                                                        }} className="link-button" style={{ position: 'relative' }} key={index}>
+                                                            {handleParseUrl(item.link)}
+                                                            <p>{item.title.length > 25 ? item.title.slice(0, 25) + "..." : item.title}</p>
+                                                            {unlockLoading === item.id ?
+                                                                <div style={{ position: 'absolute', top: 10, right: 20 }}>
+                                                                    <LeapFrog size={20} color="#B12F15" />
+                                                                </div> : null
+                                                            }
+                                                        </div>
+                                                    )
+                                                })
                                             }
                                         </div>
-                                    </div>
-                                    :
-                                    null
-                            }
+                                    </div>}
+                                </div>
+                            } */}
                         </div>
                     </div>
 
@@ -901,21 +954,18 @@ const ProjectDetails = () => {
                         <Tasks toggleShowCreateTask={toggleShowCreateTask} onlyProjects={true} />
                     </div>}
 
+                    {/* members section */}
                     <div className="projectDetails-body">
-                        <div className="projectDetails-left">
-                            <div className="projectDetails-members">
-                                <div className="members-header">
-                                    <h1>Members</h1>
+                        <div className="projectDetails-members">
+                            <div className="members-header">
+                                <h1>Members</h1>
+                                <div>
                                     <div className="divider"></div>
                                     <div className="member-count">
                                         <img src={membersGroup} alt="membersGroup" />
                                         <p>{_uniqBy(Project?.members, '_id').length} members</p>
                                     </div>
                                     <div>
-                                        {/* {canMyrole('project.member.edit') &&
-                                            <button onClick={() => setEditMember(true)}>
-                                                <img src={editToken} alt="hk-logo" />
-                                            </button>} */}
                                         {canMyrole('project.member.add') &&
                                             <button onClick={toggleMemberList}>
                                                 <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
@@ -923,36 +973,36 @@ const ProjectDetails = () => {
                                             </button>}
                                     </div>
                                 </div>
-                                <div className="members-list">
-                                    <div className="members-list-head">
-                                        <div>
-                                            <p>Name</p>
-                                        </div>
-                                        <div>
-                                            <p>joined</p>
-                                        </div>
+                            </div>
+                            <div className="members-list">
+                                <div className="members-list-head">
+                                    <div>
+                                        <p>Name</p>
                                     </div>
-                                    <div className="members-list-body">
-                                        {
-                                            _uniqBy(Project?.members, '_id').map((item, index) => (
-                                                <div className="members-row" key={index}>
-                                                    <div className="members-row-name">
-                                                        <div>
-                                                            <img src={memberIcon} alt="memberIcon" />
-                                                            <p>{item.name}</p>
-                                                        </div>
-                                                        <span>{item.wallet.slice(0, 6) + "..." + item.wallet.slice(-4)}</span>
+                                    <div>
+                                        <p>joined</p>
+                                    </div>
+                                </div>
+                                <div className="members-list-body">
+                                    {
+                                        _uniqBy(Project?.members, '_id').map((item, index) => (
+                                            <div className="members-row" key={index}>
+                                                <div className="members-row-name">
+                                                    <div>
+                                                        <img src={memberIcon} alt="memberIcon" />
+                                                        <p>{item.name}</p>
                                                     </div>
-                                                    <div className="members-row-date">
-                                                        <p>{moment.utc(item.joined).local().format('MM/DD/YYYY')} </p>
-                                                    </div>
-                                                    <div className="members-row-status">
-                                                        <span>{handleRenderRole(item)}</span>
-                                                    </div>
+                                                    <span>{item.wallet.slice(0, 6) + "..." + item.wallet.slice(-4)}</span>
                                                 </div>
-                                            ))
-                                        }
-                                    </div>
+                                                <div className="members-row-date">
+                                                    <p>{moment.utc(item.joined).local().format('MM/DD/YYYY')} </p>
+                                                </div>
+                                                <div className="members-row-status">
+                                                    <span>{handleRenderRole(item)}</span>
+                                                </div>
+                                            </div>
+                                        ))
+                                    }
                                 </div>
                             </div>
                         </div>

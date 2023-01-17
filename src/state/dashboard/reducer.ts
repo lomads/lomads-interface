@@ -14,9 +14,11 @@ import {
 	addProjectMember,
 	updateProjectMember,
 	deleteProjectMember,
+	editProjectMembers,
 	archiveProject,
 	deleteProject,
 	updateProjectLink,
+	editProjectLinks,
 	getProject,
 	addProjectLinks,
 	updateProject,
@@ -64,9 +66,11 @@ export interface DashboardState {
 	addProjectMemberLoading: boolean | null;
 	updateProjectMemberLoading: boolean | null;
 	deleteProjectMemberLoading: boolean | null;
+	editProjectMemberLoading: boolean | null;
 	archiveProjectLoading: boolean | null;
 	deleteProjectLoading: boolean | null;
 	addProjectLinksLoading: boolean | null;
+	editProjectLinksLoading: boolean | null;
 	updateProjectLoading: boolean | null;
 	createTaskLoading: boolean | null;
 	editTaskLoading: boolean | null;
@@ -108,9 +112,11 @@ const initialState: DashboardState = {
 	addProjectMemberLoading: null,
 	updateProjectMemberLoading: null,
 	deleteProjectMemberLoading: null,
+	editProjectMemberLoading: null,
 	archiveProjectLoading: null,
 	deleteProjectLoading: null,
 	addProjectLinksLoading: null,
+	editProjectLinksLoading: null,
 	updateProjectLoading: null,
 	createTaskLoading: null,
 	editTaskLoading: null,
@@ -179,6 +185,9 @@ const dashboardSlice = createSlice({
 		resetDeleteProjectMemberLoader(state) {
 			state.deleteProjectMemberLoading = null
 		},
+		resetEditProjectMemberLoader(state) {
+			state.editProjectMemberLoading = null
+		},
 		resetArchiveProjectLoader(state) {
 			state.archiveProjectLoading = null
 		},
@@ -187,6 +196,9 @@ const dashboardSlice = createSlice({
 		},
 		resetAddProjectLinksLoader(state) {
 			state.addProjectLinksLoading = null
+		},
+		resetEditProjectLinksLoader(state) {
+			state.editProjectLinksLoading = null
 		},
 		resetCreateTaskLoader(state) {
 			state.createTaskLoading = null
@@ -423,6 +435,14 @@ const dashboardSlice = createSlice({
 		[`${deleteProjectMember.pending}`]: (state) => {
 			state.deleteProjectMemberLoading = true;
 		},
+		// edit Project members
+		[`${editProjectMembers.fulfilled}`]: (state, action) => {
+			state.editProjectMemberLoading = false;
+			state.Project = action.payload;
+		},
+		[`${editProjectMembers.pending}`]: (state) => {
+			state.editProjectMemberLoading = true;
+		},
 		// archive Project
 		[`${archiveProject.fulfilled}`]: (state, action) => {
 			state.archiveProjectLoading = false;
@@ -450,6 +470,16 @@ const dashboardSlice = createSlice({
 		[`${addProjectLinks.pending}`]: (state) => {
 			state.addProjectLinksLoading = true;
 		},
+		// edit project links
+		[`${editProjectLinks.fulfilled}`]: (state, action) => {
+			state.editProjectLinksLoading = false;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
+		},
+		[`${editProjectLinks.pending}`]: (state) => {
+			state.editProjectLinksLoading = true;
+		},
+		// update project single link --- unlock link
 		[`${updateProjectLink.fulfilled}`]: (state, action) => {
 			state.Project = action.payload.project;
 			state.DAO = action.payload.dao;
@@ -644,9 +674,11 @@ export const {
 	resetUpdateProjectMemberLoader,
 	resetUpdateProjectLoader,
 	resetDeleteProjectMemberLoader,
+	resetEditProjectMemberLoader,
 	resetArchiveProjectLoader,
 	resetDeleteProjectLoader,
 	resetAddProjectLinksLoader,
+	resetEditProjectLinksLoader,
 	updateSafeTransaction,
 	resetCreateTaskLoader,
 	resetEditTaskLoader,
