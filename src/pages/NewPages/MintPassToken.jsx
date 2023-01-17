@@ -24,9 +24,7 @@ import { addDaoMember } from 'state/dashboard/actions'
 import axiosHttp from 'api'
 import SideBar from "../NewPages/DashBoard/SideBar";
 import useRole from 'hooks/useRole';
-
-import { encrypt } from '@metamask/eth-sig-util';
-const ascii85 = require('ascii85');
+import useEncryptDecrypt from "hooks/useEncryptDecrypt";
 
 const MintPassToken = () => {
     /// temporary solution until we don't have specific routes for DAO, contract address will be passed into the url 
@@ -45,33 +43,34 @@ const MintPassToken = () => {
     const [discordError, setDiscordError] = useState(false);
     const [emailError, setEmailError] = useState(false);
     const [telegramError, setTelegramError] = useState(false);
+    const [decrypted, setDecrypted] = useState(null);
     const { account, chainId, provider } = useWeb3React();
     const { user, DAO, DAOLoading } = useAppSelector((state) => state.dashboard);
     const { myRole } = useRole(DAO, account)
     const { needWhitelist, isWhitelisted, balanceOf, contractName, currentIndex } = useSBTStats(provider, account, update, contractAddr ? contractAddr : '', chainId);
     const sbtContract = useSBTContract(contractAddr ? contractAddr : null);
-    const [publicKey, setPublicKey] = useState(null);
-    const [encodedData, setEncodedData] = useState(null);
+    const { encryptMessage, decryptMessage } = useEncryptDecrypt()
+
 
     const showSideBar = (_choice) => {
         setShowNavBar(_choice);
     };
 
-    useEffect(() => {
-        if (account && chainId && user) {
-            handleGetPublicKey();
-        }
-    }, [account, chainId, user]);
+    // useEffect(() => {
+    //     if (account && chainId && user) {
+    //         handleGetPublicKey();
+    //     }
+    // }, [account, chainId, user]);
 
-    const handleGetPublicKey = async () => {
-        // Key is returned as base64
-        const keyB64 = await window.ethereum.request({
-            method: 'eth_getEncryptionPublicKey',
-            params: [account],
-        });
-        const publicKey = Buffer.from(keyB64, 'base64');
-        setPublicKey(publicKey);
-    }
+    // const handleGetPublicKey = async () => {
+    //     // Key is returned as base64
+    //     const keyB64 = await window.ethereum.request({
+    //         method: 'eth_getEncryptionPublicKey',
+    //         params: [account],
+    //     });
+    //     const publicKey = Buffer.from(keyB64, 'base64');
+    //     setPublicKey(publicKey);
+    // }
 
     useEffect(() => {
         if (account && chainId)
@@ -97,6 +96,22 @@ const MintPassToken = () => {
     }, [daoURL, DAO, DAOLoading])
 
     const findTraitValue = useCallback(attr => {
+        if (DAO && DAO.sbt) {
+            if (myMetadata && myMetadata.attributes) {
+                for (let index = 0; index < myMetadata.attributes.length; index++) {
+                    const attribute = myMetadata.attributes[index];
+                    if (attr === attribute.trait_type.toLowerCase()) {
+                        if(decrypted)
+                            return decrypted[attr]
+                        //return attribute?.value;
+                    }
+                }
+                return null
+            }
+        }
+    }, [myMetadata, decrypted])
+
+    const getPersonalDetails = useCallback(attr => {
         if (DAO && DAO.sbt) {
             if (myMetadata && myMetadata.attributes) {
                 for (let index = 0; index < myMetadata.attributes.length; index++) {
@@ -168,7 +183,17 @@ const MintPassToken = () => {
         return false
     }, [contractAddr, balanceOf, DAO])
 
-
+    useEffect(() => {
+        console.log("DAO", DAO)
+        if(isUpdate && DAO && myMetadata && account) {
+            const personalDetails = getPersonalDetails('Personal Details'.toLowerCase())
+            if(personalDetails) {
+                decryptMessage(personalDetails)
+                .then(res => setDecrypted(res))
+                .catch(e => console.log(e))
+            }
+        }
+    }, [isUpdate])
 
     const updateMetadata = async () => {
         const userName = document.querySelector("#user-name");
@@ -192,10 +217,11 @@ const MintPassToken = () => {
             setTelegramError(true);
             return;
         } else {
+            const msg = await encryptMessage(JSON.stringify({ email: _get(userMail, 'value', ''), discord: _get(userDiscord, 'value', ''), telegram: _get(userTG, 'value', '') }))
             let payload = {
                 attributes: [...myMetadata.attributes].map(attribute => {
                     if (attribute.trait_type === 'Personal Details') {
-                        return { ...attribute, value: encryptData(publicKey, JSON.stringify({ email: _get(userMail, 'value', ''), discord: _get(userDiscord, 'value', ''), telegram: _get(userTG, 'value', '') })) }
+                        return { ...attribute, value: msg }
                     }
                     else if (attribute.trait_type === 'Email') {
                         return { ...attribute, value: _get(userMail, 'value', '') && userMail.value !== '' ? true : null }
@@ -209,7 +235,13 @@ const MintPassToken = () => {
                 })
             }
             axiosHttp.patch(`metadata/${_get(DAO, 'sbt._id')}`, payload)
-                .then(res => {
+                .then(async res => {
+                    if(userDiscord.value) {
+                        await axiosHttp.patch(`dao/${_get(DAO, 'url', '')}/update-user-discord`, { 
+                            discordId: userDiscord.value || null,
+                            userId: _get(user, '_id', '')
+                        })
+                    }
                     dispatch(getDao(_get(DAO, 'url', '')))
                     setTimeout(() => navigate(`/${DAO.url}`), 1500);
                 })
@@ -256,6 +288,7 @@ const MintPassToken = () => {
                         return;
                     }
                     else {
+                        const msg = await encryptMessage(JSON.stringify({ email: _get(userMail, 'value', ''), discord: _get(userDiscord, 'value', ''), telegram: _get(userTG, 'value', '') }))
                         const metadataJSON = {
                             id: sbtId,
                             daoUrl: DAO.url,
@@ -269,7 +302,7 @@ const MintPassToken = () => {
                                 },
                                 {
                                     trait_type: "Personal Details",
-                                    value: encryptData(publicKey, JSON.stringify({ email: _get(userMail, 'value', ''), discord: _get(userDiscord, 'value', ''), telegram: _get(userTG, 'value', '') }))
+                                    value: msg
                                 },
                                 {
                                     trait_type: "Email",
@@ -289,6 +322,10 @@ const MintPassToken = () => {
                         console.log("metadataJSON : ", metadataJSON);
                         const req = await APInewSBTtoken(metadataJSON);
                         if (req) {
+                            await axiosHttp.patch(`dao/${_get(DAO, 'url', '')}/update-user-discord`, { 
+                                discordId: userDiscord.value || null,
+                                userId: _get(user, '_id', '')
+                             })
                             dispatch(updateCurrentUser({ name: userName.value }))
                             dispatch(addDaoMember({ url: DAO?.url, payload: { name: '', address: account, role: myRole ? myRole : 'role4' } }))
                             dispatch(getDao(DAO.url));
@@ -307,42 +344,6 @@ const MintPassToken = () => {
             toast.error("Please connect your account before !")
             return;
         }
-    }
-
-    const encryptData = (publicKey, data) => {
-        const enc = encrypt({
-            publicKey: publicKey.toString('base64'),
-            data: ascii85.encode(data).toString(),
-            version: 'x25519-xsalsa20-poly1305',
-        });
-
-        const buf = Buffer.concat([
-            Buffer.from(enc.ephemPublicKey, 'base64'),
-            Buffer.from(enc.nonce, 'base64'),
-            Buffer.from(enc.ciphertext, 'base64'),
-        ]);
-        // setEncodedData(buf);
-        return JSON.stringify(buf);
-    }
-
-    const decryptData = async (account, data) => {
-        const structuredData = {
-            version: 'x25519-xsalsa20-poly1305',
-            ephemPublicKey: data.slice(0, 32).toString('base64'),
-            nonce: data.slice(32, 56).toString('base64'),
-            ciphertext: data.slice(56).toString('base64'),
-        };
-        // Convert data to hex string required by MetaMask
-        const ct = `0x${Buffer.from(JSON.stringify(structuredData), 'utf8').toString('hex')}`;
-        // Send request to MetaMask to decrypt the ciphertext
-        // Once again application must have acces to the account
-        const decrypt = await window.ethereum.request({
-            method: 'eth_decrypt',
-            params: [ct, account],
-        });
-        // Decode the base85 to final bytes
-        console.log("decoded data : ", JSON.parse(new TextDecoder("utf-8").decode(ascii85.decode(decrypt))));
-        return JSON.parse(new TextDecoder("utf-8").decode(ascii85.decode(decrypt)));
     }
 
     return (
@@ -450,17 +451,6 @@ const MintPassToken = () => {
                                 bgColor={"#C94B32"}
                                 condition={isLoading}
                             />
-
-                            {/* <SimpleLoadButton
-                                title={'DECRYPT'}
-                                height={50}
-                                width={160}
-                                fontsize={20}
-                                fontweight={400}
-                                onClick={() => decryptData(account, encodedData)}
-                                bgColor={"#C94B32"}
-                                condition={isLoading}
-                            /> */}
                         </div>
                         :
                         <div className="mintPassToken-body" style={{ height: '90vh', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 0 }}>

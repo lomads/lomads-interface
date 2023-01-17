@@ -1,0 +1,273 @@
+.safe-modal-container {
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.safe-modal .owner-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: 50px;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+
+.safe-modal .owner-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 16px 0;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+
+.safe-modal .owner-item img {
+    width: 30px;
+    height: 30px;
+    margin-right: 16px;
+}
+
+.safe-modal .voting-container {
+}
+
+.safe-modal.voting-container .header {
+    font-family: 'Inter', sans-serif;
+    text-align: left;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+
+.safe-modal.voting-container .description {
+    font-family: 'Inter', sans-serif;
+    font-style: italic;
+    text-align: left;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+
+.safe-modal.voting-container .vote-select-container { 
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.safe-modal.voting-container .tokenDropdown {
+    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
+    border-radius: 10px;
+    width: 100px;
+    height: 50px;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+    padding: 0px 15px 0px 15px;
+    margin-right: 25px;
+}
+
+.safe-modal.voting-container .voting-total {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    color: rgba(27, 45, 65, 0.6);
+}
+
+.safe-modal_member-list-container {
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 32px;
+    height: 100%;
+    padding: 0 32px 100px 60px;
+    
+}
+
+.safe-modal_member-list-container .header {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    text-align: left;
+    font-size: 16px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+    margin-bottom: 16px;
+}
+
+.safe-modal_member-list-container .list-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin: 16px 0;
+}
+
+.safe-modal_member-list-container .list-item .name {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    margin-left: 8px;
+    line-height: 15px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+
+.safe-modal_member-list-container .list-item .wallet {
+    font-family: 'Inter', sans-serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 15px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+    
+}
+
+.safe-modal_member-list-container .button-section {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 420px;
+    margin: 0 auto;
+    right: 0;
+    height: 100px;
+    background: linear-gradient(180deg, rgba(2,0,36,0) 0%, rgba(255,255,255,1) 30%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.safe-modal_member-list-container .button-section .btn-save {
+    color: #FFFFFF;
+    font-weight: 400;
+    background: #C94B32;
+    border-radius: 5px;
+    margin: 0 0 0 6px;
+}
+
+.safe-modal_member-list-container .button-section .btn-cancel {
+    background-color: #FFFFFF;
+    font-weight: 400;
+    color: #C94B32;
+    width: 200px !important;
+    border: 1px solid #C94B32;
+    border-radius: 5px;
+    margin: 0 6px 0 0;
+}
+
+.safe-modal_search_container {
+    display: flex;
+    flex-direction: row;
+    margin: 8px 0 16px 0;
+}
+
+.safe-modal_search_container .search-input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    height: 40px;
+    background: #F5F5F5;
+    box-shadow: inset 1px 1px 4px rgba(27, 43, 65, 0.1);
+    border-width: 0;
+}
+
+.safe-modal_search_container .search-button {
+    width: 50px;
+    height: 40px;
+    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 0px 5px 5px 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.safe-modal_confirmation-container {
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 100%;
+    margin-top: 32px;
+    height: 100vh;
+    padding: 80px 32px 100px 60px;
+}
+
+.safe-modal_confirmation-container .add-remove-container {
+    background: rgba(118, 128, 141, 0.05);
+    border-radius: 5px;
+    padding: 20px;
+    margin: 6px 0;
+}
+
+.safe-modal_confirmation-container .add-remove-container .title {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+
+.safe-modal_confirmation-container .button-section {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    margin: 0 auto;
+    right: 0;
+    width: 420px;
+    height: 100px;
+    background: linear-gradient(180deg, rgba(2,0,36,0) 0%, rgba(255,255,255,1) 30%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.safe-modal_confirmation-container .button-section .btn-save {
+    color: #FFFFFF;
+    font-weight: 400;
+    background: #C94B32;
+    border-radius: 5px;
+    margin: 0 0 0 6px;
+}
+
+.safe-modal_confirmation-container .button-section .btn-cancel, .safe-modal-container .button-section .btn-cancel {
+    background-color: #FFFFFF;
+    font-weight: 400;
+    color: #C94B32;
+    width: 200px !important;
+    border: 1px solid #C94B32;
+    border-radius: 5px;
+    margin: 0 6px 0 0;
+}
+
