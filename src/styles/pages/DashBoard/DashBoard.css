@@ -515,7 +515,7 @@ body.active-modal {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    width: 54%;
+    width: 100%;
     height: fit-content;
     margin-bottom: 20px;
 }
@@ -528,19 +528,25 @@ body.active-modal {
     gap: 40px;
 }
 
+.membersListWrapper {
+    width: 100%;
+    background: #FFFFFF;
+    border-radius: 5px;
+    margin-top: 0.2rem;
+}
+
 .membersList {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
     padding: 26px 22px;
-    width: 100%;
+    width: 50%;
     gap: 35px;
     min-height: fit-content;
     max-height: 260px;
     background: #FFFFFF;
     border-radius: 5px;
-    margin-top: 2px;
     overflow-y: auto;
 }
 
@@ -892,13 +898,15 @@ body.active-modal {
     align-items: center;
     gap: 20px;
     transition: 0.5s;
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
 }
 
 .sideBarStrip::-webkit-scrollbar {
     display: none;
-  }
+}
 
 .sideBarStripItem {
     margin-top: 24px;
