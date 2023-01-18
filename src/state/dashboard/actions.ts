@@ -473,3 +473,15 @@ export const updateMilestone = createAsyncThunk(
 	}
 );
 
+export const editProjectMilestone = createAsyncThunk(
+	'dao/editProjectMilestone',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`project/${params.projectId}/edit-milestones?daoUrl=${params.daoUrl}`, params.payload)
+			.then(res => res.data)
+			.catch(e => {
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
+	}
+);
+

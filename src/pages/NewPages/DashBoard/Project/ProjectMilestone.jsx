@@ -26,18 +26,20 @@ import {
     Select
 } from "@chakra-ui/react";
 
-import polygonIcon from 'assets/svg/polygon.svg';
-import starIcon from 'assets/svg/star.svg';
-import moment from 'moment';
-
 import { beautifyHexToken, getSafeTokens } from '../../../../utils'
 import { useWeb3React } from "@web3-react/core";
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import { SupportedChainId } from "constants/chains";
 
-const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation, list, editMilestones }) => {
+import { resetEditProjectMilestoneLoader } from 'state/dashboard/reducer';
 
-    const { DAO } = useAppSelector((state) => state.dashboard);
+import { editProjectMilestone } from "state/dashboard/actions";
+
+import SimpleLoadButton from "UIpack/SimpleLoadButton";
+
+const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation, list, editMilestones }) => {
+    const dispatch = useAppDispatch();
+    const { DAO, Project, editProjectMilestoneLoading } = useAppSelector((state) => state.dashboard);
     const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies'))
     const { chainId, account } = useWeb3React();
     const editorRef = useRef(null);
@@ -48,8 +50,16 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
 
     const [safeTokens, setSafeTokens] = useState([]);
 
-    const [amount, setAmount] = useState(0);
-    const [currency, setCurrency] = useState(null);
+    const [amount, setAmount] = useState(_get(Project, 'compensation.amount', ''));
+    const [currency, setCurrency] = useState(_get(Project, 'compensation.currency', ''));
+
+    // runs after editing milestones
+    useEffect(() => {
+        if (editProjectMilestoneLoading === false) {
+            dispatch(resetEditProjectMilestoneLoader());
+            toggleShowMilestone();
+        }
+    }, [editProjectMilestoneLoading]);
 
     useEffect(() => {
         getTokens(_get(DAO, 'safe.address'));
@@ -80,7 +90,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
     const onChangeNumberOMilestones = (e) => {
         let n = parseInt(e.target.value);
         setMilestoneCount(n);
-        let array = milestones;
+        let array = [...milestones];
 
         if (array.length === 0) {
             for (var i = 0; i < n; i++) {
@@ -99,6 +109,12 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                 array.pop();
             }
         }
+
+        for (var i = 0; i < milestones.length; i++) {
+            var el = document.getElementById(`inputBox${i}`);
+            el.style.background = '';
+        }
+
         setMilestones(array);
     };
 
@@ -220,8 +236,10 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
             var x = document.getElementById(`amount${milestones.length - 1}`);
             x.innerHTML = 'Total Project Value should be 100 %';
             for (var i = 0; i < milestones.length; i++) {
-                var el = document.getElementById(`inputBox${i}`);
-                el.style.background = 'rgba(217, 83, 79, 0.75)';
+                if (!milestones[i].complete) {
+                    var el = document.getElementById(`inputBox${i}`);
+                    el.style.background = 'rgba(217, 83, 79, 0.75)';
+                }
             }
             return;
         }
@@ -231,9 +249,14 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
             if (!symbol)
                 symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
 
-            getCompensation({ currency: currency, amount, symbol })
-            getMilestones(milestones);
-            toggleShowMilestone();
+            if (editMilestones) {
+                dispatch(editProjectMilestone({ projectId: _get(Project, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { milestones } }));
+            }
+            else {
+                getCompensation({ currency: currency, amount, symbol })
+                getMilestones(milestones);
+                toggleShowMilestone();
+            }
         }
     }
 
@@ -254,7 +277,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                         <div className='milestone-inputRow' style={{ width: '320px', marginBottom: '5px' }}>
                             <span>Total {transformWorkspace().label} Value</span>
                             <div className='picker-container' style={{ margin: '0', marginTop: '5px' }}>
-                                <Select defaultValue={currency} onChange={handleChangeCurrency} bg='#FFFF' color='#76808D' variant='unstyled' style={{ borderRadius: '10px 0px 0px 10px', borderWidth: 1, borderRightWidth: 0, borderColor: 'rgba(27, 43, 65, 0.1)', height: 50, padding: '0px 50px 0px 20px' }} iconSize={15} icon={<ArrowDown />}>
+                                <Select disabled={editMilestones} value={currency} onChange={handleChangeCurrency} bg='#FFFF' color='#76808D' variant='unstyled' style={{ borderRadius: '10px 0px 0px 10px', borderWidth: 1, borderRightWidth: 0, borderColor: 'rgba(27, 43, 65, 0.1)', height: 50, padding: '0px 50px 0px 20px' }} iconSize={15} icon={<ArrowDown />}>
                                     <option value="" selected disabled>Select currency</option>
                                     {
                                         safeTokens.map((result, index) => {
@@ -269,7 +292,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                                         })}
                                 </Select>
                                 <div className='number-input'>
-                                    <NumberInput onChange={handleChangeCompensationAmount} defaultValue={0} style={{ width: (64 + 50), height: 50, borderWidth: 1, borderColor: 'rgba(27, 43, 65, 0.1)', borderRightWidth: 0, borderRadius: '0px 10px 10px 0px' }} step={1} min={0}>
+                                    <NumberInput isDisabled={editMilestones} onChange={handleChangeCompensationAmount} value={amount} style={{ width: (64 + 50), height: 50, borderWidth: 1, borderColor: 'rgba(27, 43, 65, 0.1)', borderRightWidth: 0, borderRadius: '0px 10px 10px 0px' }} step={1} min={0}>
                                         <NumberInputField className='input' style={{ padding: 0, textAlign: "center", height: 50, width: 64, borderWidth: 0, background: '#F5F5F5' }} />
                                         <NumberInputStepper style={{ width: 50, backgroundColor: 'transparent' }}>
                                             <NumberIncrementStepper color="#C94B32" children={<DropupRed />} />
@@ -404,9 +427,26 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                         <button onClick={() => toggleShowMilestone()}>
                             CANCEL
                         </button>
-                        <button onClick={handleSubmit}>
-                            ADD
-                        </button>
+                        {
+                            editMilestones
+                                ?
+                                <SimpleLoadButton
+                                    condition={editProjectMilestoneLoading}
+                                    disabled={editProjectMilestoneLoading}
+                                    title="SAVE"
+                                    bgColor='#C94B32'
+                                    className="button"
+                                    fontsize={16}
+                                    fontweight={400}
+                                    height={40}
+                                    width={180}
+                                    onClick={handleSubmit}
+                                />
+                                :
+                                <button onClick={handleSubmit}>
+                                    ADD
+                                </button>
+                        }
                     </div>
                 </div>
             </div>
