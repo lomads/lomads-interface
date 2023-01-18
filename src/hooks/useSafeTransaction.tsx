@@ -197,7 +197,7 @@ const useSafeTransaction = (safeAddress: string) => {
         
             let payload: any[] = [];
             newOwners.map((r: any) => {
-                payload.push({ safeAddress, safeTxHash, recipient: r, label: thresholdChanged ? `Add Owner: ${beautifyHexToken(r)} | Change Threshold ${threshold}/${ownerCount}` : `Add Owner: ${r}` })
+                payload.push({ safeAddress, safeTxHash, recipient: r, label: thresholdChanged ? `Add Owner: ${beautifyHexToken(r)} | Change Threshold ${threshold}/${ownerCount}` : `Add Owner: ${beautifyHexToken(r)}` })
             })
             removeOwners.map((r: any) => {
                 payload.push({ safeAddress, safeTxHash, recipient: r, label: `Remove Owner: ${beautifyHexToken(r)} | Change Threshold ${threshold}/${ownerCount}` })
