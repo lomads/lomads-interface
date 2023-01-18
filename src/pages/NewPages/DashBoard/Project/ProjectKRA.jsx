@@ -7,11 +7,27 @@ import createTaskSvg from '../../../../assets/svg/kra.svg';
 import SimpleInputField from "UIpack/SimpleInputField";
 import { nanoid } from '@reduxjs/toolkit';
 
-const ProjectKRA = ({ toggleShowKRA, getResults, list, freq }) => {
+import { useAppSelector, useAppDispatch } from "state/hooks";
+import { resetEditProjectKraLoader } from 'state/dashboard/reducer';
 
+import { editProjectKRA } from "state/dashboard/actions";
+
+import SimpleLoadButton from "UIpack/SimpleLoadButton";
+
+const ProjectKRA = ({ toggleShowKRA, getResults, list, freq, editKRA }) => {
+    const dispatch = useAppDispatch();
+    const { DAO, Project, editProjectKraLoading } = useAppSelector((state) => state.dashboard);
     const [frequency, setFrequency] = useState(freq ? freq : 'daily');
     const [resultCount, setResultCount] = useState(list.length > 0 ? list.length : 1);
     const [results, setResults] = useState(list.length > 0 ? list : [{ _id: nanoid(16), color: '#FFCC18', name: '', progress: 0 }]);
+
+    // runs after editing kra
+    useEffect(() => {
+        if (editProjectKraLoading === false) {
+            dispatch(resetEditProjectKraLoader());
+            toggleShowKRA();
+        }
+    }, [editProjectKraLoading]);
 
     const handleChangeFrequency = (e) => {
         setFrequency(e.target.value);
@@ -20,17 +36,26 @@ const ProjectKRA = ({ toggleShowKRA, getResults, list, freq }) => {
     const onChangeNumberOfResults = (e) => {
         let n = parseInt(e.target.value);
         setResultCount(n);
-        let array = results;
-
+        let array = [...results];
         if (array.length === 0) {
             for (var i = 0; i < n; i++) {
-                array.push({ name: '', color: '#FFCC18', progress: 0, _id: nanoid(16) });
+                if (editKRA) {
+                    array.push({ name: '', _id: nanoid(16) });
+                }
+                else {
+                    array.push({ name: '', color: '#FFCC18', progress: 0, _id: nanoid(16) });
+                }
             }
         }
         else if (n > array.length) {
             let count = n - array.length;
             for (var i = 0; i < count; i++) {
-                array.push({ name: '', color: '#FFCC18', progress: 0, _id: nanoid(16) });
+                if (editKRA) {
+                    array.push({ name: '', _id: nanoid(16) });
+                }
+                else {
+                    array.push({ name: '', color: '#FFCC18', progress: 0, _id: nanoid(16) });
+                }
             }
         }
         else if (n < array.length) {
@@ -68,8 +93,13 @@ const ProjectKRA = ({ toggleShowKRA, getResults, list, freq }) => {
             }
         }
         if (flag !== -1) {
-            getResults(results, frequency);
-            toggleShowKRA();
+            if (editKRA) {
+                dispatch(editProjectKRA({ projectId: _get(Project, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { frequency, results } }));
+            }
+            else {
+                getResults(results, frequency);
+                toggleShowKRA();
+            }
         }
     }
 
@@ -151,9 +181,27 @@ const ProjectKRA = ({ toggleShowKRA, getResults, list, freq }) => {
                         <button onClick={() => toggleShowKRA()}>
                             CANCEL
                         </button>
-                        <button onClick={handleSubmit}>
-                            ADD
-                        </button>
+                        {
+                            editKRA
+                                ?
+                                <SimpleLoadButton
+                                    condition={editProjectKraLoading}
+                                    disabled={editProjectKraLoading}
+                                    title="SAVE"
+                                    bgColor='#C94B32'
+                                    className="button"
+                                    fontsize={16}
+                                    fontweight={400}
+                                    height={40}
+                                    width={180}
+                                    onClick={handleSubmit}
+                                />
+                                :
+                                <button onClick={handleSubmit}>
+                                    ADD
+                                </button>
+                        }
+
                     </div>
                 </div>
             </div>

@@ -35,7 +35,7 @@ import { useWeb3React } from "@web3-react/core";
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import { SupportedChainId } from "constants/chains";
 
-const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation, list }) => {
+const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation, list, editMilestones }) => {
 
     const { DAO } = useAppSelector((state) => state.dashboard);
     const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies'))
@@ -116,25 +116,6 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
     }
 
     const handleChangeAmount = (e, index) => {
-        // let total = 0;
-        // for (let i = 0; i < milestones.length; i++) {
-        //     if (i !== index) {
-        //         total += parseFloat(milestones[i].amount)
-        //     }
-        // }
-        // if (parseFloat(e) > (100 - total)) {
-        //     console.log("Big")
-        // }
-        // else {
-        //     const newArray = milestones.map((item, i) => {
-        //         if (i === index) {
-        //             return { ...item, amount: e };
-        //         } else {
-        //             return item;
-        //         }
-        //     });
-        //     setMilestones(newArray);
-        // }
         var x = document.getElementById(`amount${milestones.length - 1}`);
         x.innerHTML = '';
         var el = document.getElementById(`inputBox${index}`);
@@ -203,7 +184,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
             symbol = _get(symbol, 'token.symbol', null)
             if (!symbol)
-                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ||  currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
+                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
             let e = document.getElementById('currency-amt');
             e.innerHTML = `Compensation amount cannot be 0 ${symbol}`;
             e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
@@ -248,7 +229,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
             symbol = _get(symbol, 'token.symbol', null)
             if (!symbol)
-                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ||  currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
+                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
 
             getCompensation({ currency: currency, amount, symbol })
             getMilestones(milestones);
@@ -335,6 +316,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                                                     width={'100%'}
                                                     value={item.name}
                                                     onchange={(e) => handleChangeName(e.target.value, index)}
+                                                    disabled={item.complete}
                                                 />
                                             </div>
                                             <span id={`name${index}`} style={{ fontSize: '13px', color: '#C84A32', fontStyle: 'normal' }}></span>
@@ -354,9 +336,10 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                                                         max={100}
                                                         onchange={(e) => handleChangeAmount(e.target.value, index)}
                                                         placeholder={`${100 / milestoneCount}`}
+                                                        disabled={item.complete}
                                                     />
                                                 </div>
-                                                <span style={{ margin: '0', marginLeft: '14px' }}>% of {transformWorkspace().label.toLowerCase() } value</span>
+                                                <span style={{ margin: '0', marginLeft: '14px' }}>% of {transformWorkspace().label.toLowerCase()} value</span>
                                             </div>
                                             <span id={`amount${index}`} style={{ fontSize: '13px', color: '#C84A32', fontStyle: 'normal' }}></span>
                                         </div>
@@ -373,6 +356,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                                                     type="date"
                                                     value={item.deadline}
                                                     onchange={(e) => handleChangeDeadline(e.target.value, index)}
+                                                    disabled={item.complete}
                                                 />
                                             </div>
                                             <span id={`deadline${index}`} style={{ fontSize: '13px', color: '#C84A32', fontStyle: 'normal' }}></span>
@@ -407,6 +391,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                                                 }}
                                                 value={item.deliverables}
                                                 onEditorChange={(text) => handleChangeDeliverables(text, index)}
+                                                disabled={item.complete}
                                             />
                                             <span id={`deliverables${index}`} style={{ fontSize: '13px', color: '#C84A32', fontStyle: 'normal' }}></span>
                                         </div>

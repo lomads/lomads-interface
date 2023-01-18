@@ -10,9 +10,9 @@ import { useAppSelector } from "state/hooks";
 
 const LinksArea = ({ links }) => {
     const navigate = useNavigate();
-    const {  account  } = useWeb3React();
+    const { account } = useWeb3React();
     const { DAO } = useAppSelector((state) => state.dashboard);
-	const { myRole, can } = useRole(DAO, account);
+    const { myRole, can } = useRole(DAO, account);
     const handleParseUrl = (url) => {
         try {
             const link = new URL(url);
@@ -44,13 +44,13 @@ const LinksArea = ({ links }) => {
         return (
             <div onClick={() => window.open(item.link, '_blank')} className='link-pill'>
                 {handleParseUrl(item.link)}
-                <span>{ item.title }</span>
+                <span>{item.title}</span>
                 {/* <span>{item.title.length > 6 ? item.title.substring(0, 6) + "..." : item.title}</span> */}
             </div>
         )
     }
 
-    if(links.length == 0 && !can(myRole, 'settings')){
+    if (links.length == 0 && !can(myRole, 'settings')) {
         return null
     }
 
@@ -64,7 +64,7 @@ const LinksArea = ({ links }) => {
                 }
             </div>
             {
-                can(myRole, 'settings') && 
+                can(myRole, 'settings') &&
                 <button className='settings' onClick={() => { navigate(`/${DAO.url}/settings`) }}>
                     <img src={settingIcon} alt="settings-icon" />
                 </button>
