@@ -541,7 +541,7 @@ body.active-modal {
     justify-content: flex-start;
     align-items: flex-start;
     padding: 26px 22px;
-    width: 50%;
+    width: 100%;
     gap: 35px;
     min-height: fit-content;
     max-height: 260px;
@@ -555,7 +555,7 @@ body.active-modal {
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    width: 65%;
+    width: 30%;
     gap: 10px;
 }
 

@@ -176,7 +176,8 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
     }
 
     const handleChangeCompensationAmount = (e) => {
-        setAmount(parseFloat(e));
+        console.log(e);
+        setAmount(e);
         let element = document.getElementById('currency-amt');
         element.innerHTML = "";
     }
@@ -250,7 +251,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                 symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
 
             if (editMilestones) {
-                dispatch(editProjectMilestone({ projectId: _get(Project, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { milestones } }));
+                dispatch(editProjectMilestone({ projectId: _get(Project, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { milestones, compensation: { currency, amount, symbol } } }));
             }
             else {
                 getCompensation({ currency: currency, amount, symbol })
@@ -277,7 +278,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                         <div className='milestone-inputRow' style={{ width: '320px', marginBottom: '5px' }}>
                             <span>Total {transformWorkspace().label} Value</span>
                             <div className='picker-container' style={{ margin: '0', marginTop: '5px' }}>
-                                <Select disabled={editMilestones} value={currency} onChange={handleChangeCurrency} bg='#FFFF' color='#76808D' variant='unstyled' style={{ borderRadius: '10px 0px 0px 10px', borderWidth: 1, borderRightWidth: 0, borderColor: 'rgba(27, 43, 65, 0.1)', height: 50, padding: '0px 50px 0px 20px' }} iconSize={15} icon={<ArrowDown />}>
+                                <Select disabled={_get(Project, 'milestones', []).length > 0 ? true : false} value={currency} onChange={handleChangeCurrency} bg='#FFFF' color='#76808D' variant='unstyled' style={{ borderRadius: '10px 0px 0px 10px', borderWidth: 1, borderRightWidth: 0, borderColor: 'rgba(27, 43, 65, 0.1)', height: 50, padding: '0px 50px 0px 20px' }} iconSize={15} icon={<ArrowDown />}>
                                     <option value="" selected disabled>Select currency</option>
                                     {
                                         safeTokens.map((result, index) => {
@@ -292,7 +293,13 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                                         })}
                                 </Select>
                                 <div className='number-input'>
-                                    <NumberInput isDisabled={editMilestones} onChange={handleChangeCompensationAmount} value={amount} style={{ width: (64 + 50), height: 50, borderWidth: 1, borderColor: 'rgba(27, 43, 65, 0.1)', borderRightWidth: 0, borderRadius: '0px 10px 10px 0px' }} step={1} min={0}>
+                                    <NumberInput
+                                        isDisabled={_get(Project, 'milestones', []).length > 0 ? true : false}
+                                        onChange={handleChangeCompensationAmount}
+                                        value={amount}
+                                        style={{ width: (64 + 50), height: 50, borderWidth: 1, borderColor: 'rgba(27, 43, 65, 0.1)', borderRightWidth: 0, borderRadius: '0px 10px 10px 0px' }}
+                                        min={0}
+                                    >
                                         <NumberInputField className='input' style={{ padding: 0, textAlign: "center", height: 50, width: 64, borderWidth: 0, background: '#F5F5F5' }} />
                                         <NumberInputStepper style={{ width: 50, backgroundColor: 'transparent' }}>
                                             <NumberIncrementStepper color="#C94B32" children={<DropupRed />} />

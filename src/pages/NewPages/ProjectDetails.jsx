@@ -842,7 +842,7 @@ const ProjectDetails = () => {
                                                     <div className="status" style={{ justifyContent: 'space-between' }}>
                                                         <span>Review frequency : {_get(Project, 'kra.frequency', [])}</span>
                                                         <div style={{ width: '50%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                                            <button className='archive-btn'>
+                                                            <button className='archive-btn' onClick={() => navigate(`/${daoURL}/project/${projectId}/archiveKra`)}>
                                                                 <img src={archiveIcon} alt="archive-icon" />
                                                             </button>
                                                             {canMyrole('project.review') && <button className="review-btn" onClick={() => setShowKRAReview(true)}>
