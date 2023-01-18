@@ -786,7 +786,8 @@
 .projectDetails-container .info .projectDetails-body .projectDetails-members .members-list {
     width: 100%;
     padding: 20px 22px;
-    /* height: 210px; */
+    min-height: fit-content;
+    max-height: 260px;
     background: #FFFFFF;
     border-radius: 5px;
     display: flex;

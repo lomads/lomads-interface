@@ -123,7 +123,6 @@ const MemberCard = (props: any) => {
 						<div className="NameAndAvatar">
 							<div className="memberRow">
 								<div className="avatarAndName">
-
 									<div className="dashboardText">Name</div>
 								</div>
 								<div id="memberAddressText"></div>
