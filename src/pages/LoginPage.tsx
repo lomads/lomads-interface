@@ -17,11 +17,13 @@ import { SupportedChainId, SUPPORTED_CHAIN_IDS, CHAIN_IDS_TO_NAMES } from 'const
 import { updateConnectionError } from "state/connection/reducer";
 import { isChainAllowed, switchChain } from "utils/switchChain";
 import { ethers } from "ethers";
+import { setUser } from "state/dashboard/reducer";
 import Web3Token from 'web3-token';
 import { LeapFrog } from "@uiball/loaders";
 import axiosHttp from '../api';
 import { getSigner } from 'utils'
 import styled from "styled-components/macro";
+import axios from "axios";
 
 const HeaderControls = styled.div`
   display: flex;
@@ -89,13 +91,20 @@ const LoginPage = (props: any) => {
     //   .finally(() => setCheckLoading(false))
   }
 
+  const setLocalToken = (token:string) => {
+    return Promise.resolve().then(() => {
+      localStorage.setItem('__lmds_web3_token', token);
+    });
+  }
+
   const generateToken = useCallback(_throttle(async () => {
     if (!localStorage.getItem('__lmds_web3_token')) {
       if(provider && account){
         const signer = getSigner(provider, account)
         const token = await Web3Token.sign(async (msg: string) => await signer.signMessage(msg), '365d');
-        console.log(token)
-        localStorage.setItem('__lmds_web3_token', token);
+        await setLocalToken(token)
+        await axiosHttp.post(`auth/create-account`)
+        .then(res => dispatch(setUser(res.data)))
         const nTo = await navigateTo();
         setTimeout(() => navigate(nTo), 100);
       }

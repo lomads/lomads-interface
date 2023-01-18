@@ -203,7 +203,7 @@ const useSafeTransaction = (safeAddress: string) => {
                 payload.push({ safeAddress, safeTxHash, recipient: r, label: `Remove Owner: ${beautifyHexToken(r)} | Change Threshold ${threshold}/${ownerCount}` })
             })
             if(newOwners.length === 0 && removeOwners.length === 0)
-                payload.push({ safeAddress, safeTxHash, recipient: safeAddress, label: `Change Threshold ${threshold}/${ownerCount}` })
+                payload.push({ safeAddress, safeTxHash, recipient: beautifyHexToken(safeAddress), label: `Change Threshold ${threshold}/${ownerCount}` })
             await axiosHttp.post(`transaction/label`, payload)
             setUpdateOwnerLoading(false)
             return safeTxHash
