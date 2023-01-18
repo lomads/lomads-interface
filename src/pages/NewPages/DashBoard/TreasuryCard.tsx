@@ -43,6 +43,7 @@ import axios from "axios";
 import { GNOSIS_SAFE_BASE_URLS, SupportedChainId } from 'constants/chains';
 import { GNOSIS_SAFE_ALLOWANCE_MODULE_CONTRACT } from 'constants/chains';
 import RecurringTxn from "./TreasuryCard/RecurringTxn";
+import { updateSafeThreshold } from "state/flow/reducer";
 
 
 const TreasuryCard = (props: ItreasuryCardType) => {
@@ -197,7 +198,7 @@ useState<Array<any>>();
 					return matchRejTx.safeTxHash !== p.safeTxHash
 				return true
 			}))
-			.then(ptx => _filter(ptx, p => !p.dataDecoded || (_get(p, 'dataDecoded.method', '') === 'multiSend' || _get(p, 'dataDecoded.method', '') === 'transfer')))
+			.then(ptx => _filter(ptx, p => !p.dataDecoded || (_get(p, 'dataDecoded.method', '') === 'multiSend' || _get(p, 'dataDecoded.method', '') === 'transfer' || _get(p, 'dataDecoded.method', '') === 'addOwnerWithThreshold' || _get(p, 'dataDecoded.method', '') === 'removeOwner' || _get(p, 'dataDecoded.method', '') === 'changeThreshold' )))
 			.then(async ptx => {
 				const { pTxn } = await loadOffChainTxn()
 				return ptx.concat(pTxn)
@@ -212,7 +213,7 @@ useState<Array<any>>();
 			.getAllTransactions(_get(DAO, 'safe.address', ''), { executed: true, queued: false, trusted: true })
 			.then(etx => _get(etx, 'results', []))
 			//.then(etx => _filter(etx, p => _get(p, 'data')))
-			.then(etx => _filter(etx, p => !_get(p, 'dataDecoded') || (_get(p, 'dataDecoded') && _get(p, 'dataDecoded.method', '') === 'transfer' || _get(p, 'dataDecoded.method', '') === 'multiSend')))
+			.then(etx => _filter(etx, p => !_get(p, 'dataDecoded') || (_get(p, 'dataDecoded') && _get(p, 'dataDecoded.method', '') === 'transfer' || _get(p, 'dataDecoded.method', '') === 'multiSend' || _get(p, 'dataDecoded.method', '') === 'addOwnerWithThreshold' || _get(p, 'dataDecoded.method', '') === 'removeOwner' || _get(p, 'dataDecoded.method', '') === 'changeThreshold')))
 			.then(async etx => {
 				const { eTxn } = await loadOffChainTxn()
 				return etx.concat(eTxn)
@@ -453,8 +454,17 @@ useState<Array<any>>();
 		}
 	};
 
+	const ownersCount = async (_safeAddress: string) => {
+		const safeSDK = await ImportSafe(provider, _safeAddress);
+		const owners = await safeSDK.getOwners();
+		const threshold = await safeSDK.getThreshold();
+		isOwner(_safeAddress)
+		dispatch(updateSafeThreshold(threshold));
+		const dao = await axiosHttp.patch(`dao/${DAO.url}/sync-safe-owners`, owners)
+		return dao;
+	};
 
-	const handleExecuteTransactions = async (txn: any, reject: boolean | undefined) => {
+	const handleExecuteTransactions = async (txn: any, reject: boolean | undefined, syncOwners = false) => {
 		const safeTokens = await getSafeTokens();
 		let safeToken = _find(safeTokens, t => t.tokenAddress === _get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', '')))
 		if (!safeToken)
@@ -519,6 +529,8 @@ useState<Array<any>>();
 				} else {
 					await axiosHttp.patch(`recurring-payment/reject`, { txHash: txn.safeTxHash })
 				}
+				if(syncOwners)
+					await ownersCount(_get(DAO, 'safe.address', ''))
 				await loadPendingTxn()
 				await loadExecutedTxn()
 				await loadTxnLabel()

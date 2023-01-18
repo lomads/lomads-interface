@@ -118,30 +118,32 @@ const MemberCard = (props: any) => {
 
 					</div>
 				</div>
-				<div className="membersList">
-					<div className="NameAndAvatar">
-						<div className="memberRow">
-							<div className="avatarAndName">
+				<div className="membersListWrapper">
+					<div className="membersList">
+						<div className="NameAndAvatar">
+							<div className="memberRow">
+								<div className="avatarAndName">
 
-								<div className="dashboardText">Name</div>
+									<div className="dashboardText">Name</div>
+								</div>
+								<div id="memberAddressText"></div>
+								<div className="dashboardText" style={{ marginLeft: 90 }}>Joined</div>
+								<div className="dashboardText"></div>
 							</div>
-							<div id="memberAddressText"></div>
-							<div className="dashboardText" style={{ marginLeft: 90 }}>Joined</div>
-							<div className="dashboardText"></div>
 						</div>
+						{_uniqBy(membersArray, (m: any) => m.member.wallet.toLowerCase()).map((result: any, index: any) => {
+							return (
+								<NameAndAvatar
+									name={_get(result, 'member.name', '')}
+									position={index}
+									joined={_get(result, 'joined')}
+									creator={_get(result, 'creator', false)}
+									role={_get(result, 'role', 'role4')}
+									address={_get(result, 'member.wallet', '')}
+								/>
+							);
+						})}
 					</div>
-					{_uniqBy(membersArray, (m: any) => m.member.wallet.toLowerCase()).map((result: any, index: any) => {
-						return (
-							<NameAndAvatar
-								name={_get(result, 'member.name', '')}
-								position={index}
-								joined={_get(result, 'joined')}
-								creator={_get(result, 'creator', false)}
-								role={_get(result, 'role', 'role4')}
-								address={_get(result, 'member.wallet', '')}
-							/>
-						);
-					})}
 				</div>
 			</div>
 		</>

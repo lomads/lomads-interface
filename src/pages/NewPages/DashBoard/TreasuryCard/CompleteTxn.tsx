@@ -12,6 +12,7 @@ import axiosHttp from '../../../../api';
 import { updateSafeTransaction } from "state/dashboard/reducer";
 import { SupportedChainId } from "constants/chains";
 import useSafeTokens from "hooks/useSafeTokens";
+import { legacy_createStore } from "@reduxjs/toolkit";
 
 const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress, onLoadLabels, editMode, onSetEditMode }: any) => {
 	const { chainId } = useWeb3React();
@@ -22,7 +23,7 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
     const {safeTokens} = useSafeTokens(safeAddress)
     const dispatch = useAppDispatch()
 
-    const { isCredit, amount, tokenSymbol, symbol, recipient, date, reason, txHash, isAllowanceTransaction } = useMemo(() => {
+    const { isCredit, amount, tokenSymbol, symbol, recipient, date, reason, txHash, isAllowanceTransaction, isOwnerModificaitonTransaction } = useMemo(() => {
         let isCredit = _get(transaction, 'txType', '') === 'ETHEREUM_TRANSACTION'
         let decimal = 18;
         if(_get(transaction, 'transfers[0].tokenInfo.decimals', null))
@@ -37,8 +38,13 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
         let tokenSymbol = undefined;
         const setAllowance =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => _get(vd, 'dataDecoded.method', '') === "setAllowance")
         let isAllowanceTransaction = false;
+        let isOwnerModificaitonTransaction = false;
         if(setAllowance)
             isAllowanceTransaction = true;
+        const ownerModification =  _get(transaction, 'dataDecoded.method', '') === "addOwnerWithThreshold" || _get(transaction, 'dataDecoded.method', '') === "removeOwner" || _get(transaction, 'dataDecoded.method', '') === "changeThreshold" 
+        if(ownerModification)
+            isOwnerModificaitonTransaction = true;
+
         if(transaction?.dataDecoded?.method === 'multiSend' && transaction?.dataDecoded?.parameters[0]?.name === 'transactions' && isAllowanceTransaction) {
             const addDelegate =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => _get(vd, 'dataDecoded.method', '') === "addDelegate")
             recipient = _get(addDelegate, 'dataDecoded.parameters[0].value', '')
@@ -54,6 +60,14 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
             }
             amount = (amount / 10 ** tokenDecimal)
         }
+
+        if(isOwnerModificaitonTransaction) {
+            if(_get(transaction, 'dataDecoded.method', '') === "removeOwner")
+                recipient = _get(transaction, 'dataDecoded.parameters[1].value', '')
+            else if(_get(transaction, 'dataDecoded.method', '') === "addOwnerWithThreshold")
+                recipient = _get(transaction, 'dataDecoded.parameters[0].value', '')
+        }
+
         let reason = null
         if(labels && labels.length > 0) {
             reason = _get(_find(labels, l => l.recipient.toLowerCase() === recipient.toLowerCase() && l.safeTxHash === _get(transaction, 'safeTxHash', _get(transaction, 'txHash', _get(transaction, 'transactionHash', '')))), "label", null)
@@ -61,7 +75,7 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
         const txHash = _get(transaction, 'safeTxHash', _get(transaction, 'txHash', _get(transaction, 'transactionHash', '')));
         let date = _get(transaction, 'executionDate', null) ? moment.utc(_get(transaction, 'executionDate', null)).local().format('MM/DD hh:mm') : moment.utc(_get(transaction, 'submissionDate', null)).local().format('MM/DD hh:mm')
         console.log('reason', reason)
-        return { isCredit, amount, tokenSymbol, symbol, recipient, date, reason, txHash, isAllowanceTransaction }
+        return { isCredit, amount, tokenSymbol, symbol, recipient, date, reason, txHash, isAllowanceTransaction, isOwnerModificaitonTransaction }
     }, [transaction, safeTokens, tokens, labels])
 
     const _handleReasonKeyDown = (safeTxHash: string, recipient: string, reasonText: string) => {
@@ -96,7 +110,7 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
 
     const renderItem = (item: any, index: number) => {
         const mulAmount = _get(item, 'dataDecoded.parameters[1].value',  _get(item, 'value', 0))
-        const mulRecipient = _get(item, 'dataDecoded.parameters[0].value', _get(item, 'to', 0))
+        let mulRecipient = _get(item, 'dataDecoded.parameters[0].value', _get(item, 'to', 0))
         const isLast = _get(transaction, 'dataDecoded.parameters[0].valueDecoded', []).length - 1 === index;
         let token = chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR';
         if(_get(transaction, 'transfers[0].tokenAddress', null))
@@ -115,17 +129,22 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
 
         const txHash = _get(transaction, 'safeTxHash', _get(transaction, 'txHash', _get(transaction, 'transactionHash', '')));
 
+        const ownerModification =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => (_get(vd, 'dataDecoded.method', '') === "addOwnerWithThreshold") || _get(vd, 'dataDecoded.method', '') === "removeOwner")
+        if(_get(item, 'dataDecoded.method', '') === 'removeOwner')
+            mulRecipient = _get(item, 'dataDecoded.parameters[1].value', _get(item, 'to', 0))
+
         let mulReason = '';
         if(labels && labels.length > 0) {
             mulReason = _get(_find(labels, l => l.recipient.toLowerCase() === mulRecipient.toLowerCase() && _get(l, 'safeTxHash', _get(l, 'txHash', '')) === txHash), "label", null)
         }
+
 
         return (
             <div className="transactionRow">
                 <div className="coinText">
                     <img src={isCredit ? receiveToken : sendToken} alt="" />
                     <div className="dashboardTextBold">
-                        {`${mulAmount / 10 ** muldecimal} ${token}`}
+                        {ownerModification ? `-` : `${mulAmount / 10 ** muldecimal} ${token}`}
                     </div>
                 </div>
                 <div className="transactionName">
@@ -192,7 +211,7 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
                     <div className="coinText">
                         <img src={isCredit ? receiveToken : sendToken} alt="" />
                         <div className="dashboardTextBold">
-                            {`${amount} ${tokenSymbol ? tokenSymbol : symbol}`}
+                            {isOwnerModificaitonTransaction ? `-` : `${amount} ${tokenSymbol ? tokenSymbol : symbol}`}
                         </div>
                     </div>
                     <div className="transactionName">

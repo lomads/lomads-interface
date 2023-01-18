@@ -9,7 +9,7 @@ import { SiNotion } from "react-icons/si";
 import { BsDiscord, BsGoogle, BsGithub, BsTwitter, BsGlobe } from "react-icons/bs";
 import { AiOutlinePlus, AiFillQuestionCircle, AiOutlineLock } from "react-icons/ai";
 import useTerminology from 'hooks/useTerminology';
-import { useAppSelector } from "state/hooks"
+import { useAppSelector, useAppDispatch } from "state/hooks"
 
 import { isValidUrl } from 'utils';
 
@@ -17,9 +17,13 @@ import AddDiscordLink from 'components/AddDiscordLink';
 import AddNotionLink from 'components/AddNotionLink';
 
 import { nanoid } from '@reduxjs/toolkit';
+import { resetEditProjectLinksLoader } from 'state/dashboard/reducer';
+import { editProjectLinks } from "state/dashboard/actions";
+import SimpleLoadButton from "UIpack/SimpleLoadButton";
 
-const ProjectResource = ({ toggleShowResource, getResources, list }) => {
-    const { DAO } = useAppSelector((state) => state.dashboard);
+const ProjectResource = ({ toggleShowResource, getResources, list, editResources }) => {
+    const dispatch = useAppDispatch();
+    const { DAO, Project, editProjectLinksLoading } = useAppSelector((state) => state.dashboard);
     const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies'))
     const [title, setTitle] = useState('');
     const [titleError, setTitleError] = useState(null);
@@ -30,6 +34,14 @@ const ProjectResource = ({ toggleShowResource, getResources, list }) => {
     const [accessControl, setAccessControl] = useState(false);
     const [accessControlError, setAccessControlError] = useState(null);
     const [resourceList, setResourceList] = useState(list);
+
+    // runs after editing resources
+    useEffect(() => {
+        if (editProjectLinksLoading === false) {
+            dispatch(resetEditProjectLinksLoader());
+            toggleShowResource();
+        }
+    }, [editProjectLinksLoading]);
 
     useEffect(() => {
         try {
@@ -182,8 +194,13 @@ const ProjectResource = ({ toggleShowResource, getResources, list }) => {
     }
 
     const handleSubmit = () => {
-        getResources(resourceList);
-        toggleShowResource();
+        if (editResources) {
+            dispatch(editProjectLinks({ projectId: _get(Project, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { resourceList } }));
+        }
+        else {
+            getResources(resourceList);
+            toggleShowResource();
+        }
     }
 
     return (
@@ -197,7 +214,7 @@ const ProjectResource = ({ toggleShowResource, getResources, list }) => {
                 <div style={{ width: '100%', height: '100%', overflow: 'scroll' }}>
                     <div className='resource-body'>
                         <img src={createTaskSvg} alt="frame-icon" />
-                        <h1>{ transformWorkspace().label } Resources</h1>
+                        <h1>{transformWorkspace().label} Resources</h1>
                         <span>Add links for online resources </span>
 
                         <div className='resource-inputRow' style={{ marginBottom: '0', width: '410px' }}>
@@ -317,9 +334,9 @@ const ProjectResource = ({ toggleShowResource, getResources, list }) => {
                         }
 
 
-{
+                        {
                             accessControl && link && link.indexOf('notion.') > -1 &&
-                            <div style={{ fontSize: 14, marginBottom:16, padding: "5px 10px", backgroundColor: "#188C7C", borderRadius:5,  fontStyle: 'italic', color: "#FFF" }}>Invite <span style={{ color: "#FFF", fontWeight:'bold' }}>{process.env.REACT_APP_NOTION_ADMIN_EMAIL}</span> to be an Admin of your workspace</div>
+                            <div style={{ fontSize: 14, marginBottom: 16, padding: "5px 10px", backgroundColor: "#188C7C", borderRadius: 5, fontStyle: 'italic', color: "#FFF" }}>Invite <span style={{ color: "#FFF", fontWeight: 'bold' }}>{process.env.REACT_APP_NOTION_ADMIN_EMAIL}</span> to be an Admin of your workspace</div>
                         }
 
                         {/* added resource list */}
@@ -352,9 +369,27 @@ const ProjectResource = ({ toggleShowResource, getResources, list }) => {
                         <button onClick={() => toggleShowResource()}>
                             CANCEL
                         </button>
-                        <button style={{ backgroundColor: resourceList.length == 0 ? 'grey' : '#C94B32' }} disabled={resourceList.length == 0} onClick={handleSubmit}>
-                            ADD
-                        </button>
+                        {
+                            editResources
+                                ?
+                                <SimpleLoadButton
+                                    condition={editProjectLinksLoading}
+                                    disabled={editProjectLinksLoading}
+                                    title="SAVE"
+                                    bgColor='#C94B32'
+                                    className="button"
+                                    fontsize={16}
+                                    fontweight={400}
+                                    height={40}
+                                    width={180}
+                                    onClick={handleSubmit}
+                                />
+                                :
+                                <button style={{ backgroundColor: resourceList.length == 0 ? 'grey' : '#C94B32' }} disabled={resourceList.length == 0} onClick={handleSubmit}>
+                                    ADD
+                                </button>
+                        }
+
                     </div>
                 </div>
             </div>
