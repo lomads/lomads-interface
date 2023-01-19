@@ -22,6 +22,8 @@ const useSafeTransaction = (safeAddress: string) => {
     const [createSafeTxnLoading, setCreateSafeTxnLoading] = useState(false);
     const [updateOwnerLoading, setUpdateOwnerLoading] = useState(false);
 
+    const { safeThreshold } = useAppSelector(store => store.flow)
+
     const createNativeSingleTxn = async (send: any, token: any) => {
         const safeTransactionData: SafeTransactionDataPartial[] = [{
             to: toChecksumAddress(_get(send, '[0].recipient')),
@@ -113,7 +115,7 @@ const useSafeTransaction = (safeAddress: string) => {
                             })
                             await axiosHttp.post(`transaction/label`, payload)
                         }
-                    })
+                    })       
             } else {
                 if (createLabel) {
                     let payload: any[] = [];
@@ -123,6 +125,12 @@ const useSafeTransaction = (safeAddress: string) => {
                     await axiosHttp.post(`transaction/label`, payload)
                 }
             }
+            await axiosHttp.post(`utility/create-notification`, {
+                event: safeThreshold > 1 ? 'transaction:execution.required' : 'transaction:confirmation.required',
+                safeAddress,
+                safeTxHash,
+                account
+            }) 
             setCreateSafeTxnLoading(false)
             return { safeTxHash, currentNonce, signature };
         }
