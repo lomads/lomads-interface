@@ -727,7 +727,7 @@ const ProjectDetails = () => {
                                         _get(Project, 'links', []).map((item, index) => {
                                             return (
                                                 <div
-                                                    className={item.accessControl && item.unlocked.map(a => a.toLowerCase()).indexOf(account.toLowerCase()) == -1 ? "link-div locked" : "link-div"}
+                                                    className={item.accessControl && _get(item, 'unlocked', []).map(a => a.toLowerCase()).indexOf(account.toLowerCase()) == -1 ? "link-div locked" : "link-div"}
                                                     onClick={() => {
                                                         if (!item.accessControl) {
                                                             window.open(item.link, '_blank')
