@@ -97,6 +97,8 @@ export default () => {
             if(notification.type.indexOf('member') > -1 && userIcon)
                 return USER_ICON
             return PROJECT_ICON
+        }  else if(notification.model === 'Transaction'){
+            return TRANSACTION_ICON
         } else {
             if(userIcon)
                 return USER_ICON
