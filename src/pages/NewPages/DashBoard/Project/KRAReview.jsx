@@ -47,7 +47,7 @@ const KRAReview = ({ toggleShowKRA, data, daoURL }) => {
         slots = slots.map(slot => {
             const tracker = _find(data.kra.tracker, t => t.start === slot.start && t.end === slot.end)
             return {
-                ...slot, 
+                ...slot,
                 results: _get(tracker, 'results', data.kra.results.map(result => {
                     return {
                         ...result, progress: 0, color: "#FFCC18"
@@ -61,7 +61,7 @@ const KRAReview = ({ toggleShowKRA, data, daoURL }) => {
     }, [data.frequency, data.kra])
 
     useEffect(() => {
-        if(getSlots && getSlots.length > 0) {
+        if (getSlots && getSlots.length > 0) {
             const cslot = _find(getSlots, s => s.start < moment().unix() && s.end > moment().unix())
             setCurrentSlot(cslot)
         }
@@ -91,7 +91,7 @@ const KRAReview = ({ toggleShowKRA, data, daoURL }) => {
     const handleSubmit = () => {
         const kra = { ...data.kra };
         kra.tracker = getSlots.map(slot => {
-            if(slot.start === currentSlot.start && slot.end === currentSlot.end)
+            if (slot.start === currentSlot.start && slot.end === currentSlot.end)
                 return currentSlot
             return slot
         })
@@ -111,8 +111,8 @@ const KRAReview = ({ toggleShowKRA, data, daoURL }) => {
                         <img src={createTaskSvg} alt="frame-icon" />
                         <h1>Key Results</h1>
                         <span>It’s time to evaluate your scores</span>
-                        { currentSlot && data.kra.frequency !== 'daily' && <span>Review Period: {`${ moment.unix(currentSlot.start).format('DD MMM, YYYY') } - ${ moment.unix(currentSlot.end).format('DD MMM, YYYY') }`}</span> }
-                        { currentSlot && data.kra.frequency === 'daily' && <span>Review Period: {`${ moment.unix(currentSlot.start).format('DD MMM, YYYY hh:mm A') } - ${ moment.unix(currentSlot.end).format('DD MMM, YYYY hh:mm A') }`}</span> }
+                        {currentSlot && data.kra.frequency !== 'daily' && <span>Review Period: {`${moment.unix(currentSlot.start).format('DD MMM, YYYY')} - ${moment.unix(currentSlot.end).format('DD MMM, YYYY')}`}</span>}
+                        {currentSlot && data.kra.frequency === 'daily' && <span>Review Period: {`${moment.unix(currentSlot.start).format('DD MMM, YYYY hh:mm A')} - ${moment.unix(currentSlot.end).format('DD MMM, YYYY hh:mm A')}`}</span>}
                         <div className='kra-section'>
                             {
                                 currentSlot && currentSlot.results.map((item, index) => {
@@ -129,12 +129,12 @@ const KRAReview = ({ toggleShowKRA, data, daoURL }) => {
                                                     <div className='progress' id={`progress${index}`}></div>
                                                 </div> */}
                                                 <div style={{ flex: 1, maxWidth: 200 }}>
-                                                    <RangeSlider defaultValue={+item.progress} onChange={({ value, color }) => {
+                                                    <RangeSlider defaultValue={+item.progress} showThumb={true} disabled={false} onChange={({ value, color }) => {
                                                         handleSlider(item, value, color)
-                                                    }}/>
+                                                    }} />
                                                 </div>
                                                 <div style={{ marginLeft: '16px' }}>
-                                                    <h1 style={{ color: _get(item, 'color' , '#FFCC18') }}>{ `${item.progress}% done!` }</h1>
+                                                    <h1 style={{ color: _get(item, 'color', '#FFCC18') }}>{`${item.progress}% done!`}</h1>
                                                 </div>
                                             </div>
                                         </div>

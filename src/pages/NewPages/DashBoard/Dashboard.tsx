@@ -466,10 +466,12 @@ const Dashboard = () => {
 										<img src={copyIcon} alt="copy" className="safeCopyImage" />
 									</div>
 								</Tooltip>
+								<button style={{ width: '100px', height: '50px', background: '#FFF' }} onClick={() => navigate('/aikon')}>AIKON</button>
 							</div>
 							<div className="DAODescription">{_get(DAO, 'description', '')}</div>
 						</div>
 					</div>
+
 					<div className="DAOsettings-container">
 						<div className="DAOsettings">
 							<div className="DAOadminPill">
@@ -492,6 +494,7 @@ const Dashboard = () => {
 									SUPPORTED_CHAIN_IDS.map(chain => <option value={+chain}>{CHAIN_IDS_TO_NAMES[chain]}</option>)
 								}
 							</select>
+
 						</div>
 					</div>
 				</div>
