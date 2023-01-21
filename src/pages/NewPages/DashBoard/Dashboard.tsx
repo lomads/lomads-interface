@@ -466,7 +466,7 @@ const Dashboard = () => {
 										<img src={copyIcon} alt="copy" className="safeCopyImage" />
 									</div>
 								</Tooltip>
-								<button style={{ width: '100px', height: '50px', background: '#FFF' }} onClick={() => navigate('/aikon')}>AIKON</button>
+								{/* <button style={{ width: '100px', height: '50px', background: '#FFF' }} onClick={() => navigate('/aikon')}>AIKON</button> */}
 							</div>
 							<div className="DAODescription">{_get(DAO, 'description', '')}</div>
 						</div>
