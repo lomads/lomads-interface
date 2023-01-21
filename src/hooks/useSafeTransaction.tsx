@@ -115,6 +115,11 @@ const useSafeTransaction = (safeAddress: string) => {
                             })
                             await axiosHttp.post(`transaction/label`, payload)
                         }
+                        await axiosHttp.post(`utility/create-notification`, {
+                            event:'transaction:confirmed',
+                            safeAddress,
+                            account
+                        }) 
                     })       
             } else {
                 if (createLabel) {

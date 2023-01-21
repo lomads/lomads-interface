@@ -67,6 +67,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	const [offChainExecutedTxn, setOffChainExecutedTxn] = useState<Array<any>>();
 	const node = useRef<HTMLDivElement>()
 	const [editMode, setEditMode] = useState<any>();
+	const [lowBalanceError, setLowBalanceError] = useState<any>(null);
 	useOnClickOutside(node, () => editMode ? setEditMode(null) : undefined)
 useState<Array<any>>();
 	//const [recurringTxnQueue, setRecurringTxnQueue] = useState<Array<any>>();
@@ -87,6 +88,12 @@ useState<Array<any>>();
 	const [tab, setTab] = useState<any>(1);
 
 	const prevDAO = usePrevious(DAO);
+
+	useEffect(() => {
+		if(!owner && recurringPayments && recurringPayments.length > 0 && recurringPayments.filter((rp: any) => rp?.delegate?.wallet === account).length > 0) {
+			setTab(2)
+		}
+	}, [recurringPayments, owner])
 
 	const getSafeTokens = async () => {
 		if (!chainId) return [];
@@ -153,9 +160,8 @@ useState<Array<any>>();
 	}
 
 	useEffect(() => {
-		if(tab == 2)
-			loadRecurringTxnQueue()
-	}, [tab])
+		loadRecurringTxnQueue()
+	}, [_get(DAO, 'safe.address', '')])
 
 	const loadOffChainTxn = async () => {
 		return axiosHttp.get(`transaction/off-chain?daoId=${DAO._id}`)
@@ -326,7 +332,14 @@ useState<Array<any>>();
 					}] : []
 				}
 			)
-				.then(res => loadPendingTxn())
+				.then(async res => {
+					await axiosHttp.post(`utility/create-notification`, {
+						event:'transaction:confirmed',
+						safeAddress: _get(DAO, 'safe.address', ''),
+						account
+					}) 
+					loadPendingTxn()
+				})
 				.catch(e => console.log(e))
 				.finally(() => setConfirmTxLoading(null))
 		} else if (txn.offChain && _get(txn, 'token.symbol') !== 'SWEAT') {
@@ -350,6 +363,11 @@ useState<Array<any>>();
 							await (await safeService(provider, `${chainId}`)).getTransactionConfirmations(_safeTxHashs)
 								.then(async (res) => {
 									console.log(res)
+									await axiosHttp.post(`utility/create-notification`, {
+										event:'transaction:confirmed',
+										safeAddress: _get(DAO, 'safe.address', ''),
+										account
+									}) 
 									setPendingTxn(prev => {
 										return prev?.map(tx => {
 											if (tx.safeTxHash === _safeTxHashs)
@@ -396,7 +414,14 @@ useState<Array<any>>();
 					dataDecoded: null
 				}
 			)
-				.then(res => loadPendingTxn())
+				.then(async res => {
+					await axiosHttp.post(`utility/create-notification`, {
+						event:'transaction:rejected',
+						safeAddress: _get(DAO, 'safe.address', ''),
+						account
+					}) 
+					loadPendingTxn()
+				})
 				.catch(e => console.log(e))
 				.finally(() => setRejectTxLoading(null))
 		} else {
@@ -435,6 +460,11 @@ useState<Array<any>>();
 								console.log("on chain transaction has been confirmed by the signer");
 								await loadPendingTxn()
 								await loadTxnLabel()
+								await axiosHttp.post(`utility/create-notification`, {
+									event:'transaction:rejected',
+									safeAddress: _get(DAO, 'safe.address', ''),
+									account
+								}) 
 								setRejectTxLoading(null);
 							})
 							.catch((err) => {
@@ -464,24 +494,38 @@ useState<Array<any>>();
 		return dao;
 	};
 
-	const handleExecuteTransactions = async (txn: any, reject: boolean | undefined, syncOwners = false) => {
+	const handleExecuteTransactions = async (txn: any, reject: boolean | undefined, syncOwners = false, amount = null, isAllowanceTransaction = false) => {
 		const safeTokens = await getSafeTokens();
 		let safeToken = _find(safeTokens, t => t.tokenAddress === _get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', '')))
 		if (!safeToken)
 			safeToken = _find(safeTokens || [], (st: any) => _get(st, 'tokenAddress', '') === (chainId === SupportedChainId.GOERLI ? process.env.REACT_APP_GOERLI_TOKEN_ADDRESS : process.env.REACT_APP_MATIC_TOKEN_ADDRESS))
-	
 		let _txs = txn;
 		if (txn.offChain && _get(txn, 'token.symbol') === 'SWEAT') {
 			setExecuteTxLoading(txn.safeTxHash)
 			axiosHttp.get(`transaction/off-chain/${txn.safeTxHash}/execute${reject ? `?rejectedTxn=true&decimals=${tokenDecimal(_get(txn, 'to', ''))}&daoId=${_get(DAO, '_id', '')}` : `?decimals=${tokenDecimal(_get(txn, 'to', ''))}&daoId=${_get(DAO, '_id', '')}`}`)
-				.then(res => {
+				.then(async res => {
 					loadPendingTxn()
 					fetchDao()
 					dispatch(getCurrentUser({}))
+
+					await axiosHttp.post(`utility/create-notification`, {
+						event:'transaction:executed',
+						safeAddress: _get(DAO, 'safe.address', ''),
+						account
+					}) 
+
 				})
 				.catch(e => console.log(e))
 				.finally(() => setExecuteTxLoading(null))
 		} else {
+			if(!reject && amount && !isAllowanceTransaction) {
+				const balance = _get(safeToken, 'balance', 0) / 10 ** _get(safeToken, 'token.decimals', 18)
+				if(+amount > +balance) {
+					setLowBalanceError(`Low token balance`)
+					setTimeout(() => setLowBalanceError(null), 1000)
+					return;
+				}
+			}
 			if (txn.rejectedTxn && reject)
 				_txs = txn.rejectedTxn;
 			try {
@@ -531,6 +575,11 @@ useState<Array<any>>();
 				}
 				if(syncOwners)
 					await ownersCount(_get(DAO, 'safe.address', ''))
+				await axiosHttp.post(`utility/create-notification`, {
+					event:'transaction:executed',
+					safeAddress: _get(DAO, 'safe.address', ''),
+					account
+				}) 
 				await loadPendingTxn()
 				await loadExecutedTxn()
 				await loadTxnLabel()
@@ -591,6 +640,8 @@ useState<Array<any>>();
 		<div className="treasuryCard">
 			<div className="treasuryHeader">
 				<div style={{ display: 'flex', alignItems: 'center' }}>
+					{ (can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') &&
+					<>
 					<div
 						id="treasuryCardTitle"
 						style={tab === 1 ? { opacity: '1' } : { opacity: '0.4' }}
@@ -611,9 +662,12 @@ useState<Array<any>>();
 							<img style={{ width: 24, height: 24, objectFit: 'contain', marginLeft: 8 }} src={chainId === SupportedChainId.GOERLI ? GOERLI_LOGO : POLYGON_LOGO} />
 						</span>
 					</div>
-					{ owner &&
+					<div className="treasuryDivider"></div>
+					</>
+					}
+					{ true &&
 						<>
-						<div className="treasuryDivider"></div>
+						
 						<div
 							id="treasuryCardTitle"
 							style={tab === 2 ? { opacity: '1' } : { opacity: '0.4' }}
@@ -669,20 +723,22 @@ useState<Array<any>>();
 						}
 
 					</div>
-					<div className="treasuryTokens-right">
-						{
-							props.tokens.map((token: any) => {
-								return (
-									<>
-										<div className="tokenDiv">
-											<span>{`${_get(token, 'balance', 0) / 10 ** tokenDecimal(token.tokenAddress)}`}</span>
-											<h1>{`${_get(token, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}`}</h1>
-										</div>
-									</>
-								)
-							})
-						}
-					</div>
+					<Tooltip isOpen={lowBalanceError} label={"Low token balance"}>
+						<div className="treasuryTokens-right">
+							{
+								props.tokens.map((token: any) => {
+									return (
+										<>
+											<div className="tokenDiv">
+												<span>{`${_get(token, 'balance', 0) / 10 ** tokenDecimal(token.tokenAddress)}`}</span>
+												<h1>{`${_get(token, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}`}</h1>
+											</div>
+										</>
+									)
+								})
+							}
+						</div>
+					</Tooltip>
 				</div>
 			}
 
@@ -706,13 +762,16 @@ useState<Array<any>>();
 			}
 
 			{/* Treasury card body */}
-			{ tab === 1 ?
+			{ tab === 1 && (can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') ?
 				<>
 					{
 						pendingTxn !== undefined && executedTxn !== undefined &&
 						(pendingTxn && executedTxn && (pendingTxn.length !== 0 || executedTxn.length !== 0)) &&
 						<div id="treasuryTransactions">
-							<div className="dashboardText" style={{ marginBottom: '6px' }}>Last Transactions</div>
+							<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%'}}>
+								<div className="dashboardText" style={{ marginBottom: '6px', flexGrow: 1 }}>Last Transactions</div>
+								{/* { lowBalanceError && <div className="dashboardText" style={{ marginBottom: '6px', color: 'red' }}>Low token balance</div> } */}
+							</div>
 							{
 								pendingTxn.map((ptx, index) =>
 									<PendingTxn editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} executeFirst={executeFirst} isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
@@ -733,8 +792,8 @@ useState<Array<any>>();
 						<Table variant='simple' id="treasuryTransactions" style={{ width: '100%' }}>
 							<Tbody style={{ paddingTop: 8 }}>
 								{
-									recurringPayments.map((txn: any) => 
-										<RecurringTxn onRecurringEdit={props.onRecurringEdit} onExecute={async (data: any) => { 
+									(owner ? recurringPayments : recurringPayments.filter(( rp: any ) => rp?.delegate?.wallet === account)).map((txn: any) => 
+										<RecurringTxn owner={owner} onRecurringEdit={props.onRecurringEdit} onExecute={async (data: any) => { 
 											await loadTxnLabel()
 											dispatch(setRecurringPayments(data)) 
 										}} transaction={txn} />

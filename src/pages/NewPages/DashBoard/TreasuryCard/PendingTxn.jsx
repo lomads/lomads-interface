@@ -222,14 +222,14 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
                         {confirmReached &&
                             <Tooltip placement='top' isDisabled={!owner || executeFirst === transaction.nonce || transaction.offChain} label={`Transaction with nonce ${executeFirst} needs to be executed first`}>
                                 <ToolTopContainer>
-                                    <SimpleLoadButton condition={executeTxLoading === _get(transaction, 'safeTxHash')} disabled={(!transaction.offChain || !owner) && (!owner || executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading)} onClick={() => executeTransactions(transaction, false, isOwnerModificaitonTransaction)} width={"100%"} height={30} title="EXECUTE" bgColor={(transaction.offChain && owner) || (owner && executeFirst === transaction.nonce) ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
+                                    <SimpleLoadButton condition={executeTxLoading === _get(transaction, 'safeTxHash')} disabled={(!transaction.offChain || !owner) && (!owner || executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading)} onClick={() => executeTransactions(transaction, false, isOwnerModificaitonTransaction, isOwnerModificaitonTransaction ? null : mulAmount / 10 ** muldecimal)} width={"100%"} height={30} title="EXECUTE" bgColor={(transaction.offChain && owner) || (owner && executeFirst === transaction.nonce) ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
                                 </ToolTopContainer>
                             </Tooltip>
                         }
                         {rejectReached &&
                             <Tooltip placement='top' isDisabled={!owner || executeFirst === transaction.nonce || transaction.offChain} label={`Transaction with nonce ${executeFirst} needs to be executed first`}>
                                 <ToolTopContainer>
-                                    <SimpleLoadButton condition={executeTxLoading === _get(transaction, 'rejectedTxn.safeTxHash', _get(transaction, 'safeTxHash', ''))} disabled={ (!transaction.offChain || !owner) && ( !owner || executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading )} onClick={() => executeTransactions(transaction, true, isOwnerModificaitonTransaction)} width={"100%"} height={30} title="REJECT" bgColor={transaction.offChain || (owner && executeFirst === transaction.nonce) ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
+                                    <SimpleLoadButton condition={executeTxLoading === _get(transaction, 'rejectedTxn.safeTxHash', _get(transaction, 'safeTxHash', ''))} disabled={ (!transaction.offChain || !owner) && ( !owner || executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading )} onClick={() => executeTransactions(transaction, true, isOwnerModificaitonTransaction, isOwnerModificaitonTransaction ? null : mulAmount / 10 ** muldecimal)} width={"100%"} height={30} title="REJECT" bgColor={transaction.offChain || (owner && executeFirst === transaction.nonce) ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
                                 </ToolTopContainer>
                             </Tooltip>
                         }
@@ -364,14 +364,14 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
                             {confirmReached &&
                                 <Tooltip placement='top' isDisabled={!owner || executeFirst === transaction.nonce || transaction.offChain} label={`Transaction with nonce ${executeFirst} needs to be executed first`}>
                                     <ToolTopContainer>
-                                        <SimpleLoadButton condition={executeTxLoading == _get(transaction, 'safeTxHash')} disabled={!transaction.offChain && (!owner || executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading)} onClick={() => executeTransactions(transaction, false, isOwnerModificaitonTransaction)} width={"100%"} height={30} title="EXECUTE" bgColor={(transaction.offChain && owner) || (owner && executeFirst === transaction.nonce) ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
+                                        <SimpleLoadButton condition={executeTxLoading == _get(transaction, 'safeTxHash')} disabled={!transaction.offChain && (!owner || executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading)} onClick={() => executeTransactions(transaction, false, isOwnerModificaitonTransaction, amount / 10 ** decimal, isAllowanceTransaction)} width={"100%"} height={30} title="EXECUTE" bgColor={(transaction.offChain && owner) || (owner && executeFirst === transaction.nonce) ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
                                     </ToolTopContainer>
                                 </Tooltip>
                             }
                             {rejectReached &&
                             <Tooltip placement='top' isDisabled={!owner || executeFirst === transaction.nonce || transaction.offChain} label={`Transaction with nonce ${executeFirst} needs to be executed first`}>
                                 <ToolTopContainer>
-                                    <SimpleLoadButton  condition={executeTxLoading === _get(transaction, 'rejectedTxn.safeTxHash', _get(transaction, 'safeTxHash', ''))} disabled={!transaction.offChain && (!owner || executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading)} onClick={() => executeTransactions(transaction, true, isOwnerModificaitonTransaction)} width={"100%"} height={30} title="REJECT" bgColor={transaction.offChain || (owner && executeFirst === transaction.nonce) ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
+                                    <SimpleLoadButton  condition={executeTxLoading === _get(transaction, 'rejectedTxn.safeTxHash', _get(transaction, 'safeTxHash', ''))} disabled={!transaction.offChain && (!owner || executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading)} onClick={() => executeTransactions(transaction, true, isOwnerModificaitonTransaction, isOwnerModificaitonTransaction ? null : amount / 10 ** decimal)} width={"100%"} height={30} title="REJECT" bgColor={transaction.offChain || (owner && executeFirst === transaction.nonce) ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
                                 </ToolTopContainer>
                             </Tooltip>
                             }

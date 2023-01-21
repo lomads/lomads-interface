@@ -140,7 +140,7 @@ const ProjectDetails = () => {
             p = `${permission}.inproject`
         if (creator)
             p = `${permission}.creator`
-        console.log(p)
+        console.log("can(myRole, p) || can(myRole, permission)", can(myRole, p) || can(myRole, permission))
         return (can(myRole, p) || can(myRole, permission))
     }, [Project]);
 
@@ -719,7 +719,7 @@ const ProjectDetails = () => {
                         </div>
 
                         {/* new Links */}
-                        {
+                        {    canMyrole('project.links.view') &&
                             _get(Project, 'links', []).length > 0 &&
                             <div className="projectDetails-links">
                                 <div className="links-left">
@@ -764,8 +764,8 @@ const ProjectDetails = () => {
                         }
 
                         {/* project milestones & kra */}
-                        {
-                            _get(Project, 'milestones', []).length > 0 || _get(Project, 'kra.results', []).length > 0
+                        {     canMyrole('project.milestone.view') &&
+                            (_get(Project, 'milestones', []).length > 0 || _get(Project, 'kra.results', []).length > 0)
                                 ?
                                 <>
                                     <div className="milestone-div">
@@ -983,6 +983,7 @@ const ProjectDetails = () => {
                     </div>}
 
                     {/* members section */}
+                    {  canMyrole('members.view') &&
                     <div className="projectDetails-body">
                         <div className="projectDetails-members">
                             <div className="members-header">
@@ -1035,6 +1036,7 @@ const ProjectDetails = () => {
                             </div>
                         </div>
                     </div>
+                    }
                 </div>
 
                 <div style={{ width: '80%' }}>
