@@ -24,12 +24,17 @@ import ArchiveTasks from "pages/NewPages/ArchiveTasks";
 import ArchiveProjectTasks from "pages/NewPages/ArchiveProjectTasks";
 import AllProjectTasks from "pages/NewPages/AllProjectTasks";
 import AllProjects from "pages/NewPages/AllProjects";
-// import ArchieveResult from "components/ArchieveResult/ArchieveResult";
+import ArchiveKRA from "pages/NewPages/ArchiveKRA";
+import { Aikon } from "pages/NewPages/Aikon";
 
 export default [
     {
         path: '/',
         component: Dashboard
+    },
+    {
+        path: '/aikon',
+        component: Aikon
     },
     {
         path: '/login',
@@ -95,10 +100,10 @@ export default [
         path: '/:daoURL/project/:projectId',
         component: ProjectDetails
     },
-    // {
-    //     path: '/:daoURL/project/:projectId/archiveKra',
-    //     component: ArchieveResult
-    // },
+    {
+        path: '/:daoURL/project/:projectId/archiveKra',
+        component: ArchiveKRA
+    },
     {
         path: '/:daoURL/projects',
         component: AllProjects
