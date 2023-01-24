@@ -147,7 +147,7 @@ const SubmitTask = ({ task, close }) => {
                                 <textarea
                                     style={{ width: '100%' }}
                                     className="inputField"
-                                    placeholder='I made this changes because...'
+                                    placeholder=''
                                     value={note}
                                     onChange={handleChangeNote}
                                 />

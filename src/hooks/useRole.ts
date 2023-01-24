@@ -10,6 +10,7 @@ const role4: Array<string> = [
     'project.view', 
     'project.view.own', 
     'project.member.view',
+    'project.milestone.view.inproject',
     'project.task.view.inproject',
     'project.links.view.inproject',
     'members.view'
@@ -43,6 +44,7 @@ const role2: Array<string> = [
     'project.member.add', 
     'project.member.edit', 
     'project.link.add',
+    'project.milestone.view',
     'project.task.view',
     'project.links.view',
     'transaction.view', 

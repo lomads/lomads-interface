@@ -127,19 +127,19 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
                 resetMins = currentAllowance.resetTimeMin
                 resetBaseMins = currentAllowance.lastResetMin
             }
-            let memberName = _find(eligibleContributors, (m:any) => m.member._id === selectedUser)
-            memberName = memberName.member.name && memberName.member.name !== "" ? memberName.member.name : beautifyHexToken(memberName.member.wallet)
+            let m = _find(eligibleContributors, (m:any) => m.member._id === selectedUser)
+            const memberName = m.member.name && m.member.name !== "" ? m.member.name : beautifyHexToken(m.member.wallet)
             const txnHash = await setAllowance({
                 allowance: [{ token: compensation?.currency, amount: `${BigInt(parseFloat(amount) * 10 ** _get(compensation, 'decimal', 18))}`, resetMins: `${resetMins}`, resetBaseMins: `${resetBaseMins}`}],
                 label: `Approval for ${frequency} payment | ${memberName} | ${_get(compensation, 'amount')} ${_get(compensation, 'symbol')}`,
                 actualAmount:  _get(compensation, 'amount'),
-                delegate: account as string,
+                delegate:  _get(m, 'member.wallet', null),
              })
             const payload = {
                 daoId: _get(DAO, '_id', null),
                 safeAddress: _get(DAO, 'safe.address', null),
                 receiver: selectedUser,
-                delegate: user._id,
+                delegate: selectedUser,
                 compensation,
                 frequency,
                 startDate: moment(startDate, 'YYYY-MM-DD').startOf('day').utc().toDate(),
@@ -222,6 +222,7 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
                     resetMins = currentAllowance.resetTimeMin
                     resetBaseMins = currentAllowance.lastResetMin
                 }
+
                 const memberName = transaction?.receiver?.name && transaction?.receiver?.name !== "" ? transaction?.receiver?.name : beautifyHexToken(transaction?.receiver?.wallet)
                 const txnHash = await setAllowance({
                     allowance: [
@@ -230,7 +231,7 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
                     ],
                     actualAmount:  _get(compensation, 'amount'),
                     label: `Allowance reset for ${frequency} payment | ${memberName} | ${_get(compensation, 'amount')} ${_get(compensation, 'symbol')}`,
-                    delegate: account as string,
+                    delegate: transaction?.receiver?.wallet
                  })
                 payload.allowanceTxnHash = txnHash?.safeTxHash
             } else if (isAmountChanged) {
@@ -254,7 +255,7 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
                     ],
                     actualAmount:  _get(compensation, 'amount'),
                     label: `Allowance update for ${frequency} payment | ${memberName} | ${_get(compensation, 'amount')} ${_get(compensation, 'symbol')}`,
-                    delegate: account as string,
+                    delegate: transaction?.receiver?.wallet
                  })
                 payload.allowanceTxnHash = txnHash?.safeTxHash
 
@@ -295,7 +296,7 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
             ],
             actualAmount:  transaction.compensation.amount,
             label: `Stopping ${frequency} payment | ${memberName} | ${transaction.compensation.amount} ${_get(compensation, 'symbol')}`,
-            delegate: account as string,
+            delegate: transaction?.receiver?.wallet
          })
 
         await axiosHttp.delete(`recurring-payment/${transaction._id}`)
