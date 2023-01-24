@@ -75,10 +75,10 @@ const SubmitTask = ({ task, close }) => {
             document.getElementById('link-error').innerHTML = "Please enter a link";
             return;
         }
-        else if (!isValidUrl(link)) {
-            document.getElementById('link-error').innerHTML = "Please enter a valid link"
-            return;
-        }
+        // else if (!isValidUrl(link)) {
+        //     document.getElementById('link-error').innerHTML = "Please enter a valid link"
+        //     return;
+        // }
         else {
             let tempLink = link;
             if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
@@ -112,11 +112,11 @@ const SubmitTask = ({ task, close }) => {
                 daoUrl: _get(DAO, 'url', ''),
                 taskId: task._id,
                 note,
-                submissionLink: task.submissionLink === "" ? resourceList: task.submissionLink
+                submissionLink: task.submissionLink === "" ? resourceList : task.submissionLink
             }
             console.log("payload : ", payload)
             //console.log(payload)
-           dispatch(submitTaskAction(payload))
+            dispatch(submitTaskAction(payload))
         }
     }, [note, resourceList, task])
 

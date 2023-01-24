@@ -27,7 +27,7 @@ const ProjectEdit = ({ toggleShowEdit, toggleDeletePrompt, toggleClosePrompt, to
                         <h1>Workspace settings</h1>
 
                         <div className='edit-card'>
-                            <h1>Workspace infos</h1>
+                            <h1>Workspace details</h1>
                             <button onClick={() => toggleWorkspaceInfo(true)}>
                                 <img src={editTokenvg} alt="editToken" />
                             </button>
@@ -101,7 +101,7 @@ const ProjectEdit = ({ toggleShowEdit, toggleDeletePrompt, toggleClosePrompt, to
 
                     <div className='ProjectEdit-footer'>
                         <button onClick={() => toggleClosePrompt(true)}>
-                            CLOSE PROJECT
+                            CLOSE WORKSPACE
                         </button>
                     </div>
                 </div>
