@@ -25,16 +25,11 @@ import ArchiveProjectTasks from "pages/NewPages/ArchiveProjectTasks";
 import AllProjectTasks from "pages/NewPages/AllProjectTasks";
 import AllProjects from "pages/NewPages/AllProjects";
 import ArchiveKRA from "pages/NewPages/ArchiveKRA";
-import { Aikon } from "pages/NewPages/Aikon";
 
 export default [
     {
         path: '/',
         component: Dashboard
-    },
-    {
-        path: '/aikon',
-        component: Aikon
     },
     {
         path: '/login',

@@ -65,6 +65,7 @@ const Dashboard = () => {
 	const [update, setUpdate] = useState(0);
 	const treasuryRef = useRef<any>();
 	const { provider, account, chainId, connector } = useWeb3React();
+	console.log("chainId : ", chainId, provider);
 	const safeAddress = useAppSelector((state) => state.flow.safeAddress);
 	const totalMembers = useAppSelector((state) => state.flow.totalMembers);
 	const [pendingTransactions, setPendingTransactions] =
@@ -466,7 +467,7 @@ const Dashboard = () => {
 										<img src={copyIcon} alt="copy" className="safeCopyImage" />
 									</div>
 								</Tooltip>
-								{/* <button style={{ width: '100px', height: '50px', background: '#FFF' }} onClick={() => navigate('/aikon')}>AIKON</button> */}
+
 							</div>
 							<div className="DAODescription">{_get(DAO, 'description', '')}</div>
 						</div>

@@ -24,6 +24,7 @@ import axiosHttp from '../api';
 import { getSigner } from 'utils'
 import styled from "styled-components/macro";
 import axios from "axios";
+import { Aikon } from "./NewPages/Aikon";
 
 const HeaderControls = styled.div`
   display: flex;
@@ -195,6 +196,7 @@ const LoginPage = (props: any) => {
 							alt="WalletConnect"
 						/>
 					</button>
+					<Aikon />
 				</div>
 				<div className="humangroup">
 					<img src={humangroup} alt="human group" />

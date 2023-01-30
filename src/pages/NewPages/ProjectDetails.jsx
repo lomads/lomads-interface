@@ -453,6 +453,16 @@ const ProjectDetails = () => {
         setShowEdit(!showEdit);
     }
 
+    const amIMember = useMemo(() => {
+        if (Project) {
+            let user = _find(_get(Project, 'members', []), m => _get(m, 'wallet', '').toLowerCase() === account?.toLowerCase())
+            if (user)
+                return true
+            return false
+        }
+        return false;
+    }, [account, Project])
+
     return (
         <>
             {
@@ -719,7 +729,7 @@ const ProjectDetails = () => {
                         </div>
 
                         {/* new Links */}
-                        {    canMyrole('project.links.view') &&
+                        {canMyrole('project.links.view') && amIMember &&
                             _get(Project, 'links', []).length > 0 &&
                             <div className="projectDetails-links">
                                 <div className="links-left">
@@ -764,139 +774,139 @@ const ProjectDetails = () => {
                         }
 
                         {/* project milestones & kra */}
-                        {     canMyrole('project.milestone.view') &&
+                        {canMyrole('project.milestone.view') &&
                             (_get(Project, 'milestones', []).length > 0 || _get(Project, 'kra.results', []).length > 0)
-                                ?
-                                <>
-                                    <div className="milestone-div">
-                                        <div className="milestone-kra">
-                                            {
-                                                _get(Project, 'milestones', []).length > 0 && _get(Project, 'kra.results', []).length > 0
-                                                    ?
-                                                    <>
-                                                        <div onClick={() => setTab(1)}>
-                                                            <h1 style={tab === 1 ? { opacity: '1' } : { opacity: '0.4' }}>Milestones</h1>
-                                                        </div>
-                                                        <div className="divider"></div>
-                                                        <div onClick={() => setTab(2)}>
-                                                            <h1 style={tab === 2 ? { opacity: '1' } : { opacity: '0.4' }}>Key results</h1>
-                                                        </div>
-                                                    </>
-                                                    :
-                                                    <>
-                                                        {
-                                                            _get(Project, 'milestones', []).length > 0 && !_get(Project, 'kra.results', []).length > 0
-                                                                ?
-                                                                <div>
-                                                                    <h1 style={{ opacity: '1' }}>Milestones</h1>
-                                                                </div>
-                                                                :
-                                                                <div>
-                                                                    <h1 style={{ opacity: '1' }}>Key results</h1>
-                                                                </div>
-                                                        }
-                                                    </>
-                                            }
-                                        </div>
-                                        <div className="milestone-kra-status">
-                                            {
-                                                tab === 1
-                                                    ?
-                                                    <>
-                                                        <div className="status">
-                                                            <div style={{ width: '300px' }}>
-                                                                <ProgressBar
-                                                                    percent={((_get(Project, 'milestones', []).filter((item) => item.complete === true).length) / (_get(Project, 'milestones', []).length)) * 100}
-                                                                    filledBackground="#188C7C"
-                                                                    unfilledBackground="#F0F0F0"
-                                                                    height="5px"
-                                                                >
-                                                                    <Step transition="scale">
-                                                                        {({ accomplished, index }) => (
-                                                                            <div className={`indexedStep ${accomplished ? "accomplished" : ""}`}></div>
-                                                                        )}
-                                                                    </Step>
-                                                                    {
-                                                                        _get(Project, 'milestones', []).map((item, index) => {
-                                                                            return (
-                                                                                <Step transition="scale">
-                                                                                    {({ accomplished, index }) => (
-                                                                                        <div className={`indexedStep ${accomplished ? "accomplished" : ""}`}></div>
-                                                                                    )}
-                                                                                </Step>
-                                                                            )
-                                                                        })
-                                                                    }
-                                                                </ProgressBar>
-                                                            </div>
-                                                            {
-                                                                _get(Project, 'milestones', []).length > 0
-                                                                    ?
-                                                                    <span className="percent-text">{(((_get(Project, 'milestones', []).filter((item) => item.complete === true).length) / (_get(Project, 'milestones', []).length)) * 100).toFixed(2)}%</span>
-                                                                    :
-                                                                    <span className="percent-text">0%</span>
-                                                            }
-                                                        </div>
-                                                    </>
-                                                    :
-                                                    <div className="status" style={{ justifyContent: 'space-between' }}>
-                                                        <span>Review frequency : {_get(Project, 'kra.frequency', [])}</span>
-                                                        <div style={{ width: '50%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                                            <button className='archive-btn' onClick={() => navigate(`/${daoURL}/project/${projectId}/archiveKra`)}>
-                                                                <img src={archiveIcon} alt="archive-icon" />
-                                                            </button>
-                                                            {canMyrole('project.review') && <button className="review-btn" onClick={() => setShowKRAReview(true)}>
-                                                                REVIEW
-                                                            </button>}
-                                                        </div>
-                                                    </div>
-                                            }
-                                        </div>
-                                    </div>
-
-                                    <div className="milestone-kra-body">
+                            ?
+                            <>
+                                <div className="milestone-div">
+                                    <div className="milestone-kra">
                                         {
-                                            tab === 1
+                                            _get(Project, 'milestones', []).length > 0 && _get(Project, 'kra.results', []).length > 0
                                                 ?
                                                 <>
-                                                    {
-                                                        _get(Project, 'milestones', []).map((item, index) => {
-                                                            return (
-                                                                <div className={item.complete ? "milestone-card done" : "milestone-card"}>
-                                                                    <div className="mile-div">
-                                                                        <span>{index + 1}</span>
-                                                                        <h1>{item.name}</h1>
-                                                                    </div>
-                                                                    <div className="mile-date">
-                                                                        <h1>{item.deadline}</h1>
-                                                                    </div>
-                                                                    {canMyrole('project.milestone.update') &&
-                                                                        <div className="check-circle" onClick={() => selectMilestone(item, index)}>
-                                                                            <FiCheck size={20} />
-                                                                        </div>
-                                                                    }
-                                                                </div>
-                                                            )
-                                                        })
-                                                    }
+                                                    <div onClick={() => setTab(1)}>
+                                                        <h1 style={tab === 1 ? { opacity: '1' } : { opacity: '0.4' }}>Milestones</h1>
+                                                    </div>
+                                                    <div className="divider"></div>
+                                                    <div onClick={() => setTab(2)}>
+                                                        <h1 style={tab === 2 ? { opacity: '1' } : { opacity: '0.4' }}>Key results</h1>
+                                                    </div>
                                                 </>
                                                 :
                                                 <>
                                                     {
-                                                        _get(Project, 'kra.results', []).map((item, index) => {
-                                                            return (
-                                                                <div className="milestone-card">
-                                                                    <div className="kra-div"><h1>{item.name}</h1></div>
-                                                                </div>
-                                                            )
-                                                        })
+                                                        _get(Project, 'milestones', []).length > 0 && !_get(Project, 'kra.results', []).length > 0
+                                                            ?
+                                                            <div>
+                                                                <h1 style={{ opacity: '1' }}>Milestones</h1>
+                                                            </div>
+                                                            :
+                                                            <div>
+                                                                <h1 style={{ opacity: '1' }}>Key results</h1>
+                                                            </div>
                                                     }
                                                 </>
                                         }
                                     </div>
-                                </>
-                                :
-                                null
+                                    <div className="milestone-kra-status">
+                                        {
+                                            tab === 1
+                                                ?
+                                                <>
+                                                    <div className="status">
+                                                        <div style={{ width: '300px' }}>
+                                                            <ProgressBar
+                                                                percent={((_get(Project, 'milestones', []).filter((item) => item.complete === true).length) / (_get(Project, 'milestones', []).length)) * 100}
+                                                                filledBackground="#188C7C"
+                                                                unfilledBackground="#F0F0F0"
+                                                                height="5px"
+                                                            >
+                                                                <Step transition="scale">
+                                                                    {({ accomplished, index }) => (
+                                                                        <div className={`indexedStep ${accomplished ? "accomplished" : ""}`}></div>
+                                                                    )}
+                                                                </Step>
+                                                                {
+                                                                    _get(Project, 'milestones', []).map((item, index) => {
+                                                                        return (
+                                                                            <Step transition="scale">
+                                                                                {({ accomplished, index }) => (
+                                                                                    <div className={`indexedStep ${accomplished ? "accomplished" : ""}`}></div>
+                                                                                )}
+                                                                            </Step>
+                                                                        )
+                                                                    })
+                                                                }
+                                                            </ProgressBar>
+                                                        </div>
+                                                        {
+                                                            _get(Project, 'milestones', []).length > 0
+                                                                ?
+                                                                <span className="percent-text">{(((_get(Project, 'milestones', []).filter((item) => item.complete === true).length) / (_get(Project, 'milestones', []).length)) * 100).toFixed(2)}%</span>
+                                                                :
+                                                                <span className="percent-text">0%</span>
+                                                        }
+                                                    </div>
+                                                </>
+                                                :
+                                                <div className="status" style={{ justifyContent: 'space-between' }}>
+                                                    <span>Review frequency : {_get(Project, 'kra.frequency', [])}</span>
+                                                    <div style={{ width: '50%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                                                        <button className='archive-btn' onClick={() => navigate(`/${daoURL}/project/${projectId}/archiveKra`)}>
+                                                            <img src={archiveIcon} alt="archive-icon" />
+                                                        </button>
+                                                        {canMyrole('project.review') && <button className="review-btn" onClick={() => setShowKRAReview(true)}>
+                                                            REVIEW
+                                                        </button>}
+                                                    </div>
+                                                </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div className="milestone-kra-body">
+                                    {
+                                        tab === 1
+                                            ?
+                                            <>
+                                                {
+                                                    _get(Project, 'milestones', []).map((item, index) => {
+                                                        return (
+                                                            <div className={item.complete ? "milestone-card done" : "milestone-card"}>
+                                                                <div className="mile-div">
+                                                                    <span>{index + 1}</span>
+                                                                    <h1>{item.name}</h1>
+                                                                </div>
+                                                                <div className="mile-date">
+                                                                    <h1>{item.deadline}</h1>
+                                                                </div>
+                                                                {canMyrole('project.milestone.update') &&
+                                                                    <div className="check-circle" onClick={() => selectMilestone(item, index)}>
+                                                                        <FiCheck size={20} />
+                                                                    </div>
+                                                                }
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
+                                            </>
+                                            :
+                                            <>
+                                                {
+                                                    _get(Project, 'kra.results', []).map((item, index) => {
+                                                        return (
+                                                            <div className="milestone-card">
+                                                                <div className="kra-div"><h1>{item.name}</h1></div>
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
+                                            </>
+                                    }
+                                </div>
+                            </>
+                            :
+                            null
                         }
 
                         {/* old code for links */}
@@ -983,59 +993,59 @@ const ProjectDetails = () => {
                     </div>}
 
                     {/* members section */}
-                    {  canMyrole('members.view') &&
-                    <div className="projectDetails-body">
-                        <div className="projectDetails-members">
-                            <div className="members-header">
-                                <h1>Members</h1>
-                                <div>
-                                    <div className="divider"></div>
-                                    <div className="member-count">
-                                        <img src={membersGroup} alt="membersGroup" />
-                                        <p>{_uniqBy(Project?.members, '_id').length} members</p>
-                                    </div>
+                    {canMyrole('members.view') &&
+                        <div className="projectDetails-body">
+                            <div className="projectDetails-members">
+                                <div className="members-header">
+                                    <h1>Members</h1>
                                     <div>
-                                        {canMyrole('project.member.add') &&
-                                            <button onClick={toggleMemberList}>
-                                                <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
-                                                MEMBER
-                                            </button>}
+                                        <div className="divider"></div>
+                                        <div className="member-count">
+                                            <img src={membersGroup} alt="membersGroup" />
+                                            <p>{_uniqBy(Project?.members, '_id').length} members</p>
+                                        </div>
+                                        <div>
+                                            {canMyrole('project.member.add') &&
+                                                <button onClick={toggleMemberList}>
+                                                    <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
+                                                    MEMBER
+                                                </button>}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="members-list">
-                                <div className="members-list-head">
-                                    <div>
-                                        <p>Name</p>
+                                <div className="members-list">
+                                    <div className="members-list-head">
+                                        <div>
+                                            <p>Name</p>
+                                        </div>
+                                        <div>
+                                            <p>joined</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p>joined</p>
-                                    </div>
-                                </div>
-                                <div className="members-list-body">
-                                    {
-                                        _uniqBy(Project?.members, '_id').map((item, index) => (
-                                            <div className="members-row" key={index}>
-                                                <div className="members-row-name">
-                                                    <div>
-                                                        <img src={memberIcon} alt="memberIcon" />
-                                                        <p>{item.name}</p>
+                                    <div className="members-list-body">
+                                        {
+                                            _uniqBy(Project?.members, '_id').map((item, index) => (
+                                                <div className="members-row" key={index}>
+                                                    <div className="members-row-name">
+                                                        <div>
+                                                            <img src={memberIcon} alt="memberIcon" />
+                                                            <p>{item.name}</p>
+                                                        </div>
+                                                        <span>{item.wallet.slice(0, 6) + "..." + item.wallet.slice(-4)}</span>
                                                     </div>
-                                                    <span>{item.wallet.slice(0, 6) + "..." + item.wallet.slice(-4)}</span>
+                                                    <div className="members-row-date">
+                                                        <p>{moment.utc(item.joined).local().format('MM/DD/YYYY')} </p>
+                                                    </div>
+                                                    <div className="members-row-status">
+                                                        <span>{handleRenderRole(item)}</span>
+                                                    </div>
                                                 </div>
-                                                <div className="members-row-date">
-                                                    <p>{moment.utc(item.joined).local().format('MM/DD/YYYY')} </p>
-                                                </div>
-                                                <div className="members-row-status">
-                                                    <span>{handleRenderRole(item)}</span>
-                                                </div>
-                                            </div>
-                                        ))
-                                    }
+                                            ))
+                                        }
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                     }
                 </div>
 
