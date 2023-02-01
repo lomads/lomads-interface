@@ -71,6 +71,21 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
     };
 
     useEffect(() => {
+        var date = new Date();
+        var tdate = date.getDate();
+        var month = date.getMonth() + 1;
+        if (tdate < 10) {
+            tdate = "0" + tdate;
+        }
+        if (month < 10) {
+            month = "0" + month
+        }
+        var year = date.getUTCFullYear();
+        var minDate = year + "-" + month + "-" + tdate;
+        document.getElementById("deadlineInput").setAttribute("min", minDate);
+    }, [])
+
+    useEffect(() => {
         if (account && chainId && (!user || (user && user.wallet.toLowerCase() !== account.toLowerCase()))) {
             dispatch(getCurrentUser({}))
         }
@@ -191,7 +206,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
             symbol = _get(symbol, 'token.symbol', null)
             if (!symbol)
-                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ||  currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
+                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
 
             let task = {};
             task.daoId = DAO?._id;
@@ -235,7 +250,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
         let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
         symbol = _get(symbol, 'token.symbol', 'SWEAT')
         if (!symbol)
-            symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ||  currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
+            symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
         let task = {};
         task.daoId = DAO?._id;
         task.name = name;
@@ -374,7 +389,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
 
                                         <div className='createTask-inputRow'>
                                             <div className='createTask-optionalDiv'>
-                                                <span>In { transformWorkspace().label }:</span>
+                                                <span>In {transformWorkspace().label}:</span>
                                                 <div className='option-div'>
                                                     Optional
                                                 </div>
@@ -393,7 +408,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                         <option value={null}>{selectedProject.name}</option>
                                                         :
                                                         <>
-                                                            <option value={null}>Select { transformWorkspace().label }</option>
+                                                            <option value={null}>Select {transformWorkspace().label}</option>
                                                             {
                                                                 eligibleProjects.filter(p => !p.archivedAt && !p.deletedAt).map((item, index) => {
                                                                     return (

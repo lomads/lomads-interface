@@ -204,12 +204,12 @@ const Settings = () => {
 									</Link>
 								</div>
 							</div>
-							<div  
-							onClick={() => {
-								toggleModal();
-								setOpenSafe(true)
-							}}
-							className="settings-organisation-child">
+							<div
+								onClick={() => {
+									toggleModal();
+									setOpenSafe(true)
+								}}
+								className="settings-organisation-child">
 								<div
 									style={{
 										padding: "20px",

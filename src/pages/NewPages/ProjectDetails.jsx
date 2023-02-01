@@ -441,11 +441,21 @@ const ProjectDetails = () => {
     };
 
     const selectMilestone = (item, index) => {
-        if (!item.complete) {
-            let e = { ...item };
-            e.pos = index;
-            setSelectedMilestone(e);
-            setShowAssign(true)
+        if (index === 0) {
+            if (!item.complete) {
+                let e = { ...item };
+                e.pos = index;
+                setSelectedMilestone(e);
+                setShowAssign(true)
+            }
+        }
+        else if (index > 0) {
+            if (!item.complete && Project.milestones[index - 1].complete) {
+                let e = { ...item };
+                e.pos = index;
+                setSelectedMilestone(e);
+                setShowAssign(true)
+            }
         }
     }
 
