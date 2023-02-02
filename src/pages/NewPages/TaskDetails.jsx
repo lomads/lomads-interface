@@ -170,6 +170,42 @@ const TaskDetails = () => {
         return false;
     }, [account, DAO, Task]);
 
+        const amIEligible_discord=useMemo(()=>{
+        if (DAO && Task) {
+            let current_user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
+            console.log('currentuser',current_user);
+            let reurntype_function=false;
+            if(current_user.discordRoles){
+
+
+                Task?.validRoles.map(channelid=>{
+                    console.log('task chanellid',channelid);
+
+
+                    Object.keys(current_user.discordRoles).forEach(function(key, index) {
+                        console.log(current_user.discordRoles[key]);
+                        if(current_user.discordRoles[key].includes(channelid)){
+                            console.log('mathched');
+                            reurntype_function=true;
+                            return reurntype_function;
+
+                            }else{
+
+                            console.log('not mathched');
+                            }
+                    });
+
+
+                })
+                return reurntype_function;
+            }
+
+            return false;
+        }
+
+
+        }, [account, DAO, Task]);
+
     const amICreator = useMemo(() => {
         if (DAO && Task) {
             let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
@@ -685,7 +721,7 @@ const TaskDetails = () => {
                                 </div>
                                 <div className="body-right">
 
-                                    {/* if task status is open then users can apply */}
+                                    {/* if task status is open then users can apply */console.log('amIEligible_discord',amIEligible_discord)}
                                     {
                                         Task.taskStatus === 'open' && !Task.archivedAt && !Task.deletedAt
                                             ?
@@ -756,13 +792,14 @@ const TaskDetails = () => {
                                                                     :
                                                                     // Not applied yet --- check if valid roles condition exists
                                                                     <>
-                                                                        {
+                                                                        { 
+                                                                            
                                                                             Task.validRoles.length > 0 && !Task.archivedAt && !Task.deletedAt
                                                                                 ?
                                                                                 <>
-                                                                                    {
+                                                                                    { 
                                                                                         // check if current user has access according to validRoles
-                                                                                        amIEligible
+                                                                                        amIEligible||amIEligible_discord
                                                                                             ?
                                                                                             <>
                                                                                                 {
