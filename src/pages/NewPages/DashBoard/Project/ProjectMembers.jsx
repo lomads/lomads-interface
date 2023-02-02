@@ -22,6 +22,8 @@ const ProjectMembers = ({ toggleEditMember }) => {
     const { DAO, Project, editProjectMemberLoading } = useAppSelector((state) => state.dashboard);
     const { transformWorkspace, transformRole } = useTerminology(_get(DAO, 'terminologies'));
     const [updateMembers, setUpdateMembers] = useState(_get(Project, 'members', []).map((_item, _index) => { return _item._id }));
+    const [toggle, setToggle] = useState(false);
+    const [selectType, setSelectType] = useState('');
 
     // useEffect(() => {
     //     if (Project) {
@@ -67,35 +69,75 @@ const ProjectMembers = ({ toggleEditMember }) => {
                     <div className="editMember-body">
                         <img src={membersXL} alt="frame-icon" />
                         <h1>Project Members</h1>
-                        <span>Invite the best team or set this workspace open so anyone can participate.</span>
+                        <span className="head-text">Invite the best team or set this workspace open so anyone can participate.</span>
+                        <div className="toggle-box">
+                            <label class="switch">
+                                <input type="checkbox" onChange={() => setToggle(!toggle)} />
+                                <span class="slider round"></span>
+                            </label>
+                            <span className="toggle-text">
+                                {
+                                    toggle
+                                        ?
+                                        'FILTER BY'
+                                        :
+                                        'OPEN FOR ALL'
+                                }
+                            </span>
+                        </div>
                         {
-                            _get(DAO, 'members', []).map((item, index) => {
-                                return (
-                                    <div className="member-row" key={index}>
-                                        <div className="member-name">
-                                            <img src={memberIcon} alt="memberIcon" />
-                                            <p>{item.member.name}</p>
-                                        </div>
-                                        <div className="member-address">
-                                            <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
-                                        </div>
-                                        <div className="member-checkbox">
-                                            <div className="checkbox" onClick={() => handleAddMemberDelete(item.member._id)}>
-                                                {
-                                                    // updateMembers.includes(item._id)
-                                                    !(updateMembers.some((m) => m === item.member._id) === false)
-                                                        ?
-                                                        <div className="active-box">
-                                                            <BsCheck2 color="#FFF" />
-                                                        </div>
-                                                        :
-                                                        <div className="inactive-box"></div>
-                                                }
+                            toggle &&
+                            <div className="members-dropdown">
+                                <select
+                                    name="project"
+                                    id="project"
+                                    className="tokenDropdown"
+                                    style={{ width: '100%', margin: '0' }}
+                                    value={selectType}
+                                    onChange={(e) => setSelectType(e.target.value)}
+                                >
+                                    <option value="" selected disabled hidden>Select</option>
+                                    <option value={"Invitation"}>Invitation</option>
+                                    <option value={"Roles"}>Roles</option>
+                                    <option value={"Token"}>Token</option>
+                                </select>
+                            </div>
+                        }
+                        {
+                            toggle && selectType === 'Invitation'
+                            &&
+                            <>
+                                <div className="divider"></div>
+                                {
+                                    _get(DAO, 'members', []).map((item, index) => {
+                                        return (
+                                            <div className="member-row" key={index}>
+                                                <div className="member-name">
+                                                    <img src={memberIcon} alt="memberIcon" />
+                                                    <p>{item.member.name}</p>
+                                                </div>
+                                                <div className="member-address">
+                                                    <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
+                                                </div>
+                                                <div className="member-checkbox">
+                                                    <div className="checkbox" onClick={() => handleAddMemberDelete(item.member._id)}>
+                                                        {
+                                                            // updateMembers.includes(item._id)
+                                                            !(updateMembers.some((m) => m === item.member._id) === false)
+                                                                ?
+                                                                <div className="active-box">
+                                                                    <BsCheck2 color="#FFF" />
+                                                                </div>
+                                                                :
+                                                                <div className="inactive-box"></div>
+                                                        }
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                )
-                            })
+                                        )
+                                    })
+                                }
+                            </>
                         }
 
                         {/* {
