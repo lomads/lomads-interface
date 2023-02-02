@@ -65,6 +65,7 @@ const Dashboard = () => {
 	const [update, setUpdate] = useState(0);
 	const treasuryRef = useRef<any>();
 	const { provider, account, chainId, connector } = useWeb3React();
+	console.log("chainId : ", chainId, provider);
 	const safeAddress = useAppSelector((state) => state.flow.safeAddress);
 	const totalMembers = useAppSelector((state) => state.flow.totalMembers);
 	const [pendingTransactions, setPendingTransactions] =
@@ -466,7 +467,7 @@ const Dashboard = () => {
 										<img src={copyIcon} alt="copy" className="safeCopyImage" />
 									</div>
 								</Tooltip>
-								{/* <button style={{ width: '100px', height: '50px', background: '#FFF' }} onClick={() => navigate('/aikon')}>AIKON</button> */}
+
 							</div>
 							<div className="DAODescription">{_get(DAO, 'description', '')}</div>
 						</div>
@@ -517,20 +518,20 @@ const Dashboard = () => {
 				<MyProject />
 				<Tasks toggleShowCreateTask={toggleShowCreateTask} onlyProjects={false} />
 
-					<TreasuryCard
-						innerRef={treasuryRef}
-						onRecurringEdit={handleOnRecurringEdit}
-						safeAddress={safeAddress}
-						pendingTransactions={pendingTransactions}
-						executedTransactions={executedTransactions}
-						ownerCount={ownerCount}
-						toggleModal={toggleModal}
-						fiatBalance={safeTokens}
-						account={account}
-						onChangePendingTransactions={(tx: any) => setPendingTransactions(tx)}
-						tokens={safeTokens}
-						toggleShowCreateRecurring={toggleShowCreateRecurring}
-					/>
+				<TreasuryCard
+					innerRef={treasuryRef}
+					onRecurringEdit={handleOnRecurringEdit}
+					safeAddress={safeAddress}
+					pendingTransactions={pendingTransactions}
+					executedTransactions={executedTransactions}
+					ownerCount={ownerCount}
+					toggleModal={toggleModal}
+					fiatBalance={safeTokens}
+					account={account}
+					onChangePendingTransactions={(tx: any) => setPendingTransactions(tx)}
+					tokens={safeTokens}
+					toggleShowCreateRecurring={toggleShowCreateRecurring}
+				/>
 				{can(myRole, 'members.view') &&
 					<MemberCard
 						totalMembers={totalMembers}

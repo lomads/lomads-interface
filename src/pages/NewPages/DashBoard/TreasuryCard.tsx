@@ -10,7 +10,7 @@ import {
 	Table,
 	TableContainer,
 	Tbody
-  } from '@chakra-ui/react'
+} from '@chakra-ui/react'
 import { tokenCallSafe } from "connection/DaoTokenCall";
 import { SafeTransactionDataPartial } from "@gnosis.pm/safe-core-sdk-types";
 import {
@@ -69,7 +69,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	const [editMode, setEditMode] = useState<any>();
 	const [lowBalanceError, setLowBalanceError] = useState<any>(null);
 	useOnClickOutside(node, () => editMode ? setEditMode(null) : undefined)
-useState<Array<any>>();
+	useState<Array<any>>();
 	//const [recurringTxnQueue, setRecurringTxnQueue] = useState<Array<any>>();
 
 	const [labels, setLabels] = useState<Array<any>>();
@@ -90,27 +90,27 @@ useState<Array<any>>();
 	const prevDAO = usePrevious(DAO);
 
 	useEffect(() => {
-		if(!owner && recurringPayments && recurringPayments.length > 0 && recurringPayments.filter((rp: any) => rp?.delegate?.wallet === account).length > 0) {
+		if (!owner && recurringPayments && recurringPayments.length > 0 && recurringPayments.filter((rp: any) => rp?.delegate?.wallet === account).length > 0) {
 			setTab(2)
 		}
 	}, [recurringPayments, owner])
 
 	const getSafeTokens = async () => {
 		if (!chainId) return [];
-			let tokens = props.tokens.map((t: any) => {
-				let tkn = t
-				if (!tkn.tokenAddress) {
-					return {
-						...t,
-						tokenAddress: chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS,
-						token: {
-							symbol: chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR',
-							decimals: 18
-						}
+		let tokens = props.tokens.map((t: any) => {
+			let tkn = t
+			if (!tkn.tokenAddress) {
+				return {
+					...t,
+					tokenAddress: chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS,
+					token: {
+						symbol: chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR',
+						decimals: 18
 					}
 				}
-				return t
-			})
+			}
+			return t
+		})
 		return tokens
 	}
 
@@ -120,7 +120,7 @@ useState<Array<any>>();
 			setPendingTxn(undefined)
 		}
 	}, [DAO, prevDAO])
-	
+
 
 	useImperativeHandle(props.innerRef, () => ({
 		reload: (event: any) => {
@@ -204,7 +204,7 @@ useState<Array<any>>();
 					return matchRejTx.safeTxHash !== p.safeTxHash
 				return true
 			}))
-			.then(ptx => _filter(ptx, p => !p.dataDecoded || (_get(p, 'dataDecoded.method', '') === 'multiSend' || _get(p, 'dataDecoded.method', '') === 'transfer' || _get(p, 'dataDecoded.method', '') === 'addOwnerWithThreshold' || _get(p, 'dataDecoded.method', '') === 'removeOwner' || _get(p, 'dataDecoded.method', '') === 'changeThreshold' )))
+			.then(ptx => _filter(ptx, p => !p.dataDecoded || (_get(p, 'dataDecoded.method', '') === 'multiSend' || _get(p, 'dataDecoded.method', '') === 'transfer' || _get(p, 'dataDecoded.method', '') === 'addOwnerWithThreshold' || _get(p, 'dataDecoded.method', '') === 'removeOwner' || _get(p, 'dataDecoded.method', '') === 'changeThreshold')))
 			.then(async ptx => {
 				const { pTxn } = await loadOffChainTxn()
 				return ptx.concat(pTxn)
@@ -224,7 +224,7 @@ useState<Array<any>>();
 				const { eTxn } = await loadOffChainTxn()
 				return etx.concat(eTxn)
 			})
-			.then(ptx => _orderBy(ptx, [(p:any) => p.offChain, (p:any) => p.executionDate ?  p.executionDate : p.submissionDate], ['asc', 'asc']))
+			.then(ptx => _orderBy(ptx, [(p: any) => p.offChain, (p: any) => p.executionDate ? p.executionDate : p.submissionDate], ['asc', 'asc']))
 			.then(etx => { console.log("loadExecutedTxn", etx); return etx })
 			.then(etx => setExecutedTxn(etx))
 	}
@@ -291,7 +291,7 @@ useState<Array<any>>();
 			try {
 				if (!chainId) return;
 				let send: Array<{ recipient: string, amount: string }> = [];
-				if(txn.dataDecoded.method === 'transfer') {
+				if (txn.dataDecoded.method === 'transfer') {
 					const amountValue = _get(txn, 'dataDecoded.parameters[1].value')
 					const receiver = _get(txn, 'dataDecoded.parameters[0].value')
 					send = [{ recipient: receiver, amount: amountValue }]
@@ -334,10 +334,10 @@ useState<Array<any>>();
 			)
 				.then(async res => {
 					await axiosHttp.post(`utility/create-notification`, {
-						event:'transaction:confirmed',
+						event: 'transaction:confirmed',
 						safeAddress: _get(DAO, 'safe.address', ''),
 						account
-					}) 
+					})
 					loadPendingTxn()
 				})
 				.catch(e => console.log(e))
@@ -364,10 +364,10 @@ useState<Array<any>>();
 								.then(async (res) => {
 									console.log(res)
 									await axiosHttp.post(`utility/create-notification`, {
-										event:'transaction:confirmed',
+										event: 'transaction:confirmed',
 										safeAddress: _get(DAO, 'safe.address', ''),
 										account
-									}) 
+									})
 									setPendingTxn(prev => {
 										return prev?.map(tx => {
 											if (tx.safeTxHash === _safeTxHashs)
@@ -416,10 +416,10 @@ useState<Array<any>>();
 			)
 				.then(async res => {
 					await axiosHttp.post(`utility/create-notification`, {
-						event:'transaction:rejected',
+						event: 'transaction:rejected',
 						safeAddress: _get(DAO, 'safe.address', ''),
 						account
-					}) 
+					})
 					loadPendingTxn()
 				})
 				.catch(e => console.log(e))
@@ -461,10 +461,10 @@ useState<Array<any>>();
 								await loadPendingTxn()
 								await loadTxnLabel()
 								await axiosHttp.post(`utility/create-notification`, {
-									event:'transaction:rejected',
+									event: 'transaction:rejected',
 									safeAddress: _get(DAO, 'safe.address', ''),
 									account
-								}) 
+								})
 								setRejectTxLoading(null);
 							})
 							.catch((err) => {
@@ -509,18 +509,18 @@ useState<Array<any>>();
 					dispatch(getCurrentUser({}))
 
 					await axiosHttp.post(`utility/create-notification`, {
-						event:'transaction:executed',
+						event: 'transaction:executed',
 						safeAddress: _get(DAO, 'safe.address', ''),
 						account
-					}) 
+					})
 
 				})
 				.catch(e => console.log(e))
 				.finally(() => setExecuteTxLoading(null))
 		} else {
-			if(!reject && amount && !isAllowanceTransaction) {
+			if (!reject && amount && !isAllowanceTransaction) {
 				const balance = _get(safeToken, 'balance', 0) / 10 ** _get(safeToken, 'token.decimals', 18)
-				if(+amount > +balance) {
+				if (+amount > +balance) {
 					setLowBalanceError(`Low token balance`)
 					setTimeout(() => setLowBalanceError(null), 1000)
 					return;
@@ -573,13 +573,13 @@ useState<Array<any>>();
 				} else {
 					await axiosHttp.patch(`recurring-payment/reject`, { txHash: txn.safeTxHash })
 				}
-				if(syncOwners)
+				if (syncOwners)
 					await ownersCount(_get(DAO, 'safe.address', ''))
 				await axiosHttp.post(`utility/create-notification`, {
-					event:'transaction:executed',
+					event: 'transaction:executed',
 					safeAddress: _get(DAO, 'safe.address', ''),
 					account
-				}) 
+				})
 				await loadPendingTxn()
 				await loadExecutedTxn()
 				await loadTxnLabel()
@@ -640,44 +640,44 @@ useState<Array<any>>();
 		<div className="treasuryCard">
 			<div className="treasuryHeader">
 				<div style={{ display: 'flex', alignItems: 'center' }}>
-					{ (can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') &&
-					<>
-					<div
-						id="treasuryCardTitle"
-						style={tab === 1 ? { opacity: '1' } : { opacity: '0.4' }}
-						onClick={(e) => {
-							setTab(1)
-							loadPendingTxn()
-							loadExecutedTxn()
-						}}
-					>
-						Treasury
-						<span onClick={() => {
-							window.open(
-								chainId === SupportedChainId.GOERLI ?
-									`https://goerli.etherscan.io/address/${_get(DAO, 'safe.address')}` :
-									`https://polygonscan.com/address/${_get(DAO, 'safe.address')}`
-							)
-						}}>
-							<img style={{ width: 24, height: 24, objectFit: 'contain', marginLeft: 8 }} src={chainId === SupportedChainId.GOERLI ? GOERLI_LOGO : POLYGON_LOGO} />
-						</span>
-					</div>
-					<div className="treasuryDivider"></div>
-					</>
-					}
-					{ true &&
+					{(can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') &&
 						<>
-						
-						<div
-							id="treasuryCardTitle"
-							style={tab === 2 ? { opacity: '1' } : { opacity: '0.4' }}
-							onClick={(e) => {
-								setTab(2)
-							}}
-						>
-							Recurring payments
-						</div>
-					</> }
+							<div
+								id="treasuryCardTitle"
+								style={tab === 1 ? { opacity: '1' } : { opacity: '0.4' }}
+								onClick={(e) => {
+									setTab(1)
+									loadPendingTxn()
+									loadExecutedTxn()
+								}}
+							>
+								Treasury
+								<span onClick={() => {
+									window.open(
+										chainId === SupportedChainId.GOERLI ?
+											`https://goerli.etherscan.io/address/${_get(DAO, 'safe.address')}` :
+											`https://polygonscan.com/address/${_get(DAO, 'safe.address')}`
+									)
+								}}>
+									<img style={{ width: 24, height: 24, objectFit: 'contain', marginLeft: 8 }} src={chainId === SupportedChainId.GOERLI ? GOERLI_LOGO : POLYGON_LOGO} />
+								</span>
+							</div>
+							<div className="treasuryDivider"></div>
+						</>
+					}
+					{true &&
+						<>
+
+							<div
+								id="treasuryCardTitle"
+								style={tab === 2 ? { opacity: '1' } : { opacity: '0.4' }}
+								onClick={(e) => {
+									setTab(2)
+								}}
+							>
+								Recurring payments
+							</div>
+						</>}
 				</div>
 				<div className="headerDetails">
 					<div className="copyArea" onClick={() => setCopy(true)} onMouseOut={() => setCopy(false)}>
@@ -762,13 +762,13 @@ useState<Array<any>>();
 			}
 
 			{/* Treasury card body */}
-			{ tab === 1 && (can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') ?
+			{tab === 1 && (can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') ?
 				<>
 					{
 						pendingTxn !== undefined && executedTxn !== undefined &&
 						(pendingTxn && executedTxn && (pendingTxn.length !== 0 || executedTxn.length !== 0)) &&
 						<div id="treasuryTransactions">
-							<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%'}}>
+							<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%' }}>
 								<div className="dashboardText" style={{ marginBottom: '6px', flexGrow: 1 }}>Last Transactions</div>
 								{/* { lowBalanceError && <div className="dashboardText" style={{ marginBottom: '6px', color: 'red' }}>Low token balance</div> } */}
 							</div>
@@ -784,26 +784,26 @@ useState<Array<any>>();
 							}
 						</div>
 					}
-				</> : 
+				</> :
 				<>
-				{
-					recurringPayments && recurringPayments.length > 0 &&
-					<TableContainer>
-						<Table variant='simple' id="treasuryTransactions" style={{ width: '100%' }}>
-							<Tbody style={{ paddingTop: 8 }}>
-								{
-									(owner ? recurringPayments : recurringPayments.filter(( rp: any ) => rp?.delegate?.wallet === account)).map((txn: any) => 
-										<RecurringTxn owner={owner} onRecurringEdit={props.onRecurringEdit} onExecute={async (data: any) => { 
-											await loadTxnLabel()
-											dispatch(setRecurringPayments(data)) 
-										}} transaction={txn} />
-									)
-								}
-							</Tbody>
-						</Table>
-					</TableContainer>
-				}
-			</>
+					{
+						recurringPayments && recurringPayments.length > 0 &&
+						<TableContainer>
+							<Table variant='simple' id="treasuryTransactions" style={{ width: '100%' }}>
+								<Tbody style={{ paddingTop: 8 }}>
+									{
+										(owner ? recurringPayments : recurringPayments.filter((rp: any) => rp?.delegate?.wallet === account)).map((txn: any) =>
+											<RecurringTxn owner={owner} onRecurringEdit={props.onRecurringEdit} onExecute={async (data: any) => {
+												await loadTxnLabel()
+												dispatch(setRecurringPayments(data))
+											}} transaction={txn} />
+										)
+									}
+								</Tbody>
+							</Table>
+						</TableContainer>
+					}
+				</>
 			}
 		</div>
 	)

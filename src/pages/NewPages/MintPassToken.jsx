@@ -101,7 +101,7 @@ const MintPassToken = () => {
                 for (let index = 0; index < myMetadata.attributes.length; index++) {
                     const attribute = myMetadata.attributes[index];
                     if (attr === attribute.trait_type.toLowerCase()) {
-                        if(decrypted)
+                        if (decrypted)
                             return decrypted[attr]
                         //return attribute?.value;
                     }
@@ -185,12 +185,12 @@ const MintPassToken = () => {
 
     useEffect(() => {
         console.log("DAO", DAO)
-        if(isUpdate && DAO && myMetadata && account) {
+        if (isUpdate && DAO && myMetadata && account) {
             const personalDetails = getPersonalDetails('Personal Details'.toLowerCase())
-            if(personalDetails) {
+            if (personalDetails) {
                 decryptMessage(personalDetails)
-                .then(res => setDecrypted(res))
-                .catch(e => console.log(e))
+                    .then(res => setDecrypted(res))
+                    .catch(e => console.log(e))
             }
         }
     }, [isUpdate])
@@ -236,8 +236,8 @@ const MintPassToken = () => {
             }
             axiosHttp.patch(`metadata/${_get(DAO, 'sbt._id')}`, payload)
                 .then(async res => {
-                    if(userDiscord.value) {
-                        await axiosHttp.patch(`dao/${_get(DAO, 'url', '')}/update-user-discord`, { 
+                    if (userDiscord.value) {
+                        await axiosHttp.patch(`dao/${_get(DAO, 'url', '')}/update-user-discord`, {
                             discordId: userDiscord.value || null,
                             userId: _get(user, '_id', '')
                         })
@@ -322,10 +322,10 @@ const MintPassToken = () => {
                         console.log("metadataJSON : ", metadataJSON);
                         const req = await APInewSBTtoken(metadataJSON);
                         if (req) {
-                            await axiosHttp.patch(`dao/${_get(DAO, 'url', '')}/update-user-discord`, { 
+                            await axiosHttp.patch(`dao/${_get(DAO, 'url', '')}/update-user-discord`, {
                                 discordId: userDiscord.value || null,
                                 userId: _get(user, '_id', '')
-                             })
+                            })
                             dispatch(updateCurrentUser({ name: userName.value }))
                             dispatch(addDaoMember({ url: DAO?.url, payload: { name: '', address: account, role: myRole ? myRole : 'role4' } }))
                             dispatch(getDao(DAO.url));
@@ -357,7 +357,7 @@ const MintPassToken = () => {
                             {
                                 tab === 1
                                     ?
-                                    <p className="heading-text">To join the organisation mint your pass token</p>
+                                    <p className="heading-text">Mint your pass token for {_get(DAO, 'name', '')}</p>
                                     :
                                     null
                             }
@@ -366,7 +366,7 @@ const MintPassToken = () => {
                                     ?
                                     <>
                                         <p className="heading-text" style={{ marginBottom: 0 }}>You are whitelisted</p>
-                                        <p className="heading-text">To join the organisation mint your pass token</p>
+                                        <p className="heading-text">Mint your pass token for {_get(DAO, 'name', '')}</p>
                                     </>
                                     :
                                     null

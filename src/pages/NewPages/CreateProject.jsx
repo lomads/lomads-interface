@@ -9,7 +9,7 @@ import notionIcon from '../../assets/svg/Notion-logo.svg';
 import { AiOutlineLock } from "react-icons/ai";
 import { SiNotion } from "react-icons/si";
 import { HiOutlinePlus } from "react-icons/hi";
-import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe } from "react-icons/bs";
+import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe, BsCheck2 } from "react-icons/bs";
 import { toast, ToastContainer } from "react-toastify";
 import { ProjectContext } from "context/ProjectContext";
 import { Link, useNavigate } from "react-router-dom";
@@ -58,6 +58,9 @@ const CreateProject = () => {
     const [showMore, setShowMore] = useState(false);
     const [success, setSuccess] = useState(false);
     const [newAddress, setNewAddress] = useState([]);
+
+    const [toggle, setToggle] = useState(false);
+    const [selectType, setSelectType] = useState('');
 
     const [openResource, setOpenResource] = useState(false);
     const [openMilestone, setOpenMilestone] = useState(false);
@@ -469,36 +472,86 @@ const CreateProject = () => {
                                                     <div className="divider"></div>
 
                                                     {/* project members */}
-                                                    <div className='project-members'>
-                                                        <div className='project-members-header'>
-                                                            <p>Invite members</p>
-                                                            <button onClick={toggleShowMember}>ADD NEW MEMBER</button>
-                                                        </div>
-                                                        <div className="member-list">
+                                                    <div className="toggle-box">
+                                                        <label class="switch">
+                                                            <input type="checkbox" onChange={() => setToggle(!toggle)} />
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                        <span className="toggle-text">
                                                             {
-                                                                memberList.map((item, index) => {
-                                                                    if (item.member.wallet.toLowerCase() !== account.toLowerCase()) {
-                                                                        return (
-                                                                            <div className="member-li" key={index} onClick={() => handleAddMember(item.member)}>
-                                                                                <div className="member-img-name">
-                                                                                    <img src={memberIcon} alt="member-icon" />
-                                                                                    <p>{item.member.name}</p>
-                                                                                </div>
-                                                                                <div className="member-address">
-                                                                                    <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
-                                                                                    <input type="checkbox" onChange={() => handleAddMember(item.member)} checked={!(selectedMembers.some((m) => m.address.toLowerCase() === item.member.wallet.toLowerCase()) === false)} />
-                                                                                    {/* <div className='checkbox'>
-                                                                                        <input type="checkbox" onChange={(e) => alert("dfdf")} />
-                                                                                        <span className='inner-check check'></span>
-                                                                                    </div> */}
-                                                                                </div>
-                                                                            </div>
-                                                                        )
-                                                                    }
-                                                                })
+                                                                toggle
+                                                                    ?
+                                                                    'FILTER BY'
+                                                                    :
+                                                                    'OPEN FOR ALL'
                                                             }
-                                                        </div>
+                                                        </span>
                                                     </div>
+                                                    {
+                                                        toggle &&
+                                                        <div className="members-dropdown">
+                                                            <select
+                                                                name="project"
+                                                                id="project"
+                                                                className="tokenDropdown"
+                                                                style={{ width: '100%', margin: '0' }}
+                                                                value={selectType}
+                                                                onChange={(e) => setSelectType(e.target.value)}
+                                                            >
+                                                                <option value="" selected disabled hidden>Select</option>
+                                                                <option value={"Invitation"}>Invitation</option>
+                                                                <option value={"Roles"}>Roles</option>
+                                                                <option value={"Token"}>Token</option>
+                                                            </select>
+                                                        </div>
+                                                    }
+                                                    {
+                                                        toggle && selectType === 'Invitation'
+                                                        &&
+                                                        <div className='project-members'>
+                                                            <div className='project-members-header'>
+                                                                <p>Invite members</p>
+                                                                <button onClick={toggleShowMember}>ADD NEW MEMBER</button>
+                                                            </div>
+                                                            <div className="member-list">
+                                                                {
+                                                                    memberList.map((item, index) => {
+                                                                        if (item.member.wallet.toLowerCase() !== account.toLowerCase()) {
+                                                                            return (
+                                                                                <div className="member-li" key={index} onClick={() => handleAddMember(item.member)}>
+                                                                                    <div className="member-img-name">
+                                                                                        <img src={memberIcon} alt="member-icon" />
+                                                                                        <p>{item.member.name}</p>
+                                                                                    </div>
+                                                                                    <div className="member-address">
+                                                                                        <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
+
+                                                                                        <div className='checkbox' onClick={() => handleAddMember(item.member)}>
+                                                                                            {
+                                                                                                !(selectedMembers.some((m) => m.address.toLowerCase() === item.member.wallet.toLowerCase()) === false)
+                                                                                                    ?
+                                                                                                    <div className="active-box">
+                                                                                                        <BsCheck2 color="#FFF" />
+                                                                                                    </div>
+                                                                                                    :
+                                                                                                    <div className="inactive-box"></div>
+                                                                                            }
+                                                                                        </div>
+                                                                                        {/* <input 
+                                                                                            type="checkbox" 
+                                                                                            onChange={() => handleAddMember(item.member)} 
+                                                                                            checked={} 
+                                                                                        /> */}
+                                                                                    </div>
+                                                                                </div>
+                                                                            )
+                                                                        }
+                                                                    })
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    }
+
                                                     <div className='project-buttons'>
                                                         <button
                                                             style={{ marginRight: '35px', background: '#FFF', color: '#C94B32' }}

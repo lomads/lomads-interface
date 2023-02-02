@@ -48,7 +48,7 @@ const WorkspaceInfo = ({ toggleWorkspaceInfo, projectId, daoURL }) => {
 
                     <div className='WorkspaceEdit-body'>
                         <img src={createProjectSvg} alt="frame-icon" />
-                        <h1>Workspace Info</h1>
+                        <h1>Workspace Details</h1>
 
                         <div className='createProject-form-container'>
                             <div className='input-div'>

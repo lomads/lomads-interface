@@ -27,7 +27,7 @@ const ProjectEdit = ({ toggleShowEdit, toggleDeletePrompt, toggleClosePrompt, to
                         <h1>Workspace settings</h1>
 
                         <div className='edit-card'>
-                            <h1>Workspace infos</h1>
+                            <h1>Workspace details</h1>
                             <button onClick={() => toggleWorkspaceInfo(true)}>
                                 <img src={editTokenvg} alt="editToken" />
                             </button>
@@ -93,15 +93,20 @@ const ProjectEdit = ({ toggleShowEdit, toggleDeletePrompt, toggleClosePrompt, to
                             }
                         </div>
                         <div className='delete-card'>
+                            <h1>Close workspace</h1>
+                            <span>The project will appear in archives</span>
+                            <button onClick={() => toggleClosePrompt(true)}>CLOSE WORKSAPCE</button>
+                        </div>
+                        <div className='delete-card' style={{ marginBottom: '80px' }}>
                             <h1>Delete workspace</h1>
                             <span>The project will not appear in archives</span>
-                            <button onClick={() => toggleDeletePrompt(true)}>DELETE WORKSAPCE</button>
+                            <button onClick={() => toggleDeletePrompt(true)} style={{ color: '#76808D' }}>DELETE WORKSAPCE</button>
                         </div>
                     </div>
 
                     <div className='ProjectEdit-footer'>
-                        <button onClick={() => toggleClosePrompt(true)}>
-                            CLOSE PROJECT
+                        <button onClick={() => toggleShowEdit()}>
+                            SAVE
                         </button>
                     </div>
                 </div>
