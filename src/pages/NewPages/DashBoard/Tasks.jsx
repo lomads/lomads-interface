@@ -37,51 +37,56 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
         }
     }, [DAO, Project, tab, user, onlyProjects]);
 
-const amIEligible_discord=(Task)=>{
-    console.log('Task.jsx--------------------',Task);
+// const amIEligible_discord=(Task)=>{
+//     console.log('Task.jsx--------------------',Task);
     
-    if (DAO && Task && Task.contributionType === 'open') {
-        let current_user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
-       // console.log('currentuser',current_user);
-        let reurntype_function=false;
-        if(current_user.discordRoles){
+//     if (DAO && Task && Task.contributionType === 'open') {
+//         let current_user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
+//        // console.log('currentuser',current_user);
+//         let reurntype_function=false;
+//         if(current_user.discordRoles){
 
 
-            Task?.validRoles.map(channelid=>{
-               // console.log('task chanellid',channelid);
+//             Task?.validRoles.map(channelid=>{
+//                // console.log('task chanellid',channelid);
 
 
-                Object.keys(current_user.discordRoles).forEach(function(key, index) {
-                    console.log(current_user.discordRoles[key]);
-                    if(current_user.discordRoles[key].includes(channelid)){
-                        //console.log('mathched');
-                        reurntype_function=true;
-                        console.log('Taskk.jsx--------------------in task function TaskMatched',Task.name);
-                        return reurntype_function;
+//                 Object.keys(current_user.discordRoles).forEach(function(key, index) {
+//                     console.log(current_user.discordRoles[key]);
+//                     if(current_user.discordRoles[key].includes(channelid)){
+//                         //console.log('mathched');
+//                         reurntype_function=true;
+//                         console.log('Taskk.jsx--------------------in task function TaskMatched',Task.name);
+//                         return reurntype_function;
 
-                        }else{
+//                         }else{
 
-                            console.log('Taskk.jsx--------------------in task function TaskunMatched',Task.name);
-                            return reurntype_function;
-                        }
-                });
+//                             console.log('Taskk.jsx--------------------in task function TaskunMatched',Task.name);
+//                             return reurntype_function;
+//                         }
+//                 });
 
 
-            })
-            return reurntype_function;
-        }
+//             })
+//             return reurntype_function;
+//         }
 
-        return false;
+//         return false;
        
-    }
+//     }
 
-};
+// };
     const amIEligible = (Task) => {
         if (DAO && Task && Task.contributionType === 'open') {
             let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
             if (user) {
                 if (Task?.validRoles.length > 0) {
-                    let index = Task?.validRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase());
+                    let myDiscordRoles = []
+                    const discRoles = _get(user, 'discordRoles', {})
+                    Object.keys(discRoles).forEach(key => {
+                        myDiscordRoles = [...myDiscordRoles, ...discRoles[key]]
+                    })
+                    let index = Task?.validRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase() || myDiscordRoles.indexOf(item) > -1);
                     return index > -1 ? true : false
                 } else {
                     return true;
@@ -127,7 +132,7 @@ const amIEligible_discord=(Task)=>{
 
     const fetchProjectTasks = () => {
         if (Project && user) {
-            const myTasks = _get(Project, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) || amIEligible_discord(task)  || (task.contributionType === 'open' && !task.isSingleContributor))))
+            const myTasks = _get(Project, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && amIEligible(task) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || (task.contributionType === 'open' && !task.isSingleContributor))))
             console.log("setMyTasks", myTasks)
             setMyTasks(_orderBy(myTasks, i => moment(i.deadline).unix(), 'desc'))
             let manageTasks = _get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id));
@@ -152,7 +157,7 @@ const amIEligible_discord=(Task)=>{
     const fetchDaoTasks = () => {
         if (DAO && user) {
           
-            const myTasks = _get(DAO, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) || amIEligible_discord(task) ||(task.contributionType === 'open' && !task.isSingleContributor))))
+            const myTasks = _get(DAO, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) ||(task.contributionType === 'open' && !task.isSingleContributor))))
             console.log('fetchDaoTasks',user);
             console.log("fetchDaoTasks setMyTasks", myTasks);
             setMyTasks(_orderBy(myTasks, i => moment(i.deadline).unix(), 'asc'))

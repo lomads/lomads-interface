@@ -114,7 +114,19 @@ const Settings = () => {
 
 	//! TOGGLE FUNCTIONS
 	let toggleModal = () => {
-		setShowModal(!showModal);
+		setShowModal(prev => { 
+			if(prev) {
+				setOpenOrganisationDetails(false);
+				setOpenRolesPermissions(false);
+				setOpenSafe(false);
+				setOpenPassToken(false);
+				setOpenXpPoints(false);
+				setOpenTerminology(false);
+				setOpenDiscord(false);
+				setOpenCreatePassToken(false);
+			}
+			return !prev 
+		});
 	};
 	let toggleOrganisationDetailsModal = () => {
 		setOpenOrganisationDetails(!openOrganisationDetails);

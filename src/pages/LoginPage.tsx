@@ -196,7 +196,7 @@ const LoginPage = (props: any) => {
 							alt="WalletConnect"
 						/>
 					</button>
-					<Aikon />
+					{/* <Aikon /> */}
 				</div>
 				<div className="humangroup">
 					<img src={humangroup} alt="human group" />

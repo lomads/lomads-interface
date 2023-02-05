@@ -197,7 +197,7 @@ const SafeModal = ({ toggleModal, toggleS }) => {
       <div className="sidebarModal">
         <div
           onClick={() => {
-            // toggleModal();
+            toggleModal();
             toggleS();
           }}
           className="overlay"
@@ -218,7 +218,7 @@ const SafeModal = ({ toggleModal, toggleS }) => {
               height={37}
               width={37}
               className="sideModalCloseButton"
-            // onClick={toggleModal}
+              onClick={toggleModal}
             />
           </div>
           {

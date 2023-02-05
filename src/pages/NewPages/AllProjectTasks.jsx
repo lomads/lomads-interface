@@ -49,7 +49,12 @@ const AllProjectTasks = () => {
             let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
             if (user) {
                 if (Task?.validRoles.length > 0) {
-                    let index = Task?.validRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase());
+                    let myDiscordRoles = []
+                    const discRoles = _get(user, 'discordRoles', {})
+                    Object.keys(discRoles).forEach(key => {
+                        myDiscordRoles = [...myDiscordRoles, ...discRoles[key]]
+                    })
+                    let index = Task?.validRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase() || myDiscordRoles.indexOf(item) > -1);
                     return index > -1
                 } else {
                     return true;
