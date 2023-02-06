@@ -517,7 +517,7 @@ const Dashboard = () => {
 
 				<MyProject />
 				<Tasks toggleShowCreateTask={toggleShowCreateTask} onlyProjects={false} />
-
+				{ (can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') &&
 				<TreasuryCard
 					innerRef={treasuryRef}
 					onRecurringEdit={handleOnRecurringEdit}
@@ -531,7 +531,7 @@ const Dashboard = () => {
 					onChangePendingTransactions={(tx: any) => setPendingTransactions(tx)}
 					tokens={safeTokens}
 					toggleShowCreateRecurring={toggleShowCreateRecurring}
-				/>
+				/> }
 				{can(myRole, 'members.view') &&
 					<MemberCard
 						totalMembers={totalMembers}

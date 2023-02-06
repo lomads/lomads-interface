@@ -89,11 +89,11 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
 	const prevDAO = usePrevious(DAO);
 
-	useEffect(() => {
-		if (!owner && recurringPayments && recurringPayments.length > 0 && recurringPayments.filter((rp: any) => rp?.delegate?.wallet === account).length > 0) {
-			setTab(2)
-		}
-	}, [recurringPayments, owner])
+	// useEffect(() => {
+	// 	if (!owner && recurringPayments && recurringPayments.length > 0 && recurringPayments.filter((rp: any) => rp?.delegate?.wallet === account).length > 0) {
+	// 		setTab(2)
+	// 	}
+	// }, [recurringPayments, owner])
 
 	const getSafeTokens = async () => {
 		if (!chainId) return [];
@@ -665,7 +665,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 							<div className="treasuryDivider"></div>
 						</>
 					}
-					{true &&
+					{(can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') &&
 						<>
 
 							<div
