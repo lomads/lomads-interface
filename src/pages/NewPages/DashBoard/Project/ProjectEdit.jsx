@@ -8,9 +8,12 @@ import { HiOutlinePlus } from "react-icons/hi";
 
 import { useAppSelector, useAppDispatch } from "state/hooks";
 
+import useTerminology from 'hooks/useTerminology';
+
 const ProjectEdit = ({ toggleShowEdit, toggleDeletePrompt, toggleClosePrompt, toggleWorkspaceInfo, toggleProjectMembers, toggleProjectMilestone, toggleProjectKRA, toggleProjectResources }) => {
 
     const { DAO, Project } = useAppSelector((state) => state.dashboard);
+    const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies'))
 
     return (
         <div className="ProjectEditOverlay">
@@ -24,23 +27,23 @@ const ProjectEdit = ({ toggleShowEdit, toggleDeletePrompt, toggleClosePrompt, to
 
                     <div className='ProjectEdit-body'>
                         <img src={settingSvg} alt="frame-icon" />
-                        <h1>Workspace settings</h1>
+                        <h1>{transformWorkspace().label} settings</h1>
 
                         <div className='edit-card'>
-                            <h1>Workspace details</h1>
+                            <h1>{transformWorkspace().label} details</h1>
                             <button onClick={() => toggleWorkspaceInfo(true)}>
                                 <img src={editTokenvg} alt="editToken" />
                             </button>
                         </div>
                         <div className='edit-card'>
-                            <h1>Project members</h1>
+                            <h1>{transformWorkspace().label} members</h1>
                             <button onClick={() => toggleProjectMembers(true)}>
                                 <img src={editTokenvg} alt="editToken" />
                             </button>
                         </div>
                         <div className='edit-card'>
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                <h1>Project resources</h1>
+                                <h1>{transformWorkspace().label} resources</h1>
                                 <span>Add links for your team to access</span>
                             </div>
                             {
@@ -93,14 +96,14 @@ const ProjectEdit = ({ toggleShowEdit, toggleDeletePrompt, toggleClosePrompt, to
                             }
                         </div>
                         <div className='delete-card'>
-                            <h1>Close workspace</h1>
-                            <span>The project will appear in archives</span>
-                            <button onClick={() => toggleClosePrompt(true)}>CLOSE WORKSAPCE</button>
+                            <h1>Close {transformWorkspace().label}</h1>
+                            <span>The {transformWorkspace().label} will appear in archives</span>
+                            <button onClick={() => toggleClosePrompt(true)}>CLOSE {transformWorkspace().label}</button>
                         </div>
                         <div className='delete-card' style={{ marginBottom: '80px' }}>
-                            <h1>Delete workspace</h1>
-                            <span>The project will not appear in archives</span>
-                            <button onClick={() => toggleDeletePrompt(true)} style={{ color: '#76808D' }}>DELETE WORKSAPCE</button>
+                            <h1>Delete {transformWorkspace().label}</h1>
+                            <span>The {transformWorkspace().label} will not appear in archives</span>
+                            <button onClick={() => toggleDeletePrompt(true)} style={{ color: '#76808D' }}>DELETE {transformWorkspace().label}</button>
                         </div>
                     </div>
 

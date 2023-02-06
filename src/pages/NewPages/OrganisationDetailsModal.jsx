@@ -15,7 +15,6 @@ import AddDiscordLink from 'components/AddDiscordLink';
 import { setDAO } from "state/dashboard/reducer";
 
 const OrganisationDetails = ({
-	toggleModal,
 	toggleOrganisationDetailsModal,
 }) => {
 
@@ -46,7 +45,6 @@ const OrganisationDetails = ({
 		console.log(description)
 		dispatch(updateDao({ url: DAO?.url, payload: { name, description } }))
 		dispatch(updateDaoLinks({ url: DAO?.url, payload: { links: daoLinks } }))
-		toggleModal();
 		toggleOrganisationDetailsModal();
 	}
 
@@ -90,7 +88,6 @@ const OrganisationDetails = ({
 			<div className="sidebarModal">
 				<div
 					onClick={() => {
-						toggleModal();
 						toggleOrganisationDetailsModal();
 					}}
 					className="overlay"
@@ -111,7 +108,9 @@ const OrganisationDetails = ({
 							height={37}
 							width={37}
 							className="sideModalCloseButton"
-							onClick={toggleModal}
+							onClick={() => {
+								toggleOrganisationDetailsModal();
+							}}
 						/>
 					</div>
 					<div className="MainComponent">
@@ -274,7 +273,6 @@ const OrganisationDetails = ({
 								style={{ marginRight: 8 }}
 								id="button-cancel"
 								onClick={() => {
-									toggleModal();
 									toggleOrganisationDetailsModal();
 								}}
 							>
