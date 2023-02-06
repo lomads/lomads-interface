@@ -224,7 +224,7 @@ const TaskDetails = () => {
 
     const applicationCount = useMemo(() => {
         if (Task) {
-            let applications = _get(Task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_rejected'))
+            let applications = _get(Task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
             if (applications)
                 return applications.length
             return 0

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import _ from "lodash";
+import _, { get as _get, find as _find } from "lodash";
 import IconButton from "UIpack/IconButton";
 import SimpleButton from "UIpack/SimpleButton";
 import SimpleInputField from "UIpack/SimpleInputField";
@@ -104,7 +104,18 @@ const AddRecipient = (props: any) => {
 
   const addMember = (_ownerName: string, _ownerAddress: string) => {
     const member: InviteGangType = { name: _ownerName, address: _ownerAddress };
-    dispatch(addDaoMember({ url: DAO?.url, payload: member }))
+
+    const exists = _find(_get(DAO, 'members', []), (m:any) => m.member.wallet.toLowerCase() === _ownerAddress.toLowerCase())
+
+    if(exists)
+      return setErrors({ ownerAddress: 'Address already exists' })
+    //dispatch(addDaoMember({ url: DAO?.url, payload: member }))
+    if(props?.onAddRecipient) {
+      props?.onAddRecipient(member)
+    }
+    setOwnerName("");
+    setOwnerAddress("");
+    props.toggleAddNewRecipient();
   };
 
   return (

@@ -5,12 +5,10 @@ import { useAppSelector } from "state/hooks";
 import useTerminology from 'hooks/useTerminology'
 import { DEFAULT_ROLES } from "constants/terminology";
 
-const SelectRoles = ({ toggleSelect, validRoles, handleValidRoles }) => {
-    console.log('valid',validRoles);
-    
+const SelectRoles = ({ toggleSelect, validRoles, handleValidRoles }) => {    
     const [roles, setRoles] = useState(validRoles);
 	const { DAO } = useAppSelector((state) => state.dashboard);
-    const { transformRole } = useTerminology(_get(DAO, 'terminologies'))
+    const { transformRole } = useTerminology(_get(DAO, 'terminologies', undefined))
     const handleRole = (role) => {
         console.log('onclickrolefetch',role);
 
@@ -30,7 +28,7 @@ const r=DAO.discord[server].roles
 roles=roles.concat(r);
 
         })
-        return roles;
+        return roles.filter(r => r.name !== "@everyone");
     },[DAO.discord])
     return (
         <div className="selectRoles-container">
@@ -39,7 +37,7 @@ roles=roles.concat(r);
             </div>
 
             {
-                Object.keys(_get(DAO, 'terminologies.roles')).map((key, index) => {
+                Object.keys(_get(DAO, 'terminologies.roles', {})).map((key, index) => {
                     return (
                         <div className='roles-li'>
                             <div

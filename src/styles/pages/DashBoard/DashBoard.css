@@ -779,6 +779,7 @@ body.active-modal {
 }
 
 .sideModalCloseButton {
+    cursor: pointer;
     border-radius: 5px;
     border-width: 0px;
     border-color: #FFFFFF;
