@@ -54,7 +54,7 @@ const MemberCard = (props: any) => {
 				if (person) {
 					person.roles.forEach(function (item: any) {
 						_get(discordChannel, 'roles', []).map((i: any) => {
-							if (i.id === item) {
+							if (i.id === item && i.name !== '@everyone') {
 								if (i.color) {
 									roles.push({ name: i.name, color: i.color })
 								}

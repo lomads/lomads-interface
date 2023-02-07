@@ -5,31 +5,32 @@ import { useAppSelector } from "state/hooks";
 import useTerminology from 'hooks/useTerminology'
 import { DEFAULT_ROLES } from "constants/terminology";
 
-const SelectRoles = ({ toggleSelect, validRoles, handleValidRoles }) => {    
+const SelectRoles = ({ toggleSelect, validRoles, handleValidRoles }) => {
     const [roles, setRoles] = useState(validRoles);
-	const { DAO } = useAppSelector((state) => state.dashboard);
+    const { DAO } = useAppSelector((state) => state.dashboard);
     const { transformRole } = useTerminology(_get(DAO, 'terminologies', undefined))
     const handleRole = (role) => {
-        console.log('onclickrolefetch',role);
+        console.log('onclickrolefetch', role);
 
         if (roles.includes(role)) {
             setRoles(roles.filter((i) => i !== role))
         }
         else {
-            setRoles([...roles,role]);
-            console.log('setting role',roles);
+            setRoles([...roles, role]);
+            console.log('setting role', roles);
         }
     }
-    const all_roles=useMemo(()=>{
 
-        let roles=[];
-        Object.keys(DAO?.discord).map((server)=>{
-const r=DAO.discord[server].roles
-roles=roles.concat(r);
+    const all_roles = useMemo(() => {
 
+        let roles = [];
+        Object.keys(_get(DAO, 'discord', {})).map((server) => {
+            const r = DAO.discord[server].roles
+            roles = roles.concat(r);
         })
-        return roles.filter(r => r.name !== "@everyone");
-    },[DAO.discord])
+        return roles.filter(r => r.name !== "@everyone" && r.name !== 'Lomads' && r.name !== 'LomadsTestBot');
+    }, [DAO.discord])
+
     return (
         <div className="selectRoles-container">
             <div className='selectRoles-header'>
@@ -48,7 +49,7 @@ roles=roles.concat(r);
                                     className='roles-circle'
                                     style={index === 0 ? { background: 'rgba(146, 225, 168, 1)' } : index === 1 ? { background: 'rgba(137,179,229,1)' } : index === 2 ? { background: 'rgba(234,100,71,1)' } : { background: 'rgba(146, 225, 168, 1)' }}
                                 ></div>
-                                <span>{ _get(transformRole(key), 'label') }</span>
+                                <span>{_get(transformRole(key), 'label')}</span>
                             </div>
                             {
                                 roles.includes(key)
@@ -61,50 +62,43 @@ roles=roles.concat(r);
                     )
                 })
             }
-            <div className='selectRoles-header'>
-                <span>Discord Roles</span>
-            </div>
 
             {
-               
-
-
-
-               all_roles.map((discord_value,index) => {
-                    //alert(discord_value);
-                 
-                   return (
-                        <div className='roles-li'>
-                           
-                            <div
-                                className='roles-pill'
-                                style={index === 0 ? { background: 'rgba(146, 225, 168, 0.3)' } : index === 1 ? { background: 'rgba(137,179,229,0.3)' } : index === 2 ? { background: 'rgba(234,100,71,0.3)' } : { background: 'rgba(146, 225, 168, 0.3)' }}
-                            >
-                                <div
-                                    className='roles-circle'
-                                    style={index === 0 ? { background: 'rgba(146, 225, 168, 1)' } : index === 1 ? { background: 'rgba(137,179,229,1)' } : index === 2 ? { background: 'rgba(234,100,71,1)' } : { background: 'rgba(146, 225, 168, 1)' }}
-                                ></div>
-                                <span>{ discord_value.name }</span>
-                            </div>
-                            {
-                                roles.includes(discord_value.id)
-                                    ?
-                                    <input type="checkbox" onChange={() => handleRole(discord_value.id)} checked />
-                                    :
-                                    <input type="checkbox" onChange={() => handleRole(discord_value.id)} />
-                            }
-                           
+                all_roles && all_roles.length > 0
+                    ?
+                    <>
+                        <div className='selectRoles-header'>
+                            <span>Discord Roles</span>
                         </div>
-
-                         
-            
-                        
-                     
-                       
-                    );
-                }) 
+                        {
+                            all_roles.map((discord_value, index) => {
+                                return (
+                                    <div className='roles-li'>
+                                        <div
+                                            className='roles-pill'
+                                            style={discord_value.color ? { background: `${discord_value.color}50` } : { background: `#d5d5d550` }}
+                                        >
+                                            <div
+                                                className='roles-circle'
+                                                style={discord_value.color ? { background: `${discord_value.color}` } : { background: `#d5d5d5` }}
+                                            ></div>
+                                            <span>{discord_value.name}</span>
+                                        </div>
+                                        {
+                                            roles.includes(discord_value.id)
+                                                ?
+                                                <input type="checkbox" onChange={() => handleRole(discord_value.id)} checked />
+                                                :
+                                                <input type="checkbox" onChange={() => handleRole(discord_value.id)} />
+                                        }
+                                    </div>
+                                );
+                            })
+                        }
+                    </>
+                    :
+                    null
             }
-              
 
             <div className='selectRoles-footer'>
                 <button onClick={toggleSelect}>

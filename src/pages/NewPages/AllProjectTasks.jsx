@@ -174,14 +174,14 @@ const AllProjectTasks = () => {
                 <button onClick={() => navigate(-1)}>
                     <IoIosArrowBack size={20} color="#C94B32" />
                 </button>
-                <p>{ transformTask().labelPlural }</p>
+                <p>{transformTask().labelPlural}</p>
             </div>
 
             {/* Tabs header */}
             <div className='allTasks-tabHeader'>
                 <div className="tasks-title">
                     <button className={tab === 1 ? 'active' : null} onClick={() => setTab(1)}>
-                        My { transformTask().labelPlural  }
+                        My {transformTask().labelPlural}
                     </button>
                     <div className="divider"></div>
 
@@ -204,7 +204,7 @@ const AllProjectTasks = () => {
                     }
 
                     <button className={tab === 4 ? 'active' : null} onClick={() => setTab(4)}>
-                        All { transformTask().labelPlural  }
+                        All {transformTask().labelPlural}
                     </button>
                 </div>
                 <div className="tasks-buttons">

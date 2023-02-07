@@ -93,25 +93,24 @@ const CreateProject = () => {
     }, [createProjectLoading])
 
     useEffect(() => {
-        const rolesArr = _get(DAO, 'terminologies.roles', null);
-        const discordOb = _get(DAO, 'discord', null);
+        const rolesArr = _get(DAO, 'terminologies.roles', {});
+        const discordOb = _get(DAO, 'discord', {});
         let temp = [];
         if (rolesArr) {
             Object.keys(rolesArr).forEach(function (key, _index) {
-                temp.push({ title: key, value: rolesArr[key].label });
+                temp.push({ title: key, value: rolesArr[key].label, color: '#d5d5d5' });
             });
         }
         if (discordOb) {
             Object.keys(discordOb).forEach(function (key, _index) {
                 const discordChannel = discordOb[key];
                 discordChannel.roles.forEach((item) => {
-                    if (item.name !== '@everyone' && (temp.some((m) => m.title.toLowerCase() === item.id.toLowerCase()) === false)) {
-                        temp.push({ title: item.id, value: item.name });
+                    if (item.name !== '@everyone' && item.name !== 'LomadsTestBot' && item.name !== 'Lomads' && (temp.some((m) => m.title.toLowerCase() === item.id.toLowerCase()) === false)) {
+                        temp.push({ title: item.id, value: item.name, color: item.color ? item.color : '#d5d5d5' });
                     }
                 })
             });
         }
-        console.log("temp : ", temp);
         setRoles(temp);
     }, [DAO])
 
@@ -223,6 +222,7 @@ const CreateProject = () => {
     }
 
     const handleCreateProject = () => {
+        console.log("selectedRoles : ", selectedRoles);
         let project = {};
         project.name = name;
         project.description = desc;
@@ -253,21 +253,19 @@ const CreateProject = () => {
             for (let i = 0; i < DAO.members.length; i++) {
                 let user = DAO.members[i];
                 if (user.discordRoles) {
+                    let myDiscordRoles = []
                     Object.keys(user.discordRoles).forEach(function (key, index) {
-
-                        user.discordRoles[key].every(function (_item, _index) {
-                            if (selectedRoles.includes(_item)) {
-                                arr.push({ name: user.member.name, address: user.member.wallet });
-                                return false;
-                            }
-                            return true;
-                        })
+                        myDiscordRoles = [...myDiscordRoles, ...user.discordRoles[key]]
                     })
+                    let index = selectedRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase() || myDiscordRoles.indexOf(item) > -1);
+
+                    if (index > -1) {
+                        arr.push({ name: user.member.name, address: user.member.wallet })
+                    }
                 }
                 else {
                     if (selectedRoles.includes(user.role)) {
                         arr.push({ name: user.member.name, address: user.member.wallet })
-                        console.log("roles")
                     }
                 }
             }
@@ -571,10 +569,9 @@ const CreateProject = () => {
                                                                 value={selectType}
                                                                 onChange={(e) => setSelectType(e.target.value)}
                                                             >
-                                                                <option value="" selected disabled hidden>Select</option>
+                                                                <option value="" selected disabled>Select</option>
                                                                 <option value={"Invitation"}>Invitation</option>
                                                                 <option value={"Roles"}>Roles</option>
-                                                                <option value={"Token"}>Token</option>
                                                             </select>
                                                         </div>
                                                     }
@@ -635,26 +632,48 @@ const CreateProject = () => {
                                                                 {
                                                                     roles.map((item, index) => {
                                                                         return (
-                                                                            <div className="member-li" key={index} onClick={() => handleAddRoles(item.title)}>
-                                                                                <div className="member-img-name">
-                                                                                    {/* <img src={memberIcon} alt="member-icon" /> */}
-                                                                                    <p style={{ textTransform: 'capitalize' }}>{item.value}</p>
-                                                                                </div>
-                                                                                <div className="member-address" style={{ justifyContent: 'flex-end' }}>
-
-                                                                                    <div className='checkbox' onClick={() => handleAddRoles(item.title)}>
-                                                                                        {
-                                                                                            !(selectedRoles.some((m) => m.toLowerCase() === item.title.toLowerCase()) === false)
-                                                                                                ?
-                                                                                                <div className="active-box">
-                                                                                                    <BsCheck2 color="#FFF" />
-                                                                                                </div>
-                                                                                                :
-                                                                                                <div className="inactive-box"></div>
-                                                                                        }
+                                                                            <>
+                                                                                <div className='roles-li' key={index}>
+                                                                                    <div
+                                                                                        className='roles-pill'
+                                                                                        style={{ backgroundColor: `${item.color}50` }}
+                                                                                    >
+                                                                                        <div
+                                                                                            className='roles-circle'
+                                                                                            style={{ background: `${item.color}` }}
+                                                                                        ></div>
+                                                                                        <span>{item.value}</span>
                                                                                     </div>
+                                                                                    {
+                                                                                        !(selectedRoles.some((m) => m.toLowerCase() === item.title.toLowerCase()) === false)
+                                                                                            ?
+                                                                                            <input type="checkbox" onChange={() => handleAddRoles(item.title)} checked />
+                                                                                            :
+                                                                                            <input type="checkbox" onChange={() => handleAddRoles(item.title)} />
+                                                                                    }
                                                                                 </div>
-                                                                            </div>
+
+                                                                                {/* <div className="member-li" key={index} onClick={() => handleAddRoles(item.title)}>
+                                                                                    <div className="member-img-name">
+                                                                                        <p style={{ textTransform: 'capitalize' }}>{item.value}</p>
+                                                                                    </div>
+                                                                                    <div className="member-address" style={{ justifyContent: 'flex-end' }}>
+
+                                                                                        <div className='checkbox' onClick={() => handleAddRoles(item.title)}>
+                                                                                            {
+                                                                                                !(selectedRoles.some((m) => m.toLowerCase() === item.title.toLowerCase()) === false)
+                                                                                                    ?
+                                                                                                    <div className="active-box">
+                                                                                                        <BsCheck2 color="#FFF" />
+                                                                                                    </div>
+                                                                                                    :
+                                                                                                    <div className="inactive-box"></div>
+                                                                                            }
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div> */}
+                                                                            </>
+
                                                                         )
                                                                     })
                                                                 }
