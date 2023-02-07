@@ -237,7 +237,7 @@ return "";
             task.isFilterRoles = isFilterRoles;
             task.validRoles = isFilterRoles ? validRoles : [];
             console.log("task role:" ,task);
-           // dispatch(createTask({ payload: task }))
+            dispatch(createTask({ payload: task }))
         }
     }
 
