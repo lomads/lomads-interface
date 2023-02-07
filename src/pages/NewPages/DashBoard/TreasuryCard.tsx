@@ -44,6 +44,8 @@ import { GNOSIS_SAFE_BASE_URLS, SupportedChainId } from 'constants/chains';
 import { GNOSIS_SAFE_ALLOWANCE_MODULE_CONTRACT } from 'constants/chains';
 import RecurringTxn from "./TreasuryCard/RecurringTxn";
 import { updateSafeThreshold } from "state/flow/reducer";
+import RecurringTxnTreasury from "./TreasuryCard/RecurringTxnTreasury";
+const { toChecksumAddress } = require('ethereum-checksum-address')
 
 
 const TreasuryCard = (props: ItreasuryCardType) => {
@@ -224,7 +226,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				const { eTxn } = await loadOffChainTxn()
 				return etx.concat(eTxn)
 			})
-			.then(ptx => _orderBy(ptx, [(p: any) => p.offChain, (p: any) => p.executionDate ? p.executionDate : p.submissionDate], ['asc', 'asc']))
+			.then(ptx => _orderBy(ptx, [(p: any) => p.offChain, (p: any) => p.executionDate ? p.executionDate : p.submissionDate], ['desc', 'desc']))
 			.then(etx => { console.log("loadExecutedTxn", etx); return etx })
 			.then(etx => setExecutedTxn(etx))
 	}
@@ -633,6 +635,26 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	// 	return _get(tkn, 'token.decimals', 18)
 	// }
 
+	const nextQueue = (rtransaction:any) => {
+		if(rtransaction && rtransaction.queue) {
+			let queue = rtransaction.queue.filter((q:any) => !q.moduleTxnHash);
+			queue = _orderBy(queue, q => q.nonce, 'asc')
+			if(queue && queue.length > 0) return queue[0]
+		}
+		return null
+	}
+
+	const recurringTreasuryData = useMemo(() => {
+		if(!recurringPayments) return []
+		const rp = recurringPayments.filter((rtx:any) => {
+			const nQ = nextQueue(rtx);
+			if(rtx.active && nQ && nQ.nonce < moment().utc().endOf('day').unix() && (account === toChecksumAddress(rtx.receiver.wallet))) 
+				return true
+			return false
+		})
+		return rp
+	}, [recurringPayments])
+
 	if (!DAO || (DAO && DAO.url !== daoURL))
 		return null
 
@@ -772,6 +794,14 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 								<div className="dashboardText" style={{ marginBottom: '6px', flexGrow: 1 }}>Last Transactions</div>
 								{/* { lowBalanceError && <div className="dashboardText" style={{ marginBottom: '6px', color: 'red' }}>Low token balance</div> } */}
 							</div>
+							{
+								recurringTreasuryData.map((rtx :any) => 
+									<RecurringTxnTreasury onExecute={async (data: any) => {
+										await loadTxnLabel()
+										dispatch(setRecurringPayments(data))
+									}} transaction={rtx}/>
+								)
+							}
 							{
 								pendingTxn.map((ptx, index) =>
 									<PendingTxn editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} executeFirst={executeFirst} isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />

@@ -291,6 +291,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                                                 )
                                             );
                                         })}
+                                    { _get(DAO, 'sweatPoints', false) && <option value="SWEAT">SWEAT</option>}
                                 </Select>
                                 <div className='number-input'>
                                     <NumberInput

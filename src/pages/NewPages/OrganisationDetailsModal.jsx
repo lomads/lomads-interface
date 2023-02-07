@@ -250,7 +250,13 @@ const OrganisationDetails = ({
 													}}
 												>
 													<p width="50%">{item.title.length > 7 ? item.title.substring(0, 7) + "..." : item.title}</p>
-													<p width="50%" style={{ paddingLeft: 8 }}>{item.link.length > 6 ? item.link.substring(0, 40) + "..." : item.link}</p>
+													<p width="50%" style={{ 
+														paddingLeft: 8,
+														width: 250,
+														whiteSpace: 'nowrap',
+														overflow: 'hidden',
+														textOverflow: 'ellipsis'
+													 }}>{item.link}</p>
 												</div>
 												<div
 													className="deleteButton"
