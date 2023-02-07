@@ -69,7 +69,6 @@ const Settings = () => {
 	const dispatch = useAppDispatch();
 
 	//! CONST DECLARATION
-	const [showModal, setShowModal] = useState(false);
 	const [openOrganisationDetails, setOpenOrganisationDetails] = useState(false);
 	const [openRolesPermissions, setOpenRolesPermissions] = useState(false);
 	const [openSafe, setOpenSafe] = useState(false);
@@ -98,36 +97,16 @@ const Settings = () => {
 
 	useEffect(() => {
 		eventEmitter.on('close-xp-modal', () => {
-			setShowModal(false)
 			setOpenXpPoints(false)
 		})
 		return () => {
 			eventEmitter.off('close-xp-modal', () => {
-				setShowModal(false)
 				setOpenXpPoints(false)
 			})
 		}
 	}, [])
 
-
-
-
 	//! TOGGLE FUNCTIONS
-	let toggleModal = () => {
-		setShowModal(prev => { 
-			if(prev) {
-				setOpenOrganisationDetails(false);
-				setOpenRolesPermissions(false);
-				setOpenSafe(false);
-				setOpenPassToken(false);
-				setOpenXpPoints(false);
-				setOpenTerminology(false);
-				setOpenDiscord(false);
-				setOpenCreatePassToken(false);
-			}
-			return !prev 
-		});
-	};
 	let toggleOrganisationDetailsModal = () => {
 		setOpenOrganisationDetails(!openOrganisationDetails);
 	};
@@ -135,7 +114,7 @@ const Settings = () => {
 		setOpenRolesPermissions(!openRolesPermissions);
 	};
 	let toggleS = () => {
-		setOpenSafe(prev => !prev);
+		setOpenSafe(!openSafe);
 	};
 	let togglePassToken = () => {
 		setOpenPassToken(!openPassToken);
@@ -154,7 +133,6 @@ const Settings = () => {
 	};
 	const daoName = name.split(" ");
 
-	console.log("showModal : ", showModal);
 	return (
 		<>
 			<div className="settings-page">
@@ -178,7 +156,6 @@ const Settings = () => {
 						</div>
 						<div className="settings-organisation"
 							onClick={() => {
-								setShowModal(true)
 								setOpenOrganisationDetails(true);
 							}}
 						>
@@ -197,7 +174,6 @@ const Settings = () => {
 						<div className="settings-organisation-flexbox">
 							<div className="settings-organisation-child"
 								onClick={() => {
-									toggleModal();
 									setOpenRolesPermissions(true);
 								}}
 							>
@@ -218,7 +194,6 @@ const Settings = () => {
 							</div>
 							<div
 								onClick={() => {
-									toggleModal();
 									setOpenSafe(true)
 								}}
 								className="settings-organisation-child">
@@ -240,7 +215,6 @@ const Settings = () => {
 
 							<div className="settings-organisation-child"
 								onClick={() => {
-									toggleModal();
 									DAO?.sbt?.name ? togglePassToken() : toggleCreatePassTokenModal()
 								}}
 							>
@@ -264,7 +238,6 @@ const Settings = () => {
 						<div className="settings-organisation-flexbox">
 							<div className="settings-organisation-child"
 								onClick={() => {
-									toggleModal();
 									setOpenXpPoints(true);
 								}}
 							>
@@ -285,7 +258,6 @@ const Settings = () => {
 							</div>
 							<div className="settings-organisation-child"
 								onClick={() => {
-									// toggleModal();
 									setOpenTerminology(true);
 								}}
 							>
@@ -307,8 +279,7 @@ const Settings = () => {
 
 							<div className="settings-organisation-child disabled"
 								onClick={() => {
-									// toggleModal();
-									// setOpenDiscord(true);
+									setOpenDiscord(true);
 								}}
 							>
 								<div
@@ -339,48 +310,44 @@ const Settings = () => {
 			</div>
 
 			{/* // !-------------  Organisation Details ------------ */}
-			{showModal && openOrganisationDetails && (
+			{openOrganisationDetails && (
 				<OrganisationDetailsModal
-					toggleModal={toggleModal}
 					toggleOrganisationDetailsModal={toggleOrganisationDetailsModal}
 				/>
 			)}
 			{/* // !-------------  Roles & Permissions ------------ */}
-			{showModal && openRolesPermissions && (
-				<RolesPermissionsModal toggleModal={toggleModal} toggleRP={toggleRP} />
+			{openRolesPermissions && (
+				<RolesPermissionsModal toggleRP={toggleRP} />
 			)}
 			{/* // !-------------  Safe ------------ */}
-			{showModal && openSafe && (
-				<SafeModal toggleModal={toggleModal} toggleS={toggleS} />
+			{openSafe && (
+				<SafeModal toggleS={toggleS} />
 			)}
 			{/* // !-------------  Pass Token ------------ */}
-			{showModal && openPassToken && (
+			{openPassToken && (
 				<PassTokenModal
-					toggleModal={toggleModal}
 					togglePassToken={togglePassToken}
 				/>
 			)}
-			{showModal && openCreatePassToken && (
+			{openCreatePassToken && (
 				<CreateMorePassTokenModal
-					toggleModal={toggleModal}
 					navFromSetting={true}
 					toggleCreatePassTokenModal={toggleCreatePassTokenModal}
 				/>
 			)}
 			{/* // !-------------  SWEAT Points ------------ */}
-			{showModal && openXpPoints && (
-				<XpPointsModal toggleModal={toggleModal} toggleXp={toggleXp} />
+			{openXpPoints && (
+				<XpPointsModal toggleXp={toggleXp} />
 			)}
 			{/* // !-------------  Terminology ------------ */}
 			{openTerminology && (
 				<TerminologyModal
-					toggleModal={toggleModal}
 					toggleTerminology={toggleTerminology}
 				/>
 			)}
 			{/* // !-------------  Discord ------------ */}
 			{openDiscord && (
-				<DiscordModal toggleModal={toggleModal} toggleDiscord={toggleDiscord} />
+				<DiscordModal toggleDiscord={toggleDiscord} />
 			)}
 		</>
 	);

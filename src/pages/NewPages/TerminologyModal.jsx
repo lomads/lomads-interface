@@ -12,7 +12,7 @@ import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import { TASK_OPTIONS, WORKSPACE_OPTIONS, DEFAULT_ROLES } from '../../constants/terminology';
 
 
-const TerminologyModal = ({ toggleModal, toggleTerminology }) => {
+const TerminologyModal = ({ toggleTerminology }) => {
 
 	const dispatch = useAppDispatch();
 	const { DAO, updateDaoLoading } = useAppSelector((state) => state.dashboard);

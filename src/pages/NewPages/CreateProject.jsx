@@ -62,6 +62,9 @@ const CreateProject = () => {
     const [toggle, setToggle] = useState(false);
     const [selectType, setSelectType] = useState('');
 
+    const [roles, setRoles] = useState([]);
+    const [selectedRoles, setSelectedRoles] = useState([]);
+
     const [openResource, setOpenResource] = useState(false);
     const [openMilestone, setOpenMilestone] = useState(false);
     const [openKRA, setOpenKRA] = useState(false);
@@ -90,6 +93,29 @@ const CreateProject = () => {
     }, [createProjectLoading])
 
     useEffect(() => {
+        const rolesArr = _get(DAO, 'terminologies.roles', null);
+        const discordOb = _get(DAO, 'discord', null);
+        let temp = [];
+        if (rolesArr) {
+            Object.keys(rolesArr).forEach(function (key, _index) {
+                temp.push({ title: key, value: rolesArr[key].label });
+            });
+        }
+        if (discordOb) {
+            Object.keys(discordOb).forEach(function (key, _index) {
+                const discordChannel = discordOb[key];
+                discordChannel.roles.forEach((item) => {
+                    if (item.name !== '@everyone' && (temp.some((m) => m.title.toLowerCase() === item.id.toLowerCase()) === false)) {
+                        temp.push({ title: item.id, value: item.name });
+                    }
+                })
+            });
+        }
+        console.log("temp : ", temp);
+        setRoles(temp);
+    }, [DAO])
+
+    useEffect(() => {
         const memberList = DAO?.members;
         if (memberList.length > 0 && selectedMembers.length === 0) {
             for (let i = 0; i < memberList.length; i++) {
@@ -101,7 +127,7 @@ const CreateProject = () => {
                 }
             }
         }
-    }, []);
+    }, [DAO]);
 
     // useEffect(() => {
     //     let accessControlElement = document.getElementById('accessControl');
@@ -183,6 +209,15 @@ const CreateProject = () => {
         }
     }
 
+    const handleAddRoles = (role) => {
+        const roleExists = _find(selectedRoles, m => m.toLowerCase() === role.toLowerCase())
+        if (roleExists)
+            setSelectedRoles(prev => prev.filter((item) => item.toLowerCase() !== role.toLowerCase()));
+        else {
+            setSelectedRoles([...selectedRoles, role]);
+        }
+    }
+
     const handleRemoveMember = (position) => {
         setSelectedMembers(selectedMembers.filter((_, index) => index !== position));
     }
@@ -191,7 +226,6 @@ const CreateProject = () => {
         let project = {};
         project.name = name;
         project.description = desc;
-        project.members = _uniqBy(selectedMembers, m => m.address);
         project.links = resourceList;
         project.milestones = milestones;
         project.compensation = compensation;
@@ -200,8 +234,47 @@ const CreateProject = () => {
             results
         };
         project.daoId = DAO?._id;
-        console.log(project)
-        dispatch(createProject({ payload: project }))
+
+        if (!toggle) {
+            let arr = [];
+            for (let i = 0; i < DAO.members.length; i++) {
+                let user = DAO.members[i];
+                arr.push({ name: user.member.name, address: user.member.wallet })
+            }
+            project.members = arr;
+        }
+
+        if (toggle && selectType === 'Invitation') {
+            project.members = _uniqBy(selectedMembers, m => m.address);
+        }
+
+        if (toggle && selectType === 'Roles') {
+            let arr = [];
+            for (let i = 0; i < DAO.members.length; i++) {
+                let user = DAO.members[i];
+                if (user.discordRoles) {
+                    Object.keys(user.discordRoles).forEach(function (key, index) {
+
+                        user.discordRoles[key].every(function (_item, _index) {
+                            if (selectedRoles.includes(_item)) {
+                                arr.push({ name: user.member.name, address: user.member.wallet });
+                                return false;
+                            }
+                            return true;
+                        })
+                    })
+                }
+                else {
+                    if (selectedRoles.includes(user.role)) {
+                        arr.push({ name: user.member.name, address: user.member.wallet })
+                        console.log("roles")
+                    }
+                }
+            }
+            project.members = _uniqBy(arr, m => m.address);
+        }
+
+        dispatch(createProject({ payload: project }));
     }
 
     return (
@@ -546,6 +619,43 @@ const CreateProject = () => {
                                                                                 </div>
                                                                             )
                                                                         }
+                                                                    })
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    {
+                                                        toggle && selectType === 'Roles' && roles.length > 0
+                                                        &&
+                                                        <div className='project-members'>
+                                                            <div className='project-members-header'>
+                                                                <p>Select Roles</p>
+                                                            </div>
+                                                            <div className="member-list">
+                                                                {
+                                                                    roles.map((item, index) => {
+                                                                        return (
+                                                                            <div className="member-li" key={index} onClick={() => handleAddRoles(item.title)}>
+                                                                                <div className="member-img-name">
+                                                                                    {/* <img src={memberIcon} alt="member-icon" /> */}
+                                                                                    <p style={{ textTransform: 'capitalize' }}>{item.value}</p>
+                                                                                </div>
+                                                                                <div className="member-address" style={{ justifyContent: 'flex-end' }}>
+
+                                                                                    <div className='checkbox' onClick={() => handleAddRoles(item.title)}>
+                                                                                        {
+                                                                                            !(selectedRoles.some((m) => m.toLowerCase() === item.title.toLowerCase()) === false)
+                                                                                                ?
+                                                                                                <div className="active-box">
+                                                                                                    <BsCheck2 color="#FFF" />
+                                                                                                </div>
+                                                                                                :
+                                                                                                <div className="inactive-box"></div>
+                                                                                        }
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        )
                                                                     })
                                                                 }
                                                             </div>
