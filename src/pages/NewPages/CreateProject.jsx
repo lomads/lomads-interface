@@ -252,37 +252,29 @@ const CreateProject = () => {
             let arr = [];
             for (let i = 0; i < DAO.members.length; i++) {
                 let user = DAO.members[i];
-                if (selectedRoles.includes(user.role)) {
-                    arr.push({ name: user.member.name, address: user.member.wallet })
-                    console.log("roles")
-                }
-                // if (user.discordRoles){
-                //     Object.keys(user.discordRoles).forEach(function(key,index) {
-                //         if ((arr.some((m) => m.address.toLowerCase() === user.member.wallet.toLowerCase()) === false)){
+                if (user.discordRoles) {
+                    Object.keys(user.discordRoles).forEach(function (key, index) {
 
-                //         }
-                //         user.discordRoles[key].every(function(_item,_index){
-                //             if(selectedRoles.includes(_item)){
-                //                 arr.push({ name: user.member.name, address: user.member.wallet });
-                //                 return false;
-                //             }
-                //             return true;
-                //         })
-                //     })
-                // }
-                // else{
-                //     if (selectedRoles.includes(user.role)) {
-                //         arr.push({ name: user.member.name, address: user.member.wallet })
-                //         console.log("roles")
-                //     }
-                // }
+                        user.discordRoles[key].every(function (_item, _index) {
+                            if (selectedRoles.includes(_item)) {
+                                arr.push({ name: user.member.name, address: user.member.wallet });
+                                return false;
+                            }
+                            return true;
+                        })
+                    })
+                }
+                else {
+                    if (selectedRoles.includes(user.role)) {
+                        arr.push({ name: user.member.name, address: user.member.wallet })
+                        console.log("roles")
+                    }
+                }
             }
-            project.members = arr;
+            project.members = _uniqBy(arr, m => m.address);
         }
 
-        console.log("final project : ", project);
-
-        // dispatch(createProject({ payload: project }));
+        dispatch(createProject({ payload: project }));
     }
 
     return (
