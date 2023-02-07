@@ -219,8 +219,8 @@ return "";
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
             symbol = _get(symbol, 'token.symbol', null)
             if (!symbol)
-                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
-
+                symbol = currency.currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency.currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : ''
+            console.log("task role:",symbol);
             let task = {};
             task.daoId = DAO?._id;
             task.name = name;
@@ -237,7 +237,7 @@ return "";
             task.isFilterRoles = isFilterRoles;
             task.validRoles = isFilterRoles ? validRoles : [];
             console.log("task role:" ,task);
-            dispatch(createTask({ payload: task }))
+           // dispatch(createTask({ payload: task }))
         }
     }
 
