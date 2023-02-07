@@ -62,7 +62,7 @@
     margin-bottom: 8px;
 }
 
-.editMemberOverlay .editMemberContainer .editMember-body .head-text {
+.editMemberOverlay .editMemberContainer .editMember-body span {
     font-style: italic;
     font-weight: 400;
     font-size: 14px;
@@ -71,41 +71,6 @@
     text-align: center;
     color: #76808D;
     margin-bottom: 35px;
-}
-
-.editMemberOverlay .editMemberContainer .editMember-body .members-dropdown {
-    width: 60%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 10px;
-}
-
-.editMemberOverlay .editMemberContainer .editMember-body .divider {
-    width: 200px;
-    border: 2px solid #C94B32;
-    margin: 35px 0;
-}
-
-.editMemberOverlay .editMemberContainer .editMember-body .toggle-box {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.editMemberOverlay .editMemberContainer .editMember-body .toggle-box .toggle-text {
-    font-style: normal;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 18px;
-    /* identical to box height, or 112% */
-    letter-spacing: -0.011em;
-    text-transform: uppercase;
-
-    /* Grey */
-    color: #76808D;
-    margin-left: 10px;
 }
 
 .editMemberOverlay .editMemberContainer .editMember-body .member-row {

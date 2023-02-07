@@ -4,10 +4,10 @@
     background-color: #FFF;
     border-radius: 20px 0px 0px 20px;
     padding: 60px 54px;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     position: relative;
-    overflow: auto;
 }
 
 .selectRoles-container .selectRoles-header {

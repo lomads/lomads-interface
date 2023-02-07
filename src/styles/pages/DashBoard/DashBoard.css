@@ -324,63 +324,6 @@ body.active-modal {
     /* overflow: hidden; */
     white-space: nowrap;
     text-overflow: ellipsis;
-    width: 10%;
-}
-
-.roleContainer {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.roleContainer .role-count {
-    padding: 4px;
-    min-width: 36px;
-    background: #FFFFFF;
-    /* Color-drop */
-    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
-    border-radius: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 10px;
-    cursor: pointer;
-}
-
-.roleContainer .role-count span {
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 16px;
-    color: #76808D;
-}
-
-.roleContainer .role-pill {
-    padding: 4px;
-    min-width: 55px;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    /* background: rgba(251, 114, 87, 0.3); */
-    /* opacity: 0.3; */
-    border-radius: 100px;
-    display: flex;
-    align-items: center;
-}
-
-.roleContainer .role-pill .role-circle {
-    width: 14px;
-    height: 14px;
-    /* background: #FB7257; */
-    border-radius: 100px;
-    margin-right: 5px;
-}
-
-.roleContainer .role-pill span {
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 16px;
-    color: #76808D;
-    text-transform: capitalize;
 }
 
 .dashboardTextBold {
@@ -608,7 +551,12 @@ body.active-modal {
 }
 
 .NameAndAvatar {
-    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 30%;
+    gap: 10px;
 }
 
 .memberRow {
@@ -617,7 +565,6 @@ body.active-modal {
     justify-content: flex-start;
     align-items: center;
     width: 100%;
-    /* background-color: blue; */
 }
 
 .avatarAndName,
@@ -626,7 +573,7 @@ body.active-modal {
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    width: 15%;
+    min-width: 45%;
 }
 
 .avatarAndName,
@@ -779,7 +726,6 @@ body.active-modal {
 }
 
 .sideModalCloseButton {
-    cursor: pointer;
     border-radius: 5px;
     border-width: 0px;
     border-color: #FFFFFF;
@@ -1241,7 +1187,7 @@ body.active-modal {
     display: flex;
     align-items: center;
     color: #76808D;
-    width: 15%;
+    min-width: 20%;
 }
 
 #recipientListandButtons {

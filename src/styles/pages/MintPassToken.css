@@ -1,228 +1,297 @@
 .mintPassToken-container {
-    width: 100%;
-    padding-top: 10vh;
-    height: 100vh;
-    background: linear-gradient(180deg, #FDF7F7 0%, #F3F2F2 100%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
-    overflow-y: scroll;
+  width: 100%;
+  padding-top: 10vh;
+  height: 100vh;
+  background: linear-gradient(180deg, #fdf7f7 0%, #f3f2f2 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow-y: scroll;
 }
 
 .error {
-    font-size: 13px;
-    margin-bottom: 1rem;
-    color: #C84A32;
+  font-size: 13px;
+  margin-bottom: 1rem;
+  color: #c84a32;
 }
 
 p,
 label {
-    font-family: "Insignia", sans-serif;
+  font-family: "Insignia", sans-serif;
 }
 
 @font-face {
-    font-family: "Insignia";
-    src: url("../fonts/Insignia.ttf") format("truetype"),
+  font-family: "Insignia";
+  src: url("../fonts/Insignia.ttf") format("truetype");
 }
 
 .mintPassToken-container .address-dropdown-container {
-    width: 220px;
-    height: 60px;
-    border-radius: 30px;
-    background-color: #FFF;
-    box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: fixed;
-    top: 1.5rem;
-    right: 1.5rem;
+  width: 220px;
+  height: 60px;
+  border-radius: 30px;
+  background-color: #fff;
+  box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05),
+    -3px -3px 8px rgba(201, 75, 50, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
 }
 
 .mintPassToken-container .address-dropdown-container .address-dropdown-div1 {
-    height: 100%;
-    width: 75%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-right: 1px solid #F0F0F0;
+  height: 100%;
+  width: 75%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #f0f0f0;
 }
 
 .mintPassToken-container .address-dropdown-container .address-dropdown-div1 p {
-    color: #909090;
-    font-size: 14px;
-    font-style: italic;
-    margin-left: 10px;
+  color: #909090;
+  font-size: 14px;
+  font-style: italic;
+  margin-left: 10px;
 }
 
 .mintPassToken-container .address-dropdown-container .address-dropdown-div2 {
-    height: 100%;
-    width: 25%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  height: 100%;
+  width: 25%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.mintPassToken-container .address-dropdown-container .address-dropdown-div2 span {
-    transform: translateX(-5px);
-    cursor: pointer;
+.mintPassToken-container
+  .address-dropdown-container
+  .address-dropdown-div2
+  span {
+  transform: translateX(-5px);
+  cursor: pointer;
 }
 
 .mintPassToken-container .mintPassToken-body {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    /* margin-bottom: 20vh; */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* margin-bottom: 20vh; */
 }
 
 .mintPassToken-container .mintPassToken-body .heading-text {
-    font-style: normal;
-    font-weight: 400;
-    font-size: 30px;
-    line-height: 33px;
-    color: #C94B32;
-    margin: 1.5rem 0;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 33px;
+  color: #c94b32;
+  margin: 1.5rem 0;
 }
 
 .mintPassToken-container .mintPassToken-body .tokenName-box {
-    width: 400px;
-    background: #FFFFFF;
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
-    padding: 26px 22px;
-    margin-bottom: 20px;
+  width: 400px;
+  background: #ffffff;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  padding: 26px 22px;
+  margin-bottom: 20px;
 }
 
 .mintPassToken-container .mintPassToken-body .tokenName-box img {
-    margin-right: 10px;
+  margin-right: 10px;
 }
 
 .mintPassToken-container .mintPassToken-body .tokenName-box p {
-    font-style: normal;
-    font-weight: 400;
-    font-size: 22px;
-    line-height: 25px;
-    letter-spacing: -0.011em;
-    color: #76808D;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 25px;
+  letter-spacing: -0.011em;
+  color: #76808d;
 }
 
 .mintPassToken-container .mintPassToken-body .userName-box {
-    width: 400px;
-    background: #FFFFFF;
-    border-radius: 5px;
-    display: flex;
-    flex-direction: column;
-    padding: 26px 22px;
-    margin-bottom: 20px;
+  width: 400px;
+  background: #ffffff;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  padding: 26px 22px;
+  margin-bottom: 20px;
 }
 
 .mintPassToken-container .mintPassToken-body .userName-box label {
-    font-style: normal;
-    font-weight: 700;
-    /* font-family: "Insignia"; */
-    font-size: 16px;
-    line-height: 18px;
-    color: #76808D;
-    margin-bottom: 0.5rem;
+  font-style: normal;
+  font-weight: 700;
+  /* font-family: "Insignia"; */
+  font-size: 16px;
+  line-height: 18px;
+  color: #76808d;
+  margin-bottom: 0.5rem;
 }
 
 .mintPassToken-container .mintPassToken-body .userName-box input {
-    width: 100%;
-    height: 50px;
-    border-radius: 10px;
-    background: #F5F5F5;
-    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
-    padding: 0 1rem;
-    outline: none;
+  width: 100%;
+  height: 50px;
+  border-radius: 10px;
+  background: #f5f5f5;
+  box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+  padding: 0 1rem;
+  outline: none;
 }
 
 .mintPassToken-container .mintPassToken-body .contact-box {
-    width: 400px;
-    background: #FFFFFF;
-    border-radius: 5px;
-    display: flex;
-    flex-direction: column;
-    padding: 26px 22px;
-    margin-bottom: 20px;
+  width: 400px;
+  background: #ffffff;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  padding: 26px 22px;
+  margin-bottom: 20px;
 }
 
 .mintPassToken-container .mintPassToken-body .contact-box label {
-    font-style: normal;
-    font-weight: 700;
-    font-size: 16px;
-    line-height: 18px;
-    color: #76808D;
-    margin-bottom: 1rem;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 18px;
+  color: #76808d;
+  margin-bottom: 1rem;
 }
 
 .mintPassToken-container .mintPassToken-body .contact-box .contact-li {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
 }
 
-.mintPassToken-container .mintPassToken-body .contact-box .contact-li:last-child {
-    margin-bottom: 0;
+.mintPassToken-container
+  .mintPassToken-body
+  .contact-box
+  .contact-li:last-child {
+  margin-bottom: 0;
 }
 
 .mintPassToken-container .mintPassToken-body .contact-box .contact-li div {
-    width: 320px;
-    height: 50px;
+  width: 320px;
+  height: 50px;
 }
 
-.mintPassToken-container .mintPassToken-body .contact-box .contact-li div input {
-    width: 100%;
-    height: 50px;
-    border-radius: 10px;
-    background: #F5F5F5;
-    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
-    padding: 0 1rem;
-    outline: none;
+.mintPassToken-container
+  .mintPassToken-body
+  .contact-box
+  .contact-li
+  div
+  input {
+  width: 100%;
+  height: 50px;
+  border-radius: 10px;
+  background: #f5f5f5;
+  box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+  padding: 0 1rem;
+  outline: none;
 }
 
 .mintPassToken-container .mintPassToken-body button {
-    width: 250px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(27, 43, 65, 0.2);
-    border-radius: 5px;
-    color: #FFF;
+  width: 250px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(27, 43, 65, 0.2);
+  border-radius: 5px;
+  color: #fff;
 }
 
 .notAllowedText {
-    font-style: normal;
-    font-family: "Insignia";
-    font-weight: 400;
-    font-size: 30px;
-    line-height: 33px;
-    /* or 110% */
-    display: flex;
-    align-items: center;
-    text-align: center;
-    margin: 20px 0;
-    /* RED */
-    color: #C94B32;
+  font-style: normal;
+  font-family: "Insignia";
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 33px;
+  /* or 110% */
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+  /* RED */
+  color: #c94b32;
 }
 
 .notAllowedText2 {
-    font-style: normal;
-    font-weight: 400;
-    font-family: "Insignia";
-    font-size: 14px;
-    line-height: 16px;
-    /* or 114% */
-    display: flex;
-    align-items: center;
-    text-align: center;
-    margin-top: 20px;
-    /* Grey */
-    color: #76808D;
+  font-style: normal;
+  font-weight: 400;
+  font-family: "Insignia";
+  font-size: 14px;
+  line-height: 16px;
+  /* or 114% */
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin-top: 20px;
+  /* Grey */
+  color: #76808d;
+}
+
+.image-picker-container {
+  /* width: 200px; */
+  height: 200px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+  margin: 1rem 0;
+  cursor: pointer;
+  position: relative;
+}
+
+.image-picker-container .selected-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+}
+.image-picker-container p {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 18px;
+  text-align: center;
+  letter-spacing: -0.011em;
+  color: rgba(27, 45, 65, 0.6);
+  margin-top: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+.image-picker-container span {
+  color: rgba(27, 45, 65, 0.2);
+  font-style: normal;
+}
+
+.image-picker-container input {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.summary-item p {
+  color: #747e8b;
 }

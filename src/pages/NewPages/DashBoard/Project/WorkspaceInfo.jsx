@@ -17,8 +17,8 @@ import { resetUpdateProjectLoader } from 'state/dashboard/reducer';
 const WorkspaceInfo = ({ toggleWorkspaceInfo, projectId, daoURL }) => {
     const dispatch = useAppDispatch();
     const { DAO, Project, updateProjectLoading } = useAppSelector((state) => state.dashboard);
-    const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies'))
     const editorRef = useRef(null);
+    const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies'));
     const [name, setName] = useState(_get(Project, 'name', ''));
     const [description, setDescription] = useState(_get(Project, 'description', ''));
 
@@ -48,7 +48,7 @@ const WorkspaceInfo = ({ toggleWorkspaceInfo, projectId, daoURL }) => {
 
                     <div className='WorkspaceEdit-body'>
                         <img src={createProjectSvg} alt="frame-icon" />
-                        <h1>{transformWorkspace().label} Details</h1>
+                        <h1>Workspace Info</h1>
 
                         <div className='createProject-form-container'>
                             <div className='input-div'>

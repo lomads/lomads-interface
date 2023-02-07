@@ -92,12 +92,12 @@ const MyProject = () => {
                 <div className="myproject-title">
                     <>
                         <button className={tab === 1 ? 'active' : null} onClick={() => setTab(1)}>
-                            My {transformWorkspace().labelPlural}
+                            My { transformWorkspace().labelPlural }
                         </button>
                         <div className="divider"></div>
                     </>
                     <button className={tab === 2 ? 'active' : null} onClick={() => setTab(2)}>
-                        All {transformWorkspace().labelPlural}
+                        All { transformWorkspace().labelPlural }
                     </button>
                 </div>
                 <div className="myproject-buttons">

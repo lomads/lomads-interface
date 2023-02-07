@@ -129,7 +129,7 @@
     padding: 26px 22px;
     display: flex;
     flex-direction: column;
-    margin-bottom: 20px;
+    margin-bottom: 100px;
 }
 
 .ProjectEditOverlay .ProjectEditContainer .ProjectEdit-body .delete-card h1 {

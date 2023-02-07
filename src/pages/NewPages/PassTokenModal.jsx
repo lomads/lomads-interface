@@ -16,7 +16,7 @@ import POLYGON_LOGO from 'assets/images/polygon.png';
 import { resetUpdateContractLoading } from "state/dashboard/reducer";
 
 
-const PassTokenModal = ({ togglePassToken }) => {
+const PassTokenModal = ({ toggleModal, togglePassToken }) => {
 
 	const dispatch = useAppDispatch()
 	const { provider, account, chainId, connector } = useWeb3React();
@@ -44,6 +44,7 @@ const PassTokenModal = ({ togglePassToken }) => {
 	useEffect(() => {
 		if (updateContractLoading === false) {
 			dispatch(resetUpdateContractLoading())
+			toggleModal();
 			togglePassToken();
 		}
 	}, [updateContractLoading])
@@ -64,6 +65,7 @@ const PassTokenModal = ({ togglePassToken }) => {
 			<div className="sidebarModal">
 				<div
 					onClick={() => {
+						toggleModal();
 						togglePassToken();
 					}}
 					className="overlay"
@@ -85,6 +87,7 @@ const PassTokenModal = ({ togglePassToken }) => {
 							width={37}
 							className="sideModalCloseButton"
 							onClick={() => {
+								toggleModal();
 								togglePassToken();
 							}}
 						/>
@@ -245,6 +248,7 @@ const PassTokenModal = ({ togglePassToken }) => {
 								style={{ marginRight: 6 }}
 								variant="outline"
 								onClick={() => {
+									toggleModal();
 									togglePassToken();
 								}}
 							>

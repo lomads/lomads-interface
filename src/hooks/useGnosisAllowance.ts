@@ -126,7 +126,7 @@ const useGnosisAllowance = (safeAddress: string | null) => {
         return safeTransactionData;
     }
 
-    const createAllowanceTransaction = async ({ tokenAddress, amount, to, label, delegate}: { tokenAddress: string, amount: number, to: string, label: string, delegate: string} ) => {
+    const createAllowanceTransaction = async ({ tokenAddress, amount, to, label, delegate = account as string}: { tokenAddress: string, amount: number, to: string, label: string, delegate: string} ) => {
         if(!safeAddress || !account || !chainId || !amount || !tokenAddress) return;
         const safeToken = _find(safeTokens, t => _get(t, 'tokenAddress', null) === tokenAddress)
         if(amount == 0) throw `Cannot send 0 ${_get(safeToken, 'token.symbol', '')}`

@@ -40,7 +40,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
 
     const dispatch = useAppDispatch();
     const { DAO, user, createTaskLoading, draftTaskLoading } = useAppSelector((state) => state.dashboard);
-    const { transformTask, transformWorkspace, transformRole } = useTerminology(_get(DAO, 'terminologies', null));
+    const { transformTask, transformWorkspace, transformRole } = useTerminology(_get(DAO, 'terminologies', null))
     const { chainId, account } = useWeb3React();
 
     const { myRole, can } = useRole(DAO, account)
@@ -64,39 +64,11 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
     const [amount, setAmount] = useState(0);
     const [safeTokens, setSafeTokens] = useState([]);
     const [showSuccess, setShowSuccess] = useState(false);
-    const getrolename=(roleId)=>{
 
-for (let index = 0; index < Object.keys(DAO.discord).length; index++) {
-    const element = Object.keys(DAO.discord)[index];
-    const rolename_discord=_find(DAO.discord[element].roles, r => r.id === roleId)
-    if(rolename_discord){
-        return rolename_discord.name
-    }
-}
-return "";
-    
-};
-            
-        
     const getTokens = async (safeAddress) => {
         const tokens = await getSafeTokens(chainId, safeAddress)
         setSafeTokens(tokens)
     };
-
-    useEffect(() => {
-        var date = new Date();
-        var tdate = date.getDate();
-        var month = date.getMonth() + 1;
-        if (tdate < 10) {
-            tdate = "0" + tdate;
-        }
-        if (month < 10) {
-            month = "0" + month
-        }
-        var year = date.getUTCFullYear();
-        var minDate = year + "-" + month + "-" + tdate;
-        document.getElementById("deadlineInput").setAttribute("min", minDate);
-    }, [])
 
     useEffect(() => {
         if (account && chainId && (!user || (user && user.wallet.toLowerCase() !== account.toLowerCase()))) {
@@ -219,8 +191,8 @@ return "";
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
             symbol = _get(symbol, 'token.symbol', null)
             if (!symbol)
-                symbol = currency.currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency.currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
-            console.log("task role:",symbol);
+                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ||  currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
+
             let task = {};
             task.daoId = DAO?._id;
             task.name = name;
@@ -236,7 +208,6 @@ return "";
             task.isSingleContributor = isSingleContributor;
             task.isFilterRoles = isFilterRoles;
             task.validRoles = isFilterRoles ? validRoles : [];
-            console.log("task role:" ,task);
             dispatch(createTask({ payload: task }))
         }
     }
@@ -264,7 +235,7 @@ return "";
         let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
         symbol = _get(symbol, 'token.symbol', 'SWEAT')
         if (!symbol)
-            symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
+            symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ||  currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
         let task = {};
         task.daoId = DAO?._id;
         task.name = name;
@@ -403,7 +374,7 @@ return "";
 
                                         <div className='createTask-inputRow'>
                                             <div className='createTask-optionalDiv'>
-                                                <span>In {transformWorkspace().label}:</span>
+                                                <span>In { transformWorkspace().label }:</span>
                                                 <div className='option-div'>
                                                     Optional
                                                 </div>
@@ -422,7 +393,7 @@ return "";
                                                         <option value={null}>{selectedProject.name}</option>
                                                         :
                                                         <>
-                                                            <option value={null}>Select {transformWorkspace().label}</option>
+                                                            <option value={null}>Select { transformWorkspace().label }</option>
                                                             {
                                                                 eligibleProjects.filter(p => !p.archivedAt && !p.deletedAt).map((item, index) => {
                                                                     return (
@@ -529,8 +500,7 @@ return "";
                                                                                 className='roles-circle'
                                                                                 style={index === 0 ? { background: 'rgba(146, 225, 168, 1)' } : index === 1 ? { background: 'rgba(137,179,229,1)' } : index === 2 ? { background: 'rgba(234,100,71,1)' } : { background: 'rgba(146, 225, 168, 1)' }}
                                                                             ></div>
-                                                                            
-                                                                            <span>{item=="role1"||item=="role2"||item=="role3"||item=="role4"? transformRole(item).label:getrolename(item)}</span>
+                                                                            <span>{transformRole(item).label}</span>
                                                                         </div>
                                                                         <div className='roles-close' onClick={() => handleRemoveRole(item)}>
                                                                             <CgClose color='#FFF' />

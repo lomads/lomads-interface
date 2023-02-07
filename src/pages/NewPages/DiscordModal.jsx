@@ -4,12 +4,13 @@ import "./Settings.css";
 import DiscordIcon from "../../assets/images/drawer-icons/DiscordIcon.svg";
 import { Button, Image } from "@chakra-ui/react";
 
-const DiscordModal = ({ toggleDiscord }) => {
+const DiscordModal = ({ toggleModal, toggleDiscord }) => {
   return (
     <>
       <div className="sidebarModal">
         <div
           onClick={() => {
+            toggleModal();
             toggleDiscord();
           }}
           className="overlay"
@@ -31,6 +32,7 @@ const DiscordModal = ({ toggleDiscord }) => {
               width={37}
               className="sideModalCloseButton"
               onClick={() => {
+                toggleModal();
                 toggleDiscord();
               }}
             />
@@ -143,6 +145,7 @@ const DiscordModal = ({ toggleDiscord }) => {
               variant="outline"
               mr={3}
               onClick={() => {
+                toggleModal();
                 toggleDiscord();
               }}
             >

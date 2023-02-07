@@ -37,7 +37,7 @@
     display: flex;
     align-items: flex-end;
     position: fixed;
-    top: 16px;
+    top:16px;
     z-index: 999;
 }
 
@@ -80,102 +80,4 @@
     margin-top: 135px;
     display: flex;
     flex-wrap: wrap;
-}
-
-.archive-container .archive-body .accordion-wrapper {
-    width: 85%;
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
-    border-radius: 5px;
-    overflow: hidden;
-}
-
-.archive-container .archive-body .accordion-wrapper .accordion {
-    background-color: #FFF;
-    color: #444;
-    cursor: pointer;
-    padding: 20px 22px;
-    width: 100%;
-    border: none;
-    text-align: left;
-    outline: none;
-    font-size: 15px;
-    transition: 0.4s;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.archive-container .archive-body .accordion-wrapper .accordion h1 {
-    font-style: normal;
-    font-weight: 400;
-    font-size: 22px;
-    line-height: 25px;
-    /* identical to box height, or 114% */
-    letter-spacing: -0.011em;
-
-    /* Grey */
-    color: #76808D;
-}
-
-.archive-container .archive-body .accordion-wrapper .accordion div {
-    display: flex;
-    align-items: center;
-}
-
-.archive-container .archive-body .accordion-wrapper .accordion div h1 {
-    font-style: normal;
-    font-weight: 700;
-    font-size: 22px;
-    line-height: 25px;
-    /* identical to box height, or 114% */
-    letter-spacing: -0.011em;
-
-    color: #54C466;
-    margin-right: 15px;
-}
-
-.archive-container .archive-body .accordion-wrapper .panel {
-    padding: 0 22px;
-    background-color: white;
-    /* display: flex;
-    flex-wrap: wrap; */
-}
-
-.archive-container .archive-body .accordion-wrapper .panel .panel-div {
-    width: 50%;
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 35px;
-}
-
-.archive-container .archive-body .accordion-wrapper .panel .panel-div h1 {
-    font-style: normal;
-    font-weight: 700;
-    font-size: 16px;
-    line-height: 18px;
-    /* or 112% */
-    letter-spacing: -0.011em;
-
-    /* Grey */
-    color: #76808D;
-}
-
-.archive-container .archive-body .accordion-wrapper .panel .panel-div .progress-wrapper {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    margin-top: 0.5rem;
-}
-
-.archive-container .archive-body .accordion-wrapper .panel .panel-div .progress-wrapper .progress-text {
-    font-style: normal;
-    font-weight: 700;
-    font-size: 16px;
-    line-height: 18px;
-    letter-spacing: -0.011em;
-    color: #2AB87C;
-    margin: 0;
-    margin-left: 1rem;
 }

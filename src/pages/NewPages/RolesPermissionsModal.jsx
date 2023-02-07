@@ -10,7 +10,7 @@ import TotalAccess from "../../assets/images/drawer-icons/StatusAccess.svg";
 import ViewOnly from "../../assets/images/drawer-icons/StatusViewOnly.svg";
 import NoAccess from "../../assets/images/drawer-icons/StatusNoAccess.svg";
 
-const RolesPermissionsModal = ({ toggleRP }) => {
+const RolesPermissionsModal = ({ toggleModal, toggleRP }) => {
   //! ROLES & PERMISSIONS OBJECT
   var permissionsArray = [
     {
@@ -124,6 +124,7 @@ const RolesPermissionsModal = ({ toggleRP }) => {
       <div className="sidebarModal">
         <div
           onClick={() => {
+            toggleModal();
             toggleRP();
           }}
           className="overlay"
@@ -145,6 +146,7 @@ const RolesPermissionsModal = ({ toggleRP }) => {
               width={37}
               className="sideModalCloseButton"
               onClick={() => {
+                toggleModal();
                 toggleRP();
               }}
             />

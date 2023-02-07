@@ -362,35 +362,6 @@
     margin: 35px 0;
 }
 
-.createProject-container .createProject-body .toggle-box {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.createProject-container .createProject-body .members-dropdown {
-    width: 20%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 20px 0;
-}
-
-.createProject-container .createProject-body .toggle-box .toggle-text {
-    font-style: normal;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 18px;
-    /* identical to box height, or 112% */
-    letter-spacing: -0.011em;
-    text-transform: uppercase;
-
-    /* Grey */
-    color: #76808D;
-    margin-left: 10px;
-}
-
 .createProject-container .createProject-body .project-members {
     width: 480px;
     background: #FFFFFF;
@@ -444,53 +415,6 @@
     overflow-y: auto;
 }
 
-
-.createProject-container .createProject-body .project-members .member-list .roles-li {
-    display: flex;
-    width: 70%;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
-}
-
-.createProject-container .createProject-body .project-members .member-list .roles-li:last-child {
-    margin: 0;
-}
-
-.createProject-container .createProject-body .project-members .member-list .roles-li .roles-pill {
-    width: 200px;
-    height: 30px;
-    border-radius: 100px;
-    display: flex;
-    align-items: center;
-    padding: 3.75px;
-    margin-right: 15px;
-}
-
-.createProject-container .createProject-body .project-members .member-list .roles-li .roles-pill .roles-circle {
-    height: 22.5px;
-    width: 22.5px;
-    border-radius: 50%;
-    margin-right: 8.25px;
-}
-
-.createProject-container .createProject-body .project-members .member-list .roles-li .roles-pill span {
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 16px;
-    /* or 114% */
-
-    /* Grey */
-    color: #76808D;
-}
-
-
-
-
-
-
-
 .createProject-container .createProject-body .project-members .member-list .member-li {
     width: 100%;
     display: flex;
@@ -537,36 +461,6 @@
     line-height: 15px;
     letter-spacing: -0.011em;
     color: #76808D;
-}
-
-.createProject-container .createProject-body .project-members .member-list .member-li .member-address .checkbox {
-    width: 30px;
-    height: 30px;
-    background: #F0F0F0;
-    /* SMALL-inputs */
-    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-}
-
-.createProject-container .createProject-body .project-members .member-list .member-li .member-address .checkbox .inactive-box {
-    width: 12px;
-    height: 12px;
-    border-radius: 2px;
-    background-color: #FFF;
-}
-
-.createProject-container .createProject-body .project-members .member-list .member-li .member-address .checkbox .active-box {
-    width: 24px;
-    height: 24px;
-    background: #C94B32;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 /* For showing list of already added members */

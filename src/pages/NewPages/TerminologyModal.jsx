@@ -9,10 +9,10 @@ import { useAppSelector, useAppDispatch } from "state/hooks";
 import { updateDao } from 'state/dashboard/actions';
 import { resetUpdateDAOLoader, setTask } from 'state/dashboard/reducer';
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
-import { TASK_OPTIONS, WORKSPACE_OPTIONS, DEFAULT_ROLES } from '../../constants/terminology';
+import { TASK_OPTIONS, WORKSPACE_OPTIONS, DEFAULT_ROLES } from '../../constants/terminology'; 
 
 
-const TerminologyModal = ({ toggleTerminology }) => {
+const TerminologyModal = ({ toggleModal, toggleTerminology }) => {
 
 	const dispatch = useAppDispatch();
 	const { DAO, updateDaoLoading } = useAppSelector((state) => state.dashboard);
@@ -30,7 +30,7 @@ const TerminologyModal = ({ toggleTerminology }) => {
 	}, [updateDaoLoading]);
 
 	useEffect(() => {
-		if (DAO?.terminologies) {
+		if(DAO?.terminologies) {
 			setWorkspaceTerminology(_get(DAO, 'terminologies.workspace.value'))
 			setTaskTerminology(_get(DAO, 'terminologies.task.value'))
 			setRoles(_get(DAO, 'terminologies.roles'))
@@ -39,12 +39,11 @@ const TerminologyModal = ({ toggleTerminology }) => {
 
 	const handleChange = (e) => {
 		setRoles(prev => {
-			return {
-				...prev,
-				[e.target.name]: {
+			return { ...prev, 
+				[e.target.name] : { 
 					...prev[e.target.name],
-					label: e.target.value && e.target.value !== '' ? e.target.value : ''
-				}
+					label:  e.target.value && e.target.value !== '' ? e.target.value : ''
+				} 
 			}
 		})
 	}
@@ -55,8 +54,8 @@ const TerminologyModal = ({ toggleTerminology }) => {
 			const role = roles[key]
 			const rv = {
 				...role,
-				label: role.label && role.label !== '' ? (role.label).trim().replace(/ +(?= )/g, '') : DEFAULT_ROLES[key].label,
-				value: role.label && role.label !== '' ? (role.label).trim().toUpperCase().split(' ').join('_').replace(/ +(?= )/g, '').replace(/[^a-zA-Z0-9_]/g, '') : DEFAULT_ROLES[key].value
+				label:  role.label && role.label !== '' ? (role.label).trim().replace(/ +(?= )/g,'') : DEFAULT_ROLES[key].label,
+				value: role.label&& role.label!== '' ? (role.label).trim().toUpperCase().split(' ').join('_').replace(/ +(?= )/g,'').replace(/[^a-zA-Z0-9_]/g, '') : DEFAULT_ROLES[key].value
 			}
 			r[key] = rv
 		})
@@ -118,17 +117,17 @@ const TerminologyModal = ({ toggleTerminology }) => {
 									?
 									<>
 										<div className="section" style={{ width: '320px' }}>
-											<h1>Workspaces : <span>{_find(WORKSPACE_OPTIONS, wo => wo.value === workspaceTerminology)?.labelPlural}</span></h1>
-											<h1>Tasks : <span>{_find(TASK_OPTIONS, wo => wo.value === taskTerminology)?.labelPlural}</span></h1>
+											<h1>Workspaces : <span>{ _find(WORKSPACE_OPTIONS, wo => wo.value === workspaceTerminology)?.labelPlural }</span></h1>
+											<h1>Tasks : <span>{ _find(TASK_OPTIONS, wo => wo.value === taskTerminology)?.labelPlural }</span></h1>
 										</div>
 										<div className="divider"></div>
 										<div className="section" style={{ width: '320px' }}>
 											{
-												Object.keys(roles).map(key => {
-													return (
-														<h1>{key} : <span>{_get(roles, `${key}.label`)}</span></h1>
-													)
-												})
+											Object.keys(roles).map(key => {
+												return (
+													<h1>{ key } : <span>{ _get(roles, `${key}.label`) }</span></h1>
+												)
+											})
 											}
 										</div>
 									</>
@@ -147,7 +146,7 @@ const TerminologyModal = ({ toggleTerminology }) => {
 												>
 													{
 														WORKSPACE_OPTIONS.map(option => {
-															return <option key={option.value} value={option.value}>{option.labelPlural}</option>
+															return <option key={option.value} value={option.value}>{ option.labelPlural }</option>
 														})
 													}
 												</select>
@@ -164,7 +163,7 @@ const TerminologyModal = ({ toggleTerminology }) => {
 												>
 													{
 														TASK_OPTIONS.map(option => {
-															return <option key={option.value} value={option.value}>{option.labelPlural}</option>
+															return <option key={option.value} value={option.value}>{ option.labelPlural }</option>
 														})
 													}
 												</select>

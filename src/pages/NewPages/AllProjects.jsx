@@ -92,19 +92,19 @@ const AllProjects = () => {
                 <button onClick={() => navigate(-1)}>
                     <IoIosArrowBack size={20} color="#C94B32" />
                 </button>
-                <p>{transformWorkspace().labelPlural}</p>
+                <p>{ transformWorkspace().labelPlural }</p>
             </div>
 
             {/* Tabs header */}
             <div className='allTasks-tabHeader'>
                 <div className="tasks-title">
                     <button className={tab === 1 ? 'active' : null} onClick={() => setTab(1)}>
-                        My {transformWorkspace().labelPlural}
+                        My { transformWorkspace().labelPlural  }
                     </button>
                     <div className="divider"></div>
 
                     <button className={tab === 2 ? 'active' : null} onClick={() => setTab(2)}>
-                        All {transformWorkspace().labelPlural}
+                        All { transformWorkspace().labelPlural  }
                     </button>
                 </div>
                 <div className="tasks-buttons">
@@ -137,44 +137,44 @@ const AllProjects = () => {
                 </div>
             </div>
             <div className='allTasks-body'>
-                {
-                    tab === 1 &&
-                    <div className='allTask-container'>
-                        {
-                            currentProjects && currentProjects.map((item, index) => {
-                                return (
-                                    <div key={index} style={{ marginBottom: '25px' }}>
-                                        <ProjectCard
-                                            project={item}
-                                            daoUrl={DAO?.url}
-                                            tab={tab}
-                                        />
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
-                }
+            {
+                tab === 1 &&
+                <div className='allTask-container'>
+                    {
+                        currentProjects && currentProjects.map((item, index) => {
+                            return (
+                                <div key={index} style={{ marginBottom: '25px' }}>
+                                    <ProjectCard
+                                        project={item}
+                                        daoUrl={DAO?.url}
+                                        tab={tab}
+                                    />
+                                </div>
+                            )
+                        })
+                    }
+                </div>
+            }
 
-                {
-                    tab === 2 &&
-                    <div className='allTask-container'>
-                        {
-                            currentProjects && currentProjects.map((item, index) => {
-                                return (
-                                    <div key={index} style={{ marginBottom: '25px' }}>
-                                        <ProjectCard
-                                            project={item}
-                                            daoUrl={DAO?.url}
-                                            tab={tab}
-                                        />
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
-                }
-            </div>
+            {
+                tab === 2 &&
+                <div className='allTask-container'>
+                    {
+                        currentProjects && currentProjects.map((item, index) => {
+                            return (
+                                <div key={index} style={{ marginBottom: '25px' }}>
+                                    <ProjectCard
+                                        project={item}
+                                        daoUrl={DAO?.url}
+                                        tab={tab}
+                                    />
+                                </div>
+                            )
+                        })
+                    }
+                </div>
+            }
+        </div>
         </div>
     )
 }

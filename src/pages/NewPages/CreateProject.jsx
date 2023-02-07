@@ -9,7 +9,7 @@ import notionIcon from '../../assets/svg/Notion-logo.svg';
 import { AiOutlineLock } from "react-icons/ai";
 import { SiNotion } from "react-icons/si";
 import { HiOutlinePlus } from "react-icons/hi";
-import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe, BsCheck2 } from "react-icons/bs";
+import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe } from "react-icons/bs";
 import { toast, ToastContainer } from "react-toastify";
 import { ProjectContext } from "context/ProjectContext";
 import { Link, useNavigate } from "react-router-dom";
@@ -59,12 +59,6 @@ const CreateProject = () => {
     const [success, setSuccess] = useState(false);
     const [newAddress, setNewAddress] = useState([]);
 
-    const [toggle, setToggle] = useState(false);
-    const [selectType, setSelectType] = useState('');
-
-    const [roles, setRoles] = useState([]);
-    const [selectedRoles, setSelectedRoles] = useState([]);
-
     const [openResource, setOpenResource] = useState(false);
     const [openMilestone, setOpenMilestone] = useState(false);
     const [openKRA, setOpenKRA] = useState(false);
@@ -93,28 +87,6 @@ const CreateProject = () => {
     }, [createProjectLoading])
 
     useEffect(() => {
-        const rolesArr = _get(DAO, 'terminologies.roles', {});
-        const discordOb = _get(DAO, 'discord', {});
-        let temp = [];
-        if (rolesArr) {
-            Object.keys(rolesArr).forEach(function (key, _index) {
-                temp.push({ title: key, value: rolesArr[key].label, color: '#d5d5d5' });
-            });
-        }
-        if (discordOb) {
-            Object.keys(discordOb).forEach(function (key, _index) {
-                const discordChannel = discordOb[key];
-                discordChannel.roles.forEach((item) => {
-                    if (item.name !== '@everyone' && item.name !== 'LomadsTestBot' && item.name !== 'Lomads' && (temp.some((m) => m.title.toLowerCase() === item.id.toLowerCase()) === false)) {
-                        temp.push({ title: item.id, value: item.name, color: item.color ? item.color : '#d5d5d5' });
-                    }
-                })
-            });
-        }
-        setRoles(temp);
-    }, [DAO])
-
-    useEffect(() => {
         const memberList = DAO?.members;
         if (memberList.length > 0 && selectedMembers.length === 0) {
             for (let i = 0; i < memberList.length; i++) {
@@ -126,7 +98,7 @@ const CreateProject = () => {
                 }
             }
         }
-    }, [DAO]);
+    }, []);
 
     // useEffect(() => {
     //     let accessControlElement = document.getElementById('accessControl');
@@ -208,24 +180,15 @@ const CreateProject = () => {
         }
     }
 
-    const handleAddRoles = (role) => {
-        const roleExists = _find(selectedRoles, m => m.toLowerCase() === role.toLowerCase())
-        if (roleExists)
-            setSelectedRoles(prev => prev.filter((item) => item.toLowerCase() !== role.toLowerCase()));
-        else {
-            setSelectedRoles([...selectedRoles, role]);
-        }
-    }
-
     const handleRemoveMember = (position) => {
         setSelectedMembers(selectedMembers.filter((_, index) => index !== position));
     }
 
     const handleCreateProject = () => {
-        console.log("selectedRoles : ", selectedRoles);
         let project = {};
         project.name = name;
         project.description = desc;
+        project.members = _uniqBy(selectedMembers, m => m.address);
         project.links = resourceList;
         project.milestones = milestones;
         project.compensation = compensation;
@@ -234,45 +197,8 @@ const CreateProject = () => {
             results
         };
         project.daoId = DAO?._id;
-
-        if (!toggle) {
-            let arr = [];
-            for (let i = 0; i < DAO.members.length; i++) {
-                let user = DAO.members[i];
-                arr.push({ name: user.member.name, address: user.member.wallet })
-            }
-            project.members = arr;
-        }
-
-        if (toggle && selectType === 'Invitation') {
-            project.members = _uniqBy(selectedMembers, m => m.address);
-        }
-
-        if (toggle && selectType === 'Roles') {
-            let arr = [];
-            for (let i = 0; i < DAO.members.length; i++) {
-                let user = DAO.members[i];
-                if (user.discordRoles) {
-                    let myDiscordRoles = []
-                    Object.keys(user.discordRoles).forEach(function (key, index) {
-                        myDiscordRoles = [...myDiscordRoles, ...user.discordRoles[key]]
-                    })
-                    let index = selectedRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase() || myDiscordRoles.indexOf(item) > -1);
-
-                    if (index > -1) {
-                        arr.push({ name: user.member.name, address: user.member.wallet })
-                    }
-                }
-                else {
-                    if (selectedRoles.includes(user.role)) {
-                        arr.push({ name: user.member.name, address: user.member.wallet })
-                    }
-                }
-            }
-            project.members = _uniqBy(arr, m => m.address);
-        }
-
-        dispatch(createProject({ payload: project }));
+        console.log(project)
+        dispatch(createProject({ payload: project }))
     }
 
     return (
@@ -543,144 +469,36 @@ const CreateProject = () => {
                                                     <div className="divider"></div>
 
                                                     {/* project members */}
-                                                    <div className="toggle-box">
-                                                        <label class="switch">
-                                                            <input type="checkbox" onChange={() => setToggle(!toggle)} />
-                                                            <span class="slider round"></span>
-                                                        </label>
-                                                        <span className="toggle-text">
+                                                    <div className='project-members'>
+                                                        <div className='project-members-header'>
+                                                            <p>Invite members</p>
+                                                            <button onClick={toggleShowMember}>ADD NEW MEMBER</button>
+                                                        </div>
+                                                        <div className="member-list">
                                                             {
-                                                                toggle
-                                                                    ?
-                                                                    'FILTER BY'
-                                                                    :
-                                                                    'OPEN FOR ALL'
-                                                            }
-                                                        </span>
-                                                    </div>
-                                                    {
-                                                        toggle &&
-                                                        <div className="members-dropdown">
-                                                            <select
-                                                                name="project"
-                                                                id="project"
-                                                                className="tokenDropdown"
-                                                                style={{ width: '100%', margin: '0' }}
-                                                                value={selectType}
-                                                                onChange={(e) => setSelectType(e.target.value)}
-                                                            >
-                                                                <option value="" selected disabled>Select</option>
-                                                                <option value={"Invitation"}>Invitation</option>
-                                                                <option value={"Roles"}>Roles</option>
-                                                            </select>
-                                                        </div>
-                                                    }
-                                                    {
-                                                        toggle && selectType === 'Invitation'
-                                                        &&
-                                                        <div className='project-members'>
-                                                            <div className='project-members-header'>
-                                                                <p>Invite members</p>
-                                                                <button onClick={toggleShowMember}>ADD NEW MEMBER</button>
-                                                            </div>
-                                                            <div className="member-list">
-                                                                {
-                                                                    memberList.map((item, index) => {
-                                                                        if (item.member.wallet.toLowerCase() !== account.toLowerCase()) {
-                                                                            return (
-                                                                                <div className="member-li" key={index} onClick={() => handleAddMember(item.member)}>
-                                                                                    <div className="member-img-name">
-                                                                                        <img src={memberIcon} alt="member-icon" />
-                                                                                        <p>{item.member.name}</p>
-                                                                                    </div>
-                                                                                    <div className="member-address">
-                                                                                        <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
-
-                                                                                        <div className='checkbox' onClick={() => handleAddMember(item.member)}>
-                                                                                            {
-                                                                                                !(selectedMembers.some((m) => m.address.toLowerCase() === item.member.wallet.toLowerCase()) === false)
-                                                                                                    ?
-                                                                                                    <div className="active-box">
-                                                                                                        <BsCheck2 color="#FFF" />
-                                                                                                    </div>
-                                                                                                    :
-                                                                                                    <div className="inactive-box"></div>
-                                                                                            }
-                                                                                        </div>
-                                                                                        {/* <input 
-                                                                                            type="checkbox" 
-                                                                                            onChange={() => handleAddMember(item.member)} 
-                                                                                            checked={} 
-                                                                                        /> */}
-                                                                                    </div>
-                                                                                </div>
-                                                                            )
-                                                                        }
-                                                                    })
-                                                                }
-                                                            </div>
-                                                        </div>
-                                                    }
-                                                    {
-                                                        toggle && selectType === 'Roles' && roles.length > 0
-                                                        &&
-                                                        <div className='project-members'>
-                                                            <div className='project-members-header'>
-                                                                <p>Select Roles</p>
-                                                            </div>
-                                                            <div className="member-list">
-                                                                {
-                                                                    roles.map((item, index) => {
+                                                                memberList.map((item, index) => {
+                                                                    if (item.member.wallet.toLowerCase() !== account.toLowerCase()) {
                                                                         return (
-                                                                            <>
-                                                                                <div className='roles-li' key={index}>
-                                                                                    <div
-                                                                                        className='roles-pill'
-                                                                                        style={{ backgroundColor: `${item.color}50` }}
-                                                                                    >
-                                                                                        <div
-                                                                                            className='roles-circle'
-                                                                                            style={{ background: `${item.color}` }}
-                                                                                        ></div>
-                                                                                        <span>{item.value}</span>
-                                                                                    </div>
-                                                                                    {
-                                                                                        !(selectedRoles.some((m) => m.toLowerCase() === item.title.toLowerCase()) === false)
-                                                                                            ?
-                                                                                            <input type="checkbox" onChange={() => handleAddRoles(item.title)} checked />
-                                                                                            :
-                                                                                            <input type="checkbox" onChange={() => handleAddRoles(item.title)} />
-                                                                                    }
+                                                                            <div className="member-li" key={index} onClick={() => handleAddMember(item.member)}>
+                                                                                <div className="member-img-name">
+                                                                                    <img src={memberIcon} alt="member-icon" />
+                                                                                    <p>{item.member.name}</p>
                                                                                 </div>
-
-                                                                                {/* <div className="member-li" key={index} onClick={() => handleAddRoles(item.title)}>
-                                                                                    <div className="member-img-name">
-                                                                                        <p style={{ textTransform: 'capitalize' }}>{item.value}</p>
-                                                                                    </div>
-                                                                                    <div className="member-address" style={{ justifyContent: 'flex-end' }}>
-
-                                                                                        <div className='checkbox' onClick={() => handleAddRoles(item.title)}>
-                                                                                            {
-                                                                                                !(selectedRoles.some((m) => m.toLowerCase() === item.title.toLowerCase()) === false)
-                                                                                                    ?
-                                                                                                    <div className="active-box">
-                                                                                                        <BsCheck2 color="#FFF" />
-                                                                                                    </div>
-                                                                                                    :
-                                                                                                    <div className="inactive-box"></div>
-                                                                                            }
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div> */}
-                                                                            </>
-
+                                                                                <div className="member-address">
+                                                                                    <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
+                                                                                    <input type="checkbox" onChange={() => handleAddMember(item.member)} checked={!(selectedMembers.some((m) => m.address.toLowerCase() === item.member.wallet.toLowerCase()) === false)} />
+                                                                                    {/* <div className='checkbox'>
+                                                                                        <input type="checkbox" onChange={(e) => alert("dfdf")} />
+                                                                                        <span className='inner-check check'></span>
+                                                                                    </div> */}
+                                                                                </div>
+                                                                            </div>
                                                                         )
-                                                                    })
-                                                                }
-                                                            </div>
+                                                                    }
+                                                                })
+                                                            }
                                                         </div>
-                                                    }
-
+                                                    </div>
                                                     <div className='project-buttons'>
                                                         <button
                                                             style={{ marginRight: '35px', background: '#FFF', color: '#C94B32' }}

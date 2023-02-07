@@ -1,0 +1,10 @@
+.asset-container {
+  width: 100px !important;
+  border: 1px solid red;
+  display: flex;
+  justify-content: center !important;
+}
+
+.dropdown-container {
+  width: 100px !important;
+}

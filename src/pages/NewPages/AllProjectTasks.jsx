@@ -49,12 +49,7 @@ const AllProjectTasks = () => {
             let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
             if (user) {
                 if (Task?.validRoles.length > 0) {
-                    let myDiscordRoles = []
-                    const discRoles = _get(user, 'discordRoles', {})
-                    Object.keys(discRoles).forEach(key => {
-                        myDiscordRoles = [...myDiscordRoles, ...discRoles[key]]
-                    })
-                    let index = Task?.validRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase() || myDiscordRoles.indexOf(item) > -1);
+                    let index = Task?.validRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase());
                     return index > -1
                 } else {
                     return true;
@@ -174,14 +169,14 @@ const AllProjectTasks = () => {
                 <button onClick={() => navigate(-1)}>
                     <IoIosArrowBack size={20} color="#C94B32" />
                 </button>
-                <p>{transformTask().labelPlural}</p>
+                <p>{ transformTask().labelPlural }</p>
             </div>
 
             {/* Tabs header */}
             <div className='allTasks-tabHeader'>
                 <div className="tasks-title">
                     <button className={tab === 1 ? 'active' : null} onClick={() => setTab(1)}>
-                        My {transformTask().labelPlural}
+                        My { transformTask().labelPlural  }
                     </button>
                     <div className="divider"></div>
 
@@ -204,7 +199,7 @@ const AllProjectTasks = () => {
                     }
 
                     <button className={tab === 4 ? 'active' : null} onClick={() => setTab(4)}>
-                        All {transformTask().labelPlural}
+                        All { transformTask().labelPlural  }
                     </button>
                 </div>
                 <div className="tasks-buttons">

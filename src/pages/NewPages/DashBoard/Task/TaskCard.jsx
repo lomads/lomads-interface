@@ -70,7 +70,7 @@ const TaskCard = ({ task, daoUrl }) => {
     const applicationCount = useMemo(() => {
         if (task) {
             if (task.taskStatus === 'open') {
-                let applications = _get(task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+                let applications = _get(task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_rejected'))
                 if (applications)
                     return applications.length
             }
