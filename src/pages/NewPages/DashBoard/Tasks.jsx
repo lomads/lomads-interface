@@ -92,7 +92,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                     return true;
                 }
             }
-            return false;
+            return true;
         }
         return true;
     };
@@ -132,7 +132,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
 
     const fetchProjectTasks = () => {
         if (Project && user) {
-            const myTasks = _get(Project, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && amIEligible(task) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || (task.contributionType === 'open' && !task.isSingleContributor))))
+            const myTasks = _get(Project, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && amIEligible(task) && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || (task.contributionType === 'open' && !task.isSingleContributor))))
             console.log("setMyTasks", myTasks)
             setMyTasks(_orderBy(myTasks, i => moment(i.deadline).unix(), 'desc'))
             let manageTasks = _get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id));
@@ -157,7 +157,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
     const fetchDaoTasks = () => {
         if (DAO && user) {
           
-            const myTasks = _get(DAO, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) ||(task.contributionType === 'open' && !task.isSingleContributor))))
+            const myTasks = _get(DAO, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && amIEligible(task) && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) ||(task.contributionType === 'open' && !task.isSingleContributor))))
             console.log('fetchDaoTasks',user);
             console.log("fetchDaoTasks setMyTasks", myTasks);
             setMyTasks(_orderBy(myTasks, i => moment(i.deadline).unix(), 'asc'))

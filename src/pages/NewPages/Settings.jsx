@@ -129,7 +129,7 @@ const Settings = () => {
 		setOpenDiscord(!openDiscord);
 	};
 	let toggleCreatePassTokenModal = () => {
-		setOpenCreatePassToken(!openCreatePassToken);
+		setOpenCreatePassToken(prev => !prev);
 	};
 	const daoName = name.split(" ");
 
