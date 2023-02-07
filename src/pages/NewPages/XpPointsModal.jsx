@@ -13,18 +13,18 @@ import { toggleXPPoints } from "state/dashboard/actions";
 
 
 
-const XpPointsModal = ({ toggleModal, toggleXp }) => {
+const XpPointsModal = ({ toggleXp }) => {
   const [showDisableDailog, setShowDisableDailog] = useState(false)
   const [isXpPointEnable, setIsXpPointEnable] = useState(false)
   const [isXpPointSetByDailog, setIsXpPointSetByDailog] = useState(false)
   const [showCompensateMembersModals, setShowCompensateMembersModals] = useState(false)
   const [firstUpdate, setFirstUpdate] = useState(false)
   const dispatch = useAppDispatch()
-  
+
   const { DAO } = useAppSelector((state) => state.dashboard);
 
   useEffect(() => {
-    if(DAO)
+    if (DAO)
       setIsXpPointEnable(_get(DAO, 'sweatPoints', false))
   }, [DAO])
 
@@ -38,18 +38,17 @@ const XpPointsModal = ({ toggleModal, toggleXp }) => {
   //     }
   //   }
   // },[isXpPointEnable]);
-  
+
   return (
     <>
       <div className="sidebarModal">
         {showDisableDailog && <DisableXpPointDailog setShowDisableDailog={setShowDisableDailog} setIsXpPointEnable={(status) => {
-          if(!status) {
-            dispatch(toggleXPPoints({ payload: { status }, daoUrl: _get(DAO, 'url', '')}))
+          if (!status) {
+            dispatch(toggleXPPoints({ payload: { status }, daoUrl: _get(DAO, 'url', '') }))
           }
         }} isXpPointSetByDailog={isXpPointSetByDailog} />}
         <div
           onClick={() => {
-            toggleModal();
             toggleXp();
           }}
           className="overlay"
@@ -71,7 +70,6 @@ const XpPointsModal = ({ toggleModal, toggleXp }) => {
               width={37}
               className="sideModalCloseButton"
               onClick={() => {
-                toggleModal();
                 toggleXp();
               }}
             />
@@ -103,26 +101,26 @@ const XpPointsModal = ({ toggleModal, toggleXp }) => {
           </div>
           {isXpPointEnable && <Button onClick={() => setShowCompensateMembersModals(true)} id="button-save">{'Convert to tokens & Compensate members'}</Button>}
           <div
-                style={{
-                  marginTop: "10px",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <label class="switch">
-                  <input checked={isXpPointEnable} onChange={(e, d) => { 
-                    if(!isXpPointEnable) {
-                      dispatch(toggleXPPoints({ payload: { status: !isXpPointEnable }, daoUrl: _get(DAO, 'url', '')}))
-                      setIsXpPointEnable(!isXpPointEnable)
-                    } else {
-                      setShowDisableDailog(true)
-                      setIsXpPointSetByDailog(false)
-                    } 
-                  }} type="checkbox" />
-                  <span class="slider check round"></span>
-                </label>
-                <div id="switch-title">{isXpPointEnable ? "ENABLED" : "DISABLED"}</div>
-              </div>
+            style={{
+              marginTop: "10px",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <label class="switch">
+              <input checked={isXpPointEnable} onChange={(e, d) => {
+                if (!isXpPointEnable) {
+                  dispatch(toggleXPPoints({ payload: { status: !isXpPointEnable }, daoUrl: _get(DAO, 'url', '') }))
+                  setIsXpPointEnable(!isXpPointEnable)
+                } else {
+                  setShowDisableDailog(true)
+                  setIsXpPointSetByDailog(false)
+                }
+              }} type="checkbox" />
+              <span class="slider check round"></span>
+            </label>
+            <div id="switch-title">{isXpPointEnable ? "ENABLED" : "DISABLED"}</div>
+          </div>
           {/* //! FOOTER */}
           {/* <div className="button-section">
             <Button

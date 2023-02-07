@@ -90,9 +90,27 @@ const Dashboard = () => {
 	const { myRole, displayRole, permissions, can, isSafeOwner } = useRole(DAO, account);
 	const { getENSAddress, getENSName } = useEns()
 
-	console.log("role", myRole)
-
 	const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '', chainId);
+
+	const token = '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';
+
+	const requestReposIssues = (name: String) => {
+		fetch(`https://api.github.com/repos/${name}/issues`,
+			{
+				headers: {
+					'Accept': 'application/vnd.github.v3+json',
+					'Authorization': `token ${token}`
+				}
+			})
+			.then(response => response.json())
+			.then(data => {
+				console.log("github issues : ", data);
+			})
+	}
+
+	useEffect(() => {
+		requestReposIssues('octocat/hello-world');
+	}, []);
 
 	const amIAdmin = useMemo(() => {
 		if (DAO) {
@@ -517,21 +535,21 @@ const Dashboard = () => {
 
 				<MyProject />
 				<Tasks toggleShowCreateTask={toggleShowCreateTask} onlyProjects={false} />
-				{ (can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') &&
-				<TreasuryCard
-					innerRef={treasuryRef}
-					onRecurringEdit={handleOnRecurringEdit}
-					safeAddress={safeAddress}
-					pendingTransactions={pendingTransactions}
-					executedTransactions={executedTransactions}
-					ownerCount={ownerCount}
-					toggleModal={toggleModal}
-					fiatBalance={safeTokens}
-					account={account}
-					onChangePendingTransactions={(tx: any) => setPendingTransactions(tx)}
-					tokens={safeTokens}
-					toggleShowCreateRecurring={toggleShowCreateRecurring}
-				/> }
+				{(can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') &&
+					<TreasuryCard
+						innerRef={treasuryRef}
+						onRecurringEdit={handleOnRecurringEdit}
+						safeAddress={safeAddress}
+						pendingTransactions={pendingTransactions}
+						executedTransactions={executedTransactions}
+						ownerCount={ownerCount}
+						toggleModal={toggleModal}
+						fiatBalance={safeTokens}
+						account={account}
+						onChangePendingTransactions={(tx: any) => setPendingTransactions(tx)}
+						tokens={safeTokens}
+						toggleShowCreateRecurring={toggleShowCreateRecurring}
+					/>}
 				{can(myRole, 'members.view') &&
 					<MemberCard
 						totalMembers={totalMembers}

@@ -68,8 +68,8 @@ const ProjectMembers = ({ toggleEditMember }) => {
                 <div style={{ width: '100%', height: '100%', overflow: 'scroll' }}>
                     <div className="editMember-body">
                         <img src={membersXL} alt="frame-icon" />
-                        <h1>Project Members</h1>
-                        <span className="head-text">Invite the best team or set this workspace open so anyone can participate.</span>
+                        <h1>{transformWorkspace().label} Members</h1>
+                        <span className="head-text">Invite the best team or set this {transformWorkspace().label} open so anyone can participate.</span>
                         <div className="toggle-box">
                             <label class="switch">
                                 <input type="checkbox" onChange={() => setToggle(!toggle)} />

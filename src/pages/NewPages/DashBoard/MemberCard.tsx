@@ -43,25 +43,30 @@ const MemberCard = (props: any) => {
 	}
 
 	const NameAndAvatar = (props: any) => {
-		// const [show, setShow] = useState(false);
-		// let roles: any = [];
-		// const discordOb = _get(DAO, 'discord', null);
-		// const user = props.user;
-		// if (user.discordId && discordOb) {
-		// 	Object.keys(discordOb).forEach(function (key, _index) {
-		// 		const discordChannel = discordOb[key];
-		// 		let person = _find(_get(discordChannel, 'members', []), m => _get(m, 'displayName', '').toLowerCase() === user.discordId.toLowerCase());
-		// 		if (person) {
-		// 			person.roles.forEach(function (item: any) {
-		// 				_get(discordChannel, 'roles', []).map((i: any) => {
-		// 					if (i.id === item) {
-		// 						roles.push(i.name)
-		// 					}
-		// 				})
-		// 			})
-		// 		}
-		// 	});
-		// }
+		const [show, setShow] = useState(false);
+		let roles: any = [];
+		const discordOb = _get(DAO, 'discord', null);
+		const user = props.user;
+		if (user.discordId && discordOb) {
+			Object.keys(discordOb).forEach(function (key, _index) {
+				const discordChannel = discordOb[key];
+				let person = _find(_get(discordChannel, 'members', []), m => _get(m, 'displayName', '').toLowerCase() === user.discordId.toLowerCase());
+				if (person) {
+					person.roles.forEach(function (item: any) {
+						_get(discordChannel, 'roles', []).map((i: any) => {
+							if (i.id === item) {
+								if (i.color) {
+									roles.push({ name: i.name, color: i.color })
+								}
+								else {
+									roles.push({ name: i.name, color: '#d5d5d5' })
+								}
+							}
+						})
+					})
+				}
+			});
+		}
 
 		return (
 			<>
@@ -87,7 +92,7 @@ const MemberCard = (props: any) => {
 							}
 						</div>
 
-						{/* {
+						{
 							roles.length > 0 &&
 							<>
 								<div className="memberdivider">
@@ -98,9 +103,9 @@ const MemberCard = (props: any) => {
 										roles.filter((_: any, i: any) => i < 5).map((item: any, index: any) => {
 											if (index <= 3) {
 												return (
-													<div className="role-pill">
-														<div className="role-circle"></div>
-														<span>{item}</span>
+													<div className="role-pill" style={{ backgroundColor: `${item.color}50` }}>
+														<div className="role-circle" style={{ backgroundColor: `${item.color}` }}></div>
+														<span>{item.name}</span>
 													</div>
 												)
 											}
@@ -115,7 +120,7 @@ const MemberCard = (props: any) => {
 									}
 								</div>
 							</>
-						} */}
+						}
 
 					</div>
 				</div>
