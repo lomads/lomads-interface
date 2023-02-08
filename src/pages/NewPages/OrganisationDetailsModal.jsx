@@ -33,6 +33,8 @@ const OrganisationDetails = ({
 	}, [DAO])
 
 	const addLink = useCallback(() => {
+		if(!linkTitle || !link || (linkTitle && linkTitle === '') || (link && link === ''))
+			return;
 		let tempLink = link
 		if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
 			tempLink = 'https://' + link;
@@ -40,7 +42,7 @@ const OrganisationDetails = ({
 		setDaoLinks([...daoLinks, { title: linkTitle, link: tempLink }]);
 		setLinkTitle("")
 		setLink("")
-	},[link])
+	}, [link, linkTitle])
 
 	const saveChanges = () => {
 		console.log(description)
@@ -215,7 +217,7 @@ const OrganisationDetails = ({
 									Icon={<AiOutlinePlus style={{ height: 30, width: 30 }} />}
 									height={40}
 									width={40}
-									onClick={addLink}
+									onClick={() => addLink()}
 									bgColor={
 										(linkTitle.length > 0 && isValidUrl(link))
 											? "#C94B32"

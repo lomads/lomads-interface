@@ -221,23 +221,23 @@ const ProjectDetails = () => {
             .then(res => res.data)
     }
 
-    const handleParseUrl = (url, accessControl) => {
+    const handleParseUrl = (url, accessControl, locked) => {
         try {
             const link = new URL(url);
             if (link.hostname.indexOf('notion.') > -1) {
-                return <SiNotion color={accessControl ? '#FFF' : '#B12F15'} size={20} />
+                return <SiNotion color={accessControl && locked ? '#FFF' : '#B12F15'} size={20} />
             }
             else if (link.hostname.indexOf('discord.') > -1) {
-                return <BsDiscord color={accessControl ? '#FFF' : '#B12F15'} size={20} />
+                return <BsDiscord color={accessControl && locked ? '#FFF' : '#B12F15'} size={20} />
             }
             else if (link.hostname.indexOf('github.') > -1) {
-                return <BsGithub color={accessControl ? '#FFF' : '#B12F15'} size={20} />
+                return <BsGithub color={accessControl && locked ? '#FFF' : '#B12F15'} size={20} />
             }
             else if (link.hostname.indexOf('google.') > -1) {
-                return <BsGoogle color={accessControl ? '#FFF' : '#B12F15'} size={20} />
+                return <BsGoogle color={accessControl && locked ? '#FFF' : '#B12F15'} size={20} />
             }
             else if (link.hostname.indexOf('twitter.') > -1) {
-                return <BsTwitter color={accessControl ? '#FFF' : '#B12F15'} size={20} />
+                return <BsTwitter color={accessControl && locked ? '#FFF' : '#B12F15'} size={20} />
             }
             else {
                 return <span><BsGlobe color={accessControl ? '#FFF' : '#B12F15'} size={20} /></span>
@@ -737,7 +737,7 @@ const ProjectDetails = () => {
                                                         }
                                                     }}
                                                 >
-                                                    {handleParseUrl(item.link, item.accessControl)}
+                                                    {handleParseUrl(item.link, item.accessControl, _get(item, 'unlocked', []).map(a => a.toLowerCase()).indexOf(account.toLowerCase()) == -1)}
                                                     <p>{item.title.length > 25 ? item.title.slice(0, 25) + "..." : item.title}</p>
                                                     {
                                                         item.accessControl &&

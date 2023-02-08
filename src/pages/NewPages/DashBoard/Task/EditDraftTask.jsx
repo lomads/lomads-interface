@@ -486,7 +486,7 @@ const EditDraftTask = ({ close, task, daoURL }) => {
                                                                                 className='roles-circle'
                                                                                 style={index === 0 ? { background: 'rgba(146, 225, 168, 1)' } : index === 1 ? { background: 'rgba(137,179,229,1)' } : index === 2 ? { background: 'rgba(234,100,71,1)' } : { background: 'rgba(146, 225, 168, 1)' }}
                                                                             ></div>
-                                                                            <span>{transformRole(item).label}</span>
+                                                                            <span>{_get(transformRole(item), 'label', '')}</span>
                                                                         </div>
                                                                         <div className='roles-close' onClick={() => handleRemoveRole(item)}>
                                                                             <CgClose color='#FFF' />
