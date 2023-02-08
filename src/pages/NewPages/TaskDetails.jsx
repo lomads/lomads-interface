@@ -673,7 +673,7 @@ const TaskDetails = () => {
                                             {
                                                 Task.submissionLink && Task.submissionLink.length > 0
                                                     ?
-                                                    <button className="other-btn" onClick={() => window.open(Task.submissionLink[0], '_blank', 'noopener,noreferrer')}>
+                                                    <button className="other-btn" onClick={() => window.open(Task.submissionLink, '_blank', 'noopener,noreferrer')}>
                                                         <img src={folder} />
                                                     </button>
                                                     :

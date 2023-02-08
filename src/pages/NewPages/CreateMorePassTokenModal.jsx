@@ -12,7 +12,7 @@ const CreateMorePassTokenModal = ({ navFromSetting, toggleCreatePassTokenModal }
       <div className="sidebarModal">
         <div
           onClick={() => {
-            navFromSetting();
+            //navFromSetting();
             toggleCreatePassTokenModal();
           }}
           className="overlay"
@@ -34,7 +34,7 @@ const CreateMorePassTokenModal = ({ navFromSetting, toggleCreatePassTokenModal }
               width={37}
               className="sideModalCloseButton"
               onClick={() => {
-                navFromSetting();
+                //navFromSetting();
                 toggleCreatePassTokenModal();
               }}
             />

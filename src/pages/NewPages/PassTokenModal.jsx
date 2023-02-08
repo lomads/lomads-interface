@@ -28,7 +28,7 @@ const PassTokenModal = ({ togglePassToken }) => {
 	const [contactDetail, setContactDetail] = useState(_get(DAO?.sbt, 'contactDetail', []));
 
 	let toggleCreatePassTokenModal = () => {
-		setOpenCreatePassToken(!openCreatePassToken);
+		setOpenCreatePassToken(prev => !prev);
 	};
 
 	let changeContactDetails = (contact) => {
