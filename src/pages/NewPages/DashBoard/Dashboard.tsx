@@ -109,7 +109,7 @@ const Dashboard = () => {
 	}
 
 	useEffect(() => {
-		requestReposIssues('octocat/hello-world');
+		requestReposIssues('Lomads-Technologies/gnosis-safe-integration');
 	}, []);
 
 	const amIAdmin = useMemo(() => {

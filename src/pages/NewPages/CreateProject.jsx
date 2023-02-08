@@ -607,11 +607,6 @@ const CreateProject = () => {
                                                                                                     <div className="inactive-box"></div>
                                                                                             }
                                                                                         </div>
-                                                                                        {/* <input 
-                                                                                            type="checkbox" 
-                                                                                            onChange={() => handleAddMember(item.member)} 
-                                                                                            checked={} 
-                                                                                        /> */}
                                                                                     </div>
                                                                                 </div>
                                                                             )
@@ -652,26 +647,6 @@ const CreateProject = () => {
                                                                                             <input type="checkbox" onChange={() => handleAddRoles(item.title)} />
                                                                                     }
                                                                                 </div>
-
-                                                                                {/* <div className="member-li" key={index} onClick={() => handleAddRoles(item.title)}>
-                                                                                    <div className="member-img-name">
-                                                                                        <p style={{ textTransform: 'capitalize' }}>{item.value}</p>
-                                                                                    </div>
-                                                                                    <div className="member-address" style={{ justifyContent: 'flex-end' }}>
-
-                                                                                        <div className='checkbox' onClick={() => handleAddRoles(item.title)}>
-                                                                                            {
-                                                                                                !(selectedRoles.some((m) => m.toLowerCase() === item.title.toLowerCase()) === false)
-                                                                                                    ?
-                                                                                                    <div className="active-box">
-                                                                                                        <BsCheck2 color="#FFF" />
-                                                                                                    </div>
-                                                                                                    :
-                                                                                                    <div className="inactive-box"></div>
-                                                                                            }
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div> */}
                                                                             </>
 
                                                                         )
