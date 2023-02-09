@@ -26,7 +26,7 @@ const ProjectMembers = ({ toggleEditMember }) => {
     const [selectType, setSelectType] = useState(_get(Project, 'inviteType', ''));
 
     const [roles, setRoles] = useState([]);
-    const [selectedRoles, setSelectedRoles] = useState([]);
+    const [selectedRoles, setSelectedRoles] = useState(_get(Project, 'validRoles', []));
 
     // useEffect(() => {
     //     if (Project) {
@@ -95,11 +95,11 @@ const ProjectMembers = ({ toggleEditMember }) => {
                 let user = DAO.members[i];
                 arr.push(user.member._id)
             }
-            dispatch(editProjectMembers({ projectId: _get(Project, '_id', ''), payload: { daoId: _get(DAO, '_id', null), memberList: arr, inviteType: 'Open' } }));
+            dispatch(editProjectMembers({ projectId: _get(Project, '_id', ''), payload: { daoId: _get(DAO, '_id', null), memberList: arr, inviteType: 'Open', validRoles: [] } }));
         }
 
         else if (toggle && selectType === 'Invitation') {
-            dispatch(editProjectMembers({ projectId: _get(Project, '_id', ''), payload: { daoId: _get(DAO, '_id', null), memberList: updateMembers, inviteType: 'Invitation' } }));
+            dispatch(editProjectMembers({ projectId: _get(Project, '_id', ''), payload: { daoId: _get(DAO, '_id', null), memberList: updateMembers, inviteType: 'Invitation', validRoles: [] } }));
         }
 
         if (toggle && selectType === 'Roles') {
@@ -123,7 +123,7 @@ const ProjectMembers = ({ toggleEditMember }) => {
                     }
                 }
             }
-            dispatch(editProjectMembers({ projectId: _get(Project, '_id', ''), payload: { daoId: _get(DAO, '_id', null), memberList: arr, inviteType: 'Roles' } }));
+            dispatch(editProjectMembers({ projectId: _get(Project, '_id', ''), payload: { daoId: _get(DAO, '_id', null), memberList: arr, inviteType: 'Roles', validRoles: selectedRoles } }));
         }
 
     }
@@ -229,13 +229,24 @@ const ProjectMembers = ({ toggleEditMember }) => {
                                                             ></div>
                                                             <span>{item.value}</span>
                                                         </div>
-                                                        {
+                                                        <div className='checkbox' onClick={() => handleAddRoles(item.title)}>
+                                                            {
+                                                                !(selectedRoles.some((m) => m.toLowerCase() === item.title.toLowerCase()) === false)
+                                                                    ?
+                                                                    <div className="active-box">
+                                                                        <BsCheck2 color="#FFF" />
+                                                                    </div>
+                                                                    :
+                                                                    <div className="inactive-box"></div>
+                                                            }
+                                                        </div>
+                                                        {/* {
                                                             !(selectedRoles.some((m) => m.toLowerCase() === item.title.toLowerCase()) === false)
                                                                 ?
                                                                 <input type="checkbox" onChange={() => handleAddRoles(item.title)} checked />
                                                                 :
                                                                 <input type="checkbox" onChange={() => handleAddRoles(item.title)} />
-                                                        }
+                                                        } */}
                                                     </div>
                                                 </>
 
