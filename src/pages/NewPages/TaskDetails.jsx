@@ -487,7 +487,7 @@ const TaskDetails = () => {
                                                                         </div> : 
                                                                         isMySubmissionAccepted ? 
                                                                         <div>
-                                                                            <img src={submitted} style={{ marginRight: '5px' }} />
+                                                                            <img src={approved} style={{ marginRight: '5px' }} />
                                                                             <span style={{ color: '#27C46E' }}>Approved</span>
                                                                         </div> :
                                                                         <div>

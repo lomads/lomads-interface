@@ -103,8 +103,8 @@ const MemberCard = (props: any) => {
 										roles.filter((_: any, i: any) => i < 5).map((item: any, index: any) => {
 											if (index <= 3) {
 												return (
-													<div className="role-pill" style={{ backgroundColor: `${item.color}50` }}>
-														<div className="role-circle" style={{ backgroundColor: `${item.color}` }}></div>
+													<div className="role-pill" style={{ backgroundColor: item.roleColor ? `${item.roleColor}50` : `#99aab550` }}>
+														<div className="role-circle" style={{ backgroundColor: `${item.roleColor || `#99aab5`}` }}></div>
 														<span>{item.name}</span>
 													</div>
 												)

@@ -221,11 +221,11 @@ const ProjectMembers = ({ toggleEditMember }) => {
                                                     <div className='roles-li' key={index}>
                                                         <div
                                                             className='roles-pill'
-                                                            style={{ backgroundColor: `${item.color}50` }}
+                                                            style={{ backgroundColor: `${_get(item, 'roleColor', '#99aab5')}50` }}
                                                         >
                                                             <div
                                                                 className='roles-circle'
-                                                                style={{ background: `${item.color}` }}
+                                                                style={{ background: `${_get(item, 'roleColor', '#99aab5')}` }}
                                                             ></div>
                                                             <span>{item.value}</span>
                                                         </div>
