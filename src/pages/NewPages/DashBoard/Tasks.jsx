@@ -182,11 +182,12 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
             for (let index = 0; index < manageTasks.length; index++) {
                 const task = manageTasks[index];
                 if (task.taskStatus === 'open' && task.isSingleContributor) {
-                    let applications = _get(task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_rejected'))
+                    let applications = _get(task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
                     if (applications)
-                        return sum = sum + applications.length
+                        sum = sum + applications.length
                 }
             }
+            return sum
         }
         return 0;
     }, [manageTasks]);
@@ -199,9 +200,10 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                 if ((task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign') {
                     let submissions = _get(task, 'members', []).filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
                     if (submissions)
-                        return sum = sum + submissions.length
+                        sum = sum + submissions.length
                 }
             }
+            return sum
         }
         return 0;
     }, [manageTasks]);

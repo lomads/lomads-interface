@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect, useCallback, useMemo, useRef } from 'react';
-import { find as _find, get as _get, debounce as _debounce, uniqBy as _uniqBy } from 'lodash';
+import { find as _find, get as _get, debounce as _debounce, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 import '../../styles/pages/CreateProject.css';
 import AddMember from "./DashBoard/MemberCard/AddMember";
 import createProjectSvg from '../../assets/svg/createProject.svg';
@@ -585,7 +585,7 @@ const CreateProject = () => {
                                                             </div>
                                                             <div className="member-list">
                                                                 {
-                                                                    memberList.map((item, index) => {
+                                                                    _sortBy(memberList, m => _get(m, 'member.name', '').toLowerCase(), 'asc').map((item, index) => {
                                                                         if (item.member.wallet.toLowerCase() !== account.toLowerCase()) {
                                                                             return (
                                                                                 <div className="member-li" key={index} onClick={() => handleAddMember(item.member)}>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
-import { get as _get, find as _find, uniqBy as _uniqBy } from 'lodash';
+import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 
 import './ProjectMembers.css';
 
@@ -179,7 +179,7 @@ const ProjectMembers = ({ toggleEditMember }) => {
                             <>
                                 <div className="divider"></div>
                                 {
-                                    _get(DAO, 'members', []).map((item, index) => {
+                                    _sortBy(_get(DAO, 'members', []), m => _get(m, 'member.name', '').toLowerCase(), 'asc').map((item, index) => {
                                         return (
                                             <div className="member-row" key={index}>
                                                 <div className="member-name">

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
-import { get as _get, find as _find, uniqBy as _uniqBy } from 'lodash';
+import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 import SafeButton from "UIpack/SafeButton";
 import '../../styles/pages/ProjectDetails.css';
 import { LeapFrog } from "@uiball/loaders";
@@ -691,7 +691,7 @@ const ProjectDetails = () => {
                                     <h1>{Project?.name}</h1>
                                 </div>
                                 {
-                                    can(myRole, 'settings') &&
+                                    canMyrole('project.edit') &&
                                     <button className='settings' onClick={() => { setShowEdit(true) }}>
                                         <img src={settingIcon} alt="settings-icon" />
                                     </button>
@@ -1034,7 +1034,7 @@ const ProjectDetails = () => {
                                     </div>
                                     <div className="members-list-body">
                                         {
-                                            _uniqBy(Project?.members, '_id').map((item, index) => (
+                                            _sortBy(_uniqBy(Project?.members, '_id'), m => _get(m, 'name', '').toLowerCase()).map((item, index) => (
                                                 <div className="members-row" key={index}>
                                                     <div className="members-row-name">
                                                         <div>

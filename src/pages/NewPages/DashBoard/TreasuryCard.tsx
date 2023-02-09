@@ -752,7 +752,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 									return (
 										<>
 											<div className="tokenDiv">
-												<span>{`${_get(token, 'balance', 0) / 10 ** tokenDecimal(token.tokenAddress)}`}</span>
+												<span>{`${(_get(token, 'balance', 0) / 10 ** tokenDecimal(token.tokenAddress)).toFixed(4)}`}</span>
 												<h1>{`${_get(token, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}`}</h1>
 											</div>
 										</>
