@@ -663,7 +663,7 @@ const CreateProject = () => {
                                                                                     </div>
                                                                                 </div>
                                                                                 {
-                                                                                    item.lastRole && <div style={{ marginLeft: 60, marginTop: 10, marginBottom: 30, width: 300, backgroundColor: '#C94B32', height: 4 }}></div>
+                                                                                    item.lastRole && <div style={{ marginLeft: 30, marginTop: 10, marginBottom: 30, width: 230, backgroundColor: '#C94B32', height: 3 }}></div>
                                                                                 }
                                                                             </>
 
