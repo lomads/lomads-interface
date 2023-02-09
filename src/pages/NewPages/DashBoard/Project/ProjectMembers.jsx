@@ -16,6 +16,7 @@ import { editProjectMembers } from "state/dashboard/actions";
 import useTerminology from 'hooks/useTerminology';
 
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
+import { DEFAULT_ROLES } from "constants/terminology";
 
 const ProjectMembers = ({ toggleEditMember }) => {
     const dispatch = useAppDispatch();
@@ -38,7 +39,7 @@ const ProjectMembers = ({ toggleEditMember }) => {
     // }, [Project])
 
     useEffect(() => {
-        const rolesArr = _get(DAO, 'terminologies.roles', {});
+        const rolesArr = _get(DAO, 'terminologies.roles', DEFAULT_ROLES);
         const discordOb = _get(DAO, 'discord', {});
         let temp = [];
         if (rolesArr) {

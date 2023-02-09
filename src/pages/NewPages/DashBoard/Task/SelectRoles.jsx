@@ -39,7 +39,7 @@ const SelectRoles = ({ toggleSelect, validRoles, handleValidRoles }) => {
             </div>
 
             {
-                Object.keys(_get(DAO, 'terminologies.roles', {})).map((key, index) => {
+                (_get(DAO, 'terminologies') ? Object.keys(_get(DAO, 'terminologies.roles', {})) : Object.keys(DEFAULT_ROLES)).map((key, index) => {
                     return (
                         <div className='roles-li'>
                             <div

@@ -9,6 +9,7 @@ import notionIcon from '../../assets/svg/Notion-logo.svg';
 import { AiOutlineLock } from "react-icons/ai";
 import { SiNotion } from "react-icons/si";
 import { HiOutlinePlus } from "react-icons/hi";
+import { DEFAULT_ROLES } from "constants/terminology";
 import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe, BsCheck2 } from "react-icons/bs";
 import { toast, ToastContainer } from "react-toastify";
 import { ProjectContext } from "context/ProjectContext";
@@ -93,7 +94,7 @@ const CreateProject = () => {
     }, [createProjectLoading])
 
     useEffect(() => {
-        const rolesArr = _get(DAO, 'terminologies.roles', {});
+        const rolesArr = _get(DAO, 'terminologies.roles', DEFAULT_ROLES);
         const discordOb = _get(DAO, 'discord', {});
         let temp = [];
         if (rolesArr) {
