@@ -99,7 +99,11 @@ const CreateProject = () => {
         let temp = [];
         if (rolesArr) {
             Object.keys(rolesArr).forEach(function (key, _index) {
-                temp.push({ title: key, value: rolesArr[key].label, color: '#d5d5d5' });
+                temp.push({ lastRole: _index === 3, title: key, value: rolesArr[key].label, 
+                    roleColor: _index == 0 ? '#92e1a8' :
+                    _index == 1 ? '#89b3e5' :
+                    _index == 2 ? '#e96447' : '#92e1a8'
+                });
             });
         }
         if (discordOb) {
@@ -107,7 +111,7 @@ const CreateProject = () => {
                 const discordChannel = discordOb[key];
                 discordChannel.roles.forEach((item) => {
                     if (item.name !== '@everyone' && item.name !== 'LomadsTestBot' && item.name !== 'Lomads' && (temp.some((m) => m.title.toLowerCase() === item.id.toLowerCase()) === false)) {
-                        temp.push({ title: item.id, value: item.name, color: item.color ? item.color : '#d5d5d5' });
+                        temp.push({ title: item.id, value: item.name, roleColor: item?.roleColor });
                     }
                 })
             });
@@ -658,6 +662,9 @@ const CreateProject = () => {
                                                                                         }
                                                                                     </div>
                                                                                 </div>
+                                                                                {
+                                                                                    item.lastRole && <div style={{ marginLeft: 60, marginTop: 10, marginBottom: 30, width: 300, backgroundColor: '#C94B32', height: 4 }}></div>
+                                                                                }
                                                                             </>
 
                                                                         )
