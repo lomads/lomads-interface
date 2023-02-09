@@ -242,10 +242,14 @@ const CreateProject = () => {
                 arr.push({ name: user.member.name, address: user.member.wallet })
             }
             project.members = arr;
+            project.validRoles = [];
+            project.inviteType = 'Open';
         }
 
         if (toggle && selectType === 'Invitation') {
             project.members = _uniqBy(selectedMembers, m => m.address);
+            project.validRoles = [];
+            project.inviteType = 'Invitation';
         }
 
         if (toggle && selectType === 'Roles') {
@@ -270,6 +274,8 @@ const CreateProject = () => {
                 }
             }
             project.members = _uniqBy(arr, m => m.address);
+            project.validRoles = selectedRoles;
+            project.inviteType = 'Roles'
         }
 
         dispatch(createProject({ payload: project }));
@@ -639,13 +645,17 @@ const CreateProject = () => {
                                                                                         ></div>
                                                                                         <span>{item.value}</span>
                                                                                     </div>
-                                                                                    {
-                                                                                        !(selectedRoles.some((m) => m.toLowerCase() === item.title.toLowerCase()) === false)
-                                                                                            ?
-                                                                                            <input type="checkbox" onChange={() => handleAddRoles(item.title)} checked />
-                                                                                            :
-                                                                                            <input type="checkbox" onChange={() => handleAddRoles(item.title)} />
-                                                                                    }
+                                                                                    <div className='checkbox' onClick={() => handleAddRoles(item.title)}>
+                                                                                        {
+                                                                                            !(selectedRoles.some((m) => m.toLowerCase() === item.title.toLowerCase()) === false)
+                                                                                                ?
+                                                                                                <div className="active-box">
+                                                                                                    <BsCheck2 color="#FFF" />
+                                                                                                </div>
+                                                                                                :
+                                                                                                <div className="inactive-box"></div>
+                                                                                        }
+                                                                                    </div>
                                                                                 </div>
                                                                             </>
 

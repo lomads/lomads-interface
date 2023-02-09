@@ -453,6 +453,36 @@
     margin-bottom: 24px;
 }
 
+.createProject-container .createProject-body .project-members .member-list .roles-li .checkbox {
+    width: 30px;
+    height: 30px;
+    background: #F0F0F0;
+    /* SMALL-inputs */
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.createProject-container .createProject-body .project-members .member-list .roles-li .checkbox .inactive-box {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    background-color: #FFF;
+}
+
+.createProject-container .createProject-body .project-members .member-list .roles-li .checkbox .active-box {
+    width: 24px;
+    height: 24px;
+    background: #C94B32;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .createProject-container .createProject-body .project-members .member-list .roles-li:last-child {
     margin: 0;
 }
