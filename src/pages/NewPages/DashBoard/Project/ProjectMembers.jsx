@@ -23,14 +23,11 @@ const ProjectMembers = ({ toggleEditMember }) => {
     const { DAO, Project, editProjectMemberLoading } = useAppSelector((state) => state.dashboard);
     const { transformWorkspace, transformRole } = useTerminology(_get(DAO, 'terminologies'));
     const [updateMembers, setUpdateMembers] = useState(_get(Project, 'members', []).map((_item, _index) => { return _item._id }));
-<<<<<<< HEAD
-=======
     const [toggle, setToggle] = useState(_get(Project, 'inviteType', '') === 'Open' ? false : true);
     const [selectType, setSelectType] = useState(_get(Project, 'inviteType', ''));
 
     const [roles, setRoles] = useState([]);
     const [selectedRoles, setSelectedRoles] = useState(_get(Project, 'validRoles', []));
->>>>>>> main
 
     // useEffect(() => {
     //     if (Project) {
@@ -147,33 +144,6 @@ const ProjectMembers = ({ toggleEditMember }) => {
                 <div style={{ width: '100%', height: '100%', overflow: 'scroll' }}>
                     <div className="editMember-body">
                         <img src={membersXL} alt="frame-icon" />
-<<<<<<< HEAD
-                        <h1>Project Members</h1>
-                        <span>Invite the best team or set this workspace open so anyone can participate.</span>
-                        {
-                            _get(DAO, 'members', []).map((item, index) => {
-                                return (
-                                    <div className="member-row" key={index}>
-                                        <div className="member-name">
-                                            <img src={memberIcon} alt="memberIcon" />
-                                            <p>{item.member.name}</p>
-                                        </div>
-                                        <div className="member-address">
-                                            <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
-                                        </div>
-                                        <div className="member-checkbox">
-                                            <div className="checkbox" onClick={() => handleAddMemberDelete(item.member._id)}>
-                                                {
-                                                    // updateMembers.includes(item._id)
-                                                    !(updateMembers.some((m) => m === item.member._id) === false)
-                                                        ?
-                                                        <div className="active-box">
-                                                            <BsCheck2 color="#FFF" />
-                                                        </div>
-                                                        :
-                                                        <div className="inactive-box"></div>
-                                                }
-=======
                         <h1>{transformWorkspace().label} Members</h1>
                         <span className="head-text">Invite the best team or set this {transformWorkspace().label} open so anyone can participate.</span>
                         <div className="toggle-box">
@@ -237,12 +207,11 @@ const ProjectMembers = ({ toggleEditMember }) => {
                                                         }
                                                     </div>
                                                 </div>
->>>>>>> main
                                             </div>
-                                        </div>
-                                    </div>
-                                )
-                            })
+                                        )
+                                    })
+                                }
+                            </>
                         }
 
                         {
