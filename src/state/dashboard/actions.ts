@@ -265,6 +265,15 @@ export const getTask = createAsyncThunk(
 	}
 );
 
+export const storeGithubIssues = createAsyncThunk(
+	'dao/storeGithubIssues',
+	async (params: any, thunkApi) => {
+		return axiosHttp.post(`task/storeGithubIssues`, params.payload)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+)
+
 export const createTask = createAsyncThunk(
 	'dao/createTask',
 	async (params: any, thunkApi) => {
