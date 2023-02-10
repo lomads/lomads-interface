@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
-import { get as _get, find as _find, uniqBy as _uniqBy } from 'lodash';
+import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 import SafeButton from "UIpack/SafeButton";
 import '../../styles/pages/ProjectDetails.css';
 import { LeapFrog } from "@uiball/loaders";
@@ -671,7 +671,7 @@ const ProjectDetails = () => {
                                     <h1>{Project?.name}</h1>
                                 </div>
                                 {
-                                    can(myRole, 'settings') &&
+                                    canMyrole('project.edit') &&
                                     <button className='settings' onClick={() => { setShowEdit(true) }}>
                                         <img src={settingIcon} alt="settings-icon" />
                                     </button>
@@ -994,11 +994,49 @@ const ProjectDetails = () => {
                                         <p>{_uniqBy(Project?.members, '_id').length} members</p>
                                     </div>
                                     <div>
-                                        {canMyrole('project.member.add') &&
-                                            <button onClick={toggleMemberList}>
-                                                <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
-                                                MEMBER
-                                            </button>}
+                                        <div className="divider"></div>
+                                        <div className="member-count">
+                                            <img src={membersGroup} alt="membersGroup" />
+                                            <p>{_uniqBy(Project?.members, '_id').length} members</p>
+                                        </div>
+                                        <div>
+                                            {canMyrole('project.member.add') &&
+                                                <button onClick={toggleMemberList}>
+                                                    <HiOutlinePlus size={20} style={{ marginRight: '10px' }} />
+                                                    MEMBER
+                                                </button>}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="members-list">
+                                    <div className="members-list-head">
+                                        <div>
+                                            <p>Name</p>
+                                        </div>
+                                        <div>
+                                            <p>joined</p>
+                                        </div>
+                                    </div>
+                                    <div className="members-list-body">
+                                        {
+                                            _sortBy(_uniqBy(Project?.members, '_id'), m => _get(m, 'name', '').toLowerCase()).map((item, index) => (
+                                                <div className="members-row" key={index}>
+                                                    <div className="members-row-name">
+                                                        <div>
+                                                            <img src={memberIcon} alt="memberIcon" />
+                                                            <p>{item.name}</p>
+                                                        </div>
+                                                        <span>{item.wallet.slice(0, 6) + "..." + item.wallet.slice(-4)}</span>
+                                                    </div>
+                                                    <div className="members-row-date">
+                                                        <p>{moment.utc(item.joined).local().format('MM/DD/YYYY')} </p>
+                                                    </div>
+                                                    <div className="members-row-status">
+                                                        <span>{handleRenderRole(item)}</span>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        }
                                     </div>
                                 </div>
                             </div>

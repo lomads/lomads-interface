@@ -91,15 +91,16 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
     const finish = result => {
         setChannels(null);
         setPoll(null);
-        setAddLinkLoading(null);
         setHasClickedAuth(false)
         if(server) {
             axiosHttp.post(`discord/guild/${server.id}/sync-roles`, { daoId: _get(DAO, '_id') })
             .finally(() => {
+                setAddLinkLoading(null);
                 onGuildCreateSuccess(result)
                 setServer(null);
             })
         } else {
+            setAddLinkLoading(null);
             onGuildCreateSuccess(result)
             setServer(null);
         }
@@ -153,21 +154,21 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                         if(validServer){ 
                             const guildId = await axiosHttp.get(`project/discord-server-exists/${dcserverid}`).then(res => res.data);
                             if(guildId) {
-                                const guild = await axios.get(`https://api.guild.xyz/v1/guild/${guildId}`).then(res => res.data)
-                                if(guild) {
+                                // const guild = await axios.get(`https://api.guild.xyz/v1/guild/${guildId}`).then(res => res.data)
+                                // if(guild) {
                                     
-                                } else {
-                                    setServer(validServer)
+                                // } else {
+                                   setServer(validServer)
                                     // check if bot already added 
-                                   const discordGuild = await axiosHttp.get(`discord/guild/${validServer.id}`).then(res => res.data);  
-                                   if(!discordGuild){
+                                //    const discordGuild = await axiosHttp.get(`discord/guild/${validServer.id}`).then(res => res.data);  
+                                //    if(!discordGuild){
                                        const redirectUri = typeof window !== "undefined" && `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
                                        setPoll(dcserverid)
                                        openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=${process.env.REACT_APP_DISCORD_APP_ID}&guild_id=${dcserverid}&permissions=8&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
-                                   } else {
-                                        onGuildBotAddedDelayed(validServer)
-                                   }
-                                }
+                                //    } else {
+                                //         onGuildBotAddedDelayed(validServer)
+                                //    }
+                                //}
                             } else {
                                 setServer(validServer)
                                 // check if bot already added 
@@ -206,7 +207,14 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                 if(!(link === '' || title === '' || addLinkLoading))
                     handleAddResource() 
             }}>
-                { renderButton }
+                { addLinkLoading ? 
+                <button
+                style={{ background: link !== '' && title !== '' && !addLinkLoading ? '#C84A32' : 'rgba(27, 43, 65, 0)', width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+                disabled={link === '' || title === '' || addLinkLoading}
+                > 
+                   { addLinkLoading ? <LeapFrog size={20} color="#C84A32"/> : <AiOutlinePlus color="#FFF" size={25} />  }
+                </button>
+                 : renderButton }
             </div>
         )
     }
@@ -216,13 +224,16 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
             { 
                 okButton ? 
                 <SimpleLoadButton condition={addLinkLoading} disabled={addLinkLoading} title="OK" bgColor="#C94B32" className="button" fontsize={16} fontweight={400} height={40} width={129} onClick={() => handleAddResource()} /> : 
-                <button
+                <>
+                {
+                    <button
                     style={{ background: link !== '' && title !== '' && !addLinkLoading ? '#C84A32' : 'rgba(27, 43, 65, 0.2)', width: 50, height: 50, display: 'flex', alignItems: 'center', justifyContent: 'center'}}
                     disabled={link === '' || title === '' || addLinkLoading}
-                    onClick={() => handleAddResource() }
-                > 
-                    <AiOutlinePlus color="#FFF" size={25} />
-                </button>
+                    onClick={() => handleAddResource() }> 
+                       { addLinkLoading ? <LeapFrog size={20} color="#FFF"/> : <AiOutlinePlus color="#FFF" size={25} />  }
+                    </button>
+                }
+                </>
             }
         </>
 

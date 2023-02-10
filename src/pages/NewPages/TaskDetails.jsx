@@ -442,10 +442,24 @@ const TaskDetails = () => {
                                                             {
                                                                 hasMySubmission
                                                                     ?
-                                                                    <div>
-                                                                        <img src={submitted} style={{ marginRight: '5px' }} />
-                                                                        <span style={{ color: '#6B99F7' }}>Under review</span>
-                                                                    </div>
+                                                                    <>
+                                                                    {
+                                                                        amIRejected ? 
+                                                                        <div>
+                                                                            <img src={rejected} style={{ marginRight: '5px' }} />
+                                                                            <span style={{ color: '#E23B53' }}>Rejected</span>
+                                                                        </div> : 
+                                                                        isMySubmissionAccepted ? 
+                                                                        <div>
+                                                                            <img src={approved} style={{ marginRight: '5px' }} />
+                                                                            <span style={{ color: '#27C46E' }}>Approved</span>
+                                                                        </div> :
+                                                                        <div>
+                                                                            <img src={submitted} style={{ marginRight: '5px' }} />
+                                                                            <span style={{ color: '#6B99F7' }}>Under review</span>
+                                                                        </div>
+                                                                    }
+                                                                    </>
                                                                     :
                                                                     <>
                                                                         {

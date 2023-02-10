@@ -31,7 +31,7 @@ const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
     </div>
 ))
 
-export default ({ transaction, onExecute, onRecurringEdit }) => {
+export default ({ transaction, onExecute, onRecurringEdit, owner }) => {
 const dispatch = useAppDispatch()
 const { DAO } = useAppSelector(store => store.dashboard);
 const { createAllowanceTransaction } = useGnosisAllowance(_get(DAO, 'safe.address', null));

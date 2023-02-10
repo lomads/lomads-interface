@@ -64,6 +64,19 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
     const [amount, setAmount] = useState(0);
     const [safeTokens, setSafeTokens] = useState([]);
     const [showSuccess, setShowSuccess] = useState(false);
+    const getrolename = (roleId) => {
+
+        for (let index = 0; index < Object.keys(DAO.discord).length; index++) {
+            const element = Object.keys(DAO.discord)[index];
+            const rolename_discord = _find(DAO.discord[element].roles, r => r.id === roleId)
+            if (rolename_discord) {
+                return rolename_discord.name
+            }
+        }
+        return "";
+
+    };
+
 
     const getTokens = async (safeAddress) => {
         const tokens = await getSafeTokens(chainId, safeAddress)
@@ -191,8 +204,8 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
             symbol = _get(symbol, 'token.symbol', null)
             if (!symbol)
-                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ||  currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
-
+                symbol = currency.currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency.currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
+            console.log("task role:", symbol);
             let task = {};
             task.daoId = DAO?._id;
             task.name = name;
@@ -208,6 +221,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
             task.isSingleContributor = isSingleContributor;
             task.isFilterRoles = isFilterRoles;
             task.validRoles = isFilterRoles ? validRoles : [];
+            console.log("task role:", task);
             dispatch(createTask({ payload: task }))
         }
     }
@@ -500,7 +514,8 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                                                 className='roles-circle'
                                                                                 style={index === 0 ? { background: 'rgba(146, 225, 168, 1)' } : index === 1 ? { background: 'rgba(137,179,229,1)' } : index === 2 ? { background: 'rgba(234,100,71,1)' } : { background: 'rgba(146, 225, 168, 1)' }}
                                                                             ></div>
-                                                                            <span>{transformRole(item).label}</span>
+
+                                                                            <span>{item == "role1" || item == "role2" || item == "role3" || item == "role4" ? transformRole(item).label : getrolename(item)}</span>
                                                                         </div>
                                                                         <div className='roles-close' onClick={() => handleRemoveRole(item)}>
                                                                             <CgClose color='#FFF' />

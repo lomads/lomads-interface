@@ -88,7 +88,6 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
     const fetchProjectTasks = () => {
         if (Project && user) {
             const myTasks = _get(Project, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && amIEligible(task) && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || (task.contributionType === 'open' && !task.isSingleContributor))))
-            console.log("setMyTasks", myTasks)
             setMyTasks(_orderBy(myTasks, i => moment(i.deadline).unix(), 'desc'))
             let manageTasks = _get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id));
             manageTasks = manageTasks.map(t => {
@@ -111,10 +110,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
 
     const fetchDaoTasks = () => {
         if (DAO && user) {
-          
             const myTasks = _get(DAO, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && amIEligible(task) && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) ||(task.contributionType === 'open' && !task.isSingleContributor))))
-            console.log('fetchDaoTasks',user);
-            console.log("fetchDaoTasks setMyTasks", myTasks);
             setMyTasks(_orderBy(myTasks, i => moment(i.deadline).unix(), 'asc'))
             let manageTasks = _get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id));
             manageTasks = manageTasks.map(t => {
@@ -141,11 +137,12 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
             for (let index = 0; index < manageTasks.length; index++) {
                 const task = manageTasks[index];
                 if (task.taskStatus === 'open' && task.isSingleContributor) {
-                    let applications = _get(task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_rejected'))
+                    let applications = _get(task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
                     if (applications)
-                        return sum = sum + applications.length
+                        sum = sum + applications.length
                 }
             }
+            return sum
         }
         return 0;
     }, [manageTasks]);
@@ -158,9 +155,10 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                 if ((task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign') {
                     let submissions = _get(task, 'members', []).filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
                     if (submissions)
-                        return sum = sum + submissions.length
+                        sum = sum + submissions.length
                 }
             }
+            return sum
         }
         return 0;
     }, [manageTasks]);
