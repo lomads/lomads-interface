@@ -89,6 +89,25 @@ const CreatePassToken = () => {
     mintPrice: "0",
   });
 
+
+  useEffect(() => {
+    setTreasuryAddress(DAO?.safe?.address)
+    setSBTConstructor(prev => {
+      return {
+        ...prev, treasury: DAO?.safe?.address
+      }
+    })
+  }, [DAO?.safe])
+
+  useEffect(() => {
+    setOwnerAddress(account)
+    setSBTConstructor(prev => {
+      return {
+        ...prev, owner: account
+      }
+    })
+  }, [account])
+
   const handleOptions = (value) => {
     if (selectedOptions.includes(value)) {
       setSelectedOptions(selectedOptions.filter((item) => item !== value));
@@ -504,7 +523,7 @@ const CreatePassToken = () => {
                 />
                 {supplyError && <p className='error'>{error}</p>} */}
 
-                <div className='optional-div'>
+                {/* <div className='optional-div'>
                   <label>Owner</label>
                 </div>
                 <input
@@ -513,7 +532,7 @@ const CreatePassToken = () => {
                   placeholder='Wallet Address Of Token Owner'
                   value={ownerAddress}
                   onChange={(e) => setOwnerAddress(e.target.value)}
-                />
+                /> */}
 
                 {ownerAddressError && <p className='error'>{error}</p>}
 
