@@ -25,6 +25,7 @@ import {
 	getCurrentUser,
 	updateCurrentUser,
 	createTask,
+	storeGithubIssues,
 	editTask,
 	editDraftTask,
 	convertDraftTask,
@@ -74,6 +75,7 @@ export interface DashboardState {
 	editProjectLinksLoading: boolean | null;
 	updateProjectLoading: boolean | null;
 	createTaskLoading: boolean | null;
+	storeGithubIssuesLoading: boolean | null;
 	editTaskLoading: boolean | null;
 	editDraftTaskLoading: boolean | null;
 	convertDraftTaskLoading: boolean | null;
@@ -121,6 +123,7 @@ const initialState: DashboardState = {
 	editProjectLinksLoading: null,
 	updateProjectLoading: null,
 	createTaskLoading: null,
+	storeGithubIssuesLoading: null,
 	editTaskLoading: null,
 	editDraftTaskLoading: null,
 	convertDraftTaskLoading: null,
@@ -205,6 +208,9 @@ const dashboardSlice = createSlice({
 		},
 		resetCreateTaskLoader(state) {
 			state.createTaskLoading = null
+		},
+		resetStoreGithubIssuesLoader(state) {
+			state.storeGithubIssuesLoading = null
 		},
 		resetEditTaskLoader(state) {
 			state.editTaskLoading = null
@@ -502,6 +508,14 @@ const dashboardSlice = createSlice({
 		[`${createTask.pending}`]: (state) => {
 			state.createTaskLoading = true;
 		},
+		// store gihtub issues creation
+		[`${storeGithubIssues.fulfilled}`]: (state, action) => {
+			state.storeGithubIssuesLoading = false;
+			state.DAO = action.payload.dao;
+		},
+		[`${storeGithubIssues.pending}`]: (state) => {
+			state.storeGithubIssuesLoading = true;
+		},
 		// edit task
 		[`${editTask.fulfilled}`]: (state, action) => {
 			state.editTaskLoading = false;
@@ -696,6 +710,7 @@ export const {
 	resetEditProjectLinksLoader,
 	updateSafeTransaction,
 	resetCreateTaskLoader,
+	resetStoreGithubIssuesLoader,
 	resetEditTaskLoader,
 	resetEditDraftTaskLoader,
 	resetConvertDraftTaskLoader,

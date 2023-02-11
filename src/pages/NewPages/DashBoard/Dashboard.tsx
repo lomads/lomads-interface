@@ -31,9 +31,8 @@ import dashboardfooterlogo from "../../../assets/svg/dashboardfooterlogo.svg";
 import starDashboard from "../../../assets/svg/star_dashboard.svg";
 import tokenDashboard from "../../../assets/svg/token_dashboard.svg";
 import { useAppDispatch } from "state/hooks";
-import { getCurrentUser, getDao } from "state/dashboard/actions";
+import { getCurrentUser, getDao, loadDao, storeGithubIssues } from "state/dashboard/actions";
 import { setDAO, setDAOList } from "state/dashboard/reducer";
-import { loadDao } from 'state/dashboard/actions';
 import copyIcon from "../../../assets/svg/copyIcon.svg";
 import { useDispatch } from "react-redux";
 import { updateCurrentNonce, updateSafeThreshold, updateSafeAddress } from "state/flow/reducer";
@@ -105,12 +104,37 @@ const Dashboard = () => {
 			.then(response => response.json())
 			.then(data => {
 				console.log("github issues : ", data);
+				var newArray = data.map((i: any) => (
+					{
+						daoId: DAO?._id,
+						provider: 'Github',
+						name: i.title,
+						description: i.body,
+						creator: null,
+						members: [],
+						project: null,
+						discussionChannel: i.html_url,
+						deadline: null,
+						submissionLink: i.html_url,
+						compensation: null,
+						reviewer: null,
+						contributionType: 'open',
+						createdAt: i.created_at,
+						draftedAt: Date.now(),
+					}
+				))
+
+				console.log("new array : ", newArray);
+				dispatch(storeGithubIssues({ payload: { daoId: _get(DAO, '_id', null), issueList: newArray } }))
 			})
 	}
 
 	useEffect(() => {
-		requestReposIssues('Lomads-Technologies/gnosis-safe-integration');
-	}, []);
+		if (DAO && !DAO.githubIssues) {
+			console.log("fetching...")
+			requestReposIssues('Lomads-Technologies/gnosis-safe-integration');
+		}
+	}, [DAO]);
 
 	const amIAdmin = useMemo(() => {
 		if (DAO) {
