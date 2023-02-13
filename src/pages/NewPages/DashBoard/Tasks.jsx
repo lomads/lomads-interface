@@ -147,7 +147,8 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                 return tsk
             })
             setManageTasks(_orderBy(manageTasks, ['notification', i => moment(i.deadline).unix()], ['desc', 'desc']));
-            setDraftTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null && task.creator === user._id));
+            setDraftTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
+            // setDraftTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null && task.creator === user._id));
             const otherTasks = _get(Project, 'tasks', []).filter(task => !_find(myTasks, t => t._id === task._id) && !task.deletedAt && !task.archivedAt && !task.draftedAt && !(task.creator === user._id || task.reviewer === user._id))
             setOtherTasks([..._orderBy(otherTasks, i => moment(i.deadline).unix(), 'desc'), ..._orderBy(myTasks.concat(manageTasks), i => moment(i.deadline).unix(), 'desc')]);
         }
@@ -170,7 +171,8 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                 return tsk
             })
             setManageTasks(_orderBy(manageTasks, ['notification', i => moment(i.deadline).unix()], ['desc', 'desc']));
-            setDraftTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null && task.creator === user._id));
+            // setDraftTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null && task.creator === user._id));
+            setDraftTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
             const otherTasks = _get(DAO, 'tasks', []).filter(task => !_find(myTasks, t => t._id === task._id) && !task.deletedAt && !task.archivedAt && !task.draftedAt && !(task.creator === user._id || task.reviewer === user._id))
             setOtherTasks([..._orderBy(otherTasks, i => moment(i.deadline).unix(), 'desc'), ..._orderBy(myTasks.concat(manageTasks), i => moment(i.deadline).unix(), 'desc')]);
         }
@@ -257,10 +259,10 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                                 </button>
                                 <div className="divider"></div>
 
-                                <button className={tab === 3 ? 'active' : null} onClick={() => setTab(3)}>
+                                {/* <button className={tab === 3 ? 'active' : null} onClick={() => setTab(3)}>
                                     Drafts
                                 </button>
-                                <div className="divider"></div>
+                                <div className="divider"></div> */}
                             </>
                             :
                             null

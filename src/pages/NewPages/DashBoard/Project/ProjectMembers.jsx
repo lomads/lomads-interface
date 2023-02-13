@@ -38,31 +38,41 @@ const ProjectMembers = ({ toggleEditMember }) => {
     //     }
     // }, [Project])
 
-    useEffect(() => {
-        const rolesArr = _get(DAO, 'terminologies.roles', DEFAULT_ROLES);
-        const discordOb = _get(DAO, 'discord', {});
-        let temp = [];
-        if (rolesArr) {
-            Object.keys(rolesArr).forEach(function (key, _index) {
-                temp.push({ lastRole: _index === 3, title: key, value: rolesArr[key].label, 
-                    roleColor: _index == 0 ? '#92e1a8' :
-                    _index == 1 ? '#89b3e5' :
-                    _index == 2 ? '#e96447' : '#92e1a8'
-                });
-            });
-        }
-        if (discordOb) {
-            Object.keys(discordOb).forEach(function (key, _index) {
-                const discordChannel = discordOb[key];
-                discordChannel.roles.forEach((item) => {
-                    if (item.name !== '@everyone' && item.name !== 'LomadsTestBot' && item.name !== 'Lomads' && (temp.some((m) => m.title.toLowerCase() === item.id.toLowerCase()) === false)) {
-                        temp.push({ title: item.id, value: item.name, roleColor: item?.roleColor });
-                    }
-                })
-            });
-        }
-        setRoles(temp);
-    }, [DAO])
+    // useEffect(() => {
+    //     const rolesArr = _get(DAO, 'terminologies.roles', DEFAULT_ROLES);
+    //     const discordOb = _get(DAO, 'discord', {});
+    //     let temp = [];
+    //     if (rolesArr) {
+    //         Object.keys(rolesArr).forEach(function (key, _index) {
+    //             temp.push({
+    //                 lastRole: _index === 3, title: key, value: rolesArr[key].label,
+    //                 roleColor: _index == 0 ? '#92e1a8' :
+    //                     _index == 1 ? '#89b3e5' :
+    //                         _index == 2 ? '#e96447' : '#92e1a8'
+    //             });
+    //         });
+    //     }
+    //     if (discordOb) {
+    //         Object.keys(discordOb).forEach(function (key, _index) {
+    //             const discordChannel = discordOb[key];
+    //             discordChannel.roles.forEach((item) => {
+    //                 if (item.name !== '@everyone' && item.name !== 'LomadsTestBot' && item.name !== 'Lomads' && (temp.some((m) => m.title.toLowerCase() === item.id.toLowerCase()) === false)) {
+    //                     temp.push({ title: item.id, value: item.name, roleColor: item?.roleColor });
+    //                 }
+    //             })
+    //         });
+    //     }
+    //     setRoles(temp);
+    // }, [DAO])
+
+    const all_roles = useMemo(() => {
+        let roles = [];
+        Object.keys(_get(DAO, 'discord', {})).map((server) => {
+            const r = DAO.discord[server].roles
+            roles = roles.concat(r);
+        })
+        return roles.filter(r => r.name !== "@everyone" && r.name !== 'Lomads' && r.name !== 'LomadsTestBot');
+    }, [DAO.discord])
 
     // runs after deleting selected members from the project
     useEffect(() => {
@@ -215,6 +225,90 @@ const ProjectMembers = ({ toggleEditMember }) => {
                         }
 
                         {
+                            toggle && selectType === 'Roles'
+                            &&
+                            <>
+                                <div className='project-members'>
+                                    <h1>Organisation Roles</h1>
+                                    <div className="member-list">
+                                        {
+                                            Object.keys(_get(DAO, 'terminologies.roles', {})).map((key, index) => {
+                                                return (
+                                                    <div className='roles-li'>
+                                                        <div
+                                                            className='roles-pill'
+                                                            style={index === 0 ? { background: 'rgba(146, 225, 168, 0.3)' } : index === 1 ? { background: 'rgba(137,179,229,0.3)' } : index === 2 ? { background: 'rgba(234,100,71,0.3)' } : { background: 'rgba(146, 225, 168, 0.3)' }}
+                                                        >
+                                                            <div
+                                                                className='roles-circle'
+                                                                style={index === 0 ? { background: 'rgba(146, 225, 168, 1)' } : index === 1 ? { background: 'rgba(137,179,229,1)' } : index === 2 ? { background: 'rgba(234,100,71,1)' } : { background: 'rgba(146, 225, 168, 1)' }}
+                                                            ></div>
+                                                            <span>{_get(transformRole(key), 'label')}</span>
+                                                        </div>
+                                                        <div className='checkbox' onClick={() => handleAddRoles(key)}>
+                                                            {
+                                                                !(selectedRoles.some((m) => m.toLowerCase() === key.toLowerCase()) === false)
+                                                                    ?
+                                                                    <div className="active-box">
+                                                                        <BsCheck2 color="#FFF" />
+                                                                    </div>
+                                                                    :
+                                                                    <div className="inactive-box"></div>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                )
+                                            })
+                                        }
+                                    </div>
+                                </div>
+
+                                {
+                                    all_roles && all_roles.length > 0
+                                        ?
+                                        <div className='project-members' style={{ marginBottom: '100px' }}>
+                                            <h1>Discord Roles</h1>
+                                            <div className="member-list">
+                                                {
+                                                    all_roles.map((discord_value, index) => {
+                                                        return (
+                                                            <div className='roles-li'>
+                                                                <div
+                                                                    className='roles-pill'
+                                                                    style={{ background: `${_get(discord_value, 'roleColor', '#99aab5')}50` }}
+                                                                >
+                                                                    <div
+                                                                        className='roles-circle'
+                                                                        style={{ background: _get(discord_value, 'roleColor', '#99aab5') }}
+                                                                    ></div>
+                                                                    <span>{discord_value.name}</span>
+                                                                </div>
+                                                                <div className='checkbox' onClick={() => handleAddRoles(discord_value.id)}>
+                                                                    {
+                                                                        !(selectedRoles.some((m) => m.toLowerCase() === discord_value.id.toLowerCase()) === false)
+                                                                            ?
+                                                                            <div className="active-box">
+                                                                                <BsCheck2 color="#FFF" />
+                                                                            </div>
+                                                                            :
+                                                                            <div className="inactive-box"></div>
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
+                                            </div>
+                                        </div>
+                                        :
+                                        null
+                                }
+                            </>
+                        }
+
+
+                        {/* 
+                        {
                             toggle && selectType === 'Roles' && roles.length > 0
                             &&
                             <div className='project-members'>
@@ -245,13 +339,6 @@ const ProjectMembers = ({ toggleEditMember }) => {
                                                                     <div className="inactive-box"></div>
                                                             }
                                                         </div>
-                                                        {/* {
-                                                            !(selectedRoles.some((m) => m.toLowerCase() === item.title.toLowerCase()) === false)
-                                                                ?
-                                                                <input type="checkbox" onChange={() => handleAddRoles(item.title)} checked />
-                                                                :
-                                                                <input type="checkbox" onChange={() => handleAddRoles(item.title)} />
-                                                        } */}
                                                     </div>
                                                     {
                                                         item.lastRole && <div style={{ marginLeft: 30, marginTop: 10, marginBottom: 30, width: 230, backgroundColor: '#C94B32', height: 3 }}></div>
@@ -263,24 +350,7 @@ const ProjectMembers = ({ toggleEditMember }) => {
                                     }
                                 </div>
                             </div>
-                        }
-
-                        {/* {
-                        _uniqBy(Project?.members, '_id').map((item, index) => (
-                            <div onClick={() => handleAddMemberDelete(item._id)} className="editMember-row" key={index}>
-                                <div>
-                                    <img src={memberIcon} alt="memberIcon" />
-                                    <p>{item.name}</p>
-                                </div>
-                                <span>{item.wallet.slice(0, 6) + "..." + item.wallet.slice(-4)}</span>
-                                <input
-                                    type='checkbox'
-                                    onChange={() => handleAddMemberDelete(item._id)}
-                                    checked={!(deleteMembers.some((m) => m === item._id) === false)}
-                                />
-                            </div>
-                        ))
-                    } */}
+                        } */}
                     </div>
                 </div>
                 <div className="editMember-footer">

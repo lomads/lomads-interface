@@ -46,7 +46,7 @@ const CreateProject = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const { DAO, createProjectLoading } = useAppSelector((state) => state.dashboard);
-    const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies'))
+    const { transformWorkspace, transformRole } = useTerminology(_get(DAO, 'terminologies'));
     const editorRef = useRef(null);
 
     const [name, setName] = useState('');
@@ -99,10 +99,11 @@ const CreateProject = () => {
         let temp = [];
         if (rolesArr) {
             Object.keys(rolesArr).forEach(function (key, _index) {
-                temp.push({ lastRole: _index === 3, title: key, value: rolesArr[key].label, 
+                temp.push({
+                    lastRole: _index === 3, title: key, value: rolesArr[key].label,
                     roleColor: _index == 0 ? '#92e1a8' :
-                    _index == 1 ? '#89b3e5' :
-                    _index == 2 ? '#e96447' : '#92e1a8'
+                        _index == 1 ? '#89b3e5' :
+                            _index == 2 ? '#e96447' : '#92e1a8'
                 });
             });
         }
@@ -118,6 +119,15 @@ const CreateProject = () => {
         }
         setRoles(temp);
     }, [DAO])
+
+    const all_roles = useMemo(() => {
+        let roles = [];
+        Object.keys(_get(DAO, 'discord', {})).map((server) => {
+            const r = DAO.discord[server].roles
+            roles = roles.concat(r);
+        })
+        return roles.filter(r => r.name !== "@everyone" && r.name !== 'Lomads' && r.name !== 'LomadsTestBot');
+    }, [DAO.discord])
 
     useEffect(() => {
         const memberList = DAO?.members;
@@ -628,14 +638,43 @@ const CreateProject = () => {
                                                         </div>
                                                     }
                                                     {
-                                                        toggle && selectType === 'Roles' && roles.length > 0
+                                                        toggle && selectType === 'Roles'
                                                         &&
                                                         <div className='project-members'>
                                                             <div className='project-members-header'>
-                                                                <p>Select Roles</p>
+                                                                <p>Organisation Roles</p>
                                                             </div>
                                                             <div className="member-list">
                                                                 {
+                                                                    Object.keys(_get(DAO, 'terminologies.roles', {})).map((key, index) => {
+                                                                        return (
+                                                                            <div className='roles-li'>
+                                                                                <div
+                                                                                    className='roles-pill'
+                                                                                    style={index === 0 ? { background: 'rgba(146, 225, 168, 0.3)' } : index === 1 ? { background: 'rgba(137,179,229,0.3)' } : index === 2 ? { background: 'rgba(234,100,71,0.3)' } : { background: 'rgba(146, 225, 168, 0.3)' }}
+                                                                                >
+                                                                                    <div
+                                                                                        className='roles-circle'
+                                                                                        style={index === 0 ? { background: 'rgba(146, 225, 168, 1)' } : index === 1 ? { background: 'rgba(137,179,229,1)' } : index === 2 ? { background: 'rgba(234,100,71,1)' } : { background: 'rgba(146, 225, 168, 1)' }}
+                                                                                    ></div>
+                                                                                    <span>{_get(transformRole(key), 'label')}</span>
+                                                                                </div>
+                                                                                <div className='checkbox' onClick={() => handleAddRoles(key)}>
+                                                                                    {
+                                                                                        !(selectedRoles.some((m) => m.toLowerCase() === key.toLowerCase()) === false)
+                                                                                            ?
+                                                                                            <div className="active-box">
+                                                                                                <BsCheck2 color="#FFF" />
+                                                                                            </div>
+                                                                                            :
+                                                                                            <div className="inactive-box"></div>
+                                                                                    }
+                                                                                </div>
+                                                                            </div>
+                                                                        )
+                                                                    })
+                                                                }
+                                                                {/* {
                                                                     roles.map((item, index) => {
                                                                         return (
                                                                             <>
@@ -669,8 +708,50 @@ const CreateProject = () => {
 
                                                                         )
                                                                     })
-                                                                }
+                                                                } */}
                                                             </div>
+                                                            {
+                                                                all_roles && all_roles.length > 0
+                                                                    ?
+                                                                    <>
+                                                                        <div className='project-members-header' style={{ marginTop: '1.5rem' }}>
+                                                                            <p>Discord Roles</p>
+                                                                        </div>
+                                                                        <div className="member-list">
+                                                                            {
+                                                                                all_roles.map((discord_value, index) => {
+                                                                                    return (
+                                                                                        <div className='roles-li'>
+                                                                                            <div
+                                                                                                className='roles-pill'
+                                                                                                style={{ background: `${_get(discord_value, 'roleColor', '#99aab5')}50` }}
+                                                                                            >
+                                                                                                <div
+                                                                                                    className='roles-circle'
+                                                                                                    style={{ background: _get(discord_value, 'roleColor', '#99aab5') }}
+                                                                                                ></div>
+                                                                                                <span>{discord_value.name}</span>
+                                                                                            </div>
+                                                                                            <div className='checkbox' onClick={() => handleAddRoles(discord_value.id)}>
+                                                                                                {
+                                                                                                    !(selectedRoles.some((m) => m.toLowerCase() === discord_value.id.toLowerCase()) === false)
+                                                                                                        ?
+                                                                                                        <div className="active-box">
+                                                                                                            <BsCheck2 color="#FFF" />
+                                                                                                        </div>
+                                                                                                        :
+                                                                                                        <div className="inactive-box"></div>
+                                                                                                }
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    )
+                                                                                })
+                                                                            }
+                                                                        </div>
+                                                                    </>
+                                                                    :
+                                                                    null
+                                                            }
                                                         </div>
                                                     }
 
