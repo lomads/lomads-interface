@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import moment from 'moment';
-import { get as _get, find as _find, uniqBy as _uniqBy } from 'lodash';
+import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 import { useWeb3React } from "@web3-react/core";
 import { useAppSelector } from "state/hooks";
 import membersIcon from "../../../assets/svg/membersIcon.svg";
@@ -55,12 +55,7 @@ const MemberCard = (props: any) => {
 					person.roles.forEach(function (item: any) {
 						_get(discordChannel, 'roles', []).map((i: any) => {
 							if (i.id === item && i.name !== '@everyone') {
-								if (i.color) {
-									roles.push({ name: i.name, color: i.color })
-								}
-								else {
-									roles.push({ name: i.name, color: '#d5d5d5' })
-								}
+								roles.push({ name: i.name, roleColor: _get(i, 'roleColor', '#99aab5') })
 							}
 						})
 					})
@@ -103,8 +98,8 @@ const MemberCard = (props: any) => {
 										roles.filter((_: any, i: any) => i < 5).map((item: any, index: any) => {
 											if (index <= 3) {
 												return (
-													<div className="role-pill" style={{ backgroundColor: `${item.color}50` }}>
-														<div className="role-circle" style={{ backgroundColor: `${item.color}` }}></div>
+													<div className="role-pill" style={{ backgroundColor: `${_get(item, "roleColor", '#99aab5')}50` }}>
+														<div className="role-circle" style={{ backgroundColor: `${_get(item, "roleColor", '#99aab5')}` }}></div>
 														<span>{item.name}</span>
 													</div>
 												)
@@ -184,7 +179,7 @@ const MemberCard = (props: any) => {
 								<div className="dashboardText" style={{ marginLeft: '40px' }}>Joined</div>
 							</div>
 						</div>
-						{_uniqBy(membersArray, (m: any) => m.member.wallet.toLowerCase()).map((result: any, index: any) => {
+						{_sortBy(_uniqBy(membersArray, (m: any) => m.member.wallet.toLowerCase()), (m:any) => _get(m, 'member.name', '').toLowerCase(), 'asc').map((result: any, index: any) => {
 							return (
 								<NameAndAvatar
 									user={result}

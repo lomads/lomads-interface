@@ -4,6 +4,7 @@ import './SelectRoles.css';
 import { useAppSelector } from "state/hooks";
 import useTerminology from 'hooks/useTerminology'
 import { DEFAULT_ROLES } from "constants/terminology";
+import { BsCheck2 } from "react-icons/bs";
 
 const SelectRoles = ({ toggleSelect, validRoles, handleValidRoles }) => {
     const [roles, setRoles] = useState(validRoles);
@@ -41,7 +42,7 @@ const SelectRoles = ({ toggleSelect, validRoles, handleValidRoles }) => {
             </div>
 
             {
-                Object.keys(_get(DAO, 'terminologies.roles', {})).map((key, index) => {
+                (_get(DAO, 'terminologies') ? Object.keys(_get(DAO, 'terminologies.roles', {})) : Object.keys(DEFAULT_ROLES)).map((key, index) => {
                     return (
                         <div className='roles-li'>
                             <div
@@ -54,13 +55,24 @@ const SelectRoles = ({ toggleSelect, validRoles, handleValidRoles }) => {
                                 ></div>
                                 <span>{_get(transformRole(key), 'label')}</span>
                             </div>
-                            {
+                            {/* {
                                 roles.includes(key)
                                     ?
                                     <input type="checkbox" onChange={() => handleRole(key)} checked />
                                     :
                                     <input type="checkbox" onChange={() => handleRole(key)} />
-                            }
+                            } */}
+                            <div className='checkbox' onClick={() => handleRole(key)}>
+                                {
+                                    (roles.includes(key))
+                                        ?
+                                        <div className="active-box">
+                                            <BsCheck2 color="#FFF" />
+                                        </div>
+                                        :
+                                        <div className="inactive-box"></div>
+                                }
+                            </div>
                         </div>
                     )
                 })
@@ -79,21 +91,32 @@ const SelectRoles = ({ toggleSelect, validRoles, handleValidRoles }) => {
                                     <div className='roles-li'>
                                         <div
                                             className='roles-pill'
-                                            style={discord_value.color ? { background: `${discord_value.color}50` } : { background: `#d5d5d550` }}
+                                            style={{ background: `${_get(discord_value, 'roleColor', '#99aab5')}50` }}
                                         >
                                             <div
                                                 className='roles-circle'
-                                                style={discord_value.color ? { background: `${discord_value.color}` } : { background: `#d5d5d5` }}
+                                                style={{ background: _get(discord_value, 'roleColor', '#99aab5') }}
                                             ></div>
                                             <span>{discord_value.name}</span>
                                         </div>
-                                        {
+                                        {/* {
                                             roles.includes(discord_value.id)
                                                 ?
                                                 <input type="checkbox" onChange={() => handleRole(discord_value.id)} checked />
                                                 :
                                                 <input type="checkbox" onChange={() => handleRole(discord_value.id)} />
-                                        }
+                                        } */}
+                                         <div className='checkbox' onClick={() => handleRole(discord_value.id)}>
+                                            {
+                                                (roles.includes(discord_value.id))
+                                                    ?
+                                                    <div className="active-box">
+                                                        <BsCheck2 color="#FFF" />
+                                                    </div>
+                                                    :
+                                                    <div className="inactive-box"></div>
+                                            }
+                                        </div>
                                     </div>
                                 );
                             })

@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect, useCallback, useMemo, useRef } from 'react';
-import { find as _find, get as _get, debounce as _debounce, uniqBy as _uniqBy } from 'lodash';
+import { find as _find, get as _get, debounce as _debounce, uniqBy as _uniqBy, sortBy as _sortBy } from 'lodash';
 import '../../styles/pages/CreateProject.css';
 import AddMember from "./DashBoard/MemberCard/AddMember";
 import createProjectSvg from '../../assets/svg/createProject.svg';
@@ -9,6 +9,7 @@ import notionIcon from '../../assets/svg/Notion-logo.svg';
 import { AiOutlineLock } from "react-icons/ai";
 import { SiNotion } from "react-icons/si";
 import { HiOutlinePlus } from "react-icons/hi";
+import { DEFAULT_ROLES } from "constants/terminology";
 import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe, BsCheck2 } from "react-icons/bs";
 import { toast, ToastContainer } from "react-toastify";
 import { ProjectContext } from "context/ProjectContext";
@@ -93,12 +94,16 @@ const CreateProject = () => {
     }, [createProjectLoading])
 
     useEffect(() => {
-        const rolesArr = _get(DAO, 'terminologies.roles', {});
+        const rolesArr = _get(DAO, 'terminologies.roles', DEFAULT_ROLES);
         const discordOb = _get(DAO, 'discord', {});
         let temp = [];
         if (rolesArr) {
             Object.keys(rolesArr).forEach(function (key, _index) {
-                temp.push({ title: key, value: rolesArr[key].label, color: '#d5d5d5' });
+                temp.push({ lastRole: _index === 3, title: key, value: rolesArr[key].label, 
+                    roleColor: _index == 0 ? '#92e1a8' :
+                    _index == 1 ? '#89b3e5' :
+                    _index == 2 ? '#e96447' : '#92e1a8'
+                });
             });
         }
         if (discordOb) {
@@ -106,7 +111,7 @@ const CreateProject = () => {
                 const discordChannel = discordOb[key];
                 discordChannel.roles.forEach((item) => {
                     if (item.name !== '@everyone' && item.name !== 'LomadsTestBot' && item.name !== 'Lomads' && (temp.some((m) => m.title.toLowerCase() === item.id.toLowerCase()) === false)) {
-                        temp.push({ title: item.id, value: item.name, color: item.color ? item.color : '#d5d5d5' });
+                        temp.push({ title: item.id, value: item.name, roleColor: item?.roleColor });
                     }
                 })
             });
@@ -591,7 +596,7 @@ const CreateProject = () => {
                                                             </div>
                                                             <div className="member-list">
                                                                 {
-                                                                    memberList.map((item, index) => {
+                                                                    _sortBy(memberList, m => _get(m, 'member.name', '').toLowerCase(), 'asc').map((item, index) => {
                                                                         if (item.member.wallet.toLowerCase() !== account.toLowerCase()) {
                                                                             return (
                                                                                 <div className="member-li" key={index} onClick={() => handleAddMember(item.member)}>
@@ -637,11 +642,11 @@ const CreateProject = () => {
                                                                                 <div className='roles-li' key={index}>
                                                                                     <div
                                                                                         className='roles-pill'
-                                                                                        style={{ backgroundColor: `${item.color}50` }}
+                                                                                        style={{ backgroundColor: `${_get(item, 'roleColor', '#99aab5')}50` }}
                                                                                     >
                                                                                         <div
                                                                                             className='roles-circle'
-                                                                                            style={{ background: `${item.color}` }}
+                                                                                            style={{ background: `${_get(item, 'roleColor', '#99aab5')}` }}
                                                                                         ></div>
                                                                                         <span>{item.value}</span>
                                                                                     </div>
@@ -657,6 +662,9 @@ const CreateProject = () => {
                                                                                         }
                                                                                     </div>
                                                                                 </div>
+                                                                                {
+                                                                                    item.lastRole && <div style={{ marginLeft: 30, marginTop: 10, marginBottom: 30, width: 230, backgroundColor: '#C94B32', height: 3 }}></div>
+                                                                                }
                                                                             </>
 
                                                                         )

@@ -239,7 +239,8 @@ const MintPassToken = () => {
                     if (userDiscord.value) {
                         await axiosHttp.patch(`dao/${_get(DAO, 'url', '')}/update-user-discord`, {
                             discordId: userDiscord.value || null,
-                            userId: _get(user, '_id', '')
+                            userId: _get(user, '_id', ''),
+                            daoId: _get(DAO, '_id')
                         })
                     }
                     dispatch(getDao(_get(DAO, 'url', '')))
@@ -321,11 +322,12 @@ const MintPassToken = () => {
                         }
                         console.log("metadataJSON : ", metadataJSON);
                         const req = await APInewSBTtoken(metadataJSON);
+                        await axiosHttp.patch(`dao/${_get(DAO, 'url', '')}/update-user-discord`, {
+                            discordId: userDiscord.value || null,
+                            userId: _get(user, '_id', ''),
+                            daoId: _get(DAO, '_id')
+                        })
                         if (req) {
-                            await axiosHttp.patch(`dao/${_get(DAO, 'url', '')}/update-user-discord`, {
-                                discordId: userDiscord.value || null,
-                                userId: _get(user, '_id', '')
-                            })
                             dispatch(updateCurrentUser({ name: userName.value }))
                             dispatch(addDaoMember({ url: DAO?.url, payload: { name: '', address: account, role: myRole ? myRole : 'role4' } }))
                             dispatch(getDao(DAO.url));
