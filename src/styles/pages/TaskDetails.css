@@ -164,8 +164,7 @@
 
 .taskDetails-container .info .taskDetails-top .taskDetails-header .header-name {
     width: 100%;
-    height: 75px;
-    display: flex;
+    /* height: 75px; */
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -192,7 +191,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 25px;
+    padding: 22px;
 }
 
 .taskDetails-container .info .taskDetails-top .taskDetails-header .header-name .right h1 {

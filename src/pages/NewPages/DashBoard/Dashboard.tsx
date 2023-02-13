@@ -129,12 +129,12 @@ const Dashboard = () => {
 			})
 	}
 
-	useEffect(() => {
-		if (DAO && !DAO.githubIssues) {
-			console.log("fetching...")
-			requestReposIssues('Lomads-Technologies/gnosis-safe-integration');
-		}
-	}, [DAO]);
+	// useEffect(() => {
+	// 	if (DAO && !DAO.githubIssues) {
+	// 		console.log("fetching...")
+	// 		requestReposIssues('Lomads-Technologies/gnosis-safe-integration');
+	// 	}
+	// }, [DAO]);
 
 	const amIAdmin = useMemo(() => {
 		if (DAO) {

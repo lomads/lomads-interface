@@ -397,8 +397,9 @@
     box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
     border-radius: 5px;
     padding: 26px 22px;
-    max-height: 75vh;
-    position: relative;
+    /* max-height: 75vh;
+    overflow: hidden;
+    overflow-y: scroll; */
 }
 
 .createProject-container .createProject-body .project-members .project-members-header {
@@ -439,9 +440,6 @@
 
 .createProject-container .createProject-body .project-members .member-list {
     width: 100%;
-    max-height: 324px;
-    overflow: hidden;
-    overflow-y: auto;
 }
 
 

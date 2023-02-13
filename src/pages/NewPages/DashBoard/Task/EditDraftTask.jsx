@@ -56,7 +56,7 @@ const EditDraftTask = ({ close, task, daoURL }) => {
     const [name, setName] = useState(_get(task, 'name', ''));
     const [description, setDescription] = useState(_get(task, 'description', ''));
     const [dchannel, setDChannel] = useState(_get(task, 'discussionChannel', ''));
-    const [deadline, setDeadline] = useState(new Date(_get(task, 'deadline', '')).toISOString().substring(0, 10));
+    const [deadline, setDeadline] = useState(task.deadline ? new Date(_get(task, 'deadline', '')).toISOString().substring(0, 10) : new Date());
     const [projectId, setProjectId] = useState(task.project?._id);
     const [subLink, setSubLink] = useState(_get(task, 'submissionLink', ''));
     const [reviewer, setReviewer] = useState(null);
@@ -64,6 +64,19 @@ const EditDraftTask = ({ close, task, daoURL }) => {
     const [amount, setAmount] = useState(task.compensation ? task.compensation.amount : 0);
     const [safeTokens, setSafeTokens] = useState([]);
     const [showSuccess, setShowSuccess] = useState(false);
+
+    const getrolename = (roleId) => {
+
+        for (let index = 0; index < Object.keys(DAO.discord).length; index++) {
+            const element = Object.keys(DAO.discord)[index];
+            const rolename_discord = _find(DAO.discord[element].roles, r => r.id === roleId)
+            if (rolename_discord) {
+                return rolename_discord.name
+            }
+        }
+        return "";
+
+    };
 
     const getTokens = async (safeAddress) => {
         const tokens = await getSafeTokens(chainId, safeAddress)
@@ -80,6 +93,21 @@ const EditDraftTask = ({ close, task, daoURL }) => {
         getTokens(_get(DAO, 'safe.address'));
         return () => { };
     }, [DAO]);
+
+    useEffect(() => {
+        var date = new Date();
+        var tdate = date.getDate();
+        var month = date.getMonth() + 1;
+        if (tdate < 10) {
+            tdate = "0" + tdate;
+        }
+        if (month < 10) {
+            month = "0" + month
+        }
+        var year = date.getUTCFullYear();
+        var minDate = year + "-" + month + "-" + tdate;
+        document.getElementById("deadlineInput").setAttribute("min", minDate);
+    }, [])
 
     useEffect(() => {
         if (editDraftTaskLoading === false) {
@@ -413,8 +441,9 @@ const EditDraftTask = ({ close, task, daoURL }) => {
                                         <div className='createTask-inputRow'>
                                             <span>Contribution</span>
                                             <div className='createTask-buttonRow'>
-                                                <button onClick={() => { setContributionType('assign'); setIsFilterRoles(false); setValidRoles([]); setIsSingleContributor(false); }} className={contributionType === 'assign' ? 'active' : null}>ASSIGN MEMBER</button>
                                                 <button onClick={() => { setContributionType('open'); setSelectedUser(null) }} className={contributionType === 'open' ? 'active' : null}>OPEN</button>
+                                                <button onClick={() => { setContributionType('assign'); setIsFilterRoles(false); setValidRoles([]); setIsSingleContributor(false); }} className={contributionType === 'assign' ? 'active' : null}>ASSIGN MEMBER</button>
+
                                             </div>
                                         </div>
 
@@ -480,13 +509,13 @@ const EditDraftTask = ({ close, task, daoURL }) => {
                                                                     <div className='roles-li'>
                                                                         <div
                                                                             className='roles-pill'
-                                                                            style={index === 0 ? { background: 'rgba(146, 225, 168, 0.3)' } : index === 1 ? { background: 'rgba(137,179,229,0.3)' } : index === 2 ? { background: 'rgba(234,100,71,0.3)' } : { background: 'rgba(146, 225, 168, 0.3)' }}
+                                                                            style={{ background: '#99aab550' }}
                                                                         >
                                                                             <div
                                                                                 className='roles-circle'
-                                                                                style={index === 0 ? { background: 'rgba(146, 225, 168, 1)' } : index === 1 ? { background: 'rgba(137,179,229,1)' } : index === 2 ? { background: 'rgba(234,100,71,1)' } : { background: 'rgba(146, 225, 168, 1)' }}
+                                                                                style={{ background: '#99aab5' }}
                                                                             ></div>
-                                                                            <span>{_get(transformRole(item), 'label', '')}</span>
+                                                                            <span>{item == "role1" || item == "role2" || item == "role3" || item == "role4" ? transformRole(item).label : getrolename(item)}</span>
                                                                         </div>
                                                                         <div className='roles-close' onClick={() => handleRemoveRole(item)}>
                                                                             <CgClose color='#FFF' />

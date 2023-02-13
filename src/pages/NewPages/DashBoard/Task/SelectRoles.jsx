@@ -9,10 +9,10 @@ import { BsCheck2 } from "react-icons/bs";
 const SelectRoles = ({ toggleSelect, validRoles, handleValidRoles }) => {
     const [roles, setRoles] = useState(validRoles);
     const { DAO } = useAppSelector((state) => state.dashboard);
-    const { transformRole } = useTerminology(_get(DAO, 'terminologies', undefined))
-    const handleRole = (role) => {
-        console.log('onclickrolefetch', role);
+    const { transformRole } = useTerminology(_get(DAO, 'terminologies', undefined));
 
+    const handleRole = (role) => {
+        console.log("role : ", role)
         if (roles.includes(role)) {
             setRoles(roles.filter((i) => i !== role))
         }
@@ -23,7 +23,6 @@ const SelectRoles = ({ toggleSelect, validRoles, handleValidRoles }) => {
     }
 
     const all_roles = useMemo(() => {
-
         let roles = [];
         Object.keys(_get(DAO, 'discord', {})).map((server) => {
             const r = DAO.discord[server].roles
@@ -55,13 +54,6 @@ const SelectRoles = ({ toggleSelect, validRoles, handleValidRoles }) => {
                                 ></div>
                                 <span>{_get(transformRole(key), 'label')}</span>
                             </div>
-                            {/* {
-                                roles.includes(key)
-                                    ?
-                                    <input type="checkbox" onChange={() => handleRole(key)} checked />
-                                    :
-                                    <input type="checkbox" onChange={() => handleRole(key)} />
-                            } */}
                             <div className='checkbox' onClick={() => handleRole(key)}>
                                 {
                                     (roles.includes(key))
@@ -99,14 +91,7 @@ const SelectRoles = ({ toggleSelect, validRoles, handleValidRoles }) => {
                                             ></div>
                                             <span>{discord_value.name}</span>
                                         </div>
-                                        {/* {
-                                            roles.includes(discord_value.id)
-                                                ?
-                                                <input type="checkbox" onChange={() => handleRole(discord_value.id)} checked />
-                                                :
-                                                <input type="checkbox" onChange={() => handleRole(discord_value.id)} />
-                                        } */}
-                                         <div className='checkbox' onClick={() => handleRole(discord_value.id)}>
+                                        <div className='checkbox' onClick={() => handleRole(discord_value.id)}>
                                             {
                                                 (roles.includes(discord_value.id))
                                                     ?

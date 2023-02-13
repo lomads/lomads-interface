@@ -411,7 +411,7 @@ const TaskDetails = () => {
                                                 <h1>{Task.name}</h1>
                                             </div>
                                             {/* <p>Single contributor : {Task.isSingleContributor ? 'true' : 'false'}</p> */}
-                                            <div className="menu">
+                                            <div className="menu" style={{ justifyContent: 'flex-end' }}>
 
                                                 {/* Task status */}
                                                 {/* If task was manually assigned---check if current user is approved applicant or other user*/}
@@ -481,22 +481,22 @@ const TaskDetails = () => {
                                                                 hasMySubmission
                                                                     ?
                                                                     <>
-                                                                    {
-                                                                        amIRejected ? 
-                                                                        <div>
-                                                                            <img src={rejected} style={{ marginRight: '5px' }} />
-                                                                            <span style={{ color: '#E23B53' }}>Rejected</span>
-                                                                        </div> : 
-                                                                        isMySubmissionAccepted ? 
-                                                                        <div>
-                                                                            <img src={approved} style={{ marginRight: '5px' }} />
-                                                                            <span style={{ color: '#27C46E' }}>Approved</span>
-                                                                        </div> :
-                                                                        <div>
-                                                                            <img src={submitted} style={{ marginRight: '5px' }} />
-                                                                            <span style={{ color: '#6B99F7' }}>Under review</span>
-                                                                        </div>
-                                                                    }
+                                                                        {
+                                                                            amIRejected ?
+                                                                                <div>
+                                                                                    <img src={rejected} style={{ marginRight: '5px' }} />
+                                                                                    <span style={{ color: '#E23B53' }}>Rejected</span>
+                                                                                </div> :
+                                                                                isMySubmissionAccepted ?
+                                                                                    <div>
+                                                                                        <img src={approved} style={{ marginRight: '5px' }} />
+                                                                                        <span style={{ color: '#27C46E' }}>Approved</span>
+                                                                                    </div> :
+                                                                                    <div>
+                                                                                        <img src={submitted} style={{ marginRight: '5px' }} />
+                                                                                        <span style={{ color: '#6B99F7' }}>Under review</span>
+                                                                                    </div>
+                                                                        }
                                                                     </>
                                                                     :
                                                                     <>
@@ -717,13 +717,14 @@ const TaskDetails = () => {
 
                                             }
 
-                                            <div>
-                                                <span>Deadline</span>
-                                                <img src={calendarIcon} alt="calendarIcon" />
-                                                {
-                                                    Task.deadline ? <span>{moment(Task.deadline).format('L')}</span> : <span>NA</span>
-                                                }
-                                            </div>
+                                            {
+                                                Task.deadline &&
+                                                <div>
+                                                    <span>Deadline</span>
+                                                    <img src={calendarIcon} alt="calendarIcon" />
+                                                    <span>{moment(Task.deadline).format('L')}</span>
+                                                </div>
+                                            }
                                         </div>
 
                                     </div>
@@ -1000,11 +1001,14 @@ const TaskDetails = () => {
 
                             {/* reviewer section */}
                             <div className="task-reviewer">
-                                <div>
-                                    <span>Reviewer</span>
-                                    <img src={memberIcon} alt="member-icon" />
-                                    {Task.reviewer ? <p>{Task.reviewer.name}</p> : <p>NA</p>}
-                                </div>
+                                {
+                                    Task.reviewer &&
+                                    <div>
+                                        <span>Reviewer</span>
+                                        <img src={memberIcon} alt="member-icon" />
+                                        <p>{Task.reviewer.name}</p>
+                                    </div>
+                                }
                                 {!(Task.isSingleContributor === false && Task.contributionType === 'open') &&
                                     <div>
                                         <span>Assigned</span>

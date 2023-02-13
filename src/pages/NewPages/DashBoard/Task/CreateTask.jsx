@@ -64,6 +64,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
     const [amount, setAmount] = useState(0);
     const [safeTokens, setSafeTokens] = useState([]);
     const [showSuccess, setShowSuccess] = useState(false);
+
     const getrolename = (roleId) => {
 
         for (let index = 0; index < Object.keys(DAO.discord).length; index++) {
@@ -520,15 +521,16 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
 
                                                         {
                                                             validRoles.map((item, index) => {
+                                                                console.log("item role : ", item)
                                                                 return (
                                                                     <div className='roles-li'>
                                                                         <div
                                                                             className='roles-pill'
-                                                                            style={index === 0 ? { background: 'rgba(146, 225, 168, 0.3)' } : index === 1 ? { background: 'rgba(137,179,229,0.3)' } : index === 2 ? { background: 'rgba(234,100,71,0.3)' } : { background: 'rgba(146, 225, 168, 0.3)' }}
+                                                                            style={{ background: '#99aab550' }}
                                                                         >
                                                                             <div
                                                                                 className='roles-circle'
-                                                                                style={index === 0 ? { background: 'rgba(146, 225, 168, 1)' } : index === 1 ? { background: 'rgba(137,179,229,1)' } : index === 2 ? { background: 'rgba(234,100,71,1)' } : { background: 'rgba(146, 225, 168, 1)' }}
+                                                                                style={{ background: '#99aab5' }}
                                                                             ></div>
 
                                                                             <span>{item == "role1" || item == "role2" || item == "role3" || item == "role4" ? transformRole(item).label : getrolename(item)}</span>

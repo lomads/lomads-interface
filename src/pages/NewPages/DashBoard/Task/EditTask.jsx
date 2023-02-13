@@ -56,7 +56,7 @@ const EditTask = ({ close, task, daoURL }) => {
     const [name, setName] = useState(task.name);
     const [description, setDescription] = useState(task.description);
     const [dchannel, setDChannel] = useState(task.discussionChannel);
-    const [deadline, setDeadline] = useState(new Date(task.deadline).toISOString().substring(0, 10));
+    const [deadline, setDeadline] = useState(task.deadline ? new Date(task.deadline).toISOString().substring(0, 10) : new Date());
     const [projectId, setProjectId] = useState(task.project?._id);
     const [subLink, setSubLink] = useState(task.submissionLink);
     const [reviewer, setReviewer] = useState(null);
@@ -94,6 +94,21 @@ const EditTask = ({ close, task, daoURL }) => {
         getTokens(_get(DAO, 'safe.address'));
         return () => { };
     }, [DAO]);
+
+    useEffect(() => {
+        var date = new Date();
+        var tdate = date.getDate();
+        var month = date.getMonth() + 1;
+        if (tdate < 10) {
+            tdate = "0" + tdate;
+        }
+        if (month < 10) {
+            month = "0" + month
+        }
+        var year = date.getUTCFullYear();
+        var minDate = year + "-" + month + "-" + tdate;
+        document.getElementById("deadlineInput").setAttribute("min", minDate);
+    }, [])
 
     useEffect(() => {
         if (editTaskLoading === false) {
@@ -363,8 +378,9 @@ const EditTask = ({ close, task, daoURL }) => {
                                         <div className='createTask-inputRow'>
                                             <span>Contribution</span>
                                             <div className='createTask-buttonRow'>
-                                                <button onClick={() => { setContributionType('assign'); setIsFilterRoles(false); setValidRoles([]); setIsSingleContributor(false); }} className={contributionType === 'assign' ? 'active' : null} disabled style={{ cursor: 'not-allowed' }}>ASSIGN MEMBER</button>
                                                 <button onClick={() => { setContributionType('open'); setSelectedUser(null) }} className={contributionType === 'open' ? 'active' : null} disabled style={{ cursor: 'not-allowed' }}>OPEN</button>
+                                                <button onClick={() => { setContributionType('assign'); setIsFilterRoles(false); setValidRoles([]); setIsSingleContributor(false); }} className={contributionType === 'assign' ? 'active' : null} disabled style={{ cursor: 'not-allowed' }}>ASSIGN MEMBER</button>
+
                                             </div>
                                         </div>
 
@@ -432,11 +448,11 @@ const EditTask = ({ close, task, daoURL }) => {
                                                                     <div className='roles-li'>
                                                                         <div
                                                                             className='roles-pill'
-                                                                            style={index === 0 ? { background: 'rgba(146, 225, 168, 0.3)' } : index === 1 ? { background: 'rgba(137,179,229,0.3)' } : index === 2 ? { background: 'rgba(234,100,71,0.3)' } : { background: 'rgba(146, 225, 168, 0.3)' }}
+                                                                            style={{ background: '#99aab550' }}
                                                                         >
                                                                             <div
                                                                                 className='roles-circle'
-                                                                                style={index === 0 ? { background: 'rgba(146, 225, 168, 1)' } : index === 1 ? { background: 'rgba(137,179,229,1)' } : index === 2 ? { background: 'rgba(234,100,71,1)' } : { background: 'rgba(146, 225, 168, 1)' }}
+                                                                                style={{ background: '#99aab5' }}
                                                                             ></div>
                                                                             <span>{item == "role1" || item == "role2" || item == "role3" || item == "role4" ? transformRole(item).label : getrolename(item)}</span>
                                                                         </div>

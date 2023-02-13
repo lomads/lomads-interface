@@ -38,31 +38,32 @@ const ProjectMembers = ({ toggleEditMember }) => {
     //     }
     // }, [Project])
 
-    useEffect(() => {
-        const rolesArr = _get(DAO, 'terminologies.roles', DEFAULT_ROLES);
-        const discordOb = _get(DAO, 'discord', {});
-        let temp = [];
-        if (rolesArr) {
-            Object.keys(rolesArr).forEach(function (key, _index) {
-                temp.push({ lastRole: _index === 3, title: key, value: rolesArr[key].label, 
-                    roleColor: _index == 0 ? '#92e1a8' :
-                    _index == 1 ? '#89b3e5' :
-                    _index == 2 ? '#e96447' : '#92e1a8'
-                });
-            });
-        }
-        if (discordOb) {
-            Object.keys(discordOb).forEach(function (key, _index) {
-                const discordChannel = discordOb[key];
-                discordChannel.roles.forEach((item) => {
-                    if (item.name !== '@everyone' && item.name !== 'LomadsTestBot' && item.name !== 'Lomads' && (temp.some((m) => m.title.toLowerCase() === item.id.toLowerCase()) === false)) {
-                        temp.push({ title: item.id, value: item.name, roleColor: item?.roleColor });
-                    }
-                })
-            });
-        }
-        setRoles(temp);
-    }, [DAO])
+    // useEffect(() => {
+    //     const rolesArr = _get(DAO, 'terminologies.roles', DEFAULT_ROLES);
+    //     const discordOb = _get(DAO, 'discord', {});
+    //     let temp = [];
+    //     if (rolesArr) {
+    //         Object.keys(rolesArr).forEach(function (key, _index) {
+    //             temp.push({
+    //                 lastRole: _index === 3, title: key, value: rolesArr[key].label,
+    //                 roleColor: _index == 0 ? '#92e1a8' :
+    //                     _index == 1 ? '#89b3e5' :
+    //                         _index == 2 ? '#e96447' : '#92e1a8'
+    //             });
+    //         });
+    //     }
+    //     if (discordOb) {
+    //         Object.keys(discordOb).forEach(function (key, _index) {
+    //             const discordChannel = discordOb[key];
+    //             discordChannel.roles.forEach((item) => {
+    //                 if (item.name !== '@everyone' && item.name !== 'LomadsTestBot' && item.name !== 'Lomads' && (temp.some((m) => m.title.toLowerCase() === item.id.toLowerCase()) === false)) {
+    //                     temp.push({ title: item.id, value: item.name, roleColor: item?.roleColor });
+    //                 }
+    //             })
+    //         });
+    //     }
+    //     setRoles(temp);
+    // }, [DAO])
 
     const all_roles = useMemo(() => {
         let roles = [];
@@ -236,11 +237,11 @@ const ProjectMembers = ({ toggleEditMember }) => {
                                                     <div className='roles-li'>
                                                         <div
                                                             className='roles-pill'
-                                                            style={{ backgroundColor: '#d5d5d550' }}
+                                                            style={index === 0 ? { background: 'rgba(146, 225, 168, 0.3)' } : index === 1 ? { background: 'rgba(137,179,229,0.3)' } : index === 2 ? { background: 'rgba(234,100,71,0.3)' } : { background: 'rgba(146, 225, 168, 0.3)' }}
                                                         >
                                                             <div
                                                                 className='roles-circle'
-                                                                style={{ backgroundColor: '#d5d5d5' }}
+                                                                style={index === 0 ? { background: 'rgba(146, 225, 168, 1)' } : index === 1 ? { background: 'rgba(137,179,229,1)' } : index === 2 ? { background: 'rgba(234,100,71,1)' } : { background: 'rgba(146, 225, 168, 1)' }}
                                                             ></div>
                                                             <span>{_get(transformRole(key), 'label')}</span>
                                                         </div>
@@ -274,11 +275,11 @@ const ProjectMembers = ({ toggleEditMember }) => {
                                                             <div className='roles-li'>
                                                                 <div
                                                                     className='roles-pill'
-                                                                    style={discord_value.color ? { background: `${discord_value.color}50` } : { background: `#d5d5d550` }}
+                                                                    style={{ background: `${_get(discord_value, 'roleColor', '#99aab5')}50` }}
                                                                 >
                                                                     <div
                                                                         className='roles-circle'
-                                                                        style={discord_value.color ? { background: `${discord_value.color}` } : { background: `#d5d5d5` }}
+                                                                        style={{ background: _get(discord_value, 'roleColor', '#99aab5') }}
                                                                     ></div>
                                                                     <span>{discord_value.name}</span>
                                                                 </div>
