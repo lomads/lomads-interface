@@ -34,7 +34,10 @@ const SelectRoles = ({ toggleSelect, validRoles, handleValidRoles }) => {
     return (
         <div className="selectRoles-container">
             <div className='selectRoles-header'>
-                <span>Select Roles</span>
+                <h1>Select Roles</h1>
+            </div>
+            <div className='selectRoles-header'>
+                <span>Organisation Roles</span>
             </div>
 
             {

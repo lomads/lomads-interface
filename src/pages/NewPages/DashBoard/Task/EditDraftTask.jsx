@@ -60,8 +60,8 @@ const EditDraftTask = ({ close, task, daoURL }) => {
     const [projectId, setProjectId] = useState(task.project?._id);
     const [subLink, setSubLink] = useState(_get(task, 'submissionLink', ''));
     const [reviewer, setReviewer] = useState(null);
-    const [currency, setCurrency] = useState({ currency: task.compensation.currency });
-    const [amount, setAmount] = useState(task.compensation.amount);
+    const [currency, setCurrency] = useState({ currency: task.compensation ? task.compensation.currency : null });
+    const [amount, setAmount] = useState(task.compensation ? task.compensation.amount : 0);
     const [safeTokens, setSafeTokens] = useState([]);
     const [showSuccess, setShowSuccess] = useState(false);
 
@@ -186,13 +186,13 @@ const EditDraftTask = ({ close, task, daoURL }) => {
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
             symbol = _get(symbol, 'token.symbol', null)
             if (!symbol)
-                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ||  currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
+                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
 
             let tsk = {};
             tsk.name = name;
             tsk.description = description;
             tsk.applicant = selectedUser;
-            tsk.projectId = projectId;;
+            tsk.projectId = projectId;
             tsk.discussionChannel = tempLink;
             tsk.deadline = deadline;
             tsk.submissionLink = tempSub ? tempSub : '';
@@ -230,12 +230,12 @@ const EditDraftTask = ({ close, task, daoURL }) => {
         let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
         symbol = _get(symbol, 'token.symbol', 'SWEAT')
         if (!symbol)
-            symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ||  currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
+            symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
         let tsk = {};
         tsk.name = name;
         tsk.description = description;
         tsk.applicant = selectedUser;
-        tsk.projectId = projectId;;
+        tsk.projectId = projectId;
         tsk.discussionChannel = tempLink;
         tsk.deadline = deadline;
         tsk.submissionLink = tempSub ? tempSub : '';

@@ -59,6 +59,15 @@ const ProjectMembers = ({ toggleEditMember }) => {
         setRoles(temp);
     }, [DAO])
 
+    const all_roles = useMemo(() => {
+        let roles = [];
+        Object.keys(_get(DAO, 'discord', {})).map((server) => {
+            const r = DAO.discord[server].roles
+            roles = roles.concat(r);
+        })
+        return roles.filter(r => r.name !== "@everyone" && r.name !== 'Lomads' && r.name !== 'LomadsTestBot');
+    }, [DAO.discord])
+
     // runs after deleting selected members from the project
     useEffect(() => {
         if (editProjectMemberLoading === false) {
@@ -210,6 +219,90 @@ const ProjectMembers = ({ toggleEditMember }) => {
                         }
 
                         {
+                            toggle && selectType === 'Roles'
+                            &&
+                            <>
+                                <div className='project-members'>
+                                    <h1>Organisation Roles</h1>
+                                    <div className="member-list">
+                                        {
+                                            Object.keys(_get(DAO, 'terminologies.roles', {})).map((key, index) => {
+                                                return (
+                                                    <div className='roles-li'>
+                                                        <div
+                                                            className='roles-pill'
+                                                            style={{ backgroundColor: '#d5d5d550' }}
+                                                        >
+                                                            <div
+                                                                className='roles-circle'
+                                                                style={{ backgroundColor: '#d5d5d5' }}
+                                                            ></div>
+                                                            <span>{_get(transformRole(key), 'label')}</span>
+                                                        </div>
+                                                        <div className='checkbox' onClick={() => handleAddRoles(key)}>
+                                                            {
+                                                                !(selectedRoles.some((m) => m.toLowerCase() === key.toLowerCase()) === false)
+                                                                    ?
+                                                                    <div className="active-box">
+                                                                        <BsCheck2 color="#FFF" />
+                                                                    </div>
+                                                                    :
+                                                                    <div className="inactive-box"></div>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                )
+                                            })
+                                        }
+                                    </div>
+                                </div>
+
+                                {
+                                    all_roles && all_roles.length > 0
+                                        ?
+                                        <div className='project-members' style={{ marginBottom: '100px' }}>
+                                            <h1>Discord Roles</h1>
+                                            <div className="member-list">
+                                                {
+                                                    all_roles.map((discord_value, index) => {
+                                                        return (
+                                                            <div className='roles-li'>
+                                                                <div
+                                                                    className='roles-pill'
+                                                                    style={discord_value.color ? { background: `${discord_value.color}50` } : { background: `#d5d5d550` }}
+                                                                >
+                                                                    <div
+                                                                        className='roles-circle'
+                                                                        style={discord_value.color ? { background: `${discord_value.color}` } : { background: `#d5d5d5` }}
+                                                                    ></div>
+                                                                    <span>{discord_value.name}</span>
+                                                                </div>
+                                                                <div className='checkbox' onClick={() => handleAddRoles(discord_value.id)}>
+                                                                    {
+                                                                        !(selectedRoles.some((m) => m.toLowerCase() === discord_value.id.toLowerCase()) === false)
+                                                                            ?
+                                                                            <div className="active-box">
+                                                                                <BsCheck2 color="#FFF" />
+                                                                            </div>
+                                                                            :
+                                                                            <div className="inactive-box"></div>
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
+                                            </div>
+                                        </div>
+                                        :
+                                        null
+                                }
+                            </>
+                        }
+
+
+                        {/* 
+                        {
                             toggle && selectType === 'Roles' && roles.length > 0
                             &&
                             <div className='project-members'>
@@ -240,13 +333,6 @@ const ProjectMembers = ({ toggleEditMember }) => {
                                                                     <div className="inactive-box"></div>
                                                             }
                                                         </div>
-                                                        {/* {
-                                                            !(selectedRoles.some((m) => m.toLowerCase() === item.title.toLowerCase()) === false)
-                                                                ?
-                                                                <input type="checkbox" onChange={() => handleAddRoles(item.title)} checked />
-                                                                :
-                                                                <input type="checkbox" onChange={() => handleAddRoles(item.title)} />
-                                                        } */}
                                                     </div>
                                                 </>
 
@@ -255,24 +341,7 @@ const ProjectMembers = ({ toggleEditMember }) => {
                                     }
                                 </div>
                             </div>
-                        }
-
-                        {/* {
-                        _uniqBy(Project?.members, '_id').map((item, index) => (
-                            <div onClick={() => handleAddMemberDelete(item._id)} className="editMember-row" key={index}>
-                                <div>
-                                    <img src={memberIcon} alt="memberIcon" />
-                                    <p>{item.name}</p>
-                                </div>
-                                <span>{item.wallet.slice(0, 6) + "..." + item.wallet.slice(-4)}</span>
-                                <input
-                                    type='checkbox'
-                                    onChange={() => handleAddMemberDelete(item._id)}
-                                    checked={!(deleteMembers.some((m) => m === item._id) === false)}
-                                />
-                            </div>
-                        ))
-                    } */}
+                        } */}
                     </div>
                 </div>
                 <div className="editMember-footer">

@@ -170,29 +170,29 @@ const TaskDetails = () => {
         return false;
     }, [account, DAO, Task]);
 
-        const amIEligible_discord=useMemo(()=>{
+    const amIEligible_discord = useMemo(() => {
         if (DAO && Task) {
             let current_user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
-            console.log('currentuser',current_user);
-            let reurntype_function=false;
-            if(current_user.discordRoles){
+            console.log('currentuser', current_user);
+            let reurntype_function = false;
+            if (current_user.discordRoles) {
 
 
-                Task?.validRoles.map(channelid=>{
-                    console.log('task chanellid',channelid);
+                Task?.validRoles.map(channelid => {
+                    console.log('task chanellid', channelid);
 
 
-                    Object.keys(current_user.discordRoles).forEach(function(key, index) {
+                    Object.keys(current_user.discordRoles).forEach(function (key, index) {
                         console.log(current_user.discordRoles[key]);
-                        if(current_user.discordRoles[key].includes(channelid)){
+                        if (current_user.discordRoles[key].includes(channelid)) {
                             console.log('mathched');
-                            reurntype_function=true;
+                            reurntype_function = true;
                             return reurntype_function;
 
-                            }else{
+                        } else {
 
                             console.log('not mathched');
-                            }
+                        }
                     });
 
 
@@ -204,12 +204,12 @@ const TaskDetails = () => {
         }
 
 
-        }, [account, DAO, Task]);
+    }, [account, DAO, Task]);
 
     const amICreator = useMemo(() => {
         if (DAO && Task) {
             let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
-            if (user) {
+            if (user && Task.reviewer) {
                 if (user.member._id === Task.reviewer._id) {
                     return true;
                 }
@@ -352,7 +352,7 @@ const TaskDetails = () => {
                                             </button>
                                             <img src={iconSvg} alt="frame-icon" />
                                             <h1>Close {Task?.name}</h1>
-                                            <p>This action <span>is irreversible</span> for now.<br />You will find closed  { transformTask().labelPlural } in the archives.</p>
+                                            <p>This action <span>is irreversible</span> for now.<br />You will find closed  {transformTask().labelPlural} in the archives.</p>
                                             <div>
                                                 <button onClick={() => setClosePrompt(false)}>NO</button>
                                                 <button onClick={handleCloseTask}>YES</button>
@@ -407,7 +407,9 @@ const TaskDetails = () => {
                                             <IoIosArrowBack size={20} color="#C94B32" />
                                         </div>
                                         <div className="right">
-                                            <h1>{Task.name}</h1>
+                                            <div className="menu">
+                                                <h1>{Task.name}</h1>
+                                            </div>
                                             {/* <p>Single contributor : {Task.isSingleContributor ? 'true' : 'false'}</p> */}
                                             <div className="menu">
 
@@ -684,7 +686,7 @@ const TaskDetails = () => {
 
                                         <div>
                                             {
-                                                Task.compensation.amount !== 0
+                                                Task.compensation && Task.compensation.amount !== 0
 
                                                     ?
                                                     <>
@@ -704,7 +706,9 @@ const TaskDetails = () => {
                                             <div>
                                                 <span>Deadline</span>
                                                 <img src={calendarIcon} alt="calendarIcon" />
-                                                <span>{moment(Task.deadline).format('L')}</span>
+                                                {
+                                                    Task.deadline ? <span>{moment(Task.deadline).format('L')}</span> : <span>NA</span>
+                                                }
                                             </div>
                                         </div>
 
@@ -721,7 +725,7 @@ const TaskDetails = () => {
                                 </div>
                                 <div className="body-right">
 
-                                    {/* if task status is open then users can apply */console.log('amIEligible_discord',amIEligible_discord)}
+                                    {/* if task status is open then users can apply */console.log('amIEligible_discord', amIEligible_discord)}
                                     {
                                         Task.taskStatus === 'open' && !Task.archivedAt && !Task.deletedAt
                                             ?
@@ -792,14 +796,14 @@ const TaskDetails = () => {
                                                                     :
                                                                     // Not applied yet --- check if valid roles condition exists
                                                                     <>
-                                                                        { 
-                                                                            
+                                                                        {
+
                                                                             Task.validRoles.length > 0 && !Task.archivedAt && !Task.deletedAt
                                                                                 ?
                                                                                 <>
-                                                                                    { 
+                                                                                    {
                                                                                         // check if current user has access according to validRoles
-                                                                                        amIEligible||amIEligible_discord
+                                                                                        amIEligible || amIEligible_discord
                                                                                             ?
                                                                                             <>
                                                                                                 {
@@ -808,13 +812,13 @@ const TaskDetails = () => {
                                                                                                         // user need to apply --- single contributor
                                                                                                         <>
 
-                                                                                                            <h1>This  { transformTask().label.toLowerCase() }<br />fits your role.</h1>
+                                                                                                            <h1>This  {transformTask().label.toLowerCase()}<br />fits your role.</h1>
                                                                                                             {moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt ? null : <button onClick={() => setOpenApply(true)}>APPLY</button>}
                                                                                                         </>
                                                                                                         :
                                                                                                         // mulitple contributor
                                                                                                         <>
-                                                                                                            <h1>This  { transformTask().label.toLowerCase() }<br />fits your role.</h1>
+                                                                                                            <h1>This  {transformTask().label.toLowerCase()}<br />fits your role.</h1>
                                                                                                             {!Task.draftedAt && <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>}
 
                                                                                                         </>
@@ -823,7 +827,7 @@ const TaskDetails = () => {
                                                                                             </>
                                                                                             :
                                                                                             <>
-                                                                                                <h1>This  { transformTask().label.toLowerCase() } does not<br />fits your role.</h1>
+                                                                                                <h1>This  {transformTask().label.toLowerCase()} does not<br />fits your role.</h1>
                                                                                             </>
                                                                                     }
                                                                                 </>
@@ -835,7 +839,7 @@ const TaskDetails = () => {
                                                                                             // user need to apply --- single contributor
                                                                                             <>
 
-                                                                                                <h1>This { transformTask().label.toLowerCase() } needs a<br />contributor.</h1>
+                                                                                                <h1>This {transformTask().label.toLowerCase()} needs a<br />contributor.</h1>
                                                                                                 {moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt ? null : <button onClick={() => setOpenApply(true)}>APPLY</button>}
 
                                                                                             </>
@@ -911,7 +915,7 @@ const TaskDetails = () => {
                                                         :
                                                         // for others
                                                         <>
-                                                            <h1>{ transformTask().label } is submitted</h1>
+                                                            <h1>{transformTask().label} is submitted</h1>
                                                             {amICreator && !Task.draftedAt && <button onClick={() => setOpenTaskReview(true)}>CHECK</button>}
                                                         </>
                                                 }
@@ -934,7 +938,7 @@ const TaskDetails = () => {
                                                         :
                                                         // for others
                                                         <>
-                                                            <h1>{ transformTask().label } has been<br /> {Task.taskStatus}</h1>
+                                                            <h1>{transformTask().label} has been<br /> {Task.taskStatus}</h1>
                                                         </>
                                                 }
                                             </>
@@ -985,7 +989,7 @@ const TaskDetails = () => {
                                 <div>
                                     <span>Reviewer</span>
                                     <img src={memberIcon} alt="member-icon" />
-                                    <p>{Task.reviewer.name}</p>
+                                    {Task.reviewer ? <p>{Task.reviewer.name}</p> : <p>NA</p>}
                                 </div>
                                 {!(Task.isSingleContributor === false && Task.contributionType === 'open') &&
                                     <div>

@@ -208,11 +208,14 @@
     /* Grey */
     color: #76808D;
     margin: 0;
+    /* width: 50%; */
 }
 
 .taskDetails-container .info .taskDetails-top .taskDetails-header .header-name .right .menu {
+    width: 50%;
     display: flex;
     align-items: center;
+    /* background-color: red; */
 }
 
 .taskDetails-container .info .taskDetails-top .taskDetails-header .header-name .right .menu div {

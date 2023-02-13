@@ -89,15 +89,28 @@
 
 .editMemberOverlay .editMemberContainer .editMember-body .project-members {
     width: 350px;
-    background: #FFFFFF;
     border-radius: 5px;
-    padding: 26px 22px;
+    /* padding: 26px 22px; */
     position: relative;
+    margin-top: 20px;
+}
+
+.editMemberOverlay .editMemberContainer .editMember-body .project-members h1 {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
+    /* identical to box height, or 112% */
+    letter-spacing: -0.011em;
+
+    /* Grey */
+    color: #76808D;
+    margin-bottom: 20px;
 }
 
 .editMemberOverlay .editMemberContainer .editMember-body .project-members .member-list {
     width: 100%;
-    margin-bottom: 100px;
+    /* margin-bottom: 100px; */
 }
 
 
