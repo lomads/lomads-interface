@@ -24,6 +24,7 @@ import ArchiveTasks from "pages/NewPages/ArchiveTasks";
 import ArchiveProjectTasks from "pages/NewPages/ArchiveProjectTasks";
 import AllProjectTasks from "pages/NewPages/AllProjectTasks";
 import AllProjects from "pages/NewPages/AllProjects";
+import ArchiveKRA from "pages/NewPages/ArchiveKRA";
 
 export default [
     {
@@ -93,6 +94,10 @@ export default [
     {
         path: '/:daoURL/project/:projectId',
         component: ProjectDetails
+    },
+    {
+        path: '/:daoURL/project/:projectId/archiveKra',
+        component: ArchiveKRA
     },
     {
         path: '/:daoURL/projects',

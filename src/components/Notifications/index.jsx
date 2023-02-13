@@ -4,6 +4,7 @@ import { get as _get } from 'lodash';
 import PROJECT_ICON from 'assets/svg/project-icon.svg'
 import TASK_ICON from 'assets/svg/taskicon.svg'
 import USER_ICON from 'assets/svg/user-icon.svg'
+import TRANSACTION_ICON from "assets/svg/sendTokenOutline.svg";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from 'state/hooks';
 import axiosHttp from 'api'
@@ -96,6 +97,8 @@ export default () => {
             if(notification.type.indexOf('member') > -1 && userIcon)
                 return USER_ICON
             return PROJECT_ICON
+        }  else if(notification.model === 'Transaction'){
+            return TRANSACTION_ICON
         } else {
             if(userIcon)
                 return USER_ICON

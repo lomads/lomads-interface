@@ -16,7 +16,7 @@ import POLYGON_LOGO from 'assets/images/polygon.png';
 import { resetUpdateContractLoading } from "state/dashboard/reducer";
 
 
-const PassTokenModal = ({ toggleModal, togglePassToken }) => {
+const PassTokenModal = ({ togglePassToken }) => {
 
 	const dispatch = useAppDispatch()
 	const { provider, account, chainId, connector } = useWeb3React();
@@ -28,7 +28,7 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
 	const [contactDetail, setContactDetail] = useState(_get(DAO?.sbt, 'contactDetail', []));
 
 	let toggleCreatePassTokenModal = () => {
-		setOpenCreatePassToken(!openCreatePassToken);
+		setOpenCreatePassToken(prev => !prev);
 	};
 
 	let changeContactDetails = (contact) => {
@@ -44,7 +44,6 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
 	useEffect(() => {
 		if (updateContractLoading === false) {
 			dispatch(resetUpdateContractLoading())
-			toggleModal();
 			togglePassToken();
 		}
 	}, [updateContractLoading])
@@ -65,7 +64,6 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
 			<div className="sidebarModal">
 				<div
 					onClick={() => {
-						toggleModal();
 						togglePassToken();
 					}}
 					className="overlay"
@@ -87,7 +85,6 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
 							width={37}
 							className="sideModalCloseButton"
 							onClick={() => {
-								toggleModal();
 								togglePassToken();
 							}}
 						/>
@@ -248,7 +245,6 @@ const PassTokenModal = ({ toggleModal, togglePassToken }) => {
 								style={{ marginRight: 6 }}
 								variant="outline"
 								onClick={() => {
-									toggleModal();
 									togglePassToken();
 								}}
 							>

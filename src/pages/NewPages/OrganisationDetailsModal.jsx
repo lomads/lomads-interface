@@ -15,7 +15,6 @@ import AddDiscordLink from 'components/AddDiscordLink';
 import { setDAO } from "state/dashboard/reducer";
 
 const OrganisationDetails = ({
-	toggleModal,
 	toggleOrganisationDetailsModal,
 }) => {
 
@@ -33,6 +32,8 @@ const OrganisationDetails = ({
 	}, [DAO])
 
 	const addLink = useCallback(() => {
+		if(!linkTitle || !link || (linkTitle && linkTitle === '') || (link && link === ''))
+			return;
 		let tempLink = link
 		if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
 			tempLink = 'https://' + link;
@@ -40,13 +41,12 @@ const OrganisationDetails = ({
 		setDaoLinks([...daoLinks, { title: linkTitle, link: tempLink }]);
 		setLinkTitle("")
 		setLink("")
-	},[link])
+	}, [link, linkTitle])
 
 	const saveChanges = () => {
 		console.log(description)
 		dispatch(updateDao({ url: DAO?.url, payload: { name, description } }))
 		dispatch(updateDaoLinks({ url: DAO?.url, payload: { links: daoLinks } }))
-		toggleModal();
 		toggleOrganisationDetailsModal();
 	}
 
@@ -79,10 +79,10 @@ const OrganisationDetails = ({
 
 	const handleOnServerAdded = serverId => {
 		axiosHttp.post(`discord/guild/${serverId}/sync-roles`, { daoId: _get(DAO, '_id') })
-		.then(res => {
-			addLink()
-			//dispatch(setDAO(res.data))
-		})
+			.then(res => {
+				addLink()
+				//dispatch(setDAO(res.data))
+			})
 	}
 
 	return (
@@ -90,7 +90,6 @@ const OrganisationDetails = ({
 			<div className="sidebarModal">
 				<div
 					onClick={() => {
-						toggleModal();
 						toggleOrganisationDetailsModal();
 					}}
 					className="overlay"
@@ -111,7 +110,9 @@ const OrganisationDetails = ({
 							height={37}
 							width={37}
 							className="sideModalCloseButton"
-							onClick={toggleModal}
+							onClick={() => {
+								toggleOrganisationDetailsModal();
+							}}
 						/>
 					</div>
 					<div className="MainComponent">
@@ -194,77 +195,83 @@ const OrganisationDetails = ({
 								/>
 								<Input value={link} placeholder="link" variant="filled" width="50%" onChange={(evt) => setLink(evt.target.value)} />
 								{/* <IconButton icon={<AddIcon />} /> */}
-								{ link && link.indexOf('discord.') > -1 ?
-								<AddDiscordLink
-								renderButton={
+								{link && link.indexOf('discord.') > -1 ?
+									<AddDiscordLink
+										renderButton={
+											<IconButton
+												className="addButton"
+												Icon={<AiOutlinePlus style={{ height: 30, width: 30 }} />}
+												height={40}
+												width={40}
+												bgColor={
+													(linkTitle.length > 0 && isValidUrl(link))
+														? "#C94B32"
+														: "rgba(27, 43, 65, 0.2)"
+												}
+											/>
+										}
+										onGuildCreateSuccess={handleOnServerAdded} accessControl={true} link={link} /> :
 									<IconButton
-									className="addButton"
-									Icon={<AiOutlinePlus style={{ height: 30, width: 30 }} />}
-									height={40}
-									width={40}
-									bgColor={
-										(linkTitle.length > 0 && isValidUrl(link))
-											? "#C94B32"
-											: "rgba(27, 43, 65, 0.2)"
-									}
-								/>
-								}
-								onGuildCreateSuccess={handleOnServerAdded} accessControl={true} link={link} /> : 
-								<IconButton
-									className="addButton"
-									Icon={<AiOutlinePlus style={{ height: 30, width: 30 }} />}
-									height={40}
-									width={40}
-									onClick={addLink}
-									bgColor={
-										(linkTitle.length > 0 && isValidUrl(link))
-											? "#C94B32"
-											: "rgba(27, 43, 65, 0.2)"
-									}
-								/>
+										className="addButton"
+										Icon={<AiOutlinePlus style={{ height: 30, width: 30 }} />}
+										height={40}
+										width={40}
+										onClick={() => addLink()}
+										bgColor={
+											(linkTitle.length > 0 && isValidUrl(link))
+												? "#C94B32"
+												: "rgba(27, 43, 65, 0.2)"
+										}
+									/>
 								}
 							</div>
-							{ daoLinks.length > 0 &&
-							<div
-								style={{
-									marginTop: "9px",
-									padding: "9px 20px 9px 20px",
-									backgroundColor: "#edf2f7",
-									color: "#718096",
-									borderRadius: "5px",
-									justifyContent: 'space-between'
-								}}>
-								{daoLinks.map((item, index) => {
-									return (
-										<div
-											style={{
-												display: "flex",
-												flexDirection: "row",
-												marginTop: "9px",
-												color: "#718096",
-												justifyContent: 'space-between'
-											}}>
+							{daoLinks.length > 0 &&
+								<div
+									style={{
+										marginTop: "9px",
+										padding: "9px 20px 9px 20px",
+										backgroundColor: "#edf2f7",
+										color: "#718096",
+										borderRadius: "5px",
+										justifyContent: 'space-between'
+									}}>
+									{daoLinks.map((item, index) => {
+										return (
 											<div
 												style={{
 													display: "flex",
-													flexDirection: "row"
-												}}
-											>
-												<p width="50%">{item.title.length > 7 ? item.title.substring(0, 7) + "..." : item.title}</p>
-												<p width="50%" style={{ paddingLeft: 8 }}>{item.link.length > 6 ? item.link.substring(0, 40) + "..." : item.link}</p>
+													flexDirection: "row",
+													marginTop: "9px",
+													color: "#718096",
+													justifyContent: 'space-between'
+												}}>
+												<div
+													style={{
+														display: "flex",
+														flexDirection: "row"
+													}}
+												>
+													<p width="50%">{item.title.length > 7 ? item.title.substring(0, 7) + "..." : item.title}</p>
+													<p width="50%" style={{ 
+														paddingLeft: 8,
+														width: 250,
+														whiteSpace: 'nowrap',
+														overflow: 'hidden',
+														textOverflow: 'ellipsis'
+													 }}>{item.link}</p>
+												</div>
+												<div
+													className="deleteButton"
+													onClick={() => {
+														deleteLink(item);
+													}}
+												>
+													<AiOutlineClose style={{ height: 15, width: 15 }} />
+												</div>
 											</div>
-											<div
-												className="deleteButton"
-												onClick={() => {
-													deleteLink(item);
-												}}
-											>
-												<AiOutlineClose style={{ height: 15, width: 15 }} />
-											</div>
-										</div>
-									)
-								})}
-							</div> }
+										)
+									})}
+								</div>}
 						</div>
 
 						{/* //! FOOTER */}
@@ -274,7 +281,6 @@ const OrganisationDetails = ({
 								style={{ marginRight: 8 }}
 								id="button-cancel"
 								onClick={() => {
-									toggleModal();
 									toggleOrganisationDetailsModal();
 								}}
 							>

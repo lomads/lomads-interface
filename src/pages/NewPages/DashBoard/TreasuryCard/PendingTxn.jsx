@@ -32,16 +32,22 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
     const {safeTokens} = useSafeTokens(safeAddress)
     //const threshold = useAppSelector((state) => state.flow.safeThreshold);
 
-    const { amount, tokenSymbol, recipient, reason, decimal, isAllowanceTransaction } = useMemo(() => {
+    const { amount, tokenSymbol, recipient, reason, decimal, isAllowanceTransaction, isOwnerModificaitonTransaction } = useMemo(() => {
         const tokendata = _find(tokens, t => t.tokenAddress === _get(transaction, 'to', ''))
         const decimal = _get(tokendata, 'token.decimals', _get(transaction, 'token.decimals', 18))
         let amount = _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'value' || p.name === '_value'), 'value', _get(transaction, 'value', 0))
         let recipient = _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'to' || p.name === '_to'), 'value', _get(transaction, 'to', ''))
         let tokenSymbol = undefined;
+
         let isAllowanceTransaction = false;
+        let isOwnerModificaitonTransaction = false;
+
         const setAllowance =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => _get(vd, 'dataDecoded.method', '')=== "setAllowance")
         if(setAllowance)
             isAllowanceTransaction = true;
+        const ownerModification =  _get(transaction, 'dataDecoded.method', '') === "addOwnerWithThreshold" || _get(transaction, 'dataDecoded.method', '') === "removeOwner" || _get(transaction, 'dataDecoded.method', '') === "changeThreshold" 
+        if(ownerModification)
+            isOwnerModificaitonTransaction = true;
         if(transaction?.dataDecoded?.method === 'multiSend' && transaction?.dataDecoded?.parameters[0]?.name === 'transactions' && isAllowanceTransaction) {
             const addDelegate =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => _get(vd, 'dataDecoded.method', '') === "addDelegate")
             recipient = _get(addDelegate, 'dataDecoded.parameters[0].value', '')
@@ -54,6 +60,14 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
                     amount = am * 10 ** _get(transaction, 'token.decimals', 18);
             }
         }
+
+        if(isOwnerModificaitonTransaction) {
+            if(_get(transaction, 'dataDecoded.method', '') === "removeOwner")
+                recipient = _get(transaction, 'dataDecoded.parameters[1].value', '')
+            else if(_get(transaction, 'dataDecoded.method', '') === "addOwnerWithThreshold")
+                recipient = _get(transaction, 'dataDecoded.parameters[0].value', '')
+        }
+
         //let trans = _find(_get(DAO, 'safe.transactions', []), t => t.safeTxHash === transaction.safeTxHash)
         let reason = null
         if(labels && labels.length > 0) {
@@ -64,7 +78,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
         //     reason = _get(_find(trans.data, u => u.recipient.toLowerCase() === recipient.toLowerCase()), 'reason', null)
         // }
         console.log('reason', reason)
-        return { amount, tokenSymbol, recipient, reason, decimal, isAllowanceTransaction }
+        return { amount, tokenSymbol, recipient, reason, decimal, isAllowanceTransaction, isOwnerModificaitonTransaction }
     }, [transaction, labels, tokens])
 
     const { confirmReached, hasMyConfirmVote, rejectReached, hasMyRejectVote } = useMemo(() => {
@@ -111,23 +125,29 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
 
     const renderItem = (item, index) => {
         const mulAmount = _get(item, 'dataDecoded.parameters[1].value', _get(item, 'value', 0))
-        const mulRecipient = _get(item, 'dataDecoded.parameters[0].value', _get(item, 'to', 0))
-        console.log("mulRecipient", mulRecipient)
+        let mulRecipient = _get(item, 'dataDecoded.parameters[0].value', _get(item, 'to', 0))
+
         const isLast = _get(transaction, 'dataDecoded.parameters[0].valueDecoded', []).length - 1 === index;
         const muldecimal = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.decimals', _get(transaction, 'token.decimals', 18))
         const token = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
         //let trans = _find(_get(DAO, 'safe.transactions', []), t => t.safeTxHash === transaction.safeTxHash)
+
+        if(_get(item, 'dataDecoded.method', '') === 'removeOwner')
+            mulRecipient = _get(item, 'dataDecoded.parameters[1].value', _get(item, 'to', 0))
+
         let mulReason = '';
         if(labels && labels.length > 0) {
             mulReason = _get(_find(labels, l => l.recipient && l.safeTxHash && (_get(l, "recipient", "").toLowerCase() === mulRecipient.toLowerCase()) && (l.safeTxHash.toLowerCase() === transaction.safeTxHash.toLowerCase())), "label", null)
         }
+        const isOwnerModificaitonTransaction =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => (_get(vd, 'dataDecoded.method', '') === "addOwnerWithThreshold") || _get(vd, 'dataDecoded.method', '') === "removeOwner" || _get(vd, 'dataDecoded.method', '') === "changeThreshold" )
+
         return (
             <>
                 <div className="transactionRow">
                     <div className="coinText">
                         <img src={sendTokenOutline} alt="" />
                         <div className="dashboardTextBold">
-                            {`${mulAmount / 10 ** muldecimal} ${token}`}
+                            { isOwnerModificaitonTransaction ? `-` : `${mulAmount / 10 ** muldecimal} ${token}`}
                         </div>
                     </div>
                     <div className="transactionName">
@@ -202,14 +222,14 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
                         {confirmReached &&
                             <Tooltip placement='top' isDisabled={!owner || executeFirst === transaction.nonce || transaction.offChain} label={`Transaction with nonce ${executeFirst} needs to be executed first`}>
                                 <ToolTopContainer>
-                                    <SimpleLoadButton condition={executeTxLoading === _get(transaction, 'safeTxHash')} disabled={(!transaction.offChain || !owner) && (!owner || executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading)} onClick={() => executeTransactions(transaction)} width={"100%"} height={30} title="EXECUTE" bgColor={(transaction.offChain && owner) || (owner && executeFirst === transaction.nonce) ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
+                                    <SimpleLoadButton condition={executeTxLoading === _get(transaction, 'safeTxHash')} disabled={(!transaction.offChain || !owner) && (!owner || executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading)} onClick={() => executeTransactions(transaction, false, isOwnerModificaitonTransaction, isOwnerModificaitonTransaction ? null : mulAmount / 10 ** muldecimal)} width={"100%"} height={30} title="EXECUTE" bgColor={(transaction.offChain && owner) || (owner && executeFirst === transaction.nonce) ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
                                 </ToolTopContainer>
                             </Tooltip>
                         }
                         {rejectReached &&
                             <Tooltip placement='top' isDisabled={!owner || executeFirst === transaction.nonce || transaction.offChain} label={`Transaction with nonce ${executeFirst} needs to be executed first`}>
                                 <ToolTopContainer>
-                                    <SimpleLoadButton condition={executeTxLoading === _get(transaction, 'rejectedTxn.safeTxHash', _get(transaction, 'safeTxHash', ''))} disabled={ (!transaction.offChain || !owner) && ( !owner || executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading )} onClick={() => executeTransactions(transaction, true)} width={"100%"} height={30} title="REJECT" bgColor={transaction.offChain || (owner && executeFirst === transaction.nonce) ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
+                                    <SimpleLoadButton condition={executeTxLoading === _get(transaction, 'rejectedTxn.safeTxHash', _get(transaction, 'safeTxHash', ''))} disabled={ (!transaction.offChain || !owner) && ( !owner || executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading )} onClick={() => executeTransactions(transaction, true, isOwnerModificaitonTransaction, isOwnerModificaitonTransaction ? null : mulAmount / 10 ** muldecimal)} width={"100%"} height={30} title="REJECT" bgColor={transaction.offChain || (owner && executeFirst === transaction.nonce) ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
                                 </ToolTopContainer>
                             </Tooltip>
                         }
@@ -271,7 +291,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
                         <div className="coinText">
                             <img src={sendTokenOutline} alt="" />
                             <div className="dashboardTextBold">
-                                {`${amount / 10 ** decimal} ${tokenSymbol ? tokenSymbol : _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))}`}
+                                {isOwnerModificaitonTransaction ? `-` : `${amount / 10 ** decimal} ${tokenSymbol ? tokenSymbol : _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))}`}
                             </div>
                         </div>
                         <div className="transactionName">
@@ -344,14 +364,14 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
                             {confirmReached &&
                                 <Tooltip placement='top' isDisabled={!owner || executeFirst === transaction.nonce || transaction.offChain} label={`Transaction with nonce ${executeFirst} needs to be executed first`}>
                                     <ToolTopContainer>
-                                        <SimpleLoadButton condition={executeTxLoading == _get(transaction, 'safeTxHash')} disabled={!transaction.offChain && (!owner || executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading)} onClick={() => executeTransactions(transaction)} width={"100%"} height={30} title="EXECUTE" bgColor={(transaction.offChain && owner) || (owner && executeFirst === transaction.nonce) ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
+                                        <SimpleLoadButton condition={executeTxLoading == _get(transaction, 'safeTxHash')} disabled={!transaction.offChain && (!owner || executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading)} onClick={() => executeTransactions(transaction, false, isOwnerModificaitonTransaction, amount / 10 ** decimal, isAllowanceTransaction)} width={"100%"} height={30} title="EXECUTE" bgColor={(transaction.offChain && owner) || (owner && executeFirst === transaction.nonce) ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
                                     </ToolTopContainer>
                                 </Tooltip>
                             }
                             {rejectReached &&
                             <Tooltip placement='top' isDisabled={!owner || executeFirst === transaction.nonce || transaction.offChain} label={`Transaction with nonce ${executeFirst} needs to be executed first`}>
                                 <ToolTopContainer>
-                                    <SimpleLoadButton  condition={executeTxLoading === _get(transaction, 'rejectedTxn.safeTxHash', _get(transaction, 'safeTxHash', ''))} disabled={!transaction.offChain && (!owner || executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading)} onClick={() => executeTransactions(transaction, true)} width={"100%"} height={30} title="REJECT" bgColor={transaction.offChain || (owner && executeFirst === transaction.nonce) ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
+                                    <SimpleLoadButton  condition={executeTxLoading === _get(transaction, 'rejectedTxn.safeTxHash', _get(transaction, 'safeTxHash', ''))} disabled={!transaction.offChain && (!owner || executeFirst !== transaction.nonce || confirmTxLoading || rejectTxLoading || executeTxLoading)} onClick={() => executeTransactions(transaction, true, isOwnerModificaitonTransaction, isOwnerModificaitonTransaction ? null : amount / 10 ** decimal)} width={"100%"} height={30} title="REJECT" bgColor={transaction.offChain || (owner && executeFirst === transaction.nonce) ? "#C94B32" : "rgba(27, 43, 65, 0.2)"} className="button" />
                                 </ToolTopContainer>
                             </Tooltip>
                             }

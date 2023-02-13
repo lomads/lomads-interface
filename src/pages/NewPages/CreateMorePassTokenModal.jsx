@@ -5,14 +5,14 @@ import PT from "../../assets/images/drawer-icons/PT.svg";
 import { Button, Image, Input } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 
-const CreateMorePassTokenModal = ({navFromSetting, toggleModal, toggleCreatePassTokenModal }) => {
+const CreateMorePassTokenModal = ({ navFromSetting, toggleCreatePassTokenModal }) => {
   const navigate = useNavigate();
   return (
     <>
       <div className="sidebarModal">
         <div
           onClick={() => {
-            navFromSetting && toggleModal();
+            //navFromSetting();
             toggleCreatePassTokenModal();
           }}
           className="overlay"
@@ -34,7 +34,7 @@ const CreateMorePassTokenModal = ({navFromSetting, toggleModal, toggleCreatePass
               width={37}
               className="sideModalCloseButton"
               onClick={() => {
-                navFromSetting && toggleModal();
+                //navFromSetting();
                 toggleCreatePassTokenModal();
               }}
             />

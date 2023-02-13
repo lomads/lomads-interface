@@ -48,7 +48,14 @@ const AllTasks = () => {
             let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
             if (user) {
                 if (Task?.validRoles.length > 0) {
-                    let index = Task?.validRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase());
+                    let myDiscordRoles = []
+                    const discRoles = _get(user, 'discordRoles', {})
+                    Object.keys(discRoles).forEach(key => {
+                        myDiscordRoles = [...myDiscordRoles, ...discRoles[key]]
+                    })
+                    console.log("myDiscordRoles", myDiscordRoles)
+                    let index = Task?.validRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase() || myDiscordRoles.indexOf(item) > -1);
+                    console.log("myDiscordRoles", index, Task?.validRoles)
                     return index > -1
                 } else {
                     return true;
@@ -97,7 +104,7 @@ const AllTasks = () => {
             // setManageTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id)));
             // setDraftTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
             // setOtherTasks(_get(DAO, 'tasks', []).filter(task => !amIEligible(task) && (!(task.contributionType === 'open' && !task.isSingleContributor) && !task.deletedAt && !task.archivedAt && !task.draftedAt && task.creator !== user._id && task.reviewer !== user._id && !_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()))));
-            const myTasks = _get(DAO, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) || (task.contributionType === 'open' && !task.isSingleContributor))))
+            const myTasks = _get(DAO, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && amIEligible(task) && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || (task.contributionType === 'open' && !task.isSingleContributor))))
             setMyTasks(_orderBy(myTasks, i => moment(i.deadline).unix(), 'desc'))
             let manageTasks = _get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id));
             manageTasks = manageTasks.map(t => {

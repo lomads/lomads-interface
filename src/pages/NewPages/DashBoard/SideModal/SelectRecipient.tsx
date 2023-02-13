@@ -1,4 +1,5 @@
 import { Checkbox } from "@chakra-ui/react";
+import { get as _get } from 'lodash'
 import React, { useState, useEffect } from "react";
 import SimpleButton from "UIpack/SimpleButton";
 import daoMember2 from "../../../../assets/svg/daoMember2.svg";
@@ -15,11 +16,17 @@ const SelectRecipient = (props: IselectRecipientType) => {
 	const handleCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const checked = event.target.checked;
 		if (checked) {
-			const index = props.totalMembers.findIndex(
+			let index = props.totalMembers.findIndex(
 				(result: InviteGangType) => result.address === event.target.value
 			);
-			const newData: InviteGangType = props.totalMembers[index];
+			let newData: InviteGangType = props.totalMembers[index];
 
+			if(!newData) {
+				index = newMembers.findIndex(
+					(result: InviteGangType) => result.address === event.target.value
+				);
+				newData = newMembers[index];
+			}
 			props.selectedRecipients.current.push(newData);
 		} else {
 			const refIndex = props.selectedRecipients.current.findIndex(
@@ -30,20 +37,23 @@ const SelectRecipient = (props: IselectRecipientType) => {
 		}
 	};
 
+	const [newMembers, setNewMembers] = useState<any>([])
+
 	useEffect(() => {
 		console.log(props.selectedRecipients)
 	}, [])
 
 	const handleSetRecipient = () => {
+		console.log(props.selectedRecipients)
 		props.selectedRecipients.current.forEach(
-			(result: InviteGangType, index: number) => {
+			(result: any, index: number) => {
 				const obj: IsetRecipientType = {
 					amount: "",
 					name: "",
 					recipient: "",
 					reason: "",
 				};
-				obj["name"] = result.name;
+				obj["name"] = _get(result, 'name', '');
 				obj["recipient"] = result.address;
 				props.setRecipient.current.push(obj);
 			}
@@ -105,6 +115,33 @@ const SelectRecipient = (props: IselectRecipientType) => {
 							</div>
 						);
 					})}
+					{newMembers &&
+					newMembers.map((result: any, index: any) => {
+						return (
+							<div className="selectRecipient">
+								<div className="avatarName">
+									<img src={daoMember2} alt={result.address} />
+									<p className="nameText">{result.name}</p>
+								</div>
+								<p className="addressText">
+									{result.address.slice(0, 6) +
+										"..." +
+										result.address.slice(-4)}
+								</p>
+								<Checkbox
+									size="lg"
+									colorScheme="orange"
+									name="owner"
+									defaultChecked={false}
+									disabled={false}
+									value={result.address}
+									onChange={(event) => {
+										handleCheck(event);
+									}}
+								/>
+							</div>
+						);
+					})}
 				</div>
 				<div id="recipientButtonArea">
 					<OutlineButton
@@ -136,6 +173,11 @@ const SelectRecipient = (props: IselectRecipientType) => {
 				<AddRecipient
 					toggleAddNewRecipient={props.toggleAddNewRecipient}
 					isTransactionSendPage={false}
+					onAddRecipient={(recipient:any) => {
+						setNewMembers((prev:any) => {
+							return [...prev, recipient]
+						})
+					}}
 				/>
 			)}
 		</>

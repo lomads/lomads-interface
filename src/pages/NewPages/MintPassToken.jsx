@@ -24,6 +24,7 @@ import { addDaoMember } from 'state/dashboard/actions'
 import axiosHttp from 'api'
 import SideBar from "../NewPages/DashBoard/SideBar";
 import useRole from 'hooks/useRole';
+import useEncryptDecrypt from "hooks/useEncryptDecrypt";
 
 const MintPassToken = () => {
     /// temporary solution until we don't have specific routes for DAO, contract address will be passed into the url 
@@ -42,45 +43,80 @@ const MintPassToken = () => {
     const [discordError, setDiscordError] = useState(false);
     const [emailError, setEmailError] = useState(false);
     const [telegramError, setTelegramError] = useState(false);
+    const [decrypted, setDecrypted] = useState(null);
     const { account, chainId, provider } = useWeb3React();
     const { user, DAO, DAOLoading } = useAppSelector((state) => state.dashboard);
     const { myRole } = useRole(DAO, account)
     const { needWhitelist, isWhitelisted, balanceOf, contractName, currentIndex } = useSBTStats(provider, account, update, contractAddr ? contractAddr : '', chainId);
     const sbtContract = useSBTContract(contractAddr ? contractAddr : null);
+    const { encryptMessage, decryptMessage } = useEncryptDecrypt()
+
 
     const showSideBar = (_choice) => {
-		setShowNavBar(_choice);
-	};
+        setShowNavBar(_choice);
+    };
+
+    // useEffect(() => {
+    //     if (account && chainId && user) {
+    //         handleGetPublicKey();
+    //     }
+    // }, [account, chainId, user]);
+
+    // const handleGetPublicKey = async () => {
+    //     // Key is returned as base64
+    //     const keyB64 = await window.ethereum.request({
+    //         method: 'eth_getEncryptionPublicKey',
+    //         params: [account],
+    //     });
+    //     const publicKey = Buffer.from(keyB64, 'base64');
+    //     setPublicKey(publicKey);
+    // }
 
     useEffect(() => {
-        if(account && chainId)
+        if (account && chainId)
             dispatch(loadDao({ chainId }))
     }, [chainId, account])
 
     useEffect(() => {
-		if(account && chainId && ( !user || ( user && user.wallet.toLowerCase() !== account.toLowerCase() ) )) {
-			dispatch(getCurrentUser({}))
-		}
-	}, [account, chainId, user])
+        if (account && chainId && (!user || (user && user.wallet.toLowerCase() !== account.toLowerCase()))) {
+            dispatch(getCurrentUser({}))
+        }
+    }, [account, chainId, user])
 
     const myMetadata = useMemo(() => {
         return _find(_get(DAO, 'sbt.metadata', []), m => {
             return _find(m.attributes, a => a.value === account)
         })
     }, [DAO?.sbt, account])
-    
-    
+
+
     useEffect(() => {
-        if((!DAO || (DAO && DAO.url !== daoURL)) && !DAOLoading) 
+        if ((!DAO || (DAO && DAO.url !== daoURL)) && !DAOLoading)
             dispatch(getDao(daoURL))
     }, [daoURL, DAO, DAOLoading])
 
     const findTraitValue = useCallback(attr => {
-        if(DAO && DAO.sbt) {
-            if(myMetadata && myMetadata.attributes){
+        if (DAO && DAO.sbt) {
+            if (myMetadata && myMetadata.attributes) {
                 for (let index = 0; index < myMetadata.attributes.length; index++) {
                     const attribute = myMetadata.attributes[index];
-                    if(attr === attribute.trait_type.toLowerCase()) {
+                    if (attr === attribute.trait_type.toLowerCase()) {
+                        if (decrypted)
+                            return decrypted[attr]
+                        //return attribute?.value;
+                    }
+                }
+                return null
+            }
+        }
+    }, [myMetadata, decrypted])
+
+    const getPersonalDetails = useCallback(attr => {
+        if (DAO && DAO.sbt) {
+            if (myMetadata && myMetadata.attributes) {
+                for (let index = 0; index < myMetadata.attributes.length; index++) {
+                    const attribute = myMetadata.attributes[index];
+                    if (attr === attribute.trait_type.toLowerCase()) {
                         return attribute?.value;
                     }
                 }
@@ -147,7 +183,17 @@ const MintPassToken = () => {
         return false
     }, [contractAddr, balanceOf, DAO])
 
-
+    useEffect(() => {
+        console.log("DAO", DAO)
+        if (isUpdate && DAO && myMetadata && account) {
+            const personalDetails = getPersonalDetails('Personal Details'.toLowerCase())
+            if (personalDetails) {
+                decryptMessage(personalDetails)
+                    .then(res => setDecrypted(res))
+                    .catch(e => console.log(e))
+            }
+        }
+    }, [isUpdate])
 
     const updateMetadata = async () => {
         const userName = document.querySelector("#user-name");
@@ -171,25 +217,36 @@ const MintPassToken = () => {
             setTelegramError(true);
             return;
         } else {
+            const msg = await encryptMessage(JSON.stringify({ email: _get(userMail, 'value', ''), discord: _get(userDiscord, 'value', ''), telegram: _get(userTG, 'value', '') }))
             let payload = {
-                attributes : [...myMetadata.attributes].map(attribute => {
-                    if(attribute.trait_type === 'Email') {
-                        return { ...attribute, value: userMail.value }
+                attributes: [...myMetadata.attributes].map(attribute => {
+                    if (attribute.trait_type === 'Personal Details') {
+                        return { ...attribute, value: msg }
+                    }
+                    else if (attribute.trait_type === 'Email') {
+                        return { ...attribute, value: _get(userMail, 'value', '') && userMail.value !== '' ? true : null }
                     } else if (attribute.trait_type === 'Discord') {
-                        return { ...attribute, value: userDiscord.value }
+                        return { ...attribute, value: _get(userDiscord, 'value', '') && userDiscord.value !== '' ? true : null }
                     } else if (attribute.trait_type === 'Telegram') {
-                        return { ...attribute, value: userTG.value }
+                        return { ...attribute, value: _get(userTG, 'value', '') && userTG.value !== '' ? true : null }
                     } else {
                         return attribute
                     }
                 })
-            } 
+            }
             axiosHttp.patch(`metadata/${_get(DAO, 'sbt._id')}`, payload)
-            .then(res => {
-                dispatch(getDao(_get(DAO, 'url', '')))
-                setTimeout(() => navigate(`/${DAO.url}`), 1500);
-            })
-            .catch(e => console.log(e))
+                .then(async res => {
+                    if (userDiscord.value) {
+                        await axiosHttp.patch(`dao/${_get(DAO, 'url', '')}/update-user-discord`, {
+                            discordId: userDiscord.value || null,
+                            userId: _get(user, '_id', ''),
+                            daoId: _get(DAO, '_id')
+                        })
+                    }
+                    dispatch(getDao(_get(DAO, 'url', '')))
+                    setTimeout(() => navigate(`/${DAO.url}`), 1500);
+                })
+                .catch(e => console.log(e))
         }
     }
 
@@ -221,7 +278,7 @@ const MintPassToken = () => {
                     setLoading(true);
                     const sbtId = currentIndex.toString();
                     let tx = null;
-                    if(shouldMint)
+                    if (shouldMint)
                         tx = await mintSBTtoken(sbtContract, account);
                     console.log(tx)
                     if (tx?.error) {
@@ -232,32 +289,44 @@ const MintPassToken = () => {
                         return;
                     }
                     else {
+                        const msg = await encryptMessage(JSON.stringify({ email: _get(userMail, 'value', ''), discord: _get(userDiscord, 'value', ''), telegram: _get(userTG, 'value', '') }))
                         const metadataJSON = {
                             id: sbtId,
                             daoUrl: DAO.url,
                             description: "SBT TOKEN",
                             name: userName.value,
                             image: _get(DAO, 'sbt.image', ''),
-                            attributes: [{
-                                trait_type: "Wallet Address/ENS Domain",
-                                value: account
-                            },
-                            {
-                                trait_type: "Email",
-                                value: _get(userMail, 'value', '')
-                            },
-                            {
-                                trait_type: "Discord",
-                                value: _get(userDiscord, 'value', '')
-                            },
-                            {
-                                trait_type: "Telegram",
-                                value: _get(userTG, 'value', '')
-                            }],
+                            attributes: [
+                                {
+                                    trait_type: "Wallet Address/ENS Domain",
+                                    value: account
+                                },
+                                {
+                                    trait_type: "Personal Details",
+                                    value: msg
+                                },
+                                {
+                                    trait_type: "Email",
+                                    value: _get(userMail, 'value', '') && userMail.value !== '' ? true : null
+                                },
+                                {
+                                    trait_type: "Discord",
+                                    value: _get(userDiscord, 'value', '') && userDiscord.value !== '' ? true : null
+                                },
+                                {
+                                    trait_type: "Telegram",
+                                    value: _get(userTG, 'value', '') && userTG.value !== '' ? true : null
+                                }
+                            ],
                             contract: contractAddr,
                         }
-    
+                        console.log("metadataJSON : ", metadataJSON);
                         const req = await APInewSBTtoken(metadataJSON);
+                        await axiosHttp.patch(`dao/${_get(DAO, 'url', '')}/update-user-discord`, {
+                            discordId: userDiscord.value || null,
+                            userId: _get(user, '_id', ''),
+                            daoId: _get(DAO, '_id')
+                        })
                         if (req) {
                             dispatch(updateCurrentUser({ name: userName.value }))
                             dispatch(addDaoMember({ url: DAO?.url, payload: { name: '', address: account, role: myRole ? myRole : 'role4' } }))
@@ -278,6 +347,7 @@ const MintPassToken = () => {
             return;
         }
     }
+
     return (
         <>
             <div className="mintPassToken-container">
@@ -289,7 +359,7 @@ const MintPassToken = () => {
                             {
                                 tab === 1
                                     ?
-                                    <p className="heading-text">To join the organisation mint your pass token</p>
+                                    <p className="heading-text">Mint your pass token for {_get(DAO, 'name', '')}</p>
                                     :
                                     null
                             }
@@ -298,7 +368,7 @@ const MintPassToken = () => {
                                     ?
                                     <>
                                         <p className="heading-text" style={{ marginBottom: 0 }}>You are whitelisted</p>
-                                        <p className="heading-text">To join the organisation mint your pass token</p>
+                                        <p className="heading-text">Mint your pass token for {_get(DAO, 'name', '')}</p>
                                     </>
                                     :
                                     null
@@ -366,17 +436,17 @@ const MintPassToken = () => {
                             </div>
 
                             <SimpleLoadButton
-                                title={ isUpdate ? "UPDATE" : "MINT"}
+                                title={isUpdate ? "UPDATE" : "MINT"}
                                 height={50}
                                 width={160}
                                 fontsize={20}
                                 fontweight={400}
                                 onClick={() => {
-                                    if(isUpdate) {
-                                        if(myMetadata)
+                                    if (isUpdate) {
+                                        if (myMetadata)
                                             updateMetadata()
                                         else
-                                            mintSBT(false)    
+                                            mintSBT(false)
                                     } else
                                         mintSBT()
                                 }}
@@ -411,10 +481,10 @@ const MintPassToken = () => {
                 theme='dark'
                 rtl={false} />
             <SideBar
-				name={_get(DAO, 'name', '')}
-				showSideBar={showSideBar}
-				showNavBar={showNavBar}
-			/>
+                name={_get(DAO, 'name', '')}
+                showSideBar={showSideBar}
+                showNavBar={showNavBar}
+            />
         </>
     )
 }

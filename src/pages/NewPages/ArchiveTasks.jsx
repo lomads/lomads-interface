@@ -49,7 +49,7 @@ const ArchiveTasks = () => {
                         <IoIosArrowBack size={20} color="#C94B32" />
                     </div>
                     <div className="right">
-                        <p>Archived <span>{ transformTask().labelPlural }</span></p>
+                        <p>Archived <span>{transformTask().labelPlural}</span></p>
                     </div>
                 </div>
             </div>

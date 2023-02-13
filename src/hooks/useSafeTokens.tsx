@@ -10,7 +10,7 @@ const useSafeTokens = (safeAddress: string | null) => {
     const [safeTokens, setSafeTokens] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const tokenBalance = useCallback((token: any) => {
+    const tokenBalance = (token: any) => {
         if(safeTokens && safeTokens.length > 0) {
             let selToken = _find(safeTokens, t => _get(t, 'tokenAddress', null) === token)
 			if (safeTokens.length > 0 && !selToken)
@@ -18,7 +18,7 @@ const useSafeTokens = (safeAddress: string | null) => {
             return _get(selToken, 'balance', 0) / 10 ** _get(selToken, 'token.decimals', 18)
         }
         return 0
-    }, [safeTokens])
+    }
 
     useEffect(() => {
         if(chainId && safeAddress !== null){

@@ -31,9 +31,8 @@ import dashboardfooterlogo from "../../../assets/svg/dashboardfooterlogo.svg";
 import starDashboard from "../../../assets/svg/star_dashboard.svg";
 import tokenDashboard from "../../../assets/svg/token_dashboard.svg";
 import { useAppDispatch } from "state/hooks";
-import { getCurrentUser, getDao } from "state/dashboard/actions";
+import { getCurrentUser, getDao, loadDao, storeGithubIssues } from "state/dashboard/actions";
 import { setDAO, setDAOList } from "state/dashboard/reducer";
-import { loadDao } from 'state/dashboard/actions';
 import copyIcon from "../../../assets/svg/copyIcon.svg";
 import { useDispatch } from "react-redux";
 import { updateCurrentNonce, updateSafeThreshold, updateSafeAddress } from "state/flow/reducer";
@@ -65,6 +64,7 @@ const Dashboard = () => {
 	const [update, setUpdate] = useState(0);
 	const treasuryRef = useRef<any>();
 	const { provider, account, chainId, connector } = useWeb3React();
+	console.log("chainId : ", chainId, provider);
 	const safeAddress = useAppSelector((state) => state.flow.safeAddress);
 	const totalMembers = useAppSelector((state) => state.flow.totalMembers);
 	const [pendingTransactions, setPendingTransactions] =
@@ -89,9 +89,52 @@ const Dashboard = () => {
 	const { myRole, displayRole, permissions, can, isSafeOwner } = useRole(DAO, account);
 	const { getENSAddress, getENSName } = useEns()
 
-	console.log("role", myRole)
-
 	const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '', chainId);
+
+	const token = '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';
+
+	const requestReposIssues = (name: String) => {
+		fetch(`https://api.github.com/repos/${name}/issues`,
+			{
+				headers: {
+					'Accept': 'application/vnd.github.v3+json',
+					'Authorization': `token ${token}`
+				}
+			})
+			.then(response => response.json())
+			.then(data => {
+				console.log("github issues : ", data);
+				var newArray = data.map((i: any) => (
+					{
+						daoId: DAO?._id,
+						provider: 'Github',
+						name: i.title,
+						description: i.body,
+						creator: null,
+						members: [],
+						project: null,
+						discussionChannel: i.html_url,
+						deadline: null,
+						submissionLink: i.html_url,
+						compensation: null,
+						reviewer: null,
+						contributionType: 'open',
+						createdAt: i.created_at,
+						draftedAt: Date.now(),
+					}
+				))
+
+				console.log("new array : ", newArray);
+				dispatch(storeGithubIssues({ payload: { daoId: _get(DAO, '_id', null), issueList: newArray } }))
+			})
+	}
+
+	// useEffect(() => {
+	// 	if (DAO && !DAO.githubIssues) {
+	// 		console.log("fetching...")
+	// 		requestReposIssues('Lomads-Technologies/gnosis-safe-integration');
+	// 	}
+	// }, [DAO]);
 
 	const amIAdmin = useMemo(() => {
 		if (DAO) {
@@ -109,7 +152,7 @@ const Dashboard = () => {
 	}
 
 	useEffect(() => {
-		if(account)
+		if (account)
 			getENSName(account)
 	}, [account])
 
@@ -131,8 +174,8 @@ const Dashboard = () => {
 	};
 
 	const toggleShowCreateRecurring = () => {
-		setShowCreateRecurring((prev:boolean) => {
-			if(prev)  {
+		setShowCreateRecurring((prev: boolean) => {
+			if (prev) {
 				treasuryRef?.current?.reload()
 				setRecurringTxn(null)
 			}
@@ -196,25 +239,25 @@ const Dashboard = () => {
 	}, [chainId, account, DAOList, daoURL])
 
 	const validateMetaData = () => {
-		if(_get(DAO, 'sbt.contactDetail', null)) {
+		if (_get(DAO, 'sbt.contactDetail', null)) {
 			const contactdetails = _get(DAO, 'sbt.contactDetail', []);
 			for (let index = 0; index < contactdetails.length; index++) {
 				let shouldUpdate = true;
 				const contact = contactdetails[index];
-				const myMetadata  = _find(_get(DAO, 'sbt.metadata', []), m => {
+				const myMetadata = _find(_get(DAO, 'sbt.metadata', []), m => {
 					return _find(m.attributes, a => a.value === account)
 				})
-				if(myMetadata && myMetadata.attributes){
+				if (myMetadata && myMetadata.attributes) {
 					for (let index = 0; index < myMetadata.attributes.length; index++) {
 						const attribute = myMetadata.attributes[index];
-						if(contact === attribute.trait_type.toLowerCase()) {
-							if(attribute.value && attribute.value !== "") {
+						if (contact === attribute.trait_type.toLowerCase()) {
+							if (attribute.value && attribute.value !== "") {
 								shouldUpdate = false
 							}
 						}
 					}
 				}
-				if(shouldUpdate){
+				if (shouldUpdate) {
 					navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
 					break;
 				}
@@ -242,7 +285,7 @@ const Dashboard = () => {
 						if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
 							if (parseInt(balanceOf._hex, 16) === 0) {
 								navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
-							}  else {
+							} else {
 								// check if data has been filled show mint page. with prefilled data. save data without minting again
 								validateMetaData()
 							}
@@ -466,10 +509,12 @@ const Dashboard = () => {
 										<img src={copyIcon} alt="copy" className="safeCopyImage" />
 									</div>
 								</Tooltip>
+
 							</div>
 							<div className="DAODescription">{_get(DAO, 'description', '')}</div>
 						</div>
 					</div>
+
 					<div className="DAOsettings-container">
 						<div className="DAOsettings">
 							<div className="DAOadminPill">
@@ -492,6 +537,7 @@ const Dashboard = () => {
 									SUPPORTED_CHAIN_IDS.map(chain => <option value={+chain}>{CHAIN_IDS_TO_NAMES[chain]}</option>)
 								}
 							</select>
+
 						</div>
 					</div>
 				</div>
@@ -527,8 +573,7 @@ const Dashboard = () => {
 						onChangePendingTransactions={(tx: any) => setPendingTransactions(tx)}
 						tokens={safeTokens}
 						toggleShowCreateRecurring={toggleShowCreateRecurring}
-					/>
-				}
+					/>}
 				{can(myRole, 'members.view') &&
 					<MemberCard
 						totalMembers={totalMembers}

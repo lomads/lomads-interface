@@ -56,7 +56,7 @@ const EditTask = ({ close, task, daoURL }) => {
     const [name, setName] = useState(task.name);
     const [description, setDescription] = useState(task.description);
     const [dchannel, setDChannel] = useState(task.discussionChannel);
-    const [deadline, setDeadline] = useState(new Date(task.deadline).toISOString().substring(0, 10));
+    const [deadline, setDeadline] = useState(task.deadline ? new Date(task.deadline).toISOString().substring(0, 10) : new Date());
     const [projectId, setProjectId] = useState(task.project?._id);
     const [subLink, setSubLink] = useState(task.submissionLink);
     const [reviewer, setReviewer] = useState(null);
@@ -71,6 +71,19 @@ const EditTask = ({ close, task, daoURL }) => {
         setSafeTokens(tokens)
     };
 
+    const getrolename = (roleId) => {
+
+        for (let index = 0; index < Object.keys(DAO.discord).length; index++) {
+            const element = Object.keys(DAO.discord)[index];
+            const rolename_discord = _find(DAO.discord[element].roles, r => r.id === roleId)
+            if (rolename_discord) {
+                return rolename_discord.name
+            }
+        }
+        return "";
+
+    };
+
     useEffect(() => {
         if (account && chainId && (!user || (user && user.wallet.toLowerCase() !== account.toLowerCase()))) {
             dispatch(getCurrentUser({}))
@@ -81,6 +94,21 @@ const EditTask = ({ close, task, daoURL }) => {
         getTokens(_get(DAO, 'safe.address'));
         return () => { };
     }, [DAO]);
+
+    useEffect(() => {
+        var date = new Date();
+        var tdate = date.getDate();
+        var month = date.getMonth() + 1;
+        if (tdate < 10) {
+            tdate = "0" + tdate;
+        }
+        if (month < 10) {
+            month = "0" + month
+        }
+        var year = date.getUTCFullYear();
+        var minDate = year + "-" + month + "-" + tdate;
+        document.getElementById("deadlineInput").setAttribute("min", minDate);
+    }, [])
 
     useEffect(() => {
         if (editTaskLoading === false) {
@@ -163,7 +191,7 @@ const EditTask = ({ close, task, daoURL }) => {
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
             symbol = _get(symbol, 'token.symbol', null)
             if (!symbol)
-                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ||  currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
+                symbol = currency.currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
 
             let taskOb = {};
             taskOb.name = name;
@@ -208,17 +236,17 @@ const EditTask = ({ close, task, daoURL }) => {
                                 ?
                                 <div className='createTask-success'>
                                     <img src={createTaskSvg} alt="frame-icon" />
-                                    <h1>{ transformTask().label } Edited!</h1>
-                                    <span>The { transformTask().label } has been edited successfully.<br />You will be redirected in a few seconds.</span>
+                                    <h1>{transformTask().label} Edited!</h1>
+                                    <span>The {transformTask().label} has been edited successfully.<br />You will be redirected in a few seconds.</span>
                                 </div>
                                 :
                                 <>
                                     <div className='createTask-body'>
                                         <img src={createTaskSvg} alt="frame-icon" />
-                                        <h1>Edit { transformTask().label }</h1>
+                                        <h1>Edit {transformTask().label}</h1>
 
                                         <div className='createTask-inputRow'>
-                                            <span>Name of the { transformTask().label }</span>
+                                            <span>Name of the {transformTask().label}</span>
                                             <SimpleInputField
                                                 className="inputField"
                                                 id="nameInput"
@@ -226,7 +254,7 @@ const EditTask = ({ close, task, daoURL }) => {
                                                 width={'100%'}
                                                 value={name}
                                                 onchange={(e) => { setName(e.target.value); document.getElementById('error-name').innerHTML = '' }}
-                                                placeholder={`Name of the ${ transformTask().label }`}
+                                                placeholder={`Name of the ${transformTask().label}`}
                                             />
                                             <span className='error-msg' id="error-name"></span>
                                         </div>
@@ -303,7 +331,7 @@ const EditTask = ({ close, task, daoURL }) => {
 
                                         <div className='createTask-inputRow'>
                                             <div className='createTask-optionalDiv'>
-                                                <span>In { transformWorkspace().label }:</span>
+                                                <span>In {transformWorkspace().label}:</span>
                                                 <div className='option-div'>
                                                     Optional
                                                 </div>
@@ -330,7 +358,7 @@ const EditTask = ({ close, task, daoURL }) => {
                                                         </>
                                                         :
                                                         <>
-                                                            <option value={null}>Select { transformWorkspace().label.toLowerCase() }</option>
+                                                            <option value={null}>Select {transformWorkspace().label.toLowerCase()}</option>
                                                             {
                                                                 eligibleProjects.filter(p => !p.archivedAt && !p.deletedAt).map((item, index) => {
                                                                     return (
@@ -350,8 +378,9 @@ const EditTask = ({ close, task, daoURL }) => {
                                         <div className='createTask-inputRow'>
                                             <span>Contribution</span>
                                             <div className='createTask-buttonRow'>
-                                                <button onClick={() => { setContributionType('assign'); setIsFilterRoles(false); setValidRoles([]); setIsSingleContributor(false); }} className={contributionType === 'assign' ? 'active' : null} disabled style={{ cursor: 'not-allowed' }}>ASSIGN MEMBER</button>
                                                 <button onClick={() => { setContributionType('open'); setSelectedUser(null) }} className={contributionType === 'open' ? 'active' : null} disabled style={{ cursor: 'not-allowed' }}>OPEN</button>
+                                                <button onClick={() => { setContributionType('assign'); setIsFilterRoles(false); setValidRoles([]); setIsSingleContributor(false); }} className={contributionType === 'assign' ? 'active' : null} disabled style={{ cursor: 'not-allowed' }}>ASSIGN MEMBER</button>
+
                                             </div>
                                         </div>
 
@@ -412,20 +441,20 @@ const EditTask = ({ close, task, daoURL }) => {
                                             <>
                                                 <div className='selected-roles'>
                                                     <div className='roles-left'>
-
                                                         {
                                                             validRoles.map((item, index) => {
+                                                                console.log("Valid roles : ", validRoles);
                                                                 return (
                                                                     <div className='roles-li'>
                                                                         <div
                                                                             className='roles-pill'
-                                                                            style={index === 0 ? { background: 'rgba(146, 225, 168, 0.3)' } : index === 1 ? { background: 'rgba(137,179,229,0.3)' } : index === 2 ? { background: 'rgba(234,100,71,0.3)' } : { background: 'rgba(146, 225, 168, 0.3)' }}
+                                                                            style={{ background: '#99aab550' }}
                                                                         >
                                                                             <div
                                                                                 className='roles-circle'
-                                                                                style={index === 0 ? { background: 'rgba(146, 225, 168, 1)' } : index === 1 ? { background: 'rgba(137,179,229,1)' } : index === 2 ? { background: 'rgba(234,100,71,1)' } : { background: 'rgba(146, 225, 168, 1)' }}
+                                                                                style={{ background: '#99aab5' }}
                                                                             ></div>
-                                                                            <span>{transformRole(item).label}</span>
+                                                                            <span>{item == "role1" || item == "role2" || item == "role3" || item == "role4" ? transformRole(item).label : getrolename(item)}</span>
                                                                         </div>
                                                                         <div className='roles-close' style={{ cursor: 'not-allowed' }}>
                                                                             <CgClose color='#FFF' />
@@ -434,7 +463,6 @@ const EditTask = ({ close, task, daoURL }) => {
                                                                 )
                                                             })
                                                         }
-
                                                     </div>
                                                     <div className='roles-right'>
                                                         <button onClick={toggleSelect} disabled style={{ cursor: 'not-allowed' }}>

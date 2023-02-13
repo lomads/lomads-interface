@@ -70,7 +70,7 @@ const TaskCard = ({ task, daoUrl }) => {
     const applicationCount = useMemo(() => {
         if (task) {
             if (task.taskStatus === 'open') {
-                let applications = _get(task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_rejected'))
+                let applications = _get(task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
                 if (applications)
                     return applications.length
             }
@@ -78,6 +78,16 @@ const TaskCard = ({ task, daoUrl }) => {
         }
         return 0;
     }, [task]);
+
+    const isMySubmissionAccepted = useMemo(() => {
+        if (task) {
+            let user = _find(_get(task, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
+            if (user && user.submission && user.status === 'submission_accepted')
+                return true
+            return false
+        }
+        return false;
+    }, [account, task]);
 
     const submissionCount = useMemo(() => {
         if (task) {
@@ -182,10 +192,24 @@ const TaskCard = ({ task, daoUrl }) => {
                             {
                                 hasMySubmission
                                     ?
-                                    <div>
-                                        <img src={submitted} style={{ marginRight: '5px' }} />
-                                        <span style={{ color: '#6B99F7' }}>Under review</span>
-                                    </div>
+                                    <>
+                                        {
+                                            amIRejected ? 
+                                            <div>
+                                                <img src={rejected} style={{ marginRight: '5px' }} />
+                                                <span style={{ color: '#E23B53' }}>Rejected</span>
+                                            </div> : 
+                                            isMySubmissionAccepted ? 
+                                            <div>
+                                                <img src={approved} style={{ marginRight: '5px' }} />
+                                                <span style={{ color: '#27C46E' }}>Approved</span>
+                                            </div> :
+                                            <div>
+                                                <img src={submitted} style={{ marginRight: '5px' }} />
+                                                <span style={{ color: '#6B99F7' }}>Under review</span>
+                                            </div>
+                                        }
+                                        </>
                                     :
                                     <>
                                         {

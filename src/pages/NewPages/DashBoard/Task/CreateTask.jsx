@@ -40,14 +40,14 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
 
     const dispatch = useAppDispatch();
     const { DAO, user, createTaskLoading, draftTaskLoading } = useAppSelector((state) => state.dashboard);
-    const { transformTask, transformWorkspace, transformRole } = useTerminology(_get(DAO, 'terminologies', null))
+    const { transformTask, transformWorkspace, transformRole } = useTerminology(_get(DAO, 'terminologies', null));
     const { chainId, account } = useWeb3React();
 
     const { myRole, can } = useRole(DAO, account)
 
     const editorRef = useRef(null);
 
-    const [contributionType, setContributionType] = useState('assign');
+    const [contributionType, setContributionType] = useState('open');
     const [isSingleContributor, setIsSingleContributor] = useState(false);
     const [isFilterRoles, setIsFilterRoles] = useState(false);
     const [select, setSelect] = useState(false);
@@ -65,10 +65,39 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
     const [safeTokens, setSafeTokens] = useState([]);
     const [showSuccess, setShowSuccess] = useState(false);
 
+    const getrolename = (roleId) => {
+
+        for (let index = 0; index < Object.keys(DAO.discord).length; index++) {
+            const element = Object.keys(DAO.discord)[index];
+            const rolename_discord = _find(DAO.discord[element].roles, r => r.id === roleId)
+            if (rolename_discord) {
+                return rolename_discord.name
+            }
+        }
+        return "";
+
+    };
+
+
     const getTokens = async (safeAddress) => {
         const tokens = await getSafeTokens(chainId, safeAddress)
         setSafeTokens(tokens)
     };
+
+    useEffect(() => {
+        var date = new Date();
+        var tdate = date.getDate();
+        var month = date.getMonth() + 1;
+        if (tdate < 10) {
+            tdate = "0" + tdate;
+        }
+        if (month < 10) {
+            month = "0" + month
+        }
+        var year = date.getUTCFullYear();
+        var minDate = year + "-" + month + "-" + tdate;
+        document.getElementById("deadlineInput").setAttribute("min", minDate);
+    }, [])
 
     useEffect(() => {
         if (account && chainId && (!user || (user && user.wallet.toLowerCase() !== account.toLowerCase()))) {
@@ -86,7 +115,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
             dispatch(resetCreateTaskLoader());
             dispatch(resetDraftTaskLoader());
             setShowSuccess(true);
-            setContributionType('assign');
+            setContributionType('open');
             setIsSingleContributor(false);
             setIsFilterRoles(false);
             setValidRoles([]);
@@ -191,8 +220,8 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
             symbol = _get(symbol, 'token.symbol', null)
             if (!symbol)
-                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ||  currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
-
+                symbol = currency.currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency.currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
+            console.log("task role:", symbol);
             let task = {};
             task.daoId = DAO?._id;
             task.name = name;
@@ -208,6 +237,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
             task.isSingleContributor = isSingleContributor;
             task.isFilterRoles = isFilterRoles;
             task.validRoles = isFilterRoles ? validRoles : [];
+            console.log("task role:", task);
             dispatch(createTask({ payload: task }))
         }
     }
@@ -235,7 +265,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
         let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
         symbol = _get(symbol, 'token.symbol', 'SWEAT')
         if (!symbol)
-            symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS ||  currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
+            symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
         let task = {};
         task.daoId = DAO?._id;
         task.name = name;
@@ -374,7 +404,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
 
                                         <div className='createTask-inputRow'>
                                             <div className='createTask-optionalDiv'>
-                                                <span>In { transformWorkspace().label }:</span>
+                                                <span>In {transformWorkspace().label}:</span>
                                                 <div className='option-div'>
                                                     Optional
                                                 </div>
@@ -393,7 +423,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                         <option value={null}>{selectedProject.name}</option>
                                                         :
                                                         <>
-                                                            <option value={null}>Select { transformWorkspace().label }</option>
+                                                            <option value={null}>Select {transformWorkspace().label}</option>
                                                             {
                                                                 eligibleProjects.filter(p => !p.archivedAt && !p.deletedAt).map((item, index) => {
                                                                     return (
@@ -413,8 +443,9 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                         <div className='createTask-inputRow'>
                                             <span>Contribution</span>
                                             <div className='createTask-buttonRow'>
-                                                <button onClick={() => { setContributionType('assign'); setIsFilterRoles(false); setValidRoles([]); setIsSingleContributor(false); }} className={contributionType === 'assign' ? 'active' : null}>ASSIGN MEMBER</button>
                                                 <button onClick={() => { setContributionType('open'); setSelectedUser(null) }} className={contributionType === 'open' ? 'active' : null}>OPEN</button>
+                                                <button onClick={() => { setContributionType('assign'); setIsFilterRoles(false); setValidRoles([]); setIsSingleContributor(false); }} className={contributionType === 'assign' ? 'active' : null}>ASSIGN MEMBER</button>
+
                                             </div>
                                         </div>
 
@@ -490,17 +521,19 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
 
                                                         {
                                                             validRoles.map((item, index) => {
+                                                                console.log("item role : ", item)
                                                                 return (
                                                                     <div className='roles-li'>
                                                                         <div
                                                                             className='roles-pill'
-                                                                            style={index === 0 ? { background: 'rgba(146, 225, 168, 0.3)' } : index === 1 ? { background: 'rgba(137,179,229,0.3)' } : index === 2 ? { background: 'rgba(234,100,71,0.3)' } : { background: 'rgba(146, 225, 168, 0.3)' }}
+                                                                            style={{ background: '#99aab550' }}
                                                                         >
                                                                             <div
                                                                                 className='roles-circle'
-                                                                                style={index === 0 ? { background: 'rgba(146, 225, 168, 1)' } : index === 1 ? { background: 'rgba(137,179,229,1)' } : index === 2 ? { background: 'rgba(234,100,71,1)' } : { background: 'rgba(146, 225, 168, 1)' }}
+                                                                                style={{ background: '#99aab5' }}
                                                                             ></div>
-                                                                            <span>{transformRole(item).label}</span>
+
+                                                                            <span>{item == "role1" || item == "role2" || item == "role3" || item == "role4" ? transformRole(item).label : getrolename(item)}</span>
                                                                         </div>
                                                                         <div className='roles-close' onClick={() => handleRemoveRole(item)}>
                                                                             <CgClose color='#FFF' />
@@ -525,7 +558,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                 <span>Submission link</span>
 
                                                 <div className='option-div'>
-                                                    Optionnal
+                                                    Optional
                                                 </div>
                                             </div>
                                             <p>Provide a link here only if the submissions will come from trusted contributors</p>

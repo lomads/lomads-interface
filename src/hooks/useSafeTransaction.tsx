@@ -8,6 +8,9 @@ import { ImportSafe, safeService } from "connection/SafeCall";
 import { useWeb3React } from "@web3-react/core";
 import { useAppSelector } from "state/hooks";
 import axiosHttp from 'api'
+import { AddOwnerTxParams } from "@gnosis.pm/safe-core-sdk";
+import { SupportedChainId } from "constants/chains";
+import { beautifyHexToken } from "utils";
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
 
@@ -17,6 +20,9 @@ const useSafeTransaction = (safeAddress: string) => {
     const { safeTokens, tokenBalance } = useSafeTokens(safeAddress)
     //const currentNonce = useAppSelector((state) => state.flow.currentNonce);
     const [createSafeTxnLoading, setCreateSafeTxnLoading] = useState(false);
+    const [updateOwnerLoading, setUpdateOwnerLoading] = useState(false);
+
+    const { safeThreshold } = useAppSelector(store => store.flow)
 
     const createNativeSingleTxn = async (send: any, token: any) => {
         const safeTransactionData: SafeTransactionDataPartial[] = [{
@@ -109,6 +115,11 @@ const useSafeTransaction = (safeAddress: string) => {
                             })
                             await axiosHttp.post(`transaction/label`, payload)
                         }
+                        await axiosHttp.post(`utility/create-notification`, {
+                            event: 'transaction:confirmed',
+                            safeAddress,
+                            account
+                        })
                     })
             } else {
                 if (createLabel) {
@@ -119,6 +130,12 @@ const useSafeTransaction = (safeAddress: string) => {
                     await axiosHttp.post(`transaction/label`, payload)
                 }
             }
+            await axiosHttp.post(`utility/create-notification`, {
+                event: safeThreshold > 1 ? 'transaction:execution.required' : 'transaction:confirmation.required',
+                safeAddress,
+                safeTxHash,
+                account
+            })
             setCreateSafeTxnLoading(false)
             return { safeTxHash, currentNonce, signature };
         }
@@ -129,7 +146,88 @@ const useSafeTransaction = (safeAddress: string) => {
         }
     }
 
-    return { createSafeTransaction, createSafeTxnLoading }
+
+    const updateOwnersWithThreshold = async ({ newOwners = [], removeOwners = [], threshold, thresholdChanged = false, ownerCount = 0 }: any) => {
+        if (!safeAddress || !account || !chainId) return;
+        try {
+            setUpdateOwnerLoading(true)
+            const safeSDK = await ImportSafe(provider, safeAddress);
+            const isOwner = await safeSDK.isOwner(account as string);
+            if (!isOwner) {
+                setUpdateOwnerLoading(false)
+                throw 'Not allowed operation. Only safe owner can perform setAllowance operation'
+            }
+
+            const currentNonce = await (await safeService(provider, `${chainId}`)).getNextNonce(safeAddress);
+
+            const options: SafeTransactionOptionalProps = { nonce: currentNonce };
+
+            const newOwnerTxnData: SafeTransactionDataPartial[] = await Promise.all(
+                newOwners.map(async (owner: string) => {
+                    const params: AddOwnerTxParams = {
+                        ownerAddress: owner,
+                        threshold
+                    }
+                    const ownerTxn = await safeSDK.createAddOwnerTx(params)
+                    const transactionData = {
+                        to: ownerTxn.data.to,
+                        data: ownerTxn.data.data,
+                        value: "0",
+                    };
+                    return transactionData;
+                })
+            )
+
+            const removeOwnerTxnData: SafeTransactionDataPartial[] = await Promise.all(
+                removeOwners.map(async (owner: string) => {
+                    const params: AddOwnerTxParams = {
+                        ownerAddress: owner,
+                        threshold
+                    }
+                    const ownerTxn = await safeSDK.createRemoveOwnerTx(params)
+                    const transactionData = {
+                        to: ownerTxn.data.to,
+                        data: ownerTxn.data.data,
+                        value: "0",
+                    };
+                    return transactionData;
+                })
+            )
+
+            let txnPayload: any = [...removeOwnerTxnData, ...newOwnerTxnData]
+            if (txnPayload.length === 0) {
+                const thresholdTxn = await safeSDK.createChangeThresholdTx(threshold, options)
+                txnPayload = thresholdTxn.data
+            }
+
+            const safeTransaction = await safeSDK.createTransaction({ safeTransactionData: txnPayload, options })
+            console.log(safeTransaction)
+            const safeTxHash = await safeSDK.getTransactionHash(safeTransaction);
+            const signature = await safeSDK.signTransactionHash(safeTxHash);
+            await (await safeService(provider, `${chainId}`))
+                .proposeTransaction({ safeAddress, safeTransactionData: safeTransaction.data, safeTxHash, senderAddress: account, senderSignature: signature.data })
+            await (await safeService(provider, `${chainId}`)).confirmTransaction(safeTxHash, signature.data)
+
+            let payload: any[] = [];
+            newOwners.map((r: any) => {
+                payload.push({ safeAddress, safeTxHash, recipient: r, label: thresholdChanged ? `Add Owner: ${beautifyHexToken(r)} | Change Threshold ${threshold}/${ownerCount}` : `Add Owner: ${beautifyHexToken(r)}` })
+            })
+            removeOwners.map((r: any) => {
+                payload.push({ safeAddress, safeTxHash, recipient: r, label: `Remove Owner: ${beautifyHexToken(r)} | Change Threshold ${threshold}/${ownerCount}` })
+            })
+            if (newOwners.length === 0 && removeOwners.length === 0)
+                payload.push({ safeAddress, safeTxHash, recipient: beautifyHexToken(safeAddress), label: `Change Threshold ${threshold}/${ownerCount}` })
+            await axiosHttp.post(`transaction/label`, payload)
+            setUpdateOwnerLoading(false)
+            return safeTxHash
+        } catch (e) {
+            console.log(e)
+            setUpdateOwnerLoading(false)
+            throw 'Something went wrong. Please try again.'
+        }
+    }
+
+    return { createSafeTransaction, createSafeTxnLoading, updateOwnersWithThreshold, updateOwnerLoading }
 
 };
 

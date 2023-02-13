@@ -9,6 +9,8 @@ import { GNOSIS_SAFE_ALLOWANCE_MODULE_CONTRACT, SupportedChainId } from 'constan
 import { SafeTransactionOptionalProps } from "@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/types";
 import { useAllowanceContract } from "hooks/useContract";
 import { Contract, utils } from "ethers"
+import { owners } from 'assets/owners';
+import { AddOwnerTxParams } from '@gnosis.pm/safe-core-sdk';
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
 
@@ -124,7 +126,7 @@ const useGnosisAllowance = (safeAddress: string | null) => {
         return safeTransactionData;
     }
 
-    const createAllowanceTransaction = async ({ tokenAddress, amount, to, label, delegate = account as string}: { tokenAddress: string, amount: number, to: string, label: string, delegate: string} ) => {
+    const createAllowanceTransaction = async ({ tokenAddress, amount, to, label, delegate}: { tokenAddress: string, amount: number, to: string, label: string, delegate: string} ) => {
         if(!safeAddress || !account || !chainId || !amount || !tokenAddress) return;
         const safeToken = _find(safeTokens, t => _get(t, 'tokenAddress', null) === tokenAddress)
         if(amount == 0) throw `Cannot send 0 ${_get(safeToken, 'token.symbol', '')}`

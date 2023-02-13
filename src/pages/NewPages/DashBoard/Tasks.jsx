@@ -37,21 +37,66 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
         }
     }, [DAO, Project, tab, user, onlyProjects]);
 
+    // const amIEligible_discord=(Task)=>{
+    //     console.log('Task.jsx--------------------',Task);
+
+    //     if (DAO && Task && Task.contributionType === 'open') {
+    //         let current_user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
+    //        // console.log('currentuser',current_user);
+    //         let reurntype_function=false;
+    //         if(current_user.discordRoles){
+
+
+    //             Task?.validRoles.map(channelid=>{
+    //                // console.log('task chanellid',channelid);
+
+
+    //                 Object.keys(current_user.discordRoles).forEach(function(key, index) {
+    //                     console.log(current_user.discordRoles[key]);
+    //                     if(current_user.discordRoles[key].includes(channelid)){
+    //                         //console.log('mathched');
+    //                         reurntype_function=true;
+    //                         console.log('Taskk.jsx--------------------in task function TaskMatched',Task.name);
+    //                         return reurntype_function;
+
+    //                         }else{
+
+    //                             console.log('Taskk.jsx--------------------in task function TaskunMatched',Task.name);
+    //                             return reurntype_function;
+    //                         }
+    //                 });
+
+
+    //             })
+    //             return reurntype_function;
+    //         }
+
+    //         return false;
+
+    //     }
+
+    // };
     const amIEligible = (Task) => {
         if (DAO && Task && Task.contributionType === 'open') {
             let user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
             if (user) {
                 if (Task?.validRoles.length > 0) {
-                    let index = Task?.validRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase());
+                    let myDiscordRoles = []
+                    const discRoles = _get(user, 'discordRoles', {})
+                    Object.keys(discRoles).forEach(key => {
+                        myDiscordRoles = [...myDiscordRoles, ...discRoles[key]]
+                    })
+                    let index = Task?.validRoles.findIndex(item => item.toLowerCase() === user.role.toLowerCase() || myDiscordRoles.indexOf(item) > -1);
                     return index > -1 ? true : false
                 } else {
                     return true;
                 }
             }
-            return false;
+            return true;
         }
         return true;
     };
+
 
     const isOthersApproved = (Task) => {
         if (Task) {
@@ -87,8 +132,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
 
     const fetchProjectTasks = () => {
         if (Project && user) {
-            const myTasks = _get(Project, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) || (task.contributionType === 'open' && !task.isSingleContributor))))
-            console.log("setMyTasks", myTasks)
+            const myTasks = _get(Project, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && amIEligible(task) && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || (task.contributionType === 'open' && !task.isSingleContributor))))
             setMyTasks(_orderBy(myTasks, i => moment(i.deadline).unix(), 'desc'))
             let manageTasks = _get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id));
             manageTasks = manageTasks.map(t => {
@@ -103,7 +147,8 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                 return tsk
             })
             setManageTasks(_orderBy(manageTasks, ['notification', i => moment(i.deadline).unix()], ['desc', 'desc']));
-            setDraftTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null && task.creator === user._id));
+            setDraftTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
+            // setDraftTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null && task.creator === user._id));
             const otherTasks = _get(Project, 'tasks', []).filter(task => !_find(myTasks, t => t._id === task._id) && !task.deletedAt && !task.archivedAt && !task.draftedAt && !(task.creator === user._id || task.reviewer === user._id))
             setOtherTasks([..._orderBy(otherTasks, i => moment(i.deadline).unix(), 'desc'), ..._orderBy(myTasks.concat(manageTasks), i => moment(i.deadline).unix(), 'desc')]);
         }
@@ -111,8 +156,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
 
     const fetchDaoTasks = () => {
         if (DAO && user) {
-            const myTasks = _get(DAO, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || amIEligible(task) || (task.contributionType === 'open' && !task.isSingleContributor))))
-            console.log("setMyTasks", myTasks)
+            const myTasks = _get(DAO, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && amIEligible(task) && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || (task.contributionType === 'open' && !task.isSingleContributor))))
             setMyTasks(_orderBy(myTasks, i => moment(i.deadline).unix(), 'asc'))
             let manageTasks = _get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id));
             manageTasks = manageTasks.map(t => {
@@ -127,7 +171,8 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                 return tsk
             })
             setManageTasks(_orderBy(manageTasks, ['notification', i => moment(i.deadline).unix()], ['desc', 'desc']));
-            setDraftTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null && task.creator === user._id));
+            // setDraftTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null && task.creator === user._id));
+            setDraftTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
             const otherTasks = _get(DAO, 'tasks', []).filter(task => !_find(myTasks, t => t._id === task._id) && !task.deletedAt && !task.archivedAt && !task.draftedAt && !(task.creator === user._id || task.reviewer === user._id))
             setOtherTasks([..._orderBy(otherTasks, i => moment(i.deadline).unix(), 'desc'), ..._orderBy(myTasks.concat(manageTasks), i => moment(i.deadline).unix(), 'desc')]);
         }
@@ -139,11 +184,12 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
             for (let index = 0; index < manageTasks.length; index++) {
                 const task = manageTasks[index];
                 if (task.taskStatus === 'open' && task.isSingleContributor) {
-                    let applications = _get(task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_rejected'))
+                    let applications = _get(task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
                     if (applications)
-                        return sum = sum + applications.length
+                        sum = sum + applications.length
                 }
             }
+            return sum
         }
         return 0;
     }, [manageTasks]);
@@ -156,9 +202,10 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                 if ((task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign') {
                     let submissions = _get(task, 'members', []).filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
                     if (submissions)
-                        return sum = sum + submissions.length
+                        sum = sum + submissions.length
                 }
             }
+            return sum
         }
         return 0;
     }, [manageTasks]);
@@ -259,96 +306,96 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                 </div>
             </div>
 
-            { ( tab === 1 && myTasks && myTasks.length > 0 ) ||
-              ( tab === 2 && manageTasks && manageTasks.length > 0 ) ||
-              ( tab === 3 && draftTasks && draftTasks.length > 0 ) ||
-              ( tab === 4 && otherTasks && otherTasks.length > 0 ) ?
-            <div className='tasks-body'>
-                {
-                    tab === 1 && myTasks && myTasks.filter((item, index) => index < 6).map((item, index) => {
-                        if (index <= 4) {
-                            return (
-                                <div key={index}>
-                                    <TaskCard
-                                        task={item}
-                                        daoUrl={DAO?.url}
-                                    />
-                                </div>
-                            )
-                        }
-                        else {
-                            return (
-                                <div className='all-tasks' onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { activeTab: tab } }) : navigate(`/${DAO.url}/tasks`, { state: { activeTab: tab } }) }}>
-                                    <span>Show All</span>
-                                </div>
-                            )
-                        }
-                    })
-                }
-                {
-                    tab === 2 && manageTasks && manageTasks.filter((item, index) => index < 6).map((item, index) => {
-                        if (index <= 4) {
-                            return (
-                                <div key={index}>
-                                    <TaskCard
-                                        task={item}
-                                        daoUrl={DAO?.url}
-                                    />
-                                </div>
-                            )
-                        }
-                        else {
-                            return (
-                                <div className='all-tasks' onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { activeTab: tab } }) : navigate(`/${DAO.url}/tasks`, { state: { activeTab: tab } }) }}>
-                                    <span>Show All</span>
-                                </div>
-                            )
-                        }
-                    })
-                }
-                {
-                    tab === 3 && draftTasks && draftTasks.filter((item, index) => index < 6).map((item, index) => {
-                        if (index <= 4) {
-                            return (
-                                <div key={index}>
-                                    <TaskCard
-                                        task={item}
-                                        daoUrl={DAO?.url}
-                                    />
-                                </div>
-                            )
-                        }
-                        else {
-                            return (
-                                <div className='all-tasks' onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { activeTab: tab } }) : navigate(`/${DAO.url}/tasks`, { state: { activeTab: tab } }) }}>
-                                    <span>Show All</span>
-                                </div>
-                            )
-                        }
-                    })
-                }
-                {
-                    tab === 4 && otherTasks && otherTasks.filter((item, index) => index < 6).map((item, index) => {
-                        if (index <= 4) {
-                            return (
-                                <div key={index}>
-                                    <TaskCard
-                                        task={item}
-                                        daoUrl={DAO?.url}
-                                    />
-                                </div>
-                            )
-                        }
-                        else {
-                            return (
-                                <div className='all-tasks' onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { activeTab: tab } }) : navigate(`/${DAO.url}/tasks`, { state: { activeTab: tab } }) }}>
-                                    <span>Show All</span>
-                                </div>
-                            )
-                        }
-                    })
-                }
-            </div> : null
+            {(tab === 1 && myTasks && myTasks.length > 0) ||
+                (tab === 2 && manageTasks && manageTasks.length > 0) ||
+                (tab === 3 && draftTasks && draftTasks.length > 0) ||
+                (tab === 4 && otherTasks && otherTasks.length > 0) ?
+                <div className='tasks-body'>
+                    {
+                        tab === 1 && myTasks && myTasks.filter((item, index) => index < 6).map((item, index) => {
+                            if (index <= 4) {
+                                return (
+                                    <div key={index}>
+                                        <TaskCard
+                                            task={item}
+                                            daoUrl={DAO?.url}
+                                        />
+                                    </div>
+                                )
+                            }
+                            else {
+                                return (
+                                    <div className='all-tasks' onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { activeTab: tab } }) : navigate(`/${DAO.url}/tasks`, { state: { activeTab: tab } }) }}>
+                                        <span>Show All</span>
+                                    </div>
+                                )
+                            }
+                        })
+                    }
+                    {
+                        tab === 2 && manageTasks && manageTasks.filter((item, index) => index < 6).map((item, index) => {
+                            if (index <= 4) {
+                                return (
+                                    <div key={index}>
+                                        <TaskCard
+                                            task={item}
+                                            daoUrl={DAO?.url}
+                                        />
+                                    </div>
+                                )
+                            }
+                            else {
+                                return (
+                                    <div className='all-tasks' onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { activeTab: tab } }) : navigate(`/${DAO.url}/tasks`, { state: { activeTab: tab } }) }}>
+                                        <span>Show All</span>
+                                    </div>
+                                )
+                            }
+                        })
+                    }
+                    {
+                        tab === 3 && draftTasks && draftTasks.filter((item, index) => index < 6).map((item, index) => {
+                            if (index <= 4) {
+                                return (
+                                    <div key={index}>
+                                        <TaskCard
+                                            task={item}
+                                            daoUrl={DAO?.url}
+                                        />
+                                    </div>
+                                )
+                            }
+                            else {
+                                return (
+                                    <div className='all-tasks' onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { activeTab: tab } }) : navigate(`/${DAO.url}/tasks`, { state: { activeTab: tab } }) }}>
+                                        <span>Show All</span>
+                                    </div>
+                                )
+                            }
+                        })
+                    }
+                    {
+                        tab === 4 && otherTasks && otherTasks.filter((item, index) => index < 6).map((item, index) => {
+                            if (index <= 4) {
+                                return (
+                                    <div key={index}>
+                                        <TaskCard
+                                            task={item}
+                                            daoUrl={DAO?.url}
+                                        />
+                                    </div>
+                                )
+                            }
+                            else {
+                                return (
+                                    <div className='all-tasks' onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { activeTab: tab } }) : navigate(`/${DAO.url}/tasks`, { state: { activeTab: tab } }) }}>
+                                        <span>Show All</span>
+                                    </div>
+                                )
+                            }
+                        })
+                    }
+                </div> : null
             }
         </div>
     )

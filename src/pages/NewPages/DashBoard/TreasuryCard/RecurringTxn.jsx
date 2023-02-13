@@ -31,7 +31,7 @@ const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
     </div>
 ))
 
-export default ({ transaction, onExecute, onRecurringEdit }) => {
+export default ({ transaction, onExecute, onRecurringEdit, owner }) => {
 const dispatch = useAppDispatch()
 const { DAO } = useAppSelector(store => store.dashboard);
 const { createAllowanceTransaction } = useGnosisAllowance(_get(DAO, 'safe.address', null));
@@ -57,7 +57,7 @@ const handleCreateAllowanceTxn = async (queue, transaction) => {
             to: transaction.receiver.wallet, 
             amount: transaction.compensation.amount,
             label: `${transaction.frequency} payment | ${transaction.receiver.name ? transaction.receiver.name : beautifyHexToken(transaction.receiver.wallet)} | ${moment.unix(queue.nonce).local().format('MM/DD/YYYY')}`,
-            delegate: toChecksumAddress(transaction.delegate.wallet)
+            delegate: toChecksumAddress(transaction.receiver.wallet)
         })
         await axiosHttp.post(`recurring-payment/${queue._id}/complete`, { txHash: response.transactionHash })
         .then(res =>
@@ -77,9 +77,11 @@ const renderNextSection = (nextQueue, transaction) => {
         return (
             <Tooltip placement='top' label={`Payment for ${moment.unix(nextQueue.nonce).format(`MM/DD/YYYY`)}`}>
                 <ToolTopContainer>
-                    { account !== toChecksumAddress(transaction.delegate.wallet) ?
-                    <div className="text">Next: { `${ moment.unix(nextQueue.nonce).local().format('MM/DD/YYYY') }` }</div> :
-                    <SimpleLoadButton onClick={() => handleCreateAllowanceTxn(nextQueue, transaction)} condition={loading} width={"100%"}  height={30} title="EXECUTE" bgColor={loading || account !== toChecksumAddress(transaction.delegate.wallet) ? 'grey': "#C94B32"} className="button" /> }
+                    <div className="text">Next: { `${ moment.unix(nextQueue.nonce).local().format('MM/DD/YYYY') }` }</div> 
+                    {/* { account !== toChecksumAddress(transaction.receiver.wallet) ?
+                    <div className="text">Next: { `${ moment.unix(nextQueue.nonce).local().format('MM/DD/YYYY') }` }</div> 
+                    :
+                    <SimpleLoadButton onClick={() => handleCreateAllowanceTxn(nextQueue, transaction)} condition={loading} width={"100%"}  height={30} title="EXECUTE" bgColor={loading ? 'grey': "#C94B32"} className="button" /> } */}
                 </ToolTopContainer>
             </Tooltip>
     )
@@ -146,7 +148,7 @@ const handleDeleteRecurringPayment = async tx => {
                 }
             </div>
         </Td>
-        { account ===  toChecksumAddress(transaction.delegate.wallet) &&
+        {owner &&
             <Td className='recurringtxn-row-item'>
                 <div className="edit">
                         { showEdit && transaction.active && nextQueue &&

@@ -14,15 +14,18 @@ import {
 	addProjectMember,
 	updateProjectMember,
 	deleteProjectMember,
+	editProjectMembers,
 	archiveProject,
 	deleteProject,
 	updateProjectLink,
+	editProjectLinks,
 	getProject,
 	addProjectLinks,
 	updateProject,
 	getCurrentUser,
 	updateCurrentUser,
 	createTask,
+	storeGithubIssues,
 	editTask,
 	editDraftTask,
 	convertDraftTask,
@@ -39,7 +42,9 @@ import {
 	updateContract,
 	loadRecurringPayments,
 	updateKRA,
+	editProjectKRA,
 	updateMilestone,
+	editProjectMilestone,
 } from "./actions";
 import { createContract } from "state/contract/actions";
 import { get as _get, find as _find } from "lodash";
@@ -63,11 +68,14 @@ export interface DashboardState {
 	addProjectMemberLoading: boolean | null;
 	updateProjectMemberLoading: boolean | null;
 	deleteProjectMemberLoading: boolean | null;
+	editProjectMemberLoading: boolean | null;
 	archiveProjectLoading: boolean | null;
 	deleteProjectLoading: boolean | null;
 	addProjectLinksLoading: boolean | null;
+	editProjectLinksLoading: boolean | null;
 	updateProjectLoading: boolean | null;
 	createTaskLoading: boolean | null;
+	storeGithubIssuesLoading: boolean | null;
 	editTaskLoading: boolean | null;
 	editDraftTaskLoading: boolean | null;
 	convertDraftTaskLoading: boolean | null;
@@ -84,7 +92,9 @@ export interface DashboardState {
 	recurringPayments: any;
 	recurringPaymentsLoading: boolean | null;
 	updateKraLoading: boolean | null;
+	editProjectKraLoading: boolean | null;
 	updateMilestoneLoading: boolean | null;
+	editProjectMilestoneLoading: boolean | null;
 }
 
 const initialState: DashboardState = {
@@ -106,11 +116,14 @@ const initialState: DashboardState = {
 	addProjectMemberLoading: null,
 	updateProjectMemberLoading: null,
 	deleteProjectMemberLoading: null,
+	editProjectMemberLoading: null,
 	archiveProjectLoading: null,
 	deleteProjectLoading: null,
 	addProjectLinksLoading: null,
+	editProjectLinksLoading: null,
 	updateProjectLoading: null,
 	createTaskLoading: null,
+	storeGithubIssuesLoading: null,
 	editTaskLoading: null,
 	editDraftTaskLoading: null,
 	convertDraftTaskLoading: null,
@@ -127,7 +140,9 @@ const initialState: DashboardState = {
 	recurringPayments: null,
 	recurringPaymentsLoading: null,
 	updateKraLoading: null,
+	editProjectKraLoading: null,
 	updateMilestoneLoading: null,
+	editProjectMilestoneLoading: null,
 };
 
 const dashboardSlice = createSlice({
@@ -176,6 +191,9 @@ const dashboardSlice = createSlice({
 		resetDeleteProjectMemberLoader(state) {
 			state.deleteProjectMemberLoading = null
 		},
+		resetEditProjectMemberLoader(state) {
+			state.editProjectMemberLoading = null
+		},
 		resetArchiveProjectLoader(state) {
 			state.archiveProjectLoading = null
 		},
@@ -185,8 +203,14 @@ const dashboardSlice = createSlice({
 		resetAddProjectLinksLoader(state) {
 			state.addProjectLinksLoading = null
 		},
+		resetEditProjectLinksLoader(state) {
+			state.editProjectLinksLoading = null
+		},
 		resetCreateTaskLoader(state) {
 			state.createTaskLoading = null
+		},
+		resetStoreGithubIssuesLoader(state) {
+			state.storeGithubIssuesLoading = null
 		},
 		resetEditTaskLoader(state) {
 			state.editTaskLoading = null
@@ -236,8 +260,14 @@ const dashboardSlice = createSlice({
 		resetUpdateKraLoader(state) {
 			state.updateKraLoading = null
 		},
+		resetEditProjectKraLoader(state) {
+			state.editProjectKraLoading = null
+		},
 		resetUpdateMilestoneLoader(state) {
 			state.updateMilestoneLoading = null
+		},
+		resetEditProjectMilestoneLoader(state) {
+			state.editProjectMilestoneLoading = null
 		},
 		updateSafeTransaction(state, action) {
 			console.log(action.payload)
@@ -417,6 +447,14 @@ const dashboardSlice = createSlice({
 		[`${deleteProjectMember.pending}`]: (state) => {
 			state.deleteProjectMemberLoading = true;
 		},
+		// edit Project members
+		[`${editProjectMembers.fulfilled}`]: (state, action) => {
+			state.editProjectMemberLoading = false;
+			state.Project = action.payload;
+		},
+		[`${editProjectMembers.pending}`]: (state) => {
+			state.editProjectMemberLoading = true;
+		},
 		// archive Project
 		[`${archiveProject.fulfilled}`]: (state, action) => {
 			state.archiveProjectLoading = false;
@@ -444,6 +482,16 @@ const dashboardSlice = createSlice({
 		[`${addProjectLinks.pending}`]: (state) => {
 			state.addProjectLinksLoading = true;
 		},
+		// edit project links
+		[`${editProjectLinks.fulfilled}`]: (state, action) => {
+			state.editProjectLinksLoading = false;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
+		},
+		[`${editProjectLinks.pending}`]: (state) => {
+			state.editProjectLinksLoading = true;
+		},
+		// update project single link --- unlock link
 		[`${updateProjectLink.fulfilled}`]: (state, action) => {
 			state.Project = action.payload.project;
 			state.DAO = action.payload.dao;
@@ -459,6 +507,14 @@ const dashboardSlice = createSlice({
 		},
 		[`${createTask.pending}`]: (state) => {
 			state.createTaskLoading = true;
+		},
+		// store gihtub issues creation
+		[`${storeGithubIssues.fulfilled}`]: (state, action) => {
+			state.storeGithubIssuesLoading = false;
+			state.DAO = action.payload.dao;
+		},
+		[`${storeGithubIssues.pending}`]: (state) => {
+			state.storeGithubIssuesLoading = true;
 		},
 		// edit task
 		[`${editTask.fulfilled}`]: (state, action) => {
@@ -599,6 +655,15 @@ const dashboardSlice = createSlice({
 		[`${updateKRA.pending}`]: (state) => {
 			state.updateKraLoading = true;
 		},
+		// edit kra
+		[`${editProjectKRA.fulfilled}`]: (state, action) => {
+			state.editProjectKraLoading = false;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
+		},
+		[`${editProjectKRA.pending}`]: (state) => {
+			state.editProjectKraLoading = true;
+		},
 		// update milestone
 		[`${updateMilestone.fulfilled}`]: (state, action) => {
 			state.updateMilestoneLoading = false;
@@ -607,6 +672,15 @@ const dashboardSlice = createSlice({
 		},
 		[`${updateMilestone.pending}`]: (state) => {
 			state.updateMilestoneLoading = true;
+		},
+		// edit milestone
+		[`${editProjectMilestone.fulfilled}`]: (state, action) => {
+			state.editProjectMilestoneLoading = false;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
+		},
+		[`${editProjectMilestone.pending}`]: (state) => {
+			state.editProjectMilestoneLoading = true;
 		},
 	},
 });
@@ -629,11 +703,14 @@ export const {
 	resetUpdateProjectMemberLoader,
 	resetUpdateProjectLoader,
 	resetDeleteProjectMemberLoader,
+	resetEditProjectMemberLoader,
 	resetArchiveProjectLoader,
 	resetDeleteProjectLoader,
 	resetAddProjectLinksLoader,
+	resetEditProjectLinksLoader,
 	updateSafeTransaction,
 	resetCreateTaskLoader,
+	resetStoreGithubIssuesLoader,
 	resetEditTaskLoader,
 	resetEditDraftTaskLoader,
 	resetConvertDraftTaskLoader,
@@ -648,6 +725,8 @@ export const {
 	resetUpdateContractLoading,
 	setRecurringPayments,
 	resetUpdateKraLoader,
-	resetUpdateMilestoneLoader
+	resetEditProjectKraLoader,
+	resetUpdateMilestoneLoader,
+	resetEditProjectMilestoneLoader
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;
