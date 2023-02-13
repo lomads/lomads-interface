@@ -119,7 +119,8 @@ const AllTasks = () => {
                 return tsk
             })
             setManageTasks(_orderBy(manageTasks, ['notification', i => moment(i.deadline).unix()], ['desc', 'desc']));
-            setDraftTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null && task.creator === user._id));
+            // setDraftTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null && task.creator === user._id));
+            setDraftTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
             const otherTasks = _get(DAO, 'tasks', []).filter(task => !_find(myTasks, t => t._id === task._id) && !task.deletedAt && !task.archivedAt && !task.draftedAt && !(task.creator === user._id || task.reviewer === user._id))
             setOtherTasks([..._orderBy(otherTasks, i => moment(i.deadline).unix(), 'desc'), ..._orderBy(myTasks.concat(manageTasks), i => moment(i.deadline).unix(), 'desc')]);
         }
@@ -174,14 +175,14 @@ const AllTasks = () => {
                 <button onClick={() => navigate(-1)}>
                     <IoIosArrowBack size={20} color="#C94B32" />
                 </button>
-                <p>{ transformTask().labelPlural }</p>
+                <p>{transformTask().labelPlural}</p>
             </div>
 
             {/* Tabs header */}
             <div className='allTasks-tabHeader'>
                 <div className="tasks-title">
                     <button className={tab === 1 ? 'active' : null} onClick={() => setTab(1)}>
-                        My { transformTask().labelPlural }
+                        My {transformTask().labelPlural}
                     </button>
                     <div className="divider"></div>
 
@@ -194,17 +195,17 @@ const AllTasks = () => {
                                 </button>
                                 <div className="divider"></div>
 
-                                {/* <button className={tab === 3 ? 'active' : null} onClick={() => setTab(3)}>
+                                <button className={tab === 3 ? 'active' : null} onClick={() => setTab(3)}>
                                     Drafts
                                 </button>
-                                <div className="divider"></div> */}
+                                <div className="divider"></div>
                             </>
                             :
                             null
                     }
 
                     <button className={tab === 4 ? 'active' : null} onClick={() => setTab(4)}>
-                        All { transformTask().labelPlural }
+                        All {transformTask().labelPlural}
                     </button>
                 </div>
                 <div className="tasks-buttons">
