@@ -412,8 +412,7 @@ const MintPassToken = () => {
                                                         <input
                                                             type="text"
                                                             id={`user-${item}`}
-                                                            disabled={isUpdate && findTraitValue(item) && findTraitValue(item) !== ""}
-                                                            defaultValue={findTraitValue(item)}
+                                                            defaultValue={findTraitValue(item) && findTraitValue(item) !== true ? findTraitValue(item) : null}
                                                             placeholder={`Enter your ${item}`}
                                                             onChange={() => handleResetError(item)}
                                                         />
