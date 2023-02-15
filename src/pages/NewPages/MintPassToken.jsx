@@ -103,7 +103,7 @@ const MintPassToken = () => {
                     if (attr === attribute.trait_type.toLowerCase()) {
                         if (decrypted)
                             return decrypted[attr]
-                        //return attribute?.value;
+                        return (attribute?.value && attribute?.value !== 'true' && attribute?.value !== true) ? attribute?.value : '';
                     }
                 }
                 return null
