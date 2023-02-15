@@ -16,6 +16,7 @@ import MintPassToken from "../pages/NewPages/MintPassToken";
 import CreatePassSucess from "../pages/NewPages/CreatePassSucess";
 import CreateProject from "../pages/NewPages/CreateProject";
 import ProjectDetails from "../pages/NewPages/ProjectDetails";
+import ProjectDetailsPreview from "../pages/NewPages/ProjectDetailsPreview";
 import OnlyWhitelisted from "pages/NewPages/OnlyWhitelisted";
 import ArchiveProjects from "../pages/NewPages/ArchiveProjects";
 import TaskDetails from "pages/NewPages/TaskDetails";
@@ -94,6 +95,10 @@ export default [
     {
         path: '/:daoURL/project/:projectId',
         component: ProjectDetails
+    },
+    {
+        path: '/:daoURL/project/:projectId/preview',
+        component: ProjectDetailsPreview
     },
     {
         path: '/:daoURL/project/:projectId/archiveKra',

@@ -26,11 +26,12 @@ import routes from '../routes';
 
 export default function App() {
 	const landingPage = useMatch("/login");
+	const previewPage = window.location.pathname.indexOf('preview') > -1
 	const [projects, setProjects] = useState([]);
 
 	return (
 		<div className="body">
-			{!landingPage && <Header />}
+			{!landingPage && !previewPage && <Header />}
 			<ProjectContext.Provider value={{ projects, setProjects }}>
 				<Routes>
 					{

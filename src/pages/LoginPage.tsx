@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { useEffect, useState, useCallback } from "react";
 import { get as _get, find as _find, throttle as _throttle, debounce as _debounce } from 'lodash';
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import lomadsfulllogo from "../assets/svg/lomadsfulllogo.svg";
 import humangroup from "../assets/svg/humangroup.svg";
 import metamask2 from "../assets/svg/metamask2.svg";
@@ -55,6 +55,8 @@ const HeaderElement = styled.div`
 const LoginPage = (props: any) => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
+	const location = useLocation()
+	const from = location?.state?.from;
 	const selectedWallet = useAppSelector((state) => state.user.selectedWallet);
 	const [checkLoading, setCheckLoading] = useState<boolean>(false)
 	const { chainId, connector, account, provider } = useWeb3React();
@@ -74,9 +76,15 @@ const LoginPage = (props: any) => {
 
 	const navigateTo = async () => {
 		const activeDao = sessionStorage.getItem('__lmds_active_dao')
-		if (activeDao)
+		if(from)
+			return from
+	    if(activeDao)
 			return `/${activeDao}`
 		return "/"
+		// const activeDao = sessionStorage.getItem('__lmds_active_dao')
+		// if (activeDao)
+		// 	return `/${activeDao}`
+		// return "/"
 		// return axiosHttp.get('dao').then(res => {
 		//   if (res.data && res.data.length > 0) {
 		//     const activeDao = sessionStorage.getItem('__lmds_active_dao')

@@ -213,7 +213,12 @@ const Dashboard = () => {
 
 	useEffect(() => {
 		if (chainId && !account)
-			window.location.href = '/login'
+		navigate("/login", {
+			replace: true,
+			state: {
+			  from: window.location.pathname
+			}
+		  });
 	}, [chainId, account])
 
 	useEffect(() => {

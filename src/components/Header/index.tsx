@@ -154,11 +154,16 @@ export default function Header() {
   useEffect(() => {
     if ((chainId && !chainAllowed && !account) || !localStorage.getItem('__lmds_web3_token')) {
       const match = matchPath({ path: "/:daoURL" }, location.pathname);
-      if(match && !_find(routes, r => r.path === location.pathname)){
+      if((match) && !_find(routes, r => r.path === location.pathname)){
           console.log('storing...', location.pathname)
           sessionStorage.setItem('__lmds_active_dao', location.pathname.substring(1))
        }
-      navigate("/login");
+      navigate("/login", {
+        replace: true,
+        state: {
+          from: location.pathname
+        }
+      });
     }
   }, [chainId , account, chainAllowed, navigate]);
 
@@ -193,7 +198,12 @@ export default function Header() {
       clearOnDisconnect();
     }
     dispatch(updateSelectedWallet({ wallet: undefined }));
-    window.location.href = '/login'
+    navigate("/login", {
+      replace: true,
+      state: {
+        from: window.location.pathname
+      }
+    });
     //openOptions();
   };
 
