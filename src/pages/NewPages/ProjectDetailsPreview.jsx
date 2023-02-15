@@ -475,6 +475,9 @@ const ProjectDetails = () => {
         return false;
     }, [account, Project])
 
+    if(!Project)
+        return null
+
     return (
         <>
             {
