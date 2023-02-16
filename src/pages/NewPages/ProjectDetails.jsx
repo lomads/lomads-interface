@@ -142,7 +142,7 @@ const ProjectDetails = () => {
             p = `${permission}.creator`
         console.log("can(myRole, p) || can(myRole, permission)", can(myRole, p) || can(myRole, permission))
         return (can(myRole, p) || can(myRole, permission))
-    }, [Project]);
+    }, [Project, myRole]);
 
     useEffect(() => {
         if (Project) {
