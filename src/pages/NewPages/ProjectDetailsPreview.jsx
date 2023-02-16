@@ -41,7 +41,7 @@ import { updateCurrentUser } from "state/dashboard/actions";
 
 import { IoIosArrowBack } from 'react-icons/io';
 import SimpleInputField from "UIpack/SimpleInputField";
-import Tasks from "./DashBoard/Tasks";
+import Tasks from "./DashBoard/TasksPreview";
 import CreateTask from "./DashBoard/Task/CreateTask";
 
 import { Editor } from '@tinymce/tinymce-react';
@@ -406,14 +406,14 @@ const ProjectDetails = () => {
     const handleUsers = (item, index) => {
         if (_uniqBy(Project?.members, '_id').some(m => m.wallet === item.member.wallet) === false) {
             return (
-                <div onClick={() => navigate(window.location.pathname.replace('/preview', ''))} className="member-li" key={index}>
+                <div onClick={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })} className="member-li" key={index}>
                     <div className="member-img-name">
                         <img src={memberIcon} alt="member-icon" />
                         <p>{item.member.name}</p>
                     </div>
                     <div className="member-address">
                         <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
-                        <input type="checkbox" onChange={() => navigate(window.location.pathname.replace('/preview', ''))} checked={!(extraMembers.some((m) => m === item.member._id) === false)} />
+                        <input type="checkbox" onChange={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })} checked={!(extraMembers.some((m) => m === item.member._id) === false)} />
                     </div>
                 </div>
             )
@@ -521,13 +521,13 @@ const ProjectDetails = () => {
                                     <div className='project-buttons'>
                                         <button
                                             style={{ marginRight: '35px', background: '#FFF', color: '#C94B32' }}
-                                            onClick={() => navigate(window.location.pathname.replace('/preview', ''))}
+                                            onClick={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}
                                         >
                                             CANCEL
                                         </button>
                                         <button
                                             style={{ background: '#C94B32', color: '#FFF' }}
-                                            onClick={() => navigate(window.location.pathname.replace('/preview', ''))}
+                                            onClick={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}
                                         >
                                             ADD
                                         </button>
@@ -695,7 +695,7 @@ const ProjectDetails = () => {
 
                     <div className="projectDetails-top">
                         <div className="projectDetails-name">
-                            <div className="left" onClick={() => navigate(-1)}>
+                            <div className="left" onClick={() => { navigate(window.location.pathname.replace('/preview', ''), { replace: true }) }}>
                                 <IoIosArrowBack size={20} color="#C94B32" />
                             </div>
                             <div className="right">
@@ -704,7 +704,7 @@ const ProjectDetails = () => {
                                 </div>
                                 {
                                     canMyrole('project.edit') &&
-                                    <button className='settings' onClick={() => { navigate(window.location.pathname.replace('/preview', '')) }}>
+                                    <button className='settings' onClick={() => { navigate(window.location.pathname.replace('/preview', ''), { replace: true }) }}>
                                         <img src={settingIcon} alt="settings-icon" />
                                     </button>
                                 }
@@ -760,7 +760,7 @@ const ProjectDetails = () => {
                                             return (
                                                 <div
                                                     className={item.accessControl && _get(item, 'unlocked', []).map(a => a.toLowerCase()).indexOf(account.toLowerCase()) == -1 ? "link-div locked" : "link-div"}
-                                                    onClick={() => navigate(window.location.pathname.replace('/preview', ''))}
+                                                    onClick={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}
                                                 >
                                                     {handleParseUrl(item.link, item.accessControl, _get(item, 'unlocked', []).map(a => a.toLowerCase()).indexOf(account.toLowerCase()) == -1)}
                                                     <p>{item.title.length > 25 ? item.title.slice(0, 25) + "..." : item.title}</p>
@@ -783,7 +783,7 @@ const ProjectDetails = () => {
                                 </div>
                                 {
                                     canMyrole('project.link.add') &&
-                                    <div className="links-right"><button onClick={() => navigate(window.location.pathname.replace('/preview', ''))}><HiOutlinePlus size={20} color="#C94B32" /></button></div>
+                                    <div className="links-right"><button onClick={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}><HiOutlinePlus size={20} color="#C94B32" /></button></div>
                                 }
                             </div>
                         }
@@ -867,10 +867,10 @@ const ProjectDetails = () => {
                                                 <div className="status" style={{ justifyContent: 'space-between' }}>
                                                     <span>Review frequency : {_get(Project, 'kra.frequency', [])}</span>
                                                     <div style={{ width: '50%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                                        <button className='archive-btn' onClick={() => navigate(window.location.pathname.replace('/preview', ''))}>
+                                                        <button className='archive-btn' onClick={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>
                                                             <img src={archiveIcon} alt="archive-icon" />
                                                         </button>
-                                                        {canMyrole('project.review') && <button className="review-btn" onClick={() => navigate(window.location.pathname.replace('/preview', ''))}>
+                                                        {canMyrole('project.review') && <button className="review-btn" onClick={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>
                                                             REVIEW
                                                         </button>}
                                                     </div>
@@ -896,7 +896,7 @@ const ProjectDetails = () => {
                                                                     <h1>{item.deadline}</h1>
                                                                 </div>
                                                                 {canMyrole('project.milestone.update') &&
-                                                                    <div className="check-circle" onClick={() => navigate(window.location.pathname.replace('/preview', ''))}>
+                                                                    <div className="check-circle" onClick={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>
                                                                         <FiCheck size={20} />
                                                                     </div>
                                                                 }
@@ -1004,7 +1004,7 @@ const ProjectDetails = () => {
 
                     {/* Tasks section */}
                     {canMyrole('project.task.view') && <div style={{ width: '80%' }}>
-                        <Tasks toggleShowCreateTask={toggleShowCreateTask} onlyProjects={true} />
+                        <Tasks toggleShowCreateTask={toggleShowCreateTask} preview={true} onlyProjects={true} />
                     </div>}
 
                     {/* members section */}

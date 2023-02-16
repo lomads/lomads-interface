@@ -669,7 +669,7 @@ const ProjectDetails = () => {
                     {/* Show KRA review side modal */}
                     {showKRAReview && <KRAReview toggleShowKRA={() => setShowKRAReview(false)} data={Project} daoURL={daoURL} />}
 
-                    <div className="home-btn" onClick={() => navigate(-1)}>
+                    <div className="home-btn" onClick={() => navigate('/', { replace: true })}>
                         <div className="invertedBox">
                             <div className="navbarText">
                                 {
@@ -739,7 +739,7 @@ const ProjectDetails = () => {
                         </div>
 
                         {/* new Links */}
-                        {canMyrole('project.links.view') && amIMember &&
+                        {canMyrole('project.links.view') &&
                             _get(Project, 'links', []).length > 0 &&
                             <div className="projectDetails-links">
                                 <div className="links-left">
@@ -776,10 +776,10 @@ const ProjectDetails = () => {
                                         })
                                     }
                                 </div>
-                                {
+                                {/* {
                                     canMyrole('project.link.add') &&
                                     <div className="links-right"><button onClick={toggleShowLink}><HiOutlinePlus size={20} color="#C94B32" /></button></div>
-                                }
+                                } */}
                             </div>
                         }
 
