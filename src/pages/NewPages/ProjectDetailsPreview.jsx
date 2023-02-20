@@ -127,8 +127,8 @@ const ProjectDetails = () => {
 
     useEffect(() => {
         if (Project) {
-            setLockedLinks(_get(Project, 'links', []).filter(link => link.accessControl && _get(link, 'unlocked', []).indexOf(account.toLowerCase()) == -1))
-            setOpenLinks(_get(Project, 'links', []).filter(link => ((!link.accessControl) || (_get(link, 'accessControl', null) && _get(link, 'unlocked', []).indexOf(account.toLowerCase()) > -1))))
+            setLockedLinks(_get(Project, 'links', []).filter(link => link.accessControl && _get(link, 'unlocked', []).indexOf(account?.toLowerCase()) == -1))
+            setOpenLinks(_get(Project, 'links', []).filter(link => ((!link.accessControl) || (_get(link, 'accessControl', null) && _get(link, 'unlocked', []).indexOf(account?.toLowerCase()) > -1))))
         }
     }, [Project]);
 
@@ -298,7 +298,7 @@ const ProjectDetails = () => {
         //if (unlockLoading) return;
         setUnlockLoading(link.id)
         console.log(_uniqBy(Project?.members, '_id'))
-        let memberExists = _find(_uniqBy(Project?.members, '_id'), member => member.wallet.toLowerCase() === account.toLowerCase())
+        let memberExists = _find(_uniqBy(Project?.members, '_id'), member => member.wallet.toLowerCase() === account?.toLowerCase())
         console.log("memberExists", memberExists)
         if (!memberExists)
             return setUnlockLoading(null);
@@ -759,7 +759,7 @@ const ProjectDetails = () => {
                                         _get(Project, 'links', []).map((item, index) => {
                                             return (
                                                 <div
-                                                    className={item.accessControl && _get(item, 'unlocked', []).map(a => a.toLowerCase()).indexOf(account.toLowerCase()) == -1 ? "link-div locked" : "link-div"}
+                                                    className={item.accessControl && _get(item, 'unlocked', []).map(a => a.toLowerCase()).indexOf(account?.toLowerCase()) == -1 ? "link-div locked" : "link-div"}
                                                     onClick={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}
                                                 >
                                                     {handleParseUrl(item.link, item.accessControl, _get(item, 'unlocked', []).map(a => a.toLowerCase()).indexOf(account.toLowerCase()) == -1)}

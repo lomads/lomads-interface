@@ -5,6 +5,31 @@ import '../../styles/pages/TaskDetails.css';
 import Footer from "components/Footer";
 import { LeapFrog } from "@uiball/loaders";
 
+import {
+    Button,
+    Menu,
+    MenuButton,
+    MenuList,
+    MenuItem,
+    MenuItemOption,
+    MenuGroup,
+    MenuOptionGroup,
+    MenuDivider,
+  } from '@chakra-ui/react'
+
+  import ShareSVG from '../../assets/svg/share.svg'
+  import copyIcon from "assets/svg/copyIcon.svg";
+
+  import {
+    TelegramIcon,
+    TwitterIcon,
+    WhatsappIcon,
+    LivejournalIcon,
+    TelegramShareButton,
+    TwitterShareButton,
+    WhatsappShareButton,
+  } from "react-share";
+
 import SafeButton from "UIpack/SafeButton";
 import useTerminology from 'hooks/useTerminology';
 import { useAppSelector, useAppDispatch } from "state/hooks";
@@ -175,7 +200,7 @@ const TaskDetails = () => {
             let current_user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
             console.log('currentuser', current_user);
             let reurntype_function = false;
-            if (current_user.discordRoles) {
+            if (current_user?.discordRoles) {
 
 
                 Task?.validRoles.map(channelid => {
@@ -670,6 +695,58 @@ const TaskDetails = () => {
                                                         :
                                                         null
                                                 }
+                                                <Menu>
+                                                    <MenuButton>
+                                                        <button style={{ 
+                                                            marginLeft: 0,
+                                                            background: 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)',
+                                                            height: '40px',
+                                                            minWidth: '40px',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            borderRadius: '5px'
+                                                         }}>
+                                                            <img style={{ width: 18, height: 18 }} src={ShareSVG} alt="settings-icon" />
+                                                        </button>
+                                                    </MenuButton>
+                                                    <MenuList style={{ display: 'flex', flexDirection: 'column', width: 350 }}>
+                                                    <MenuItem style={{ marginLeft: 0, height: 40 }}>
+                                                            <TwitterShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/task/${taskId}/preview`}>
+                                                                <div style={{ width: '100%' }}>
+                                                                    <TwitterIcon size={32}/>
+                                                                    <div style={{ marginLeft: 16 }}>Twitter</div>
+                                                                </div>
+                                                            </TwitterShareButton>
+                                                        </MenuItem>
+                                                        <MenuItem style={{ marginLeft: 0, height: 40 }}>
+                                                            <TelegramShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/task/${taskId}/preview`}>
+                                                                <div style={{ width: '100%' }}>
+                                                                    <TelegramIcon size={32}/>
+                                                                    <div style={{ marginLeft: 16 }}>Telegram</div>
+                                                                </div>
+                                                            </TelegramShareButton>
+                                                        </MenuItem>
+                                                        <MenuItem style={{ marginLeft: 0, height: 40 }}>
+                                                            <WhatsappShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/task/${taskId}/preview`}>
+                                                                <div style={{ width: '100%' }}>
+                                                                    <WhatsappIcon size={32}/>
+                                                                    <div style={{ marginLeft: 16 }}>Whatsapp</div>
+                                                                </div>
+                                                            </WhatsappShareButton>
+                                                        </MenuItem>
+                                                        <MenuItem onClick={() => {
+                                                            navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/task/${taskId}/preview`)
+                                                        }} style={{ marginLeft: 0, height: 40 }}>
+                                                            <div style={{ paddingLeft: 22 }}>
+                                                                <div style={{ width: '100%' }}>
+                                                                    <img style={{ marginLeft: 8 }} src={copyIcon} />
+                                                                    <div style={{ marginLeft: 24 }}>Copy to clipboard</div>
+                                                                </div>
+                                                            </div>
+                                                        </MenuItem>
+                                                    </MenuList>
+                                                </Menu>
                                             </div>
                                         </div>
                                     </div>

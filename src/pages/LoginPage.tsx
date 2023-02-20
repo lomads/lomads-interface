@@ -76,8 +76,6 @@ const LoginPage = (props: any) => {
 
 	const navigateTo = async () => {
 		const activeDao = sessionStorage.getItem('__lmds_active_dao')
-		if(from)
-			return from
 	    if(activeDao)
 			return `/${activeDao}`
 		return "/"
@@ -115,7 +113,9 @@ const LoginPage = (props: any) => {
 				await axiosHttp.post(`auth/create-account`)
 					.then(res => dispatch(setUser(res.data)))
 				const nTo = await navigateTo();
-				setTimeout(() => navigate(nTo), 100);
+				setTimeout(() => navigate(nTo, from ? { state: {
+					from
+				  } } : undefined), 100);
 			}
 		} else {
 			const nTo = await navigateTo();

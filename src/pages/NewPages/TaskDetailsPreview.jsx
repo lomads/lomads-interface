@@ -175,16 +175,16 @@ const TaskDetails = () => {
             let current_user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
             console.log('currentuser', current_user);
             let reurntype_function = false;
-            if (current_user.discordRoles) {
+            if (current_user && current_user?.discordRoles) {
 
 
                 Task?.validRoles.map(channelid => {
                     console.log('task chanellid', channelid);
 
 
-                    Object.keys(current_user.discordRoles).forEach(function (key, index) {
-                        console.log(current_user.discordRoles[key]);
-                        if (current_user.discordRoles[key].includes(channelid)) {
+                    Object.keys(current_user?.discordRoles).forEach(function (key, index) {
+                        console.log(current_user?.discordRoles[key]);
+                        if (current_user?.discordRoles[key].includes(channelid)) {
                             console.log('mathched');
                             reurntype_function = true;
                             return reurntype_function;

@@ -3,8 +3,33 @@ import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy } from
 import SafeButton from "UIpack/SafeButton";
 import '../../styles/pages/ProjectDetails.css';
 import { LeapFrog } from "@uiball/loaders";
-import lomadsfulllogo from "../../assets/svg/lomadsfulllogo.svg";
 
+import {
+    Button,
+    Menu,
+    MenuButton,
+    MenuList,
+    MenuItem,
+    MenuItemOption,
+    MenuGroup,
+    MenuOptionGroup,
+    MenuDivider,
+  } from '@chakra-ui/react'
+
+  import copyIcon from "assets/svg/copyIcon.svg";
+
+  import {
+    TelegramIcon,
+    TwitterIcon,
+    WhatsappIcon,
+    LivejournalIcon,
+    TelegramShareButton,
+    TwitterShareButton,
+    WhatsappShareButton,
+  } from "react-share";
+
+import lomadsfulllogo from "../../assets/svg/lomadsfulllogo.svg";
+import ShareSVG from '../../assets/svg/share.svg'
 import membersGroup from '../../assets/svg/membersGroup.svg'
 import iconSvg from '../../assets/svg/createProject.svg';
 import axios from "axios";
@@ -133,8 +158,8 @@ const ProjectDetails = () => {
 
     const canMyrole = useCallback((permission) => {
         if (!Project) return false;
-        let creator = _get(Project, 'creator', '').toLowerCase() === account.toLowerCase();
-        let inProject = _find(_uniqBy(Project?.members, '_id'), m => m.wallet.toLowerCase() === account.toLowerCase())
+        let creator = _get(Project, 'creator', '').toLowerCase() === account?.toLowerCase();
+        let inProject = _find(_uniqBy(Project?.members, '_id'), m => m.wallet.toLowerCase() === account?.toLowerCase())
         let p = permission;
         if (inProject)
             p = `${permission}.inproject`
@@ -690,12 +715,57 @@ const ProjectDetails = () => {
                                 <div>
                                     <h1>{Project?.name}</h1>
                                 </div>
-                                {
-                                    canMyrole('project.edit') &&
-                                    <button className='settings' onClick={() => { setShowEdit(true) }}>
-                                        <img src={settingIcon} alt="settings-icon" />
-                                    </button>
-                                }
+                                <div>
+                                    {
+                                        canMyrole('project.edit') &&
+                                        <button className='settings' onClick={() => { setShowEdit(true) }}>
+                                            <img src={settingIcon} alt="settings-icon" />
+                                        </button>
+                                    }
+                                    <Menu>
+                                        <MenuButton>
+                                            <button className='settings' style={{ marginLeft: 0 }} onClick={() => { setShowEdit(true) }}>
+                                                <img style={{ width: 18, height: 18 }} src={ShareSVG} alt="settings-icon" />
+                                            </button>
+                                        </MenuButton>
+                                        <MenuList style={{ display: 'flex', flexDirection: 'column', width: 350 }}>
+                                        <MenuItem style={{ marginLeft: 0, height: 40 }}>
+                                                <TwitterShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`}>
+                                                    <div style={{ width: '100%' }}>
+                                                        <TwitterIcon size={32}/>
+                                                        <div style={{ marginLeft: 16 }}>Twitter</div>
+                                                    </div>
+                                                </TwitterShareButton>
+                                            </MenuItem>
+                                            <MenuItem style={{ marginLeft: 0, height: 40 }}>
+                                                <TelegramShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`}>
+                                                    <div style={{ width: '100%' }}>
+                                                        <TelegramIcon size={32}/>
+                                                        <div style={{ marginLeft: 16 }}>Telegram</div>
+                                                    </div>
+                                                </TelegramShareButton>
+                                            </MenuItem>
+                                            <MenuItem style={{ marginLeft: 0, height: 40 }}>
+                                                <WhatsappShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`}>
+                                                    <div style={{ width: '100%' }}>
+                                                        <WhatsappIcon size={32}/>
+                                                        <div style={{ marginLeft: 16 }}>Whatsapp</div>
+                                                    </div>
+                                                </WhatsappShareButton>
+                                            </MenuItem>
+                                            <MenuItem onClick={() => {
+                                                navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`)
+                                            }} style={{ marginLeft: 0, height: 40 }}>
+                                                <div style={{ paddingLeft: 22 }}>
+                                                    <div style={{ width: '100%' }}>
+                                                        <img style={{ marginLeft: 8 }} src={copyIcon} />
+                                                        <div style={{ marginLeft: 24 }}>Copy to clipboard</div>
+                                                    </div>
+                                                </div>
+                                            </MenuItem>
+                                        </MenuList>
+                                    </Menu>
+                                </div>
                                 {/* {
                                     <div>
                                         {canMyrole('project.delete') && <button onClick={() => setDeletePrompt(true)}>
