@@ -20,6 +20,7 @@ import ProjectDetailsPreview from "../pages/NewPages/ProjectDetailsPreview";
 import OnlyWhitelisted from "pages/NewPages/OnlyWhitelisted";
 import ArchiveProjects from "../pages/NewPages/ArchiveProjects";
 import TaskDetails from "pages/NewPages/TaskDetails";
+import TaskDetailsPreview from "pages/NewPages/TaskDetailsPreview";
 import AllTasks from "pages/NewPages/AllTasks";
 import ArchiveTasks from "pages/NewPages/ArchiveTasks";
 import ArchiveProjectTasks from "pages/NewPages/ArchiveProjectTasks";
@@ -111,6 +112,10 @@ export default [
     {
         path: '/:daoURL/task/:taskId',
         component: TaskDetails
+    },
+    {
+        path: '/:daoURL/task/:taskId/preview',
+        component: TaskDetailsPreview
     },
     {
         path: '/:daoURL/settings',

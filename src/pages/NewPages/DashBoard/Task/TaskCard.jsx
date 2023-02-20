@@ -21,7 +21,7 @@ import submissionDashboard from '../../../../assets/svg/submission_dashboard.svg
 import { IoMdClose } from 'react-icons/io'
 import { useAppSelector } from "state/hooks";
 
-const TaskCard = ({ task, daoUrl }) => {
+const TaskCard = ({ task, daoUrl, preview = false }) => {
     const navigate = useNavigate();
     console.log("task card : ", task)
     const { provider, account, chainId } = useWeb3React();
@@ -101,7 +101,7 @@ const TaskCard = ({ task, daoUrl }) => {
 
 
     return (
-        <div className='tasks-card' onClick={() => navigate(`/${daoUrl}/task/${task._id}`, { state: { task } })}>
+        <div className='tasks-card' onClick={() => navigate(`/${daoUrl}/task/${task._id}${preview ? '/preview' : ''}`, { state: { task } })}>
             {( ( ( (task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign' ) && submissionCount > 0  ) || applicationCount > 0) && task.creator === user._id &&
                 <div className='tasks-card-icons'>
                     {((task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign' ) && submissionCount > 0 ?

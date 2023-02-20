@@ -681,7 +681,7 @@ const ProjectDetails = () => {
                     {/* Show KRA review side modal */}
                     {showKRAReview && <KRAReview toggleShowKRA={() => setShowKRAReview(false)} data={Project} daoURL={daoURL} />}
 
-                    <div className="home-btn" onClick={() => navigate(-1)}>
+                    <div className="home-btn" onClick={() => navigate('/', { replace: true }) }>
                         <div className="invertedBox">
                             <div className="navbarText">
                                 {
@@ -695,19 +695,19 @@ const ProjectDetails = () => {
 
                     <div className="projectDetails-top">
                         <div className="projectDetails-name">
-                            <div className="left" onClick={() => { navigate(window.location.pathname.replace('/preview', ''), { replace: true }) }}>
+                            <div className="left" onClick={() => { navigate('/', { replace: true }) }}>
                                 <IoIosArrowBack size={20} color="#C94B32" />
                             </div>
                             <div className="right">
                                 <div>
                                     <h1>{Project?.name}</h1>
                                 </div>
-                                {
+                                {/* {
                                     canMyrole('project.edit') &&
                                     <button className='settings' onClick={() => { navigate(window.location.pathname.replace('/preview', ''), { replace: true }) }}>
                                         <img src={settingIcon} alt="settings-icon" />
                                     </button>
-                                }
+                                } */}
                                 {/* {
                                     <div>
                                         {canMyrole('project.delete') && <button onClick={() => setDeletePrompt(true)}>
@@ -781,10 +781,10 @@ const ProjectDetails = () => {
                                         })
                                     }
                                 </div>
-                                {
+                                {/* {
                                     canMyrole('project.link.add') &&
                                     <div className="links-right"><button onClick={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}><HiOutlinePlus size={20} color="#C94B32" /></button></div>
-                                }
+                                } */}
                             </div>
                         }
 
@@ -866,14 +866,14 @@ const ProjectDetails = () => {
                                                 :
                                                 <div className="status" style={{ justifyContent: 'space-between' }}>
                                                     <span>Review frequency : {_get(Project, 'kra.frequency', [])}</span>
-                                                    <div style={{ width: '50%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                                                    {/* <div style={{ width: '50%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                                                         <button className='archive-btn' onClick={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>
                                                             <img src={archiveIcon} alt="archive-icon" />
                                                         </button>
                                                         {canMyrole('project.review') && <button className="review-btn" onClick={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>
                                                             REVIEW
                                                         </button>}
-                                                    </div>
+                                                    </div> */}
                                                 </div>
                                         }
                                     </div>

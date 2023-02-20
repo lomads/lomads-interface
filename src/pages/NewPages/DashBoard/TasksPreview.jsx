@@ -242,7 +242,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                         {transformTask().labelPlural}
                     </button>
                 </div>
-                <div className="tasks-buttons">
+                {/* <div className="tasks-buttons">
                     <div style={{ marginRight: '20px' }}>
                         <button className='archive-btn' onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { activeTab: tab } }) : navigate(`/${DAO.url}/tasks`, { state: { activeTab: tab } }) }}>
                             <img src={expandIcon} alt="archive-icon" />
@@ -273,28 +273,20 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                             />
                         </div>
                     }
-                </div>
+                </div> */}
             </div>
                 <div className='tasks-body'>
                     {
-                        tab === 4 && _get(Project, 'tasks', []) && _get(Project, 'tasks', []).filter((item, index) => index < 6).map((item, index) => {
-                            if (index <= 4) {
-                                return (
-                                    <div key={index}>
-                                        <TaskCard
-                                            task={item}
-                                            daoUrl={DAO?.url}
-                                        />
-                                    </div>
-                                )
-                            }
-                            else {
-                                return (
-                                    <div className='all-tasks' onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { activeTab: tab } }) : navigate(`/${DAO.url}/tasks`, { state: { activeTab: tab } }) }}>
-                                        <span>Show All</span>
-                                    </div>
-                                )
-                            }
+                        tab === 4 && _get(Project, 'tasks', []) && _get(Project, 'tasks', []).map((item, index) => {
+                            return (
+                                <div key={index}>
+                                    <TaskCard
+                                        preview={true}
+                                        task={item}
+                                        daoUrl={DAO?.url}
+                                    />
+                                </div>
+                            )
                         })
                     }
                 </div>
