@@ -722,6 +722,7 @@ const ProjectDetails = () => {
                                             <img src={settingIcon} alt="settings-icon" />
                                         </button>
                                     }
+                                    { canMyrole('project.share') &&
                                     <Menu>
                                         <MenuButton>
                                             <button className='settings' style={{ marginLeft: 0 }} onClick={() => { setShowEdit(true) }}>
@@ -765,6 +766,7 @@ const ProjectDetails = () => {
                                             </MenuItem>
                                         </MenuList>
                                     </Menu>
+                                    }
                                 </div>
                                 {/* {
                                     <div>

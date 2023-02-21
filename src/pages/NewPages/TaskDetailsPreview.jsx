@@ -8,7 +8,7 @@ import { LeapFrog } from "@uiball/loaders";
 import SafeButton from "UIpack/SafeButton";
 import useTerminology from 'hooks/useTerminology';
 import { useAppSelector, useAppDispatch } from "state/hooks";
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { IoIosArrowBack } from 'react-icons/io'
 import { GoKebabVertical } from 'react-icons/go'
 import { SiNotion } from "react-icons/si";
@@ -50,6 +50,8 @@ import EditDraftTask from "./DashBoard/Task/EditDraftTask";
 const TaskDetails = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const location = useLocation()
+	const previewFromProject = location?.state?.previewFromProject;
     const { provider, account, chainId } = useWeb3React();
     const { taskId, daoURL } = useParams();
     const { DAO, Task, TaskLoading, user, archiveTaskLoading, deleteTaskLoading } = useAppSelector((state) => state.dashboard);
@@ -385,7 +387,7 @@ const TaskDetails = () => {
                                     null
                             }
 
-                            <div className="home-btn" onClick={() => { navigate('/', { replace: true }) }}>
+                            <div className="home-btn">
                                 <div className="invertedBox">
                                     <div className="navbarText">
                                         {
@@ -403,7 +405,7 @@ const TaskDetails = () => {
 
                                 <div className="taskDetails-header">
                                     <div className="header-name">
-                                        <div className="left" onClick={() => { navigate('/', { replace: true }) }}>
+                                        <div className="left" onClick={() => { previewFromProject ? navigate(-1) : navigate('/', { replace: true }) }}>
                                             <IoIosArrowBack size={20} color="#C94B32" />
                                         </div>
                                         <div className="right">
@@ -760,7 +762,7 @@ const TaskDetails = () => {
                                                                             <span>{submissionCount}</span>
                                                                         </div>
                                                                         <h1>{submissionCount > 1 ? 'Submissions' : 'Submission'}</h1>
-                                                                        {/* {!Task.draftedAt && <button onClick={() => { submissionCount > 0 && setOpenTaskReview(true) }}>CHECK</button>} */}
+                                                                        {!Task.draftedAt && <button onChange={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>CHECK</button>}
                                                                     </>
                                                                     :
                                                                     <>
@@ -769,7 +771,7 @@ const TaskDetails = () => {
                                                                             <span>{applicationCount}</span>
                                                                         </div>
                                                                         <h1>{applicationCount > 1 ? 'Applicants' : 'Applicant'}</h1>
-                                                                        {/* {!Task.draftedAt && <button onClick={handleOpenApplicantsSlider}>CHECK</button>} */}
+                                                                        {!Task.draftedAt && <button onChange={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>CHECK</button>}
                                                                     </>
                                                             }
                                                         </>
@@ -828,13 +830,13 @@ const TaskDetails = () => {
                                                                                                         <>
 
                                                                                                             <h1>This  {transformTask().label.toLowerCase()}<br />fits your role.</h1>
-                                                                                                            {/* {moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt ? null : <button onClick={() => setOpenApply(true)}>APPLY</button>} */}
+                                                                                                            {moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt ? null : <button onChange={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>APPLY</button>}
                                                                                                         </>
                                                                                                         :
                                                                                                         // mulitple contributor
                                                                                                         <>
                                                                                                             <h1>This  {transformTask().label.toLowerCase()}<br />fits your role.</h1>
-                                                                                                            {/* {!Task.draftedAt && <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>} */}
+                                                                                                            {!Task.draftedAt && <button onChange={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>SUBMIT WORK</button>}
 
                                                                                                         </>
                                                                                                 }
@@ -855,14 +857,14 @@ const TaskDetails = () => {
                                                                                             <>
 
                                                                                                 <h1>This {transformTask().label.toLowerCase()} needs a<br />contributor.</h1>
-                                                                                                {/* {moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt ? null : <button onClick={() => setOpenApply(true)}>APPLY</button>} */}
+                                                                                                {moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt ? null : <button onChange={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>APPLY</button>}
 
                                                                                             </>
                                                                                             :
                                                                                             // mulitple contributor
                                                                                             <>
                                                                                                 <h1>Open for all.</h1>
-                                                                                                {/* {!Task.draftedAt && <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>} */}
+                                                                                                {!Task.draftedAt && <button onChange={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>SUBMIT WORK</button>}
 
                                                                                             </>
                                                                                     }
@@ -931,7 +933,7 @@ const TaskDetails = () => {
                                                         // for others
                                                         <>
                                                             <h1>{transformTask().label} is submitted</h1>
-                                                            {/* {amICreator && !Task.draftedAt && <button onClick={() => setOpenTaskReview(true)}>CHECK</button>} */}
+                                                            {amICreator && !Task.draftedAt && <button onChange={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>CHECK</button>}
                                                         </>
                                                 }
                                             </>
@@ -981,7 +983,7 @@ const TaskDetails = () => {
                                                                     <>
                                                                         <h1>Your submission has been rejected!</h1>
                                                                         <p style={{ color: '#FFF' }}>{renderRejectionNote}</p>
-                                                                        {/* <button onClick={() => setOpenSubmit(true)}>SUBMIT AGAIN</button> */}
+                                                                        <button onChange={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>SUBMIT AGAIN</button>
                                                                     </>
                                                             }
                                                         </>

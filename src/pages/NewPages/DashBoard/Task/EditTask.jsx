@@ -397,7 +397,7 @@ const EditTask = ({ close, task, daoURL }) => {
                                                     disabled
                                                 >
 
-                                                    <option value={null}>{_find(_get(task, 'members', []), m => m.status === 'approved').member.name && _find(_get(task, 'members', []), m => m.status === 'approved').member.name !== "" ? `${_find(_get(task, 'members', []), m => m.status === 'approved').member.name}  (${beautifyHexToken(_find(_get(task, 'members', []), m => m.status === 'approved').member.wallet)})` : beautifyHexToken(_find(_get(task, 'members', []), m => m.status === 'approved').member.wallet)}</option>
+                                                    <option value={null}>{_find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.name && _find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.name !== "" ? `${_find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.name}  (${beautifyHexToken(_find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.wallet)})` : beautifyHexToken(_find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.wallet)}</option>
                                                     {/* {
                                                         eligibleContributors.map((item, index) => {
                                                             return (

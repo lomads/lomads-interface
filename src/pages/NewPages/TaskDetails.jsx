@@ -695,6 +695,7 @@ const TaskDetails = () => {
                                                         :
                                                         null
                                                 }
+                                                {(amICreator || can(myRole, 'task.share')) &&
                                                 <Menu>
                                                     <MenuButton>
                                                         <button style={{ 
@@ -747,6 +748,7 @@ const TaskDetails = () => {
                                                         </MenuItem>
                                                     </MenuList>
                                                 </Menu>
+                                                }
                                             </div>
                                         </div>
                                     </div>

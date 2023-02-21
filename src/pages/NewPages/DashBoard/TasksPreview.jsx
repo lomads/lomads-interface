@@ -14,7 +14,7 @@ import archiveIcon from '../../../assets/svg/archiveIcon.svg';
 import expandIcon from '../../../assets/svg/expand.svg';
 import moment from 'moment';
 
-const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
+const Tasks = ({ toggleShowCreateTask, onlyProjects, previewFromProject = false }) => {
     const navigate = useNavigate();
     const { DAO, user, Project } = useAppSelector((state) => state.dashboard);
     const { transformTask } = useTerminology(_get(DAO, 'terminologies', null))
@@ -282,6 +282,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                                 <div key={index}>
                                     <TaskCard
                                         preview={true}
+                                        previewFromProject={previewFromProject}
                                         task={item}
                                         daoUrl={DAO?.url}
                                     />

@@ -681,7 +681,7 @@ const ProjectDetails = () => {
                     {/* Show KRA review side modal */}
                     {showKRAReview && <KRAReview toggleShowKRA={() => setShowKRAReview(false)} data={Project} daoURL={daoURL} />}
 
-                    <div className="home-btn" onClick={() => navigate('/', { replace: true }) }>
+                    <div className="home-btn">
                         <div className="invertedBox">
                             <div className="navbarText">
                                 {
@@ -1004,7 +1004,7 @@ const ProjectDetails = () => {
 
                     {/* Tasks section */}
                     {canMyrole('project.task.view') && <div style={{ width: '80%' }}>
-                        <Tasks toggleShowCreateTask={toggleShowCreateTask} preview={true} onlyProjects={true} />
+                        <Tasks toggleShowCreateTask={toggleShowCreateTask} previewFromProject={true} preview={true} onlyProjects={true} />
                     </div>}
 
                     {/* members section */}
