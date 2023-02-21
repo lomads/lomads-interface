@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, createContext } from "react";
 import "./Settings.css";
 import { get as _get, find as _find } from "lodash";
 import settingIcon from "../../assets/svg/settingsXL.svg";
 import { CgClose } from "react-icons/cg";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Table from "react-bootstrap/Table";
+import axiosHttp from '../../api';
 
 import {
 	Button,
@@ -62,6 +63,10 @@ import CompensateMembersDoneModal from "./CompensateMembersDoneModal";
 import DisableXpPointDailog from "./DisableXpPointDailog";
 import eventEmitter from "utils/eventEmmiter";
 
+const CLIENT_ID = "8472b2207a0e12684382";
+
+export const CodeContext = createContext();
+
 const Settings = () => {
 	const navigate = useNavigate();
 	const { daoURL } = useParams();
@@ -77,13 +82,15 @@ const Settings = () => {
 	const [openTerminology, setOpenTerminology] = useState(false);
 	const [openDiscord, setOpenDiscord] = useState(false);
 	const [openCreatePassToken, setOpenCreatePassToken] = useState(false);
-
+	const [repoInfo, setRepoInfo] = useState('');
 
 	const { DAO, updateDaoLoading, updateDaoLinksLoading } = useAppSelector((state) => state.dashboard);
 
 	console.log("DAO data : ", DAO);
 
 	const [name, setName] = useState(_get(DAO, 'name', ''));
+
+	const [code, setCode] = useState('');
 
 	useEffect(() => {
 		setName(_get(DAO, 'name', ''))
@@ -105,6 +112,31 @@ const Settings = () => {
 			})
 		}
 	}, [])
+
+	useEffect(() => {
+		const queryString = window.location.search;
+		const urlParams = new URLSearchParams(queryString);
+		const codeParam = urlParams.get("code");
+
+		if (codeParam) {
+			setCode(codeParam);
+			// async function getAccessToken() {
+			// 	axiosHttp.get('utility/getGithubAccessToken?code=' + codeParam)
+			// 		.then((response) => {
+			// 			console.log("response : ", response.data);
+			// 			axiosHttp.post('utility/create-webhook', { token: response.data.access_token, repoInfo })
+			// 				.then((res) => {
+			// 					console.log("res : ", res)
+			// 				})
+			// 		})
+			// }
+			// getAccessToken();
+		}
+	}, []);
+
+	// const githubLogin = () => {
+	// 	window.location.assign(`https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&scope=repo%20user%20admin:repo_hook%20admin:org&redirect_uri=http://localhost:3000/${_get(DAO, 'url', '')}/settings`);
+	// }
 
 	//! TOGGLE FUNCTIONS
 	let toggleOrganisationDetailsModal = () => {
@@ -134,7 +166,7 @@ const Settings = () => {
 	const daoName = name.split(" ");
 
 	return (
-		<>
+		<CodeContext.Provider value={code}>
 			<div className="settings-page">
 				{/* <DisableXpPointDailog
                     toggleShowLink={toggleCreatePassTokenModal}
@@ -313,6 +345,7 @@ const Settings = () => {
 			{openOrganisationDetails && (
 				<OrganisationDetailsModal
 					toggleOrganisationDetailsModal={toggleOrganisationDetailsModal}
+				// githubLogin={githubLogin}
 				/>
 			)}
 			{/* // !-------------  Roles & Permissions ------------ */}
@@ -349,7 +382,7 @@ const Settings = () => {
 			{openDiscord && (
 				<DiscordModal toggleDiscord={toggleDiscord} />
 			)}
-		</>
+		</CodeContext.Provider>
 	);
 };
 

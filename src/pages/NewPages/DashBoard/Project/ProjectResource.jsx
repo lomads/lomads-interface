@@ -18,7 +18,7 @@ import AddNotionLink from 'components/AddNotionLink';
 
 import { nanoid } from '@reduxjs/toolkit';
 import { resetEditProjectLinksLoader } from 'state/dashboard/reducer';
-import { editProjectLinks } from "state/dashboard/actions";
+import { editProjectLinks, storeGithubIssues } from "state/dashboard/actions";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 
 const ProjectResource = ({ toggleShowResource, getResources, list, editResources }) => {
@@ -63,6 +63,44 @@ const ProjectResource = ({ toggleShowResource, getResources, list, editResources
             setAccessControlError(null)
         }
     }, [link, DAO]);
+
+    const requestReposIssues = (name) => {
+        const token = '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';
+        fetch(`https://api.github.com/repos/${name}/issues`,
+            {
+                headers: {
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Authorization': `token ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("github issues : ", data);
+                var newArray = data.map((i) => (
+                    {
+                        daoId: DAO?._id,
+                        provider: 'Github',
+                        name: i.title,
+                        description: i.body,
+                        creator: null,
+                        members: [],
+                        // project id will go here
+                        project: null,
+                        discussionChannel: i.html_url,
+                        deadline: null,
+                        submissionLink: i.html_url,
+                        compensation: null,
+                        reviewer: null,
+                        contributionType: 'open',
+                        createdAt: i.created_at,
+                        draftedAt: Date.now(),
+                    }
+                ))
+
+                console.log("new array : ", newArray);
+                dispatch(storeGithubIssues({ payload: { daoId: _get(DAO, '_id', null), issueList: newArray } }))
+            })
+    }
 
     const accesscontrolDisabled = useMemo(() => {
         return (!link || (link && link.length <= 8) || (link.indexOf('discord.') == -1 && link.indexOf('notion.') == -1))

@@ -18,34 +18,54 @@ import "./polyfill";
 import 'react-toastify/dist/ReactToastify.css';
 
 const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement
+	document.getElementById("root") as HTMLElement
 );
 const serverUrl = process.env.REACT_APP_MORALIS_SERVER_URL as string;
 const appId = process.env.REACT_APP_MORALIS_APP_ID as string;
 
 root.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <LanguageProvider>
-        <Web3Provider>
-          <BlockNumberProvider>
-            <MulticallUpdater />
-            <TransactionUpdater />
-            <ThemeProvider>
-              <ThemedGlobalStyle />
-              <BrowserRouter>
-                <ChakraProvider>
-                  <MoralisProvider serverUrl={serverUrl} appId={appId}>
-                    <App />
-                  </MoralisProvider>
-                </ChakraProvider>
-              </BrowserRouter>
-            </ThemeProvider>
-          </BlockNumberProvider>
-        </Web3Provider>
-      </LanguageProvider>
-    </Provider>
-  </React.StrictMode>
+	// <React.StrictMode>
+	// 	<Provider store={store}>
+	// 		<LanguageProvider>
+	// 			<Web3Provider>
+	// 				<BlockNumberProvider>
+	// 					<MulticallUpdater />
+	// 					<TransactionUpdater />
+	// 					<ThemeProvider>
+	// 						<ThemedGlobalStyle />
+	// 						<BrowserRouter>
+	// 							<ChakraProvider>
+	// 								<MoralisProvider serverUrl={serverUrl} appId={appId}>
+	// 									<App />
+	// 								</MoralisProvider>
+	// 							</ChakraProvider>
+	// 						</BrowserRouter>
+	// 					</ThemeProvider>
+	// 				</BlockNumberProvider>
+	// 			</Web3Provider>
+	// 		</LanguageProvider>
+	// 	</Provider>
+	// </React.StrictMode>
+	<Provider store={store}>
+		<LanguageProvider>
+			<Web3Provider>
+				<BlockNumberProvider>
+					<MulticallUpdater />
+					<TransactionUpdater />
+					<ThemeProvider>
+						<ThemedGlobalStyle />
+						<BrowserRouter>
+							<ChakraProvider>
+								<MoralisProvider serverUrl={serverUrl} appId={appId}>
+									<App />
+								</MoralisProvider>
+							</ChakraProvider>
+						</BrowserRouter>
+					</ThemeProvider>
+				</BlockNumberProvider>
+			</Web3Provider>
+		</LanguageProvider>
+	</Provider>
 );
 
 // If you want to start measuring performance in your app, pass a function

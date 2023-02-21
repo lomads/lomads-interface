@@ -10,13 +10,12 @@ import { get as _get, find as _find } from 'lodash';
 import { isValidUrl } from "utils";
 import { useDispatch } from "react-redux";
 import axiosHttp from 'api'
-import { updateDao, updateDaoLinks } from 'state/dashboard/actions';
+import { updateDao, updateDaoLinks, storeGithubIssues } from 'state/dashboard/actions';
 import AddDiscordLink from 'components/AddDiscordLink';
 import { setDAO } from "state/dashboard/reducer";
+import AddGithubLink from "components/AddGithubLink";
 
-const OrganisationDetails = ({
-	toggleOrganisationDetailsModal,
-}) => {
+const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) => {
 
 	const { DAO, updateDaoLoading, updateDaoLinksLoading } = useAppSelector((state) => state.dashboard);
 	const [name, setName] = useState(_get(DAO, 'name', ''));
@@ -32,7 +31,28 @@ const OrganisationDetails = ({
 	}, [DAO])
 
 	const addLink = useCallback(() => {
-		if(!linkTitle || !link || (linkTitle && linkTitle === '') || (link && link === ''))
+		// try {
+		// 	const url = new URL(link);
+		// 	if (url.hostname.indexOf('github.') > -1) {
+		// 		const result = extractGitHubRepoPath(link);
+		// 		githubLogin(result);
+		// 	}
+		// 	else {
+		// 		if (!linkTitle || !link || (linkTitle && linkTitle === '') || (link && link === ''))
+		// 			return;
+		// 		let tempLink = link
+		// 		if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
+		// 			tempLink = 'https://' + link;
+		// 		}
+		// 		setDaoLinks([...daoLinks, { title: linkTitle, link: tempLink }]);
+		// 		setLinkTitle("")
+		// 		setLink("")
+		// 	}
+		// }
+		// catch (e) {
+		// 	console.error(e);
+		// }
+		if (!linkTitle || !link || (linkTitle && linkTitle === '') || (link && link === ''))
 			return;
 		let tempLink = link
 		if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
@@ -41,7 +61,8 @@ const OrganisationDetails = ({
 		setDaoLinks([...daoLinks, { title: linkTitle, link: tempLink }]);
 		setLinkTitle("")
 		setLink("")
-	}, [link, linkTitle])
+
+	}, [link, linkTitle]);
 
 	const saveChanges = () => {
 		console.log(description)
@@ -210,19 +231,48 @@ const OrganisationDetails = ({
 												}
 											/>
 										}
-										onGuildCreateSuccess={handleOnServerAdded} accessControl={true} link={link} /> :
-									<IconButton
-										className="addButton"
-										Icon={<AiOutlinePlus style={{ height: 30, width: 30 }} />}
-										height={40}
-										width={40}
-										onClick={() => addLink()}
-										bgColor={
-											(linkTitle.length > 0 && isValidUrl(link))
-												? "#C94B32"
-												: "rgba(27, 43, 65, 0.2)"
-										}
+										onGuildCreateSuccess={handleOnServerAdded}
+										accessControl={true}
+										link={link}
 									/>
+									:
+									<>
+										{
+											link && link.indexOf('github.') > -1
+												?
+												<AddGithubLink
+													link={link}
+													linkTitle={linkTitle}
+													renderButton={
+														<IconButton
+															className="addButton"
+															Icon={<AiOutlinePlus style={{ height: 30, width: 30 }} />}
+															height={40}
+															width={40}
+															bgColor={
+																(linkTitle.length > 0 && isValidUrl(link))
+																	? "#C94B32"
+																	: "rgba(27, 43, 65, 0.2)"
+															}
+														/>
+													}
+												/>
+												:
+												<IconButton
+													className="addButton"
+													Icon={<AiOutlinePlus style={{ height: 30, width: 30 }} />}
+													height={40}
+													width={40}
+													// onClick={githubLogin}
+													onClick={() => addLink()}
+													bgColor={
+														(linkTitle.length > 0 && isValidUrl(link))
+															? "#C94B32"
+															: "rgba(27, 43, 65, 0.2)"
+													}
+												/>
+										}
+									</>
 								}
 							</div>
 							{daoLinks.length > 0 &&
@@ -252,13 +302,13 @@ const OrganisationDetails = ({
 													}}
 												>
 													<p width="50%">{item.title.length > 7 ? item.title.substring(0, 7) + "..." : item.title}</p>
-													<p width="50%" style={{ 
+													<p width="50%" style={{
 														paddingLeft: 8,
 														width: 250,
 														whiteSpace: 'nowrap',
 														overflow: 'hidden',
 														textOverflow: 'ellipsis'
-													 }}>{item.link}</p>
+													}}>{item.link}</p>
 												</div>
 												<div
 													className="deleteButton"

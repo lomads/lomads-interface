@@ -67,8 +67,8 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
 
     const getrolename = (roleId) => {
 
-        for (let index = 0; index < Object.keys(DAO.discord).length; index++) {
-            const element = Object.keys(DAO.discord)[index];
+        for (let index = 0; index < Object.keys(_get(DAO, 'discord', {})).length; index++) {
+            const element = Object.keys(_get(DAO, 'discord', {}))[index];
             const rolename_discord = _find(DAO.discord[element].roles, r => r.id === roleId)
             if (rolename_discord) {
                 return rolename_discord.name
