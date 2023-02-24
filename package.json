@@ -91,6 +91,7 @@
     "react-helmet": "^6.1.0",
     "react-icons": "^4.4.0",
     "react-loader-spinner": "^5.1.7-beta.1",
+    "react-login-github": "^1.0.8",
     "react-moralis": "1.4.0",
     "react-popover-portal": "^0.3.5",
     "react-popper": "^2.3.0",

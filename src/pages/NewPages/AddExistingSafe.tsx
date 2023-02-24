@@ -11,13 +11,13 @@ import { updateHolder } from "state/proposal/reducer";
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import { ImportSafe } from "connection/SafeCall";
 import {
-  updateSafeAddress,
-  updatesafeName,
-  updateTotalMembers,
-  resetCreateDAOLoader,
-  updateDaoAddress,
-  updateDaoName,
-  updateInvitedGang
+	updateSafeAddress,
+	updatesafeName,
+	updateTotalMembers,
+	resetCreateDAOLoader,
+	updateDaoAddress,
+	updateDaoName,
+	updateInvitedGang
 } from "state/flow/reducer";
 import { ethers } from "ethers";
 import AddressInputField from "UIpack/AddressInputField";
@@ -33,22 +33,22 @@ import { usePrevious } from "hooks/usePrevious";
 import { updateDaoMember } from "state/dashboard/actions";
 
 const AddExistingSafe = () => {
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-  const safeAddress = useAppSelector((state) => state.flow.safeAddress);
-  const safeName = useAppSelector((state) => state.flow.safeName);
-  const selectedOwners = useAppSelector((state) => state.flow.owners);
-  const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
-  const [safeOwners, setSafeOwners] = useState<string[]>([]);
-  const [tokens, setTokens] = useState<any>([]);
-  const [errors, setErrors] = useState<any>({});
-  const [balance, setBalance] = useState<string>("");
-  const [isLoading, setisLoading] = useState<boolean>(false);
-  const owners = useRef<InviteGangType[]>([]);
-  const safeNameRef = useRef<string>("");
-  const [showSafeDetails, setShowSafeDetails] = useState<boolean>(false);
-  const flow = useAppSelector((state) => state.flow);
-  const createDAOLoading = useAppSelector((state) => state.flow.createDAOLoading);
+	const dispatch = useAppDispatch();
+	const navigate = useNavigate();
+	const safeAddress = useAppSelector((state) => state.flow.safeAddress);
+	const safeName = useAppSelector((state) => state.flow.safeName);
+	const selectedOwners = useAppSelector((state) => state.flow.owners);
+	const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
+	const [safeOwners, setSafeOwners] = useState<string[]>([]);
+	const [tokens, setTokens] = useState<any>([]);
+	const [errors, setErrors] = useState<any>({});
+	const [balance, setBalance] = useState<string>("");
+	const [isLoading, setisLoading] = useState<boolean>(false);
+	const owners = useRef<InviteGangType[]>([]);
+	const safeNameRef = useRef<string>("");
+	const [showSafeDetails, setShowSafeDetails] = useState<boolean>(false);
+	const flow = useAppSelector((state) => state.flow);
+	const createDAOLoading = useAppSelector((state) => state.flow.createDAOLoading);
 
 	const { provider, account, chainId } = useWeb3React();
 
@@ -59,49 +59,49 @@ const AddExistingSafe = () => {
 	}, [])
 
 	const UseExistingSafe = useCallback(async () => {
-		if(isLoading) return;
-		if(chainId){
+		if (isLoading) return;
+		if (chainId) {
 			owners.current = [];
 			setisLoading(true);
 			ImportSafe(provider, safeAddress)
-			.then(async safeSDK => {
-				dispatch(updateHolder(safeSDK.getAddress() as string));
-				const safeowners: string[] = await safeSDK.getOwners();
-				safeowners.map((ownerAddress: string, index: number) => {
-					let obj: InviteGangType = { name: "", address: "" };
-					obj["address"] = ownerAddress;
-					if(!_.find(owners.current, (w:any) => w.address.toLowerCase() === obj.address.toLowerCase()))
-						owners.current.push(obj);
-				});
-				const bal = await safeSDK.getBalance();
-				setBalance(bal.toString());
-				await getTokens(safeAddress);
-				setShowSafeDetails(true);
-				setisLoading(false);
-			})
-			.catch(e => {
-				setisLoading(false);
-				console.log(e)
-				if(e.message === "SafeProxy contract is not deployed on the current network"){
-					if(chainId) {
-						const chain = chainId || 137;
-						setErrors({ issafeAddress: `This safe is not on ${CHAIN_IDS_TO_NAMES[chain]}` });
+				.then(async safeSDK => {
+					dispatch(updateHolder(safeSDK.getAddress() as string));
+					const safeowners: string[] = await safeSDK.getOwners();
+					safeowners.map((ownerAddress: string, index: number) => {
+						let obj: InviteGangType = { name: "", address: "" };
+						obj["address"] = ownerAddress;
+						if (!_.find(owners.current, (w: any) => w.address.toLowerCase() === obj.address.toLowerCase()))
+							owners.current.push(obj);
+					});
+					const bal = await safeSDK.getBalance();
+					setBalance(bal.toString());
+					await getTokens(safeAddress);
+					setShowSafeDetails(true);
+					setisLoading(false);
+				})
+				.catch(e => {
+					setisLoading(false);
+					console.log(e)
+					if (e.message === "SafeProxy contract is not deployed on the current network") {
+						if (chainId) {
+							const chain = chainId || 137;
+							setErrors({ issafeAddress: `This safe is not on ${CHAIN_IDS_TO_NAMES[chain]}` });
+						}
 					}
-				}
-			})
+				})
 		}
 	}, [chainId, safeAddress]);
 
 
 	const getTokens = async (safeAddress: string) => {
 		chainId &&
-		axios
-			.get(
-				`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`
-			)
-			.then((tokens: any) => {
-				setTokens(tokens.data);
-			});
+			axios
+				.get(
+					`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`
+				)
+				.then((tokens: any) => {
+					setTokens(tokens.data);
+				});
 	};
 
 	const isAddressValid = (holderAddress: string) => {
@@ -113,51 +113,51 @@ const AddExistingSafe = () => {
 		isAddressValid(safeAddress);
 	}, [safeAddress]);
 
-  useEffect(() => {
-    if(createDAOLoading == false){
-		dispatch(updateSafeAddress(''))
-		dispatch(updatesafeName(''))
-		dispatch(updateDaoName(''))
-		dispatch(updateInvitedGang([]))
-		dispatch(updateTotalMembers([]))
-      setisLoading(false)
-      dispatch(resetCreateDAOLoader())
-      return navigate(`/success?dao=${flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, '')}`);
-    }
-    if(createDAOLoading == true)
-      setisLoading(true)
-  }, [createDAOLoading])
-
-  const handleAddSafe = useCallback(() => {
-    const totalAddresses = [...invitedMembers, ...owners.current];
-    const value = totalAddresses.reduce((final: any, current: any) => {
-      let object = final.find((item: any) => item.address === current.address);
-      if (object) {
-        return final;
-      }
-      return final.concat([current]);
-    }, []);
-    dispatch(updateTotalMembers(value));
-    const payload: any = {
-	  chainId,
-      contractAddress: '',
-      name: flow.daoName,
-      url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
-      image: null,
-      members: value.map((m:any) => {
-		if(m.address.toLowerCase() === account?.toLowerCase()) {
-			return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : 'role2' }
+	useEffect(() => {
+		if (createDAOLoading == false) {
+			dispatch(updateSafeAddress(''))
+			dispatch(updatesafeName(''))
+			dispatch(updateDaoName(''))
+			dispatch(updateInvitedGang([]))
+			dispatch(updateTotalMembers([]))
+			setisLoading(false)
+			dispatch(resetCreateDAOLoader())
+			return navigate(`/success?dao=${flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, '')}`);
 		}
-		return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' :  m.role ? m.role: 'role4' }
-	  }),
-      safe: {
-        name: safeName,
-        address: safeAddress,
-        owners: owners.current.map(o => o.address),
-      }
-    }
-    dispatch(createDAO(payload))
-  }, [chainId, safeAddress]);
+		if (createDAOLoading == true)
+			setisLoading(true)
+	}, [createDAOLoading])
+
+	const handleAddSafe = useCallback(() => {
+		const totalAddresses = [...invitedMembers, ...owners.current];
+		const value = totalAddresses.reduce((final: any, current: any) => {
+			let object = final.find((item: any) => item.address === current.address);
+			if (object) {
+				return final;
+			}
+			return final.concat([current]);
+		}, []);
+		dispatch(updateTotalMembers(value));
+		const payload: any = {
+			chainId,
+			contractAddress: '',
+			name: flow.daoName,
+			url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
+			image: flow.daoImage,
+			members: value.map((m: any) => {
+				if (m.address.toLowerCase() === account?.toLowerCase()) {
+					return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : 'role2' }
+				}
+				return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4' }
+			}),
+			safe: {
+				name: safeName,
+				address: safeAddress,
+				owners: owners.current.map(o => o.address),
+			}
+		}
+		dispatch(createDAO(payload))
+	}, [chainId, safeAddress]);
 
 	const handleClick = useCallback(() => {
 		console.log("clicked")

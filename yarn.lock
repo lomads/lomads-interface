@@ -18578,6 +18578,11 @@ react-loader-spinner@^5.1.7-beta.1:
     styled-components "^5.3.5"
     styled-tools "^1.7.2"
 
+react-login-github@^1.0.8:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/react-login-github/-/react-login-github-1.0.8.tgz#2262024270e7ba001b998996781620c98a3fa2dd"
+  integrity sha512-Et30Hx8eV7vmqQpEma0DyYKak2RMGX7le0OC3R49vdeOfoJL4+RaTS4IeqDgWrAmyFWs9oWLamvvXbG67Mmr4A==
+
 react-moralis@1.4.0:
   version "1.4.0"
   resolved "https://registry.npmjs.org/react-moralis/-/react-moralis-1.4.0.tgz"
