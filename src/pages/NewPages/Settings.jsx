@@ -328,7 +328,8 @@ const Settings = () => {
 			)}
 			{/* // !-------------  Roles & Permissions ------------ */}
 			{openRolesPermissions && (
-				<RolesPermissionsModal toggleRP={toggleRP} />
+				<></>
+				// <RolesPermissionsModal toggleRP={toggleRP} />
 			)}
 			{/* // !-------------  Safe ------------ */}
 			{openSafe && (

@@ -206,7 +206,7 @@ const RolesPermissionsModal = ({ toggleRP }) => {
 								</div>
 							</div> */}
 							<div>
-								{/* <Table borderless hover>
+								<Table borderless hover>
 									<thead>
 										<tr>
 											<th></th>
@@ -220,8 +220,8 @@ const RolesPermissionsModal = ({ toggleRP }) => {
 										{permissionsArray.map((e) => {
 											return (
 												<div style={{ display: 'flex', flexDirection: 'column' }}>
-													<div style={{ width: '500px', background: 'yellow' }}>ORGANISATION SETTINGS</div>
-													<tr style={{ background: 'red' }}>
+													<div>ORGANISATION SETTINGS</div>
+													<tr>
 														<td>{e.name}</td>
 														<td align="center">
 															{e.admin === "total" ? (
@@ -337,10 +337,10 @@ const RolesPermissionsModal = ({ toggleRP }) => {
 											</td>
 										</tr>
 									</tbody>
-								</Table> */}
+								</Table>
 								<br />
 
-								<table borderless>
+								{/* <table borderless>
 									<thead>
 										<tr>
 											<th></th>
@@ -418,7 +418,7 @@ const RolesPermissionsModal = ({ toggleRP }) => {
 											</tr>
 										</tbody>
 									</tbody>
-								</table>
+								</table> */}
 							</div>
 						</div>
 					</div>
