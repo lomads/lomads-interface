@@ -12,46 +12,46 @@ import { useDispatch } from "react-redux";
 import axiosHttp from 'api'
 import { updateDao, updateDaoLinks, storeGithubIssues } from 'state/dashboard/actions';
 import AddDiscordLink from 'components/AddDiscordLink';
-import { setDAO } from "state/dashboard/reducer";
+import { setDAO, resetStoreGithubIssuesLoader } from "state/dashboard/reducer";
 import AddGithubLink from "components/AddGithubLink";
+
+import ReactS3Uploader from 'components/ReactS3Uploader';
+import { LeapFrog } from "@uiball/loaders";
+import { nanoid } from "@reduxjs/toolkit";
+import { useDropzone } from 'react-dropzone'
+import uploadIcon from '../../assets/svg/ico-upload.svg';
+
+import LoginGithub from 'react-login-github';
 
 const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) => {
 
-	const { DAO, updateDaoLoading, updateDaoLinksLoading } = useAppSelector((state) => state.dashboard);
+	const { DAO, updateDaoLoading, updateDaoLinksLoading, storeGithubIssuesLoading } = useAppSelector((state) => state.dashboard);
 	const [name, setName] = useState(_get(DAO, 'name', ''));
 	const [oUrl, setOUrl] = useState(_get(DAO, 'url', ''));
 	const [description, setDescription] = useState(_get(DAO, 'description', ''));
 	const [daoLinks, setDaoLinks] = useState(_get(DAO, 'links', []));
 	const [linkTitle, setLinkTitle] = useState("");
 	const [link, setLink] = useState("");
+	const [image, setImage] = useState(_get(DAO, 'image', ''));
+	const [droppedfiles, setDroppedfiles] = useState([]);
+	const [uploadLoading, setUploadLoading] = useState(false);
+	const [pullIssues, setPullIssues] = useState(false);
+	const [isAuthenticating, setIsAuthenticating] = useState(false);
 	const dispatch = useDispatch()
 
 	useEffect(() => {
 		setDaoLinks(_get(DAO, 'links', []));
 	}, [DAO])
 
+	useEffect(() => {
+		if (storeGithubIssuesLoading === false) {
+			dispatch(resetStoreGithubIssuesLoader());
+			setIsAuthenticating(false);
+			addLink();
+		}
+	}, [storeGithubIssuesLoading]);
+
 	const addLink = useCallback(() => {
-		// try {
-		// 	const url = new URL(link);
-		// 	if (url.hostname.indexOf('github.') > -1) {
-		// 		const result = extractGitHubRepoPath(link);
-		// 		githubLogin(result);
-		// 	}
-		// 	else {
-		// 		if (!linkTitle || !link || (linkTitle && linkTitle === '') || (link && link === ''))
-		// 			return;
-		// 		let tempLink = link
-		// 		if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
-		// 			tempLink = 'https://' + link;
-		// 		}
-		// 		setDaoLinks([...daoLinks, { title: linkTitle, link: tempLink }]);
-		// 		setLinkTitle("")
-		// 		setLink("")
-		// 	}
-		// }
-		// catch (e) {
-		// 	console.error(e);
-		// }
 		if (!linkTitle || !link || (linkTitle && linkTitle === '') || (link && link === ''))
 			return;
 		let tempLink = link
@@ -65,8 +65,8 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 	}, [link, linkTitle]);
 
 	const saveChanges = () => {
-		console.log(description)
-		dispatch(updateDao({ url: DAO?.url, payload: { name, description } }))
+		console.log("Image : ", image)
+		dispatch(updateDao({ url: DAO?.url, payload: { name, description, image } }))
 		dispatch(updateDaoLinks({ url: DAO?.url, payload: { links: daoLinks } }))
 		toggleOrganisationDetailsModal();
 	}
@@ -105,6 +105,101 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 				//dispatch(setDAO(res.data))
 			})
 	}
+
+	const onDrop = useCallback(acceptedFiles => { setDroppedfiles(acceptedFiles) }, [])
+
+	const { getRootProps, getInputProps } = useDropzone({ onDrop, multiple: false })
+
+	const getSignedUploadUrl = (file, callback) => {
+		console.log(file)
+		const filename = `DAOThumbnail/${nanoid(32)}.${file.type.split('/')[1]}`
+		return axiosHttp.post(`utility/upload-url`, { key: filename, mime: file.type }).then(res => callback(res.data))
+	}
+
+	const onUploadProgress = (progress, message, file) => { }
+
+	const onUploadError = error => { setDroppedfiles([]); setUploadLoading(false) }
+
+	const onUploadStart = (file, next) => { setUploadLoading(true); return next(file); }
+
+	const onFinish = finish => {
+		setDroppedfiles([])
+		setUploadLoading(false);
+		var arr = finish.signedUrl.split('?');
+		console.log("image : ", arr[0]);
+		setImage(arr[0]);
+	}
+
+	const onSuccess = (response) => {
+		setIsAuthenticating(true);
+		const repoInfo = extractGitHubRepoPath(link);
+		console.log("repo info : ", repoInfo);
+		axiosHttp.get(`utility/getGithubAccessToken?code=${response.code}&repoInfo=${repoInfo}`)
+			.then((res) => {
+				if (res.data) {
+					console.log("response : ", res.data);
+					// check if issues has been previously pulled --- inside DAO object
+					const githubOb = _get(DAO, 'github', null);
+
+					if (githubOb) {
+						console.log("githubOb : ", githubOb);
+						if (_get(DAO, `github.${repoInfo}`, null)) {
+							console.log("exists")
+							const e = document.getElementById('error-msg');
+							e.innerHTML = 'Repository already added';
+							setIsAuthenticating(false);
+							return;
+						}
+						else {
+							console.log("doesnt exists")
+							handleGithub(res.data.access_token, repoInfo);
+						}
+					}
+					else {
+						console.log("githubOb doesnt exists");
+						handleGithub(res.data.access_token, repoInfo);
+					}
+				}
+				else {
+					alert("No res : Something went wrong");
+					setIsAuthenticating(false);
+				}
+			})
+			.catch((e) => {
+				console.log("error : ", e);
+				alert("Something went wrong");
+				setIsAuthenticating(false);
+			})
+	}
+
+	const extractGitHubRepoPath = (url) => {
+		if (!url) return null;
+		const match = url.match(
+			/^https?:\/\/(www\.)?github.com\/(?<owner>[\w.-]+)\/(?<name>[\w.-]+)/
+		);
+		if (!match || !(match.groups?.owner && match.groups?.name)) return null;
+		return `${match.groups.owner}/${match.groups.name}`;
+	}
+
+	const handleGithub = (token, repoInfo) => {
+		axiosHttp.get(`utility/get-issues?token=${token}&repoInfo=${repoInfo}&daoId=${_get(DAO, '_id', null)}`)
+			.then((result) => {
+				console.log("issues : ", result.data);
+				if (result.data.message === 'error') {
+					console.log("Not allowed");
+					const e = document.getElementById('error-msg');
+					e.innerHTML = 'Please check repository for ownership or typography error';
+					setIsAuthenticating(false);
+					return;
+				}
+				else {
+					console.log("Allowed to pull and store issues")
+					dispatch(storeGithubIssues({ payload: { daoId: _get(DAO, '_id', null), issueList: result.data.data, token, repoInfo } }));
+				}
+			})
+	}
+
+	const onFailure = response => console.error("git res : ", response);
 
 	return (
 		<>
@@ -170,15 +265,15 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 								value={process.env.REACT_APP_URL + "/" + _get(DAO, 'url', '')}
 							/>
 
-							<hr
+							{/* <hr
 								style={{
 									height: "1px",
 									width: 288,
 									background: "#C94B32",
 									margin: "35px auto 35px",
 								}}
-							/>
-							<div id="text-type">Member visibility</div>
+							/> */}
+							<div id="text-type-od">Member visibility</div>
 							<p id="paragraph-type">
 								If unlocked, everyone in the organisation will be able to see
 								who is part of which project. Otherwise, only members part of a
@@ -188,6 +283,53 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 								<input type="checkbox" />
 								<span class="slider round"></span>
 							</label>
+
+							<div id="text-type-od">Import thumbnail</div>
+							<div className="image-picker-wrapper">
+								<div className="image-picker-container">
+									{
+										image
+											?
+											<div style={{ position: 'relative', width: '100%', height: '100%' }}>
+												<div onClick={() => setImage(null)} style={{ cursor: 'pointer' }}>
+													<img style={{ width: 18, height: 18, position: 'absolute', right: 8, top: 8, opacity: 0.7 }} src={require('../../assets/images/close.png')} />
+												</div>
+												<img src={image} alt="selected-token-icon" className="selected-img" />
+											</div>
+											:
+											<div {...getRootProps()}>
+												<ReactS3Uploader
+													droppedfiles={droppedfiles}
+													getSignedUrl={getSignedUploadUrl}
+													accept="image/png,image/jpeg,image/jpg"
+													className={{ display: 'none' }}
+													onProgress={onUploadProgress}
+													onError={onUploadError}
+													preprocess={onUploadStart}
+													onFinish={onFinish}
+													multiple
+													uploadRequestHeaders={{
+													}}
+													contentDisposition="auto"
+												/>
+												<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+													{uploadLoading ?
+														<LeapFrog size={24} color="#C94B32" /> :
+														<>
+															<img src={uploadIcon} alt="upload-icon" />
+															<p>Choose <br /> or drag an image</p>
+															<span>maximum size 2mb</span>
+														</>
+													}
+												</div>
+
+												<input {...getInputProps()} />
+											</div>
+
+									}
+								</div>
+								<p className="text">Accepted formats:<br />jpg, svg or png</p>
+							</div>
 
 							<hr
 								style={{
@@ -212,9 +354,23 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 									variant="filled"
 									width="35%"
 									value={linkTitle}
-									onChange={(evt) => setLinkTitle(evt.target.value)}
+									onChange={(evt) => {
+										const e = document.getElementById('error-msg');
+										e.innerHTML = '';
+										setLinkTitle(evt.target.value)
+									}}
 								/>
-								<Input value={link} placeholder="link" variant="filled" width="50%" onChange={(evt) => setLink(evt.target.value)} />
+								<Input
+									value={link}
+									placeholder="link"
+									variant="filled"
+									width="50%"
+									onChange={(evt) => {
+										const e = document.getElementById('error-msg');
+										e.innerHTML = '';
+										setLink(evt.target.value)
+									}}
+								/>
 								{/* <IconButton icon={<AddIcon />} /> */}
 								{link && link.indexOf('discord.') > -1 ?
 									<AddDiscordLink
@@ -238,32 +394,32 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 									:
 									<>
 										{
-											link && link.indexOf('github.') > -1
+											link && link.indexOf('github.') > -1 && pullIssues
 												?
-												<AddGithubLink
-													link={link}
-													linkTitle={linkTitle}
-													renderButton={
-														<IconButton
-															className="addButton"
-															Icon={<AiOutlinePlus style={{ height: 30, width: 30 }} />}
-															height={40}
-															width={40}
-															bgColor={
-																(linkTitle.length > 0 && isValidUrl(link))
-																	? "#C94B32"
-																	: "rgba(27, 43, 65, 0.2)"
-															}
-														/>
+												<>
+													{
+														isAuthenticating
+															?
+															<button className="githubAddButton active" disabled>
+																<LeapFrog size={20} color="#FFF" />
+															</button>
+															:
+															<LoginGithub
+																clientId="8472b2207a0e12684382"
+																scope="repo user admin:repo_hook admin:org"
+																onSuccess={onSuccess}
+																onFailure={onFailure}
+																className={linkTitle.length > 0 && isValidUrl(link) ? "githubAddButton active" : "githubAddButton"}
+																buttonText="+"
+															/>
 													}
-												/>
+												</>
 												:
 												<IconButton
 													className="addButton"
 													Icon={<AiOutlinePlus style={{ height: 30, width: 30 }} />}
 													height={40}
 													width={40}
-													// onClick={githubLogin}
 													onClick={() => addLink()}
 													bgColor={
 														(linkTitle.length > 0 && isValidUrl(link))
@@ -275,6 +431,34 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 									</>
 								}
 							</div>
+							{
+								link && link.indexOf('github.') > -1
+									?
+									<div className="link-toggle-section">
+										<label class="switch" style={{ marginTop: "10px" }}>
+											<input type="checkbox" onChange={() => setPullIssues(!pullIssues)} />
+											<span class="slider round"></span>
+										</label>
+										<span className="toggle-text">IMPORT ISSUES</span>
+									</div>
+									:
+									<>
+										{
+											link && link.indexOf('discord.') > -1
+												?
+												<div className="link-toggle-section">
+													<label class="switch" style={{ marginTop: "10px" }}>
+														<input type="checkbox" />
+														<span class="slider round"></span>
+													</label>
+													<span className="toggle-text">IMPORT ROLES</span>
+												</div>
+												:
+												null
+										}
+									</>
+							}
+							<span className="error-msg" id="error-msg"></span>
 							{daoLinks.length > 0 &&
 								<div
 									style={{

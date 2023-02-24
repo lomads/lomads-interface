@@ -63,10 +63,6 @@ import CompensateMembersDoneModal from "./CompensateMembersDoneModal";
 import DisableXpPointDailog from "./DisableXpPointDailog";
 import eventEmitter from "utils/eventEmmiter";
 
-const CLIENT_ID = "8472b2207a0e12684382";
-
-export const CodeContext = createContext();
-
 const Settings = () => {
 	const navigate = useNavigate();
 	const { daoURL } = useParams();
@@ -113,31 +109,6 @@ const Settings = () => {
 		}
 	}, [])
 
-	useEffect(() => {
-		const queryString = window.location.search;
-		const urlParams = new URLSearchParams(queryString);
-		const codeParam = urlParams.get("code");
-
-		if (codeParam) {
-			setCode(codeParam);
-			// async function getAccessToken() {
-			// 	axiosHttp.get('utility/getGithubAccessToken?code=' + codeParam)
-			// 		.then((response) => {
-			// 			console.log("response : ", response.data);
-			// 			axiosHttp.post('utility/create-webhook', { token: response.data.access_token, repoInfo })
-			// 				.then((res) => {
-			// 					console.log("res : ", res)
-			// 				})
-			// 		})
-			// }
-			// getAccessToken();
-		}
-	}, []);
-
-	// const githubLogin = () => {
-	// 	window.location.assign(`https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&scope=repo%20user%20admin:repo_hook%20admin:org&redirect_uri=http://localhost:3000/${_get(DAO, 'url', '')}/settings`);
-	// }
-
 	//! TOGGLE FUNCTIONS
 	let toggleOrganisationDetailsModal = () => {
 		setOpenOrganisationDetails(!openOrganisationDetails);
@@ -166,7 +137,7 @@ const Settings = () => {
 	const daoName = name.split(" ");
 
 	return (
-		<CodeContext.Provider value={code}>
+		<>
 			<div className="settings-page">
 				{/* <DisableXpPointDailog
                     toggleShowLink={toggleCreatePassTokenModal}
@@ -174,11 +145,19 @@ const Settings = () => {
                 /> */}
 				<div className="settings-left-bar">
 					<div onClick={() => navigate(-1)} className="logo-container">
-						<p style={{ textTransform: "capitalize" }}>{daoName.length === 1
-							? daoName[0].charAt(0)
-							: daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)}</p>
+						{
+							_get(DAO, 'image', null)
+								?
+								<img src={_get(DAO, 'image', null)} />
+								:
+								<p style={{ textTransform: "capitalize" }}>
+									{daoName.length === 1
+										? daoName[0].charAt(0)
+										: daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)}
+								</p>
+						}
 					</div>
-					<img src={settingIcon} />
+					<img src={settingIcon} className="setting-icon" />
 				</div>
 				<div className="settings-center">
 					<div>
@@ -345,7 +324,6 @@ const Settings = () => {
 			{openOrganisationDetails && (
 				<OrganisationDetailsModal
 					toggleOrganisationDetailsModal={toggleOrganisationDetailsModal}
-				// githubLogin={githubLogin}
 				/>
 			)}
 			{/* // !-------------  Roles & Permissions ------------ */}
@@ -382,7 +360,7 @@ const Settings = () => {
 			{openDiscord && (
 				<DiscordModal toggleDiscord={toggleDiscord} />
 			)}
-		</CodeContext.Provider>
+		</>
 	);
 };
 

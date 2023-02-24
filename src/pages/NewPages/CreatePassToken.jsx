@@ -54,7 +54,7 @@ const CreatePassToken = () => {
     const [image, setImage] = useState(null);
     const [whitelisted, setWhitelisted] = useState(false);
     const [uploadLoading, setUploadLoading] = useState(false);
-    const { getENSAddress, getENSName }  = useEns();
+    const { getENSAddress, getENSName } = useEns();
 
     const daoName = _get(DAO, 'name', '').split(" ");
 
@@ -314,9 +314,17 @@ const CreatePassToken = () => {
         <>
             <div className="createPassToken-container">
                 <div onClick={() => navigate(-1)} className="logo-container">
-                    <p style={{ textTransform: "capitalize" }}>{daoName.length === 1
-                        ? daoName[0].charAt(0)
-                        : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)}</p>
+                    {
+                        _get(DAO, 'image', null)
+                            ?
+                            <img src={_get(DAO, 'image', null)} />
+                            :
+                            <p style={{ textTransform: "capitalize" }}>
+                                {daoName.length === 1
+                                    ? daoName[0].charAt(0)
+                                    : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)}
+                            </p>
+                    }
                 </div>
                 <div className="createPassToken-body">
                     <img src={Frame} alt="frame-icon" />

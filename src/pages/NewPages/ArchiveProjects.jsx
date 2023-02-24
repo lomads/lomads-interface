@@ -17,13 +17,17 @@ const ArchiveProjects = () => {
         <div className="archive-container">
             <div className="home-btn" onClick={() => navigate(-1)}>
                 <div className="invertedBox">
-                    <div className="navbarText">
-                        {
-                            daoName.length === 1
-                                ? daoName[0].charAt(0)
-                                : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)
-                        }
-                    </div>
+                    {
+                        _get(DAO, 'image', null)
+                            ?
+                            <img src={_get(DAO, 'image', null)} />
+                            :
+                            <div className="navbarText">
+                                {daoName.length === 1
+                                    ? daoName[0].charAt(0)
+                                    : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)}
+                            </div>
+                    }
                 </div>
             </div>
 
@@ -33,7 +37,7 @@ const ArchiveProjects = () => {
                         <IoIosArrowBack size={20} color="#C94B32" />
                     </div>
                     <div className="right">
-                        <p>Archived <span>{ transformWorkspace().labelPlural }</span></p>
+                        <p>Archived <span>{transformWorkspace().labelPlural}</span></p>
                     </div>
                 </div>
             </div>

@@ -13,9 +13,9 @@ const SideBar = (props: any) => {
 	const { DAOList, DAO } = useAppSelector((state) => state.dashboard);
 	const name = props.name ? props.name.split(" ") : _get(DAO, 'name', '');
 
-	const navigateTo = (url:string|undefined) => {
-		if(!url) return;
-		if(DAO && DAO.url === url) {
+	const navigateTo = (url: string | undefined) => {
+		if (!url) return;
+		if (DAO && DAO.url === url) {
 			dispatch(getDao(url))
 		} else {
 			dispatch(setDAO(null))
@@ -31,6 +31,7 @@ const SideBar = (props: any) => {
 						DAOList && DAOList.map(dao => {
 							console.log("const daoName", dao)
 							const daoName = _get(dao, 'name', '') ? _get(dao, 'name', '').split(" ") : '';
+							const daoImage = _get(dao, 'image', null);
 							return (
 								<>
 									<div className="sideBarStripItem">
@@ -40,11 +41,26 @@ const SideBar = (props: any) => {
 												navigateTo(dao?.url)
 											}}
 										>
-											{ daoName && <div className="navbarText" style={{ color: '#FFF' }}>
-												{daoName.length === 1
-													? daoName[0].charAt(0).toUpperCase()
-													: daoName[0].charAt(0).toUpperCase() + daoName[daoName.length - 1].charAt(0).toUpperCase()}
-											</div> }
+											{
+												daoImage
+													?
+													<img src={daoImage} />
+													:
+													<>
+														{
+															daoName &&
+															<div className="navbarText" style={{ color: '#FFF' }}>
+																{
+																	daoName.length === 1
+																		?
+																		daoName[0].charAt(0).toUpperCase()
+																		:
+																		daoName[0].charAt(0).toUpperCase() + daoName[daoName.length - 1].charAt(0).toUpperCase()
+																}
+															</div>
+														}
+													</>
+											}
 										</div>
 										<div id="createADAOText">{_get(dao, 'name', '')}</div>
 									</div>
@@ -78,11 +94,19 @@ const SideBar = (props: any) => {
 				}}
 			>
 				<div className="invertedBox">
-					{ name && <div className="navbarText">
-						{name.length === 1
-							? name[0].charAt(0)
-							: name[0].charAt(0) + name[name.length - 1].charAt(0)}
-					</div> }
+					{
+						_get(DAO, 'image', null)
+							?
+							<img src={_get(DAO, 'image', null)} />
+							:
+							<>
+								{name && <div className="navbarText">
+									{name.length === 1
+										? name[0].charAt(0)
+										: name[0].charAt(0) + name[name.length - 1].charAt(0)}
+								</div>}
+							</>
+					}
 				</div>
 			</div>
 			{props.showNavBar && <SideBarStrip />}

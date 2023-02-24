@@ -89,21 +89,21 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
             return toast.error("Please enter a valid link");
         }
         else {
-            setHasClickedAuth(true)
-            try {
-                setAddLinkLoading(true);
-                if (!authorization)
-                    return onOpen()
-                setHasClickedAuth(false);
-                const repoInfo = extractGitHubRepoPath(link);
+            // setHasClickedAuth(true)
+            // try {
+            //     setAddLinkLoading(true);
+            //     if (!authorization)
+            //         return onOpen()
+            //     setHasClickedAuth(false);
+            //     const repoInfo = extractGitHubRepoPath(link);
 
-                const redirectUri = typeof window !== "undefined" && `${window.location.href.split("/").slice(0, 3).join("/")}/githubauth`
-                openAddBotPopup(`https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&scope=repo%20user%20admin:repo_hook%20admin:org&redirect_uri=${redirectUri}`)
-            }
-            catch (e) {
-                console.log(e)
-                setAddLinkLoading(null);
-            }
+            //     const redirectUri = typeof window !== "undefined" && `${window.location.href.split("/").slice(0, 3).join("/")}/githubauth`
+            //     openAddBotPopup(`https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&scope=repo%20user%20admin:repo_hook%20admin:org&redirect_uri=${redirectUri}`)
+            // }
+            // catch (e) {
+            //     console.log(e)
+            //     setAddLinkLoading(null);
+            // }
         }
     }
 
