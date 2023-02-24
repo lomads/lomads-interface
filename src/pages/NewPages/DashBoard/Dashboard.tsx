@@ -4,7 +4,7 @@ import { get as _get, find as _find } from 'lodash';
 import lomadsfulllogo from "../../../assets/svg/lomadsfulllogo.svg";
 import settingIcon from '../../../assets/svg/settings.svg';
 import { useAppSelector } from "state/hooks";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import "../../../styles/Global.css";
 import "../../../styles/pages/DashBoard/DashBoard.css";
 import MemberCard from "./MemberCard";
@@ -59,6 +59,8 @@ const Dashboard = () => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const { daoURL } = useParams();
+	const location = useLocation()
+	const from = location?.state?.from;
 	const { user, DAO, DAOList, DAOLoading } = useAppSelector((state) => state.dashboard);
 	console.log("DAO : ", DAO);
 	const [update, setUpdate] = useState(0);
@@ -215,7 +217,12 @@ const Dashboard = () => {
 
 	useEffect(() => {
 		if (chainId && !account)
-			window.location.href = '/login'
+		navigate("/login", {
+			replace: true,
+			state: {
+			  from: window.location.pathname
+			}
+		  });
 	}, [chainId, account])
 
 	useEffect(() => {
@@ -265,6 +272,8 @@ const Dashboard = () => {
 				}
 			}
 		}
+		if(from)
+			navigate(from)
 	}
 
 	useEffect(() => {

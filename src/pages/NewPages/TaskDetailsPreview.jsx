@@ -5,35 +5,10 @@ import '../../styles/pages/TaskDetails.css';
 import Footer from "components/Footer";
 import { LeapFrog } from "@uiball/loaders";
 
-import {
-    Button,
-    Menu,
-    MenuButton,
-    MenuList,
-    MenuItem,
-    MenuItemOption,
-    MenuGroup,
-    MenuOptionGroup,
-    MenuDivider,
-  } from '@chakra-ui/react'
-
-  import ShareSVG from '../../assets/svg/share.svg'
-  import copyIcon from "assets/svg/copyIcon.svg";
-
-  import {
-    TelegramIcon,
-    TwitterIcon,
-    WhatsappIcon,
-    LivejournalIcon,
-    TelegramShareButton,
-    TwitterShareButton,
-    WhatsappShareButton,
-  } from "react-share";
-
 import SafeButton from "UIpack/SafeButton";
 import useTerminology from 'hooks/useTerminology';
 import { useAppSelector, useAppDispatch } from "state/hooks";
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { IoIosArrowBack } from 'react-icons/io'
 import { GoKebabVertical } from 'react-icons/go'
 import { SiNotion } from "react-icons/si";
@@ -75,6 +50,8 @@ import EditDraftTask from "./DashBoard/Task/EditDraftTask";
 const TaskDetails = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const location = useLocation()
+	const previewFromProject = location?.state?.previewFromProject;
     const { provider, account, chainId } = useWeb3React();
     const { taskId, daoURL } = useParams();
     const { DAO, Task, TaskLoading, user, archiveTaskLoading, deleteTaskLoading } = useAppSelector((state) => state.dashboard);
@@ -200,16 +177,16 @@ const TaskDetails = () => {
             let current_user = _find(_get(DAO, 'members', []), m => _get(m, 'member.wallet', '').toLowerCase() === account?.toLowerCase())
             console.log('currentuser', current_user);
             let reurntype_function = false;
-            if (current_user?.discordRoles) {
+            if (current_user && current_user?.discordRoles) {
 
 
                 Task?.validRoles.map(channelid => {
                     console.log('task chanellid', channelid);
 
 
-                    Object.keys(current_user.discordRoles).forEach(function (key, index) {
-                        console.log(current_user.discordRoles[key]);
-                        if (current_user.discordRoles[key].includes(channelid)) {
+                    Object.keys(current_user?.discordRoles).forEach(function (key, index) {
+                        console.log(current_user?.discordRoles[key]);
+                        if (current_user?.discordRoles[key].includes(channelid)) {
                             console.log('mathched');
                             reurntype_function = true;
                             return reurntype_function;
@@ -372,15 +349,15 @@ const TaskDetails = () => {
                                     ?
                                     <div className="taskDetails-overlay">
                                         <div className="taskDetails-modal">
-                                            <button className="close-btn" onClick={() => setClosePrompt(false)}>
+                                            {/* <button className="close-btn" onClick={() => setClosePrompt(false)}>
                                                 <CgClose size={20} color="#C94B32" />
-                                            </button>
+                                            </button> */}
                                             <img src={iconSvg} alt="frame-icon" />
                                             <h1>Close {Task?.name}</h1>
                                             <p>This action <span>is irreversible</span> for now.<br />You will find closed  {transformTask().labelPlural} in the archives.</p>
                                             <div>
-                                                <button onClick={() => setClosePrompt(false)}>NO</button>
-                                                <button onClick={handleCloseTask}>YES</button>
+                                                {/* <button onClick={() => setClosePrompt(false)}>NO</button>
+                                                <button onClick={handleCloseTask}>YES</button> */}
                                             </div>
                                         </div>
                                     </div>
@@ -394,15 +371,15 @@ const TaskDetails = () => {
                                     ?
                                     <div className="taskDetails-overlay">
                                         <div className="taskDetails-modal">
-                                            <button className="close-btn" onClick={() => setDeletePrompt(false)}>
+                                            {/* <button className="close-btn" onClick={() => setDeletePrompt(false)}>
                                                 <CgClose size={20} color="#C94B32" />
-                                            </button>
+                                            </button> */}
                                             <img src={iconSvg} alt="frame-icon" />
                                             <h1>Delete {Task?.name}</h1>
                                             <p>This action <span>is irreversible</span>.</p>
                                             <div>
-                                                <button onClick={() => setDeletePrompt(false)}>NO</button>
-                                                <button onClick={handleDeleteTask}>YES</button>
+                                                {/* <button onClick={() => setDeletePrompt(false)}>NO</button>
+                                                <button onClick={handleDeleteTask}>YES</button> */}
                                             </div>
                                         </div>
                                     </div>
@@ -410,19 +387,15 @@ const TaskDetails = () => {
                                     null
                             }
 
-                            <div className="home-btn" onClick={() => navigate(-1)}>
+                            <div className="home-btn">
                                 <div className="invertedBox">
-                                    {
-                                        _get(DAO, 'image', null)
-                                            ?
-                                            <img src={_get(DAO, 'image', null)} />
-                                            :
-                                            <div className="navbarText">
-                                                {daoName.length === 1
-                                                    ? daoName[0].charAt(0)
-                                                    : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)}
-                                            </div>
-                                    }
+                                    <div className="navbarText">
+                                        {
+                                            daoName.length === 1
+                                                ? daoName[0].charAt(0)
+                                                : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)
+                                        }
+                                    </div>
                                 </div>
                             </div>
 
@@ -432,7 +405,7 @@ const TaskDetails = () => {
 
                                 <div className="taskDetails-header">
                                     <div className="header-name">
-                                        <div className="left" onClick={() => navigate(-1)}>
+                                        <div className="left" onClick={() => { previewFromProject ? navigate(-1) : navigate('/', { replace: true }) }}>
                                             <IoIosArrowBack size={20} color="#C94B32" />
                                         </div>
                                         <div className="right">
@@ -662,17 +635,17 @@ const TaskDetails = () => {
                                                     amICreator || can(myRole, 'task.edit') || can(myRole, 'task.delete') || can(myRole, 'task.close')
                                                         ?
                                                         <>
-                                                            {(amICreator || can(myRole, 'task.edit')) &&
+                                                            {/* {(amICreator || can(myRole, 'task.edit')) &&
                                                                 <button style={{ marginRight: '25px' }} onClick={() => { Task.draftedAt ? setOpenEditDraftedTask(true) : setOpenEditTask(true) }}>
                                                                     <img src={editToken} alt="hk-logo" />
                                                                 </button>
-                                                            }
-                                                            {(amICreator || can(myRole, 'task.delete')) &&
+                                                            } */}
+                                                            {/* {(amICreator || can(myRole, 'task.delete')) &&
                                                                 <button style={{ marginRight: '25px' }} onClick={() => setDeletePrompt(true)}>
                                                                     <img src={deleteIcon} alt="hk-logo" />
                                                                 </button>
-                                                            }
-                                                            <>
+                                                            } */}
+                                                            {/* <>
                                                                 {
                                                                     Task?.archivedAt === null && (amICreator || can(myRole, 'task.close')) ?
                                                                         <SafeButton
@@ -690,7 +663,7 @@ const TaskDetails = () => {
                                                                         :
                                                                         null
                                                                 }
-                                                            </>
+                                                            </> */}
 
                                                             {/* <button className="kebab-btn">
                                                         <GoKebabVertical size={24} color="#76808D" />
@@ -698,60 +671,6 @@ const TaskDetails = () => {
                                                         </>
                                                         :
                                                         null
-                                                }
-                                                {(amICreator || can(myRole, 'task.share')) &&
-                                                <Menu>
-                                                    <MenuButton>
-                                                        <button style={{ 
-                                                            marginLeft: 0,
-                                                            background: 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)',
-                                                            height: '40px',
-                                                            minWidth: '40px',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'center',
-                                                            borderRadius: '5px'
-                                                         }}>
-                                                            <img style={{ width: 18, height: 18 }} src={ShareSVG} alt="settings-icon" />
-                                                        </button>
-                                                    </MenuButton>
-                                                    <MenuList style={{ display: 'flex', flexDirection: 'column', width: 350 }}>
-                                                    <MenuItem style={{ marginLeft: 0, height: 40 }}>
-                                                            <TwitterShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/task/${taskId}/preview`}>
-                                                                <div style={{ width: '100%' }}>
-                                                                    <TwitterIcon size={32}/>
-                                                                    <div style={{ marginLeft: 16 }}>Twitter</div>
-                                                                </div>
-                                                            </TwitterShareButton>
-                                                        </MenuItem>
-                                                        <MenuItem style={{ marginLeft: 0, height: 40 }}>
-                                                            <TelegramShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/task/${taskId}/preview`}>
-                                                                <div style={{ width: '100%' }}>
-                                                                    <TelegramIcon size={32}/>
-                                                                    <div style={{ marginLeft: 16 }}>Telegram</div>
-                                                                </div>
-                                                            </TelegramShareButton>
-                                                        </MenuItem>
-                                                        <MenuItem style={{ marginLeft: 0, height: 40 }}>
-                                                            <WhatsappShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/task/${taskId}/preview`}>
-                                                                <div style={{ width: '100%' }}>
-                                                                    <WhatsappIcon size={32}/>
-                                                                    <div style={{ marginLeft: 16 }}>Whatsapp</div>
-                                                                </div>
-                                                            </WhatsappShareButton>
-                                                        </MenuItem>
-                                                        <MenuItem onClick={() => {
-                                                            navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/task/${taskId}/preview`)
-                                                        }} style={{ marginLeft: 0, height: 40 }}>
-                                                            <div style={{ paddingLeft: 22 }}>
-                                                                <div style={{ width: '100%' }}>
-                                                                    <img style={{ marginLeft: 8 }} src={copyIcon} />
-                                                                    <div style={{ marginLeft: 24 }}>Copy to clipboard</div>
-                                                                </div>
-                                                            </div>
-                                                        </MenuItem>
-                                                    </MenuList>
-                                                </Menu>
                                                 }
                                             </div>
                                         </div>
@@ -761,7 +680,7 @@ const TaskDetails = () => {
                                             {
                                                 Task.discussionChannel && Task.discussionChannel !== ''
                                                     ?
-                                                    <button className="other-btn" onClick={() => window.open(Task.discussionChannel, '_blank', 'noopener,noreferrer')}>
+                                                    <button className="other-btn" onClick={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>
                                                         {/* <SiNotion color="#B12F15" size={20} style={{ marginRight: '5px' }} /> */}
                                                         {handleParseUrl(Task.discussionChannel)}
                                                         CHAT
@@ -772,7 +691,7 @@ const TaskDetails = () => {
                                             {
                                                 Task.submissionLink && Task.submissionLink.length > 0
                                                     ?
-                                                    <button className="other-btn" onClick={() => window.open(Task.submissionLink, '_blank', 'noopener,noreferrer')}>
+                                                    <button className="other-btn" onClick={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>
                                                         <img src={folder} />
                                                     </button>
                                                     :
@@ -843,7 +762,7 @@ const TaskDetails = () => {
                                                                             <span>{submissionCount}</span>
                                                                         </div>
                                                                         <h1>{submissionCount > 1 ? 'Submissions' : 'Submission'}</h1>
-                                                                        {!Task.draftedAt && <button onClick={() => { submissionCount > 0 && setOpenTaskReview(true) }}>CHECK</button>}
+                                                                        {!Task.draftedAt && <button onChange={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>CHECK</button>}
                                                                     </>
                                                                     :
                                                                     <>
@@ -852,7 +771,7 @@ const TaskDetails = () => {
                                                                             <span>{applicationCount}</span>
                                                                         </div>
                                                                         <h1>{applicationCount > 1 ? 'Applicants' : 'Applicant'}</h1>
-                                                                        {!Task.draftedAt && <button onClick={handleOpenApplicantsSlider}>CHECK</button>}
+                                                                        {!Task.draftedAt && <button onChange={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>CHECK</button>}
                                                                     </>
                                                             }
                                                         </>
@@ -911,13 +830,13 @@ const TaskDetails = () => {
                                                                                                         <>
 
                                                                                                             <h1>This  {transformTask().label.toLowerCase()}<br />fits your role.</h1>
-                                                                                                            {moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt ? null : <button onClick={() => setOpenApply(true)}>APPLY</button>}
+                                                                                                            {moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt ? null : <button onChange={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>APPLY</button>}
                                                                                                         </>
                                                                                                         :
                                                                                                         // mulitple contributor
                                                                                                         <>
                                                                                                             <h1>This  {transformTask().label.toLowerCase()}<br />fits your role.</h1>
-                                                                                                            {!Task.draftedAt && <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>}
+                                                                                                            {!Task.draftedAt && <button onChange={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>SUBMIT WORK</button>}
 
                                                                                                         </>
                                                                                                 }
@@ -938,14 +857,14 @@ const TaskDetails = () => {
                                                                                             <>
 
                                                                                                 <h1>This {transformTask().label.toLowerCase()} needs a<br />contributor.</h1>
-                                                                                                {moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt ? null : <button onClick={() => setOpenApply(true)}>APPLY</button>}
+                                                                                                {moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt ? null : <button onChange={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>APPLY</button>}
 
                                                                                             </>
                                                                                             :
                                                                                             // mulitple contributor
                                                                                             <>
                                                                                                 <h1>Open for all.</h1>
-                                                                                                {!Task.draftedAt && <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>}
+                                                                                                {!Task.draftedAt && <button onChange={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>SUBMIT WORK</button>}
 
                                                                                             </>
                                                                                     }
@@ -973,7 +892,7 @@ const TaskDetails = () => {
                                                         ?
                                                         <>
                                                             <h1>You are assigned.</h1>
-                                                            {!Task.draftedAt && <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>}
+                                                            {/* {!Task.draftedAt && <button onClick={() => setOpenSubmit(true)}>SUBMIT WORK</button>} */}
 
                                                         </>
                                                         :
@@ -1014,7 +933,7 @@ const TaskDetails = () => {
                                                         // for others
                                                         <>
                                                             <h1>{transformTask().label} is submitted</h1>
-                                                            {amICreator && !Task.draftedAt && <button onClick={() => setOpenTaskReview(true)}>CHECK</button>}
+                                                            {amICreator && !Task.draftedAt && <button onChange={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>CHECK</button>}
                                                         </>
                                                 }
                                             </>
@@ -1064,7 +983,7 @@ const TaskDetails = () => {
                                                                     <>
                                                                         <h1>Your submission has been rejected!</h1>
                                                                         <p style={{ color: '#FFF' }}>{renderRejectionNote}</p>
-                                                                        <button onClick={() => setOpenSubmit(true)}>SUBMIT AGAIN</button>
+                                                                        <button onChange={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>SUBMIT AGAIN</button>
                                                                     </>
                                                             }
                                                         </>

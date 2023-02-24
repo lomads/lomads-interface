@@ -103,7 +103,7 @@ const MintPassToken = () => {
                     if (attr === attribute.trait_type.toLowerCase()) {
                         if (decrypted)
                             return decrypted[attr]
-                        //return attribute?.value;
+                        return (attribute?.value && attribute?.value !== 'true' && attribute?.value !== true) ? attribute?.value : '';
                     }
                 }
                 return null
@@ -359,7 +359,7 @@ const MintPassToken = () => {
                             {
                                 tab === 1
                                     ?
-                                    <p className="heading-text">Mint your pass token for {_get(DAO, 'name', '')}</p>
+                                    <p className="heading-text">{ isUpdate? 'Update' : 'Mint' } your pass token for {_get(DAO, 'name', '')}</p>
                                     :
                                     null
                             }
@@ -368,7 +368,7 @@ const MintPassToken = () => {
                                     ?
                                     <>
                                         <p className="heading-text" style={{ marginBottom: 0 }}>You are whitelisted</p>
-                                        <p className="heading-text">Mint your pass token for {_get(DAO, 'name', '')}</p>
+                                        <p className="heading-text">{ isUpdate? 'Update' : 'Mint' } your pass token for {_get(DAO, 'name', '')}</p>
                                     </>
                                     :
                                     null
@@ -412,8 +412,7 @@ const MintPassToken = () => {
                                                         <input
                                                             type="text"
                                                             id={`user-${item}`}
-                                                            disabled={isUpdate && findTraitValue(item) && findTraitValue(item) !== ""}
-                                                            defaultValue={findTraitValue(item)}
+                                                            defaultValue={findTraitValue(item) && findTraitValue(item) !== true ? findTraitValue(item) : null}
                                                             placeholder={`Enter your ${item}`}
                                                             onChange={() => handleResetError(item)}
                                                         />

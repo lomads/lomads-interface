@@ -16,9 +16,11 @@ import MintPassToken from "../pages/NewPages/MintPassToken";
 import CreatePassSucess from "../pages/NewPages/CreatePassSucess";
 import CreateProject from "../pages/NewPages/CreateProject";
 import ProjectDetails from "../pages/NewPages/ProjectDetails";
+import ProjectDetailsPreview from "../pages/NewPages/ProjectDetailsPreview";
 import OnlyWhitelisted from "pages/NewPages/OnlyWhitelisted";
 import ArchiveProjects from "../pages/NewPages/ArchiveProjects";
 import TaskDetails from "pages/NewPages/TaskDetails";
+import TaskDetailsPreview from "pages/NewPages/TaskDetailsPreview";
 import AllTasks from "pages/NewPages/AllTasks";
 import ArchiveTasks from "pages/NewPages/ArchiveTasks";
 import ArchiveProjectTasks from "pages/NewPages/ArchiveProjectTasks";
@@ -101,6 +103,10 @@ export default [
         component: ProjectDetails
     },
     {
+        path: '/:daoURL/project/:projectId/preview',
+        component: ProjectDetailsPreview
+    },
+    {
         path: '/:daoURL/project/:projectId/archiveKra',
         component: ArchiveKRA
     },
@@ -111,6 +117,10 @@ export default [
     {
         path: '/:daoURL/task/:taskId',
         component: TaskDetails
+    },
+    {
+        path: '/:daoURL/task/:taskId/preview',
+        component: TaskDetailsPreview
     },
     {
         path: '/:daoURL/settings',

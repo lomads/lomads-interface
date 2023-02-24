@@ -3,33 +3,8 @@ import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy } from
 import SafeButton from "UIpack/SafeButton";
 import '../../styles/pages/ProjectDetails.css';
 import { LeapFrog } from "@uiball/loaders";
-
-import {
-    Button,
-    Menu,
-    MenuButton,
-    MenuList,
-    MenuItem,
-    MenuItemOption,
-    MenuGroup,
-    MenuOptionGroup,
-    MenuDivider,
-  } from '@chakra-ui/react'
-
-  import copyIcon from "assets/svg/copyIcon.svg";
-
-  import {
-    TelegramIcon,
-    TwitterIcon,
-    WhatsappIcon,
-    LivejournalIcon,
-    TelegramShareButton,
-    TwitterShareButton,
-    WhatsappShareButton,
-  } from "react-share";
-
 import lomadsfulllogo from "../../assets/svg/lomadsfulllogo.svg";
-import ShareSVG from '../../assets/svg/share.svg'
+
 import membersGroup from '../../assets/svg/membersGroup.svg'
 import iconSvg from '../../assets/svg/createProject.svg';
 import axios from "axios";
@@ -66,7 +41,7 @@ import { updateCurrentUser } from "state/dashboard/actions";
 
 import { IoIosArrowBack } from 'react-icons/io';
 import SimpleInputField from "UIpack/SimpleInputField";
-import Tasks from "./DashBoard/Tasks";
+import Tasks from "./DashBoard/TasksPreview";
 import CreateTask from "./DashBoard/Task/CreateTask";
 
 import { Editor } from '@tinymce/tinymce-react';
@@ -89,6 +64,7 @@ import ProjectKRA from "./DashBoard/Project/ProjectKRA";
 import WorkspaceInfo from "./DashBoard/Project/WorkspaceInfo";
 import ProjectMembers from "./DashBoard/Project/ProjectMembers";
 import ProjectResource from "./DashBoard/Project/ProjectResource";
+import { Helmet } from "react-helmet";
 
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
@@ -151,23 +127,24 @@ const ProjectDetails = () => {
 
     useEffect(() => {
         if (Project) {
-            setLockedLinks(_get(Project, 'links', []).filter(link => link.accessControl && _get(link, 'unlocked', []).indexOf(account.toLowerCase()) == -1))
-            setOpenLinks(_get(Project, 'links', []).filter(link => ((!link.accessControl) || (_get(link, 'accessControl', null) && _get(link, 'unlocked', []).indexOf(account.toLowerCase()) > -1))))
+            setLockedLinks(_get(Project, 'links', []).filter(link => link.accessControl && _get(link, 'unlocked', []).indexOf(account?.toLowerCase()) == -1))
+            setOpenLinks(_get(Project, 'links', []).filter(link => ((!link.accessControl) || (_get(link, 'accessControl', null) && _get(link, 'unlocked', []).indexOf(account?.toLowerCase()) > -1))))
         }
     }, [Project]);
 
     const canMyrole = useCallback((permission) => {
         if (!Project) return false;
-        let creator = _get(Project, 'creator', '').toLowerCase() === account?.toLowerCase();
-        let inProject = _find(_uniqBy(Project?.members, '_id'), m => m.wallet.toLowerCase() === account?.toLowerCase())
-        let p = permission;
-        if (inProject)
-            p = `${permission}.inproject`
-        if (creator)
-            p = `${permission}.creator`
-        console.log("can(myRole, p) || can(myRole, permission)", can(myRole, p) || can(myRole, permission))
-        return (can(myRole, p) || can(myRole, permission))
-    }, [Project, myRole]);
+        return true;
+        // let creator = _get(Project, 'creator', '').toLowerCase() === account.toLowerCase();
+        // let inProject = _find(_uniqBy(Project?.members, '_id'), m => m.wallet.toLowerCase() === account.toLowerCase())
+        // let p = permission;
+        // if (inProject)
+        //     p = `${permission}.inproject`
+        // if (creator)
+        //     p = `${permission}.creator`
+        // console.log("can(myRole, p) || can(myRole, permission)", can(myRole, p) || can(myRole, permission))
+        // return (can(myRole, p) || can(myRole, permission))
+    }, [Project]);
 
     useEffect(() => {
         if (Project) {
@@ -321,7 +298,7 @@ const ProjectDetails = () => {
         //if (unlockLoading) return;
         setUnlockLoading(link.id)
         console.log(_uniqBy(Project?.members, '_id'))
-        let memberExists = _find(_uniqBy(Project?.members, '_id'), member => member.wallet.toLowerCase() === account.toLowerCase())
+        let memberExists = _find(_uniqBy(Project?.members, '_id'), member => member.wallet.toLowerCase() === account?.toLowerCase())
         console.log("memberExists", memberExists)
         if (!memberExists)
             return setUnlockLoading(null);
@@ -429,14 +406,14 @@ const ProjectDetails = () => {
     const handleUsers = (item, index) => {
         if (_uniqBy(Project?.members, '_id').some(m => m.wallet === item.member.wallet) === false) {
             return (
-                <div onClick={() => handleAddMember(item)} className="member-li" key={index}>
+                <div onClick={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })} className="member-li" key={index}>
                     <div className="member-img-name">
                         <img src={memberIcon} alt="member-icon" />
                         <p>{item.member.name}</p>
                     </div>
                     <div className="member-address">
                         <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
-                        <input type="checkbox" onChange={() => handleAddMember(item)} checked={!(extraMembers.some((m) => m === item.member._id) === false)} />
+                        <input type="checkbox" onChange={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })} checked={!(extraMembers.some((m) => m === item.member._id) === false)} />
                     </div>
                 </div>
             )
@@ -498,6 +475,9 @@ const ProjectDetails = () => {
         return false;
     }, [account, Project])
 
+    if(!Project)
+        return null
+
     return (
         <>
             {
@@ -514,6 +494,13 @@ const ProjectDetails = () => {
                     :
                     null
             }
+            <Helmet>
+                <meta charSet="utf-8" />
+                <title>{ _get(Project, 'name') }</title>
+                <meta property="og:title" content={_get(Project, 'name')} />
+                <meta property="og:description" content={_get(Project, 'description')} />
+                <meta property="og:type" content="article" />
+            </Helmet>
             <div className='projectDetails-container'>
                 <div className="info">
                     {
@@ -534,13 +521,13 @@ const ProjectDetails = () => {
                                     <div className='project-buttons'>
                                         <button
                                             style={{ marginRight: '35px', background: '#FFF', color: '#C94B32' }}
-                                            onClick={toggleMemberList}
+                                            onClick={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}
                                         >
                                             CANCEL
                                         </button>
                                         <button
                                             style={{ background: '#C94B32', color: '#FFF' }}
-                                            onClick={handleSubmit}
+                                            onClick={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}
                                         >
                                             ADD
                                         </button>
@@ -694,84 +681,33 @@ const ProjectDetails = () => {
                     {/* Show KRA review side modal */}
                     {showKRAReview && <KRAReview toggleShowKRA={() => setShowKRAReview(false)} data={Project} daoURL={daoURL} />}
 
-                    <div className="home-btn" onClick={() => navigate('/', { replace: true })}>
+                    <div className="home-btn">
                         <div className="invertedBox">
-                            {
-                                _get(DAO, 'image', null)
-                                    ?
-                                    <img src={_get(DAO, 'image', null)} />
-                                    :
-                                    <div className="navbarText">
-                                        {daoName.length === 1
-                                            ? daoName[0].charAt(0)
-                                            : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)}
-                                    </div>
-                            }
+                            <div className="navbarText">
+                                {
+                                    daoName.length === 1
+                                        ? daoName[0].charAt(0)
+                                        : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)
+                                }
+                            </div>
                         </div>
                     </div>
 
                     <div className="projectDetails-top">
                         <div className="projectDetails-name">
-                            <div className="left" onClick={() => navigate(-1)}>
+                            <div className="left" onClick={() => { navigate('/', { replace: true }) }}>
                                 <IoIosArrowBack size={20} color="#C94B32" />
                             </div>
                             <div className="right">
                                 <div>
                                     <h1>{Project?.name}</h1>
                                 </div>
-                                <div>
-                                    {
-                                        canMyrole('project.edit') &&
-                                        <button className='settings' onClick={() => { setShowEdit(true) }}>
-                                            <img src={settingIcon} alt="settings-icon" />
-                                        </button>
-                                    }
-                                    { canMyrole('project.share') &&
-                                    <Menu>
-                                        <MenuButton>
-                                            <button className='settings' style={{ marginLeft: 0 }} onClick={() => { setShowEdit(true) }}>
-                                                <img style={{ width: 18, height: 18 }} src={ShareSVG} alt="settings-icon" />
-                                            </button>
-                                        </MenuButton>
-                                        <MenuList style={{ display: 'flex', flexDirection: 'column', width: 350 }}>
-                                        <MenuItem style={{ marginLeft: 0, height: 40 }}>
-                                                <TwitterShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`}>
-                                                    <div style={{ width: '100%' }}>
-                                                        <TwitterIcon size={32}/>
-                                                        <div style={{ marginLeft: 16 }}>Twitter</div>
-                                                    </div>
-                                                </TwitterShareButton>
-                                            </MenuItem>
-                                            <MenuItem style={{ marginLeft: 0, height: 40 }}>
-                                                <TelegramShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`}>
-                                                    <div style={{ width: '100%' }}>
-                                                        <TelegramIcon size={32}/>
-                                                        <div style={{ marginLeft: 16 }}>Telegram</div>
-                                                    </div>
-                                                </TelegramShareButton>
-                                            </MenuItem>
-                                            <MenuItem style={{ marginLeft: 0, height: 40 }}>
-                                                <WhatsappShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`}>
-                                                    <div style={{ width: '100%' }}>
-                                                        <WhatsappIcon size={32}/>
-                                                        <div style={{ marginLeft: 16 }}>Whatsapp</div>
-                                                    </div>
-                                                </WhatsappShareButton>
-                                            </MenuItem>
-                                            <MenuItem onClick={() => {
-                                                navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`)
-                                            }} style={{ marginLeft: 0, height: 40 }}>
-                                                <div style={{ paddingLeft: 22 }}>
-                                                    <div style={{ width: '100%' }}>
-                                                        <img style={{ marginLeft: 8 }} src={copyIcon} />
-                                                        <div style={{ marginLeft: 24 }}>Copy to clipboard</div>
-                                                    </div>
-                                                </div>
-                                            </MenuItem>
-                                        </MenuList>
-                                    </Menu>
-                                    }
-                                </div>
+                                {/* {
+                                    canMyrole('project.edit') &&
+                                    <button className='settings' onClick={() => { navigate(window.location.pathname.replace('/preview', ''), { replace: true }) }}>
+                                        <img src={settingIcon} alt="settings-icon" />
+                                    </button>
+                                } */}
                                 {/* {
                                     <div>
                                         {canMyrole('project.delete') && <button onClick={() => setDeletePrompt(true)}>
@@ -815,7 +751,7 @@ const ProjectDetails = () => {
                         </div>
 
                         {/* new Links */}
-                        {canMyrole('project.links.view') &&
+                        {canMyrole('project.links.view') && amIMember &&
                             _get(Project, 'links', []).length > 0 &&
                             <div className="projectDetails-links">
                                 <div className="links-left">
@@ -823,15 +759,8 @@ const ProjectDetails = () => {
                                         _get(Project, 'links', []).map((item, index) => {
                                             return (
                                                 <div
-                                                    className={item.accessControl && _get(item, 'unlocked', []).map(a => a.toLowerCase()).indexOf(account.toLowerCase()) == -1 ? "link-div locked" : "link-div"}
-                                                    onClick={() => {
-                                                        if (!item.accessControl) {
-                                                            window.open(item.link, '_blank')
-                                                        }
-                                                        else {
-                                                            unlock(item)
-                                                        }
-                                                    }}
+                                                    className={item.accessControl && _get(item, 'unlocked', []).map(a => a.toLowerCase()).indexOf(account?.toLowerCase()) == -1 ? "link-div locked" : "link-div"}
+                                                    onClick={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}
                                                 >
                                                     {handleParseUrl(item.link, item.accessControl, _get(item, 'unlocked', []).map(a => a.toLowerCase()).indexOf(account.toLowerCase()) == -1)}
                                                     <p>{item.title.length > 25 ? item.title.slice(0, 25) + "..." : item.title}</p>
@@ -854,7 +783,7 @@ const ProjectDetails = () => {
                                 </div>
                                 {/* {
                                     canMyrole('project.link.add') &&
-                                    <div className="links-right"><button onClick={toggleShowLink}><HiOutlinePlus size={20} color="#C94B32" /></button></div>
+                                    <div className="links-right"><button onClick={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}><HiOutlinePlus size={20} color="#C94B32" /></button></div>
                                 } */}
                             </div>
                         }
@@ -937,14 +866,14 @@ const ProjectDetails = () => {
                                                 :
                                                 <div className="status" style={{ justifyContent: 'space-between' }}>
                                                     <span>Review frequency : {_get(Project, 'kra.frequency', [])}</span>
-                                                    <div style={{ width: '50%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                                        <button className='archive-btn' onClick={() => navigate(`/${daoURL}/project/${projectId}/archiveKra`)}>
+                                                    {/* <div style={{ width: '50%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                                                        <button className='archive-btn' onClick={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>
                                                             <img src={archiveIcon} alt="archive-icon" />
                                                         </button>
-                                                        {canMyrole('project.review') && <button className="review-btn" onClick={() => setShowKRAReview(true)}>
+                                                        {canMyrole('project.review') && <button className="review-btn" onClick={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>
                                                             REVIEW
                                                         </button>}
-                                                    </div>
+                                                    </div> */}
                                                 </div>
                                         }
                                     </div>
@@ -967,7 +896,7 @@ const ProjectDetails = () => {
                                                                     <h1>{item.deadline}</h1>
                                                                 </div>
                                                                 {canMyrole('project.milestone.update') &&
-                                                                    <div className="check-circle" onClick={() => selectMilestone(item, index)}>
+                                                                    <div className="check-circle" onClick={() => navigate(window.location.pathname.replace('/preview', ''), { replace: true })}>
                                                                         <FiCheck size={20} />
                                                                     </div>
                                                                 }
@@ -1075,11 +1004,11 @@ const ProjectDetails = () => {
 
                     {/* Tasks section */}
                     {canMyrole('project.task.view') && <div style={{ width: '80%' }}>
-                        <Tasks toggleShowCreateTask={toggleShowCreateTask} onlyProjects={true} />
+                        <Tasks toggleShowCreateTask={toggleShowCreateTask} previewFromProject={true} preview={true} onlyProjects={true} />
                     </div>}
 
                     {/* members section */}
-                    {canMyrole('members.view') &&
+                    {canMyrole('members.view') && false &&
                         <div className="projectDetails-body">
                             <div className="projectDetails-members">
                                 <div className="members-header">

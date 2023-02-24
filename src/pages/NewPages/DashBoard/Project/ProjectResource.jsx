@@ -118,7 +118,7 @@ const ProjectResource = ({ toggleShowResource, getResources, list, editResources
 
     const LinkBtn = (props) => {
         if (link && link.indexOf('discord.') > -1)
-            return <AddDiscordLink {...props} />
+            return <AddDiscordLink onLinkError={e => setLinkError(e)} {...props} />
         if (link && link.indexOf('notion.') > -1)
             return <AddNotionLink {...props} />
     }
@@ -257,7 +257,7 @@ const ProjectResource = ({ toggleShowResource, getResources, list, editResources
 
                         <div className='resource-inputRow' style={{ marginBottom: '0', width: '410px' }}>
                             <span>Add links</span>
-                            <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <div style={{ width: '100%', height: '90px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <div style={{ width: '145px', height: '70px' }}>
                                     <SimpleInputField
                                         className="inputField"

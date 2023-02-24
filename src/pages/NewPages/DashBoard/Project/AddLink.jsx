@@ -147,7 +147,7 @@ const AddLink = (props) => {
 
     const LinkBtn = (props) => {
         if(link && link.indexOf('discord.') > -1)
-            return <AddDiscordLink {...props} />
+            return <AddDiscordLink onLinkError={e => setLinkError(e)} {...props} />
         if(link && link.indexOf('notion.') > -1)
             return <AddNotionLink {...props} />
     }

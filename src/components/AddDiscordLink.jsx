@@ -19,7 +19,7 @@ import axiosHttp from '../api';
 import { nanoid } from "@reduxjs/toolkit";
 import { SupportedChainId } from "constants/chains";
 
-export default ({ title, desc, link, roleName, accessControl, okButton, onGuildCreateSuccess, renderButton = undefined, ...props }) => {
+export default ({ title, desc, link, roleName, accessControl, okButton, onGuildCreateSuccess, renderButton = undefined, onLinkError, ...props }) => {
 
     const { provider, account, chainId } = useWeb3React();
     const signerFunction = useCallback((signableMessage) => getSigner(provider, account).signMessage(signableMessage), [provider, account]);
@@ -183,9 +183,10 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                                 }
                             }
                         } else {
-                            setHasClickedAuth(true)
-                            onResetAuth()
-                            return setTimeout(() => onOpen(), 2000)
+                            onLinkError('You are not the owner')
+                            // setHasClickedAuth(true)
+                            // onResetAuth()
+                            // return setTimeout(() => onOpen(), 2000) 
                         }
                     } else {
                         setAddLinkLoading(null);
