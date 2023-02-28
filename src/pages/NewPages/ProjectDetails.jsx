@@ -89,6 +89,7 @@ import ProjectKRA from "./DashBoard/Project/ProjectKRA";
 import WorkspaceInfo from "./DashBoard/Project/WorkspaceInfo";
 import ProjectMembers from "./DashBoard/Project/ProjectMembers";
 import ProjectResource from "./DashBoard/Project/ProjectResource";
+import useMintSBT from "hooks/useMintSBT";
 
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
@@ -107,7 +108,6 @@ const ProjectDetails = () => {
     console.log("Project : ", Project)
     const daoName = _get(DAO, 'name', '').split(" ");
     const { myRole, can } = useRole(DAO, account);
-    const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
 
     const [lockedLinks, setLockedLinks] = useState([]);
     const [openLinks, setOpenLinks] = useState([]);
@@ -138,6 +138,7 @@ const ProjectDetails = () => {
     const [openKRA, setOpenKRA] = useState(false);
     const [openWorkspaceInfo, setOpenWorkspaceInfo] = useState(false);
     const { decryptMessage } = useEncryptDecrypt()
+    const { getStats } = useMintSBT(DAO?.sbt?.address)
 
     useEffect(() => {
         if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
@@ -327,7 +328,10 @@ const ProjectDetails = () => {
             return setUnlockLoading(null);
         if (link.link.indexOf('discord.') > -1) {
             try {
-                if (contractName !== '' && parseInt(balanceOf._hex, 16) === 1) {
+                    const stats = await getStats();
+                    const balanceOf = stats[0];
+                    console.log("BALANCEOF:", parseInt(balanceOf._hex, 16))
+                    console.log(parseInt(balanceOf._hex, 16))
                     if (parseInt(balanceOf._hex, 16) === 1) {
                         const url = new URL(link.link)
                         const dcserverid = url.pathname.split('/')[2]
@@ -355,7 +359,7 @@ const ProjectDetails = () => {
                             window.open(`https://discord.gg/${code}`, '_blank')
                         }
                     }
-                }
+                
             } catch (e) {
                 console.log(e)
                 setUnlockLoading(null)
@@ -370,8 +374,10 @@ const ProjectDetails = () => {
                     .then(async res => {
                         if (res.data) {
                             console.log(res.data)
-                            console.log("BALANCEOF:", parseInt(balanceOf._hex, 16), contractName)
-                            if (contractName !== '' && parseInt(balanceOf._hex, 16) === 1) {
+                            const stats = await getStats();
+                            const balanceOf = stats[0];
+                            console.log("BALANCEOF:", parseInt(balanceOf._hex, 16))
+                            console.log(parseInt(balanceOf._hex, 16))
                                 if (parseInt(balanceOf._hex, 16) === 1) {
                                     const metadata = await axiosHttp.get(`/metadata/${_get(DAO, 'sbt._id', '')}`)
                                     console.log("metadata", metadata)
@@ -402,7 +408,7 @@ const ProjectDetails = () => {
                                         }
                                     }
                                 }
-                            }
+                            
                         }
                     })
                     .catch(e => {
@@ -415,7 +421,7 @@ const ProjectDetails = () => {
                 setUnlockLoading(null)
             }
         }
-    }, [contractName, balanceOf, unlockLoading, Project, account, authorization])
+    }, [ unlockLoading, Project, account, authorization])
 
     const handleAddMember = (user) => {
         if (extraMembers.includes(user.member._id)) {

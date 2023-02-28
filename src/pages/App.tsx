@@ -31,11 +31,18 @@ export default function App() {
 
 	return (
 		<div className="body">
-			{!landingPage && !previewPage && <Header />}
 			<ProjectContext.Provider value={{ projects, setProjects }}>
 				<Routes>
 					{
-						routes.map(route => <Route path={route.path} element={<route.component/>} />)
+						routes.map(route => <Route path={route.path} element={ route.layout ?
+							<route.layout>
+								<route.component/>
+							</route.layout> : 
+							<>
+								{!landingPage && !previewPage && <Header />}
+								<route.component/>
+							</>
+						} />)
 					}
 				</Routes>
 			</ProjectContext.Provider>
