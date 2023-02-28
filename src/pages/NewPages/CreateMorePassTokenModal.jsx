@@ -1,11 +1,14 @@
 import { AiOutlineClose } from "react-icons/ai";
+import { get as _get } from 'lodash'
 import IconButton from "UIpack/IconButton";
 import "./Settings.css";
 import PT from "../../assets/images/drawer-icons/PT.svg";
 import { Button, Image, Input } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "state/hooks";
 
 const CreateMorePassTokenModal = ({ navFromSetting, toggleCreatePassTokenModal }) => {
+	const { DAO } = useAppSelector(store => store.dashboard)
   const navigate = useNavigate();
   return (
     <>
@@ -55,7 +58,7 @@ const CreateMorePassTokenModal = ({ navFromSetting, toggleCreatePassTokenModal }
                 The organisation doesn’t have token yet
               </div>
               <div>
-                <Button onClick={() => navigate('/sbt/create')} id="button-configure-token">
+                <Button onClick={() => navigate(`/${_get(DAO, 'url', '')}/create-pass-token`)} id="button-configure-token">
                   CONFIGURE PASS TOKEN
                 </Button>
               </div>

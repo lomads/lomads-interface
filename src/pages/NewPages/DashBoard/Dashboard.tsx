@@ -53,6 +53,7 @@ import CreateTask from "./Task/CreateTask";
 import CreateRecurring from "./TreasuryCard/CreateRecurring";
 import axiosHttp from 'api'
 import useEns from "hooks/useEns";
+import useMintSBT from "hooks/useMintSBT";
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
 const Dashboard = () => {
@@ -91,7 +92,8 @@ const Dashboard = () => {
 	const { myRole, displayRole, permissions, can, isSafeOwner } = useRole(DAO, account);
 	const { getENSAddress, getENSName } = useEns()
 
-	const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '', chainId);
+	//const { contractNamebalanceOf,  } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '', chainId);
+	const { getStats } = useMintSBT(DAO?.sbt?.address)
 
 	const token = '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';
 
@@ -265,7 +267,7 @@ const Dashboard = () => {
 					}
 				}
 				if (shouldUpdate) {
-					navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
+					navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
 					break;
 				}
 			}
@@ -276,44 +278,46 @@ const Dashboard = () => {
 
 	useEffect(() => {
 		if (chainId) {
-			if (contractName !== '' && DAO && DAO.sbt && DAO.sbt && account && balanceOf) {
-				console.log("BALANCEOF:", parseInt(balanceOf._hex, 16))
-				if (chainId === DAO.chainId) {
-					if (DAO?.sbt?.whitelisted) {
-						if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
-							if (parseInt(balanceOf._hex, 16) === 0) {
-								navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
+			if (DAO && DAO.sbt && DAO.sbt && account) {
+				getStats().then(res => {
+					const balanceOf = res[0];
+					if (chainId === DAO.chainId) {
+						if (DAO?.sbt?.whitelisted) {
+							if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
+								if (parseInt(balanceOf._hex, 16) === 0) {
+									navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
+								} else {
+									// check if data has been filled show mint page. with prefilled data. save data without minting again
+									validateMetaData()
+								}
 							} else {
-								// check if data has been filled show mint page. with prefilled data. save data without minting again
-								validateMetaData()
+								navigate('/only-whitelisted')
 							}
-						} else {
-							navigate('/only-whitelisted')
+						} else if (!DAO?.sbt?.whitelisted) {
+							if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
+								if (parseInt(balanceOf._hex, 16) === 0) {
+									navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
+								} else {
+									// check if data has been filled show mint page. with prefilled data. save data without minting again
+									validateMetaData()
+								}
+							} else {
+								//add to DAO
+								if (parseInt(balanceOf._hex, 16) === 0) {
+									navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
+								} else {
+									// check if data has been filled show mint page. with prefilled data. save data without minting again
+									validateMetaData()
+								}
+							}
 						}
-					} else if (!DAO?.sbt?.whitelisted) {
-						if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
-							if (parseInt(balanceOf._hex, 16) === 0) {
-								navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
-							} else {
-								// check if data has been filled show mint page. with prefilled data. save data without minting again
-								validateMetaData()
-							}
-						} else {
-							//add to DAO
-							if (parseInt(balanceOf._hex, 16) === 0) {
-								navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
-							} else {
-								// check if data has been filled show mint page. with prefilled data. save data without minting again
-								validateMetaData()
-							}
-						}
+					} else {
+						console.log('Switch chain to', DAO.chainId)
 					}
-				} else {
-					console.log('Switch chain to', DAO.chainId)
-				}
+				})				
 			}
 		}
-	}, [chainId, DAO, balanceOf, contractName, account]);
+	}, [chainId, DAO, getStats, account]);
 
 	useEffect(() => {
 		if (account && chainId && (!user || (user && user.wallet.toLowerCase() !== account.toLowerCase()))) {

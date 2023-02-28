@@ -11,8 +11,8 @@ import Dashboard from "../pages/NewPages/DashBoard/Dashboard";
 import Settings from "../pages/NewPages/Settings";
 import SettingsOlder from "../pages/NewPages/SettingsOlder";
 import DCAuth from '../pages/NewPages/DCAuth';
-import CreatePassToken from "../pages/NewPages/CreatePassToken";
-import MintPassToken from "../pages/NewPages/MintPassToken";
+//import CreatePassToken from "../pages/NewPages/CreatePassToken";
+//import MintPassToken from "../pages/NewPages/MintPassToken";
 import CreatePassSucess from "../pages/NewPages/CreatePassSucess";
 import CreateProject from "../pages/NewPages/CreateProject";
 import ProjectDetails from "../pages/NewPages/ProjectDetails";
@@ -27,6 +27,11 @@ import ArchiveProjectTasks from "pages/NewPages/ArchiveProjectTasks";
 import AllProjectTasks from "pages/NewPages/AllProjectTasks";
 import AllProjects from "pages/NewPages/AllProjects";
 import ArchiveKRA from "pages/NewPages/ArchiveKRA";
+
+import PrimaryLayout from "muiLayouts/PrimaryLayout";
+
+import CreatePassToken from "muiViews/CreatePassToken";
+import MintPassToken from "muiViews/MintPassToken";
 
 export default [
     {
@@ -74,11 +79,12 @@ export default [
         component: OnlyWhitelisted
     },
     {
-        path: '/sbt/create',
-        component: CreatePassToken
+        path: '/:daoURL/create-pass-token',
+        component: CreatePassToken,
+        layout: PrimaryLayout
     },
     {
-        path: '/:daoURL/sbt/mint/:contractAddr',
+        path: '/:daoURL/mint/:contractId',
         component: MintPassToken
     },
     {

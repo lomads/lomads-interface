@@ -56,15 +56,19 @@ export default () => {
     }
 
     const decryptMessage = async (message: string) => {
-      if(window.ethereum) {
-        /* @ts-ignore */
-        const decrypt = await window.ethereum.request({
-          method: 'eth_decrypt',
-          params: [message, account],
-        });
-        return JSON.parse(new TextDecoder("utf-8").decode(ascii85.decode(decrypt)));
+      try {
+        if(window.ethereum) {
+          /* @ts-ignore */
+          const decrypt = await window.ethereum.request({
+            method: 'eth_decrypt',
+            params: [message, account],
+          });
+          return JSON.parse(new TextDecoder("utf-8").decode(ascii85.decode(decrypt)));
+        }
+        return null;
+      } catch (e) {
+        console.log(e)
       }
-      return null;
     }
 
     return { encryptMessage, decryptMessage }

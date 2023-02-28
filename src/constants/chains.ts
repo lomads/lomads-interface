@@ -103,3 +103,14 @@ export const CHAIN_GAS_STATION :any = {
   },
   [SupportedChainId.GOERLI]: ''
 }
+
+export const SUPPORTED_ASSETS = {
+  [`${SupportedChainId.GOERLI}`]: {
+    id: "ethereum",
+    symbol: "ETH",
+  },
+  [`${SupportedChainId.POLYGON}`]: {
+    id: "wmatic",
+    symbol: "MATIC",
+  },
+};

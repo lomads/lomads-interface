@@ -11,12 +11,14 @@ import { BlockNumberProvider } from "hooks/useBlockNumber";
 import { MulticallUpdater } from "state/multicall";
 import TransactionUpdater from "state/transactions/updater";
 import ThemeProvider, { ThemedGlobalStyle } from "./theme";
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { LanguageProvider } from "./i18n";
 import { ChakraProvider } from "@chakra-ui/react";
 import { MoralisProvider } from "react-moralis";
+import { Toaster } from 'react-hot-toast';
 import "./polyfill";
 import 'react-toastify/dist/ReactToastify.css';
-
+import muiTheme from './muiTheme';
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
@@ -33,13 +35,16 @@ root.render(
             <TransactionUpdater />
             <ThemeProvider>
               <ThemedGlobalStyle />
-              <BrowserRouter>
-                <ChakraProvider>
-                  <MoralisProvider serverUrl={serverUrl} appId={appId}>
-                    <App />
-                  </MoralisProvider>
-                </ChakraProvider>
-              </BrowserRouter>
+                <BrowserRouter>
+                  <ChakraProvider>
+                    <MoralisProvider serverUrl={serverUrl} appId={appId}>
+                      <MuiThemeProvider theme={muiTheme}>
+                        <App />
+                      </MuiThemeProvider>
+                      <Toaster position="bottom-right" />
+                    </MoralisProvider>
+                  </ChakraProvider>
+                </BrowserRouter>
             </ThemeProvider>
           </BlockNumberProvider>
         </Web3Provider>

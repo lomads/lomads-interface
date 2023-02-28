@@ -13,7 +13,7 @@ const CreatePassSucess = () => {
   const {contractAddr} = useParams();
 
   const handleClick = () => {
-    navigate(`/:daoURL/sbt/mint/${contractAddr}`);
+    navigate(`/:daoURL/mint/${contractAddr}`);
   };
   return (
     <>
