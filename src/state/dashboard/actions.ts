@@ -268,7 +268,7 @@ export const getTask = createAsyncThunk(
 export const storeGithubIssues = createAsyncThunk(
 	'dao/storeGithubIssues',
 	async (params: any, thunkApi) => {
-		return axiosHttp.post(`task/storeGithubIssues`, params.payload)
+		return axiosHttp.post(`utility/store-issues`, params.payload)
 			.then(res => res.data)
 			.catch(e => thunkApi.rejectWithValue(e))
 	}

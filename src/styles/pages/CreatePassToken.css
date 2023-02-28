@@ -25,6 +25,17 @@
     box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
     border-radius: 10px;
     transform: rotate(45deg);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.createPassToken-container .logo-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transform: rotate(-45deg);
 }
 
 .createPassToken-container .logo-container p {

@@ -95,7 +95,7 @@ const Dashboard = () => {
 	//const { contractNamebalanceOf,  } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '', chainId);
 	const { getStats } = useMintSBT(DAO?.sbt?.address)
 
-	const token = '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';
+	const token = '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';
 
 	const requestReposIssues = (name: String) => {
 		fetch(`https://api.github.com/repos/${name}/issues`,
@@ -108,36 +108,38 @@ const Dashboard = () => {
 			.then(response => response.json())
 			.then(data => {
 				console.log("github issues : ", data);
-				var newArray = data.map((i: any) => (
-					{
-						daoId: DAO?._id,
-						provider: 'Github',
-						name: i.title,
-						description: i.body,
-						creator: null,
-						members: [],
-						project: null,
-						discussionChannel: i.html_url,
-						deadline: null,
-						submissionLink: i.html_url,
-						compensation: null,
-						reviewer: null,
-						contributionType: 'open',
-						createdAt: i.created_at,
-						draftedAt: Date.now(),
-					}
-				))
+				// var newArray = data.map((i: any) => (
+				// 	{
+				// 		daoId: DAO?._id,
+				// 		provider: 'Github',
+				// 		name: i.title,
+				// 		description: i.body,
+				// 		creator: null,
+				// 		members: [],
+				// 		project: null,
+				// 		discussionChannel: i.html_url,
+				// 		deadline: null,
+				// 		submissionLink: i.html_url,
+				// 		compensation: null,
+				// 		reviewer: null,
+				// 		contributionType: 'open',
+				// 		createdAt: i.created_at,
+				// 		draftedAt: Date.now(),
+				// 	}
+				// ))
 
-				console.log("new array : ", newArray);
-				dispatch(storeGithubIssues({ payload: { daoId: _get(DAO, '_id', null), issueList: newArray } }))
+				// console.log("new array : ", newArray);
+				// dispatch(storeGithubIssues({ payload: { daoId: _get(DAO, '_id', null), issueList: newArray } }))
 			})
 	}
 
 	useEffect(() => {
-		if (DAO && !DAO.githubIssues) {
-			console.log("fetching...")
-			requestReposIssues('Lomads-Technologies/gnosis-safe-integration');
-		}
+		// if (DAO && !DAO.githubIssues) {
+		// 	console.log("fetching...")
+		// 	// https://github.com/Lomads-Technologies/token-gating
+		// 	requestReposIssues('Lomads-Technologies/token-gating');
+		// }
+		// requestReposIssues('Lomads-Technologies/soulbound-token');
 	}, [DAO]);
 
 	const amIAdmin = useMemo(() => {

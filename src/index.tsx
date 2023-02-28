@@ -20,13 +20,12 @@ import "./polyfill";
 import 'react-toastify/dist/ReactToastify.css';
 import muiTheme from './muiTheme';
 const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement
+	document.getElementById("root") as HTMLElement
 );
 const serverUrl = process.env.REACT_APP_MORALIS_SERVER_URL as string;
 const appId = process.env.REACT_APP_MORALIS_APP_ID as string;
 
 root.render(
-  <React.StrictMode>
     <Provider store={store}>
       <LanguageProvider>
         <Web3Provider>
@@ -50,7 +49,6 @@ root.render(
         </Web3Provider>
       </LanguageProvider>
     </Provider>
-  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -27,6 +27,7 @@ import ArchiveProjectTasks from "pages/NewPages/ArchiveProjectTasks";
 import AllProjectTasks from "pages/NewPages/AllProjectTasks";
 import AllProjects from "pages/NewPages/AllProjects";
 import ArchiveKRA from "pages/NewPages/ArchiveKRA";
+import GithubAuth from "pages/NewPages/GithubAuth";
 
 import PrimaryLayout from "muiLayouts/PrimaryLayout";
 
@@ -98,6 +99,10 @@ export default [
     {
         path: '/dcauth',
         component: DCAuth
+    },
+    {
+        path: '/githubauth',
+        component: GithubAuth
     },
     {
         path: '/:daoURL/project/:projectId',

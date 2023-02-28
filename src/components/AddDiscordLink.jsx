@@ -38,29 +38,29 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
     const getDiscordServers = useCallback(async () => {
         console.log("getDiscordServers", authorization)
         return axios.get('https://discord.com/api/users/@me/guilds', { headers: { Authorization: authorization } })
-        .then(res => res.data)
-        .catch(e => {
-            if(e.response.status === 401){
-                console.log(e)
-                setHasClickedAuth(true)
-                onResetAuth()
-                setTimeout(() => onOpen(), 1000) 
-            }
-            return null;
-        })
+            .then(res => res.data)
+            .catch(e => {
+                if (e.response.status === 401) {
+                    console.log(e)
+                    setHasClickedAuth(true)
+                    onResetAuth()
+                    setTimeout(() => onOpen(), 1000)
+                }
+                return null;
+            })
     }, [authorization, onOpen])
 
     const prevAuth = usePrevious(authorization)
     console.log("prevAuth", prevAuth, authorization, hasClickedAuth)
     useEffect(() => {
-        if(( (prevAuth == undefined && authorization) || ( prevAuth && authorization && prevAuth !== authorization ) ) && link && hasClickedAuth){
-            handleAddResource() 
+        if (((prevAuth == undefined && authorization) || (prevAuth && authorization && prevAuth !== authorization)) && link && hasClickedAuth) {
+            handleAddResource()
         }
     }, [prevAuth, authorization, hasClickedAuth])
 
     useInterval(async () => {
         axiosHttp.get(`discord/guild/${poll}`)
-        .then(res => setChannels(res.data.channels))
+            .then(res => setChannels(res.data.channels))
     }, poll ? 5000 : null)
 
     const prevActiveAddBotPopup = usePrevious(activeAddBotPopup)
@@ -68,15 +68,15 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
 
     useEffect(() => {
         if (!!prevActiveAddBotPopup && !activeAddBotPopup) {
-       // onSelect(serverData.id)
-            if(poll)
+            // onSelect(serverData.id)
+            if (poll)
                 setPoll(null)
         }
     }, [prevActiveAddBotPopup, activeAddBotPopup, poll])
 
 
     useEffect(() => {
-        if(prevIsAuthenticating && !isAuthenticating)
+        if (prevIsAuthenticating && !isAuthenticating)
             setAddLinkLoading(null);
     }, [prevIsAuthenticating, isAuthenticating])
 
@@ -92,13 +92,13 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
         setChannels(null);
         setPoll(null);
         setHasClickedAuth(false)
-        if(server) {
+        if (server) {
             axiosHttp.post(`discord/guild/${server.id}/sync-roles`, { daoId: _get(DAO, '_id') })
-            .finally(() => {
-                setAddLinkLoading(null);
-                onGuildCreateSuccess(result)
-                setServer(null);
-            })
+                .finally(() => {
+                    setAddLinkLoading(null);
+                    onGuildCreateSuccess(result)
+                    setServer(null);
+                })
         } else {
             setAddLinkLoading(null);
             onGuildCreateSuccess(result)
@@ -108,21 +108,21 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
 
     const onGuildBotAdded = async server => {
         let attachRoleId = undefined;
-        if(roleName) {
+        if (roleName) {
             attachRoleId = await axiosHttp.get(`discord/guild/${server.id}/roles`)
-            .then(async res => {
-                if(res.data) {
-                    console.log(res.data)
-                    let guildRole = _find(res.data, r => r.name.toLowerCase() === roleName.toLowerCase())
-                    if(guildRole) 
-                        return guildRole.id
-                    else {
-                        guildRole = await axiosHttp.post(`discord/guild/${server.id}/role`, { name: roleName }).then(res => res.data)
-                        console.log("guildRole.id", guildRole.id)
-                        return guildRole.id
+                .then(async res => {
+                    if (res.data) {
+                        console.log(res.data)
+                        let guildRole = _find(res.data, r => r.name.toLowerCase() === roleName.toLowerCase())
+                        if (guildRole)
+                            return guildRole.id
+                        else {
+                            guildRole = await axiosHttp.post(`discord/guild/${server.id}/role`, { name: roleName }).then(res => res.data)
+                            console.log("guildRole.id", guildRole.id)
+                            return guildRole.id
+                        }
                     }
-                }
-            })
+                })
         }
         finish(attachRoleId ? attachRoleId : server.id)
     }
@@ -139,32 +139,32 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
             return toast.error("Please enter a valid link");
         }
         else {
-            if(accessControl){
+            if (accessControl) {
                 setHasClickedAuth(true)
                 try {
                     setAddLinkLoading(true);
-                    if(!authorization) 
+                    if (!authorization)
                         return onOpen()
                     setHasClickedAuth(false)
                     const url = new URL(link)
                     const dcserverid = url.pathname.split('/')[2]
                     const dcServers = await getDiscordServers();
-                    if(dcServers && dcServers.length) {
-                        let validServer = _find(dcServers, s => s.id.toString() === dcserverid.toString() && s.owner)   
-                        if(validServer){ 
+                    if (dcServers && dcServers.length) {
+                        let validServer = _find(dcServers, s => s.id.toString() === dcserverid.toString() && s.owner)
+                        if (validServer) {
                             const guildId = await axiosHttp.get(`project/discord-server-exists/${dcserverid}`).then(res => res.data);
-                            if(guildId) {
+                            if (guildId) {
                                 // const guild = await axios.get(`https://api.guild.xyz/v1/guild/${guildId}`).then(res => res.data)
                                 // if(guild) {
-                                    
+
                                 // } else {
-                                   setServer(validServer)
-                                    // check if bot already added 
+                                setServer(validServer)
+                                // check if bot already added 
                                 //    const discordGuild = await axiosHttp.get(`discord/guild/${validServer.id}`).then(res => res.data);  
                                 //    if(!discordGuild){
-                                       const redirectUri = typeof window !== "undefined" && `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
-                                       setPoll(dcserverid)
-                                       openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=${process.env.REACT_APP_DISCORD_APP_ID}&guild_id=${dcserverid}&permissions=8&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
+                                const redirectUri = typeof window !== "undefined" && `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
+                                setPoll(dcserverid)
+                                openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=${process.env.REACT_APP_DISCORD_APP_ID}&guild_id=${dcserverid}&permissions=8&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
                                 //    } else {
                                 //         onGuildBotAddedDelayed(validServer)
                                 //    }
@@ -172,15 +172,15 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                             } else {
                                 setServer(validServer)
                                 // check if bot already added 
-                               const discordGuild = await axiosHttp.get(`discord/guild/${validServer.id}`).then(res => res.data).catch(e => null);  
-                               console.log("discordGuild", discordGuild)
-                               if(!discordGuild){
-                                   const redirectUri = typeof window !== "undefined" && `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
-                                   setPoll(dcserverid)
-                                   openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=${process.env.REACT_APP_DISCORD_APP_ID}&guild_id=${dcserverid}&permissions=8&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
-                               } else {
-                                   onGuildBotAddedDelayed(validServer)
-                               }
+                                const discordGuild = await axiosHttp.get(`discord/guild/${validServer.id}`).then(res => res.data).catch(e => null);
+                                console.log("discordGuild", discordGuild)
+                                if (!discordGuild) {
+                                    const redirectUri = typeof window !== "undefined" && `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
+                                    setPoll(dcserverid)
+                                    openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=${process.env.REACT_APP_DISCORD_APP_ID}&guild_id=${dcserverid}&permissions=8&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
+                                } else {
+                                    onGuildBotAddedDelayed(validServer)
+                                }
                             }
                         } else {
                             onLinkError('You are not the owner')
@@ -202,41 +202,41 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
         }
     }
 
-    if(renderButton){
+    if (renderButton) {
         return (
-            <div onClick={() => { 
-                if(!(link === '' || title === '' || addLinkLoading))
-                    handleAddResource() 
+            <div onClick={() => {
+                if (!(link === '' || title === '' || addLinkLoading))
+                    handleAddResource()
             }}>
-                { addLinkLoading ? 
-                <button
-                style={{ background: link !== '' && title !== '' && !addLinkLoading ? '#C84A32' : 'rgba(27, 43, 65, 0)', width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center'}}
-                disabled={link === '' || title === '' || addLinkLoading}
-                > 
-                   { addLinkLoading ? <LeapFrog size={20} color="#C84A32"/> : <AiOutlinePlus color="#FFF" size={25} />  }
-                </button>
-                 : renderButton }
+                {addLinkLoading ?
+                    <button
+                        style={{ background: link !== '' && title !== '' && !addLinkLoading ? '#C84A32' : 'rgba(27, 43, 65, 0)', width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        disabled={link === '' || title === '' || addLinkLoading}
+                    >
+                        {addLinkLoading ? <LeapFrog size={20} color="#C84A32" /> : <AiOutlinePlus color="#FFF" size={25} />}
+                    </button>
+                    : renderButton}
             </div>
         )
     }
 
     return (
         <>
-            { 
-                okButton ? 
-                <SimpleLoadButton condition={addLinkLoading} disabled={addLinkLoading} title="OK" bgColor="#C94B32" className="button" fontsize={16} fontweight={400} height={40} width={129} onClick={() => handleAddResource()} /> : 
-                <>
-                {
-                    <button
-                    style={{ background: link !== '' && title !== '' && !addLinkLoading ? '#C84A32' : 'rgba(27, 43, 65, 0.2)', width: 50, height: 50, display: 'flex', alignItems: 'center', justifyContent: 'center'}}
-                    disabled={link === '' || title === '' || addLinkLoading}
-                    onClick={() => handleAddResource() }> 
-                       { addLinkLoading ? <LeapFrog size={20} color="#FFF"/> : <AiOutlinePlus color="#FFF" size={25} />  }
-                    </button>
-                }
-                </>
+            {
+                okButton ?
+                    <SimpleLoadButton condition={addLinkLoading} disabled={addLinkLoading} title="OK" bgColor="#C94B32" className="button" fontsize={16} fontweight={400} height={40} width={129} onClick={() => handleAddResource()} /> :
+                    <>
+                        {
+                            <button
+                                style={{ background: link !== '' && title !== '' && !addLinkLoading ? '#C84A32' : 'rgba(27, 43, 65, 0.2)', width: 50, height: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                disabled={link === '' || title === '' || addLinkLoading}
+                                onClick={() => handleAddResource()}>
+                                {addLinkLoading ? <LeapFrog size={20} color="#FFF" /> : <AiOutlinePlus color="#FFF" size={25} />}
+                            </button>
+                        }
+                    </>
             }
         </>
 
-    )   
+    )
 }

@@ -39,7 +39,7 @@ const InviteGang = () => {
 	const { transformRole } = useTerminology(_.get(DAO, 'terminologies'))
 	const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
 	const { account, provider, chainId } = useWeb3React();
-	const { getENSAddress, getENSName }  = useEns();
+	const { getENSAddress, getENSName } = useEns();
 	const [showModal, setShowModal] = useState(false);
 	const [deleteMembers, setDeleteMembers] = useState<string[]>([]);
 	const [validMembers, setValidMembers] = useState<{ address: string; name: string, role: string }[]>([]);
@@ -104,7 +104,7 @@ const InviteGang = () => {
 			}
 			else {
 				let ENSname = null;
-					ENSname = await getENSName(_ownerAddress)
+				ENSname = await getENSName(_ownerAddress)
 				if (ENSname) {
 					member.name = _ownerName !== '' ? _ownerName : ENSname;
 				}
@@ -162,24 +162,24 @@ const InviteGang = () => {
 			setUploadLoading(true)
 			let validMembers = [];
 			let mem: any = {}
-			if(data.length > 0){
+			if (data.length > 0) {
 				const noHeader = _.find(Object.keys(data[0]), key => isAddressValid(key))
-				if(noHeader) {
-					Object.keys(data[0]).map((key:any) => {
-						if(isAddressValid(key))
+				if (noHeader) {
+					Object.keys(data[0]).map((key: any) => {
+						if (isAddressValid(key))
 							mem.address = key
 						else
 							mem.name = key
 					})
 				}
 				let newData = data;
-				if(Object.keys(mem).length > 0)
-					newData = [ ...newData, mem ]
+				if (Object.keys(mem).length > 0)
+					newData = [...newData, mem]
 				for (let index = 0; index < newData.length; index++) {
 					let preParseMember: any = newData[index];
 					let member: any = {}
-					Object.keys(preParseMember).map((key:any) => {
-						if(isAddressValid(preParseMember[key]))
+					Object.keys(preParseMember).map((key: any) => {
+						if (isAddressValid(preParseMember[key]))
 							member.address = preParseMember[key]
 						else
 							member.name = preParseMember[key]
@@ -204,7 +204,7 @@ const InviteGang = () => {
 						}
 					}
 				}
-	
+
 				setValidMembers(validMembers);
 				setUploadLoading(false)
 				setShowModal(true);
@@ -452,8 +452,8 @@ const InviteGang = () => {
 														<option value="role4">Contributor</option> */}
 														{
 															Object.keys(DEFAULT_ROLES).map((key: any) => {
-																if(key !== 'role1')
-																	return <option value={key}>{  _.get(DEFAULT_ROLES, `[${key}].label`) }</option>
+																if (key !== 'role1')
+																	return <option value={key}>{_.get(DEFAULT_ROLES, `[${key}].label`)}</option>
 																return null
 															})
 														}

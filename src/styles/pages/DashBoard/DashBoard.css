@@ -983,7 +983,23 @@ body.active-modal {
     }
 }
 
-.invertedBox,
+.invertedBox {
+    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
+    box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
+    border-radius: 10px;
+    transform: rotate(45deg);
+    height: 35px;
+    width: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.invertedBox img {
+    transform: rotate(-45deg);
+}
+
 .stripInvertedBox {
     background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
     box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
@@ -1024,6 +1040,11 @@ body.active-modal {
     border: 2px solid #FFFFFF;
     color: #FFFFFF;
     cursor: pointer;
+    overflow: hidden;
+}
+
+.stripInvertedBoxOutline img {
+    transform: rotate(-45deg);
 }
 
 #transactionSuccessPage {
