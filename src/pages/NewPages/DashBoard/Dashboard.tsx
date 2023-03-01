@@ -30,6 +30,7 @@ import AddMember from "./MemberCard/AddMember";
 import dashboardfooterlogo from "../../../assets/svg/dashboardfooterlogo.svg";
 import starDashboard from "../../../assets/svg/star_dashboard.svg";
 import tokenDashboard from "../../../assets/svg/token_dashboard.svg";
+import questionMark from "../../../assets/svg/question-mark.svg";
 import { useAppDispatch } from "state/hooks";
 import { getCurrentUser, getDao, loadDao, storeGithubIssues } from "state/dashboard/actions";
 import { setDAO, setDAOList } from "state/dashboard/reducer";
@@ -39,7 +40,7 @@ import { updateCurrentNonce, updateSafeThreshold, updateSafeAddress } from "stat
 import { Tooltip } from "@chakra-ui/react";
 import useDCAuth from "hooks/useDCAuth";
 import MyProject from "./MyProject";
-
+import Steps from './WalkThrough/steps';
 import { useSBTStats } from "hooks/SBT/sbt";
 import Footer from "components/Footer";
 import EditMember from "./MemberCard/EditMember";
@@ -353,7 +354,7 @@ const Dashboard = () => {
 			}
 		}
 	}, [DAO, account, chainId]);
-
+   console.log(Steps[5], '...steps...')
 	useEffect(() => {
 		if (DAO && account && chainId) {
 			if (chainId === DAO.chainId) {
@@ -616,6 +617,9 @@ const Dashboard = () => {
 					toggleShowMember={toggleShowMember}
 				/>
 			)}
+			<div className="question-mark">
+			  <img src={questionMark} />
+			</div>
 			<SideBar
 				name={_get(DAO, 'name', '')}
 				showSideBar={showSideBar}
