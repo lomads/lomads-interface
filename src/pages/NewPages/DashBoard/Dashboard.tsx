@@ -44,6 +44,7 @@ import { useSBTStats } from "hooks/SBT/sbt";
 import Footer from "components/Footer";
 import EditMember from "./MemberCard/EditMember";
 import LinksArea from "./LinksArea";
+import WalkThrough from './WalkThrough/WalkThrough'
 import useRole from "hooks/useRole";
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains';
 import { switchChain } from "utils/switchChain";
@@ -88,6 +89,7 @@ const Dashboard = () => {
 	const [recurringTxn, setRecurringTxn] = useState<any>(null);
 	const [safeOwners, setSafeOwners] = useState<any>(null);
 	const [checkLoading, setCheckLoading] = useState<boolean>(true);
+	const [walkThroughStep, setWalkThroughStep] = useState<number>(0);
 	const currentNonce = useAppSelector((state) => state.flow.currentNonce);
 	const { myRole, displayRole, permissions, can, isSafeOwner } = useRole(DAO, account);
 	const { getENSAddress, getENSName } = useEns()
@@ -481,7 +483,11 @@ const Dashboard = () => {
 		setRecurringTxn(txn)
 		setShowCreateRecurring(true)
 	}
-
+	const beginWalkThrough = () =>{
+		setWalkThroughStep(1)
+		console.log('....walkthrough step..', walkThroughStep)
+	}
+	console.log('....walkthrough step..', walkThroughStep)
 	return (
 		<>
 			{!validDaoChain || !DAO || DAOLoading || (daoURL && (DAO && DAO.url !== daoURL)) ?
@@ -493,6 +499,7 @@ const Dashboard = () => {
 						<LeapFrog size={50} color="#C94B32" />
 					</div>
 				</div> : null}
+			<WalkThrough beginWalkThrough={beginWalkThrough}/>
 			<div
 				className="dashBoardBody"
 				onMouseEnter={() => {
