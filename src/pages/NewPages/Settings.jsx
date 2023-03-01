@@ -51,7 +51,7 @@ import OrganisationDetailsModal from "./OrganisationDetailsModal";
 import RolesPermissionsModal from "./RolesPermissionsModal";
 import SafeModal from "./SafeModal";
 import XpPointsModal from "./XpPointsModal";
-import PassTokenModal from "./PassTokenModal";
+import PassTokenModal from "muiModals/PassTokenModal";
 import TerminologyModal from "./TerminologyModal";
 import DiscordModal from "./DiscordModal";
 import { useAppDispatch, useAppSelector } from "state/hooks";
@@ -120,7 +120,7 @@ const Settings = () => {
 		setOpenSafe(!openSafe);
 	};
 	let togglePassToken = () => {
-		setOpenPassToken(!openPassToken);
+		setOpenPassToken(prev => !prev);
 	};
 	let toggleXp = () => {
 		setOpenXpPoints(!openXpPoints);
@@ -226,7 +226,7 @@ const Settings = () => {
 
 							<div className="settings-organisation-child"
 								onClick={() => {
-									DAO?.sbt?.name ? togglePassToken() : toggleCreatePassTokenModal()
+									togglePassToken() 
 								}}
 							>
 								<div
@@ -336,17 +336,16 @@ const Settings = () => {
 				<SafeModal toggleS={toggleS} />
 			)}
 			{/* // !-------------  Pass Token ------------ */}
-			{openPassToken && (
-				<PassTokenModal
-					togglePassToken={togglePassToken}
-				/>
-			)}
-			{openCreatePassToken && (
+			<PassTokenModal
+				open={openPassToken}
+				onClose={() => setOpenPassToken(false)}
+			/>
+			{/* {openCreatePassToken && (
 				<CreateMorePassTokenModal
 					navFromSetting={true}
 					toggleCreatePassTokenModal={toggleCreatePassTokenModal}
 				/>
-			)}
+			)} */}
 			{/* // !-------------  SWEAT Points ------------ */}
 			{openXpPoints && (
 				<XpPointsModal toggleXp={toggleXp} />
@@ -358,9 +357,9 @@ const Settings = () => {
 				/>
 			)}
 			{/* // !-------------  Discord ------------ */}
-			{openDiscord && (
+			{/* {openDiscord && (
 				<DiscordModal toggleDiscord={toggleDiscord} />
-			)}
+			)} */}
 		</>
 	);
 };
