@@ -185,9 +185,11 @@ export default () => {
                         mintPrice: _get(contract, 'mintPrice', '0'),
                         mintPriceinUsd: mintPriceinUsd.toString()
                     })
-        
+                    
+                    
+
                     const estimateTransactionCost = await estimateGas(
-                    ethers.utils.parseEther(contract?.mintPrice).toString(),
+                    ethers.utils.parseUnits(contract?.mintPrice, ).toString(),
                     state?.referralCode
                     );
             
