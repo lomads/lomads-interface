@@ -18,7 +18,7 @@ import CurrencyInput from "muiComponents/CurrencyInput"
 import { useNavigate, useParams } from "react-router-dom"
 import XlsxUpload from "muiComponents/XlsxUpload"
 import toast from 'react-hot-toast';
-
+import { USDC } from 'constants/tokens';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -202,11 +202,13 @@ export default () => {
             setTokens([
                 {
                     label: 'ETH',
-                    value: "0x0000000000000000000000000000000000000000"
+                    value: "0x0000000000000000000000000000000000000000",
+                    decimals: 18
                 },
                 {
-                    label: 'USDC',
-                    value: SupportedChainId.GOERLI === chainId ? '0x07865c6e87b9f70255377e024ace6630c1eaa37f' : '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
+                    label: _get(USDC, `[${chainId}].symbol`),
+                    value: _get(USDC, `[${chainId}].address`),
+                    decimals: _get(USDC, `[${chainId}].decimals`),
                 }
             ])
         }

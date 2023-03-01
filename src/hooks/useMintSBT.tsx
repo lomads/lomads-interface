@@ -1,9 +1,10 @@
-import { get as _get } from 'lodash'
+import { get as _get, find as _find } from 'lodash'
 import { useWeb3React } from "@web3-react/core";
 import { useContract } from "hooks/useContract";
 import { SupportedChainId } from "constants/chains";
 import { ethers } from "ethers";
 import MultiCall from "@indexed-finance/multicall";
+import { USDC } from 'constants/tokens';
 
 export type SBTParams = {
     name: string,
@@ -20,9 +21,27 @@ const useMintSBT = (contractAddress: string | undefined) => {
         chainId === SupportedChainId.POLYGON ? require('abisPolygon/SBT.json') : ''
     , true);
 
+    const weth = (price: string, token: string): any => {
+      if(!chainId) return;
+      const tokens = [
+          {
+              label: 'ETH',
+              value: "0x0000000000000000000000000000000000000000",
+              decimals: 18
+          },
+          {
+              label: _get(USDC, `[${chainId}].symbol`),
+              value: _get(USDC, `[${chainId}].address`),
+              decimals: _get(USDC, `[${chainId}].decimals`),
+          }
+      ]
+      const payToken = _find(tokens, (t:any) => t.value === token)
+      return ethers.utils.parseUnits(price, payToken?.decimals)
+  }
+
     const getStats = async () => {
         const calls: any = [
-            {
+              {
                 target: contractAddress,
                 function: "balanceOf",
                 args: [account],
@@ -35,6 +54,11 @@ const useMintSBT = (contractAddress: string | undefined) => {
               {
                 target: contractAddress,
                 function: "totalSupply",
+                args: [],
+              },
+              {
+                target: contractAddress,
+                function: "mintToken",
                 args: [],
               },
         ]
@@ -55,6 +79,8 @@ const useMintSBT = (contractAddress: string | undefined) => {
             parseFloat(stats[2].toString()) === 0
               ? "1"
               : stats[2].toString();
+            const mintToken = stats[4];
+
             if(chainId && account && mintContract?.signer) {
                 console.log(referralCode, mintPrice)
                 const tx = await mintContract?.safeMint(
@@ -62,7 +88,7 @@ const useMintSBT = (contractAddress: string | undefined) => {
                     referralCode, 
                 {
                     from: account,
-                    value: ethers.utils.parseEther(mintPrice)
+                    value: weth(mintPrice, mintToken)
                 });
                 await tx.wait();
                 return currentIndex;
@@ -106,7 +132,7 @@ const useMintSBT = (contractAddress: string | undefined) => {
       throw 'Could not estimate gas. Please try after sometime'
     }
 
-    const updateContract = async (price: any) => {
+    const updateContract = async (price: string, mintToken: string) => {
       if (mintContract?.signer) {
         try {
           // const [err, res] = await multicall.multiCall(
@@ -114,7 +140,7 @@ const useMintSBT = (contractAddress: string | undefined) => {
           //     chainId === SupportedChainId.POLYGON ? require('abisPolygon/SBT.json') : '',
           //     calls
           // );
-          const tx = await mintContract?.setMintPrice(price)
+          const tx = await mintContract?.setMintPrice(weth(price, mintToken))
           await tx.wait()
           const mintPriceValue = await mintContract?.mintPrice()
           console.log(mintPriceValue.toString())

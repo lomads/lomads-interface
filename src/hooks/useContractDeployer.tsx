@@ -1,13 +1,15 @@
-import { get as _get } from 'lodash'
+import { get as _get, find as _find } from 'lodash'
 import { BigNumber } from "@ethersproject/bignumber";
 import { useWeb3React } from "@web3-react/core";
 import { useContract } from "hooks/useContract";
 import { ethers } from "ethers";
+import { USDC } from 'constants/tokens';
 
 import {
     SBT_DEPLOYER_ADDRESSES
   } from 'constants/addresses'
 import { useState } from "react";
+import { SupportedChainId } from 'constants/chains';
 
 export type SBTParams = {
     name: string,
@@ -21,6 +23,7 @@ export type SBTParams = {
     discounts: Array<number>,
     inviteCodes: Array<string>
 }
+
 
 const useContractDeployer = (abi: any) => {
     const { account, provider, chainId } = useWeb3React();
@@ -55,20 +58,35 @@ const useContractDeployer = (abi: any) => {
         return deployerContract?.getContractByIndex(BigNumber.from(parseInt(id.toString())));
     }
 
+    const weth = (price: string, token: string): any => {
+        const tokens = [
+            {
+                label: 'ETH',
+                value: "0x0000000000000000000000000000000000000000",
+                decimals: 18
+            },
+            {
+                label: _get(USDC, `[${chainId}].symbol`),
+                value: _get(USDC, `[${chainId}].address`),
+                decimals: _get(USDC, `[${chainId}].decimals`),
+            }
+        ]
+        const payToken = _find(tokens, (t:any) => t.value === token)
+        return ethers.utils.parseUnits(price, payToken?.decimals)
+    }
+
     const deploy = async ({ name, symbol, owner, payToken, treasury, mintPrice, whitelisted, discounts, inviteCodes, members }: SBTParams) => {
         setDeployLoading(true);
         try {
             if(chainId && account && deployerContract?.signer) {
                 const currentTokenId: BigNumber = await deployerContract?.counter();
-                console.log(currentTokenId)
-                console.log({ name, symbol, owner, treasury, mintPrice, whitelisted })
                 const tx = await deployerContract?.deployNewSBT(
                     name, 
                     symbol, 
                     owner,
                     payToken,
                     treasury,
-                    ethers.utils.parseEther(mintPrice),
+                    weth(mintPrice, payToken),
                     whitelisted ? 1 : 0,
                     discounts,
                     inviteCodes,
