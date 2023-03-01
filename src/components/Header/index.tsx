@@ -237,7 +237,7 @@ export default function Header() {
   }
   
   return (
-    <HeaderFrame showBackground={scrollY > 45}>
+    <HeaderFrame showBackground={false}>
       <Title href=".">
         <UniIcon></UniIcon>
       </Title>
