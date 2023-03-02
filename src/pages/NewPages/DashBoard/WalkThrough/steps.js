@@ -1,33 +1,41 @@
+import stepOneWalkthrough from '../../../../assets/svg/step_1_walkthrough.svg'
+import stepTwoWalkthrough from '../../../../assets/svg/step_2_walkthrough.svg'
+import stepThreeWalkthrough from '../../../../assets/svg/step_3_walkthrough.svg'
+import stepFourWalkthrough from '../../../../assets/svg/step_4_walkthrough.svg'
+import stepFiveWalkthrough from '../../../../assets/svg/step_5_walkthrough.svg'
+import stepSixWalkthrough from '../../../../assets/svg/step_6_walkthrough.svg'
+import stepSevenWalkthrough from '../../../../assets/svg/step_7_walkthrough.svg'
+
 const steps = [{
     step: 1,
     id: 'my-workspace',
     title: 'Create Workspaces',
     content: 'Here, you can create customized workspaces for all of your teams, manage milestones, and track key results.',
     buttonText: '1/7  NEXT',
-    imgPath: '.../'
+    imgPath: stepOneWalkthrough
   },
   {
     step: 2,
     id: 'my-task',
     title: 'Create Tasks',
     content: 'By creating tasks, you can track progress, deadlines, and rewards on bounties, and assign contributors to each task.',
-    imgPath: '../../',
-    buttonText: '2/7 NEXT'
+    buttonText: '2/7 NEXT',
+    imgPath: stepTwoWalkthrough
   },
   {
     step: 3,
     id: 'treasury-management',
     title: 'Treasury Management',
     content: 'Managing and automating your treasury has never been easier! Here you can approve and send token payments manually, or set up recurring payments to team members!',
-    imgPath: '../../',
+    imgPath: stepThreeWalkthrough,
     buttonText: '3/7 NEXT'
   },
   {
     step: 4,
-    id: 'bootstrapping',
+    id: 'treasury-management',
     title: 'Bootstrapping?',
     content: 'Turn on SWEAT points in settings to track contributions for future rewards.',
-    imgPath: '../../',
+    imgPath: stepFourWalkthrough,
     buttonText: '4/7 NEXT'
   },
   {
@@ -35,7 +43,7 @@ const steps = [{
     id: 'members',
     title: 'Members',
     content: 'Add new members and manage details and roles of existing members.',
-    imgPath: '../../',
+    imgPath: stepFiveWalkthrough,
     buttonText: '5/7 NEXT',
   },
   {
@@ -43,7 +51,7 @@ const steps = [{
     id: 'global-settings',
     title: 'Global settings',
     content: 'Customize your Dashboard with settings: edit organization details, manage treasury signatories, launch pass tokens, enable SWEAT points, and personalize terminologies. Explore now!',
-    imgPath: '../../',
+    imgPath: stepSixWalkthrough,
     buttonText: '6/7 NEXT',
   },
   {
@@ -51,7 +59,7 @@ const steps = [{
     id: 'question-mark',
     title: 'Well done!',
     content: 'If you need any help or tips, you will find it here.',
-    imgPath: '../../',
+    imgPath: stepSevenWalkthrough,
     buttonText: 'END'
   }
 ]

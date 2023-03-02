@@ -22,11 +22,35 @@
     border-radius: '10%';
 }
 
-.walkThroughCard {
+.walkThroughTooltip {
     position: relative;
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     background: #FFFFFF;
+    width: 650px;
+    height: 247px;
+}
+
+.tooltip-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-self: center;
+    width: 464px;
+    padding: 30px;
+}
+
+.tooltip-img {
+    background: #F0F0F0;
+    border-radius: 10px 0px 0px 10px;
+    width: 186px;
+    height: 247px;
+    align-self: center;
+    padding: 20px;
+}
+
+.MuiTooltip-arrow {
+    color: #FFF !important;
 }

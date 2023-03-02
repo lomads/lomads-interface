@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import BasicModal from '../../../../muiComponents/Modal'
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
@@ -7,19 +7,20 @@ import WalkThroughStart from '../../../../assets/svg/step_0_walkthrough.svg'
 import Typography from '@mui/material/Typography';
 import './WalkThrough.css'
 
-export default function WalkThrough({ beginWalkThrough }: { beginWalkThrough: any }) {
-
-  const [showWalkThrough, setShowWalkthrough] = useState<boolean>(true);
-  const closeWalkthrough = () => setShowWalkthrough(false)
-  const beginWalkThroughStep = () => {
-    beginWalkThrough()
-    setShowWalkthrough(false)
-  }
+export default function WalkThrough({
+  showConfirmation,
+  beginWalkThrough,
+  endWalkThrough
+}: {
+  showConfirmation: boolean,
+  beginWalkThrough: any,
+  endWalkThrough: any
+}) {
 
   return (
-    <BasicModal isOpen={showWalkThrough} key={showWalkThrough.toString() + Math.random()+'walkThrough'}>
+    <BasicModal isOpen={showConfirmation} key={showConfirmation.toString() + Math.random() + 'walkThrough'}>
       <div className="confirm-walkthrough">
-        <div className="close-btn" onClick={closeWalkthrough}>
+        <div className="close-btn" onClick={endWalkThrough}>
           <img src={CloseBtn} />
         </div>
         <img src={WalkThroughStart} />
@@ -31,14 +32,14 @@ export default function WalkThrough({ beginWalkThrough }: { beginWalkThrough: an
         <Stack spacing={2} direction="row">
           <Button
             variant="outlined"
-            onClick={closeWalkthrough}
+            onClick={endWalkThrough}
             size="small">
             Later Thanks!
           </Button>
           <Button
             variant="contained"
             size="small"
-            onClick={beginWalkThroughStep}
+            onClick={beginWalkThrough}
           >
             Let's Go
           </Button>
