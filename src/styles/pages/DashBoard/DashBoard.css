@@ -1526,7 +1526,7 @@ body.active-modal {
     content: url(../../../assets/images/drawer-icons/ico-check.svg);
 }
 
-.question-mark {
+#question-mark {
     margin-left: 33px;
     bottom: 44px;
     position: sticky;

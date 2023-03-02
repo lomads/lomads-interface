@@ -10,7 +10,9 @@
     overflow: hidden;
     padding: 40px;
     border-radius: 20px;
-    border: none !important
+    border: none !important;
+    width: 700px;
+    height: 490px;
 }
 
 .close-btn {
@@ -22,17 +24,6 @@
     border-radius: '10%';
 }
 
-.walkThroughTooltip {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    background: #FFFFFF;
-    width: 650px;
-    height: 247px;
-}
-
 .tooltip-right {
     display: flex;
     flex-direction: column;
@@ -42,7 +33,7 @@
     padding: 30px;
 }
 
-.tooltip-img {
+.tooltip-left {
     background: #F0F0F0;
     border-radius: 10px 0px 0px 10px;
     width: 186px;
@@ -53,4 +44,17 @@
 
 .MuiTooltip-arrow {
     color: #FFF !important;
+}
+
+.tooltip {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background: #FFFFFF;
+    width: 650px;
+    height: 247px;
+    padding: 0;
+    border-radius: 10px;
 }

@@ -65,7 +65,7 @@ const MemberCard = (props: any) => {
 
 		return (
 			<>
-				<div className="NameAndAvatar">
+				<div className="NameAndAvatar" id="members">
 					<div className="memberRow">
 						<div className="avatarAndName">
 							<img src={daoMember2} alt="avatar" />

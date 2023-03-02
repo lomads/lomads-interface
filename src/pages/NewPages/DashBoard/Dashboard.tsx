@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from "react";
+import React, { useEffect, useRef, useState, useMemo, useLayoutEffect } from "react";
 import { usePrevious } from "@chakra-ui/react"
 import { get as _get, find as _find } from 'lodash';
 import lomadsfulllogo from "../../../assets/svg/lomadsfulllogo.svg";
@@ -224,12 +224,12 @@ const Dashboard = () => {
 
 	useEffect(() => {
 		if (chainId && !account)
-		navigate("/login", {
-			replace: true,
-			state: {
-			  from: window.location.pathname
-			}
-		  });
+			navigate("/login", {
+				replace: true,
+				state: {
+					from: window.location.pathname
+				}
+			});
 	}, [chainId, account])
 
 	useEffect(() => {
@@ -279,7 +279,7 @@ const Dashboard = () => {
 				}
 			}
 		}
-		if(from)
+		if (from)
 			navigate(from)
 	}
 
@@ -321,7 +321,7 @@ const Dashboard = () => {
 					} else {
 						console.log('Switch chain to', DAO.chainId)
 					}
-				})				
+				})
 			}
 		}
 	}, [chainId, DAO, getStats, account]);
@@ -356,7 +356,7 @@ const Dashboard = () => {
 			}
 		}
 	}, [DAO, account, chainId]);
-   console.log(Steps[5], '...steps...')
+	console.log(Steps[5], '...steps...')
 	useEffect(() => {
 		if (DAO && account && chainId) {
 			if (chainId === DAO.chainId) {
@@ -487,14 +487,28 @@ const Dashboard = () => {
 		setShowCreateRecurring(true)
 	}
 
-	const endWalkThrough= () => setShowWalkThrough(false)
-	const updateWalkThroughSteps = () => {
-		if(currWalkThroughStep === 7){
+	const endWalkThrough = () => setShowWalkThrough(false)
+	const incrementWalkThroughSteps = () => {
+		
+		if (currWalkThroughStep === 7) {
 			endWalkThrough()
 			return
 		}
-		setWalkThroughStep(currWalkThroughStep+1)
+		setWalkThroughStep(currWalkThroughStep + 1)
 	}
+
+	useLayoutEffect(() => {
+	 if(currWalkThroughStep > 0){
+		 const idName =  Steps[currWalkThroughStep-1]?.id
+		 document.getElementById(idName)?.focus();
+		if(document.getElementById(idName)?.style) {
+			if(currWalkThroughStep > 1){
+				document.getElementById(Steps[currWalkThroughStep-2]?.id).style.zIndex = 0
+			}
+			document.getElementById(idName).style.zIndex = 1299;
+		}
+	 }
+	}, [currWalkThroughStep])
 
 	return (
 		<>
@@ -507,17 +521,18 @@ const Dashboard = () => {
 						<LeapFrog size={50} color="#C94B32" />
 					</div>
 				</div> : null}
-			<WalkThrough 
-			   beginWalkThrough={updateWalkThroughSteps}
-			   showConfirmation={showWalkThrough && currWalkThroughStep === 0}
-			   endWalkThrough={endWalkThrough}
+			<WalkThrough
+				beginWalkThrough={incrementWalkThroughSteps}
+				showConfirmation={showWalkThrough && currWalkThroughStep === 0}
+				endWalkThrough={endWalkThrough}
 			/>
 			<WalkThroughTooltips
-			     open={showWalkThrough && currWalkThroughStep > 0}
-			   	 obj={Steps[currWalkThroughStep-1]}
- 				 moveToNextStep={updateWalkThroughSteps}
-				  endWalkThrough={endWalkThrough}
-			 />
+                    displayTooltip={showWalkThrough && currWalkThroughStep > 0}
+					obj={Steps[currWalkThroughStep-1]}
+					incrementWalkThroughSteps={incrementWalkThroughSteps}
+					endWalkThrough={endWalkThrough}
+				/>
+
 			<div
 				className="dashBoardBody"
 				onMouseEnter={() => {
@@ -581,7 +596,7 @@ const Dashboard = () => {
 						</div>
 					</div>
 				</div>
-
+				 
 				<LinksArea links={_get(DAO, 'links', [])} />
 
 				<Notifications />
@@ -596,7 +611,7 @@ const Dashboard = () => {
 						/>
 					)} */}
 
-
+				
 				<MyProject />
 				<Tasks toggleShowCreateTask={toggleShowCreateTask} onlyProjects={false} />
 				{(can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') &&
@@ -634,8 +649,8 @@ const Dashboard = () => {
 					toggleShowMember={toggleShowMember}
 				/>
 			)}
-			{!showWalkThrough && <div className="question-mark">
-			  <img src={questionMark} />
+			{!showWalkThrough && <div id="question-mark">
+				<img src={questionMark} />
 			</div>}
 			<SideBar
 				name={_get(DAO, 'name', '')}
@@ -646,7 +661,8 @@ const Dashboard = () => {
 			{showEditMember && <EditMember toggleShowEditMember={toggleShowEditMember} DAO={DAO} amIAdmin={amIAdmin} account={account} />}
 
 			{/* create task side modal */}
-			{showCreateTask && <CreateTask toggleShowCreateTask={toggleShowCreateTask} selectedProject={null} />}
+			{showCreateTask
+				&& <CreateTask toggleShowCreateTask={toggleShowCreateTask} selectedProject={null} />}
 
 			{/* Create recurring payment side modal */}
 			{showCreateRecurring && <CreateRecurring transaction={recurringTxn} onRecurringPaymentCreated={() => treasuryRef?.current?.reload()} toggleShowCreateRecurring={toggleShowCreateRecurring} />}

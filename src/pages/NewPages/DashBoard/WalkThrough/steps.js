@@ -12,7 +12,7 @@ const steps = [{
     title: 'Create Workspaces',
     content: 'Here, you can create customized workspaces for all of your teams, manage milestones, and track key results.',
     buttonText: '1/7  NEXT',
-    imgPath: stepOneWalkthrough
+    imgPath: stepOneWalkthrough,
   },
   {
     step: 2,
@@ -20,7 +20,7 @@ const steps = [{
     title: 'Create Tasks',
     content: 'By creating tasks, you can track progress, deadlines, and rewards on bounties, and assign contributors to each task.',
     buttonText: '2/7 NEXT',
-    imgPath: stepTwoWalkthrough
+    imgPath: stepTwoWalkthrough,
   },
   {
     step: 3,
@@ -44,7 +44,7 @@ const steps = [{
     title: 'Members',
     content: 'Add new members and manage details and roles of existing members.',
     imgPath: stepFiveWalkthrough,
-    buttonText: '5/7 NEXT',
+    buttonText: '5/7 NEXT'
   },
   {
     step: 6,
@@ -52,7 +52,7 @@ const steps = [{
     title: 'Global settings',
     content: 'Customize your Dashboard with settings: edit organization details, manage treasury signatories, launch pass tokens, enable SWEAT points, and personalize terminologies. Explore now!',
     imgPath: stepSixWalkthrough,
-    buttonText: '6/7 NEXT',
+    buttonText: '6/7 NEXT'
   },
   {
     step: 7,

@@ -9,8 +9,6 @@ const style = {
   transform: 'translate(-50%, -50%)',
   bgcolor: 'background.paper',
   borderRadius: '20px',
-  width: '55vw',
-  height: '55vh'
 };
 
 export default ({ children, isOpen = false }: { children: React.ReactElement, isOpen: boolean }) => {

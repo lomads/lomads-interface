@@ -659,7 +659,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		return null
 
 	return (
-		<div className="treasuryCard">
+		<div className="treasuryCard" id="treasury-management">
 			<div className="treasuryHeader">
 				<div style={{ display: 'flex', alignItems: 'center' }}>
 					{(can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') &&

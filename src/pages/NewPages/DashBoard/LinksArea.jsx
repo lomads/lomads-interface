@@ -65,7 +65,7 @@ const LinksArea = ({ links }) => {
             </div>
             {
                 can(myRole, 'settings') &&
-                <button className='settings' onClick={() => { navigate(`/${DAO.url}/settings`) }}>
+                <button className='settings' id="global-settings" onClick={() => { navigate(`/${DAO.url}/settings`) }}>
                     <img src={settingIcon} alt="settings-icon" />
                 </button>
             }
