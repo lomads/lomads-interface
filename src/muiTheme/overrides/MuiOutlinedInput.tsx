@@ -3,13 +3,21 @@ import palette from "muiTheme/palette";
 export default {
 	styleOverrides: {
 		root: {
+			background: '#f0f0f0',
+			borderRadius: 10,
 			"&.Mui-focused fieldset": {
 				borderColor: palette.primary.main
+			},
+			"&.Mui-disabled fieldset": {
+				borderColor: 'transparent !important',
 			},
 			"'&:hover $notchedOutline'": {
 				borderColor: palette.primary.main
 			}
 		},
+		multiline: {
+
+        },
 		input: {
 			background: '#f0f0f0',
 			borderColor: 'transparent',

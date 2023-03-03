@@ -22,6 +22,8 @@ import useMintSBT from 'hooks/useMintSBT';
 import PT from "assets/images/drawer-icons/PT.svg";
 import { useNavigate } from 'react-router-dom';
 import { USDC } from 'constants/tokens';
+import { CHAIN_INFO } from 'constants/chainInfo';
+import { setDAO } from 'state/dashboard/reducer';
 
 const LOCK_SVG = `<svg width="13" height="15" viewBox="0 0 13 15" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g clip-path="url(#clip0_2971_2676)">
@@ -106,7 +108,7 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
     const {  DAO } = useAppSelector(store => store.dashboard)
     const [contract, setContract] = useState<any>(null);
     const [updateContractLoading, setUpdateContractLoading] = useState<boolean | null>(null)
-    const { updateContract } = useMintSBT(_get(contract, 'address', ''))
+    const { updateContract, getStats } = useMintSBT(_get(contract, 'address', ''))
     const [tokens, setTokens] = useState<any>([])
     const [state, setState] = useState<any>({
         whitelisted: false,
@@ -122,6 +124,10 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
             value: 0
         }
     })
+
+    useEffect(() => {
+        getStats().then(res => console.log("MINT_PRICE", res[5]))
+    }, [open])
 
     useEffect(() => {
         if(contract) {
@@ -175,13 +181,17 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
         // }
         try {
             setUpdateContractLoading(true)
-            const res = await updateContract(state?.price?.value, state?.price?.token)
+            if((state?.price?.token !== prevState?.price?.token) || (state?.price?.value !== prevState?.price?.value)) {
+                await updateContract(state?.price?.value, state?.price?.token)
+            }
             await axiosHttp.patch(`contract/${contract?.address}`, {
+                 daoId: DAO?._id,
                  mintPrice: state?.price?.value,
                  whitelisted: state?.whitelisted,
-                 contactDetail: state
+                 contactDetail: state?.contact
             })
             .then(res => { 
+                setDAO(res.data)
                 setContract(contract) 
                 onClose()
             })
@@ -209,6 +219,8 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
                 anchor={'right'}
                 open={open}
                 onClose={() => onClose()}>
+                {  DAO ?
+                    <>
                 <Box sx={{ width: 575, flex: 1, paddingBottom:'80px', borderRadius: '20px 0px 0px 20px' }}>
                     <IconButton sx={{ position: 'fixed', right: 32, top: 32 }} onClick={() => onClose()}>
                         <img src={CloseSVG} />
@@ -234,11 +246,18 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
                     <Box margin="0 auto" width={380}>
                         <Box className={classes.paperDetails}>
                             <Box display="flex" flexDirection="row" alignItems="center">
-                                { contract?.image ?
-                                <img style={{ width: 40, borderRadius: 10, height: 40, objectFit: 'cover' }} src={contract?.image} /> : 
-                                <img style={{ width: 40, borderRadius: 10, height: 40 }} src={PT} />
-                                }
+                                { chainId &&
+                                <Box onClick={() => window.open(`${_get(CHAIN_INFO, chainId).explorer}address/${contract.address}`)} style={{ cursor: 'pointer' }}>
+                                    { contract?.image ?
+                                    <img style={{ width: 40, borderRadius: 10, height: 40, objectFit: 'cover' }} src={contract?.image} /> : 
+                                    <img style={{ width: 40, borderRadius: 10, height: 40 }} src={PT} />
+                                    }
+                                </Box> }
                                 <Typography className={classes.tokenName}>{ contract?.token }</Typography>
+                                { chainId &&
+                                <Box onClick={() => window.open(`${_get(CHAIN_INFO, chainId).explorer}address/${contract.address}`)} style={{ cursor: 'pointer' }}>
+                                    <img style={{ width: 20, borderRadius: 10, marginLeft: 8, height: 20 }} src={_get(CHAIN_INFO, chainId).logoUrl} />
+                                </Box> }
                             </Box>
                             <Box display="flex" flexDirection="row" alignItems="center">
                                { contract?.tokenSupply && <Typography className={classes.tokenSupply}>{ `X ${ contract?.tokenSupply }` }</Typography> }
@@ -345,6 +364,8 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
                         <Button disabled={updateContractLoading} loading={updateContractLoading} onClick={() => saveChanges()} sx={{ ml:1 }}  fullWidth variant='contained' size="small">Save</Button>
                     </Box>
                 </Box>
+                }
+                </> : <Box sx={{ width: 575, flex: 1, paddingBottom:'80px', borderRadius: '20px 0px 0px 20px' }}></Box>
                 }
             </Drawer>
     )

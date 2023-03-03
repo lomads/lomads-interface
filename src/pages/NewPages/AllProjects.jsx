@@ -79,7 +79,7 @@ const AllProjects = () => {
                     {
                         _get(DAO, 'image', null)
                             ?
-                            <img src={_get(DAO, 'image', null)} />
+                            <img style={{  objectFit: 'cover' }} src={_get(DAO, 'image', null)} />
                             :
                             <div className="navbarText">
                                 {daoName.length === 1

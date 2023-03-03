@@ -1,6 +1,6 @@
 import { Grid, Box, Typography, Paper, Chip, FormControl, FormLabel } from "@mui/material"
 import clsx from "clsx"
-import { get as _get } from 'lodash'
+import { get as _get, find as _find } from 'lodash'
 import SETTINGS_SVG from 'assets/svg/settings.svg'
 import LINK_SVG from 'assets/svg/ico-link.svg'
 import { makeStyles } from '@mui/styles';
@@ -22,7 +22,12 @@ import ArrowRightSVG from '../../assets/svg/arrowright.svg'
 import BackArrowSVG from '../../assets/svg/back-arrow.svg'
 import EmailSVG from '../../assets/svg/email.svg'
 import TelegramSVG from '../../assets/svg/telegram.svg'
+import EmailGreenSVG from '../../assets/svg/email-green.svg'
+import TelegramGreenSVG from '../../assets/svg/telegram-green.svg'
+import DiscordGreenSVG from '../../assets/svg/discord-green.svg'
+import GithubGreenSVG from '../../assets/svg/githubicon-green.svg'
 import PaymentSVG from '../../assets/svg/payment.svg'
+import CheckSVG from '../../assets/svg/check.svg'
 import CloseSVG from '../../assets/svg/close.svg'
 import { useNavigate, useParams } from "react-router-dom"
 import useMintSBT from "hooks/useMintSBT"
@@ -95,9 +100,43 @@ export default () => {
     const { encryptMessage, decryptMessage } = useEncryptDecrypt()
 
     useEffect(() => {
+        console.log("balance..getStats", balance)
+        if(account)
+            getStats().then(res => setBalance(parseInt(res[0]._hex, 16)))
+    }, [account])
+
+    useEffect(() => {
         if(!DAO)
             dispatch(getDao(daoURL))
     }, [DAO])
+
+    const updateMetadata = async () => {
+        const personalDetails = _find(metadata?.attributes, (attr: any) => attr.trait_type === 'Personal Details');
+        console.log(personalDetails)
+        if(personalDetails && personalDetails.value) {
+            const decryptMsg = await decryptMessage(personalDetails.value)
+            setState((prev: any) => {
+                return {
+                    ...prev,
+                    email: contract?.contactDetail.indexOf('email') > -1 ? _get(decryptMsg, 'email', null) : null,
+                    discord: contract?.contactDetail.indexOf('discord') > -1 ? _get(decryptMsg, 'discord', null) : null,
+                    telegram: contract?.contactDetail.indexOf('telegram') > -1 ? _get(decryptMsg, 'telegram', null) : null,
+                    github: contract?.contactDetail.indexOf('github') > -1 ? _get(decryptMsg, 'github', null) : null,
+                }
+            })
+            setShowDrawer(true)
+        } else {
+            setShowDrawer(true)
+        }
+    }
+
+    useEffect(() => {
+        console.log("balance..", balance)
+        if(balance === 1) {
+            axiosHttp.get(`metadata/${contractId}`)
+            .then(res => setMetadata(res.data))
+        }
+    }, [balance])
 
     useEffect(() => {
         if(DAO?.sbt) {
@@ -217,6 +256,75 @@ export default () => {
     
     if(!contract || contractLoading || balance == null)
         return <FullScreenLoader/>
+    
+    const handleUpdateMetadata = async () => {
+        let err: any = {}
+        setErrors({})
+        if(state?.name == null || state?.name == "") { err['name'] = 'Enter valid name' }
+        if(contract?.contactDetail.indexOf('email') > -1 && ( state?.email == null || state?.email == "")) { err['email'] = 'Enter valid email' }
+        if(contract?.contactDetail.indexOf('discord') > -1 && ( state?.discord == null || state?.discord == "")) { err['discord'] = 'Enter valid discord' }
+        if(contract?.contactDetail.indexOf('github') > -1 && ( state?.github == null || state?.github == "")) { err['github'] = 'Enter valid github' }
+        if(contract?.contactDetail.indexOf('telegram') > -1 && ( state?.telegram == null || state?.telegram == "")) { err['telegram'] = 'Enter valid telegram' }
+        if(Object.keys(err).length > 0)
+            return setErrors(err)
+        const msg = await encryptMessage(JSON.stringify({ email: _get(state, 'email', ''), discord: _get(state, 'discord', ''), telegram: _get(state, 'telegram', ''), github: _get(state, 'github', '') }))
+        const {  _id, createdAt, updatedAt, archivedAt, ...remaining } = metadata;
+        let metadataJSON = {
+            ...remaining,
+            name: state?.name,
+            attributes: remaining?.attributes.map((attr: any) => {
+                if(['Email', 'Discord', 'Telegram', 'Github', 'Personal Details'].indexOf(attr.trait_type) > -1){
+                    if(attr?.trait_type === 'Email') {
+                         return {
+                            trait_type: "Email",
+                            value: contract?.contactDetail.indexOf('email') > -1 && state?.email && state?.email.length > 0 ? true : null
+                         }
+                    }
+                    if(attr?.trait_type === 'Discord') {
+                        return {
+                           trait_type: "Discord",
+                           value: contract?.contactDetail.indexOf('discord') > -1 && state?.discord && state?.discord.length > 0 ? true : null
+                        }
+                    }
+                   if(attr?.trait_type === 'Telegram') {
+                        return {
+                        trait_type: "Telegram",
+                        value: contract?.contactDetail.indexOf('telegram') > -1 && state?.telegram && state?.telegram.length > 0 ? true : null
+                        }
+                    }
+                    if(attr?.trait_type === 'Github') {
+                        return {
+                        trait_type: "Github",
+                        value: contract?.contactDetail.indexOf('github') > -1 && state?.github && state?.github.length > 0 ? true : null
+                        }
+                    }
+                    if(attr?.trait_type === 'Personal Details') {
+                        return {
+                        trait_type: "Personal Details",
+                        value: msg
+                        }
+                    }
+                }
+                return attr
+            })
+          };
+
+        if(!_find(metadataJSON.attributes, (attr:any) => attr.trait_type === "Personal Details" )) {
+            metadataJSON = { ...metadataJSON, attributes: [ ...metadataJSON.attributes, { trait_type: "Personal Details", value: msg } ] }
+        }
+
+        axiosHttp.patch(`metadata/${_get(DAO, 'sbt._id')}`, metadataJSON)
+        .then(async res => {
+            await axiosHttp.patch(`dao/${_get(DAO, 'url', '')}/update-user-discord`, {
+                discordId: state?.discord  || null,
+                userId: _get(user, '_id', ''),
+                daoId: _get(DAO, '_id')
+            })
+            dispatch(getDao(_get(DAO, 'url', '')))
+            setTimeout(() => window.location.href = `/${DAO.url}`, 1500);
+        })
+        .catch(e => console.log(e))
+    }
 
     const handleMint = async () => {
         let err: any = {}
@@ -314,14 +422,14 @@ export default () => {
                     <Box mt={8} display="flex" alignItems="center" justifyContent="center">
                         <img src={MintSBTSvg}/>
                     </Box>
-                    <Typography sx={{ mt: 2 }} className={classes.title}>{ balance === 1 && contract && metadata ? contract.token : 'Mint your SBT' }</Typography>
+                    <Typography sx={{ mt: 2 }} className={classes.title}>{ balance === 1 ? 'Update your pass token' : 'To join the organisation mint your pass token' }</Typography>
                     <Box mt={12} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
-                        <Box onClick={() => navigate(-1)} height={77} width={50} style={{ cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' }}>
+                        {/* <Box onClick={() => navigate(-1)} height={77} width={50} style={{ cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' }}>
                             <img src={BackArrowSVG} />
-                        </Box>
+                        </Box> */}
                         <Grid ml={1} container>
                             <Grid item xs={12} sm={6}>
-                                <img src={_get(contract, 'image')} style={{ objectFit: 'cover', width: 530, height: 530, borderRadius: 5 }} />
+                                <img src={_get(contract, 'image')} style={{ objectFit: 'cover', width: 530, height: 395, borderRadius: 5 }} />
                             </Grid>
                             
                             <Grid item xs={12} sm={6}>
@@ -403,25 +511,34 @@ export default () => {
                                     }
                                   {networkError && <Typography my={2} textAlign="center" color="error" variant="body2">{ networkError }</Typography> }
                                 </Box> : 
-                                <Box mx={2} mt={0.5} px={3} style={{ borderRadius: 5, width: '100%', backgroundColor: '#FFF'  }}>
+                                <Box mx={2} mt={0.5} px={3} pb={1} style={{ borderRadius: 5, width: '100%', backgroundColor: '#FFF'  }}>
                                     {
                                         metadata && metadata?.attributes.map((attribute: any) => {
-                                            return (
-                                                <Box py={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                                    <Typography style={{ fontSize: 14, fontWeight: 400 }}>{ attribute?.trait_type }</Typography>
-                                                    <Box mx={2} mt={1} style={{ flexGrow: 1 }}>
-                
+                                            if(["Personal Details", "projects", "project_names", "tasks", "task_names"].indexOf(attribute.trait_type) === -1) {
+                                                return (
+                                                    <Box py={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                        <Typography style={{ fontSize: 14, fontWeight: 400 }}>{ attribute?.trait_type }</Typography>
+                                                        <Box mx={2} mt={1} style={{ flexGrow: 1 }}>
+                    
+                                                        </Box>
+                                                        <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                            <Typography style={{ fontSize: 14, fontWeight: 400, color: "#76808D" }}>{ 
+                                                                attribute?.trait_type === 'Wallet Address/ENS Domain' ?
+                                                                beautifyHexToken(attribute?.value) :
+                                                                typeof attribute?.value === 'boolean' ? attribute?.value ? '********' : '' :
+                                                                attribute?.value
+                                                            }</Typography>
+                                                        </Box>
                                                     </Box>
-                                                    <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                                        <Typography style={{ fontSize: 14, fontWeight: 400, color: "#76808D" }}>{ 
-                                                            attribute?.trait_type === 'Wallet Address/ENS Domain' ?
-                                                            beautifyHexToken(attribute?.value) :
-                                                            attribute?.value
-                                                        }</Typography>
-                                                    </Box>
-                                                </Box>
-                                            )
+                                                )
+                                            }
+                                            return null
                                         })
+                                    }
+                                    { balance === 1 && metadata &&
+                                        <Button onClick={() => { 
+                                            updateMetadata()
+                                        }} style={{ margin: '32px 0 16px 0' }} variant="contained" fullWidth>UPDATE</Button>
                                     }
                                 </Box>
                                 }
@@ -441,7 +558,7 @@ export default () => {
                         </IconButton>
                         <Box display="flex" flexDirection="column" my={6} alignItems="center">
                             <img src={PaymentSVG} />
-                            <Typography my={4} style={{ color: palette.primary.main, fontSize: '30px', fontWeight: 400 }}>Paiement</Typography>
+                            <Typography my={4} style={{ color: palette.primary.main, fontSize: '30px', fontWeight: 400 }}>{ balance === 1 ? "Update details" : "Paiement"}</Typography>
                         </Box>
                         <Box px={12}>
                             <TextInput 
@@ -461,7 +578,7 @@ export default () => {
                                 {
                                     contract?.contactDetail.indexOf('email') > -1 &&
                                     <Box my={1} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
-                                        <img style={{ width: 36, marginRight: 12 }} src={EmailSVG} />
+                                        <img style={{ width: 36, marginRight: 12 }} src={state['email'] ? EmailGreenSVG : EmailSVG} />
                                         <TextInput 
                                             value={state["email"]}
                                             error={errors['email']}
@@ -473,13 +590,14 @@ export default () => {
                                 {   contract?.contactDetail.indexOf('discord') > -1 &&
                                     <>
                                         { state['discord'] ? 
-                                        <Box my={1} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
-                                            <img style={{ width: 36, marginRight: 12 }} src={DiscordSVG} />
-                                            <TextInput 
-                                                value={state["discord"]}
-                                                disabled={true}
-                                                placeholder="Enter your discord" sx={{ my: 1 }} fullWidth />
-                                        </Box> : 
+                                        <>
+                                        <Box mt={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
+                                            <img style={{ width: 36, marginRight: 12 }} src={DiscordGreenSVG} />
+                                            <Button fullWidth endIcon={<img src={CheckSVG} />} variant="contained" color="success">
+                                                    <Typography style={{ color: "#FFF"}}>CONNECTED TO DISCORD</Typography>
+                                            </Button>
+                                        </Box>
+                                    </> : 
                                         <>
                                             <Box mt={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
                                                 <img style={{ width: 36, marginRight: 12 }} src={DiscordSVG} />
@@ -502,7 +620,7 @@ export default () => {
                                     //     { errors['github'] && <FormHelperText style={{ marginLeft: 58,  marginTop: 4, color: '#e53935' }}>{ errors['github'] }</FormHelperText> }
                                     // </>
                                     <Box my={1} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
-                                        <img style={{ width: 36, marginRight: 12 }} src={GithubSVG} />
+                                        <img style={{ width: 36, marginRight: 12 }} src={state["github"] ? GithubGreenSVG : GithubSVG} />
                                         <TextInput 
                                             value={state["github"]}
                                             error={errors['github']}
@@ -513,16 +631,21 @@ export default () => {
                                 }
                                 {   contract?.contactDetail.indexOf('telegram') > -1 &&
                                     <Box my={1} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
-                                        <img style={{ width: 36, marginRight: 12 }} src={TelegramSVG} />
+                                        <img style={{ width: 36, marginRight: 12 }} src={state["telegram"] ? TelegramGreenSVG : TelegramSVG} />
                                         <TextInput 
-                                            verror={errors['telegram']}
+                                            value={state["telegram"]}
+                                            error={errors['telegram']}
                                             helperText={errors['telegram']}
                                             onChange={(e: any) => setState((prev: any) => { return { ...prev, telegram: e.target.value } } )}
                                             placeholder="Enter your telegram" sx={{ my: 1 }} fullWidth />
                                     </Box>
                                 }
                             </Box>
-                            <Button loading={mintLoading} disabled={mintLoading} onClick={() => handleMint()} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">PAY</Button>
+                            {   balance === 0 ?
+                                <Button loading={mintLoading} disabled={mintLoading} onClick={() => handleMint()} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">PAY</Button> : 
+                                <Button loading={mintLoading} disabled={mintLoading} onClick={() => handleUpdateMetadata()} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">UPDATE</Button>
+                            }
+
                             {networkError && typeof networkError === 'string' && <Typography my={2} textAlign="center" color="error" variant="body2">{ networkError }</Typography> }
                         </Box>
                     </Box>

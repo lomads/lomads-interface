@@ -2,8 +2,12 @@ import { AiOutlineClose, AiOutlinePlus } from "react-icons/ai";
 import { IsideModalNew } from "types/DashBoardType";
 import IconButton from "UIpack/IconButton";
 import "./Settings.css";
+import { Box, Typography } from "@mui/material";
+import Button  from 'muiComponents/Button'
+import { default as MuiIconButton }  from 'muiComponents/IconButton'
+import CloseSVG from 'assets/svg/close-new.svg'
 import OD from "../../assets/images/drawer-icons/OD.svg";
-import { Button, Image, Input, Textarea } from "@chakra-ui/react";
+import { Image, Input, Textarea } from "@chakra-ui/react";
 import { useAppSelector } from "state/hooks";
 import { useCallback, useEffect, useState } from "react";
 import { get as _get, find as _find } from 'lodash';
@@ -15,6 +19,8 @@ import AddDiscordLink from 'components/AddDiscordLink';
 import { setDAO, resetStoreGithubIssuesLoader } from "state/dashboard/reducer";
 import AddGithubLink from "components/AddGithubLink";
 
+import TextInput from "muiComponents/TextInput";
+
 import ReactS3Uploader from 'components/ReactS3Uploader';
 import { LeapFrog } from "@uiball/loaders";
 import { nanoid } from "@reduxjs/toolkit";
@@ -22,6 +28,7 @@ import { useDropzone } from 'react-dropzone'
 import uploadIcon from '../../assets/svg/ico-upload.svg';
 
 import LoginGithub from 'react-login-github';
+import Switch from "muiComponents/Switch";
 
 const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) => {
 
@@ -211,26 +218,9 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 					className="overlay"
 				></div>
 				<div className="SideModalNew">
-					<div className="closeButtonArea">
-						<IconButton
-							Icon={
-								<AiOutlineClose
-									style={{
-										color: "#C94B32",
-										height: "16px",
-										width: "16px",
-									}}
-								/>
-							}
-							bgColor="linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)"
-							height={37}
-							width={37}
-							className="sideModalCloseButton"
-							onClick={() => {
-								toggleOrganisationDetailsModal();
-							}}
-						/>
-					</div>
+					<MuiIconButton sx={{ position: 'fixed', right: 32, top: 32 }} onClick={() => toggleOrganisationDetailsModal()}>
+                        <img src={CloseSVG} />
+                    </MuiIconButton>
 					<div className="MainComponent">
 						<div
 							style={{
@@ -249,21 +239,23 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 						{/* //! BODY */}
 						<div
 							style={{
-								padding: "0 50px",
+								padding: "0 50px 100px 50px",
 							}}
 						>
-							<div id="text-type-od">Name</div>
-							<Input value={name} variant="filled" onChange={(evt) => setName(evt.target.value)} placeholder="Fashion Fusion" />
-							<div id="text-type-od">Description</div>
-							<Textarea value={description} onChange={(e) => { setDescription(e.target.value) }} placeholder='DAO Description' variant="filled" />
+							{/* <Input value={name} variant="filled" onChange={(evt) => setName(evt.target.value)} placeholder="Fashion Fusion" /> */}
+							<TextInput value={name}
+                        		onChange={(evt) => setName(evt.target.value)}
+                        		placeholder="Fashion Fusion" sx={{ my: 2 }} fullWidth label="Name" />
+							{/* <div id="text-type-od">Description</div>
+							<Textarea value={description} onChange={(e) => { setDescription(e.target.value) }} placeholder='DAO Description' variant="filled" /> */}
 							{/* <Input value={name} variant="filled" onChange={(evt)=>setName(evt.target.value)}  placeholder="Fashion Fusion" /> */}
-							<div id="text-type-od">Organisation’s URL</div>
-							<Input
-								variant="filled"
-								placeholder="https://app.lomads.xyz/Name"
-								disabled
-								value={process.env.REACT_APP_URL + "/" + _get(DAO, 'url', '')}
-							/>
+							<TextInput value={description}
+                        		onChange={(e) => { setDescription(e.target.value) }}
+								multiline
+          						rows={4}
+                        		placeholder="DAO Description" sx={{ my: 2 }} fullWidth label="Description" />
+							<TextInput value={process.env.REACT_APP_URL + "/" + _get(DAO, 'url', '')}
+                        		disabled sx={{ my: 2 }} fullWidth label="Organisation’s URL" />	
 
 							{/* <hr
 								style={{
@@ -279,10 +271,9 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 								who is part of which project. Otherwise, only members part of a
 								project sees the members they are working with.
 							</p>
-							<label class="switch" style={{ marginTop: "10px" }}>
-								<input type="checkbox" />
-								<span class="slider round"></span>
-							</label>
+							<Box ml={1} my={2}>
+								<Switch/>
+							</Box>
 
 							<div id="text-type-od">Import thumbnail</div>
 							<div className="image-picker-wrapper">
@@ -346,13 +337,14 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 									display: "flex",
 									flexDirection: "row",
 									marginTop: "9px",
+									alignItems: 'center',
 									justifyContent: "space-between",
 								}}
 							>
-								<Input
+								<TextInput
 									placeholder="Ex Portfolio"
-									variant="filled"
-									width="35%"
+									fullWidth
+									sx={{ mr: 1 }}
 									value={linkTitle}
 									onChange={(evt) => {
 										const e = document.getElementById('error-msg');
@@ -360,11 +352,11 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 										setLinkTitle(evt.target.value)
 									}}
 								/>
-								<Input
+								<TextInput
 									value={link}
 									placeholder="link"
-									variant="filled"
-									width="50%"
+									fullWidth
+									sx={{ mr: 1 }}
 									onChange={(evt) => {
 										const e = document.getElementById('error-msg');
 										e.innerHTML = '';
@@ -434,13 +426,9 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 							{
 								link && link.indexOf('github.') > -1
 									?
-									<div className="link-toggle-section">
-										<label class="switch" style={{ marginTop: "10px" }}>
-											<input type="checkbox" onChange={() => setPullIssues(!pullIssues)} />
-											<span class="slider round"></span>
-										</label>
-										<span className="toggle-text">IMPORT ISSUES</span>
-									</div>
+									<Box ml={2} my={2}>
+										<Switch label="IMPORT ISSUES" />
+									</Box>
 									:
 									<>
 										{
@@ -509,7 +497,7 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 						</div>
 
 						{/* //! FOOTER */}
-						<div className="button-section">
+						{/* <div className="button-section">
 							<Button
 								variant="outline"
 								style={{ marginRight: 8 }}
@@ -523,7 +511,13 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 							<Button onClick={() => {
 								saveChanges()
 							}} id="button-save">SAVE CHANGES</Button>
-						</div>
+						</div> */}
+						<Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: '567px', position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
+							<Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
+								<Button onClick={() => toggleOrganisationDetailsModal()} sx={{ mr:1 }} fullWidth variant='outlined' size="small">Cancel</Button>
+								<Button onClick={() => saveChanges()} sx={{ ml:1 }}  fullWidth variant='contained' size="small">Save</Button>
+							</Box>
+						</Box>
 					</div>
 				</div>
 			</div>

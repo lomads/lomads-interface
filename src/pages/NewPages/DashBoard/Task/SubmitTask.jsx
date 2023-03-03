@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { get as _get, find as _find, uniqBy as _uniqBy } from 'lodash';
-
+import { Box } from '@mui/material';
+import Button from 'muiComponents/Button';
 import { CgClose } from 'react-icons/cg';
 import createTaskSvg from '../../../../assets/svg/task.svg';
 
@@ -223,11 +224,16 @@ const SubmitTask = ({ task, close }) => {
                                     null
                             }
 
-                            <button className='taskApply-sendBtn' onClick={handleSubmitWork}>SEND</button>
+                            {/* <button className='taskApply-sendBtn' onClick={handleSubmitWork}>SEND</button> */}
 
                         </div>
                 }
             </div>
+            <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 575, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
+                <Box display="flex" justifyContent="center" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
+                    <Button onClick={() => handleSubmitWork()} sx={{ ml:1 }}  variant='contained' size="small">Save</Button>
+                </Box>
+            </Box>
         </div>
     )
 }
