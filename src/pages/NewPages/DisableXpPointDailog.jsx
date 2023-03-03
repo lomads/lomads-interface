@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import _ from "lodash";
 import "../../styles/Global.css";
 import "./Settings.css";
+import { Box } from "@mui/material";
 import { useAppSelector } from "state/hooks";
 import { useAppDispatch } from "state/hooks";
-import { Button, Image, Input } from "@chakra-ui/react";
+import Button from "muiComponents/Button";
+import { Image, Input } from "@chakra-ui/react";
 import { ReactComponent as XpPoints } from "../../assets/images/settings-page/5-xp-points-color.svg";
 import { AiOutlineClose } from "react-icons/ai";
 import IconButton from "UIpack/IconButton";
@@ -63,10 +65,10 @@ const DisableXpPointDailog = (props) => {
             accumulated by members will be reset to zero.
           </div>
                 {/* //! FOOTER */}
-                <div className="button-section">
+                <Box display="flex" flexDirection="row" alignItems="center" className="button-section">
                     <Button
-                    variant="outline"
-                    mr={3}
+                    variant="outlined"
+                    sx={{ mr: 1 }}
                     onClick={() => {
                         // toggleModal();
                         // toggleXp();
@@ -82,7 +84,7 @@ const DisableXpPointDailog = (props) => {
                       props.setIsXpPointEnable(false)
                       props.isXpPointSetByDailog(true)
                      }}>YES</Button>
-                </div>
+                </Box>
                 </div>
             </div>
         </>

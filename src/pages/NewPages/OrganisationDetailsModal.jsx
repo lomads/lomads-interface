@@ -427,7 +427,7 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 								link && link.indexOf('github.') > -1
 									?
 									<Box ml={2} my={2}>
-										<Switch label="IMPORT ISSUES" />
+										<Switch onChange={() => setPullIssues(prev => !prev)}  label="IMPORT ISSUES" />
 									</Box>
 									:
 									<>

@@ -2,9 +2,11 @@
 import { AiOutlineClose } from "react-icons/ai";
 import IconButton from "UIpack/IconButton";
 import "./Settings.css";
+import { Box } from "@mui/material";
 import "./Settings.css";
 import OD from "../../assets/images/drawer-icons/OD.svg";
-import { Button, Image, Input } from "@chakra-ui/react";
+import Button from "muiComponents/Button";
+import { Image, Input } from "@chakra-ui/react";
 import { ReactComponent as CompensateIcon } from "../../assets/images/settings-page/8-compensate-member.svg";
 import moment from 'moment';
 import daoMember2 from "../../assets/svg/daoMember2.svg";
@@ -123,6 +125,7 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
 
   const createTransaction = async () => {
 		try {
+      if(!sweatMembers || sweatMembers.length == 0) throw "No entries"
 			//setError(null)
 			let sendTotal = total
 			let selToken = _find(safeTokens, t => t.tokenAddress === currency)
@@ -297,10 +300,10 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
             All SWEAT counter will be reset to 0.
           </div>
           {/* //! FOOTER */}
-          <div className="button-section">
+          <Box display="flex" flexDirection="row">
             <Button
-              variant="outline"
-              mr={3}
+              variant="outlined"
+              sx={{ mr: 1 }}
               onClick={() => {
                // toggleModal();
                 toggleCompensate();
@@ -309,7 +312,7 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
               Cancel
             </Button>
             <Button disabled={loading || safeTokens.length == 0} style={{ backgroundColor: loading ? 'grey' : '#C94B32' }} onClick={() => createTransaction()} id="button-save">SEND TOKENS</Button>
-          </div>
+          </Box>
         </div>
       </div>
       {showCompensateMembersDoneModal && (
