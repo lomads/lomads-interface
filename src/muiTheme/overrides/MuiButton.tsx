@@ -5,7 +5,7 @@ export default {
         disableRipple: true
     },
 	styleOverrides: {
-		root: {
+		root: ({ ownerState, theme }: any) => ({
             fontFamily: 'Inter, sans-serif',
             fontStyle: 'normal',
             fontWeight: 400,
@@ -34,7 +34,13 @@ export default {
 				boxShadow: 'none',
                 color: '#FFF'
 			},
-		},
+            ...ownerState.color === 'success' && {
+                '&:hover': {
+                    boxShadow: `3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)`,
+                    background: palette.success.light
+                },
+            }
+		}),
         containedSecondary: {
             boxShadow: `3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)`,
             '&:hover': {

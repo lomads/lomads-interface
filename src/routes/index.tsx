@@ -30,6 +30,7 @@ import ArchiveKRA from "pages/NewPages/ArchiveKRA";
 import GithubAuth from "pages/NewPages/GithubAuth";
 
 import PrimaryLayout from "muiLayouts/PrimaryLayout";
+import BaseLayout from "muiLayouts/BaseLayout";
 
 import CreatePassToken from "muiViews/CreatePassToken";
 import MintPassToken from "muiViews/MintPassToken";
@@ -86,7 +87,8 @@ export default [
     },
     {
         path: '/:daoURL/mint/:contractId',
-        component: MintPassToken
+        component: MintPassToken,
+        layout: BaseLayout
     },
     {
         path: '/sbt/success/:contractAddr',

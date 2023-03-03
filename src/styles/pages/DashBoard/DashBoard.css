@@ -854,12 +854,12 @@ body.active-modal {
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    min-height: 70vh;
-    max-height: 70vh;
+    /* min-height: 70vh;
+    max-height: 70vh; */
     width: 100%;
-    padding-bottom: 60px;
-    overflow-y: auto;
+    padding-bottom: 150px;
     gap: 35px;
+    /* overflow-y: auto; */
 }
 
 #recipientButtonArea {
@@ -998,6 +998,10 @@ body.active-modal {
 
 .invertedBox img {
     transform: rotate(-45deg);
+    width: 141%;
+    height: 141%;
+    flex-shrink: 0;
+    max-width: 141%;
 }
 
 .stripInvertedBox {
@@ -1045,6 +1049,10 @@ body.active-modal {
 
 .stripInvertedBoxOutline img {
     transform: rotate(-45deg);
+    width: 141%;
+    height: 141%;
+    flex-shrink: 0;
+    max-width: 141%;
 }
 
 #transactionSuccessPage {
@@ -1064,10 +1072,12 @@ body.active-modal {
     max-height: fit-content;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-self: center;
+    /* justify-content: center; */
+    /* align-self: center; */
     overflow-y: auto;
+    overflow-x: hidden;
     gap: 35px;
+    padding-bottom: 80px;
 }
 
 #transactionSendDivider1,
@@ -1178,13 +1188,13 @@ body.active-modal {
 .SelectNewRecipientPage {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    /* justify-content: center; */
     align-items: center;
     margin-top: 70px;
     min-height: 100%;
     width: 100%;
     gap: 35px;
-
+    overflow-y: scroll;
 }
 
 #voteArea {
@@ -1266,11 +1276,11 @@ body.active-modal {
 }
 
 #recipientListandButtons {
-    min-height: fit-content;
-    max-height: 60%;
+    /* min-height: fit-content;
+    max-height: 60%; */
     width: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
+    /* overflow-y: auto;
+    overflow-x: hidden; */
     display: flex;
     flex-direction: column;
     justify-content: flex-start;

@@ -40,35 +40,49 @@ const useMintSBT = (contractAddress: string | undefined) => {
   }
 
     const getStats = async () => {
-        const calls: any = [
-              {
-                target: contractAddress,
-                function: "balanceOf",
-                args: [account],
-              },
-              {
-                target: contractAddress,
-                function: "name",
-                args: [],
-              },
-              {
-                target: contractAddress,
-                function: "totalSupply",
-                args: [],
-              },
-              {
-                target: contractAddress,
-                function: "mintToken",
-                args: [],
-              },
-        ]
-        const multicall = new MultiCall(provider);
-        const [, res] = await multicall.multiCall(
-            chainId === SupportedChainId.GOERLI ? require('abis/SBT.json') :
-            chainId === SupportedChainId.POLYGON ? require('abisPolygon/SBT.json') : '',
-            calls
-        );
-        return res
+        console.log("balance..", contractAddress, account)
+        if(account) {
+          const calls: any = [
+            {
+              target: contractAddress,
+              function: "balanceOf",
+              args: [account],
+            },
+            {
+              target: contractAddress,
+              function: "name",
+              args: [],
+            },
+            {
+              target: contractAddress,
+              function: "totalSupply",
+              args: [],
+            },
+            {
+              target: contractAddress,
+              function: "mintToken",
+              args: [],
+            },
+            {
+              target: contractAddress,
+              function: "mintPrice",
+              args: [],
+            },
+            {
+              target: contractAddress,
+              function: "codeOwner",
+              args: [""],
+            },
+          ]
+          const multicall = new MultiCall(provider);
+          const [, res] = await multicall.multiCall(
+              chainId === SupportedChainId.GOERLI ? require('abis/SBT.json') :
+              chainId === SupportedChainId.POLYGON ? require('abisPolygon/SBT.json') : '',
+              calls
+          );
+          return res
+        }
+        return [null, null, null, null]
     }
 
     const mint = async ({ referralCode, mintPrice }: { referralCode: string, mintPrice: string }) => {

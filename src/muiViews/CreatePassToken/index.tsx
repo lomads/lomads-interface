@@ -271,7 +271,7 @@ export default () => {
                     mintPrice: `${state?.price?.value}`,
                     mintPriceToken: `${state?.price?.token}`,
                     whitelisted: state?.whitelisted,
-                    contactDetail: state.contact,
+                    contactDetail: state?.contact,
                     metadata: [],
                     membersList: state?.whitelisted ? _get(DAO, 'members', []).map((m:any) => { return { name: m.member.name, address: m.member.wallet }}) : [],
                     daoId: _get(DAO, '_id', null)
