@@ -251,10 +251,16 @@ export default ({ children }: any) => {
                       <Typography variant='h6' className={classes.title}>{daoInitials}</Typography>
                       }
                     </Box>
-										<div className={classes.daoText}>{_get(dao, 'name', '')}</div>
+										<Typography className={classes.daoText}>{_get(dao, 'name', '')}</Typography>
 									</Box> )
               })
             }
+            <Box onClick={() => navigate('/createorg')}  className={classes.stripItem}>
+                <Box className={classes.invertedBox}>
+                  <Typography variant='h6' className={classes.title}>+</Typography>
+                </Box>
+                <Typography className={classes.daoText}>CREATE</Typography>
+              </Box> 
           </List>
         </Drawer>
         <Box
