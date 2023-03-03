@@ -117,7 +117,7 @@ const useStyles = makeStyles((theme: any) => ({
     title: {
       fontWeight: '600 !important',
       fontSize: '16px !important',
-      lineHeight: 25,
+      lineHeight: '18px !important',
       textAlign: 'center',
       letterSpacing: '-0.011em !important',
       color: `${'#FFF'} !important`,
