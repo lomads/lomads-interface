@@ -237,9 +237,12 @@ const SafeModal = ({ toggleS }) => {
 										<Image
 											src={SafeIcon}
 											alt="Safe icon"
-											style={{ marginTop: "100px", width: "94.48px", height: "50px" }}
+											style={{ marginTop: "50px", width: "94.48px", height: "50px" }}
 										/>
-										<div style={{ marginTop: 16 }} id="title-type">Safe</div>
+										<div style={{ marginTop: 16, marginBottom: 10 }} id="title-type">Safe</div>
+										<div>
+											<h1 style={{ textAlign: 'center', color: '#76808D' }}>Easily customize your multi-sig wallet with a<br /> <span style={{ fontWeight: '700' }}>personal name, signatories,</span> and <span style={{ fontWeight: '700' }}>voting threshold</span>.</h1>
+										</div>
 									</div>
 
 									{/* //! BODY */}
