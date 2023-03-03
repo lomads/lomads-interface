@@ -117,7 +117,7 @@ const useStyles = makeStyles((theme: any) => ({
     title: {
       fontWeight: '600 !important',
       fontSize: '16px !important',
-      lineHeight: 25,
+      lineHeight: '18px !important',
       textAlign: 'center',
       letterSpacing: '-0.011em !important',
       color: `${'#FFF'} !important`,
@@ -251,10 +251,16 @@ export default ({ children }: any) => {
                       <Typography variant='h6' className={classes.title}>{daoInitials}</Typography>
                       }
                     </Box>
-										<div className={classes.daoText}>{_get(dao, 'name', '')}</div>
+										<Typography className={classes.daoText}>{_get(dao, 'name', '')}</Typography>
 									</Box> )
               })
             }
+            <Box onClick={() => navigate('/createorg')}  className={classes.stripItem}>
+                <Box className={classes.invertedBox}>
+                  <Typography variant='h6' className={classes.title}>+</Typography>
+                </Box>
+                <Typography className={classes.daoText}>CREATE</Typography>
+              </Box> 
           </List>
         </Drawer>
         <Box
