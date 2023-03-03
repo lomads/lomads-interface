@@ -54,6 +54,7 @@ import CreateRecurring from "./TreasuryCard/CreateRecurring";
 import axiosHttp from 'api'
 import useEns from "hooks/useEns";
 import useMintSBT from "hooks/useMintSBT";
+import Button from "muiComponents/Button";
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
 const Dashboard = () => {
@@ -268,7 +269,7 @@ const Dashboard = () => {
 						}
 					}
 				}
-				if (true) {
+				if (shouldUpdate) {
 					navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
 					break;
 				}
