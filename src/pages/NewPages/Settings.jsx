@@ -62,6 +62,7 @@ import CompensateMembersDescriptionModal from "./CompensateMembersDescriptionMod
 import CompensateMembersDoneModal from "./CompensateMembersDoneModal";
 import DisableXpPointDailog from "./DisableXpPointDailog";
 import eventEmitter from "utils/eventEmmiter";
+import RolesAndPermissionModal from "muiModals/RolesAndPermissionModal";
 
 const Settings = () => {
 	const navigate = useNavigate();
@@ -226,7 +227,7 @@ const Settings = () => {
 
 							<div className="settings-organisation-child"
 								onClick={() => {
-									togglePassToken() 
+									togglePassToken()
 								}}
 							>
 								<div
@@ -327,10 +328,14 @@ const Settings = () => {
 				/>
 			)}
 			{/* // !-------------  Roles & Permissions ------------ */}
-			{openRolesPermissions && (
-				<></>
-				// <RolesPermissionsModal toggleRP={toggleRP} />
-			)}
+			<RolesAndPermissionModal
+				open={openRolesPermissions}
+				onClose={() => setOpenRolesPermissions(false)}
+			/>
+			{/* {openRolesPermissions && (
+				
+				<RolesPermissionsModal toggleRP={toggleRP} />
+			)} */}
 			{/* // !-------------  Safe ------------ */}
 			{openSafe && (
 				<SafeModal toggleS={toggleS} />
