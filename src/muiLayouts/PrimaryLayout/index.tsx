@@ -10,6 +10,7 @@ import Header from "components/Header";
 import { useAppSelector } from 'state/hooks';
 import palette from 'muiTheme/palette';
 import { useNavigate } from 'react-router-dom';
+import { useMemo } from 'react';
 
 const useStyles = makeStyles((theme: any) => ({
   root: {
@@ -36,7 +37,8 @@ const useStyles = makeStyles((theme: any) => ({
     color: palette.primary.main,
     fontSize: '35px !important',
     fontWeight: 600,
-    transform: 'rotate(-45deg)'
+    transform: 'rotate(-45deg)',
+    textTransform: "capitalize"
   },
   image: {
     transform: 'rotate(-45deg)',
@@ -65,6 +67,16 @@ export default ({ children } : { children: React.ReactNode }) => {
   const classes = useStyles();
   const navigate = useNavigate()
   const { DAO } = useAppSelector(store => store.dashboard);
+
+  const daoInitials = useMemo(() => {
+    if(DAO) {
+      const daoName = _get(DAO, 'name', '').split(" ");
+      return daoName.length === 1
+      ? daoName[0].charAt(0)
+      : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)
+    }
+    return ''
+  }, [DAO])
   
   return (
       <Grid container component="main" className={classes.root}>
@@ -77,8 +89,8 @@ export default ({ children } : { children: React.ReactNode }) => {
             <Grid container>
                 <Grid item xs={12} display="flex" flexDirection="row" alignItems="center">
                   <Box onClick={() => navigate(`/${_get(DAO, 'url')}`)} className={classes.logoContainer}>
-                    { DAO?.image ? <img className={classes.image} src={_get(DAO, 'image')} /> :
-                      <Typography className={classes.text}>{ _get(DAO, 'name[0]', '') }</Typography>
+                    { DAO?.image ? <img className={classes.image} src={_get(DAO, 'image')} /> : DAO &&
+                      <Typography className={classes.text}>{daoInitials}</Typography>
                     }
                   </Box>
                     <Box sx={{ flexGrow: 1 }}></Box>

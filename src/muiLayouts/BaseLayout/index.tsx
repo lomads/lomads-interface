@@ -198,6 +198,16 @@ export default ({ children }: any) => {
     setOpen(false);
   };
 
+  const daoInitials = React.useMemo(() => {
+    if(DAO) {
+      const daoName = _get(DAO, 'name', '').split(" ");
+      return daoName.length === 1
+      ? daoName[0].charAt(0)
+      : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)
+    }
+    return ''
+  }, [DAO])
+
   const navigateTo = React.useCallback((url: string | undefined) => {
 		if (!url) return;
 		if (DAO && DAO.url === url) {
@@ -238,15 +248,7 @@ export default ({ children }: any) => {
                 <Box onClick={() => navigateTo(dao?.url)} className={classes.stripItem}>
                     <Box className={classes.invertedBox}>
                     { daoImage ? <img className={classes.image} src={daoImage} /> :
-                      <Typography variant='h6' className={classes.title}>{
-                        
-                        daoName.length === 1
-                            ?
-                            daoName[0].charAt(0).toUpperCase()
-                            :
-                            daoName[0].charAt(0).toUpperCase() + daoName[daoName.length - 1].charAt(0).toUpperCase()
-                        
-                      }</Typography>
+                      <Typography variant='h6' className={classes.title}>{daoInitials}</Typography>
                       }
                     </Box>
 										<div className={classes.daoText}>{_get(dao, 'name', '')}</div>

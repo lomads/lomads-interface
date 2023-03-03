@@ -45,6 +45,8 @@ import { GNOSIS_SAFE_ALLOWANCE_MODULE_CONTRACT } from 'constants/chains';
 import RecurringTxn from "./TreasuryCard/RecurringTxn";
 import { updateSafeThreshold } from "state/flow/reducer";
 import RecurringTxnTreasury from "./TreasuryCard/RecurringTxnTreasury";
+import useGnosisTxnTransform from "hooks/useGnosisTxnTransform";
+import Button from "muiComponents/Button";
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
 
@@ -70,6 +72,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	const node = useRef<HTMLDivElement>()
 	const [editMode, setEditMode] = useState<any>();
 	const [lowBalanceError, setLowBalanceError] = useState<any>(null);
+
 	useOnClickOutside(node, () => editMode ? setEditMode(null) : undefined)
 	useState<Array<any>>();
 	//const [recurringTxnQueue, setRecurringTxnQueue] = useState<Array<any>>();
@@ -82,6 +85,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	const { createSafeTransaction, createSafeTxnLoading } = useSafeTransaction(_get(DAO, 'safe.address', ''))
 
 	const { tokenBalance } = useSafeTokens(_get(DAO, 'safe.address', ''))
+	const { transform }  = useGnosisTxnTransform(_get(DAO, 'safe.address', ''))
 
 	const { myRole, can, isSafeOwner } = useRole(DAO, account);
 
@@ -721,6 +725,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 						}
 					</div> */}
 					{owner && tab === 1 && <SafeButton onClick={props.toggleModal} height={40} width={150} titleColor="#B12F15" title="SEND TOKEN" bgColor={!hasValidToken ? "#f0f2f6" : "#FFFFFF"} opacity={!hasValidToken ? "0.4" : "1"} disabled={!hasValidToken} fontweight={400} fontsize={16} />}
+					{/* <Button onClick={() => transform(pendingTxn)} size="small" variant="contained">DOWNLOAD</Button> */}
 				</div>
 			</div>
 

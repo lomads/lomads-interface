@@ -28,6 +28,7 @@ import { useDropzone } from 'react-dropzone'
 import uploadIcon from '../../assets/svg/ico-upload.svg';
 
 import LoginGithub from 'react-login-github';
+import Switch from "muiComponents/Switch";
 
 const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) => {
 
@@ -270,10 +271,9 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 								who is part of which project. Otherwise, only members part of a
 								project sees the members they are working with.
 							</p>
-							<label class="switch" style={{ marginTop: "10px" }}>
-								<input type="checkbox" />
-								<span class="slider round"></span>
-							</label>
+							<Box ml={1} my={2}>
+								<Switch/>
+							</Box>
 
 							<div id="text-type-od">Import thumbnail</div>
 							<div className="image-picker-wrapper">
@@ -426,13 +426,9 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 							{
 								link && link.indexOf('github.') > -1
 									?
-									<div className="link-toggle-section">
-										<label class="switch" style={{ marginTop: "10px" }}>
-											<input type="checkbox" onChange={() => setPullIssues(!pullIssues)} />
-											<span class="slider round"></span>
-										</label>
-										<span className="toggle-text">IMPORT ISSUES</span>
-									</div>
+									<Box ml={2} my={2}>
+										<Switch label="IMPORT ISSUES" />
+									</Box>
 									:
 									<>
 										{

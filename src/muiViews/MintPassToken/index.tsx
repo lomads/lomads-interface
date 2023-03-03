@@ -424,12 +424,12 @@ export default () => {
                     </Box>
                     <Typography sx={{ mt: 2 }} className={classes.title}>{ balance === 1 ? 'Update your pass token' : 'To join the organisation mint your pass token' }</Typography>
                     <Box mt={12} style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
-                        <Box onClick={() => navigate(-1)} height={77} width={50} style={{ cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' }}>
+                        {/* <Box onClick={() => navigate(-1)} height={77} width={50} style={{ cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' }}>
                             <img src={BackArrowSVG} />
-                        </Box>
+                        </Box> */}
                         <Grid ml={1} container>
                             <Grid item xs={12} sm={6}>
-                                <img src={_get(contract, 'image')} style={{ objectFit: 'cover', width: 530, height: 530, borderRadius: 5 }} />
+                                <img src={_get(contract, 'image')} style={{ objectFit: 'cover', width: 530, height: 395, borderRadius: 5 }} />
                             </Grid>
                             
                             <Grid item xs={12} sm={6}>
