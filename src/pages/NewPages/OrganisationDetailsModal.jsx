@@ -3,8 +3,8 @@ import { IsideModalNew } from "types/DashBoardType";
 import IconButton from "UIpack/IconButton";
 import "./Settings.css";
 import { Box, Typography } from "@mui/material";
-import Button  from 'muiComponents/Button'
-import { default as MuiIconButton }  from 'muiComponents/IconButton'
+import Button from 'muiComponents/Button'
+import { default as MuiIconButton } from 'muiComponents/IconButton'
 import CloseSVG from 'assets/svg/close-new.svg'
 import OD from "../../assets/images/drawer-icons/OD.svg";
 import { Image, Input, Textarea } from "@chakra-ui/react";
@@ -219,8 +219,8 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 				></div>
 				<div className="SideModalNew">
 					<MuiIconButton sx={{ position: 'fixed', right: 32, top: 32 }} onClick={() => toggleOrganisationDetailsModal()}>
-                        <img src={CloseSVG} />
-                    </MuiIconButton>
+						<img src={CloseSVG} />
+					</MuiIconButton>
 					<div className="MainComponent">
 						<div
 							style={{
@@ -244,18 +244,18 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 						>
 							{/* <Input value={name} variant="filled" onChange={(evt) => setName(evt.target.value)} placeholder="Fashion Fusion" /> */}
 							<TextInput value={name}
-                        		onChange={(evt) => setName(evt.target.value)}
-                        		placeholder="Fashion Fusion" sx={{ my: 2 }} fullWidth label="Name" />
+								onChange={(evt) => setName(evt.target.value)}
+								placeholder="Fashion Fusion" sx={{ my: 2 }} fullWidth label="Name" />
 							{/* <div id="text-type-od">Description</div>
 							<Textarea value={description} onChange={(e) => { setDescription(e.target.value) }} placeholder='DAO Description' variant="filled" /> */}
 							{/* <Input value={name} variant="filled" onChange={(evt)=>setName(evt.target.value)}  placeholder="Fashion Fusion" /> */}
 							<TextInput value={description}
-                        		onChange={(e) => { setDescription(e.target.value) }}
+								onChange={(e) => { setDescription(e.target.value) }}
 								multiline
-          						rows={4}
-                        		placeholder="DAO Description" sx={{ my: 2 }} fullWidth label="Description" />
+								rows={4}
+								placeholder="DAO Description" sx={{ my: 2 }} fullWidth label="Description" />
 							<TextInput value={process.env.REACT_APP_URL + "/" + _get(DAO, 'url', '')}
-                        		disabled sx={{ my: 2 }} fullWidth label="Organisation’s URL" />	
+								disabled sx={{ my: 2 }} fullWidth label="Organisation’s URL" />
 
 							{/* <hr
 								style={{
@@ -272,7 +272,7 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 								project sees the members they are working with.
 							</p>
 							<Box ml={1} my={2}>
-								<Switch/>
+								<Switch />
 							</Box>
 
 							<div id="text-type-od">Import thumbnail</div>
@@ -397,7 +397,7 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 															</button>
 															:
 															<LoginGithub
-																clientId="8472b2207a0e12684382"
+																clientId={process.env.REACT_APP_GITHUB_CLIENT_ID}
 																scope="repo user admin:repo_hook admin:org"
 																onSuccess={onSuccess}
 																onFailure={onFailure}
@@ -427,7 +427,7 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 								link && link.indexOf('github.') > -1
 									?
 									<Box ml={2} my={2}>
-										<Switch onChange={() => setPullIssues(prev => !prev)}  label="IMPORT ISSUES" />
+										<Switch onChange={() => setPullIssues(prev => !prev)} label="IMPORT ISSUES" />
 									</Box>
 									:
 									<>
@@ -512,10 +512,10 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 								saveChanges()
 							}} id="button-save">SAVE CHANGES</Button>
 						</div> */}
-						<Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: '567px', position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
+						<Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: '567px', position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px', padding: "30px 0 20px" }}>
 							<Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
-								<Button onClick={() => toggleOrganisationDetailsModal()} sx={{ mr:1 }} fullWidth variant='outlined' size="small">Cancel</Button>
-								<Button onClick={() => saveChanges()} sx={{ ml:1 }}  fullWidth variant='contained' size="small">Save</Button>
+								<Button onClick={() => toggleOrganisationDetailsModal()} sx={{ mr: 1 }} fullWidth variant='outlined' size="small">Cancel</Button>
+								<Button onClick={() => saveChanges()} sx={{ ml: 1 }} fullWidth variant='contained' size="small">Save</Button>
 							</Box>
 						</Box>
 					</div>
