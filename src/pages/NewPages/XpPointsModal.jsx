@@ -93,11 +93,7 @@ const XpPointsModal = ({ toggleXp }) => {
 
           {/* //! BODY */}
           <div id="xp-text" >
-            This feature is super useful during the bootstrapping phase of your organisation. You
-            can assign SWEAT points to members for their contributions. Over time, this serves as a
-            measure of the relative contribution of different members of the organisation. When your
-            organisation has its own token or it has funds to pay, you can compensate members in
-            proportion to the SWEAT points they have.
+            Get ahead of the game with SWEAT points during your organization's bootstrapping phase. Track contributions and reward members based on their SWEAT points, once your organization has the funds.
           </div>
           {isXpPointEnable && <Button onClick={() => setShowCompensateMembersModals(true)} id="button-save">{'Convert to tokens & Compensate members'}</Button>}
           <div
