@@ -3,6 +3,7 @@ import { LeapFrog } from "@uiball/loaders";
 import { Button } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 import palette from 'muiTheme/palette';
+import React from 'react';
 
 const useStyles = makeStyles((theme: any) => ({
     root: {

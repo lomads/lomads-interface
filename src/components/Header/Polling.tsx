@@ -9,7 +9,7 @@ import useTheme from 'hooks/useTheme'
 import JSBI from 'jsbi'
 import useBlockNumber from 'hooks/useBlockNumber'
 import ms from 'ms.macro'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components/macro'
 import { ExternalLink, ThemedText } from 'theme'
 import { ExplorerDataType, getExplorerLink } from 'utils/getExplorerLink'

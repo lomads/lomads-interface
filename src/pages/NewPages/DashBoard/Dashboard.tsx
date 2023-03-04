@@ -503,9 +503,9 @@ const Dashboard = () => {
 		 document.getElementById(idName)?.focus();
 		if(document.getElementById(idName)?.style) {
 			if(currWalkThroughStep > 1){
-				document.getElementById(Steps[currWalkThroughStep-2]?.id).style.zIndex = 0
+				//document.getElementById(Steps[currWalkThroughStep-2]?.id).style.zIndex = 0
 			}
-			document.getElementById(idName).style.zIndex = 1299;
+			//document.getElementById(idName).style.zIndex = 1399;
 		}
 	 }
 	}, [currWalkThroughStep])

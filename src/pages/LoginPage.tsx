@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { get as _get, find as _find, throttle as _throttle, debounce as _debounce } from 'lodash';
 import { useLocation, useNavigate } from "react-router-dom";
 import lomadsfulllogo from "../assets/svg/lomadsfulllogo.svg";

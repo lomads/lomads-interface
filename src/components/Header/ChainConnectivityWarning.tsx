@@ -5,6 +5,7 @@ import { SupportedChainId } from "constants/chains";
 import { AlertOctagon } from "react-feather";
 import styled from "styled-components/macro";
 import { ExternalLink, MEDIA_WIDTHS } from "theme";
+import * as React from 'react';
 
 const BodyRow = styled.div`
   color: ${({ theme }) => theme.black};

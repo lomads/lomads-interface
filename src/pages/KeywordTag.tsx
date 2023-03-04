@@ -1,4 +1,4 @@
-import { SyntheticEvent, useCallback } from "react";
+import React, { SyntheticEvent, useCallback } from "react";
 
 import { Container } from "@chakra-ui/react";
 

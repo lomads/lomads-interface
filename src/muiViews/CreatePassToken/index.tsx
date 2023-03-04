@@ -8,7 +8,7 @@ import TextInput from 'muiComponents/TextInput';
 import Switch from "muiComponents/Switch";
 import Button from "muiComponents/Button";
 import Dropzone from "muiComponents/Dropzone";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import IconButton from "muiComponents/IconButton";
 import useContractDeployer, { SBTParams } from "hooks/useContractDeployer"
 import { useWeb3React } from "@web3-react/core"

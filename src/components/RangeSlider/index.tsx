@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Range } from 'react-range';
 // @ts-ignore
 import chroma from 'chroma-js';
