@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo, useLayoutEffect } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { usePrevious } from "@chakra-ui/react"
 import { get as _get, find as _find } from 'lodash';
 import lomadsfulllogo from "../../../assets/svg/lomadsfulllogo.svg";
@@ -30,7 +30,8 @@ import AddMember from "./MemberCard/AddMember";
 import dashboardfooterlogo from "../../../assets/svg/dashboardfooterlogo.svg";
 import starDashboard from "../../../assets/svg/star_dashboard.svg";
 import tokenDashboard from "../../../assets/svg/token_dashboard.svg";
-import questionMark from "../../../assets/svg/question-mark.svg";
+import questionMarkDark from "../../../assets/svg/question-mark-dark.svg";
+import questionMarkLight from "../../../assets/svg/question-mark-light.svg";
 import { useAppDispatch } from "state/hooks";
 import { getCurrentUser, getDao, loadDao, storeGithubIssues } from "state/dashboard/actions";
 import { setDAO, setDAOList } from "state/dashboard/reducer";
@@ -45,8 +46,8 @@ import { useSBTStats } from "hooks/SBT/sbt";
 import Footer from "components/Footer";
 import EditMember from "./MemberCard/EditMember";
 import LinksArea from "./LinksArea";
-import WalkThrough from './WalkThrough/WalkThrough'
-import WalkThroughTooltips from './WalkThrough/WalkThroughTooltip'
+import WalkThroughModal from './WalkThrough/WalkThroughModal';
+import WalkThroughPopover from './WalkThrough/WalkThroughPopover';
 import useRole from "hooks/useRole";
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains';
 import { switchChain } from "utils/switchChain";
@@ -69,6 +70,7 @@ const Dashboard = () => {
 	console.log("DAO : ", DAO);
 	const [update, setUpdate] = useState(0);
 	const treasuryRef = useRef<any>();
+	const anchorRef = useRef<any>()
 	const { provider, account, chainId, connector } = useWeb3React();
 	console.log("chainId : ", chainId, provider);
 	const safeAddress = useAppSelector((state) => state.flow.safeAddress);
@@ -91,8 +93,9 @@ const Dashboard = () => {
 	const [recurringTxn, setRecurringTxn] = useState<any>(null);
 	const [safeOwners, setSafeOwners] = useState<any>(null);
 	const [checkLoading, setCheckLoading] = useState<boolean>(true);
-	const [currWalkThroughStep, setWalkThroughStep] = useState<number>(0);
+	const [currWalkThroughObj, setWalkThroughObj] = useState<any>(Steps[0]);
 	const [showWalkThrough, setShowWalkThrough] = useState<boolean>(true);
+	const [displayHelpOptions, setDisplayHelpOptions] = useState<boolean>(false);
 	const currentNonce = useAppSelector((state) => state.flow.currentNonce);
 	const { myRole, displayRole, permissions, can, isSafeOwner } = useRole(DAO, account);
 	const { getENSAddress, getENSName } = useEns()
@@ -356,7 +359,7 @@ const Dashboard = () => {
 			}
 		}
 	}, [DAO, account, chainId]);
-	console.log(Steps[5], '...steps...')
+
 	useEffect(() => {
 		if (DAO && account && chainId) {
 			if (chainId === DAO.chainId) {
@@ -489,26 +492,34 @@ const Dashboard = () => {
 
 	const endWalkThrough = () => setShowWalkThrough(false)
 	const incrementWalkThroughSteps = () => {
-		
-		if (currWalkThroughStep === 7) {
+		if (anchorRef.current) {
+			anchorRef.current.style.zIndex = 0
+		}
+		console.log(currWalkThroughObj, '...endWalkThrough...')
+		// // end step
+		if (currWalkThroughObj.step === 7) {
 			endWalkThrough()
+			anchorRef.current.style.background  = 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)';
+			anchorRef.current.style.boxShadow = 'none'
 			return
 		}
-		setWalkThroughStep(currWalkThroughStep + 1)
-	}
-
-	useLayoutEffect(() => {
-	 if(currWalkThroughStep > 0){
-		 const idName =  Steps[currWalkThroughStep-1]?.id
-		 document.getElementById(idName)?.focus();
-		if(document.getElementById(idName)?.style) {
-			if(currWalkThroughStep > 1){
-				//document.getElementById(Steps[currWalkThroughStep-2]?.id).style.zIndex = 0
-			}
-			//document.getElementById(idName).style.zIndex = 1399;
+		const nextObj = Steps[currWalkThroughObj.step + 1]
+		setWalkThroughObj(nextObj)
+		console.error(anchorRef, '...anchorRef...befor.')
+		anchorRef.current = document.getElementById(nextObj.id)
+		anchorRef.current.scrollIntoView({
+            behavior: 'auto',
+            block: 'center',
+            inline: 'center'
+        });
+		anchorRef.current.style.zIndex = 1400
+		if (nextObj.step === 6) {
+			anchorRef.current.style.background = 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)'
+			anchorRef.current.style.boxShadow = '0px 0px 20px rgba(181, 28, 72, 0.6)'
+			return
 		}
-	 }
-	}, [currWalkThroughStep])
+
+	}
 
 	return (
 		<>
@@ -521,18 +532,18 @@ const Dashboard = () => {
 						<LeapFrog size={50} color="#C94B32" />
 					</div>
 				</div> : null}
-			<WalkThrough
+			<WalkThroughModal
 				beginWalkThrough={incrementWalkThroughSteps}
-				showConfirmation={showWalkThrough && currWalkThroughStep === 0}
+				showConfirmation={showWalkThrough && currWalkThroughObj.step === 0}
 				endWalkThrough={endWalkThrough}
 			/>
-			<WalkThroughTooltips
-                    displayTooltip={showWalkThrough && currWalkThroughStep > 0}
-					obj={Steps[currWalkThroughStep-1]}
-					incrementWalkThroughSteps={incrementWalkThroughSteps}
-					endWalkThrough={endWalkThrough}
-				/>
-
+			<WalkThroughPopover
+				displayPopover={showWalkThrough && currWalkThroughObj.step > 0}
+				obj={currWalkThroughObj}
+				incrementWalkThroughSteps={incrementWalkThroughSteps}
+				endWalkThrough={endWalkThrough}
+				anchorEl={anchorRef.current}
+			/>
 			<div
 				className="dashBoardBody"
 				onMouseEnter={() => {
@@ -596,7 +607,7 @@ const Dashboard = () => {
 						</div>
 					</div>
 				</div>
-				 
+
 				<LinksArea links={_get(DAO, 'links', [])} />
 
 				<Notifications />
@@ -611,7 +622,7 @@ const Dashboard = () => {
 						/>
 					)} */}
 
-				
+
 				<MyProject />
 				<Tasks toggleShowCreateTask={toggleShowCreateTask} onlyProjects={false} />
 				{(can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') &&
@@ -649,9 +660,10 @@ const Dashboard = () => {
 					toggleShowMember={toggleShowMember}
 				/>
 			)}
-			{!showWalkThrough && <div id="question-mark">
-				<img src={questionMark} />
-			</div>}
+			<div id="question-mark"
+				onClick={() => setDisplayHelpOptions(!displayHelpOptions)}>
+				<img src={((showWalkThrough && currWalkThroughObj.step === 7) || displayHelpOptions) ? questionMarkDark : questionMarkLight} />
+			</div>
 			<SideBar
 				name={_get(DAO, 'name', '')}
 				showSideBar={showSideBar}

@@ -7,6 +7,14 @@ import stepSixWalkthrough from '../../../../assets/svg/step_6_walkthrough.svg'
 import stepSevenWalkthrough from '../../../../assets/svg/step_7_walkthrough.svg'
 
 const steps = [{
+      step: 0,
+      id: 'walkthrough-modal',
+      title: 'Welcome to your Lomads Dashboard!',
+      content: 'We’re excited to have you here, and would love to walk you through all of our key features!',
+      buttonText: "LET'S GO",
+      buttonText2: 'LATER THANKS!',
+      imgPath: stepOneWalkthrough,
+   },{
     step: 1,
     id: 'my-workspace',
     title: 'Create Workspaces',
@@ -21,6 +29,7 @@ const steps = [{
     content: 'By creating tasks, you can track progress, deadlines, and rewards on bounties, and assign contributors to each task.',
     buttonText: '2/7 NEXT',
     imgPath: stepTwoWalkthrough,
+   
   },
   {
     step: 3,
@@ -28,7 +37,8 @@ const steps = [{
     title: 'Treasury Management',
     content: 'Managing and automating your treasury has never been easier! Here you can approve and send token payments manually, or set up recurring payments to team members!',
     imgPath: stepThreeWalkthrough,
-    buttonText: '3/7 NEXT'
+    buttonText: '3/7 NEXT',
+   
   },
   {
     step: 4,
@@ -36,7 +46,8 @@ const steps = [{
     title: 'Bootstrapping?',
     content: 'Turn on SWEAT points in settings to track contributions for future rewards.',
     imgPath: stepFourWalkthrough,
-    buttonText: '4/7 NEXT'
+    buttonText: '4/7 NEXT',
+   
   },
   {
     step: 5,
@@ -44,7 +55,8 @@ const steps = [{
     title: 'Members',
     content: 'Add new members and manage details and roles of existing members.',
     imgPath: stepFiveWalkthrough,
-    buttonText: '5/7 NEXT'
+    buttonText: '5/7 NEXT',
+   
   },
   {
     step: 6,
