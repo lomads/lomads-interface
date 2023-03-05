@@ -496,11 +496,9 @@ const Dashboard = () => {
 			anchorRef.current.style.zIndex = 0
 		}
 		console.log(currWalkThroughObj, '...endWalkThrough...')
-		// // end step
+		// end step
 		if (currWalkThroughObj.step === 7) {
 			endWalkThrough()
-			anchorRef.current.style.background  = 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)';
-			anchorRef.current.style.boxShadow = 'none'
 			return
 		}
 		const nextObj = Steps[currWalkThroughObj.step + 1]
@@ -513,11 +511,17 @@ const Dashboard = () => {
             inline: 'center'
         });
 		anchorRef.current.style.zIndex = 1400
-		if (nextObj.step === 6) {
-			anchorRef.current.style.background = 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)'
-			anchorRef.current.style.boxShadow = '0px 0px 20px rgba(181, 28, 72, 0.6)'
-			return
-		}
+		if (nextObj.step >=6) {
+			if (nextObj.step ===6){
+				anchorRef.current.style.background = 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)'
+				anchorRef.current.style.boxShadow = '0px 0px 20px rgba(181, 28, 72, 0.6)'	
+			}
+			else {
+				anchorRef.current.style.background  = 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)';
+				anchorRef.current.style.boxShadow = 'none'
+			}
+		} 
+
 
 	}
 
@@ -660,9 +664,12 @@ const Dashboard = () => {
 					toggleShowMember={toggleShowMember}
 				/>
 			)}
-			<div id="question-mark"
-				onClick={() => setDisplayHelpOptions(!displayHelpOptions)}>
-				<img src={((showWalkThrough && currWalkThroughObj.step === 7) || displayHelpOptions) ? questionMarkDark : questionMarkLight} />
+
+			<div id="question-mark">
+			<div className="help-option">
+				   <img src={((showWalkThrough && currWalkThroughObj.step === 7) || displayHelpOptions) 
+				   			? questionMarkDark : questionMarkLight } />
+			</div>
 			</div>
 			<SideBar
 				name={_get(DAO, 'name', '')}

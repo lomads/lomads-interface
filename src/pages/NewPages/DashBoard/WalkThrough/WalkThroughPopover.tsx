@@ -16,7 +16,7 @@ type tooltipObj = {
   content: string;
   imgPath: string;
   buttonText: string;
-  //origin: originObj;
+  origin: originObj;
 }
 
 export default function WalkThroughPopover({
@@ -37,11 +37,7 @@ export default function WalkThroughPopover({
     <Popover
        id={obj?.id}
       open={displayPopover}
-      //onClose={endWalkThrough}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'left',
-      }}
+      anchorOrigin={obj?.origin}
       anchorEl={anchorEl}
     >
       <div className="tooltip" style={{ top: '5%', right: '3%' }}>
