@@ -709,6 +709,7 @@ body.active-modal {
 .overlay {
     background: #1B2B41;
     opacity: 0.2;
+    z-index: 10;
 }
 
 .sidebarModal {
@@ -1530,6 +1531,9 @@ body.active-modal {
     margin-left: 33px;
     bottom: 44px;
     position: sticky;
+    width: 50px;
+    border-radius: 50%;
+    cursor: pointer;
 }
 /* 
 input:checked+.inner-check:before {

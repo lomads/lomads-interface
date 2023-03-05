@@ -502,26 +502,23 @@ const Dashboard = () => {
 			return
 		}
 		const nextObj = Steps[currWalkThroughObj.step + 1]
-		setWalkThroughObj(nextObj)
-		console.error(anchorRef, '...anchorRef...befor.')
 		anchorRef.current = document.getElementById(nextObj.id)
 		anchorRef.current.scrollIntoView({
             behavior: 'auto',
             block: 'center',
             inline: 'center'
         });
-		anchorRef.current.style.zIndex = 1400
-		if (nextObj.step >=6) {
-			if (nextObj.step ===6){
-				anchorRef.current.style.background = 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)'
+		anchorRef.current.style.zIndex = 35
+
+		if (nextObj.step >= 6) {
+			if (nextObj.step === 6){
 				anchorRef.current.style.boxShadow = '0px 0px 20px rgba(181, 28, 72, 0.6)'	
 			}
 			else {
-				anchorRef.current.style.background  = 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)';
 				anchorRef.current.style.boxShadow = 'none'
 			}
 		} 
-
+		setWalkThroughObj(nextObj)
 
 	}
 
@@ -536,6 +533,7 @@ const Dashboard = () => {
 						<LeapFrog size={50} color="#C94B32" />
 					</div>
 				</div> : null}
+			{showWalkThrough && <div className="overlay"></div>}
 			<WalkThroughModal
 				beginWalkThrough={incrementWalkThroughSteps}
 				showConfirmation={showWalkThrough && currWalkThroughObj.step === 0}
@@ -665,11 +663,9 @@ const Dashboard = () => {
 				/>
 			)}
 
-			<div id="question-mark">
-			<div className="help-option">
+			<div className="help-option" id="question-mark">
 				   <img src={((showWalkThrough && currWalkThroughObj.step === 7) || displayHelpOptions) 
 				   			? questionMarkDark : questionMarkLight } />
-			</div>
 			</div>
 			<SideBar
 				name={_get(DAO, 'name', '')}

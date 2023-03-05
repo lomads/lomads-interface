@@ -1,14 +1,12 @@
-import React, { useEffect } from 'react';
-import Popover from '@mui/material/Popover';
+import React, { useState } from 'react';
 import Typography from '@mui/material/Typography';
 import CloseBtn from '../../../../assets/svg/close-btn.svg';
 import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import Popper, { PopperPlacementType } from '@mui/material/Popper';
+import styled from "styled-components";
 import './WalkThrough.css'
 
-type originObj = {
-  vertical: number | "top" | "center" | "bottom";
-  horizontal: number | "center" | "left" | "right";
-}
 type tooltipObj = {
   step: number;
   id: string;
@@ -16,8 +14,90 @@ type tooltipObj = {
   content: string;
   imgPath: string;
   buttonText: string;
-  origin: originObj;
+  placement: PopperPlacementType;
 }
+const StyledPopper = styled(Popper)`&&{
+  
+  z-index: 1;
+  &[x-placement*="bottom"] .arrow{
+
+    width: 0; 
+    height: 0; 
+    border-left: 1em solid transparent;
+    border-right: 1em solid transparent;
+    border-bottom: 1em solid #2c3e50;
+    margin-top: -0.9em;
+    
+    &:before {
+      border-width: '0 1em 1em 1em';
+      border-color: 'transparent transparent white transparent';
+    }
+  }
+
+  &[x-placement*="top"] .arrow{
+
+    bottom: 0;
+    width: 0; 
+    height: 0; 
+    border-left: 1em solid transparent;
+    border-right: 1em solid transparent;
+    border-top: 1em solid #2c3e50;
+    margin-bottom: -0.9em;
+
+    &:before {
+      border-width: 1em 1em 0 1em;
+      border-color: white transparent transparent transparent;
+    }
+  }
+
+  &[x-placement*="right"] .arrow{
+
+    left: 0;
+    width: 0; 
+    height: 0; 
+    border-top: 1em solid transparent;
+    border-bottom: 1em solid transparent;
+    border-right: 1em solid #2c3e50;
+    margin-left: -0.9em;
+
+    &:before {
+      border-width: 1em 1em 1em 0;
+      border-color: transparent white transparent transparent;
+    }
+  }
+
+  &[x-placement*="left"] .arrow{
+    
+    right: 0;
+    width: 0; 
+    height: 0; 
+    border-top: 1em solid transparent;
+    border-bottom: 1em solid transparent;
+    border-left: 1em solid #2c3e50;
+    margin-right: -0.9em;
+
+    &:before {
+      border-width: 1em 0 1em 1em;
+      border-color: transparent transparent transparent white;
+    }
+  }
+
+  .arrow {
+    position: absolute;
+    font-size: 7px;
+    width: 3em;
+    height: 3em;
+
+    &:before {
+      content: '""',
+      margin: auto;
+      display: block;
+      width: 0;
+      height: 0;
+      border-style: solid;
+    }
+  }
+}`;
 
 export default function WalkThroughPopover({
   displayPopover,
@@ -32,34 +112,69 @@ export default function WalkThroughPopover({
   endWalkThrough: any,
   anchorEl: any
 }) {
-  console.log(anchorEl, '...anchor el.in popover.', obj)
+ const [arrowRef, setArrowRef] = useState<any>(null)
   return (
-    <Popover
-       id={obj?.id}
+    <StyledPopper
       open={displayPopover}
-      anchorOrigin={obj?.origin}
       anchorEl={anchorEl}
+      style={{ zIndex: '30', padding: 10 }}
+      placement={obj?.placement}
+      modifiers={[
+        {
+          name: 'flip',
+          enabled: true,
+          options: {
+            altBoundary: true,
+            rootBoundary: 'document',
+            padding: 8,
+          },
+        },
+        {
+          name: 'preventOverflow',
+          enabled: true,
+          options: {
+            altAxis: true,
+            altBoundary: true,
+            tether: true,
+            rootBoundary: 'document',
+            padding: 8,
+          },
+        },
+        {
+          name: 'arrow',
+          enabled: false,
+          options: {
+            element: arrowRef,
+          },
+        },
+      ]}
     >
-      <div className="tooltip" style={{ top: '5%', right: '3%' }}>
-        <div className="tooltip-left">
-          <img src={obj?.imgPath} />
+      {
+        true &&
+        <span className="arrow" ref={setArrowRef} />
+      }
+      <Box>
+        <div className="tooltip" style={{ top: '5%', right: '3%' }}>
+          <div className="tooltip-left">
+            <img src={obj?.imgPath} />
+          </div>
+          <div className="tooltip-right">
+            <Typography id="modal-modal-title" variant="h4" component="h2">
+              {obj?.title}
+            </Typography>
+            <p>{obj?.content}</p>
+            <Button
+              variant="contained"
+              onClick={incrementWalkThroughSteps}
+              size="small">
+              {obj?.buttonText}
+            </Button>
+          </div>
+          <div className="close-btn" onClick={endWalkThrough}>
+            <img src={CloseBtn} />
+          </div>
         </div>
-        <div className="tooltip-right">
-          <Typography id="modal-modal-title" variant="h4" component="h2">
-            {obj?.title}
-          </Typography>
-          <p>{obj?.content}</p>
-          <Button
-            variant="contained"
-            onClick={incrementWalkThroughSteps}
-            size="small">
-            {obj?.buttonText}
-          </Button>
-        </div>
-        <div className="close-btn" onClick={endWalkThrough}>
-          <img src={CloseBtn} />
-        </div>
-      </div>
-    </Popover>
+      </Box>
+    </StyledPopper>
   );
 }

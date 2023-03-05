@@ -14,21 +14,16 @@ const steps = [{
       buttonText: "LET'S GO",
       buttonText2: 'LATER THANKS!',
       imgPath: stepOneWalkthrough,
-      origin: {
-        vertical: 'top',
-        horizontal: 'left',
-      }
-   },{
+      placement: 'top'
+   },
+   {
     step: 1,
     id: 'my-workspace',
     title: 'Create Workspaces',
     content: 'Here, you can create customized workspaces for all of your teams, manage milestones, and track key results.',
     buttonText: '1/7  NEXT',
     imgPath: stepOneWalkthrough,
-    origin: {
-      vertical: 'top',
-      horizontal: 'left',
-    }
+    placement: 'top-end'
   },
   {
     step: 2,
@@ -37,10 +32,7 @@ const steps = [{
     content: 'By creating tasks, you can track progress, deadlines, and rewards on bounties, and assign contributors to each task.',
     buttonText: '2/7 NEXT',
     imgPath: stepTwoWalkthrough,
-    origin: {
-      vertical: 'top',
-      horizontal: 'left',
-    }
+    placement: 'top-end'
   },
   {
     step: 3,
@@ -49,11 +41,7 @@ const steps = [{
     content: 'Managing and automating your treasury has never been easier! Here you can approve and send token payments manually, or set up recurring payments to team members!',
     imgPath: stepThreeWalkthrough,
     buttonText: '3/7 NEXT',
-    origin: {
-      vertical: 'top',
-      horizontal: 'center',
-    }
-   
+    placement: 'top-end'
   },
   {
     step: 4,
@@ -62,11 +50,7 @@ const steps = [{
     content: 'Turn on SWEAT points in settings to track contributions for future rewards.',
     imgPath: stepFourWalkthrough,
     buttonText: '4/7 NEXT',
-    origin: {
-      vertical: 'top',
-      horizontal: 'right',
-    }
-   
+    placement: 'top-end'
   },
   {
     step: 5,
@@ -75,10 +59,7 @@ const steps = [{
     content: 'Add new members and manage details and roles of existing members.',
     imgPath: stepFiveWalkthrough,
     buttonText: '5/7 NEXT',
-    origin: {
-      vertical: 'top',
-      horizontal: 'center',
-    }
+    placement: 'top-end'
   },
   {
     step: 6,
@@ -87,10 +68,7 @@ const steps = [{
     content: 'Customize your Dashboard with settings: edit organization details, manage treasury signatories, launch pass tokens, enable SWEAT points, and personalize terminologies. Explore now!',
     imgPath: stepSixWalkthrough,
     buttonText: '6/7 NEXT',
-    origin: {
-      vertical: 'top',
-      horizontal: 'left',
-    }
+    placement: 'left-start'
   },
   {
     step: 7,
@@ -99,10 +77,7 @@ const steps = [{
     content: 'If you need any help or tips, you will find it here.',
     imgPath: stepSevenWalkthrough,
     buttonText: 'END',
-    origin: {
-      vertical: 'bottom',
-      horizontal: 'left',
-    }
+    placement: 'top'
   }
 ]
 
