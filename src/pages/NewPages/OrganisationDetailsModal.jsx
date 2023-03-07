@@ -72,9 +72,8 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 	}, [link, linkTitle]);
 
 	const saveChanges = () => {
-		console.log("Image : ", image)
 		dispatch(updateDao({ url: DAO?.url, payload: { name, description, image } }))
-		dispatch(updateDaoLinks({ url: DAO?.url, payload: { links: daoLinks } }))
+		// dispatch(updateDaoLinks({ url: DAO?.url, payload: { links: daoLinks } }))
 		toggleOrganisationDetailsModal();
 	}
 
@@ -201,7 +200,16 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 				}
 				else {
 					console.log("Allowed to pull and store issues")
-					dispatch(storeGithubIssues({ payload: { daoId: _get(DAO, '_id', null), issueList: result.data.data, token, repoInfo } }));
+					dispatch(storeGithubIssues({
+						payload:
+						{
+							daoId: _get(DAO, '_id', null),
+							issueList: result.data.data,
+							token,
+							repoInfo,
+							linkOb: { title: linkTitle, link: link }
+						}
+					}));
 				}
 			})
 	}
@@ -427,7 +435,7 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 								link && link.indexOf('github.') > -1
 									?
 									<Box ml={2} my={2}>
-										<Switch onChange={() => setPullIssues(prev => !prev)} label="IMPORT ISSUES" />
+										<Switch onChange={() => setPullIssues(prev => !prev)} label="IMPORT ISSUES" checked={pullIssues} />
 									</Box>
 									:
 									<>
