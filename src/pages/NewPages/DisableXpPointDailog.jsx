@@ -12,14 +12,16 @@ import { AiOutlineClose } from "react-icons/ai";
 import IconButton from "UIpack/IconButton";
 
 const DisableXpPointDailog = (props) => {
-    const dispatch = useAppDispatch();
-    return (
-        <>
-            <div id="AddNewMemberComponent">
-                <div onClick={()=>{props.setShowDisableDailog(false)
-                props.setIsXpPointEnable(true); props.isXpPointSetByDailog(true)}} id="AddNewMemberOverlay"></div>
-                <div id="AddNewMember">
-                <div className="closeButtonArea">
+  const dispatch = useAppDispatch();
+  return (
+    <>
+      <div id="AddNewMemberComponent">
+        <div onClick={() => {
+          props.setShowDisableDailog(false)
+          props.setIsXpPointEnable(true); props.isXpPointSetByDailog(true)
+        }} id="AddNewMemberOverlay"></div>
+        <div id="AddNewMember">
+          <div className="closeButtonArea">
             <IconButton
               Icon={
                 <AiOutlineClose
@@ -43,14 +45,14 @@ const DisableXpPointDailog = (props) => {
               }}
             />
           </div>
-                    <div
+          <div
             style={{
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
             }}
           >
-            <XpPoints style={{marginTop: "10px", marginBottom:'10px', width: "94.48px", height: "50px",color: "#C94B32" }} />
+            <XpPoints style={{ marginTop: "10px", marginBottom: '10px', width: "94.48px", height: "50px", color: "#C94B32" }} />
             {/* <Image
               src={XpPoints}
               alt="SWEAT Points icon"
@@ -60,35 +62,35 @@ const DisableXpPointDailog = (props) => {
           </div>
 
           {/* //! BODY */}
-          <div id="cm-info" >
-          You will no more be able to send SWEAT points and the current SWEAT points
+          <div id="cm-info" style={{ fontStyle: 'normal' }}>
+            You will no more be able to send SWEAT points and the current SWEAT points
             accumulated by members will be reset to zero.
           </div>
-                {/* //! FOOTER */}
-                <Box display="flex" flexDirection="row" alignItems="center" className="button-section">
-                    <Button
-                    variant="outlined"
-                    sx={{ mr: 1 }}
-                    onClick={() => {
-                        // toggleModal();
-                        // toggleXp();
-                        props.setShowDisableDailog(false)
-                        props.setIsXpPointEnable(true)
-                        props.isXpPointSetByDailog(true)
-                    }}
-                    >
-                    NO
-                    </Button>
-                    <Button id="button-save" onClick={() => { 
-                      props.setShowDisableDailog(false)
-                      props.setIsXpPointEnable(false)
-                      props.isXpPointSetByDailog(true)
-                     }}>YES</Button>
-                </Box>
-                </div>
-            </div>
-        </>
-    );
+          {/* //! FOOTER */}
+          <Box display="flex" flexDirection="row" alignItems="center" className="button-section">
+            <Button
+              variant="outlined"
+              sx={{ mr: 1 }}
+              onClick={() => {
+                // toggleModal();
+                // toggleXp();
+                props.setShowDisableDailog(false)
+                props.setIsXpPointEnable(true)
+                props.isXpPointSetByDailog(true)
+              }}
+            >
+              NO
+            </Button>
+            <Button id="button-save" onClick={() => {
+              props.setShowDisableDailog(false)
+              props.setIsXpPointEnable(false)
+              props.isXpPointSetByDailog(true)
+            }}>YES</Button>
+          </Box>
+        </div>
+      </div>
+    </>
+  );
 };
 
 export default DisableXpPointDailog;

@@ -116,6 +116,18 @@ export const updateDaoLinks = createAsyncThunk(
 	}
 );
 
+export const deleteDaoLink = createAsyncThunk(
+	'dao/deleteDaoLink',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`dao/${params.url}/delete-link`, params.payload)
+			.then(res => res.data)
+			.catch(e => {
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
+	}
+)
+
 export const createProject = createAsyncThunk(
 	'dao/createProject',
 	async (params: any, thunkApi) => {

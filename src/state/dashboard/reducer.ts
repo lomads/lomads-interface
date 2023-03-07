@@ -10,6 +10,7 @@ import {
 	manageDaoMember,
 	addDaoLinks,
 	updateDaoLinks,
+	deleteDaoLink,
 	createProject,
 	addProjectMember,
 	updateProjectMember,
@@ -61,6 +62,7 @@ export interface DashboardState {
 	manageMemberLoading: boolean | null;
 	addDaoLinksLoading: boolean | null;
 	updateDaoLinksLoading: boolean | null;
+	deleteDaoLinkLoading: boolean | null;
 	rejectTaskMemberLoading: boolean | null;
 	Project: any;
 	ProjectLoading: boolean | null;
@@ -109,6 +111,7 @@ const initialState: DashboardState = {
 	manageMemberLoading: null,
 	addDaoLinksLoading: null,
 	updateDaoLinksLoading: null,
+	deleteDaoLinkLoading: null,
 	rejectTaskMemberLoading: null,
 	Project: null,
 	ProjectLoading: null,
@@ -175,6 +178,9 @@ const dashboardSlice = createSlice({
 		},
 		resetUpdateDaoLinksLoader(state) {
 			state.updateDaoLinksLoading = null
+		},
+		resetDeleteDaoLinkLoader(state) {
+			state.deleteDaoLinkLoading = null
 		},
 		resetCreateProjectLoader(state) {
 			state.createProjectLoading = null
@@ -392,6 +398,14 @@ const dashboardSlice = createSlice({
 		},
 		[`${updateDaoLinks.pending}`]: (state) => {
 			state.updateDaoLinksLoading = true;
+		},
+		// delete dao link
+		[`${deleteDaoLink.fulfilled}`]: (state, action) => {
+			state.deleteDaoLinkLoading = false;
+			state.DAO = action.payload;
+		},
+		[`${deleteDaoLink.pending}`]: (state) => {
+			state.deleteDaoLinkLoading = true;
 		},
 
 		// create contract
@@ -727,6 +741,7 @@ export const {
 	resetUpdateKraLoader,
 	resetEditProjectKraLoader,
 	resetUpdateMilestoneLoader,
-	resetEditProjectMilestoneLoader
+	resetEditProjectMilestoneLoader,
+	resetDeleteDaoLinkLoader
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

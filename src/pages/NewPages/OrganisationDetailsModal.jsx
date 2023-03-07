@@ -14,9 +14,9 @@ import { get as _get, find as _find } from 'lodash';
 import { isValidUrl } from "utils";
 import { useDispatch } from "react-redux";
 import axiosHttp from 'api'
-import { updateDao, updateDaoLinks, storeGithubIssues } from 'state/dashboard/actions';
+import { updateDao, updateDaoLinks, storeGithubIssues, deleteDaoLink } from 'state/dashboard/actions';
 import AddDiscordLink from 'components/AddDiscordLink';
-import { setDAO, resetStoreGithubIssuesLoader } from "state/dashboard/reducer";
+import { setDAO, resetStoreGithubIssuesLoader, resetDeleteDaoLinkLoader } from "state/dashboard/reducer";
 import AddGithubLink from "components/AddGithubLink";
 
 import TextInput from "muiComponents/TextInput";
@@ -34,7 +34,7 @@ import useGithubAuth from "hooks/useGithubAuth";
 
 const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) => {
 
-	const { DAO, updateDaoLoading, updateDaoLinksLoading, storeGithubIssuesLoading } = useAppSelector((state) => state.dashboard);
+	const { DAO, updateDaoLoading, updateDaoLinksLoading, storeGithubIssuesLoading, deleteDaoLinkLoading } = useAppSelector((state) => state.dashboard);
 	const [name, setName] = useState(_get(DAO, 'name', ''));
 	const [oUrl, setOUrl] = useState(_get(DAO, 'url', ''));
 	const [description, setDescription] = useState(_get(DAO, 'description', ''));
@@ -60,6 +60,12 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 			addLink();
 		}
 	}, [storeGithubIssuesLoading]);
+
+	useEffect(() => {
+		if (deleteDaoLinkLoading === false) {
+			dispatch(resetDeleteDaoLinkLoader);
+		}
+	}, [deleteDaoLinkLoading])
 
 	const addLink = useCallback(() => {
 		if (!linkTitle || !link || (linkTitle && linkTitle === '') || (link && link === ''))
@@ -101,10 +107,22 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 	}
 
 	const deleteLink = (item) => {
-		// let links = _get(DAO, 'links', []);
-		let links = daoLinks.filter(l => !(l.title === item.title && l.link === item.link))
-		setDaoLinks(links)
-		// dispatch(updateDao({ url: DAO?.url, payload: { links } }))
+		if (item.link.indexOf('github.') > -1) {
+			let repoInfo = extractGitHubRepoPath(item.link);
+			let ob = _get(DAO, `github.${repoInfo}`, null)
+			if (ob) {
+				dispatch(deleteDaoLink({ url: DAO?.url, payload: { link: item, repoInfo, webhookId: ob.webhookId } }))
+			}
+			else {
+				// no import issues github link
+				let links = daoLinks.filter(l => !(l.title === item.title && l.link === item.link))
+				setDaoLinks(links);
+			}
+		}
+		else {
+			let links = daoLinks.filter(l => !(l.title === item.title && l.link === item.link))
+			setDaoLinks(links);
+		}
 	}
 
 	const handleOnServerAdded = serverId => {
@@ -173,6 +191,7 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 					alert("No res : Something went wrong");
 					setIsAuthenticating(false);
 				}
+				onResetAuth();
 			})
 			.catch((e) => {
 				onResetAuth()
@@ -400,7 +419,7 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 										{console.log(link)}
 										{
 
-											link && link.indexOf('github.') > -1
+											link && link.indexOf('github.') > -1 && pullIssues
 												?
 												<>
 													{
@@ -503,7 +522,13 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 														deleteLink(item);
 													}}
 												>
-													<AiOutlineClose style={{ height: 15, width: 15 }} />
+													{
+														deleteDaoLinkLoading
+															?
+															<LeapFrog size={24} color="#C94B32" />
+															:
+															<AiOutlineClose style={{ height: 15, width: 15 }} />
+													}
 												</div>
 											</div>
 										)

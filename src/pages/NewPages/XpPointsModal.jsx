@@ -4,7 +4,7 @@ import { get as _get } from 'lodash'
 import "./Settings.css";
 import Button from 'muiComponents/Button'
 import OD from "../../assets/images/drawer-icons/OD.svg";
-import {  Image, Input } from "@chakra-ui/react";
+import { Image, Input } from "@chakra-ui/react";
 import { ReactComponent as XpPoints } from "../../assets/images/settings-page/5-xp-points-color.svg";
 import DisableXpPointDailog from "./DisableXpPointDailog";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";

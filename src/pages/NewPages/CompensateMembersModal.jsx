@@ -20,40 +20,42 @@ import { SupportedChainId, SUPPORTED_CHAIN_IDS, CHAIN_IDS_TO_NAMES } from 'const
 import { useAppSelector } from "state/hooks";
 import { useWeb3React } from "@web3-react/core";
 
+import starXP from 'assets/svg/starXP.svg';
+
 
 const CompensateMembersModal = ({ toggleModal, toggleCompensate }) => {
   const [showCompensateMembersDescriptionModals, setShowCompensateMembersDescriptionModals] = useState(false)
   const [safeTokens, setSafeTokens] = useState([]);
-	const { user, DAO, DAOList, DAOLoading } = useAppSelector((state) => state.dashboard);
+  const { user, DAO, DAOList, DAOLoading } = useAppSelector((state) => state.dashboard);
   const { chainId } = useWeb3React();
   const [sweatValue, setSweatValue] = useState(null);
   const [currency, setCurrency] = useState(null);
 
   useEffect(() => {
-    if(chainId, DAO) {
-      axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${_get(DAO, 'safe.address', '')}/balances/usd/`, {withCredentials: false })
-      .then((tokens) => {
-        setSafeTokens(tokens.data.map(t => {
-          let tkn = t
-          console.log(tkn)
-          if(!tkn.tokenAddress){
-            return {
-              ...t,
-              tokenAddress: chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS,
-              token: {
-                symbol: chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'
+    if (chainId, DAO) {
+      axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${_get(DAO, 'safe.address', '')}/balances/usd/`, { withCredentials: false })
+        .then((tokens) => {
+          setSafeTokens(tokens.data.map(t => {
+            let tkn = t
+            console.log(tkn)
+            if (!tkn.tokenAddress) {
+              return {
+                ...t,
+                tokenAddress: chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS,
+                token: {
+                  symbol: chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'
+                }
               }
             }
-          }
             return t
-        }));
-      });
+          }));
+        });
     }
-	}, [chainId, DAO]);
+  }, [chainId, DAO]);
 
   useEffect(() => {
-    if(safeTokens && safeTokens.length > 0){
-      if(!safeTokens[0].tokenAddress) {
+    if (safeTokens && safeTokens.length > 0) {
+      if (!safeTokens[0].tokenAddress) {
         setCurrency(chainId === SupportedChainId.GOERLI ? process.env.REACT_APP_GOERLI_TOKEN_ADDRESS : process.env.REACT_APP_MATIC_TOKEN_ADDRESS)
       } else {
         setCurrency(safeTokens[0].tokenAddress)
@@ -136,9 +138,9 @@ const CompensateMembersModal = ({ toggleModal, toggleCompensate }) => {
               </div>
               { console.log("currency", currency) }
               <Select defaultValue={currency} onChange={e => setCurrency(e.target.value)} bg='#F5F5F5' color='#76808D' variant='unstyled' style={{ borderRadius: '0px 10px 10px 0px', borderWidth: 1, borderLeftWidth: 0, borderColor: 'rgba(27, 43, 65, 0.1)', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)', height: 50, padding: '0px 50px 0px 20px' }} iconSize={15} icon={<ArrowDown />}> */}
-                {/* <option value='SWEAT'>SWEAT</option>
+          {/* <option value='SWEAT'>SWEAT</option>
                 <option value='MATIC'><PolygonIcon /> MATIC</option> */}
-              {/* {
+          {/* {
                safeTokens.map((result, index) => {
                 return (
                   (
@@ -149,27 +151,35 @@ const CompensateMembersModal = ({ toggleModal, toggleCompensate }) => {
                   )
                 );
               })} */}
-              {/* </Select>
+          {/* </Select>
             </div>
           </div> */}
-          <CurrencyInput
-            value={sweatValue ? sweatValue : 0} 
-            onChange={(value) => {
-              setSweatValue(value)
-            }} 
-            options={
-              safeTokens.map(t => {
-                return {
-                  value: t.tokenAddress,
-                  label: t.token.symbol
-                }
-              })
-            } 
-            dropDownvalue={currency} 
-            onDropDownChange = {(value) => {
-              setCurrency(value)
-            }} 
-          />
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+
+            <div style={{ marginRight: '10px', display: 'flex', alignItems: 'center' }}>
+              <img src={starXP} style={{ marginRight: '5px' }} />
+              <span style={{ color: '#76808D', fontWeight: '700' }}> 1 XP = </span>
+            </div>
+            <CurrencyInput
+              value={sweatValue ? sweatValue : 0}
+              onChange={(value) => {
+                setSweatValue(value)
+              }}
+              options={
+                safeTokens.map(t => {
+                  return {
+                    value: t.tokenAddress,
+                    label: t.token.symbol
+                  }
+                })
+              }
+              dropDownvalue={currency}
+              onDropDownChange={(value) => {
+                setCurrency(value)
+              }}
+            />
+
+          </div>
           <Button variant="contained" onClick={() => setShowCompensateMembersDescriptionModals(true)}>{'Next'}</Button>
           {/* <div
                 style={{
