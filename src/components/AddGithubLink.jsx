@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useImperativeHandle } from "react";
 import { find as _find, get as _get, debounce as _debounce } from 'lodash';
 import { useWeb3React } from "@web3-react/core";
 import IconButton from "UIpack/IconButton";
@@ -21,7 +21,7 @@ import { nanoid } from "@reduxjs/toolkit";
 import { SupportedChainId } from "constants/chains";
 import useGithubAuth from "hooks/useGithubAuth";
 
-export default ({ title, desc, link, roleName, accessControl, okButton, onGuildCreateSuccess, renderButton = undefined, onSuccess, ...props }) => {
+export default ({ title, desc, link, roleName, accessControl, okButton, onGuildCreateSuccess, renderButton = undefined, onSuccess, validate=true, innerRef, ...props }) => {
 
     const { onOpen, onResetAuth, authorization, isAuthenticating } = useGithubAuth();
     const [addLinkLoading, setAddLinkLoading] = useState(null);
@@ -42,32 +42,33 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
             setAddLinkLoading(null);
     }, [prevIsAuthenticating, isAuthenticating])
 
-    const handleAddResource = async () => {
-        console.log(title, link)
-        if (title === '') {
-            return toast.error("Please enter title");
-        }
-        else if (link === '') {
-            return toast.error("Please enter link");
-        }
-        else if (!isValidUrl(link)) {
-            return toast.error("Please enter a valid link");
-        }
-        else {
-            setHasClickedAuth(true)
-            try {
-                setAddLinkLoading(true);
-                if (!authorization)
-                    return onOpen()
-                setHasClickedAuth(false);
-                console.log("authorization", authorization)
-                onSuccess({ code: authorization })
+    const handleAddResource = async (validate = true) => {
+        if(validate) {
+            if (title === '') {
+                return toast.error("Please enter title");
             }
-            catch (e) {
-                console.log(e)
-                setAddLinkLoading(null);
+            else if (link === '') {
+                return toast.error("Please enter link");
+            }
+            else if (!isValidUrl(link)) {
+                return toast.error("Please enter a valid link");
             }
         }
+         
+        setHasClickedAuth(true)
+        try {
+            setAddLinkLoading(true);
+            if (!authorization)
+                return onOpen()
+            setHasClickedAuth(false);
+            console.log("authorization", authorization)
+            onSuccess({ code: authorization })
+        }
+        catch (e) {
+            console.log(e)
+            setAddLinkLoading(null);
+        }
+        
     }
 
     if (renderButton) {
@@ -84,6 +85,15 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                         {addLinkLoading ? <LeapFrog size={20} color="#C84A32" /> : <AiOutlinePlus color="#FFF" size={25} />}
                     </button>
                     : renderButton}
+            </div>
+        )
+    }
+
+
+    if (renderButton && !validate) {
+        return (
+            <div onClick={() => handleAddResource()}>
+                { renderButton }
             </div>
         )
     }

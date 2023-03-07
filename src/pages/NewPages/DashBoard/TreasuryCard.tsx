@@ -134,10 +134,10 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
 	const exportableData = useMemo(() => {
 		if(pendingTxn && executedTxn) {
-			return transform([...(pendingTxn as []), ...(executedTxn as [])], true)
+			return transform([...(pendingTxn as []), ...(executedTxn as [])], labels, true)
 		} 
 		return []
-	}, [pendingTxn, executedTxn])
+	}, [pendingTxn, executedTxn, labels])
 
 	console.log("exportableData", exportableData)
 
@@ -766,7 +766,11 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 					</div> */}
 					{owner && tab === 1 && <SafeButton onClick={props.toggleModal} height={40} width={150} titleColor="#B12F15" title="SEND TOKEN" bgColor={!hasValidToken ? "#f0f2f6" : "#FFFFFF"} opacity={!hasValidToken ? "0.4" : "1"} disabled={!hasValidToken} fontweight={400} fontsize={16} />}
 					{/* <Button onClick={() => transform([...(pendingTxn as []), ...(executedTxn as [])])} size="small" variant="contained">DOWNLOAD</Button> */}
-					<CsvDownloadButton data={exportableData} />
+					{owner && tab === 1 && <CsvDownloadButton
+						className="downloadBtn"
+						filename={`${_get(DAO,'safe.address', 'export')}.csv`}
+						disabled={!hasValidToken}
+						data={exportableData} >EXPORT</CsvDownloadButton> }
 				</div>
 			</div>
 

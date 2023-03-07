@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { get as _get, find as _find } from 'lodash'
+import { get as _get, find as _find, pick as _pick } from 'lodash'
 import { useWeb3React } from "@web3-react/core"
 import useSafeTokens from "hooks/useSafeTokens";
 import { ethers } from 'ethers';
@@ -82,7 +82,7 @@ export default (safeAddress: string | null) => {
         }]
     }
 
-    const transformMultiOpeartion = (transaction: any) => {
+    const transformMultiOpeartion = (transaction: any, labels: any) => {
         const nativeToken = getNativeToken();
         if(!nativeToken)
             return [];
@@ -155,9 +155,12 @@ export default (safeAddress: string | null) => {
                         }
                     }
                 } else {
-                    const value = _get(_find(setAllowanceTxn?.dataDecoded?.parameters, p => p?.name === 'allowanceAmount'), 'value', '0')
+                    let value = _get(_find(setAllowanceTxn?.dataDecoded?.parameters, p => p?.name === 'allowanceAmount'), 'value', '0')
                     const allowanceToken: any = getERC20Token(_get(_find(setAllowanceTxn?.dataDecoded?.parameters, p => p?.name === 'token'), 'value', ''))
                     const to = _get(_find(setAllowanceTxn?.dataDecoded?.parameters, p => p?.name === 'delegate'), 'value', 0)
+                    let am = _get(_find(labels, (l:any) => l?.recipient?.toLowerCase() === to?.toLowerCase() && l.safeTxHash === transaction?.safeTxHash), "recurringPaymentAmount", null)
+                    if(am)
+                        value = (+am * ( 10 ** (allowanceToken?.token?.decimal || allowanceToken?.token?.decimals) ));
                     op.push({
                         safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
                         rejectionSafeTxHash: _get(transaction, 'rejectedTxn.safeTxHash', null),
@@ -185,6 +188,7 @@ export default (safeAddress: string | null) => {
         } else {
             const to = _get(_find(_get(transaction, 'dataDecoded.parameters'), p => p.name === 'to'), 'value', '0x')
             const value = _get(_find(_get(transaction, 'dataDecoded.parameters'), p => p.name === 'value'), 'value', 0)
+      
             return [{
                 safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
                 rejectionSafeTxHash: _get(transaction, 'rejectedTxn.safeTxHash', null),
@@ -205,7 +209,7 @@ export default (safeAddress: string | null) => {
                 canRejectTxn,
                 executor: _get(transaction, 'executor', '0x'),
                 submissionDate: _get(transaction, 'submissionDate', null),
-                executionDate: moment.utc(_get(transaction, 'executionDate', null)).format()
+                executionDate: _get(transaction, 'executionDate', null) ? moment.utc(_get(transaction, 'executionDate', null)).format() : ''
             }]
         }
         return op
@@ -308,11 +312,10 @@ export default (safeAddress: string | null) => {
         }]
     }
 
-    const transform = (transactions: any, exportCSV: boolean = false) => {
+    const transform = (transactions: any, labels = [], exportCSV: boolean = false) => {
         let output = []
         for (let index = 0; index < transactions.length; index++) {
             const transaction = transactions[index];
-            console.log("MULTISIG_TRANSACTION", transaction)
             if (transaction.txType === "ETHEREUM_TRANSACTION") {
                 const data = transformEthTxn(transaction)
                 output.push(data)
@@ -321,7 +324,7 @@ export default (safeAddress: string | null) => {
                     const data = transformNativeTokenSingleTransfer(transaction)
                     output.push(data)
                 } else if(isTokenMultiTransfer(transaction)) {
-                    const data = transformMultiOpeartion(transaction)
+                    const data = transformMultiOpeartion(transaction, labels)
                     output.push(data)
                 } else if(isERC20TokenSingleTransfer(transaction)) {
                     const data = transferERC20TokenSingleTransfer(transaction)
@@ -330,7 +333,7 @@ export default (safeAddress: string | null) => {
                     const data = transformOperationTxn(transaction)
                     output.push(data)
                 } else {
-                    const data = transformMultiOpeartion(transaction)
+                    const data = transformMultiOpeartion(transaction, labels)
                     output.push(data)
                 }
             }
@@ -340,9 +343,11 @@ export default (safeAddress: string | null) => {
             for (let index = 0; index < output.length; index++) {
                 const arr: any = output[index];
                 for (let j = 0; j < arr.length; j++) {
-                    const element = arr[j];
-                    if(element.value !== 0)
-                        exportData.push(element);
+                    let element = arr[j];
+                    if(element.value !== 0) {
+                        element = { ...element, label: _get(_find(labels, (l:any) => l?.recipient?.toLowerCase() === element.to.toLowerCase() && l?.safeTxHash === element.safeTxHash), "label", null) }
+                        exportData.push(_pick(element, ['safeTxHash', 'rejectionSafeTxHash', 'offChain', 'formattedValue', 'symbol', 'label', 'to', 'executor', 'submissionDate', 'executionDate']));
+                    }
                 }
             }
             return exportData
