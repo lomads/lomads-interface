@@ -42,7 +42,9 @@ body.active-modal {
     line-height: 16px;
     color: #1B2B41;
     margin-top: 6px;
-    width: calc(100% - 300px);
+    /* width: calc(100% - 300px); */
+    overflow-wrap: break-word;
+    max-width: 600px;
 }
 
 .DAOdetails .DAOsettings-container {
