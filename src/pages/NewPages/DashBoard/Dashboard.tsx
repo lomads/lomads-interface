@@ -269,7 +269,7 @@ const Dashboard = () => {
 						}
 					}
 				}
-				if (true) {
+				if (shouldUpdate) {
 					navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
 					break;
 				}
