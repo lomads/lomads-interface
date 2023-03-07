@@ -29,6 +29,8 @@ import uploadIcon from '../../assets/svg/ico-upload.svg';
 
 import LoginGithub from 'react-login-github';
 import Switch from "muiComponents/Switch";
+import { title } from "process";
+import useGithubAuth from "hooks/useGithubAuth";
 
 const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) => {
 
@@ -44,6 +46,7 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 	const [uploadLoading, setUploadLoading] = useState(false);
 	const [pullIssues, setPullIssues] = useState(false);
 	const [isAuthenticating, setIsAuthenticating] = useState(false);
+	const { onResetAuth } = useGithubAuth();
 	const dispatch = useDispatch()
 
 	useEffect(() => {
@@ -173,6 +176,7 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 				}
 			})
 			.catch((e) => {
+				onResetAuth()
 				console.log("error : ", e);
 				alert("Something went wrong");
 				setIsAuthenticating(false);
@@ -385,25 +389,28 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 									/>
 									:
 									<>
+													{ console.log(link) }
 										{
-											link && link.indexOf('github.') > -1 && pullIssues
+				
+											link && link.indexOf('github.') > -1
 												?
 												<>
 													{
-														isAuthenticating
-															?
-															<button className="githubAddButton active" disabled>
-																<LeapFrog size={20} color="#FFF" />
-															</button>
-															:
-															<LoginGithub
-																clientId={process.env.REACT_APP_GITHUB_CLIENT_ID}
-																scope="repo user admin:repo_hook admin:org"
-																onSuccess={onSuccess}
-																onFailure={onFailure}
-																className={linkTitle.length > 0 && isValidUrl(link) ? "githubAddButton active" : "githubAddButton"}
-																buttonText="+"
-															/>
+														// isAuthenticating
+														// 	?
+														// 	<button className="githubAddButton active" disabled>
+														// 		<LeapFrog size={20} color="#FFF" />
+														// 	</button>
+														// 	:
+															// <LoginGithub
+															// 	clientId={process.env.REACT_APP_GITHUB_CLIENT_ID}
+															// 	scope="repo user admin:repo_hook admin:org"
+															// 	onSuccess={onSuccess}
+															// 	onFailure={onFailure}
+															// 	className={linkTitle.length > 0 && isValidUrl(link) ? "githubAddButton active" : "githubAddButton"}
+															// 	buttonText="+"
+															// />
+															<AddGithubLink onSuccess={onSuccess} title={linkTitle} link={link} />
 													}
 												</>
 												:
@@ -427,7 +434,7 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 								link && link.indexOf('github.') > -1
 									?
 									<Box ml={2} my={2}>
-										<Switch onChange={() => setPullIssues(prev => !prev)} label="IMPORT ISSUES" />
+										<Switch checked={pullIssues} onChange={() => setPullIssues(prev => !prev)} label="IMPORT ISSUES" />
 									</Box>
 									:
 									<>
