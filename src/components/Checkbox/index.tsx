@@ -1,5 +1,6 @@
 import './index.css'
 import { FiCheck } from "react-icons/fi";
+import * as React from 'react';
 
 export default ({ checked = false, onChange }: any) => {
     return (

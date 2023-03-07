@@ -30,6 +30,8 @@ import AddMember from "./MemberCard/AddMember";
 import dashboardfooterlogo from "../../../assets/svg/dashboardfooterlogo.svg";
 import starDashboard from "../../../assets/svg/star_dashboard.svg";
 import tokenDashboard from "../../../assets/svg/token_dashboard.svg";
+import questionMarkDark from "../../../assets/svg/question-mark-dark.svg";
+import questionMarkLight from "../../../assets/svg/question-mark-light.svg";
 import { useAppDispatch } from "state/hooks";
 import { getCurrentUser, getDao, loadDao, storeGithubIssues } from "state/dashboard/actions";
 import { setDAO, setDAOList } from "state/dashboard/reducer";
@@ -39,11 +41,13 @@ import { updateCurrentNonce, updateSafeThreshold, updateSafeAddress } from "stat
 import { Tooltip } from "@chakra-ui/react";
 import useDCAuth from "hooks/useDCAuth";
 import MyProject from "./MyProject";
-
+import Steps from './WalkThrough/steps';
 import { useSBTStats } from "hooks/SBT/sbt";
 import Footer from "components/Footer";
 import EditMember from "./MemberCard/EditMember";
 import LinksArea from "./LinksArea";
+import WalkThroughModal from './WalkThrough/WalkThroughModal';
+import WalkThroughPopover from './WalkThrough/WalkThroughPopover';
 import useRole from "hooks/useRole";
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains';
 import { switchChain } from "utils/switchChain";
@@ -54,8 +58,42 @@ import CreateRecurring from "./TreasuryCard/CreateRecurring";
 import axiosHttp from 'api'
 import useEns from "hooks/useEns";
 import useMintSBT from "hooks/useMintSBT";
+import { default as MuiButton, ButtonProps  } from '@mui/material/Button';
+import CloseIcon from '@mui/icons-material/Close';
+import { styled } from '@mui/material/styles';
+import Stack from '@mui/material/Stack';
+import { grey } from '@mui/material/colors';
+
 import Button from "muiComponents/Button";
 const { toChecksumAddress } = require('ethereum-checksum-address')
+const HideHelpIconButton = styled(Button)<ButtonProps>(({ theme }) => ({
+	color: '#ffffff',
+	backgroundColor: '#1B2B41',
+	cursor: 'pointer',
+	width: 198,
+	height: 40,
+	radius: 5,
+	padding: 0,
+	fontFamily: "Inter, sans-serif",
+    fontSize: 16,
+	'&:hover': {
+		backgroundColor: '#1B2B41',
+	},
+}));
+const PlayWalkThroughButton = styled(Button)<ButtonProps>(({ theme }) => ({
+	color: '#C94B32',
+	backgroundColor: '#FFFFFF',
+	cursor: 'pointer',
+	width: 198,
+	height: 40,
+	radius: 5,
+	padding: 0,
+	fontFamily: "Inter, sans-serif",
+    fontSize: 16,
+	'&:hover': {
+		backgroundColor: '#FFFFFF',
+	},
+}));
 
 const Dashboard = () => {
 	const dispatch = useAppDispatch();
@@ -67,6 +105,7 @@ const Dashboard = () => {
 	console.log("DAO : ", DAO);
 	const [update, setUpdate] = useState(0);
 	const treasuryRef = useRef<any>();
+	const anchorRef = useRef<any>()
 	const { provider, account, chainId, connector } = useWeb3React();
 	console.log("chainId : ", chainId, provider);
 	const safeAddress = useAppSelector((state) => state.flow.safeAddress);
@@ -89,6 +128,10 @@ const Dashboard = () => {
 	const [recurringTxn, setRecurringTxn] = useState<any>(null);
 	const [safeOwners, setSafeOwners] = useState<any>(null);
 	const [checkLoading, setCheckLoading] = useState<boolean>(true);
+	const [currWalkThroughObj, setWalkThroughObj] = useState<any>(Steps[0]);
+	const [showWalkThrough, setShowWalkThrough] = useState<boolean>(true);
+	const [isHelpIconOpen, setIsHelpIconOpen] = useState<boolean>(false);
+	const [displayHelpOptions, setDisplayHelpOptions] = useState<boolean>(false);
 	const currentNonce = useAppSelector((state) => state.flow.currentNonce);
 	const { myRole, displayRole, permissions, can, isSafeOwner } = useRole(DAO, account);
 	const { getENSAddress, getENSName } = useEns()
@@ -220,12 +263,12 @@ const Dashboard = () => {
 
 	useEffect(() => {
 		if (chainId && !account)
-		navigate("/login", {
-			replace: true,
-			state: {
-			  from: window.location.pathname
-			}
-		  });
+			navigate("/login", {
+				replace: true,
+				state: {
+					from: window.location.pathname
+				}
+			});
 	}, [chainId, account])
 
 	useEffect(() => {
@@ -275,7 +318,7 @@ const Dashboard = () => {
 				}
 			}
 		}
-		if(from)
+		if (from)
 			navigate(from)
 	}
 
@@ -317,7 +360,7 @@ const Dashboard = () => {
 					} else {
 						console.log('Switch chain to', DAO.chainId)
 					}
-				})				
+				})
 			}
 		}
 	}, [chainId, DAO, getStats, account]);
@@ -483,6 +526,54 @@ const Dashboard = () => {
 		setShowCreateRecurring(true)
 	}
 
+	const endWalkThrough = () => setShowWalkThrough(false)
+	const incrementWalkThroughSteps = () => {
+		if (anchorRef.current) {
+			anchorRef.current.style = {}
+		}
+
+		if (currWalkThroughObj.step === 7) {
+			endWalkThrough()
+			return
+		}
+		const nextObj = Steps[currWalkThroughObj.step + 1]
+		anchorRef.current = document.getElementById(nextObj.id)
+		anchorRef.current.scrollIntoView({
+			behavior: 'auto',
+			block: 'center',
+			inline: 'center'
+		});
+		anchorRef.current.style.zIndex = 35
+
+		if (nextObj.step >= 6) {
+			if (nextObj.step === 6) {
+				anchorRef.current.style.boxShadow = '0px 0px 20px rgba(181, 28, 72, 0.6)'
+			}
+			else {
+				anchorRef.current.style.boxShadow = 'none'
+			}
+		}
+		setWalkThroughObj(nextObj)
+
+	}
+
+	const startWalkThroughAtStepOne = () => {
+		setShowWalkThrough(true)
+		const workspace = Steps[1]
+		setWalkThroughObj(workspace)
+		anchorRef.current = document.getElementById(workspace.id)
+		anchorRef.current.scrollIntoView({
+			behavior: 'auto',
+			block: 'center',
+			inline: 'center'
+		});
+		anchorRef.current.style.zIndex = 35
+	}
+
+	const expandHelpOptions = () => {
+		setIsHelpIconOpen(!isHelpIconOpen)
+	}
+
 	return (
 		<>
 			{!validDaoChain || !DAO || DAOLoading || (daoURL && (DAO && DAO.url !== daoURL)) ?
@@ -494,6 +585,21 @@ const Dashboard = () => {
 						<LeapFrog size={50} color="#C94B32" />
 					</div>
 				</div> : null}
+			{(showWalkThrough || isHelpIconOpen)
+				&& <div className="overlay"></div>}
+			<WalkThroughModal
+				beginWalkThrough={incrementWalkThroughSteps}
+				showConfirmation={showWalkThrough && currWalkThroughObj.step === 0}
+				endWalkThrough={endWalkThrough}
+				obj={currWalkThroughObj}
+			/>
+			<WalkThroughPopover
+				displayPopover={showWalkThrough && currWalkThroughObj.step > 0}
+				obj={currWalkThroughObj}
+				incrementWalkThroughSteps={incrementWalkThroughSteps}
+				endWalkThrough={endWalkThrough}
+				anchorEl={anchorRef.current}
+			/>
 			<div
 				className="dashBoardBody"
 				onMouseEnter={() => {
@@ -610,6 +716,37 @@ const Dashboard = () => {
 					toggleShowMember={toggleShowMember}
 				/>
 			)}
+
+			<div className={`help-option ${isHelpIconOpen ? 'z-index-60' : ''}`}
+				id="question-mark"
+				onClick={expandHelpOptions}>
+				{isHelpIconOpen
+					&&
+					<Stack spacing={2}>
+						<PlayWalkThroughButton
+							variant="contained"
+							className="play-walkthrough"
+							onClick={startWalkThroughAtStepOne}>
+							Play walk through
+            			</PlayWalkThroughButton>
+						{/* <Button
+              				variant="contained"
+              				onClick={incrementWalkThroughSteps}
+              				size="small">
+              				Lomads’Telegram
+            			</Button> */}
+						<HideHelpIconButton
+							startIcon={<CloseIcon />}
+							onClick={() => setIsHelpIconOpen(false)}
+							variant="contained">
+							Hide help icon
+						</HideHelpIconButton>
+					</Stack>
+				}
+				<img src={((showWalkThrough && currWalkThroughObj.step === 7) || isHelpIconOpen)
+					? questionMarkDark
+					: questionMarkLight} />
+			</div>
 			<SideBar
 				name={_get(DAO, 'name', '')}
 				showSideBar={showSideBar}
@@ -619,7 +756,8 @@ const Dashboard = () => {
 			{showEditMember && <EditMember toggleShowEditMember={toggleShowEditMember} DAO={DAO} amIAdmin={amIAdmin} account={account} />}
 
 			{/* create task side modal */}
-			{showCreateTask && <CreateTask toggleShowCreateTask={toggleShowCreateTask} selectedProject={null} />}
+			{showCreateTask
+				&& <CreateTask toggleShowCreateTask={toggleShowCreateTask} selectedProject={null} />}
 
 			{/* Create recurring payment side modal */}
 			{showCreateRecurring && <CreateRecurring transaction={recurringTxn} onRecurringPaymentCreated={() => treasuryRef?.current?.reload()} toggleShowCreateRecurring={toggleShowCreateRecurring} />}

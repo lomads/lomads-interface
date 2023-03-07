@@ -6,7 +6,7 @@ import { AutoColumn } from "components/Column";
 import { AutoRow } from "components/Row";
 import { ConnectionType, injectedConnection } from "connection";
 import { getConnection } from "connection/utils";
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { ArrowLeft } from "react-feather";
 import { updateConnectionError } from "state/connection/reducer";
 import { useAppDispatch, useAppSelector } from "state/hooks";

@@ -120,7 +120,7 @@ const MemberCard = (props: any) => {
 	};
 	return (
 		<>
-			<div className="memberCard">
+			<div className="memberCard" id="members">
 				<div className="treasuryHeader">
 					<div className="titleHeader">Members</div>
 					<div className="memberHeaderDetails">

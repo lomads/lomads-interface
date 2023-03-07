@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { find as _find } from 'lodash';
 import useScrollPosition from "@react-hook/window-scroll";
 import { useWeb3React } from "@web3-react/core";

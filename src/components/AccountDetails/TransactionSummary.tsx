@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/macro";
 import { Fraction, TradeType } from "@uniswap/sdk-core";
 import JSBI from "jsbi";
-
+import * as React from 'react';
 import { nativeOnChain } from "constants/tokens";
 import { useCurrency, useToken } from "hooks/Tokens";
 import {

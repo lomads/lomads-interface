@@ -1,3 +1,4 @@
+import React from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import { get as _get } from 'lodash'
 import { Box, Typography } from '@mui/material';

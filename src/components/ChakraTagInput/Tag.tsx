@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import type { MouseEvent, SyntheticEvent } from "react";
 
 import { Tag, TagLabel, TagCloseButton } from "@chakra-ui/react";

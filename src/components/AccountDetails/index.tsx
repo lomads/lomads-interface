@@ -3,7 +3,7 @@ import { useWeb3React } from "@web3-react/core";
 import { CopyHelper } from "./Copy";
 import { coinbaseWalletConnection, injectedConnection } from "connection";
 import { getConnection } from "connection/utils";
-import { useCallback, useContext, useEffect } from "react";
+import React, { useCallback, useContext, useEffect } from "react";
 import { ExternalLink as LinkIcon } from "react-feather";
 import { useAppDispatch } from "state/hooks";
 import { updateSelectedWallet } from "state/user/reducer";

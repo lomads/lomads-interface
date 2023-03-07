@@ -1,5 +1,6 @@
 import { LeapFrog } from "@uiball/loaders";
 import lomadsfulllogo from "assets/svg/lomadsfulllogo.svg";
+import React from 'react'
 
 export default () => {
     return (

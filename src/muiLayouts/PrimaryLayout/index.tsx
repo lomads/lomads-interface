@@ -7,6 +7,7 @@ import { Container } from '@mui/system';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Header from "components/Header";
+import React from 'react';
 import { useAppSelector } from 'state/hooks';
 import palette from 'muiTheme/palette';
 import { useNavigate } from 'react-router-dom';

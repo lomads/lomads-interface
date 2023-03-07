@@ -1,4 +1,5 @@
 import styled, { keyframes } from 'styled-components/macro'
+import * as React from 'react';
 
 const rotate = keyframes`
   from {
