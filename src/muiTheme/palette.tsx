@@ -21,9 +21,9 @@ export default {
 	},
 	success: {
 		contrastText: white,
-		dark: green[900],
-		main: green[600],
-		light: green[400]
+		dark: '#005e50',
+		main: "#188C7C",
+		light: '#56bdab'
 	},
 	info: {
 		contrastText: white,

@@ -76,7 +76,7 @@ const SideBar = (props: any) => {
 							}}
 						>
 							<div className="navbarText">
-								<img src={plus} alt="add" />
+								<img style={{ transform: 'rotate(0deg)', marginLeft: -1 }} src={plus} alt="add" />
 							</div>
 						</div>
 						<div id="createADAOText">Create</div>

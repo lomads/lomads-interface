@@ -2,9 +2,11 @@
 import { AiOutlineClose } from "react-icons/ai";
 import IconButton from "UIpack/IconButton";
 import "./Settings.css";
+import { Box } from "@mui/material";
 import "./Settings.css";
 import OD from "../../assets/images/drawer-icons/OD.svg";
-import { Button, Image, Input } from "@chakra-ui/react";
+import Button from "muiComponents/Button";
+import { Image, Input } from "@chakra-ui/react";
 import { ReactComponent as CompensateIcon } from "../../assets/images/settings-page/8-compensate-member.svg";
 import moment from 'moment';
 import daoMember2 from "../../assets/svg/daoMember2.svg";
@@ -93,7 +95,7 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
 			<>
 				<div style={{margin:'12px 0'}}>
 					<div className="memberRow">
-						<div className="avatarAndName" style={{ minWidth: "25%" }}>
+						<div className="avatarAndName" style={{ minWidth: "25%", flexGrow: 1 }}>
 							<img src={daoMember2} alt="avatar" />
 							<div style={{marginRight:11, minWidth:92}} className="dashboardText">{name}</div>
 						</div>
@@ -123,6 +125,7 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
 
   const createTransaction = async () => {
 		try {
+      if(!sweatMembers || sweatMembers.length == 0) throw "No entries"
 			//setError(null)
 			let sendTotal = total
 			let selToken = _find(safeTokens, t => t.tokenAddress === currency)
@@ -226,7 +229,7 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
           className="overlay"
         ></div>
         <div className="SideModal">
-          <div className="closeButtonArea">
+          <div className="closeButtonArea" style={{ position: 'fixed' }}>
             <IconButton
               Icon={
                 <AiOutlineClose
@@ -292,15 +295,15 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
               </div>
             </div>
           </div>
-          <div id="cm-info"
+          <div id="cm-info" style={{ paddingBottom : 120 }}
           >
             All SWEAT counter will be reset to 0.
           </div>
           {/* //! FOOTER */}
-          <div className="button-section">
+          <Box position="fixed" backgroundColor='#FFF' bottom={0} pb={3} pt={2} display="flex" flexDirection="row">
             <Button
-              variant="outline"
-              mr={3}
+              variant="outlined"
+              sx={{ mr: 1 }}
               onClick={() => {
                // toggleModal();
                 toggleCompensate();
@@ -308,8 +311,8 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
             >
               Cancel
             </Button>
-            <Button disabled={loading || safeTokens.length == 0} style={{ backgroundColor: loading ? 'grey' : '#C94B32' }} onClick={() => createTransaction()} id="button-save">SEND TOKENS</Button>
-          </div>
+            <Button disabled={loading || safeTokens.length == 0} fullWidth style={{ backgroundColor: loading ? 'grey' : '#C94B32' }} onClick={() => createTransaction()} id="button-save">SEND TOKENS</Button>
+          </Box>
         </div>
       </div>
       {showCompensateMembersDoneModal && (

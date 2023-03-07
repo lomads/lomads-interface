@@ -42,7 +42,9 @@ body.active-modal {
     line-height: 16px;
     color: #1B2B41;
     margin-top: 6px;
-    width: calc(100% - 300px);
+    /* width: calc(100% - 300px); */
+    overflow-wrap: break-word;
+    max-width: 600px;
 }
 
 .DAOdetails .DAOsettings-container {
@@ -267,7 +269,22 @@ body.active-modal {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    gap: 60px;
+    gap: 20px;
+}
+
+.headerDetails .downloadBtn {
+    padding: 0px 10px 0px 10px;
+    box-shadow: 3px 5px 4px rgb(27 43 65 / 5%), -3px -3px 8px rgb(201 75 50 / 10%);
+    border-radius: 5px;
+    border-width: 0px;
+    border-color: #FFFFFF;
+    height: 40px;
+    width: 150px;
+    font-size: 16px;
+    font-weight: 400;
+    color: rgb(177, 47, 21);
+    background-color: rgb(255, 255, 255);
+    opacity: 1;
 }
 
 .vl {
@@ -324,7 +341,7 @@ body.active-modal {
     /* overflow: hidden; */
     white-space: nowrap;
     text-overflow: ellipsis;
-    width: 10%;
+    /* width: 10%; */
 }
 
 .roleContainer {
@@ -855,12 +872,12 @@ body.active-modal {
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    min-height: 70vh;
-    max-height: 70vh;
+    /* min-height: 70vh;
+    max-height: 70vh; */
     width: 100%;
-    padding-bottom: 60px;
-    overflow-y: auto;
+    padding-bottom: 150px;
     gap: 35px;
+    /* overflow-y: auto; */
 }
 
 #recipientButtonArea {
@@ -999,6 +1016,10 @@ body.active-modal {
 
 .invertedBox img {
     transform: rotate(-45deg);
+    width: 141%;
+    height: 141%;
+    flex-shrink: 0;
+    max-width: 141%;
 }
 
 .stripInvertedBox {
@@ -1046,6 +1067,10 @@ body.active-modal {
 
 .stripInvertedBoxOutline img {
     transform: rotate(-45deg);
+    width: 141%;
+    height: 141%;
+    flex-shrink: 0;
+    max-width: 141%;
 }
 
 #transactionSuccessPage {
@@ -1065,10 +1090,12 @@ body.active-modal {
     max-height: fit-content;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-self: center;
+    /* justify-content: center; */
+    /* align-self: center; */
     overflow-y: auto;
+    overflow-x: hidden;
     gap: 35px;
+    padding-bottom: 80px;
 }
 
 #transactionSendDivider1,
@@ -1179,13 +1206,13 @@ body.active-modal {
 .SelectNewRecipientPage {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    /* justify-content: center; */
     align-items: center;
     margin-top: 70px;
     min-height: 100%;
     width: 100%;
     gap: 35px;
-
+    overflow-y: scroll;
 }
 
 #voteArea {
@@ -1267,11 +1294,11 @@ body.active-modal {
 }
 
 #recipientListandButtons {
-    min-height: fit-content;
-    max-height: 60%;
+    /* min-height: fit-content;
+    max-height: 60%; */
     width: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
+    /* overflow-y: auto;
+    overflow-x: hidden; */
     display: flex;
     flex-direction: column;
     justify-content: flex-start;

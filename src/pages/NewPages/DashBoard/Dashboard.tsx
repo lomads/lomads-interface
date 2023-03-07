@@ -58,12 +58,13 @@ import CreateRecurring from "./TreasuryCard/CreateRecurring";
 import axiosHttp from 'api'
 import useEns from "hooks/useEns";
 import useMintSBT from "hooks/useMintSBT";
-import Button, { ButtonProps } from '@mui/material/Button';
+import { default as MuiButton, ButtonProps  } from '@mui/material/Button';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import Stack from '@mui/material/Stack';
 import { grey } from '@mui/material/colors';
 
+import Button from "muiComponents/Button";
 const { toChecksumAddress } = require('ethereum-checksum-address')
 const HideHelpIconButton = styled(Button)<ButtonProps>(({ theme }) => ({
 	color: '#ffffff',

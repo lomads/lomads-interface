@@ -6,16 +6,11 @@ import Footer from "components/Footer";
 import { LeapFrog } from "@uiball/loaders";
 
 import {
-    Button,
     Menu,
     MenuButton,
     MenuList,
     MenuItem,
-    MenuItemOption,
-    MenuGroup,
-    MenuOptionGroup,
-    MenuDivider,
-  } from '@chakra-ui/react'
+  } from '@mui/material'
 
   import ShareSVG from '../../assets/svg/share.svg'
   import copyIcon from "assets/svg/copyIcon.svg";
@@ -82,6 +77,15 @@ const TaskDetails = () => {
     console.log("Task : ", Task);
     const daoName = _get(DAO, 'name', '').split(" ");
     const { myRole, can } = useRole(DAO, account)
+
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => {
+      setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+      setAnchorEl(null);
+    };
 
     const [openApply, setOpenApply] = useState(false);
     const [openSubmit, setOpenSubmit] = useState(false);
@@ -700,25 +704,27 @@ const TaskDetails = () => {
                                                         null
                                                 }
                                                 {(amICreator || can(myRole, 'task.share')) &&
-                                                <Menu>
-                                                    <MenuButton>
-                                                        <button style={{ 
-                                                            marginLeft: 0,
-                                                            background: 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)',
-                                                            height: '40px',
-                                                            minWidth: '40px',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'center',
-                                                            borderRadius: '5px'
-                                                         }}>
-                                                            <img style={{ width: 18, height: 18 }} src={ShareSVG} alt="settings-icon" />
-                                                        </button>
-                                                    </MenuButton>
-                                                    <MenuList style={{ display: 'flex', flexDirection: 'column', width: 350 }}>
+                                                <>
+                                                <button onClick={handleClick} style={{ 
+                                                    marginLeft: '12px',
+                                                    background: 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)',
+                                                    height: '40px',
+                                                    minWidth: '40px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    borderRadius: '5px'
+                                                 }}>
+                                                    <img style={{ width: 18, height: 18 }} src={ShareSVG} alt="settings-icon" />
+                                                </button>
+                                                <Menu
+                                                    anchorEl={anchorEl}
+                                                    open={open}
+                                                    onClose={handleClose}
+                                                >
                                                     <MenuItem style={{ marginLeft: 0, height: 40 }}>
                                                             <TwitterShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/task/${taskId}/preview`}>
-                                                                <div style={{ width: '100%' }}>
+                                                                <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                                                     <TwitterIcon size={32}/>
                                                                     <div style={{ marginLeft: 16 }}>Twitter</div>
                                                                 </div>
@@ -726,7 +732,7 @@ const TaskDetails = () => {
                                                         </MenuItem>
                                                         <MenuItem style={{ marginLeft: 0, height: 40 }}>
                                                             <TelegramShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/task/${taskId}/preview`}>
-                                                                <div style={{ width: '100%' }}>
+                                                                <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                                                     <TelegramIcon size={32}/>
                                                                     <div style={{ marginLeft: 16 }}>Telegram</div>
                                                                 </div>
@@ -734,7 +740,7 @@ const TaskDetails = () => {
                                                         </MenuItem>
                                                         <MenuItem style={{ marginLeft: 0, height: 40 }}>
                                                             <WhatsappShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/task/${taskId}/preview`}>
-                                                                <div style={{ width: '100%' }}>
+                                                                <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                                                     <WhatsappIcon size={32}/>
                                                                     <div style={{ marginLeft: 16 }}>Whatsapp</div>
                                                                 </div>
@@ -743,15 +749,15 @@ const TaskDetails = () => {
                                                         <MenuItem onClick={() => {
                                                             navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/task/${taskId}/preview`)
                                                         }} style={{ marginLeft: 0, height: 40 }}>
-                                                            <div style={{ paddingLeft: 22 }}>
-                                                                <div style={{ width: '100%' }}>
+                                                            <div style={{  }}>
+                                                                <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                                                     <img style={{ marginLeft: 8 }} src={copyIcon} />
                                                                     <div style={{ marginLeft: 24 }}>Copy to clipboard</div>
                                                                 </div>
                                                             </div>
                                                         </MenuItem>
-                                                    </MenuList>
                                                 </Menu>
+                                                </>
                                                 }
                                             </div>
                                         </div>

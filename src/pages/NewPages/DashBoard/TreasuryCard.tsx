@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useRef, useState, useMemo, useImperativeHandle, useCallback } from "react";
 import { get as _get, sortBy as _sortBy, orderBy as _orderBy, filter as _filter, map as _map, find as _find } from 'lodash';
 import { useAppDispatch, useAppSelector } from "state/hooks";
@@ -45,7 +46,39 @@ import { GNOSIS_SAFE_ALLOWANCE_MODULE_CONTRACT } from 'constants/chains';
 import RecurringTxn from "./TreasuryCard/RecurringTxn";
 import { updateSafeThreshold } from "state/flow/reducer";
 import RecurringTxnTreasury from "./TreasuryCard/RecurringTxnTreasury";
+import useGnosisTxnTransform from "hooks/useGnosisTxnTransform";
+import Button from "muiComponents/Button";
+import CsvDownloadButton from 'react-json-to-csv'
 const { toChecksumAddress } = require('ethereum-checksum-address')
+
+const HEADERS = [
+	{ key: "nonce", name: "nonce" },
+	{ key: "safeTxHash", name: "safeTxHash" },
+	{ key: "formattedValue", name: "formattedValue" },
+	{ key: "symbol", name: "symbol" },
+	{ key: "to", name: "to" },
+	{ key: "confirmations", name: "confirmations" },
+	{ key: "submissionDate", name: "submissionDate" },
+	{ key: "executionDate", name: "executionDate" },
+	// safeTxHash: _get(transaction, 'safeTxHash', "0"),
+	// rejectionSafeTxHash: _get(transaction, 'rejectedTxn.safeTxHash', null),
+	// nonce: _get(transaction, 'nonce', "0"),
+	// value: 0,
+	// formattedValue: "0",
+	// symbol: "",
+	// decimals: "",
+	// to: "0x",
+	// confimationsRequired: _get(transaction, 'confirmationsRequired', 0),
+	// confirmations: _get(transaction, 'confirmations', []).length,
+	// hasMyConfirmation: hasMyConfirmation ? true: false,
+	// hasRejection: transaction?.rejectedTxn ? true : false,
+	// hasMyRejection: hasMyRejection ? true : false,
+	// rejections: _get(transaction, 'rejectedTxn.confirmations', []).length,
+	// canExecuteTxn,
+	// canRejectTxn,
+	// submissionDate: _get(transaction, 'submissionDate', null),
+	// executionDate: _get(transaction, 'executionDate', null)
+]
 
 
 const TreasuryCard = (props: ItreasuryCardType) => {
@@ -70,6 +103,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	const node = useRef<HTMLDivElement>()
 	const [editMode, setEditMode] = useState<any>();
 	const [lowBalanceError, setLowBalanceError] = useState<any>(null);
+
 	useOnClickOutside(node, () => editMode ? setEditMode(null) : undefined)
 	useState<Array<any>>();
 	//const [recurringTxnQueue, setRecurringTxnQueue] = useState<Array<any>>();
@@ -82,6 +116,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	const { createSafeTransaction, createSafeTxnLoading } = useSafeTransaction(_get(DAO, 'safe.address', ''))
 
 	const { tokenBalance } = useSafeTokens(_get(DAO, 'safe.address', ''))
+	const { transform }  = useGnosisTxnTransform(_get(DAO, 'safe.address', ''))
 
 	const { myRole, can, isSafeOwner } = useRole(DAO, account);
 
@@ -96,6 +131,15 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	// 		setTab(2)
 	// 	}
 	// }, [recurringPayments, owner])
+
+	const exportableData = useMemo(() => {
+		if(pendingTxn && executedTxn) {
+			return transform([...(pendingTxn as []), ...(executedTxn as [])], labels, true)
+		} 
+		return []
+	}, [pendingTxn, executedTxn, labels])
+
+	console.log("exportableData", exportableData)
 
 	const getSafeTokens = async () => {
 		if (!chainId) return [];
@@ -721,6 +765,15 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 						}
 					</div> */}
 					{owner && tab === 1 && <SafeButton onClick={props.toggleModal} height={40} width={150} titleColor="#B12F15" title="SEND TOKEN" bgColor={!hasValidToken ? "#f0f2f6" : "#FFFFFF"} opacity={!hasValidToken ? "0.4" : "1"} disabled={!hasValidToken} fontweight={400} fontsize={16} />}
+					{/* <Button onClick={() => transform([...(pendingTxn as []), ...(executedTxn as [])])} size="small" variant="contained">DOWNLOAD</Button> */}
+					{owner && tab === 1 && <CsvDownloadButton
+						className="downloadBtn"
+						style={{
+							backgroundColor: !hasValidToken ? "#f0f2f6" : "#FFFFFF"
+						}}
+						filename={`${_get(DAO,'safe.address', 'export')}.csv`}
+						disabled={!hasValidToken}
+						data={exportableData} >EXPORT</CsvDownloadButton> }
 				</div>
 			</div>
 
