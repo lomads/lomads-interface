@@ -58,7 +58,27 @@ import CreateRecurring from "./TreasuryCard/CreateRecurring";
 import axiosHttp from 'api'
 import useEns from "hooks/useEns";
 import useMintSBT from "hooks/useMintSBT";
+import Button, { ButtonProps } from '@mui/material/Button';
+import CloseIcon from '@mui/icons-material/Close';
+import { styled } from '@mui/material/styles';
+import Stack from '@mui/material/Stack';
+import { grey } from '@mui/material/colors';
+
 const { toChecksumAddress } = require('ethereum-checksum-address')
+const ColorButton = styled(Button)<ButtonProps>(({ theme }) => ({
+	color: '#000',
+	backgroundColor: '#1B2B41',
+	cursor: 'pointer',
+	width: 198,
+	height: 40,
+	radius: 5,
+	padding: 0,
+	fontFamily: "Inter, sans-serif",
+    fontSize: 16,
+	'&:hover': {
+		backgroundColor: '#1B2B41',
+	},
+}));
 
 const Dashboard = () => {
 	const dispatch = useAppDispatch();
@@ -95,6 +115,7 @@ const Dashboard = () => {
 	const [checkLoading, setCheckLoading] = useState<boolean>(true);
 	const [currWalkThroughObj, setWalkThroughObj] = useState<any>(Steps[0]);
 	const [showWalkThrough, setShowWalkThrough] = useState<boolean>(true);
+	const [isHelpIconOpen, setIsHelpIconOpen] = useState<boolean>(false);
 	const [displayHelpOptions, setDisplayHelpOptions] = useState<boolean>(false);
 	const currentNonce = useAppSelector((state) => state.flow.currentNonce);
 	const { myRole, displayRole, permissions, can, isSafeOwner } = useRole(DAO, account);
@@ -495,8 +516,7 @@ const Dashboard = () => {
 		if (anchorRef.current) {
 			anchorRef.current.style = {}
 		}
-		console.log(currWalkThroughObj, '...endWalkThrough...')
-		// end step
+
 		if (currWalkThroughObj.step === 7) {
 			endWalkThrough()
 			return
@@ -504,22 +524,39 @@ const Dashboard = () => {
 		const nextObj = Steps[currWalkThroughObj.step + 1]
 		anchorRef.current = document.getElementById(nextObj.id)
 		anchorRef.current.scrollIntoView({
-            behavior: 'auto',
-            block: 'center',
-            inline: 'center'
-        });
+			behavior: 'auto',
+			block: 'center',
+			inline: 'center'
+		});
 		anchorRef.current.style.zIndex = 35
 
 		if (nextObj.step >= 6) {
-			if (nextObj.step === 6){
-				anchorRef.current.style.boxShadow = '0px 0px 20px rgba(181, 28, 72, 0.6)'	
+			if (nextObj.step === 6) {
+				anchorRef.current.style.boxShadow = '0px 0px 20px rgba(181, 28, 72, 0.6)'
 			}
 			else {
 				anchorRef.current.style.boxShadow = 'none'
 			}
-		} 
+		}
 		setWalkThroughObj(nextObj)
 
+	}
+
+	const startWalkThroughAtStepOne = () => {
+		setShowWalkThrough(true)
+		const workspace = Steps[1]
+		setWalkThroughObj(workspace)
+		anchorRef.current = document.getElementById(workspace.id)
+		anchorRef.current.scrollIntoView({
+			behavior: 'auto',
+			block: 'center',
+			inline: 'center'
+		});
+		anchorRef.current.style.zIndex = 35
+	}
+
+	const expandHelpOptions = () => {
+		setIsHelpIconOpen(!isHelpIconOpen)
 	}
 
 	return (
@@ -533,7 +570,8 @@ const Dashboard = () => {
 						<LeapFrog size={50} color="#C94B32" />
 					</div>
 				</div> : null}
-			{showWalkThrough && <div className="overlay"></div>}
+			{(showWalkThrough || isHelpIconOpen)
+				&& <div className="overlay"></div>}
 			<WalkThroughModal
 				beginWalkThrough={incrementWalkThroughSteps}
 				showConfirmation={showWalkThrough && currWalkThroughObj.step === 0}
@@ -664,9 +702,35 @@ const Dashboard = () => {
 				/>
 			)}
 
-			<div className="help-option" id="question-mark">
-				   <img src={((showWalkThrough && currWalkThroughObj.step === 7) || displayHelpOptions) 
-				   			? questionMarkDark : questionMarkLight } />
+			<div className={`help-option ${isHelpIconOpen ? 'z-index-60' : ''}`}
+				id="question-mark"
+				onClick={expandHelpOptions}>
+				{isHelpIconOpen
+					&&
+					<Stack spacing={2}>
+						<Button
+							variant="contained"
+							className="play-walkthrough"
+							onClick={startWalkThroughAtStepOne}>
+							Play walk through
+            			</Button>
+						{/* <Button
+              				variant="contained"
+              				onClick={incrementWalkThroughSteps}
+              				size="small">
+              				Lomads’Telegram
+            			</Button> */}
+						<ColorButton
+							startIcon={<CloseIcon />}
+							onClick={() => setIsHelpIconOpen(false)}
+							variant="contained">
+							Hide help icon
+						</ColorButton>
+					</Stack>
+				}
+				<img src={((showWalkThrough && currWalkThroughObj.step === 7) || isHelpIconOpen)
+					? questionMarkDark
+					: questionMarkLight} />
 			</div>
 			<SideBar
 				name={_get(DAO, 'name', '')}
