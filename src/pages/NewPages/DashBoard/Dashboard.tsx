@@ -65,8 +65,8 @@ import Stack from '@mui/material/Stack';
 import { grey } from '@mui/material/colors';
 
 const { toChecksumAddress } = require('ethereum-checksum-address')
-const ColorButton = styled(Button)<ButtonProps>(({ theme }) => ({
-	color: '#000',
+const HideHelpIconButton = styled(Button)<ButtonProps>(({ theme }) => ({
+	color: '#ffffff',
 	backgroundColor: '#1B2B41',
 	cursor: 'pointer',
 	width: 198,
@@ -77,6 +77,20 @@ const ColorButton = styled(Button)<ButtonProps>(({ theme }) => ({
     fontSize: 16,
 	'&:hover': {
 		backgroundColor: '#1B2B41',
+	},
+}));
+const PlayWalkThroughButton = styled(Button)<ButtonProps>(({ theme }) => ({
+	color: '#C94B32',
+	backgroundColor: '#FFFFFF',
+	cursor: 'pointer',
+	width: 198,
+	height: 40,
+	radius: 5,
+	padding: 0,
+	fontFamily: "Inter, sans-serif",
+    fontSize: 16,
+	'&:hover': {
+		backgroundColor: '#FFFFFF',
 	},
 }));
 
@@ -708,24 +722,24 @@ const Dashboard = () => {
 				{isHelpIconOpen
 					&&
 					<Stack spacing={2}>
-						<Button
+						<PlayWalkThroughButton
 							variant="contained"
 							className="play-walkthrough"
 							onClick={startWalkThroughAtStepOne}>
 							Play walk through
-            			</Button>
+            			</PlayWalkThroughButton>
 						{/* <Button
               				variant="contained"
               				onClick={incrementWalkThroughSteps}
               				size="small">
               				Lomads’Telegram
             			</Button> */}
-						<ColorButton
+						<HideHelpIconButton
 							startIcon={<CloseIcon />}
 							onClick={() => setIsHelpIconOpen(false)}
 							variant="contained">
 							Hide help icon
-						</ColorButton>
+						</HideHelpIconButton>
 					</Stack>
 				}
 				<img src={((showWalkThrough && currWalkThroughObj.step === 7) || isHelpIconOpen)
