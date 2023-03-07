@@ -159,10 +159,10 @@ export default function WalkThroughPopover({
             <img src={obj?.imgPath} />
           </div>
           <div className="tooltip-right">
-            <Typography id="modal-modal-title" variant="h4" component="h2">
+            <Typography className="popper-title" component="h2" variant="h4">
               {obj?.title}
             </Typography>
-            <p>{obj?.content}</p>
+            <p className="text-content" dangerouslySetInnerHTML={{ __html: obj?.content }} />
             <Button
               variant="contained"
               onClick={incrementWalkThroughSteps}

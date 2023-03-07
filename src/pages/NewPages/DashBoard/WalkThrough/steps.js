@@ -10,7 +10,7 @@ const steps = [{
       step: 0,
       id: 'walkthrough-modal',
       title: 'Welcome to your Lomads Dashboard!',
-      content: 'We’re excited to have you here, and would love to walk you through all of our key features!',
+      content: 'We’re excited to have you here, and would love<br /> to walk you through all of our <b>key features!</b>',
       buttonText: "LET'S GO",
       buttonText2: 'LATER THANKS!',
       imgPath: stepOneWalkthrough,
@@ -20,7 +20,7 @@ const steps = [{
     step: 1,
     id: 'my-workspace',
     title: 'Create Workspaces',
-    content: 'Here, you can create customized workspaces for all of your teams, manage milestones, and track key results.',
+    content: 'Here, you can create <b>customized workspaces</b> <br /> for all of your teams, <b>manage milestones,</b> <br /> and <b>track key results.</b>',
     buttonText: '1/7  NEXT',
     imgPath: stepOneWalkthrough,
     placement: 'top-end'
@@ -29,7 +29,7 @@ const steps = [{
     step: 2,
     id: 'my-task',
     title: 'Create Tasks',
-    content: 'By creating tasks, you can track progress, deadlines, and rewards on bounties, and assign contributors to each task.',
+    content: 'By creating tasks, you can <b>track progress,</b><br /> <b>deadlines,</b> and <b>rewards on bounties,</b> and <b>assign contributors</b> to each task.',
     buttonText: '2/7 NEXT',
     imgPath: stepTwoWalkthrough,
     placement: 'top-end'
@@ -38,7 +38,7 @@ const steps = [{
     step: 3,
     id: 'treasury-management',
     title: 'Treasury Management',
-    content: 'Managing and automating your treasury has never been easier! Here you can approve and send token payments manually, or set up recurring payments to team members!',
+    content: 'Managing and automating your treasury has <br />never been easier! Here you can approve and <br /><b>send token payments</b> manually, or <b>set up <br />recurring payments</b> to team members!',
     imgPath: stepThreeWalkthrough,
     buttonText: '3/7 NEXT',
     placement: 'top-end'
@@ -47,7 +47,7 @@ const steps = [{
     step: 4,
     id: 'treasury-management',
     title: 'Bootstrapping?',
-    content: 'Turn on SWEAT points in settings to track contributions for future rewards.',
+    content: 'Turn on <b>SWEAT points</b> in settings to track <br />contributions for future rewards.',
     imgPath: stepFourWalkthrough,
     buttonText: '4/7 NEXT',
     placement: 'top-end'
@@ -56,7 +56,7 @@ const steps = [{
     step: 5,
     id: 'members',
     title: 'Members',
-    content: 'Add new members and manage details and roles of existing members.',
+    content: '<b>Add new members</b> <br />and <b>manage details and roles </b> of existing <br />members.',
     imgPath: stepFiveWalkthrough,
     buttonText: '5/7 NEXT',
     placement: 'top-end'
@@ -65,7 +65,7 @@ const steps = [{
     step: 6,
     id: 'global-settings',
     title: 'Global settings',
-    content: 'Customize your Dashboard with settings: edit organization details, manage treasury signatories, launch pass tokens, enable SWEAT points, and personalize terminologies. Explore now!',
+    content: 'Customize your Dashboard with settings: <b>edit <br />organization details,</b> manage <b>treasury signatories,<br /> launch <b>pass tokens,</b> enable <b>SWEAT points,</b> and <br />personalize terminologies. Explore now!',
     imgPath: stepSixWalkthrough,
     buttonText: '6/7 NEXT',
     placement: 'left-start'
@@ -74,7 +74,7 @@ const steps = [{
     step: 7,
     id: 'question-mark',
     title: 'Well done!',
-    content: 'If you need any help or tips, you will find it here.',
+    content: 'If you need any help or tips,<br /> you will find it here.',
     imgPath: stepSevenWalkthrough,
     buttonText: 'END',
     placement: 'top'

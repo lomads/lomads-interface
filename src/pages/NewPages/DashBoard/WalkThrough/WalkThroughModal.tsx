@@ -10,25 +10,30 @@ import './WalkThrough.css'
 export default function WalkThrough({
   showConfirmation,
   beginWalkThrough,
-  endWalkThrough
+  endWalkThrough,
+  obj,
 }: {
   showConfirmation: boolean,
   beginWalkThrough: any,
-  endWalkThrough: any
+  endWalkThrough: any,
+  obj: any
 }) {
 
   return (
-    <BasicModal isOpen={showConfirmation} key={showConfirmation.toString() + Math.random() + 'walkThrough'}>
+    <BasicModal 
+        isOpen={showConfirmation}
+        key={showConfirmation.toString() + Math.random() + 'walkThrough'}
+        parentClose={endWalkThrough}
+       >
       <div className="confirm-walkthrough">
         <div className="close-btn" onClick={endWalkThrough}>
           <img src={CloseBtn} />
         </div>
         <img src={WalkThroughStart} />
-        <Typography id="modal-modal-title" variant="h4" component="h2">
-          Welcome to your Lomads Dashboard!
+        <Typography id="modal-modal-title">
+         {obj.title}
         </Typography>
-        <p>We’re excited to have you here, and would love <br />
-          to walk you through all of our key features!</p>
+        <p className="text-content" dangerouslySetInnerHTML={{ __html: obj?.content }} />
         <Stack spacing={2} direction="row">
           <Button
             variant="outlined"

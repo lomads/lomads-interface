@@ -11,7 +11,8 @@ const style = {
   borderRadius: '20px',
 };
 
-export default ({ children, isOpen = false }: { children: React.ReactElement, isOpen: boolean }) => {
+export default ({ children, isOpen = false, parentClose }: 
+  { children: React.ReactElement, isOpen: boolean, parentClose: any  }) => {
   const [open, setOpen] = useState(isOpen);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -19,7 +20,7 @@ export default ({ children, isOpen = false }: { children: React.ReactElement, is
   return (
     <Modal
       open={open}
-      onClose={handleClose}
+      onClose={parentClose}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
