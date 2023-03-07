@@ -493,7 +493,7 @@ const Dashboard = () => {
 	const endWalkThrough = () => setShowWalkThrough(false)
 	const incrementWalkThroughSteps = () => {
 		if (anchorRef.current) {
-			anchorRef.current.style.zIndex = 0
+			anchorRef.current.style = {}
 		}
 		console.log(currWalkThroughObj, '...endWalkThrough...')
 		// end step
@@ -538,6 +538,7 @@ const Dashboard = () => {
 				beginWalkThrough={incrementWalkThroughSteps}
 				showConfirmation={showWalkThrough && currWalkThroughObj.step === 0}
 				endWalkThrough={endWalkThrough}
+				obj={currWalkThroughObj}
 			/>
 			<WalkThroughPopover
 				displayPopover={showWalkThrough && currWalkThroughObj.step > 0}

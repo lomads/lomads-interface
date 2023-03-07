@@ -3,7 +3,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 93px 23px;
     gap: 35px;
     background: #FFFFFF;
     border: none;
@@ -13,12 +12,13 @@
     border: none !important;
     width: 700px;
     height: 490px;
+    position: relative;
 }
 
 .close-btn {
     cursor: pointer;
     position: absolute;
-    right: 3%;
+    right: 2%;
     top: 3%;
     background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
     border-radius: '10%';
@@ -57,26 +57,41 @@
     height: 247px;
     padding: 0;
     border-radius: 10px;
+    margin-left: 20px;
 }
 
-/* .MuiPopover-root {
-    position: fixed; 
-    width: 100%; 
-    height: 100%; 
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0,0,0,0.5);
-    z-index: 100;
-    cursor: pointer;
-} */
+#modal-modal-title {
+    color: #C94B32;
+    font-family: 'Inter', sans-serif;;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 33px;
+    text-align: center;
+}
 
-/* .MuiPopover-paper {
-    z-index: 1499;
-    margin: 20px;
-    position: relative;
-} */
+.text-content {
+    font-family: 'Inter', sans-serif;;
+    font-style: normal;
+    font-weight: 400;
+    align-self: center;
+    text-align: center;
+    color: #76808D;
+    padding-bottom: 25px;
+}
+
+.popper-title {
+    font-family: 'Inter', sans-serif;;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 25px;
+    display: flex;
+    align-self: center;
+    text-align: center;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
 
 .arrow {
     position: absolute;
