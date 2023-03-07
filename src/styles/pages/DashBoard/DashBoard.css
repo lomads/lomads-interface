@@ -267,7 +267,22 @@ body.active-modal {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    gap: 60px;
+    gap: 20px;
+}
+
+.headerDetails .downloadBtn {
+    padding: 0px 10px 0px 10px;
+    box-shadow: 3px 5px 4px rgb(27 43 65 / 5%), -3px -3px 8px rgb(201 75 50 / 10%);
+    border-radius: 5px;
+    border-width: 0px;
+    border-color: #FFFFFF;
+    height: 40px;
+    width: 150px;
+    font-size: 16px;
+    font-weight: 400;
+    color: rgb(177, 47, 21);
+    background-color: rgb(255, 255, 255);
+    opacity: 1;
 }
 
 .vl {

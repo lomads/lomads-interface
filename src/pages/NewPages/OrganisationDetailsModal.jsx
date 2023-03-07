@@ -45,6 +45,7 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 	const [droppedfiles, setDroppedfiles] = useState([]);
 	const [uploadLoading, setUploadLoading] = useState(false);
 	const [pullIssues, setPullIssues] = useState(false);
+	const [importRoles, setImportRoles] = useState(false);
 	const [isAuthenticating, setIsAuthenticating] = useState(false);
 	const { onResetAuth } = useGithubAuth();
 	const dispatch = useDispatch()
@@ -109,11 +110,14 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 	}
 
 	const handleOnServerAdded = serverId => {
-		axiosHttp.post(`discord/guild/${serverId}/sync-roles`, { daoId: _get(DAO, '_id') })
+		if(importRoles) {
+			axiosHttp.post(`discord/guild/${serverId}/sync-roles`, { daoId: _get(DAO, '_id') })
 			.then(res => {
 				addLink()
-				//dispatch(setDAO(res.data))
 			})
+		} else {
+			addLink()
+		}
 	}
 
 	const onDrop = useCallback(acceptedFiles => { setDroppedfiles(acceptedFiles) }, [])
@@ -441,13 +445,9 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 										{
 											link && link.indexOf('discord.') > -1
 												?
-												<div className="link-toggle-section">
-													<label class="switch" style={{ marginTop: "10px" }}>
-														<input type="checkbox" />
-														<span class="slider round"></span>
-													</label>
-													<span className="toggle-text">IMPORT ROLES</span>
-												</div>
+												<Box ml={2} my={2}>
+													<Switch checked={importRoles} onChange={() => setImportRoles(prev => !prev)} label="IMPORT ROLES" />
+												</Box>
 												:
 												null
 										}
