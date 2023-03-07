@@ -3,6 +3,7 @@ import IconButton from "UIpack/IconButton";
 import "./Settings.css";
 import OD from "../../assets/images/drawer-icons/OD.svg";
 import axios from "axios";
+import { Box } from "@mui/material";
 import Button from "muiComponents/Button";
 import CurrencyInput from 'muiComponents/CurrencyInput'
 import { ReactComponent as CompensateIcon } from "../../assets/images/settings-page/8-compensate-member.svg";
@@ -152,24 +153,30 @@ const CompensateMembersModal = ({ toggleModal, toggleCompensate }) => {
               {/* </Select>
             </div>
           </div> */}
-          <CurrencyInput
-            value={sweatValue ? sweatValue : 0} 
-            onChange={(value) => {
-              setSweatValue(value)
-            }} 
-            options={
-              safeTokens.map(t => {
-                return {
-                  value: t.tokenAddress,
-                  label: t.token.symbol
-                }
-              })
-            } 
-            dropDownvalue={currency} 
-            onDropDownChange = {(value) => {
-              setCurrency(value)
-            }} 
-          />
+          <Box alignItems="center" display="flex" flexDirection="row">
+            <Box mr={2} alignItems="center" display="flex" flexDirection="row" className='currency-container'>
+                {_get(null, 'compensation.symbol', 'SWEAT') === 'MATIC' ? <PolygonIcon /> : <StarIcon />}
+                <div style={{ marginLeft: 8 }}>{"1 SWT = "}</div>
+            </Box>
+            <CurrencyInput
+              value={sweatValue ? sweatValue : 0} 
+              onChange={(value) => {
+                setSweatValue(value)
+              }} 
+              options={
+                safeTokens.map(t => {
+                  return {
+                    value: t.tokenAddress,
+                    label: t.token.symbol
+                  }
+                })
+              } 
+              dropDownvalue={currency} 
+              onDropDownChange = {(value) => {
+                setCurrency(value)
+              }} 
+            />
+          </Box>
           <Button variant="contained" onClick={() => setShowCompensateMembersDescriptionModals(true)}>{'Next'}</Button>
           {/* <div
                 style={{

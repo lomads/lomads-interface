@@ -339,7 +339,7 @@ body.active-modal {
     /* overflow: hidden; */
     white-space: nowrap;
     text-overflow: ellipsis;
-    width: 10%;
+    /* width: 10%; */
 }
 
 .roleContainer {
