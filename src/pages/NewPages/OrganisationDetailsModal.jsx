@@ -9,7 +9,7 @@ import CloseSVG from 'assets/svg/close-new.svg'
 import OD from "../../assets/images/drawer-icons/OD.svg";
 import { Image, Input, Textarea } from "@chakra-ui/react";
 import { useAppSelector } from "state/hooks";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { get as _get, find as _find } from 'lodash';
 import { isValidUrl } from "utils";
 import { useDispatch } from "react-redux";
@@ -33,7 +33,7 @@ import { title } from "process";
 import useGithubAuth from "hooks/useGithubAuth";
 
 const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) => {
-
+	const githubRef = useRef();
 	const { DAO, updateDaoLoading, updateDaoLinksLoading, storeGithubIssuesLoading } = useAppSelector((state) => state.dashboard);
 	const [name, setName] = useState(_get(DAO, 'name', ''));
 	const [oUrl, setOUrl] = useState(_get(DAO, 'url', ''));
@@ -215,6 +215,10 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 	}
 
 	const onFailure = response => console.error("git res : ", response);
+
+	const removeGithubLink = () => {
+		
+	}
 
 	return (
 		<>
@@ -414,7 +418,7 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 															// 	className={linkTitle.length > 0 && isValidUrl(link) ? "githubAddButton active" : "githubAddButton"}
 															// 	buttonText="+"
 															// />
-															<AddGithubLink onSuccess={onSuccess} title={linkTitle} link={link} />
+															<AddGithubLink  innerRef={githubRef} onSuccess={onSuccess} title={linkTitle} link={link} />
 													}
 												</>
 												:
@@ -489,14 +493,25 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 														textOverflow: 'ellipsis'
 													}}>{item.link}</p>
 												</div>
-												<div
-													className="deleteButton"
-													onClick={() => {
-														deleteLink(item);
-													}}
-												>
-													<AiOutlineClose style={{ height: 15, width: 15 }} />
-												</div>
+												{
+														item.link && item.link.indexOf('github.') > -1 ? 
+														<AddGithubLink 
+														renderButton={<div
+															className="deleteButton"
+														>
+															<AiOutlineClose style={{ height: 15, width: 15 }} />
+														</div>}
+														onSuccess={removeGithubLink} validate={false} /> : 
+														<div
+															className="deleteButton"
+															onClick={() => {
+																deleteLink(item);
+															}}
+														>
+															<AiOutlineClose style={{ height: 15, width: 15 }} />
+														</div>
+
+												}
 											</div>
 										)
 									})}

@@ -188,6 +188,7 @@ export default (safeAddress: string | null) => {
         } else {
             const to = _get(_find(_get(transaction, 'dataDecoded.parameters'), p => p.name === 'to'), 'value', '0x')
             const value = _get(_find(_get(transaction, 'dataDecoded.parameters'), p => p.name === 'value'), 'value', 0)
+      
             return [{
                 safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
                 rejectionSafeTxHash: _get(transaction, 'rejectedTxn.safeTxHash', null),
@@ -208,7 +209,7 @@ export default (safeAddress: string | null) => {
                 canRejectTxn,
                 executor: _get(transaction, 'executor', '0x'),
                 submissionDate: _get(transaction, 'submissionDate', null),
-                executionDate: moment.utc(_get(transaction, 'executionDate', null)).format()
+                executionDate: _get(transaction, 'executionDate', null) ? moment.utc(_get(transaction, 'executionDate', null)).format() : ''
             }]
         }
         return op
