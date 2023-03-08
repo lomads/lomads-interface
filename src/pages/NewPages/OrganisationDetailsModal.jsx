@@ -108,12 +108,25 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 	}
 
 	const deleteLink = (response, item) => {
-		console.log("response : ", response);
 		if (item.link.indexOf('github.') > -1) {
 			let repoInfo = extractGitHubRepoPath(item.link);
 			let ob = _get(DAO, `github.${repoInfo}`, null)
 			if (ob) {
-				dispatch(deleteDaoLink({ url: DAO?.url, payload: { link: item, repoInfo, webhookId: ob.webhookId, token: response.code } }))
+				axiosHttp.get(`utility/getGithubAccessToken?code=${response.code}&repoInfo=${repoInfo}`)
+					.then((res) => {
+						if (res.data) {
+							dispatch(deleteDaoLink({ url: DAO?.url, payload: { link: item, repoInfo, webhookId: ob.webhookId, token: res.data.access_token } }))
+						}
+						else {
+							console.log("No res : Something went wrong");
+						}
+						onResetAuth();
+					})
+					.catch((e) => {
+						onResetAuth()
+						console.log("error : ", e);
+					})
+
 			}
 			else {
 				// no import issues github link
