@@ -526,11 +526,18 @@ const Dashboard = () => {
 		setShowCreateRecurring(true)
 	}
 
-	const endWalkThrough = () => setShowWalkThrough(false)
-	const incrementWalkThroughSteps = () => {
+	const endWalkThrough = () => {
+		setShowWalkThrough(false)
+		clearWalkThroughStyles()
+	}
+
+	const clearWalkThroughStyles = () => {
 		if (anchorRef.current) {
 			anchorRef.current.style = {}
 		}
+	}
+	const incrementWalkThroughSteps = () => {
+		clearWalkThroughStyles()
 
 		if (currWalkThroughObj.step === 7) {
 			endWalkThrough()
