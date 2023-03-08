@@ -4,7 +4,7 @@ import { t, Trans } from "@lingui/macro";
 import { useWeb3React } from "@web3-react/core";
 import { getConnection } from "connection/utils";
 import { darken } from "polished";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Activity } from "react-feather";
 import { useAppSelector } from "state/hooks";
 import styled, { css } from "styled-components/macro";

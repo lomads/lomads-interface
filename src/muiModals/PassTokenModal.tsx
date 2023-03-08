@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { get as _get } from 'lodash'
 import { 
     Drawer, Box, Typography, Paper
@@ -303,7 +303,7 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
                                 <Box width={300}>
                                     { state?.priced &&
                                     <CurrencyInput
-                                        value={_get(state, 'price.value')} 
+                                        value={_get(state, 'price.value', 0)} 
                                         onChange={(value: any) => {
                                             setState((prev: any)=> { return { ...prev, price : { ...prev.price, value: value } } })
                                         }} 

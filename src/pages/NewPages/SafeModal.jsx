@@ -2,6 +2,7 @@ import { AiOutlineClose } from "react-icons/ai";
 import IconButton from "UIpack/IconButton";
 import { get as _get, find as _find } from 'lodash';
 import './SafeModal.css';
+import Button from "muiComponents/Button";
 import copyIcon from "../../assets/svg/copyIcon.svg";
 import { Tooltip } from "@chakra-ui/react";
 import editIcon from 'assets/svg/editButton.svg';
@@ -10,7 +11,8 @@ import SearchSettingsSvg from 'assets/svg/search-settings.svg';
 import OD from "../../assets/images/drawer-icons/OD.svg";
 import { ImportSafe, safeService } from "connection/SafeCall";
 import SafeIcon from "../../assets/svg/safe.svg";
-import { Button, Image, Input } from "@chakra-ui/react";
+import TextInput from "muiComponents/TextInput";
+import { Image, Input } from "@chakra-ui/react";
 import { useEffect, useMemo, useState } from "react";
 import { useAppSelector } from "state/hooks";
 import { useWeb3React } from "@web3-react/core";
@@ -182,9 +184,9 @@ const SafeModal = ({ toggleS }) => {
 						})
 					}
 					<div className="button-section">
-						<Button onClick={() => setShowEdit(false)} className="chakra-button btn-cancel">CANCEL</Button>
-						<SimpleLoadButton height={40} title="SAVE OWNERS" width={200} bgColor={!((newOwners && newOwners.length > 0) || (removeOwners && removeOwners.length > 0)) || newOwnerCount == 0 ? 'grey' : "#C94B32"} condition={false} disabled={newOwnerCount == 0 || !((newOwners && newOwners.length > 0) || (removeOwners && removeOwners.length > 0))}
-							onClick={() => setShowConfirmation(true)} className="chakra-button btn-save"></SimpleLoadButton>
+						<Button sx={{mr:1}} variant="outlined" fullWidth onClick={() => setShowEdit(false)}>CANCEL</Button>
+						<Button fullWidth variant="contained" loading={false} disabled={newOwnerCount == 0 || !((newOwners && newOwners.length > 0) || (removeOwners && removeOwners.length > 0))}
+							onClick={() => setShowConfirmation(true)}>SAVE</Button>
 					</div>
 				</div>
 			</>
@@ -253,8 +255,11 @@ const SafeModal = ({ toggleS }) => {
 										}}
 									>
 										<div>
-											<div id="text-type-od">Name</div>
-											<Input value={safeName} variant="filled" onChange={(evt) => setSafeName(evt.target.value)} placeholder="Safe name" />
+			
+											<TextInput 
+												value={safeName}
+												onChange={(e) => setSafeName(e.target.value)}
+												placeholder="Epic dao" sx={{ my: 1 }} fullWidth label="Name" />
 										</div>
 										<div style={{ marginTop: 16 }} className="copyArea" onClick={() => setCopy(true)} onMouseOut={() => setCopy(false)}>
 											<Tooltip label={copy ? "copied" : "copy"}>
@@ -306,7 +311,7 @@ const SafeModal = ({ toggleS }) => {
 									{/* //! FOOTER */}
 									<div className="button-section" style={{ display: 'flex' }}>
 										<Button
-											variant="outline"
+											variant="outlined"
 											mr={3}
 											className="btn-cancel"
 											onClick={() => {
@@ -315,7 +320,7 @@ const SafeModal = ({ toggleS }) => {
 										>
 											Cancel
 										</Button>
-										<SimpleLoadButton height={40} title="SAVE CHANGES" width={200} bgColor={updateOwnerLoading ? 'grey' : "#C94B32"} condition={updateOwnerLoading} disabled={updateOwnerLoading}
+										<Button variant="contained" loading={updateOwnerLoading} disabled={updateOwnerLoading}
 											onClick={async () => {
 												// add name condition
 												if (currentThreshold !== thresholdValue) {
@@ -326,7 +331,7 @@ const SafeModal = ({ toggleS }) => {
 													toggleS();
 												}
 											}}
-											className="chakra-button btn-save">SAVE CHANGES</SimpleLoadButton>
+											>SAVE CHANGES</Button>
 									</div>
 								</div>
 					}

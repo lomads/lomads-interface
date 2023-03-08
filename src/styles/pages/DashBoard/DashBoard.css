@@ -42,7 +42,9 @@ body.active-modal {
     line-height: 16px;
     color: #1B2B41;
     margin-top: 6px;
-    width: calc(100% - 300px);
+    /* width: calc(100% - 300px); */
+    overflow-wrap: break-word;
+    max-width: 600px;
 }
 
 .DAOdetails .DAOsettings-container {
@@ -339,7 +341,7 @@ body.active-modal {
     /* overflow: hidden; */
     white-space: nowrap;
     text-overflow: ellipsis;
-    width: 10%;
+    /* width: 10%; */
 }
 
 .roleContainer {
@@ -724,6 +726,7 @@ body.active-modal {
 .overlay {
     background: #1B2B41;
     opacity: 0.2;
+    z-index: 10;
 }
 
 .sidebarModal {
@@ -935,7 +938,7 @@ body.active-modal {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 50;
 }
 
 /* @media only screen and (min-width: 1280px) {
@@ -1346,7 +1349,7 @@ body.active-modal {
 
 
 .ErrorText {
-    font-family: 'Open Sans';
+    font-family: 'Inter', sans-serif;;
     font-style: normal;
     font-weight: 800;
     font-size: 16px;
@@ -1551,6 +1554,33 @@ body.active-modal {
     content: url(../../../assets/images/drawer-icons/ico-check.svg);
 }
 
+.help-option {
+    margin-left: 33px;
+    bottom: 44px;
+    position: sticky;
+    width: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.play-walkthrough{
+    width: 198px;
+    height: 40px;
+    position: absolute;
+    color: #FFF;
+}
+
+.hide-help {
+    width: 198px;
+    height: 40px;
+    position: absolute;
+    background: #1B2B41;
+    border-radius: 5px;
+}
+
+.z-index-60 {
+    z-index: 60;
+}
 /* 
 input:checked+.inner-check:before {
     -webkit-transform: translateX(35px);

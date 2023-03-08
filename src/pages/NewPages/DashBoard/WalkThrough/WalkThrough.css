@@ -1,0 +1,110 @@
+.confirm-walkthrough{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 35px;
+    background: #FFFFFF;
+    border: none;
+    overflow: hidden;
+    padding: 40px;
+    border-radius: 20px;
+    border: none !important;
+    width: 700px;
+    height: 490px;
+    position: relative;
+}
+
+.close-btn {
+    cursor: pointer;
+    position: absolute;
+    right: 2%;
+    top: 3%;
+    background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
+    border-radius: '10%';
+}
+
+.tooltip-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-self: center;
+    width: 464px;
+    padding: 30px;
+}
+
+.tooltip-left {
+    background: #F0F0F0;
+    border-radius: 10px 0px 0px 10px;
+    width: 186px;
+    height: 247px;
+    align-self: center;
+    padding: 20px;
+}
+
+.MuiTooltip-arrow {
+    color: #FFF !important;
+}
+
+.tooltip {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background: #FFFFFF;
+    width: 650px;
+    height: 247px;
+    padding: 0;
+    border-radius: 10px;
+    margin-left: 20px;
+}
+
+#modal-modal-title {
+    color: #C94B32;
+    font-family: 'Inter', sans-serif;;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 33px;
+    text-align: center;
+}
+
+.text-content {
+    font-family: 'Inter', sans-serif;;
+    font-style: normal;
+    font-weight: 400;
+    align-self: center;
+    text-align: center;
+    color: #76808D;
+    padding-bottom: 25px;
+}
+
+.popper-title {
+    font-family: 'Inter', sans-serif;;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 25px;
+    display: flex;
+    align-self: center;
+    text-align: center;
+    letter-spacing: -0.011em;
+    color: #76808D;
+}
+
+.arrow {
+    position: absolute;
+    font-size: 7px;
+    width: 3em;
+    height: 3em;
+  }
+
+.arrow :before {
+    content: '';
+    margin: auto;
+    display: block;
+    width: 0;
+    height: 0;
+    border-style: solid;
+  }

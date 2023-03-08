@@ -703,7 +703,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		return null
 
 	return (
-		<div className="treasuryCard">
+		<div className="treasuryCard" id="treasury-management">
 			<div className="treasuryHeader">
 				<div style={{ display: 'flex', alignItems: 'center' }}>
 					{(can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') &&
@@ -768,6 +768,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 					{/* <Button onClick={() => transform([...(pendingTxn as []), ...(executedTxn as [])])} size="small" variant="contained">DOWNLOAD</Button> */}
 					{owner && tab === 1 && <CsvDownloadButton
 						className="downloadBtn"
+						style={{
+							backgroundColor: !hasValidToken ? "#f0f2f6" : "#FFFFFF"
+						}}
 						filename={`${_get(DAO,'safe.address', 'export')}.csv`}
 						disabled={!hasValidToken}
 						data={exportableData} >EXPORT</CsvDownloadButton> }

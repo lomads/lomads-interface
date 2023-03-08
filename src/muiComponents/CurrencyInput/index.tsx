@@ -14,7 +14,7 @@ import {
 import { makeStyles } from '@mui/styles';
 import TextInput from 'muiComponents/TextInput';
 import IconButton from "muiComponents/IconButton";
-import { useState } from "react";
+import React, { useState } from "react";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -50,11 +50,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default ({ options, onChange, value, dropDownvalue, onDropDownChange, disabled, disableSelect }: any) => {
+    console.log(value)
     const classes = useStyles()
     return (
         <div className={classes.pickerContainer}>
             <div className={classes.numberInput}>
-                <NumberInput isDisabled={disabled} value={value} onChange={e => onChange(e)} defaultValue={0} style={{ width: (100 + 50), height: 50, borderWidth: 1, borderColor: 'rgba(27, 43, 65, 0.1)', borderRightWidth: 0, borderRadius: '10px 0px 0px 10px' }} step={1} min={0}>
+                <NumberInput isDisabled={disabled} value={value || 0} onChange={e => onChange(e)} defaultValue={0} style={{ width: (100 + 50), height: 50, borderWidth: 1, borderColor: 'rgba(27, 43, 65, 0.1)', borderRightWidth: 0, borderRadius: '10px 0px 0px 10px' }} step={1} min={0}>
                     <NumberInputField className='input' style={{ padding: 0, textAlign: "center", height: 50, width: 100, backgroundColor: '#F5F5F5', borderTopRightRadius: 0, borderBottomRightRadius: 0, borderTopLeftRadius: 10, borderBottomLeftRadius: 10, borderWidth: 0 }} />
                     <NumberInputStepper style={{ width: 50, backgroundColor: 'transparent', borderRadius: '0px 10px 10px 0px' }}>
                     <NumberIncrementStepper color="#C94B32" children={<DropupRed />} />

@@ -235,7 +235,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
 
 
     return (
-        <div className="tasks-container">
+        <div className="tasks-container" id="my-task">
             <div className="tasks-header">
                 <div className="tasks-title">
                     <button className={tab === 1 ? 'active' : null} onClick={() => setTab(1)}>

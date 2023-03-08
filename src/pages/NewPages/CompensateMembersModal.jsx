@@ -3,6 +3,7 @@ import IconButton from "UIpack/IconButton";
 import "./Settings.css";
 import OD from "../../assets/images/drawer-icons/OD.svg";
 import axios from "axios";
+import { Box } from "@mui/material";
 import Button from "muiComponents/Button";
 import CurrencyInput from 'muiComponents/CurrencyInput'
 import { ReactComponent as CompensateIcon } from "../../assets/images/settings-page/8-compensate-member.svg";
@@ -154,12 +155,11 @@ const CompensateMembersModal = ({ toggleModal, toggleCompensate }) => {
           {/* </Select>
             </div>
           </div> */}
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-
-            <div style={{ marginRight: '10px', display: 'flex', alignItems: 'center' }}>
-              <img src={starXP} style={{ marginRight: '5px' }} />
-              <span style={{ color: '#76808D', fontWeight: '700' }}> 1 XP = </span>
-            </div>
+          <Box alignItems="center" display="flex" flexDirection="row">
+            <Box mr={2} alignItems="center" display="flex" flexDirection="row" className='currency-container'>
+              {_get(null, 'compensation.symbol', 'SWEAT') === 'MATIC' ? <PolygonIcon /> : <StarIcon />}
+              <div style={{ marginLeft: 8 }}>{"1 SWT = "}</div>
+            </Box>
             <CurrencyInput
               value={sweatValue ? sweatValue : 0}
               onChange={(value) => {
@@ -178,8 +178,7 @@ const CompensateMembersModal = ({ toggleModal, toggleCompensate }) => {
                 setCurrency(value)
               }}
             />
-
-          </div>
+          </Box>
           <Button variant="contained" onClick={() => setShowCompensateMembersDescriptionModals(true)}>{'Next'}</Button>
           {/* <div
                 style={{
