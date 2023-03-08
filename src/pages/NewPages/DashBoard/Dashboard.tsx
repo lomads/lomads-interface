@@ -33,7 +33,7 @@ import tokenDashboard from "../../../assets/svg/token_dashboard.svg";
 import questionMarkDark from "../../../assets/svg/question-mark-dark.svg";
 import questionMarkLight from "../../../assets/svg/question-mark-light.svg";
 import { useAppDispatch } from "state/hooks";
-import { getCurrentUser, getDao, loadDao, storeGithubIssues } from "state/dashboard/actions";
+import { getCurrentUser, getDao, loadDao, storeGithubIssues, updateDao } from "state/dashboard/actions";
 import { setDAO, setDAOList } from "state/dashboard/reducer";
 import copyIcon from "../../../assets/svg/copyIcon.svg";
 import { useDispatch } from "react-redux";
@@ -129,7 +129,7 @@ const Dashboard = () => {
 	const [safeOwners, setSafeOwners] = useState<any>(null);
 	const [checkLoading, setCheckLoading] = useState<boolean>(true);
 	const [currWalkThroughObj, setWalkThroughObj] = useState<any>(Steps[0]);
-	const [showWalkThrough, setShowWalkThrough] = useState<boolean>(true);
+	const [showWalkThrough, setShowWalkThrough] = useState<boolean>(false);
 	const [isHelpIconOpen, setIsHelpIconOpen] = useState<boolean>(false);
 	const [displayHelpOptions, setDisplayHelpOptions] = useState<boolean>(false);
 	const currentNonce = useAppSelector((state) => state.flow.currentNonce);
@@ -185,6 +185,11 @@ const Dashboard = () => {
 		// }
 		// requestReposIssues('Lomads-Technologies/soulbound-token');
 	}, [DAO]);
+
+	useEffect(() => {
+		if(DAO && !DAO?.walkthrough)
+			setShowWalkThrough(true)
+	}, [DAO])
 
 	const amIAdmin = useMemo(() => {
 		if (DAO) {
@@ -526,7 +531,11 @@ const Dashboard = () => {
 		setShowCreateRecurring(true)
 	}
 
-	const endWalkThrough = () => setShowWalkThrough(false)
+	const endWalkThrough = () => {
+		dispatch(updateDao({ url: _get(DAO,'url', ''), payload: { walkthrough: true }}))
+		setShowWalkThrough(false)
+	}
+
 	const incrementWalkThroughSteps = () => {
 		if (anchorRef.current) {
 			anchorRef.current.style = {}
