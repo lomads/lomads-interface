@@ -21,7 +21,7 @@ import { nanoid } from "@reduxjs/toolkit";
 import { SupportedChainId } from "constants/chains";
 import useGithubAuth from "hooks/useGithubAuth";
 
-export default ({ title, desc, link, roleName, accessControl, okButton, onGuildCreateSuccess, renderButton = undefined, onSuccess, validate=true, innerRef, ...props }) => {
+export default ({ title, desc, link, roleName, accessControl, okButton, onGuildCreateSuccess, renderButton = undefined, onSuccess, validate = true, innerRef, ...props }) => {
 
     const { onOpen, onResetAuth, authorization, isAuthenticating } = useGithubAuth();
     const [addLinkLoading, setAddLinkLoading] = useState(null);
@@ -30,6 +30,7 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
     const prevAuth = usePrevious(authorization)
 
     useEffect(() => {
+        console.log("auth : ", authorization);
         if (((prevAuth == undefined && authorization) || (prevAuth && authorization && prevAuth !== authorization)) && link && hasClickedAuth) {
             handleAddResource()
         }
@@ -42,8 +43,8 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
             setAddLinkLoading(null);
     }, [prevIsAuthenticating, isAuthenticating])
 
-    const handleAddResource = async (validate = true) => {
-        if(validate) {
+    const handleAddResource = () => {
+        if (validate) {
             if (title === '') {
                 return toast.error("Please enter title");
             }
@@ -54,7 +55,6 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                 return toast.error("Please enter a valid link");
             }
         }
-         
         setHasClickedAuth(true)
         try {
             setAddLinkLoading(true);
@@ -68,10 +68,10 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
             console.log(e)
             setAddLinkLoading(null);
         }
-        
+
     }
 
-    if (renderButton) {
+    if (renderButton && validate) {
         return (
             <div onClick={() => {
                 if (!(link === '' || title === '' || addLinkLoading))
@@ -93,7 +93,7 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
     if (renderButton && !validate) {
         return (
             <div onClick={() => handleAddResource()}>
-                { renderButton }
+                {renderButton}
             </div>
         )
     }

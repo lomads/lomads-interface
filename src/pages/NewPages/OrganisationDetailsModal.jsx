@@ -107,12 +107,13 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 		}
 	}
 
-	const deleteLink = (item) => {
+	const deleteLink = (response, item) => {
+		console.log("response : ", response);
 		if (item.link.indexOf('github.') > -1) {
 			let repoInfo = extractGitHubRepoPath(item.link);
 			let ob = _get(DAO, `github.${repoInfo}`, null)
 			if (ob) {
-				dispatch(deleteDaoLink({ url: DAO?.url, payload: { link: item, repoInfo, webhookId: ob.webhookId } }))
+				dispatch(deleteDaoLink({ url: DAO?.url, payload: { link: item, repoInfo, webhookId: ob.webhookId, token: response.code } }))
 			}
 			else {
 				// no import issues github link
@@ -242,10 +243,6 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 	}
 
 	const onFailure = response => console.error("git res : ", response);
-
-	const removeGithubLink = () => {
-
-	}
 
 	return (
 		<>
@@ -521,19 +518,25 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 													}}>{item.link}</p>
 												</div>
 												{
-													item.link && item.link.indexOf('github.') > -1 ?
+													item.link && item.link.indexOf('github.') > -1
+														?
 														<AddGithubLink
-															renderButton={<div
-																className="deleteButton"
-															>
-																<AiOutlineClose style={{ height: 15, width: 15 }} />
-															</div>}
-															onSuccess={removeGithubLink} validate={false} />
+															renderButton={
+																<div
+																	className="deleteButton"
+																>
+																	<AiOutlineClose style={{ height: 15, width: 15 }} />
+																</div>
+															}
+															onSuccess={(res) => deleteLink(res, item)}
+															validate={false}
+															link={item.link}
+														/>
 														:
 														<div
 															className="deleteButton"
 															onClick={() => {
-																deleteLink(item);
+																deleteLink(null, item);
 															}}
 														>
 															<AiOutlineClose style={{ height: 15, width: 15 }} />
