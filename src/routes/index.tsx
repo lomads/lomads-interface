@@ -32,8 +32,8 @@ import GithubAuth from "pages/NewPages/GithubAuth";
 import PrimaryLayout from "muiLayouts/PrimaryLayout";
 import BaseLayout from "muiLayouts/BaseLayout";
 
-import CreatePassToken from "muiViews/CreatePassToken";
-import MintPassToken from "muiViews/MintPassToken";
+import CreatePassToken from "pages/NewPages/CreatePassToken";
+import MintPassToken from "pages/NewPages/MintPassToken";
 
 export default [
     {
@@ -83,12 +83,12 @@ export default [
     {
         path: '/:daoURL/create-pass-token',
         component: CreatePassToken,
-        layout: PrimaryLayout
+        //layout: PrimaryLayout
     },
     {
-        path: '/:daoURL/mint/:contractId',
+        path: '/:daoURL/mint/:contractAddr',
         component: MintPassToken,
-        layout: BaseLayout
+        //layout: BaseLayout
     },
     {
         path: '/sbt/success/:contractAddr',

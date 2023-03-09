@@ -25,43 +25,23 @@
         "type": "string"
       },
       {
-        "internalType": "address",
-        "name": "_owner",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "payToken",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_treasury",
-        "type": "address"
-      },
-      {
         "internalType": "uint256",
-        "name": "_mintPrice",
+        "name": "_maxSupply",
         "type": "uint256"
       },
       {
-        "internalType": "uint8",
+        "internalType": "string",
+        "name": "_baseUri",
+        "type": "string"
+      },
+      {
+        "internalType": "bool",
         "name": "_mustBeWhitelisted",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint32[]",
-        "name": "discounts",
-        "type": "uint32[]"
-      },
-      {
-        "internalType": "string[]",
-        "name": "code",
-        "type": "string[]"
+        "type": "bool"
       },
       {
         "internalType": "address[]",
-        "name": "wallets",
+        "name": "whitelistedAddr",
         "type": "address[]"
       }
     ],
