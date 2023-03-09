@@ -14,9 +14,9 @@ import { get as _get, find as _find } from 'lodash';
 import { isValidUrl } from "utils";
 import { useDispatch } from "react-redux";
 import axiosHttp from 'api'
-import { updateDao, updateDaoLinks, storeGithubIssues } from 'state/dashboard/actions';
+import { updateDao, updateDaoLinks, storeGithubIssues, deleteDaoLink } from 'state/dashboard/actions';
 import AddDiscordLink from 'components/AddDiscordLink';
-import { setDAO, resetStoreGithubIssuesLoader } from "state/dashboard/reducer";
+import { setDAO, resetStoreGithubIssuesLoader, resetDeleteDaoLinkLoader } from "state/dashboard/reducer";
 import AddGithubLink from "components/AddGithubLink";
 
 import TextInput from "muiComponents/TextInput";
@@ -34,7 +34,7 @@ import useGithubAuth from "hooks/useGithubAuth";
 
 const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) => {
 	const githubRef = useRef();
-	const { DAO, updateDaoLoading, updateDaoLinksLoading, storeGithubIssuesLoading } = useAppSelector((state) => state.dashboard);
+	const { DAO, updateDaoLoading, updateDaoLinksLoading, storeGithubIssuesLoading, deleteDaoLinkLoading } = useAppSelector((state) => state.dashboard);
 	const [name, setName] = useState(_get(DAO, 'name', ''));
 	const [oUrl, setOUrl] = useState(_get(DAO, 'url', ''));
 	const [description, setDescription] = useState(_get(DAO, 'description', ''));
@@ -62,6 +62,12 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 		}
 	}, [storeGithubIssuesLoading]);
 
+	useEffect(() => {
+		if (deleteDaoLinkLoading === false) {
+			dispatch(resetDeleteDaoLinkLoader);
+		}
+	}, [deleteDaoLinkLoading])
+
 	const addLink = useCallback(() => {
 		if (!linkTitle || !link || (linkTitle && linkTitle === '') || (link && link === ''))
 			return;
@@ -76,9 +82,8 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 	}, [link, linkTitle]);
 
 	const saveChanges = () => {
-		console.log("Image : ", image)
 		dispatch(updateDao({ url: DAO?.url, payload: { name, description, image } }))
-		dispatch(updateDaoLinks({ url: DAO?.url, payload: { links: daoLinks } }))
+		// dispatch(updateDaoLinks({ url: DAO?.url, payload: { links: daoLinks } }))
 		toggleOrganisationDetailsModal();
 	}
 
@@ -102,19 +107,45 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 		}
 	}
 
-	const deleteLink = (item) => {
-		// let links = _get(DAO, 'links', []);
-		let links = daoLinks.filter(l => !(l.title === item.title && l.link === item.link))
-		setDaoLinks(links)
-		// dispatch(updateDao({ url: DAO?.url, payload: { links } }))
+	const deleteLink = (response, item) => {
+		if (item.link.indexOf('github.') > -1) {
+			let repoInfo = extractGitHubRepoPath(item.link);
+			let ob = _get(DAO, `github.${repoInfo}`, null)
+			if (ob) {
+				axiosHttp.get(`utility/getGithubAccessToken?code=${response.code}&repoInfo=${repoInfo}`)
+					.then((res) => {
+						if (res.data) {
+							dispatch(deleteDaoLink({ url: DAO?.url, payload: { link: item, repoInfo, webhookId: ob.webhookId, token: res.data.access_token } }))
+						}
+						else {
+							console.log("No res : Something went wrong");
+						}
+						onResetAuth();
+					})
+					.catch((e) => {
+						onResetAuth()
+						console.log("error : ", e);
+					})
+
+			}
+			else {
+				// no import issues github link
+				let links = daoLinks.filter(l => !(l.title === item.title && l.link === item.link))
+				setDaoLinks(links);
+			}
+		}
+		else {
+			let links = daoLinks.filter(l => !(l.title === item.title && l.link === item.link))
+			setDaoLinks(links);
+		}
 	}
 
 	const handleOnServerAdded = serverId => {
-		if(importRoles) {
+		if (importRoles) {
 			axiosHttp.post(`discord/guild/${serverId}/sync-roles`, { daoId: _get(DAO, '_id') })
-			.then(res => {
-				addLink()
-			})
+				.then(res => {
+					addLink()
+				})
 		} else {
 			addLink()
 		}
@@ -178,6 +209,7 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 					alert("No res : Something went wrong");
 					setIsAuthenticating(false);
 				}
+				onResetAuth();
 			})
 			.catch((e) => {
 				onResetAuth()
@@ -209,16 +241,21 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 				}
 				else {
 					console.log("Allowed to pull and store issues")
-					dispatch(storeGithubIssues({ payload: { daoId: _get(DAO, '_id', null), issueList: result.data.data, token, repoInfo } }));
+					dispatch(storeGithubIssues({
+						payload:
+						{
+							daoId: _get(DAO, '_id', null),
+							issueList: result.data.data,
+							token,
+							repoInfo,
+							linkOb: { title: linkTitle, link: link }
+						}
+					}));
 				}
 			})
 	}
 
 	const onFailure = response => console.error("git res : ", response);
-
-	const removeGithubLink = () => {
-		
-	}
 
 	return (
 		<>
@@ -397,10 +434,10 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 									/>
 									:
 									<>
-													{ console.log(link) }
+										{console.log(link)}
 										{
-				
-											link && link.indexOf('github.') > -1
+
+											link && link.indexOf('github.') > -1 && pullIssues
 												?
 												<>
 													{
@@ -410,15 +447,15 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 														// 		<LeapFrog size={20} color="#FFF" />
 														// 	</button>
 														// 	:
-															// <LoginGithub
-															// 	clientId={process.env.REACT_APP_GITHUB_CLIENT_ID}
-															// 	scope="repo user admin:repo_hook admin:org"
-															// 	onSuccess={onSuccess}
-															// 	onFailure={onFailure}
-															// 	className={linkTitle.length > 0 && isValidUrl(link) ? "githubAddButton active" : "githubAddButton"}
-															// 	buttonText="+"
-															// />
-															<AddGithubLink  innerRef={githubRef} onSuccess={onSuccess} title={linkTitle} link={link} />
+														// <LoginGithub
+														// 	clientId={process.env.REACT_APP_GITHUB_CLIENT_ID}
+														// 	scope="repo user admin:repo_hook admin:org"
+														// 	onSuccess={onSuccess}
+														// 	onFailure={onFailure}
+														// 	className={linkTitle.length > 0 && isValidUrl(link) ? "githubAddButton active" : "githubAddButton"}
+														// 	buttonText="+"
+														// />
+														<AddGithubLink onSuccess={onSuccess} title={linkTitle} link={link} />
 													}
 												</>
 												:
@@ -494,18 +531,25 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 													}}>{item.link}</p>
 												</div>
 												{
-														item.link && item.link.indexOf('github.') > -1 ? 
-														<AddGithubLink 
-														renderButton={<div
-															className="deleteButton"
-														>
-															<AiOutlineClose style={{ height: 15, width: 15 }} />
-														</div>}
-														onSuccess={removeGithubLink} validate={false} /> : 
+													item.link && item.link.indexOf('github.') > -1
+														?
+														<AddGithubLink
+															renderButton={
+																<div
+																	className="deleteButton"
+																>
+																	<AiOutlineClose style={{ height: 15, width: 15 }} />
+																</div>
+															}
+															onSuccess={(res) => deleteLink(res, item)}
+															validate={false}
+															link={item.link}
+														/>
+														:
 														<div
 															className="deleteButton"
 															onClick={() => {
-																deleteLink(item);
+																deleteLink(null, item);
 															}}
 														>
 															<AiOutlineClose style={{ height: 15, width: 15 }} />
