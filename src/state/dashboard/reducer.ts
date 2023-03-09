@@ -45,6 +45,7 @@ import {
 	editProjectKRA,
 	updateMilestone,
 	editProjectMilestone,
+	updateUserOnboardingCount
 } from "./actions";
 import { createContract } from "state/contract/actions";
 import { get as _get, find as _find } from "lodash";
@@ -312,6 +313,9 @@ const dashboardSlice = createSlice({
 			}
 		},
 		[`${getCurrentUser.fulfilled}`]: (state, action) => {
+			state.user = action.payload;
+		},
+		[`${updateUserOnboardingCount.fulfilled}`]: (state, action) => {
 			state.user = action.payload;
 		},
 		[`${getDao.fulfilled}`]: (state, action) => {
