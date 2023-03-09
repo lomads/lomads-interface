@@ -535,12 +535,17 @@ const Dashboard = () => {
 	const endWalkThrough = () => {
 		dispatch(updateUserOnboardingCount({ payload: { daoId: _get(DAO, '_id','') }}))
 		setShowWalkThrough(false)
+		clearWalkThroughStyles()
 	}
 
-	const incrementWalkThroughSteps = () => {
+	const clearWalkThroughStyles = () => {
 		if (anchorRef.current) {
 			anchorRef.current.style = {}
 		}
+	}
+	
+	const incrementWalkThroughSteps = () => {
+		clearWalkThroughStyles()
 
 		if (currWalkThroughObj.step === 7) {
 			endWalkThrough()
