@@ -47,6 +47,15 @@ export const updateDao = createAsyncThunk(
 	}
 );
 
+export const updateUserOnboardingCount = createAsyncThunk(
+	'user/updateOnboardingCount',
+	async (params: any, thunkApi) => {
+		return axiosHttp.post(`member/update-onboarding-count`, params.payload)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+);
+
 export const addDaoMember = createAsyncThunk(
 	'dao/addmember',
 	async (params: any, thunkApi) => {

@@ -33,7 +33,7 @@ import tokenDashboard from "../../../assets/svg/token_dashboard.svg";
 import questionMarkDark from "../../../assets/svg/question-mark-dark.svg";
 import questionMarkLight from "../../../assets/svg/question-mark-light.svg";
 import { useAppDispatch } from "state/hooks";
-import { getCurrentUser, getDao, loadDao, storeGithubIssues, updateDao } from "state/dashboard/actions";
+import { getCurrentUser, getDao, loadDao, storeGithubIssues, updateDao, updateUserOnboardingCount } from "state/dashboard/actions";
 import { setDAO, setDAOList } from "state/dashboard/reducer";
 import copyIcon from "../../../assets/svg/copyIcon.svg";
 import { useDispatch } from "react-redux";
@@ -187,9 +187,10 @@ const Dashboard = () => {
 	}, [DAO]);
 
 	useEffect(() => {
-		if(DAO && !DAO?.walkthrough)
+		console.log("ser?.onboardingViewCount", user)
+		if(DAO && user && (!user?.onboardingViewCount || ( user?.onboardingViewCount && user?.onboardingViewCount.indexOf(_get(DAO, '_id', '')) === -1 && user?.onboardingViewCount.length < 2 )))
 			setShowWalkThrough(true)
-	}, [DAO])
+	}, [DAO, user])
 
 	const amIAdmin = useMemo(() => {
 		if (DAO) {
@@ -532,7 +533,7 @@ const Dashboard = () => {
 	}
 
 	const endWalkThrough = () => {
-		dispatch(updateDao({ url: _get(DAO,'url', ''), payload: { walkthrough: true }}))
+		dispatch(updateUserOnboardingCount({ payload: { daoId: _get(DAO, '_id','') }}))
 		setShowWalkThrough(false)
 	}
 
