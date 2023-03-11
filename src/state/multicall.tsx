@@ -3,7 +3,7 @@ import { useWeb3React } from '@web3-react/core'
 import { SupportedChainId } from 'constants/chains'
 import { useInterfaceMulticall } from 'hooks/useContract'
 import useBlockNumber from 'hooks/useBlockNumber'
-import { useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { combineReducers, createStore } from 'redux'
 
 const multicall = createMulticall()

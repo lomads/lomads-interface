@@ -87,7 +87,7 @@ const MyProject = () => {
     }, [account, DAO])
 
     return (
-        <div className="myproject-container">
+        <div className="myproject-container" id="my-workspace">
             <div className="myproject-header">
                 <div className="myproject-title">
                     <>

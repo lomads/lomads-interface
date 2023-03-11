@@ -2,17 +2,10 @@ import { AiOutlineClose } from "react-icons/ai";
 import IconButton from "UIpack/IconButton";
 import "./Settings.css";
 import OD from "../../assets/images/drawer-icons/OD.svg";
-import {
-  Button, Image, Input,
-  FormControl,
-  FormErrorMessage,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  NumberDecrementStepper,
-  NumberIncrementStepper, Select
-} from "@chakra-ui/react";
 import axios from "axios";
+import { Box } from "@mui/material";
+import Button from "muiComponents/Button";
+import CurrencyInput from 'muiComponents/CurrencyInput'
 import { ReactComponent as CompensateIcon } from "../../assets/images/settings-page/8-compensate-member.svg";
 import { ReactComponent as ArrowDown } from "../../assets/images/dropdown.svg";
 import { get as _get, find as _find, uniqBy as _uniqBy, findIndex as _findIndex } from 'lodash';
@@ -28,40 +21,42 @@ import { SupportedChainId, SUPPORTED_CHAIN_IDS, CHAIN_IDS_TO_NAMES } from 'const
 import { useAppSelector } from "state/hooks";
 import { useWeb3React } from "@web3-react/core";
 
+import starXP from 'assets/svg/starXP.svg';
+
 
 const CompensateMembersModal = ({ toggleModal, toggleCompensate }) => {
   const [showCompensateMembersDescriptionModals, setShowCompensateMembersDescriptionModals] = useState(false)
   const [safeTokens, setSafeTokens] = useState([]);
-	const { user, DAO, DAOList, DAOLoading } = useAppSelector((state) => state.dashboard);
+  const { user, DAO, DAOList, DAOLoading } = useAppSelector((state) => state.dashboard);
   const { chainId } = useWeb3React();
   const [sweatValue, setSweatValue] = useState(null);
   const [currency, setCurrency] = useState(null);
 
   useEffect(() => {
-    if(chainId, DAO) {
-      axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${_get(DAO, 'safe.address', '')}/balances/usd/`, {withCredentials: false })
-      .then((tokens) => {
-        setSafeTokens(tokens.data.map(t => {
-          let tkn = t
-          console.log(tkn)
-          if(!tkn.tokenAddress){
-            return {
-              ...t,
-              tokenAddress: chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS,
-              token: {
-                symbol: chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'
+    if (chainId, DAO) {
+      axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${_get(DAO, 'safe.address', '')}/balances/usd/`, { withCredentials: false })
+        .then((tokens) => {
+          setSafeTokens(tokens.data.map(t => {
+            let tkn = t
+            console.log(tkn)
+            if (!tkn.tokenAddress) {
+              return {
+                ...t,
+                tokenAddress: chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS,
+                token: {
+                  symbol: chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'
+                }
               }
             }
-          }
             return t
-        }));
-      });
+          }));
+        });
     }
-	}, [chainId, DAO]);
+  }, [chainId, DAO]);
 
   useEffect(() => {
-    if(safeTokens && safeTokens.length > 0){
-      if(!safeTokens[0].tokenAddress) {
+    if (safeTokens && safeTokens.length > 0) {
+      if (!safeTokens[0].tokenAddress) {
         setCurrency(chainId === SupportedChainId.GOERLI ? process.env.REACT_APP_GOERLI_TOKEN_ADDRESS : process.env.REACT_APP_MATIC_TOKEN_ADDRESS)
       } else {
         setCurrency(safeTokens[0].tokenAddress)
@@ -125,7 +120,7 @@ const CompensateMembersModal = ({ toggleModal, toggleCompensate }) => {
             organisation has its own token or it has funds to pay, you can compensate members in
             proportion to the SWEAT points they have.
           </div> */}
-          <div className='main-picker-container'>
+          {/* <div className='main-picker-container'>
             <div className='currency'>
               <div className='currency-container'>
                 {_get(null, 'compensation.symbol', 'SWEAT') === 'MATIC' ? <PolygonIcon /> : <StarIcon />}
@@ -143,10 +138,10 @@ const CompensateMembersModal = ({ toggleModal, toggleCompensate }) => {
                 </NumberInput>
               </div>
               { console.log("currency", currency) }
-              <Select defaultValue={currency} onChange={e => setCurrency(e.target.value)} bg='#F5F5F5' color='#76808D' variant='unstyled' style={{ borderRadius: '0px 10px 10px 0px', borderWidth: 1, borderLeftWidth: 0, borderColor: 'rgba(27, 43, 65, 0.1)', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)', height: 50, padding: '0px 50px 0px 20px' }} iconSize={15} icon={<ArrowDown />}>
-                {/* <option value='SWEAT'>SWEAT</option>
+              <Select defaultValue={currency} onChange={e => setCurrency(e.target.value)} bg='#F5F5F5' color='#76808D' variant='unstyled' style={{ borderRadius: '0px 10px 10px 0px', borderWidth: 1, borderLeftWidth: 0, borderColor: 'rgba(27, 43, 65, 0.1)', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)', height: 50, padding: '0px 50px 0px 20px' }} iconSize={15} icon={<ArrowDown />}> */}
+          {/* <option value='SWEAT'>SWEAT</option>
                 <option value='MATIC'><PolygonIcon /> MATIC</option> */}
-              {
+          {/* {
                safeTokens.map((result, index) => {
                 return (
                   (
@@ -156,11 +151,35 @@ const CompensateMembersModal = ({ toggleModal, toggleCompensate }) => {
                       </option>
                   )
                 );
-              })}
-              </Select>
+              })} */}
+          {/* </Select>
             </div>
-          </div>
-          <Button onClick={() => setShowCompensateMembersDescriptionModals(true)} id="button-save" style={{ padding: '20px 100px' }}>{'Next'}</Button>
+          </div> */}
+          <Box alignItems="center" display="flex" flexDirection="row">
+            <Box mr={2} alignItems="center" display="flex" flexDirection="row" className='currency-container'>
+              {_get(null, 'compensation.symbol', 'SWEAT') === 'MATIC' ? <PolygonIcon /> : <StarIcon />}
+              <div style={{ marginLeft: 8 }}>{"1 SWT = "}</div>
+            </Box>
+            <CurrencyInput
+              value={sweatValue ? sweatValue : 0}
+              onChange={(value) => {
+                setSweatValue(value)
+              }}
+              options={
+                safeTokens.map(t => {
+                  return {
+                    value: t.tokenAddress,
+                    label: t.token.symbol
+                  }
+                })
+              }
+              dropDownvalue={currency}
+              onDropDownChange={(value) => {
+                setCurrency(value)
+              }}
+            />
+          </Box>
+          <Button variant="contained" onClick={() => setShowCompensateMembersDescriptionModals(true)}>{'Next'}</Button>
           {/* <div
                 style={{
                   marginTop: "10px",

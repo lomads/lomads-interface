@@ -5,6 +5,7 @@ import TokenPage from "./TokenPage";
 import GoLivePage from "./GoLivePage";
 import { sidebarPropType } from "types";
 import GnosisPage from "./gnosisPage";
+import React from 'react'
 
 const SidebarPage = (props: sidebarPropType) => {
   const renderPage = () => {

@@ -55,7 +55,7 @@ const AddNewSafe = () => {
 	const [thresholdValue, setThresholdValue] = useState<number>(1);
 
 	useEffect(() => {
-		if(invitedMembers && invitedMembers.length > 0) {
+		if (invitedMembers && invitedMembers.length > 0) {
 			const { name, address } = invitedMembers[0];
 			const creator = { name: name, address: address };
 			const check = Myvalue.current.some(
@@ -68,14 +68,14 @@ const AddNewSafe = () => {
 	}, [invitedMembers]);
 
 	useEffect(() => {
-		if(chainId && +chainId === SupportedChainId.POLYGON){
+		if (chainId && +chainId === SupportedChainId.POLYGON) {
 			axios.get(CHAIN_GAS_STATION[`${chainId}`].url)
-			.then(res => setPolygonGasEstimate(res.data))
+				.then(res => setPolygonGasEstimate(res.data))
 		}
 	}, [chainId])
 
 	useEffect(() => {
-		if(chainId)
+		if (chainId)
 			dispatch(loadDao({ chainId }))
 	}, [chainId])
 
@@ -124,9 +124,9 @@ const AddNewSafe = () => {
 	};
 
 
-	const runAfterCreation = async (addr:string, owners: any) => {
+	const runAfterCreation = async (addr: string, owners: any) => {
 		console.log("runAfterCreation", "safe addr", addr)
-		if(!addr) return;
+		if (!addr) return;
 		dispatch(updateSafeAddress(addr as string));
 		const totalAddresses = [...invitedMembers, ...Myvalue.current];
 		const value = totalAddresses.reduce((final: any, current: any) => {
@@ -145,7 +145,7 @@ const AddNewSafe = () => {
 			chainId,
 			name: flow.daoName,
 			url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
-			image: null,
+			image: flow.daoImage,
 			members: value.map((m: any) => {
 				return {
 					...m, creator: m.address.toLowerCase() === account?.toLowerCase()
@@ -163,56 +163,56 @@ const AddNewSafe = () => {
 
 	const waitFor = (milliseconds: number) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
-    const retry = (promise:any, onRetry:any, maxRetries:number) => {
-        const retryWithBackoff : any = async (retries: number) => {
-            try {
-                if (retries > 0) {
-                    const timeToWait = 2 ** retries * 1000;
-                    console.log(`waiting for ${timeToWait}ms...`);
-                    await waitFor(timeToWait);
-                }
-                return await promise();
-            } catch (e) {
-                if (retries < maxRetries) {
-                    onRetry();
-                    return retryWithBackoff(retries + 1);
-                } else {
-                    console.warn("Max retries reached. Bubbling the error up");
-                    throw e;
-                }
-            }
-        }
-        return retryWithBackoff(0);
-    }
+	const retry = (promise: any, onRetry: any, maxRetries: number) => {
+		const retryWithBackoff: any = async (retries: number) => {
+			try {
+				if (retries > 0) {
+					const timeToWait = 2 ** retries * 1000;
+					console.log(`waiting for ${timeToWait}ms...`);
+					await waitFor(timeToWait);
+				}
+				return await promise();
+			} catch (e) {
+				if (retries < maxRetries) {
+					onRetry();
+					return retryWithBackoff(retries + 1);
+				} else {
+					console.warn("Max retries reached. Bubbling the error up");
+					throw e;
+				}
+			}
+		}
+		return retryWithBackoff(0);
+	}
 
 	const hasNewSafe = async (currentSafes: any) => {
 		try {
-		const latestSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
-		if(latestSafes.length > currentSafes.length)
-			return latestSafes
-		else
-			throw 'SAFE NOT FOUND'
-		} catch(e) {
+			const latestSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
+			if (latestSafes.length > currentSafes.length)
+				return latestSafes
+			else
+				throw 'SAFE NOT FOUND'
+		} catch (e) {
 			throw e
 		}
 	}
 
-	const checkNewSafe = async (currentSafes:any, owners: any) => {
-			const latestSafes = await retry(
-				() => hasNewSafe(currentSafes),
-				() => { console.log('retry called...') },
-				50
-			)
-			if(latestSafes) {
-				let newSafeAddr = _.find(latestSafes, ls => currentSafes.indexOf(ls) === -1)
-				console.log("FOUND NEW SAFE", newSafeAddr)
-				if(newSafeAddr)
-					runAfterCreation(newSafeAddr, owners)
-				else
-					console.log("checkNewSafe", "Could not find new safe")
-			} else {
-				setisLoading(false);
-			}
+	const checkNewSafe = async (currentSafes: any, owners: any) => {
+		const latestSafes = await retry(
+			() => hasNewSafe(currentSafes),
+			() => { console.log('retry called...') },
+			50
+		)
+		if (latestSafes) {
+			let newSafeAddr = _.find(latestSafes, ls => currentSafes.indexOf(ls) === -1)
+			console.log("FOUND NEW SAFE", newSafeAddr)
+			if (newSafeAddr)
+				runAfterCreation(newSafeAddr, owners)
+			else
+				console.log("checkNewSafe", "Could not find new safe")
+		} else {
+			setisLoading(false);
+		}
 	}
 
 
@@ -240,9 +240,9 @@ const AddNewSafe = () => {
 		};
 
 		let currentSafes: Array<string> = []
-		if(chainId === SupportedChainId.POLYGON)
+		if (chainId === SupportedChainId.POLYGON)
 			currentSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
-		
+
 		console.log("currentSafes", currentSafes)
 
 		await safeFactory
@@ -269,7 +269,7 @@ const AddNewSafe = () => {
 					image: null,
 					members: value.map((m: any) => {
 						return {
-							...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: owners.map((a:any) => a.toLowerCase()).indexOf(m.address.toLowerCase()) > -1  ? 'role1' : m.role ? m.role : 'role4'
+							...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: owners.map((a: any) => a.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4'
 						}
 					}),
 					safe: {
@@ -282,7 +282,7 @@ const AddNewSafe = () => {
 			})
 			.catch(async (err) => {
 				console.log("An error occured while creating safe", err);
-				if(chainId === SupportedChainId.POLYGON) {
+				if (chainId === SupportedChainId.POLYGON) {
 					checkNewSafe(currentSafes, owners)
 				} else {
 					setisLoading(false);
@@ -447,14 +447,14 @@ const AddNewSafe = () => {
 					You’re about to create a new safe and will have to confirm a
 					transaction with your curentry connected wallet.
 					<span className="boldText">
-						{ chainId && +chainId === SupportedChainId.POLYGON && polygonGasEstimate ? `The creation will cost approximately ${polygonGasEstimate?.standard?.maxFee} GWei.` : `The creation will cost approximately 0.01256 GOR.` }
+						{chainId && +chainId === SupportedChainId.POLYGON && polygonGasEstimate ? `The creation will cost approximately ${polygonGasEstimate?.standard?.maxFee} GWei.` : `The creation will cost approximately 0.01256 GOR.`}
 					</span>
 					The exact amount will be determinated by your wallet.
 				</div>
 				<div className="createButton">
 					<SimpleLoadButton
 						title="CREATE SAFE"
-						bgColor={isLoading ? 'grey' : "#C94B32" }
+						bgColor={isLoading ? 'grey' : "#C94B32"}
 						height={50}
 						width={250}
 						fontsize={20}

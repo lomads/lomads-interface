@@ -119,7 +119,8 @@ const AllProjectTasks = () => {
                 return tsk
             })
             setManageTasks(_orderBy(manageTasks, ['notification', i => moment(i.deadline).unix()], ['desc', 'desc']));
-            setDraftTasks(_get(DAO, 'tasks', []).filter(task => task.project?._id === projectId && !task.deletedAt && !task.archivedAt && task.draftedAt !== null && task.creator === user._id));
+            // setDraftTasks(_get(DAO, 'tasks', []).filter(task => task.project?._id === projectId && !task.deletedAt && !task.archivedAt && task.draftedAt !== null && task.creator === user._id));
+            setDraftTasks(_get(DAO, 'tasks', []).filter(task => task.project?._id === projectId && !task.deletedAt && !task.archivedAt && task.draftedAt !== null));
             const otherTasks = _get(DAO, 'tasks', []).filter(task => !_find(myTasks, t => t._id === task._id) && task.project?._id === projectId && !task.deletedAt && !task.archivedAt && !task.draftedAt && !(task.creator === user._id || task.reviewer === user._id))
             setOtherTasks([..._orderBy(otherTasks, i => moment(i.deadline).unix(), 'desc'), ..._orderBy(myTasks.concat(manageTasks), i => moment(i.deadline).unix(), 'desc')]);
         }
@@ -158,13 +159,17 @@ const AllProjectTasks = () => {
 
             <div className="home-btn" onClick={() => navigate(-1)}>
                 <div className="invertedBox">
-                    <div className="navbarText">
-                        {
-                            daoName.length === 1
-                                ? daoName[0].charAt(0)
-                                : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)
-                        }
-                    </div>
+                    {
+                        _get(DAO, 'image', null)
+                            ?
+                            <img src={_get(DAO, 'image', null)} />
+                            :
+                            <div className="navbarText">
+                                {daoName.length === 1
+                                    ? daoName[0].charAt(0)
+                                    : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)}
+                            </div>
+                    }
                 </div>
             </div>
 

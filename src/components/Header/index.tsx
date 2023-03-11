@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { find as _find } from 'lodash';
 import useScrollPosition from "@react-hook/window-scroll";
 import { useWeb3React } from "@web3-react/core";
@@ -154,11 +154,16 @@ export default function Header() {
   useEffect(() => {
     if ((chainId && !chainAllowed && !account) || !localStorage.getItem('__lmds_web3_token')) {
       const match = matchPath({ path: "/:daoURL" }, location.pathname);
-      if(match && !_find(routes, r => r.path === location.pathname)){
+      if((match) && !_find(routes, r => r.path === location.pathname)){
           console.log('storing...', location.pathname)
           sessionStorage.setItem('__lmds_active_dao', location.pathname.substring(1))
        }
-      navigate("/login");
+      navigate("/login", {
+        replace: true,
+        state: {
+          from: location.pathname
+        }
+      });
     }
   }, [chainId , account, chainAllowed, navigate]);
 
@@ -193,7 +198,12 @@ export default function Header() {
       clearOnDisconnect();
     }
     dispatch(updateSelectedWallet({ wallet: undefined }));
-    window.location.href = '/login'
+    navigate("/login", {
+      replace: true,
+      state: {
+        from: window.location.pathname
+      }
+    });
     //openOptions();
   };
 
@@ -227,7 +237,7 @@ export default function Header() {
   }
   
   return (
-    <HeaderFrame showBackground={scrollY > 45}>
+    <HeaderFrame showBackground={false}>
       <Title href=".">
         <UniIcon></UniIcon>
       </Title>

@@ -93,24 +93,20 @@ const MemberCard = (props: any) => {
 								<div className="memberdivider">
 									<hr />
 								</div>
-								<div className="roleContainer">
+								<div className="roleContainer" style={{ maxWidth: 400 }}>
 									{
-										roles.filter((_: any, i: any) => i < 5).map((item: any, index: any) => {
-											if (index <= 3) {
+										(show ? roles : roles.filter((_: any, i: any) => i < 5)).map((item: any, index: any) => {
+											if (show || index <= 3) {
 												return (
 													<div className="role-pill" style={{ backgroundColor: `${_get(item, "roleColor", '#99aab5')}50` }}>
 														<div className="role-circle" style={{ backgroundColor: `${_get(item, "roleColor", '#99aab5')}` }}></div>
 														<span>{item.name}</span>
 													</div>
 												)
-											}
-											else {
-												return (
-													<div className="role-count" onClick={() => setShow(true)}>
-														<span>+{roles.length - 4}</span>
-													</div>
-												)
-											}
+											} 
+											return <div className="role-count" onClick={() => setShow(prev => !prev)}>
+											<span>{ show ? 'Hide' : `+${roles.length - 4}`}</span>
+										</div>
 										})
 									}
 								</div>
@@ -124,7 +120,7 @@ const MemberCard = (props: any) => {
 	};
 	return (
 		<>
-			<div className="memberCard">
+			<div className="memberCard" id="members">
 				<div className="treasuryHeader">
 					<div className="titleHeader">Members</div>
 					<div className="memberHeaderDetails">

@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, createContext } from "react";
 import "./Settings.css";
 import { get as _get, find as _find } from "lodash";
 import settingIcon from "../../assets/svg/settingsXL.svg";
 import { CgClose } from "react-icons/cg";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Table from "react-bootstrap/Table";
+import axiosHttp from '../../api';
 
 import {
 	Button,
@@ -61,6 +62,7 @@ import CompensateMembersDescriptionModal from "./CompensateMembersDescriptionMod
 import CompensateMembersDoneModal from "./CompensateMembersDoneModal";
 import DisableXpPointDailog from "./DisableXpPointDailog";
 import eventEmitter from "utils/eventEmmiter";
+import RolesAndPermissionModal from "muiModals/RolesAndPermissionModal";
 
 const Settings = () => {
 	const navigate = useNavigate();
@@ -77,13 +79,15 @@ const Settings = () => {
 	const [openTerminology, setOpenTerminology] = useState(false);
 	const [openDiscord, setOpenDiscord] = useState(false);
 	const [openCreatePassToken, setOpenCreatePassToken] = useState(false);
-
+	const [repoInfo, setRepoInfo] = useState('');
 
 	const { DAO, updateDaoLoading, updateDaoLinksLoading } = useAppSelector((state) => state.dashboard);
 
 	console.log("DAO data : ", DAO);
 
 	const [name, setName] = useState(_get(DAO, 'name', ''));
+
+	const [code, setCode] = useState('');
 
 	useEffect(() => {
 		setName(_get(DAO, 'name', ''))
@@ -117,7 +121,7 @@ const Settings = () => {
 		setOpenSafe(!openSafe);
 	};
 	let togglePassToken = () => {
-		setOpenPassToken(!openPassToken);
+		setOpenPassToken(prev => !prev);
 	};
 	let toggleXp = () => {
 		setOpenXpPoints(!openXpPoints);
@@ -142,11 +146,19 @@ const Settings = () => {
                 /> */}
 				<div className="settings-left-bar">
 					<div onClick={() => navigate(-1)} className="logo-container">
-						<p style={{ textTransform: "capitalize" }}>{daoName.length === 1
-							? daoName[0].charAt(0)
-							: daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)}</p>
+						{
+							_get(DAO, 'image', null)
+								?
+								<img src={_get(DAO, 'image', null)} />
+								:
+								<p style={{ textTransform: "capitalize" }}>
+									{daoName.length === 1
+										? daoName[0].charAt(0)
+										: daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)}
+								</p>
+						}
 					</div>
-					<img src={settingIcon} />
+					<img src={settingIcon} className="setting-icon" />
 				</div>
 				<div className="settings-center">
 					<div>
@@ -215,7 +227,7 @@ const Settings = () => {
 
 							<div className="settings-organisation-child"
 								onClick={() => {
-									DAO?.sbt?.name ? togglePassToken() : toggleCreatePassTokenModal()
+									togglePassToken()
 								}}
 							>
 								<div
@@ -316,14 +328,18 @@ const Settings = () => {
 				/>
 			)}
 			{/* // !-------------  Roles & Permissions ------------ */}
-			{openRolesPermissions && (
+			<RolesAndPermissionModal
+				open={openRolesPermissions}
+				onClose={() => setOpenRolesPermissions(false)}
+			/>
+			{/* {openRolesPermissions && (
+				
 				<RolesPermissionsModal toggleRP={toggleRP} />
-			)}
+			)} */}
 			{/* // !-------------  Safe ------------ */}
 			{openSafe && (
 				<SafeModal toggleS={toggleS} />
 			)}
-			{/* // !-------------  Pass Token ------------ */}
 			{openPassToken && (
 				<PassTokenModal
 					togglePassToken={togglePassToken}
@@ -346,9 +362,9 @@ const Settings = () => {
 				/>
 			)}
 			{/* // !-------------  Discord ------------ */}
-			{openDiscord && (
+			{/* {openDiscord && (
 				<DiscordModal toggleDiscord={toggleDiscord} />
-			)}
+			)} */}
 		</>
 	);
 };

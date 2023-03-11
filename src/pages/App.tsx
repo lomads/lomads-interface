@@ -26,15 +26,23 @@ import routes from '../routes';
 
 export default function App() {
 	const landingPage = useMatch("/login");
+	const previewPage = window.location.pathname.indexOf('preview') > -1
 	const [projects, setProjects] = useState([]);
 
 	return (
 		<div className="body">
-			{!landingPage && <Header />}
 			<ProjectContext.Provider value={{ projects, setProjects }}>
 				<Routes>
 					{
-						routes.map(route => <Route path={route.path} element={<route.component/>} />)
+						routes.map((route: any) => <Route path={route.path} element={ route.layout ?
+							<route.layout>
+								<route.component/>
+							</route.layout> : 
+							<>
+								{!landingPage && !previewPage && <Header />}
+								<route.component/>
+							</>
+						} />)
 					}
 				</Routes>
 			</ProjectContext.Provider>

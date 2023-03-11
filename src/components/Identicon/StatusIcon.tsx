@@ -1,6 +1,6 @@
 import { ConnectionType } from 'connection'
 import styled from 'styled-components/macro'
-
+import * as React from 'react';
 import CoinbaseWalletIcon from '../../assets/images/coinbaseWalletIcon.svg'
 import FortmaticIcon from '../../assets/images/fortmaticIcon.png'
 import WalletConnectIcon from '../../assets/images/walletConnectIcon.svg'

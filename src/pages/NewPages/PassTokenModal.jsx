@@ -2,7 +2,9 @@ import { AiOutlineClose } from "react-icons/ai";
 import IconButton from "UIpack/IconButton";
 import "./Settings.css";
 import PT from "../../assets/images/drawer-icons/PT.svg";
-import { Button, Image, Input } from "@chakra-ui/react";
+import {  Image, Input } from "@chakra-ui/react";
+import Button from "muiComponents/Button";
+import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import CreateMorePassTokenModal from "./CreateMorePassTokenModal";
 import { useAppDispatch, useAppSelector } from "state/hooks";
@@ -236,22 +238,20 @@ const PassTokenModal = ({ togglePassToken }) => {
 							</p>
 						</div>
 						{/* //! FOOTER */}
-						<div className="button-section">
-							<br />
-							<br />
-							<br />
+						
+						<Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px', padding: "30px 0 20px" }}>
 							<Button
-								id="button-cancel"
+								size="small"
 								style={{ marginRight: 6 }}
-								variant="outline"
+								variant="outlined"
 								onClick={() => {
 									togglePassToken();
 								}}
 							>
 								CANCEL
 							</Button>
-							<Button disabled={updateContractLoading == true} onClick={() => handleSave()} id="button-save">SAVE CHANGES</Button>
-						</div>
+							<Button  size="small" variant="contained" disabled={updateContractLoading == true} onClick={() => handleSave()}>SAVE CHANGES</Button>
+						</Box>
 					</div>
 				</div>
 			</div>

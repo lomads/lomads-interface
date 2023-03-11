@@ -25,16 +25,28 @@
     box-shadow: inset 1px 0px 4px rgba(27, 43, 65, 0.1);
     border-radius: 10px;
     transform: rotate(45deg);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.createPassToken-container .logo-container img {
+    transform: rotate(-45deg);
+    width: 141%;
+    height: 141%;
+    flex-shrink: 0;
+    max-width: 141%;
 }
 
 .createPassToken-container .logo-container p {
     /* HG */
 
 
-    position: absolute;
+    /* position: absolute;
     width: 97px;
     height: 61px;
-    top: 16px;
+    top: 16px; */
 
     font-family: var(--chakra-fonts-body);
     font-style: normal;

@@ -2,7 +2,7 @@ import { SupportedLocale, DEFAULT_LOCALE } from 'constants/locales'
 import { initialLocale, useActiveLocale } from 'hooks/useActiveLocale'
 import { ReactNode, useCallback, useEffect } from 'react'
 import { useUserLocaleManager } from 'state/user/hooks'
-
+import React from 'react'
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import {

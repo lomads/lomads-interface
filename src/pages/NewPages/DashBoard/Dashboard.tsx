@@ -4,7 +4,7 @@ import { get as _get, find as _find } from 'lodash';
 import lomadsfulllogo from "../../../assets/svg/lomadsfulllogo.svg";
 import settingIcon from '../../../assets/svg/settings.svg';
 import { useAppSelector } from "state/hooks";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import "../../../styles/Global.css";
 import "../../../styles/pages/DashBoard/DashBoard.css";
 import MemberCard from "./MemberCard";
@@ -30,8 +30,10 @@ import AddMember from "./MemberCard/AddMember";
 import dashboardfooterlogo from "../../../assets/svg/dashboardfooterlogo.svg";
 import starDashboard from "../../../assets/svg/star_dashboard.svg";
 import tokenDashboard from "../../../assets/svg/token_dashboard.svg";
+import questionMarkDark from "../../../assets/svg/question-mark-dark.svg";
+import questionMarkLight from "../../../assets/svg/question-mark-light.svg";
 import { useAppDispatch } from "state/hooks";
-import { getCurrentUser, getDao, loadDao, storeGithubIssues } from "state/dashboard/actions";
+import { getCurrentUser, getDao, loadDao, storeGithubIssues, updateDao, updateUserOnboardingCount } from "state/dashboard/actions";
 import { setDAO, setDAOList } from "state/dashboard/reducer";
 import copyIcon from "../../../assets/svg/copyIcon.svg";
 import { useDispatch } from "react-redux";
@@ -39,11 +41,13 @@ import { updateCurrentNonce, updateSafeThreshold, updateSafeAddress } from "stat
 import { Tooltip } from "@chakra-ui/react";
 import useDCAuth from "hooks/useDCAuth";
 import MyProject from "./MyProject";
-
+import Steps from './WalkThrough/steps';
 import { useSBTStats } from "hooks/SBT/sbt";
 import Footer from "components/Footer";
 import EditMember from "./MemberCard/EditMember";
 import LinksArea from "./LinksArea";
+import WalkThroughModal from './WalkThrough/WalkThroughModal';
+import WalkThroughPopover from './WalkThrough/WalkThroughPopover';
 import useRole from "hooks/useRole";
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains';
 import { switchChain } from "utils/switchChain";
@@ -53,16 +57,55 @@ import CreateTask from "./Task/CreateTask";
 import CreateRecurring from "./TreasuryCard/CreateRecurring";
 import axiosHttp from 'api'
 import useEns from "hooks/useEns";
+import useMintSBT from "hooks/useMintSBT";
+import { default as MuiButton, ButtonProps  } from '@mui/material/Button';
+import CloseIcon from '@mui/icons-material/Close';
+import { styled } from '@mui/material/styles';
+import Stack from '@mui/material/Stack';
+import { grey } from '@mui/material/colors';
+
+import Button from "muiComponents/Button";
 const { toChecksumAddress } = require('ethereum-checksum-address')
+const HideHelpIconButton = styled(Button)<ButtonProps>(({ theme }) => ({
+	color: '#ffffff',
+	backgroundColor: '#1B2B41',
+	cursor: 'pointer',
+	width: 198,
+	height: 40,
+	radius: 5,
+	padding: 0,
+	fontFamily: "Inter, sans-serif",
+    fontSize: 16,
+	'&:hover': {
+		backgroundColor: '#1B2B41',
+	},
+}));
+const PlayWalkThroughButton = styled(Button)<ButtonProps>(({ theme }) => ({
+	color: '#C94B32',
+	backgroundColor: '#FFFFFF',
+	cursor: 'pointer',
+	width: 198,
+	height: 40,
+	radius: 5,
+	padding: 0,
+	fontFamily: "Inter, sans-serif",
+    fontSize: 16,
+	'&:hover': {
+		backgroundColor: '#FFFFFF',
+	},
+}));
 
 const Dashboard = () => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const { daoURL } = useParams();
+	const location = useLocation()
+	const from = location?.state?.from;
 	const { user, DAO, DAOList, DAOLoading } = useAppSelector((state) => state.dashboard);
 	console.log("DAO : ", DAO);
 	const [update, setUpdate] = useState(0);
 	const treasuryRef = useRef<any>();
+	const anchorRef = useRef<any>()
 	const { provider, account, chainId, connector } = useWeb3React();
 	console.log("chainId : ", chainId, provider);
 	const safeAddress = useAppSelector((state) => state.flow.safeAddress);
@@ -85,13 +128,18 @@ const Dashboard = () => {
 	const [recurringTxn, setRecurringTxn] = useState<any>(null);
 	const [safeOwners, setSafeOwners] = useState<any>(null);
 	const [checkLoading, setCheckLoading] = useState<boolean>(true);
+	const [currWalkThroughObj, setWalkThroughObj] = useState<any>(Steps[0]);
+	const [showWalkThrough, setShowWalkThrough] = useState<boolean>(false);
+	const [isHelpIconOpen, setIsHelpIconOpen] = useState<boolean>(false);
+	const [displayHelpOptions, setDisplayHelpOptions] = useState<boolean>(false);
 	const currentNonce = useAppSelector((state) => state.flow.currentNonce);
 	const { myRole, displayRole, permissions, can, isSafeOwner } = useRole(DAO, account);
 	const { getENSAddress, getENSName } = useEns()
 
-	const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '', chainId);
+	//const { contractNamebalanceOf,  } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '', chainId);
+	const { getStats } = useMintSBT(DAO?.sbt?.address)
 
-	const token = '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';
+	const token = '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';
 
 	const requestReposIssues = (name: String) => {
 		fetch(`https://api.github.com/repos/${name}/issues`,
@@ -104,37 +152,45 @@ const Dashboard = () => {
 			.then(response => response.json())
 			.then(data => {
 				console.log("github issues : ", data);
-				var newArray = data.map((i: any) => (
-					{
-						daoId: DAO?._id,
-						provider: 'Github',
-						name: i.title,
-						description: i.body,
-						creator: null,
-						members: [],
-						project: null,
-						discussionChannel: i.html_url,
-						deadline: null,
-						submissionLink: i.html_url,
-						compensation: null,
-						reviewer: null,
-						contributionType: 'open',
-						createdAt: i.created_at,
-						draftedAt: Date.now(),
-					}
-				))
+				// var newArray = data.map((i: any) => (
+				// 	{
+				// 		daoId: DAO?._id,
+				// 		provider: 'Github',
+				// 		name: i.title,
+				// 		description: i.body,
+				// 		creator: null,
+				// 		members: [],
+				// 		project: null,
+				// 		discussionChannel: i.html_url,
+				// 		deadline: null,
+				// 		submissionLink: i.html_url,
+				// 		compensation: null,
+				// 		reviewer: null,
+				// 		contributionType: 'open',
+				// 		createdAt: i.created_at,
+				// 		draftedAt: Date.now(),
+				// 	}
+				// ))
 
-				console.log("new array : ", newArray);
-				dispatch(storeGithubIssues({ payload: { daoId: _get(DAO, '_id', null), issueList: newArray } }))
+				// console.log("new array : ", newArray);
+				// dispatch(storeGithubIssues({ payload: { daoId: _get(DAO, '_id', null), issueList: newArray } }))
 			})
 	}
 
+	useEffect(() => {
+		// if (DAO && !DAO.githubIssues) {
+		// 	console.log("fetching...")
+		// 	// https://github.com/Lomads-Technologies/token-gating
+		// 	requestReposIssues('Lomads-Technologies/token-gating');
+		// }
+		// requestReposIssues('Lomads-Technologies/soulbound-token');
+	}, [DAO]);
+
 	// useEffect(() => {
-	// 	if (DAO && !DAO.githubIssues) {
-	// 		console.log("fetching...")
-	// 		requestReposIssues('Lomads-Technologies/gnosis-safe-integration');
-	// 	}
-	// }, [DAO]);
+	// 	console.log("ser?.onboardingViewCount", user)
+	// 	if(DAO && user && (!user?.onboardingViewCount || ( user?.onboardingViewCount && user?.onboardingViewCount.indexOf(_get(DAO, '_id', '')) === -1 && user?.onboardingViewCount.length < 2 )))
+	// 		setShowWalkThrough(true)
+	// }, [DAO, user])
 
 	const amIAdmin = useMemo(() => {
 		if (DAO) {
@@ -213,7 +269,12 @@ const Dashboard = () => {
 
 	useEffect(() => {
 		if (chainId && !account)
-			window.location.href = '/login'
+			navigate("/login", {
+				replace: true,
+				state: {
+					from: window.location.pathname
+				}
+			});
 	}, [chainId, account])
 
 	useEffect(() => {
@@ -258,53 +319,57 @@ const Dashboard = () => {
 					}
 				}
 				if (shouldUpdate) {
-					navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
+					navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
 					break;
 				}
 			}
 		}
+		if (from)
+			navigate(from)
 	}
 
 	useEffect(() => {
 		if (chainId) {
-			if (contractName !== '' && DAO && DAO.sbt && DAO.sbt && account && balanceOf) {
-				console.log("BALANCEOF:", parseInt(balanceOf._hex, 16))
-				if (chainId === DAO.chainId) {
-					if (DAO?.sbt?.whitelisted) {
-						if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
-							if (parseInt(balanceOf._hex, 16) === 0) {
-								navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
+			if (DAO && DAO.sbt && DAO.sbt && account) {
+				getStats().then(res => {
+					const balanceOf = res[0];
+					if (chainId === DAO.chainId) {
+						if (DAO?.sbt?.whitelisted) {
+							if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
+								if (parseInt(balanceOf._hex, 16) === 0) {
+									navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
+								} else {
+									// check if data has been filled show mint page. with prefilled data. save data without minting again
+									validateMetaData()
+								}
 							} else {
-								// check if data has been filled show mint page. with prefilled data. save data without minting again
-								validateMetaData()
+								navigate('/only-whitelisted')
 							}
-						} else {
-							navigate('/only-whitelisted')
+						} else if (!DAO?.sbt?.whitelisted) {
+							if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
+								if (parseInt(balanceOf._hex, 16) === 0) {
+									navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
+								} else {
+									// check if data has been filled show mint page. with prefilled data. save data without minting again
+									validateMetaData()
+								}
+							} else {
+								//add to DAO
+								if (parseInt(balanceOf._hex, 16) === 0) {
+									navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
+								} else {
+									// check if data has been filled show mint page. with prefilled data. save data without minting again
+									validateMetaData()
+								}
+							}
 						}
-					} else if (!DAO?.sbt?.whitelisted) {
-						if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
-							if (parseInt(balanceOf._hex, 16) === 0) {
-								navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
-							} else {
-								// check if data has been filled show mint page. with prefilled data. save data without minting again
-								validateMetaData()
-							}
-						} else {
-							//add to DAO
-							if (parseInt(balanceOf._hex, 16) === 0) {
-								navigate(`/${DAO.url}/sbt/mint/${DAO.sbt.address}`);
-							} else {
-								// check if data has been filled show mint page. with prefilled data. save data without minting again
-								validateMetaData()
-							}
-						}
+					} else {
+						console.log('Switch chain to', DAO.chainId)
 					}
-				} else {
-					console.log('Switch chain to', DAO.chainId)
-				}
+				})
 			}
 		}
-	}, [chainId, DAO, balanceOf, contractName, account]);
+	}, [chainId, DAO, getStats, account]);
 
 	useEffect(() => {
 		if (account && chainId && (!user || (user && user.wallet.toLowerCase() !== account.toLowerCase()))) {
@@ -467,6 +532,63 @@ const Dashboard = () => {
 		setShowCreateRecurring(true)
 	}
 
+	const endWalkThrough = () => {
+		dispatch(updateUserOnboardingCount({ payload: { daoId: _get(DAO, '_id','') }}))
+		setShowWalkThrough(false)
+		clearWalkThroughStyles()
+	}
+
+	const clearWalkThroughStyles = () => {
+		if (anchorRef.current) {
+			anchorRef.current.style = {}
+		}
+	}
+	
+	const incrementWalkThroughSteps = () => {
+		clearWalkThroughStyles()
+
+		if (currWalkThroughObj.step === 7) {
+			endWalkThrough()
+			return
+		}
+		const nextObj = Steps[currWalkThroughObj.step + 1]
+		anchorRef.current = document.getElementById(nextObj.id)
+		anchorRef.current.scrollIntoView({
+			behavior: 'auto',
+			block: 'center',
+			inline: 'center'
+		});
+		anchorRef.current.style.zIndex = 35
+
+		if (nextObj.step >= 6) {
+			if (nextObj.step === 6) {
+				anchorRef.current.style.boxShadow = '0px 0px 20px rgba(181, 28, 72, 0.6)'
+			}
+			else {
+				anchorRef.current.style.boxShadow = 'none'
+			}
+		}
+		setWalkThroughObj(nextObj)
+
+	}
+
+	const startWalkThroughAtStepOne = () => {
+		//setShowWalkThrough(true)
+		const workspace = Steps[1]
+		setWalkThroughObj(workspace)
+		anchorRef.current = document.getElementById(workspace.id)
+		anchorRef.current.scrollIntoView({
+			behavior: 'auto',
+			block: 'center',
+			inline: 'center'
+		});
+		anchorRef.current.style.zIndex = 35
+	}
+
+	const expandHelpOptions = () => {
+		setIsHelpIconOpen(!isHelpIconOpen)
+	}
+
 	return (
 		<>
 			{!validDaoChain || !DAO || DAOLoading || (daoURL && (DAO && DAO.url !== daoURL)) ?
@@ -478,6 +600,21 @@ const Dashboard = () => {
 						<LeapFrog size={50} color="#C94B32" />
 					</div>
 				</div> : null}
+			{(showWalkThrough || isHelpIconOpen)
+				&& <div className="overlay"></div>}
+			<WalkThroughModal
+				beginWalkThrough={incrementWalkThroughSteps}
+				showConfirmation={showWalkThrough && currWalkThroughObj.step === 0}
+				endWalkThrough={endWalkThrough}
+				obj={currWalkThroughObj}
+			/>
+			<WalkThroughPopover
+				displayPopover={showWalkThrough && currWalkThroughObj.step > 0}
+				obj={currWalkThroughObj}
+				incrementWalkThroughSteps={incrementWalkThroughSteps}
+				endWalkThrough={endWalkThrough}
+				anchorEl={anchorRef.current}
+			/>
 			<div
 				className="dashBoardBody"
 				onMouseEnter={() => {
@@ -594,6 +731,31 @@ const Dashboard = () => {
 					toggleShowMember={toggleShowMember}
 				/>
 			)}
+
+			{/* <div className={`help-option ${isHelpIconOpen ? 'z-index-60' : ''}`}
+				id="question-mark"
+				onClick={expandHelpOptions}>
+				{isHelpIconOpen
+					&&
+					<Stack spacing={2}>
+						<PlayWalkThroughButton
+							variant="contained"
+							className="play-walkthrough"
+							onClick={startWalkThroughAtStepOne}>
+							Play walk through
+            			</PlayWalkThroughButton>
+						<HideHelpIconButton
+							startIcon={<CloseIcon />}
+							onClick={() => setIsHelpIconOpen(false)}
+							variant="contained">
+							Hide help icon
+						</HideHelpIconButton>
+					</Stack>
+				}
+				<img src={((showWalkThrough && currWalkThroughObj.step === 7) || isHelpIconOpen)
+					? questionMarkDark
+					: questionMarkLight} />
+			</div> */}
 			<SideBar
 				name={_get(DAO, 'name', '')}
 				showSideBar={showSideBar}
@@ -603,7 +765,8 @@ const Dashboard = () => {
 			{showEditMember && <EditMember toggleShowEditMember={toggleShowEditMember} DAO={DAO} amIAdmin={amIAdmin} account={account} />}
 
 			{/* create task side modal */}
-			{showCreateTask && <CreateTask toggleShowCreateTask={toggleShowCreateTask} selectedProject={null} />}
+			{showCreateTask
+				&& <CreateTask toggleShowCreateTask={toggleShowCreateTask} selectedProject={null} />}
 
 			{/* Create recurring payment side modal */}
 			{showCreateRecurring && <CreateRecurring transaction={recurringTxn} onRecurringPaymentCreated={() => treasuryRef?.current?.reload()} toggleShowCreateRecurring={toggleShowCreateRecurring} />}

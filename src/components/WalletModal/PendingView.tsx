@@ -3,7 +3,7 @@ import { Connector } from "@web3-react/types";
 import { ButtonEmpty, ButtonPrimary } from "components/Button";
 import styled from "styled-components/macro";
 import { ThemedText } from "theme";
-
+import * as React from 'react';
 import Loader from "../Loader";
 
 const PendingSection = styled.div`

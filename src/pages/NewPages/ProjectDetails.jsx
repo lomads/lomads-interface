@@ -3,8 +3,33 @@ import { get as _get, find as _find, uniqBy as _uniqBy, sortBy as _sortBy } from
 import SafeButton from "UIpack/SafeButton";
 import '../../styles/pages/ProjectDetails.css';
 import { LeapFrog } from "@uiball/loaders";
-import lomadsfulllogo from "../../assets/svg/lomadsfulllogo.svg";
 
+import {
+    Button,
+    Menu,
+    MenuButton,
+    MenuList,
+    MenuItem,
+    MenuItemOption,
+    MenuGroup,
+    MenuOptionGroup,
+    MenuDivider,
+  } from '@mui/material'
+
+  import copyIcon from "assets/svg/copyIcon.svg";
+
+  import {
+    TelegramIcon,
+    TwitterIcon,
+    WhatsappIcon,
+    LivejournalIcon,
+    TelegramShareButton,
+    TwitterShareButton,
+    WhatsappShareButton,
+  } from "react-share";
+
+import lomadsfulllogo from "../../assets/svg/lomadsfulllogo.svg";
+import ShareSVG from '../../assets/svg/share.svg'
 import membersGroup from '../../assets/svg/membersGroup.svg'
 import iconSvg from '../../assets/svg/createProject.svg';
 import axios from "axios";
@@ -64,6 +89,7 @@ import ProjectKRA from "./DashBoard/Project/ProjectKRA";
 import WorkspaceInfo from "./DashBoard/Project/WorkspaceInfo";
 import ProjectMembers from "./DashBoard/Project/ProjectMembers";
 import ProjectResource from "./DashBoard/Project/ProjectResource";
+import useMintSBT from "hooks/useMintSBT";
 
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
@@ -82,7 +108,16 @@ const ProjectDetails = () => {
     console.log("Project : ", Project)
     const daoName = _get(DAO, 'name', '').split(" ");
     const { myRole, can } = useRole(DAO, account);
-    const { balanceOf, contractName } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '');
+
+
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => {
+      setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+      setAnchorEl(null);
+    };
 
     const [lockedLinks, setLockedLinks] = useState([]);
     const [openLinks, setOpenLinks] = useState([]);
@@ -113,6 +148,7 @@ const ProjectDetails = () => {
     const [openKRA, setOpenKRA] = useState(false);
     const [openWorkspaceInfo, setOpenWorkspaceInfo] = useState(false);
     const { decryptMessage } = useEncryptDecrypt()
+    const { getStats } = useMintSBT(DAO?.sbt?.address)
 
     useEffect(() => {
         if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
@@ -133,8 +169,8 @@ const ProjectDetails = () => {
 
     const canMyrole = useCallback((permission) => {
         if (!Project) return false;
-        let creator = _get(Project, 'creator', '').toLowerCase() === account.toLowerCase();
-        let inProject = _find(_uniqBy(Project?.members, '_id'), m => m.wallet.toLowerCase() === account.toLowerCase())
+        let creator = _get(Project, 'creator', '').toLowerCase() === account?.toLowerCase();
+        let inProject = _find(_uniqBy(Project?.members, '_id'), m => m.wallet.toLowerCase() === account?.toLowerCase())
         let p = permission;
         if (inProject)
             p = `${permission}.inproject`
@@ -142,7 +178,7 @@ const ProjectDetails = () => {
             p = `${permission}.creator`
         console.log("can(myRole, p) || can(myRole, permission)", can(myRole, p) || can(myRole, permission))
         return (can(myRole, p) || can(myRole, permission))
-    }, [Project]);
+    }, [Project, myRole]);
 
     useEffect(() => {
         if (Project) {
@@ -302,7 +338,10 @@ const ProjectDetails = () => {
             return setUnlockLoading(null);
         if (link.link.indexOf('discord.') > -1) {
             try {
-                if (contractName !== '' && parseInt(balanceOf._hex, 16) === 1) {
+                    const stats = await getStats();
+                    const balanceOf = stats[0];
+                    console.log("BALANCEOF:", parseInt(balanceOf._hex, 16))
+                    console.log(parseInt(balanceOf._hex, 16))
                     if (parseInt(balanceOf._hex, 16) === 1) {
                         const url = new URL(link.link)
                         const dcserverid = url.pathname.split('/')[2]
@@ -330,7 +369,7 @@ const ProjectDetails = () => {
                             window.open(`https://discord.gg/${code}`, '_blank')
                         }
                     }
-                }
+                
             } catch (e) {
                 console.log(e)
                 setUnlockLoading(null)
@@ -345,8 +384,10 @@ const ProjectDetails = () => {
                     .then(async res => {
                         if (res.data) {
                             console.log(res.data)
-                            console.log("BALANCEOF:", parseInt(balanceOf._hex, 16), contractName)
-                            if (contractName !== '' && parseInt(balanceOf._hex, 16) === 1) {
+                            const stats = await getStats();
+                            const balanceOf = stats[0];
+                            console.log("BALANCEOF:", parseInt(balanceOf._hex, 16))
+                            console.log(parseInt(balanceOf._hex, 16))
                                 if (parseInt(balanceOf._hex, 16) === 1) {
                                     const metadata = await axiosHttp.get(`/metadata/${_get(DAO, 'sbt._id', '')}`)
                                     console.log("metadata", metadata)
@@ -377,7 +418,7 @@ const ProjectDetails = () => {
                                         }
                                     }
                                 }
-                            }
+                            
                         }
                     })
                     .catch(e => {
@@ -390,7 +431,7 @@ const ProjectDetails = () => {
                 setUnlockLoading(null)
             }
         }
-    }, [contractName, balanceOf, unlockLoading, Project, account, authorization])
+    }, [ unlockLoading, Project, account, authorization])
 
     const handleAddMember = (user) => {
         if (extraMembers.includes(user.member._id)) {
@@ -669,15 +710,19 @@ const ProjectDetails = () => {
                     {/* Show KRA review side modal */}
                     {showKRAReview && <KRAReview toggleShowKRA={() => setShowKRAReview(false)} data={Project} daoURL={daoURL} />}
 
-                    <div className="home-btn" onClick={() => navigate(-1)}>
+                    <div className="home-btn" onClick={() => navigate('/', { replace: true })}>
                         <div className="invertedBox">
-                            <div className="navbarText">
-                                {
-                                    daoName.length === 1
-                                        ? daoName[0].charAt(0)
-                                        : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)
-                                }
-                            </div>
+                            {
+                                _get(DAO, 'image', null)
+                                    ?
+                                    <img src={_get(DAO, 'image', null)} />
+                                    :
+                                    <div className="navbarText">
+                                        {daoName.length === 1
+                                            ? daoName[0].charAt(0)
+                                            : daoName[0].charAt(0) + daoName[daoName.length - 1].charAt(0)}
+                                    </div>
+                            }
                         </div>
                     </div>
 
@@ -690,12 +735,70 @@ const ProjectDetails = () => {
                                 <div>
                                     <h1>{Project?.name}</h1>
                                 </div>
-                                {
-                                    canMyrole('project.edit') &&
-                                    <button className='settings' onClick={() => { setShowEdit(true) }}>
-                                        <img src={settingIcon} alt="settings-icon" />
+                                <div>
+                                    {
+                                        canMyrole('project.edit') &&
+                                        <button className='settings' onClick={() => { setShowEdit(true) }}>
+                                            <img src={settingIcon} alt="settings-icon" />
+                                        </button>
+                                    }
+                                    { canMyrole('project.share') &&
+                                    <>
+                                    <button onClick={handleClick} style={{ 
+                                        marginLeft: '12px',
+                                        background: 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)',
+                                        height: '40px',
+                                        minWidth: '40px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        borderRadius: '5px'
+                                     }}>
+                                        <img style={{ width: 18, height: 18 }} src={ShareSVG} alt="settings-icon" />
                                     </button>
-                                }
+                                    <Menu
+                                        anchorEl={anchorEl}
+                                        open={open}
+                                        onClose={handleClose}
+                                    >
+                                        <MenuItem style={{ marginLeft: 0, height: 40 }}>
+                                                <TwitterShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`}>
+                                                    <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                        <TwitterIcon size={32}/>
+                                                        <div style={{ marginLeft: 16 }}>Twitter</div>
+                                                    </div>
+                                                </TwitterShareButton>
+                                            </MenuItem>
+                                            <MenuItem style={{ marginLeft: 0, height: 40 }}>
+                                                <TelegramShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`}>
+                                                    <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                        <TelegramIcon size={32}/>
+                                                        <div style={{ marginLeft: 16 }}>Telegram</div>
+                                                    </div>
+                                                </TelegramShareButton>
+                                            </MenuItem>
+                                            <MenuItem style={{ marginLeft: 0, height: 40 }}>
+                                                <WhatsappShareButton style={{ width: '100%' }} url={`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`}>
+                                                    <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                        <WhatsappIcon size={32}/>
+                                                        <div style={{ marginLeft: 16 }}>Whatsapp</div>
+                                                    </div>
+                                                </WhatsappShareButton>
+                                            </MenuItem>
+                                            <MenuItem onClick={() => {
+                                                navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/share/${_get(DAO, 'url', '')}/project/${projectId}/preview`)
+                                            }} style={{ marginLeft: 0, height: 40 }}>
+                                                <div style={{  }}>
+                                                    <div style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                        <img style={{ marginLeft: 8 }} src={copyIcon} />
+                                                        <div style={{ marginLeft: 24 }}>Copy to clipboard</div>
+                                                    </div>
+                                                </div>
+                                            </MenuItem>
+                                    </Menu>
+                                    </>
+                                    }
+                                </div>
                                 {/* {
                                     <div>
                                         {canMyrole('project.delete') && <button onClick={() => setDeletePrompt(true)}>
@@ -739,7 +842,7 @@ const ProjectDetails = () => {
                         </div>
 
                         {/* new Links */}
-                        {canMyrole('project.links.view') && amIMember &&
+                        {canMyrole('project.links.view') &&
                             _get(Project, 'links', []).length > 0 &&
                             <div className="projectDetails-links">
                                 <div className="links-left">
@@ -776,10 +879,10 @@ const ProjectDetails = () => {
                                         })
                                     }
                                 </div>
-                                {
+                                {/* {
                                     canMyrole('project.link.add') &&
                                     <div className="links-right"><button onClick={toggleShowLink}><HiOutlinePlus size={20} color="#C94B32" /></button></div>
-                                }
+                                } */}
                             </div>
                         }
 

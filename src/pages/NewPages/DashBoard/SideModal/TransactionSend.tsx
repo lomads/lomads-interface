@@ -1,5 +1,7 @@
 import { Checkbox } from "@chakra-ui/react";
 import { get as _get } from 'lodash';
+import { Box } from "@mui/material";
+import Button from "muiComponents/Button";
 import React, { useEffect, useRef, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import IconButton from "UIpack/IconButton";
@@ -33,7 +35,7 @@ import {
 
 const TransactionSend = (props: IselectTransactionSend) => {
 	console.log("error : ", props.error)
-	const { DAO } = useAppSelector((state) => state.dashboard);
+	const { DAO } = useAppSelector((state) => state?.dashboard);
 	const { chainId } = useWeb3React();
 	const managePreviousNavigation = () => {
 		const length = props.setRecipient.current.length;
@@ -187,7 +189,12 @@ const TransactionSend = (props: IselectTransactionSend) => {
 				</div>
 				{props.error && <div style={{ fontSize: 14, color: 'red', textAlign: 'center' }}>{props.error}</div>}
 				<div id="transactionSendDivider2"></div>
-				<div id="transactionSendButton">
+				<Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: '500px',  position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
+					<Box display="flex" mt={4} justifyContent="center" flexDirection="row">
+						<Button loading={props.isLoading} onClick={() => props.createTransaction()} sx={{ ml:1 }}  variant='contained' size="small">SEND TOKENS</Button>
+					</Box>
+				</Box>
+				{/* <div id="transactionSendButton">
 					<SimpleLoadButton
 						title="SEND TOKENS"
 						height={50}
@@ -201,7 +208,7 @@ const TransactionSend = (props: IselectTransactionSend) => {
 						}}
 						condition={props.isLoading}
 					/>
-				</div>
+				</div> */}
 			</div>
 			{props.addNewRecipient && (
 				<AddRecipient toggleAddNewRecipient={props.toggleAddNewRecipient} />

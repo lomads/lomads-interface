@@ -2,14 +2,16 @@ import { AiOutlineClose } from "react-icons/ai";
 import IconButton from "UIpack/IconButton";
 import { get as _get } from 'lodash'
 import "./Settings.css";
+import Button from 'muiComponents/Button'
 import OD from "../../assets/images/drawer-icons/OD.svg";
-import { Button, Image, Input } from "@chakra-ui/react";
+import { Image, Input } from "@chakra-ui/react";
 import { ReactComponent as XpPoints } from "../../assets/images/settings-page/5-xp-points-color.svg";
 import DisableXpPointDailog from "./DisableXpPointDailog";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import CompensateMembersModal from "./CompensateMembersModal";
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import { toggleXPPoints } from "state/dashboard/actions";
+import Switch from "muiComponents/Switch";
 
 
 
@@ -93,13 +95,9 @@ const XpPointsModal = ({ toggleXp }) => {
 
           {/* //! BODY */}
           <div id="xp-text" >
-            This feature is super useful during the bootstrapping phase of your organisation. You
-            can assign SWEAT points to members for their contributions. Over time, this serves as a
-            measure of the relative contribution of different members of the organisation. When your
-            organisation has its own token or it has funds to pay, you can compensate members in
-            proportion to the SWEAT points they have.
+            Get ahead of the game with SWEAT points during your organization's bootstrapping phase. Track contributions and reward members based on their SWEAT points, once your organization has the funds.
           </div>
-          {isXpPointEnable && <Button onClick={() => setShowCompensateMembersModals(true)} id="button-save">{'Convert to tokens & Compensate members'}</Button>}
+          {isXpPointEnable && <Button size="small" onClick={() => setShowCompensateMembersModals(true)} id="button-save">{'Convert to tokens & Compensate members'}</Button>}
           <div
             style={{
               marginTop: "10px",
@@ -107,7 +105,20 @@ const XpPointsModal = ({ toggleXp }) => {
               alignItems: "center",
             }}
           >
-            <label class="switch">
+            <Switch
+              checked={isXpPointEnable}
+              label={isXpPointEnable ? "ENABLED" : "DISABLED"}
+              onChange={(e, d) => {
+                if (!isXpPointEnable) {
+                  dispatch(toggleXPPoints({ payload: { status: !isXpPointEnable }, daoUrl: _get(DAO, 'url', '') }))
+                  setIsXpPointEnable(!isXpPointEnable)
+                } else {
+                  setShowDisableDailog(true)
+                  setIsXpPointSetByDailog(false)
+                }
+              }}
+            />
+            {/* <label class="switch">
               <input checked={isXpPointEnable} onChange={(e, d) => {
                 if (!isXpPointEnable) {
                   dispatch(toggleXPPoints({ payload: { status: !isXpPointEnable }, daoUrl: _get(DAO, 'url', '') }))
@@ -118,8 +129,8 @@ const XpPointsModal = ({ toggleXp }) => {
                 }
               }} type="checkbox" />
               <span class="slider check round"></span>
-            </label>
-            <div id="switch-title">{isXpPointEnable ? "ENABLED" : "DISABLED"}</div>
+            </label> */}
+            {/* <div id="switch-title">{isXpPointEnable ? "ENABLED" : "DISABLED"}</div> */}
           </div>
           {/* //! FOOTER */}
           {/* <div className="button-section">

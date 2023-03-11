@@ -1,6 +1,9 @@
-import { Checkbox } from "@chakra-ui/react";
+// import { Checkbox } from "@chakra-ui/react";
+import Checkbox from "muiComponents/Checkbox";
 import { get as _get } from 'lodash'
 import React, { useState, useEffect } from "react";
+import { Box, Typography } from "@mui/material";
+import Button from "muiComponents/Button";
 import SimpleButton from "UIpack/SimpleButton";
 import daoMember2 from "../../../../assets/svg/daoMember2.svg";
 import SafeButton from "UIpack/SafeButton";
@@ -108,7 +111,7 @@ const SelectRecipient = (props: IselectRecipientType) => {
 									defaultChecked={false}
 									disabled={false}
 									value={result.address}
-									onChange={(event) => {
+									onChange={(event:any) => {
 										handleCheck(event);
 									}}
 								/>
@@ -135,7 +138,7 @@ const SelectRecipient = (props: IselectRecipientType) => {
 									defaultChecked={false}
 									disabled={false}
 									value={result.address}
-									onChange={(event) => {
+									onChange={(event:any) => {
 										handleCheck(event);
 									}}
 								/>
@@ -143,7 +146,13 @@ const SelectRecipient = (props: IselectRecipientType) => {
 						);
 					})}
 				</div>
-				<div id="recipientButtonArea">
+				<Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: '567px', position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
+						<Box display="flex" mt={4} width={400} style={{ margin: '0 auto' }} flexDirection="row">
+							<Button onClick={() => managePreviousNavigation()} sx={{ mr:1 }} fullWidth variant='outlined' size="small">CANCEL</Button>
+							<Button onClick={() => handleSetRecipient()} sx={{ ml:1 }}  fullWidth variant='contained' size="small">NEXT</Button>
+						</Box>
+				</Box>
+				{/* <div id="recipientButtonArea">
 					<OutlineButton
 						title="CANCEL"
 						borderColor="#C94B32"
@@ -167,7 +176,7 @@ const SelectRecipient = (props: IselectRecipientType) => {
 							handleSetRecipient();
 						}}
 					/>
-				</div>
+				</div> */}
 			</div>
 			{props.addNewRecipient && (
 				<AddRecipient

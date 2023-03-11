@@ -359,7 +359,7 @@ const MintPassToken = () => {
                             {
                                 tab === 1
                                     ?
-                                    <p className="heading-text">Mint your pass token for {_get(DAO, 'name', '')}</p>
+                                    <p className="heading-text">{ isUpdate? 'Update' : 'Mint' } your pass token for {_get(DAO, 'name', '')}</p>
                                     :
                                     null
                             }
@@ -368,7 +368,7 @@ const MintPassToken = () => {
                                     ?
                                     <>
                                         <p className="heading-text" style={{ marginBottom: 0 }}>You are whitelisted</p>
-                                        <p className="heading-text">Mint your pass token for {_get(DAO, 'name', '')}</p>
+                                        <p className="heading-text">{ isUpdate? 'Update' : 'Mint' } your pass token for {_get(DAO, 'name', '')}</p>
                                     </>
                                     :
                                     null

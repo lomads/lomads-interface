@@ -10,10 +10,10 @@ import { useNavigate, useParams } from "react-router-dom";
 
 const CreatePassSucess = () => {
   const navigate = useNavigate();
-  const {contractAddr} = useParams();
+  const { contractAddr } = useParams();
 
   const handleClick = () => {
-    navigate(`/:daoURL/sbt/mint/${contractAddr}`);
+    navigate(`/:daoURL/mint/${contractAddr}`);
   };
   return (
     <>

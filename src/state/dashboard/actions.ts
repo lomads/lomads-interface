@@ -47,6 +47,15 @@ export const updateDao = createAsyncThunk(
 	}
 );
 
+export const updateUserOnboardingCount = createAsyncThunk(
+	'user/updateOnboardingCount',
+	async (params: any, thunkApi) => {
+		return axiosHttp.post(`member/update-onboarding-count`, params.payload)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+);
+
 export const addDaoMember = createAsyncThunk(
 	'dao/addmember',
 	async (params: any, thunkApi) => {
@@ -115,6 +124,18 @@ export const updateDaoLinks = createAsyncThunk(
 			})
 	}
 );
+
+export const deleteDaoLink = createAsyncThunk(
+	'dao/deleteDaoLink',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`dao/${params.url}/delete-link`, params.payload)
+			.then(res => res.data)
+			.catch(e => {
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
+	}
+)
 
 export const createProject = createAsyncThunk(
 	'dao/createProject',
@@ -268,7 +289,7 @@ export const getTask = createAsyncThunk(
 export const storeGithubIssues = createAsyncThunk(
 	'dao/storeGithubIssues',
 	async (params: any, thunkApi) => {
-		return axiosHttp.post(`task/storeGithubIssues`, params.payload)
+		return axiosHttp.post(`utility/store-issues`, params.payload)
 			.then(res => res.data)
 			.catch(e => thunkApi.rejectWithValue(e))
 	}
