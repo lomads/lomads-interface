@@ -238,7 +238,8 @@ const PassTokenModal = ({ togglePassToken }) => {
 							</p>
 						</div>
 						{/* //! FOOTER */}
-						<Box className="button-section" sx={{ display: 'flex', flexDirection: 'row', mt: 28 }}>
+						
+						<Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px', padding: "30px 0 20px" }}>
 							<Button
 								size="small"
 								style={{ marginRight: 6 }}

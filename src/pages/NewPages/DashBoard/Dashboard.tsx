@@ -186,11 +186,11 @@ const Dashboard = () => {
 		// requestReposIssues('Lomads-Technologies/soulbound-token');
 	}, [DAO]);
 
-	useEffect(() => {
-		console.log("ser?.onboardingViewCount", user)
-		if(DAO && user && (!user?.onboardingViewCount || ( user?.onboardingViewCount && user?.onboardingViewCount.indexOf(_get(DAO, '_id', '')) === -1 && user?.onboardingViewCount.length < 2 )))
-			setShowWalkThrough(true)
-	}, [DAO, user])
+	// useEffect(() => {
+	// 	console.log("ser?.onboardingViewCount", user)
+	// 	if(DAO && user && (!user?.onboardingViewCount || ( user?.onboardingViewCount && user?.onboardingViewCount.indexOf(_get(DAO, '_id', '')) === -1 && user?.onboardingViewCount.length < 2 )))
+	// 		setShowWalkThrough(true)
+	// }, [DAO, user])
 
 	const amIAdmin = useMemo(() => {
 		if (DAO) {
@@ -573,7 +573,7 @@ const Dashboard = () => {
 	}
 
 	const startWalkThroughAtStepOne = () => {
-		setShowWalkThrough(true)
+		//setShowWalkThrough(true)
 		const workspace = Steps[1]
 		setWalkThroughObj(workspace)
 		anchorRef.current = document.getElementById(workspace.id)
@@ -732,7 +732,7 @@ const Dashboard = () => {
 				/>
 			)}
 
-			<div className={`help-option ${isHelpIconOpen ? 'z-index-60' : ''}`}
+			{/* <div className={`help-option ${isHelpIconOpen ? 'z-index-60' : ''}`}
 				id="question-mark"
 				onClick={expandHelpOptions}>
 				{isHelpIconOpen
@@ -744,12 +744,6 @@ const Dashboard = () => {
 							onClick={startWalkThroughAtStepOne}>
 							Play walk through
             			</PlayWalkThroughButton>
-						{/* <Button
-              				variant="contained"
-              				onClick={incrementWalkThroughSteps}
-              				size="small">
-              				Lomads’Telegram
-            			</Button> */}
 						<HideHelpIconButton
 							startIcon={<CloseIcon />}
 							onClick={() => setIsHelpIconOpen(false)}
@@ -761,7 +755,7 @@ const Dashboard = () => {
 				<img src={((showWalkThrough && currWalkThroughObj.step === 7) || isHelpIconOpen)
 					? questionMarkDark
 					: questionMarkLight} />
-			</div>
+			</div> */}
 			<SideBar
 				name={_get(DAO, 'name', '')}
 				showSideBar={showSideBar}

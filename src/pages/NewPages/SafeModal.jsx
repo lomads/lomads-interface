@@ -5,6 +5,7 @@ import './SafeModal.css';
 import Button from "muiComponents/Button";
 import copyIcon from "../../assets/svg/copyIcon.svg";
 import { Tooltip } from "@chakra-ui/react";
+import { Box } from "@mui/material";
 import editIcon from 'assets/svg/editButton.svg';
 import bitMemberIcon from 'assets/svg/bigMember.svg';
 import SearchSettingsSvg from 'assets/svg/search-settings.svg';
@@ -252,6 +253,7 @@ const SafeModal = ({ toggleS }) => {
 										style={{
 											width: '400px',
 											marginTop: "30px",
+											paddingBottom: 120
 										}}
 									>
 										<div>
@@ -309,7 +311,7 @@ const SafeModal = ({ toggleS }) => {
 										</div>
 									</div>
 									{/* //! FOOTER */}
-									<div className="button-section" style={{ display: 'flex' }}>
+									{/* <div className="button-section" style={{ display: 'flex' }}>
 										<Button
 											variant="outlined"
 											mr={3}
@@ -332,7 +334,24 @@ const SafeModal = ({ toggleS }) => {
 												}
 											}}
 											>SAVE CHANGES</Button>
-									</div>
+									</div> */}
+									<Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: '567px', position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px', padding: "30px 0 20px" }}>
+										<Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
+											<Button onClick={() => toggleS()} sx={{ mr: 1 }} fullWidth variant='outlined'>Cancel</Button>
+											<Button 
+												onClick={async () => {
+													// add name condition
+													if (currentThreshold !== thresholdValue) {
+														await updateOwnersWithThreshold({ ownerCount: newOwnerCount, threshold: thresholdValue, thresholdChanged: currentThreshold !== thresholdValue })
+														toggleS();
+													}
+													else {
+														toggleS();
+													}
+												}}
+											sx={{ ml: 1 }} fullWidth variant='contained'>Save</Button>
+										</Box>
+									</Box>
 								</div>
 					}
 				</div>

@@ -43,10 +43,10 @@
     /* HG */
 
 
-    position: absolute;
+    /* position: absolute;
     width: 97px;
     height: 61px;
-    top: 16px;
+    top: 16px; */
 
     font-family: var(--chakra-fonts-body);
     font-style: normal;
