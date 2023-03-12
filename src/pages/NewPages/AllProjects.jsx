@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import '../../styles/pages/AllTasks.css';
 import { find as _find, get as _get, debounce as _debounce, groupBy as _groupBy, orderBy as _orderBy } from 'lodash';
-import { useAppSelector } from "state/hooks";
+import { useAppDispatch, useAppSelector } from "state/hooks";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useWeb3React } from "@web3-react/core";
 import useTerminology from 'hooks/useTerminology';
@@ -12,10 +12,12 @@ import archiveIcon from '../../assets/svg/archiveIcon.svg';
 import ProjectCard from './DashBoard/Project/ProjectCard';
 
 import moment from 'moment';
+import { resetProject } from 'state/dashboard/reducer';
 
 const AllProjects = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const dispatch = useAppDispatch()
     const { DAO, user } = useAppSelector((state) => state.dashboard);
     const { account } = useWeb3React();
     const daoName = _get(DAO, 'name', '').split(" ");
@@ -134,7 +136,8 @@ const AllProjects = () => {
                             fontweight={400}
                             fontsize={16}
                             onClick={() => {
-                                navigate("/createProject");
+                                setTimeout(() => navigate("/createProject"), 1000)
+                                
                             }}
                         />
                     </div>

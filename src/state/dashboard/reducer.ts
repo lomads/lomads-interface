@@ -276,6 +276,9 @@ const dashboardSlice = createSlice({
 		resetEditProjectMilestoneLoader(state) {
 			state.editProjectMilestoneLoading = null
 		},
+		resetProject(state) {
+			state.Project = null
+		},
 		updateSafeTransaction(state, action) {
 			console.log(action.payload)
 			const tx = _find(state.DAO.safe.transactions, t => t.safeTxHash === action.payload.safeTxHash);
@@ -705,6 +708,7 @@ const dashboardSlice = createSlice({
 
 export const {
 	setDAOList,
+	resetProject,
 	setDAO,
 	setTask,
 	setUser,
