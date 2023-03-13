@@ -227,7 +227,10 @@ const Settings = () => {
 
 							<div className="settings-organisation-child"
 								onClick={() => {
-									togglePassToken()
+									if(DAO?.sbt)
+										togglePassToken()
+									else
+										toggleCreatePassTokenModal()
 								}}
 							>
 								<div
