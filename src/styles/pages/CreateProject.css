@@ -440,6 +440,9 @@
 
 .createProject-container .createProject-body .project-members .member-list {
     width: 100%;
+    max-height: 350px;
+    overflow: hidden;
+    overflow-y: scroll;
 }
 
 

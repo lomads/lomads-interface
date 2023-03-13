@@ -34,7 +34,7 @@ export default function App() {
 			<ProjectContext.Provider value={{ projects, setProjects }}>
 				<Routes>
 					{
-						routes.map(route => <Route path={route.path} element={ route.layout ?
+						routes.map((route: any) => <Route path={route.path} element={ route.layout ?
 							<route.layout>
 								<route.component/>
 							</route.layout> : 

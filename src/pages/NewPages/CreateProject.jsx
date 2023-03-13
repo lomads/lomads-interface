@@ -17,7 +17,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import { createProject } from 'state/dashboard/actions'
 import { isValidUrl } from 'utils';
-import { resetCreateProjectLoader } from 'state/dashboard/reducer';
+import { resetCreateProjectLoader, resetProject } from 'state/dashboard/reducer';
 import useDCAuth from 'hooks/useDCAuth';
 import usePopupWindow from 'hooks/usePopupWindow';
 import axios from 'axios';
@@ -82,6 +82,10 @@ const CreateProject = () => {
         if (DAO)
             setMemberList(DAO.members)
     }, [DAO])
+
+    useEffect(() => {
+        dispatch(resetProject())
+    }, [])
 
     useEffect(() => {
         if (createProjectLoading === false) {
