@@ -685,7 +685,10 @@ const Dashboard = () => {
 					</div>
 				</div>
 
-				<LinksArea links={_get(DAO, 'links', [])} />
+				<LinksArea 
+					links={_get(DAO, 'links', [])} 
+					isHelpIconOpen={isHelpIconOpen}
+				/>
 
 				<Notifications />
 
@@ -700,8 +703,11 @@ const Dashboard = () => {
 					)} */}
 
 
-				<MyProject />
-				<Tasks toggleShowCreateTask={toggleShowCreateTask} onlyProjects={false} />
+				<MyProject isHelpIconOpen={isHelpIconOpen} />
+				<Tasks
+					toggleShowCreateTask={toggleShowCreateTask} 
+					onlyProjects={false} 
+					isHelpIconOpen={isHelpIconOpen} />
 				{(can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') &&
 					<TreasuryCard
 						innerRef={treasuryRef}
@@ -771,6 +777,7 @@ const Dashboard = () => {
 				name={_get(DAO, 'name', '')}
 				showSideBar={showSideBar}
 				showNavBar={showNavBar}
+				isHelpIconOpen={isHelpIconOpen}
 			/>
 			{showAddMember && <AddMember toggleShowMember={toggleShowMember} />}
 			{showEditMember && <EditMember toggleShowEditMember={toggleShowEditMember} DAO={DAO} amIAdmin={amIAdmin} account={account} />}

@@ -1584,6 +1584,14 @@ body.active-modal {
 .z-index-1000 {
     z-index: 1000;
 }
+
+
+.help-highlight {
+    box-shadow: 0px 0px 20px rgba(181, 28, 72, 0.6);
+    z-index: 1111;
+    position: relative;
+}
+
 /* 
 input:checked+.inner-check:before {
     -webkit-transform: translateX(35px);

@@ -160,12 +160,12 @@ export default function WalkThroughPopover({
       }
       <Box>
         <div 
-            className="tooltip"
+            className="walkthroughContainer"
             style={{ top: '5%', right: '3%' }}>
-          <div className="tooltip-left">
+          <div className="walkthroughContainer-left">
             <img src={obj?.imgPath} />
           </div>
-          <div className="tooltip-right">
+          <div className="walkthroughContainer-right">
             <Typography className="popper-title" component="h2" variant="h4">
               {obj?.title}
             </Typography>
