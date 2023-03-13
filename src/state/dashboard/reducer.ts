@@ -46,7 +46,8 @@ import {
 	editProjectKRA,
 	updateMilestone,
 	editProjectMilestone,
-	updateUserOnboardingCount
+	updateUserOnboardingCount,
+	syncTrelloData
 } from "./actions";
 import { createContract } from "state/contract/actions";
 import { get as _get, find as _find } from "lodash";
@@ -79,6 +80,7 @@ export interface DashboardState {
 	updateProjectLoading: boolean | null;
 	createTaskLoading: boolean | null;
 	storeGithubIssuesLoading: boolean | null;
+	syncTrelloDataLoading: boolean | null;
 	editTaskLoading: boolean | null;
 	editDraftTaskLoading: boolean | null;
 	convertDraftTaskLoading: boolean | null;
@@ -128,6 +130,7 @@ const initialState: DashboardState = {
 	updateProjectLoading: null,
 	createTaskLoading: null,
 	storeGithubIssuesLoading: null,
+	syncTrelloDataLoading: null,
 	editTaskLoading: null,
 	editDraftTaskLoading: null,
 	convertDraftTaskLoading: null,
@@ -218,6 +221,9 @@ const dashboardSlice = createSlice({
 		},
 		resetStoreGithubIssuesLoader(state) {
 			state.storeGithubIssuesLoading = null
+		},
+		resetSyncTrelloDataLoader(state) {
+			state.syncTrelloDataLoading = null
 		},
 		resetEditTaskLoader(state) {
 			state.editTaskLoading = null
@@ -534,6 +540,14 @@ const dashboardSlice = createSlice({
 		[`${storeGithubIssues.pending}`]: (state) => {
 			state.storeGithubIssuesLoading = true;
 		},
+		// sync trello data
+		[`${syncTrelloData.fulfilled}`]: (state, action) => {
+			state.syncTrelloDataLoading = false;
+			state.DAO = action.payload.dao;
+		},
+		[`${syncTrelloData.pending}`]: (state) => {
+			state.syncTrelloDataLoading = true;
+		},
 		// edit task
 		[`${editTask.fulfilled}`]: (state, action) => {
 			state.editTaskLoading = false;
@@ -746,6 +760,7 @@ export const {
 	resetEditProjectKraLoader,
 	resetUpdateMilestoneLoader,
 	resetEditProjectMilestoneLoader,
-	resetDeleteDaoLinkLoader
+	resetDeleteDaoLinkLoader,
+	resetSyncTrelloDataLoader,
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;
