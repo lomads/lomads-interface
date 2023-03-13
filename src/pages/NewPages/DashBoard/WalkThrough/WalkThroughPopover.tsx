@@ -118,7 +118,6 @@ export default function WalkThroughPopover({
   return (
     <StyledPopper
       open={displayPopover}
-      id="walkThroughTooltip"
       anchorEl={anchorEl}
       style={{ 
         zIndex: '1000',
