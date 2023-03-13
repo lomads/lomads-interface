@@ -729,6 +729,7 @@ body.active-modal {
     z-index: 0;
 }
 
+
 .sidebarModal {
     z-index: 10000;
 }
@@ -1162,6 +1163,7 @@ body.active-modal {
     z-index: 999;
 }
 
+.walkThroughOverlay,
 #AddNewMemberComponent,
 #AddNewMemberOverlay {
     width: 100vw;
@@ -1174,6 +1176,7 @@ body.active-modal {
     z-index: 999;
 }
 
+.walkThroughOverlay,
 #AddNewMemberOverlay {
     background: #1B2B41;
     opacity: 0.2;
@@ -1578,8 +1581,8 @@ body.active-modal {
     border-radius: 5px;
 }
 
-.z-index-60 {
-    z-index: 60;
+.z-index-1000 {
+    z-index: 1000;
 }
 /* 
 input:checked+.inner-check:before {

@@ -9,21 +9,20 @@ import './WalkThrough.css'
 
 export default function WalkThrough({
   showConfirmation,
-  beginWalkThrough,
+  incrementWalkThroughSteps,
   endWalkThrough,
   obj,
 }: {
   showConfirmation: boolean,
-  beginWalkThrough: any,
+  incrementWalkThroughSteps: any,
   endWalkThrough: any,
   obj: any
 }) {
-
   return (
-    <BasicModal 
+    <BasicModal
         isOpen={showConfirmation}
         key={showConfirmation.toString() + Math.random() + 'walkThrough'}
-        parentClose={endWalkThrough}
+        closeModal={endWalkThrough}
        >
       <div className="confirm-walkthrough">
         <div className="close-btn" onClick={endWalkThrough}>
@@ -44,7 +43,7 @@ export default function WalkThrough({
           <Button
             variant="contained"
             size="small"
-            onClick={beginWalkThrough}
+            onClick={incrementWalkThroughSteps}
           >
             Let's Go
           </Button>
