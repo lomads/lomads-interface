@@ -573,7 +573,7 @@ const Dashboard = () => {
 	}
 
 	const startWalkThroughAtStepOne = () => {
-		//setShowWalkThrough(true)
+		setShowWalkThrough(true)
 		const workspace = Steps[1]
 		setWalkThroughObj(workspace)
 		anchorRef.current = document.getElementById(workspace.id)
@@ -586,6 +586,7 @@ const Dashboard = () => {
 	}
 
 	const expandHelpOptions = () => {
+		console.log('....help icon....')
 		setIsHelpIconOpen(!isHelpIconOpen)
 	}
 
