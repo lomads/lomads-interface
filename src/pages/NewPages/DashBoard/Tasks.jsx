@@ -3,7 +3,6 @@ import './Tasks.css';
 import { get as _get, find as _find, orderBy as _orderBy } from 'lodash';
 
 import SafeButton from "UIpack/SafeButton";
-
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "state/hooks";
 import { useWeb3React } from "@web3-react/core";
@@ -13,8 +12,9 @@ import useTerminology from 'hooks/useTerminology';
 import archiveIcon from '../../../assets/svg/archiveIcon.svg';
 import expandIcon from '../../../assets/svg/expand.svg';
 import moment from 'moment';
+import BootstrapTooltip from "./WalkThrough/HelpTooltip"
 
-const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
+const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
     const navigate = useNavigate();
     const { DAO, user, Project } = useAppSelector((state) => state.dashboard);
     const { transformTask } = useTerminology(_get(DAO, 'terminologies', null))
@@ -274,21 +274,35 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                 </div>
                 <div className="tasks-buttons">
                     <div style={{ marginRight: '20px' }}>
-                        <button className='archive-btn' onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { activeTab: tab } }) : navigate(`/${DAO.url}/tasks`, { state: { activeTab: tab } }) }}>
+                    <BootstrapTooltip open={isHelpIconOpen} 
+			            placement="top-start" arrow
+			            title="Open">
+                        <button 
+                            className={`archive-btn ${isHelpIconOpen ? 'help-highlight':''}`}
+                            onClick={() => { onlyProjects ? navigate(`/${DAO.url}/tasks/${Project._id}`, { state: { activeTab: tab } }) : navigate(`/${DAO.url}/tasks`, { state: { activeTab: tab } }) }}>
                             <img src={expandIcon} alt="archive-icon" />
                         </button>
+                    </BootstrapTooltip>
                     </div>
                     <div style={{ marginRight: '20px' }}>
+                    <BootstrapTooltip open={isHelpIconOpen} 
+			            placement="bottom" arrow
+			            title="Archives">
                         <button
-                            className='archive-btn'
+                            className={`archive-btn ${isHelpIconOpen ? 'help-highlight':''}`}
                             onClick={() => { onlyProjects ? navigate(`/${DAO.url}/archiveTasks/${Project._id}`) : navigate(`/${DAO.url}/archiveTasks`) }}
                             disabled={_get(DAO, 'tasks', []).filter(task => !task.deletedAt && task.archivedAt).length > 0 ? false : true}
                         >
                             <img src={archiveIcon} alt="archive-icon" />
                         </button>
+                        </BootstrapTooltip>
                     </div>
                     {
-                        can(myRole, 'task.create') && <div>
+                        can(myRole, 'task.create') && 
+                        <BootstrapTooltip open={isHelpIconOpen} 
+			                placement="top-start" arrow
+			                title="Create Task">
+                            <div className={`${isHelpIconOpen ? 'help-highlight':''}`}>
                             <SafeButton
                                 height={40}
                                 width={150}
@@ -302,22 +316,25 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                                 onClick={() => { toggleShowCreateTask() }}
                             />
                         </div>
+                        </BootstrapTooltip>
                     }
                 </div>
             </div>
-
             {(tab === 1 && myTasks && myTasks.length > 0) ||
                 (tab === 2 && manageTasks && manageTasks.length > 0) ||
                 (tab === 3 && draftTasks && draftTasks.length > 0) ||
                 (tab === 4 && otherTasks && otherTasks.length > 0) ?
                 <div className='tasks-body'>
+                      {isHelpIconOpen && <div className="help-card">
+                            <span>By creating tasks, you can <span className="bold-text"> track progress, deadlines, </span> and <span className="bold-text"> rewards on bounties, </span> and <span className="bold-text"> assign contributors </span> to each task.</span>
+                        </div>}
                     {
                         tab === 1 && myTasks && myTasks.filter((item, index) => index < 6).map((item, index) => {
                             if (index <= 4) {
                                 return (
                                     <div key={index}>
                                         <TaskCard
-                                            task={item}
+                                              task={item}
                                             daoUrl={DAO?.url}
                                         />
                                     </div>

@@ -166,6 +166,9 @@ const MemberCard = (props: any) => {
 					</div>
 				</div>
 				<div className="membersListWrapper">
+				{props.isHelpIconOpen && <div className="help-card">
+							This allows you to add new members and manage details and roles of existing members.
+						</div>}
 					<div className="membersList">
 						<div className="NameAndAvatar">
 							<div className="memberRow">

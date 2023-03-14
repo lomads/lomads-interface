@@ -1,5 +1,5 @@
 import './LinksArea.css';
-
+import BootstrapTooltip from "./WalkThrough/HelpTooltip"
 import { SiNotion } from "react-icons/si";
 import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe } from "react-icons/bs";
 import useRole from "hooks/useRole";
@@ -8,7 +8,7 @@ import { useWeb3React } from "@web3-react/core";
 import settingIcon from '../../../assets/svg/settings.svg';
 import { useAppSelector } from "state/hooks";
 
-const LinksArea = ({ links }) => {
+const LinksArea = ({ links, isHelpIconOpen }) => {
     const navigate = useNavigate();
     const { account } = useWeb3React();
     const { DAO } = useAppSelector((state) => state.dashboard);
@@ -65,9 +65,16 @@ const LinksArea = ({ links }) => {
             </div>
             {
                 can(myRole, 'settings') &&
-                <button className='settings' id="global-settings" onClick={() => { navigate(`/${DAO.url}/settings`) }}>
+                <BootstrapTooltip open={isHelpIconOpen} 
+                    placement="left-start" arrow
+                    title="Global Settings">
+                <button
+                    className={`settings ${isHelpIconOpen ? 'help-highlight':''}`}
+                    id="global-settings" 
+                    onClick={() => { navigate(`/${DAO.url}/settings`) }}>
                     <img src={settingIcon} alt="settings-icon" />
                 </button>
+                </BootstrapTooltip>
             }
         </div>
     )
