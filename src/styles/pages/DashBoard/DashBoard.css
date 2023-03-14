@@ -608,6 +608,7 @@ body.active-modal {
     background: #FFFFFF;
     border-radius: 5px;
     margin-top: 0.2rem;
+    position: relative;
 }
 
 .membersList {
@@ -1612,16 +1613,14 @@ body.active-modal {
     height: 100%;
     opacity: 0.8;
     text-align: center;
+    padding-left: 15px;
+    padding-right: 15px;
 }
 
 .bold-text {
     font-weight: 800;
-    display: inline;
 }
 
-.tasks-body {
-    position: relative;
-}
 /* 
 input:checked+.inner-check:before {
     -webkit-transform: translateX(35px);

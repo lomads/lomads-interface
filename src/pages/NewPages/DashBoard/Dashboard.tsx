@@ -729,6 +729,7 @@ const Dashboard = () => {
 						totalMembers={totalMembers}
 						toggleShowMember={toggleShowMember}
 						toggleShowEditMember={toggleShowEditMember}
+						isHelpIconOpen={isHelpIconOpen}
 					/>
 				}
 				<Footer theme="dark" />
