@@ -16,7 +16,7 @@ import expandIcon from '../../../assets/svg/expand.svg';
 import useRole from 'hooks/useRole';
 import useTerminology from 'hooks/useTerminology';
 import moment from 'moment';
-import BootstrapTooltip from "./WalkThrough/HelpTooltip"
+import BootstrapTooltip from "./WalkThrough/HelpToolTip"
 
 const MyProject = ({ isHelpIconOpen }) => {
     const navigate = useNavigate();
