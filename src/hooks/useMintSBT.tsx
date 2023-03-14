@@ -48,31 +48,31 @@ const useMintSBT = (contractAddress: string | undefined) => {
               function: "balanceOf",
               args: [account],
             },
-            // {
-            //   target: contractAddress,
-            //   function: "name",
-            //   args: [],
-            // },
-            // {
-            //   target: contractAddress,
-            //   function: "totalSupply",
-            //   args: [],
-            // },
-            // {
-            //   target: contractAddress,
-            //   function: "mintToken",
-            //   args: [],
-            // },
-            // {
-            //   target: contractAddress,
-            //   function: "mintPrice",
-            //   args: [],
-            // },
-            // {
-            //   target: contractAddress,
-            //   function: "codeOwner",
-            //   args: [""],
-            // },
+            {
+              target: contractAddress,
+              function: "name",
+              args: [],
+            },
+            {
+              target: contractAddress,
+              function: "totalSupply",
+              args: [],
+            },
+            {
+              target: contractAddress,
+              function: "mintToken",
+              args: [],
+            },
+            {
+              target: contractAddress,
+              function: "mintPrice",
+              args: [],
+            },
+            {
+              target: contractAddress,
+              function: "codeOwner",
+              args: [""],
+            },
           ]
           const multicall = new MultiCall(provider);
           const [, res] = await multicall.multiCall(

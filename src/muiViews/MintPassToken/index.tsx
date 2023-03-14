@@ -340,6 +340,9 @@ export default () => {
         setMintLoading(true)
         const msg = await encryptMessage(JSON.stringify({ email: _get(state, 'email', ''), discord: _get(state, 'discord', ''), telegram: _get(state, 'telegram', ''), github: _get(state, 'github', '') }))
         try {
+            const whitelistSignature = await axiosHttp.get(`contract/whitelist-signature`).then(res => res?.data?.signature)
+            console.log("whitelistSignature", whitelistSignature)
+            return;
             const token = await mint({ referralCode: state?.referralCode, mintPrice: price?.mintPrice })
             const metadataJSON = {
                 id: token,
