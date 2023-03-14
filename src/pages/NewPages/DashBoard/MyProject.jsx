@@ -104,7 +104,7 @@ const MyProject = ({ isHelpIconOpen }) => {
                 <div className="myproject-buttons">
                     <div style={{ marginRight: '20px' }}>
                     <BootstrapTooltip open={isHelpIconOpen} 
-			            placement="top-start" arrow
+			            placement="top-start"
 			            title="Open">
                         <button className={`archive-btn ${isHelpIconOpen ? 'help-highlight':''}`}
                              onClick={() => { navigate(`/${DAO.url}/projects`, { state: { activeTab: tab } }) }}>
@@ -114,7 +114,7 @@ const MyProject = ({ isHelpIconOpen }) => {
                     </div>
                     {can(myRole, 'project.view.archives') && <div style={{ marginRight: '20px' }}>
                         <BootstrapTooltip open={isHelpIconOpen} 
-			                 placement="bottom" arrow
+			                 placement="bottom"
 			                 title="Archives">
                         <button
                             className={`archive-btn ${isHelpIconOpen ? 'help-highlight':''}`}
@@ -128,7 +128,7 @@ const MyProject = ({ isHelpIconOpen }) => {
                     {
                         can(myRole, 'project.create') && 
                         <BootstrapTooltip open={isHelpIconOpen} 
-			                placement="top-start" arrow
+			                placement="top-start"
 			                title="Create Workspace">
                             <div className={`${isHelpIconOpen ? 'help-highlight':''}`}>
                             <SafeButton
@@ -153,7 +153,7 @@ const MyProject = ({ isHelpIconOpen }) => {
             {
                 tab === 1 && myProjects && myProjects.length > 0
                     ?
-                    <div className='myproject-body-fixed'>
+                    <div className='myproject-body-fixed' style={isHelpIconOpen ? {overflow: 'hidden'} : {}}>
                     {isHelpIconOpen && <div className="help-card">
                          <span>Here, you can create <span className="bold-text">customized workspaces</span> for all of your teams, <span className="bold-text"> manage milestones, </span> and <span className="bold-text"> track key results.</span></span>
 			            </div>}
@@ -196,7 +196,7 @@ const MyProject = ({ isHelpIconOpen }) => {
                         {
                             otherProjects.length > 0
                                 ?
-                                <div className='myproject-body-fixed'>
+                                <div className='myproject-body-fixed' style={isHelpIconOpen ? {overflow: 'hidden'} : {}}>
                                  {isHelpIconOpen && <div className="help-card">
                                         Here, you can create <span className="bold-text">customized workspaces</span> for all of your teams, <span className="bold-text"> manage milestones, </span> and <span className="bold-text"> track key results.</span>
 			                        </div>}

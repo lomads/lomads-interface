@@ -110,7 +110,7 @@ export default ({ isHelpIconOpen }) => {
 
     return (
         <div className="notifications">
-            <div className='my_notifications'>
+            <div className='my_notifications' style={isHelpIconOpen ? {overflow: 'hidden'} : {}}>
                 {isHelpIconOpen && <div className="help-card">
                     Find important personnal notifications here.
 				</div>}

@@ -89,7 +89,7 @@ const SideBar = (props: any) => {
 	return (
 		<>
 		<BootstrapTooltip open={props.isHelpIconOpen} 
-			placement="right-start" arrow
+			placement="right-start"
 			title="All your organisations are here">
 			<div
 				className={`navBarInitialBox ${props.isHelpIconOpen ? 'z-index-1000' : ''}`}

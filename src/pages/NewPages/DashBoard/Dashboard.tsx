@@ -579,14 +579,13 @@ const Dashboard = () => {
 		anchorRef.current = document.getElementById(workspace.id)
 		anchorRef.current.scrollIntoView({
 			behavior: 'smooth',
-			block: 'center',
-			inline: 'center'
+			block: 'end',
+			inline: 'end'
 		});
 		anchorRef.current.style.zIndex = 2500
 	}
 
 	const expandHelpOptions = () => {
-		console.log('....help icon....')
 		setIsHelpIconOpen(!isHelpIconOpen)
 	}
 
@@ -594,7 +593,19 @@ const Dashboard = () => {
 		return ((showWalkThrough && currWalkThroughObj.step === 7) || isHelpIconOpen)
 					? questionMarkDark
 					: questionMarkLight
-	}	
+	}
+
+	useEffect(() => {
+        function handleClick(event: any) {
+			if(event.target.matches('div.help-card')
+				|| (event.target.matches('div.walkThroughOverlay') && isHelpIconOpen)){
+					event.preventDefault()
+					setIsHelpIconOpen(false)
+				}
+		}
+		document.addEventListener("click", handleClick); 
+		return () => document.removeEventListener("click", handleClick);
+	});
 
 	return (
 		<>
