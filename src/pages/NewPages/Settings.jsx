@@ -47,7 +47,7 @@ import Terminology from "../../assets/images/settings-page/6-terminology.svg";
 import Discord from "../../assets/images/settings-page/7-discord.svg";
 
 import SideModal from "./DashBoard/SideModal";
-import OrganisationDetailsModal from "./OrganisationDetailsModal";
+import OrganisationDetailsModal from "muiModals/OrganisationDetailsModal";
 import RolesPermissionsModal from "./RolesPermissionsModal";
 import SafeModal from "./SafeModal";
 import XpPointsModal from "./XpPointsModal";
@@ -322,11 +322,8 @@ const Settings = () => {
 			</div>
 
 			{/* // !-------------  Organisation Details ------------ */}
-			{openOrganisationDetails && (
-				<OrganisationDetailsModal
-					toggleOrganisationDetailsModal={toggleOrganisationDetailsModal}
-				/>
-			)}
+			<OrganisationDetailsModal open={openOrganisationDetails}
+                onClose={() => setOpenOrganisationDetails(false)}/>
 			{/* // !-------------  Roles & Permissions ------------ */}
 			<RolesAndPermissionModal
 				open={openRolesPermissions}
