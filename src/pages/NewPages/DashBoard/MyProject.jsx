@@ -150,11 +150,13 @@ const MyProject = ({ isHelpIconOpen }) => {
                     }
                 </div>
             </div>
-
             {
                 tab === 1 && myProjects && myProjects.length > 0
                     ?
                     <div className='myproject-body-fixed'>
+                    {/* <div className="help-card">
+                         Here, you can create <span className="bold-text">customized workspaces</span> for all of your teams, <span className="bold-text"> manage milestones, </span> and <span className="bold-text"> track key results.</span>
+			            </div> */}
                         {
                             myProjects.length > 0 && myProjects.filter((item, index) => index < 6).map((item, index) => {
                                 if (index <= 4) {
@@ -195,6 +197,9 @@ const MyProject = ({ isHelpIconOpen }) => {
                             otherProjects.length > 0
                                 ?
                                 <div className='myproject-body-fixed'>
+                                 {/* <div className="help-card">
+                                        Here, you can create <span className="bold-text">customized workspaces</span> for all of your teams, <span className="bold-text"> manage milestones, </span> and <span className="bold-text"> track key results.</span>
+			                        </div> */}
                                     {
                                         otherProjects.filter((item, index) => index < 6).map((item, index) => {
                                             if (index <= 4) {

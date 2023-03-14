@@ -690,7 +690,7 @@ const Dashboard = () => {
 					isHelpIconOpen={isHelpIconOpen}
 				/>
 
-				<Notifications />
+				<Notifications isHelpIconOpen={isHelpIconOpen} />
 
 				{/* {pendingTransactions !== undefined &&
 					pendingTransactions?.count >= 1 &&
@@ -722,6 +722,7 @@ const Dashboard = () => {
 						onChangePendingTransactions={(tx: any) => setPendingTransactions(tx)}
 						tokens={safeTokens}
 						toggleShowCreateRecurring={toggleShowCreateRecurring}
+						isHelpIconOpen={isHelpIconOpen}
 					/>}
 				{can(myRole, 'members.view') &&
 					<MemberCard
