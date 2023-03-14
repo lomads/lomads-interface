@@ -328,7 +328,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
                 (tab === 4 && otherTasks && otherTasks.length > 0) ?
                 <div className='tasks-body' style={isHelpIconOpen ? {overflow: 'hidden'} : {}}>
                       {isHelpIconOpen && <div className="help-card">
-                            <span>By creating tasks, you can <span className="bold-text"> track progress, deadlines, </span> and <span className="bold-text"> rewards on bounties, </span> and <span className="bold-text"> assign contributors </span> to each task.</span>
+                            <span className="help-card-content">By creating tasks, you can <span className="bold-text"> track progress, deadlines, </span> and <span className="bold-text"> rewards on bounties, </span> and <span className="bold-text"> assign contributors </span> to each task.</span>
                         </div>}
                     {
                         tab === 1 && myTasks && myTasks.filter((item, index) => index < 6).map((item, index) => {

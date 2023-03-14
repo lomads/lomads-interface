@@ -16,7 +16,7 @@ import expandIcon from '../../../assets/svg/expand.svg';
 import useRole from 'hooks/useRole';
 import useTerminology from 'hooks/useTerminology';
 import moment from 'moment';
-import BootstrapTooltip from "./WalkThrough/HelpTooltip"
+import BootstrapTooltip from "./WalkThrough/HelpToolTip"
 
 const MyProject = ({ isHelpIconOpen }) => {
     const navigate = useNavigate();
@@ -155,7 +155,7 @@ const MyProject = ({ isHelpIconOpen }) => {
                     ?
                     <div className='myproject-body-fixed' style={isHelpIconOpen ? {overflow: 'hidden'} : {}}>
                     {isHelpIconOpen && <div className="help-card">
-                         <span>Here, you can create <span className="bold-text">customized workspaces</span> for all of your teams, <span className="bold-text"> manage milestones, </span> and <span className="bold-text"> track key results.</span></span>
+                         <span className="help-card-content">Here, you can create <span className="bold-text">customized workspaces</span> for all of your teams, <span className="bold-text"> manage milestones, </span> and <span className="bold-text"> track key results.</span></span>
 			            </div>}
                         {
                             myProjects.length > 0 && myProjects.filter((item, index) => index < 6).map((item, index) => {
@@ -198,7 +198,7 @@ const MyProject = ({ isHelpIconOpen }) => {
                                 ?
                                 <div className='myproject-body-fixed' style={isHelpIconOpen ? {overflow: 'hidden'} : {}}>
                                  {isHelpIconOpen && <div className="help-card">
-                                        Here, you can create <span className="bold-text">customized workspaces</span> for all of your teams, <span className="bold-text"> manage milestones, </span> and <span className="bold-text"> track key results.</span>
+                                        <span className="help-card-content">Here, you can create <span className="bold-text">customized workspaces</span> for all of your teams, <span className="bold-text"> manage milestones, </span> and <span className="bold-text"> track key results.</span></span>
 			                        </div>}
                                     {
                                         otherProjects.filter((item, index) => index < 6).map((item, index) => {

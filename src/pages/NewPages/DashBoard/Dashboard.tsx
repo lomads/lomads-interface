@@ -597,8 +597,10 @@ const Dashboard = () => {
 
 	useEffect(() => {
         function handleClick(event: any) {
-			if(event.target.matches('div.help-card')
-				|| (event.target.matches('div.walkThroughOverlay') && isHelpIconOpen)){
+			if(isHelpIconOpen && (event.target.matches('div.help-card')
+				|| event.target.matches('div.walkThroughOverlay') 
+				|| event.target.matches('span.bold-text')
+				|| event.target.matches('span.help-card-content'))){
 					event.preventDefault()
 					setIsHelpIconOpen(false)
 				}
