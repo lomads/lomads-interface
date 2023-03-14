@@ -98,4 +98,5 @@ export interface ItreasuryCardType {
   // getExecutedTransactions: () => Promise<void>;
   tokens: any;
   toggleShowCreateRecurring: () => void;
+  isHelpIconOpen: boolean;
 }

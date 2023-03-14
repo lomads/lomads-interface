@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { get as _get } from 'lodash'
 import "../../../styles/pages/DashBoard/DashBoard.css";
 import plus from "../../../assets/svg/plus.svg";
@@ -6,6 +6,7 @@ import { useAppSelector, useAppDispatch } from "state/hooks";
 import { useNavigate } from "react-router-dom";
 import { setDAO } from "state/dashboard/reducer";
 import { getDao } from "state/dashboard/actions";
+import BootstrapTooltip from "./WalkThrough/HelpToolTip";
 
 const SideBar = (props: any) => {
 	const navigate = useNavigate();
@@ -87,8 +88,11 @@ const SideBar = (props: any) => {
 	};
 	return (
 		<>
+		<BootstrapTooltip open={props.isHelpIconOpen} 
+			placement="right-start" arrow
+			title="All your organisations are here">
 			<div
-				className="navBarInitialBox"
+				className={`navBarInitialBox ${props.isHelpIconOpen ? 'z-index-1000' : ''}`}
 				onMouseEnter={() => {
 					props.showSideBar(true);
 				}}
@@ -109,6 +113,7 @@ const SideBar = (props: any) => {
 					}
 				</div>
 			</div>
+			</BootstrapTooltip>
 			{props.showNavBar && <SideBarStrip />}
 		</>
 	);

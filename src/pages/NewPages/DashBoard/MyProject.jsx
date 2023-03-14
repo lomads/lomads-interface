@@ -16,8 +16,9 @@ import expandIcon from '../../../assets/svg/expand.svg';
 import useRole from 'hooks/useRole';
 import useTerminology from 'hooks/useTerminology';
 import moment from 'moment';
+import BootstrapTooltip from "./WalkThrough/HelpToolTip"
 
-const MyProject = () => {
+const MyProject = ({ isHelpIconOpen }) => {
     const navigate = useNavigate();
     const { daoURL } = useParams();
     const { DAO } = useAppSelector((state) => state.dashboard);
@@ -102,21 +103,34 @@ const MyProject = () => {
                 </div>
                 <div className="myproject-buttons">
                     <div style={{ marginRight: '20px' }}>
-                        <button className='archive-btn' onClick={() => { navigate(`/${DAO.url}/projects`, { state: { activeTab: tab } }) }}>
+                    <BootstrapTooltip open={isHelpIconOpen} 
+			            placement="top-start" arrow
+			            title="Open">
+                        <button className={`archive-btn ${isHelpIconOpen ? 'help-highlight':''}`}
+                             onClick={() => { navigate(`/${DAO.url}/projects`, { state: { activeTab: tab } }) }}>
                             <img src={expandIcon} alt="archive-icon" />
                         </button>
+                        </BootstrapTooltip>
                     </div>
                     {can(myRole, 'project.view.archives') && <div style={{ marginRight: '20px' }}>
+                        <BootstrapTooltip open={isHelpIconOpen} 
+			                 placement="bottom" arrow
+			                 title="Archives">
                         <button
-                            className='archive-btn'
+                            className={`archive-btn ${isHelpIconOpen ? 'help-highlight':''}`}
                             onClick={() => navigate('/archives')}
                             disabled={_get(DAO, 'projects', []).filter(project => !project.deletedAt && project.archivedAt).length > 0 ? false : true}
                         >
                             <img src={archiveIcon} alt="archive-icon" />
                         </button>
+                        </BootstrapTooltip>
                     </div>}
                     {
-                        can(myRole, 'project.create') && <div>
+                        can(myRole, 'project.create') && 
+                        <BootstrapTooltip open={isHelpIconOpen} 
+			                placement="top-start" arrow
+			                title="Create Workspace">
+                            <div className={`${isHelpIconOpen ? 'help-highlight':''}`}>
                             <SafeButton
                                 height={40}
                                 width={150}
@@ -132,14 +146,17 @@ const MyProject = () => {
                                 }}
                             />
                         </div>
+                        </BootstrapTooltip>
                     }
                 </div>
             </div>
-
             {
                 tab === 1 && myProjects && myProjects.length > 0
                     ?
                     <div className='myproject-body-fixed'>
+                    {isHelpIconOpen && <div className="help-card">
+                         <span>Here, you can create <span className="bold-text">customized workspaces</span> for all of your teams, <span className="bold-text"> manage milestones, </span> and <span className="bold-text"> track key results.</span></span>
+			            </div>}
                         {
                             myProjects.length > 0 && myProjects.filter((item, index) => index < 6).map((item, index) => {
                                 if (index <= 4) {
@@ -180,6 +197,9 @@ const MyProject = () => {
                             otherProjects.length > 0
                                 ?
                                 <div className='myproject-body-fixed'>
+                                 {isHelpIconOpen && <div className="help-card">
+                                        Here, you can create <span className="bold-text">customized workspaces</span> for all of your teams, <span className="bold-text"> manage milestones, </span> and <span className="bold-text"> track key results.</span>
+			                        </div>}
                                     {
                                         otherProjects.filter((item, index) => index < 6).map((item, index) => {
                                             if (index <= 4) {

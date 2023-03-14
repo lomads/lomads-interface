@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import Typography from '@mui/material/Typography';
 import CloseBtn from '../../../../assets/svg/close-btn.svg';
 import Button from '@mui/material/Button';
@@ -69,7 +69,7 @@ const StyledPopper = styled(Popper)`&&{
   &[x-placement*="left"] .arrow{
     
     right: 0;
-    width: 0; 
+    width: 0;
     height: 0; 
     border-top: 1em solid transparent;
     border-bottom: 1em solid transparent;
@@ -112,12 +112,17 @@ export default function WalkThroughPopover({
   endWalkThrough: any,
   anchorEl: any
 }) {
+
  const [arrowRef, setArrowRef] = useState<any>(null)
+
   return (
     <StyledPopper
       open={displayPopover}
       anchorEl={anchorEl}
-      style={{ zIndex: '30', padding: 10 }}
+      style={{ 
+        zIndex: '1000',
+        padding: 10
+      }}
       placement={obj?.placement}
       modifiers={[
         {
@@ -154,11 +159,13 @@ export default function WalkThroughPopover({
         <span className="arrow" ref={setArrowRef} />
       }
       <Box>
-        <div className="tooltip" style={{ top: '5%', right: '3%' }}>
-          <div className="tooltip-left">
+        <div 
+            className="walkthroughContainer"
+            style={{ top: '5%', right: '3%' }}>
+          <div className="walkthroughContainer-left">
             <img src={obj?.imgPath} />
           </div>
-          <div className="tooltip-right">
+          <div className="walkthroughContainer-right">
             <Typography className="popper-title" component="h2" variant="h4">
               {obj?.title}
             </Typography>
