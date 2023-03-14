@@ -144,7 +144,7 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
                 <div className="coinText">
                     <img src={isCredit ? receiveToken : sendToken} alt="" />
                     <div className="dashboardTextBold">
-                        {ownerModification ? `-` : `${mulAmount / 10 ** muldecimal} ${token}`}
+                        {ownerModification ? `-` : `${(mulAmount / 10 ** muldecimal).toFixed(3)} ${token}`}
                     </div>
                 </div>
                 <div className="transactionName">
@@ -211,7 +211,7 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
                     <div className="coinText">
                         <img src={isCredit ? receiveToken : sendToken} alt="" />
                         <div className="dashboardTextBold">
-                            {isOwnerModificaitonTransaction ? `-` : `${amount} ${tokenSymbol ? tokenSymbol : symbol}`}
+                            {isOwnerModificaitonTransaction ? `-` : `${parseFloat(`${amount}`).toFixed(3)} ${tokenSymbol ? tokenSymbol : symbol}`}
                         </div>
                     </div>
                     <div className="transactionName">

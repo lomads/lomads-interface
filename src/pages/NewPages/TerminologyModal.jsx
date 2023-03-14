@@ -86,9 +86,9 @@ const TerminologyModal = ({ toggleTerminology }) => {
 						}}
 					>
 						<div className='terminology-header'>
-							<button style={{ marginRight: '22px' }} onClick={() => setShowEdit(true)}>
+							{/* <button style={{ marginRight: '22px' }} onClick={() => setShowEdit(true)}>
 								<img src={editIcon} alt="editIcon" />
-							</button>
+							</button> */}
 							<IconButton
 								Icon={
 									<AiOutlineClose
@@ -111,7 +111,7 @@ const TerminologyModal = ({ toggleTerminology }) => {
 							<img src={OD} alt="frame-icon" />
 							<h1>Terminologies</h1>
 
-							{!showEdit && <p>Labels used in all your organisation’s interface.</p>}
+							{!showEdit && <p>Make it yours. Customize the terminology for<br /> everything in your organization's space.</p>}
 
 							{
 								!showEdit
@@ -195,9 +195,10 @@ const TerminologyModal = ({ toggleTerminology }) => {
 									</>
 							}
 
-							{showEdit &&
+							{showEdit
+								?
 								<div className="section-footer">
-									<button onClick={() => setShowEdit(false)}>
+									<button onClick={() => setShowEdit(false)} className="edit-btn">
 										CANCEL
 									</button>
 									<SimpleLoadButton
@@ -210,6 +211,12 @@ const TerminologyModal = ({ toggleTerminology }) => {
 										bgColor={"#C94B32"}
 										condition={updateDaoLoading}
 									/>
+								</div>
+								:
+								<div className="section-footer">
+									<button onClick={() => setShowEdit(true)} className="edit-btn">
+										EDIT
+									</button>
 								</div>
 							}
 						</div>

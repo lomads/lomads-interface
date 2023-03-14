@@ -70,6 +70,10 @@ const SelectRoles = ({ toggleSelect, validRoles, handleValidRoles }) => {
                 })
             }
 
+            <div className='selectRoles-header'>
+                <span>Discord Roles</span>
+            </div>
+
             {
                 all_roles && all_roles.length > 0
                     ?
@@ -108,7 +112,7 @@ const SelectRoles = ({ toggleSelect, validRoles, handleValidRoles }) => {
                         }
                     </>
                     :
-                    null
+                    <div style={{ fontStyle: 'italic', fontSize: '14px', opacity: 0.5 }}>To sync discord roles, please add discord under organisation setting</div>
             }
 
             <div className='selectRoles-footer'>

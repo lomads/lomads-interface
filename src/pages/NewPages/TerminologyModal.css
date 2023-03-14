@@ -49,10 +49,11 @@
 
 .terminology-container .terminology-modal .terminology-body p {
     font-family: 'Inter', sans-serif;
-    font-style: italic;
+    /* font-style: italic; */
     font-weight: 400;
-    font-size: 14px;
+    font-size: 16px;
     color: #76808D;
+    text-align: center;
 }
 
 .terminology-container .terminology-modal .terminology-body .section {
@@ -115,16 +116,24 @@
     height: 40px;
 }
 
-.terminology-container .terminology-modal .terminology-body .section-footer button:first-child {
+/* .terminology-container .terminology-modal .terminology-body .section-footer button:first-child {
     background: #FFFFFF;
     border: 1px solid #C94B32;
     color: #C94B32;
     width: 169px;
     margin-right: 20px;
-}
+} */
 
-.terminology-container .terminology-modal .terminology-body .section-footer button:last-child {
+/* .terminology-container .terminology-modal .terminology-body .section-footer button:last-child {
     background: #C94B32;
     color: #FFF;
     width: 180px;
+} */
+
+.terminology-container .terminology-modal .terminology-body .section-footer .edit-btn {
+    background: #FFFFFF;
+    border: 1px solid #C94B32;
+    color: #C94B32;
+    width: 169px;
+    margin-right: 20px;
 }

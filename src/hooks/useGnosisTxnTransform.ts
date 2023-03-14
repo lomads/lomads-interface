@@ -59,6 +59,8 @@ export default (safeAddress: string | null) => {
         const canExecuteTxn = _get(transaction, 'confirmationsRequired', 0) === _get(transaction, 'confirmations', []).length
         const canRejectTxn = _get(transaction, 'rejectedTxn.confirmations', 0) === _get(transaction, 'rejectedTxn.confirmations', []).length
         return [{
+            txHash: _get(transaction, 'txHash', ''),
+            transactionHash: _get(transaction, 'transactionHash', ''),
             safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
             rejectionSafeTxHash: _get(transaction, 'rejectedTxn.safeTxHash', null),
             offChain: false,
@@ -78,7 +80,8 @@ export default (safeAddress: string | null) => {
             canRejectTxn,
             executor: _get(transaction, 'executor', '0x'),
             submissionDate: _get(transaction, 'submissionDate', null),
-            executionDate: _get(transaction, 'executionDate', null)
+            executionDate: _get(transaction, 'executionDate', null),
+            isCredit: false
         }]
     }
 
@@ -102,6 +105,8 @@ export default (safeAddress: string | null) => {
                             const decoded = parameters.valueDecoded[index];
                             if(!decoded.dataDecoded) {
                                 op.push({
+                                    txHash: _get(transaction, 'txHash', ''),
+                                    transactionHash: _get(transaction, 'transactionHash', ''),
                                     safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
                                     rejectionSafeTxHash: _get(transaction, 'rejectedTxn.safeTxHash', null),
                                     offChain: transaction?.offChain,
@@ -122,6 +127,7 @@ export default (safeAddress: string | null) => {
                                     executor: _get(transaction, 'executor', '0x'),
                                     submissionDate: _get(transaction, 'submissionDate', null),
                                     executionDate: _get(transaction, 'executionDate', null),
+                                    isCredit: false
                                 })
                             } else if (decoded.dataDecoded) {
                                 const erc20Token: any = getERC20Token(_get(decoded, 'to', '0x'));
@@ -130,6 +136,8 @@ export default (safeAddress: string | null) => {
                                 const value = _get(_find(parameters, p => p.name === 'value'), 'value', 0)
                         
                                 op.push({
+                                    txHash: _get(transaction, 'txHash', ''),
+                                    transactionHash: _get(transaction, 'transactionHash', ''),
                                     safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
                                     rejectionSafeTxHash: _get(transaction, 'rejectedTxn.safeTxHash', null),
                                     offChain: transaction?.offChain,
@@ -149,7 +157,8 @@ export default (safeAddress: string | null) => {
                                     canRejectTxn,
                                     executor: _get(transaction, 'executor', '0x'),
                                     submissionDate: _get(transaction, 'submissionDate', null),
-                                    executionDate: _get(transaction, 'executionDate', null)
+                                    executionDate: _get(transaction, 'executionDate', null),
+                                    isCredit: false
                                 })
                             }
                         }
@@ -162,6 +171,8 @@ export default (safeAddress: string | null) => {
                     if(am)
                         value = (+am * ( 10 ** (allowanceToken?.token?.decimal || allowanceToken?.token?.decimals) ));
                     op.push({
+                        txHash: _get(transaction, 'txHash', ''),
+                        transactionHash: _get(transaction, 'transactionHash', ''),
                         safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
                         rejectionSafeTxHash: _get(transaction, 'rejectedTxn.safeTxHash', null),
                         offChain: transaction?.offChain,
@@ -181,7 +192,8 @@ export default (safeAddress: string | null) => {
                         canRejectTxn,
                         executor: _get(transaction, 'executor', '0x'),
                         submissionDate: _get(transaction, 'submissionDate', null),
-                        executionDate: _get(transaction, 'executionDate', null)
+                        executionDate: _get(transaction, 'executionDate', null),
+                        isCredit: false
                     }) 
                 }
             }
@@ -190,6 +202,8 @@ export default (safeAddress: string | null) => {
             const value = _get(_find(_get(transaction, 'dataDecoded.parameters'), p => p.name === 'value'), 'value', 0)
       
             return [{
+                txHash: _get(transaction, 'txHash', ''),
+                transactionHash: _get(transaction, 'transactionHash', ''),
                 safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
                 rejectionSafeTxHash: _get(transaction, 'rejectedTxn.safeTxHash', null),
                 offChain: transaction?.offChain,
@@ -209,7 +223,8 @@ export default (safeAddress: string | null) => {
                 canRejectTxn,
                 executor: _get(transaction, 'executor', '0x'),
                 submissionDate: _get(transaction, 'submissionDate', null),
-                executionDate: _get(transaction, 'executionDate', null) ? moment.utc(_get(transaction, 'executionDate', null)).format() : ''
+                executionDate: _get(transaction, 'executionDate', null) ? moment.utc(_get(transaction, 'executionDate', null)).format() : '',
+                isCredit: false
             }]
         }
         return op
@@ -228,6 +243,8 @@ export default (safeAddress: string | null) => {
         const value = _get(_find(parameters, p => p.name === 'value'), 'value', 0)
         let op = [];
         op.push({
+            txHash: _get(transaction, 'txHash', ''),
+            transactionHash: _get(transaction, 'transactionHash', ''),
             safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
             rejectionSafeTxHash: _get(transaction, 'rejectedTxn.safeTxHash', null),
             offChain: transaction?.offChain,
@@ -247,7 +264,8 @@ export default (safeAddress: string | null) => {
             canRejectTxn,
             executor: _get(transaction, 'executor', '0x'),
             submissionDate: _get(transaction, 'submissionDate', null),
-            executionDate: _get(transaction, 'executionDate', null)
+            executionDate: _get(transaction, 'executionDate', null),
+            isCredit: false
         })
         return op
     }
@@ -259,6 +277,8 @@ export default (safeAddress: string | null) => {
         const canRejectTxn = _get(transaction, 'rejectedTxn.confirmations', 0) === _get(transaction, 'rejectedTxn.confirmations', []).length
         let op = [];
         op.push({
+            txHash: _get(transaction, 'txHash', ''),
+            transactionHash: _get(transaction, 'transactionHash', ''),
             safeTxHash: _get(transaction, 'safeTxHash', _get(transaction, 'txHash', "0x")),
             rejectionSafeTxHash: _get(transaction, 'rejectedTxn.safeTxHash', null),
             offChain: transaction?.offChain,
@@ -278,7 +298,8 @@ export default (safeAddress: string | null) => {
             canRejectTxn,
             executor: _get(transaction, 'executor', '0x'),
             submissionDate: _get(transaction, 'submissionDate', null),
-            executionDate: _get(transaction, 'executionDate', null)
+            executionDate: _get(transaction, 'executionDate', null),
+            isCredit: false
         })
         return op
     }
@@ -289,6 +310,8 @@ export default (safeAddress: string | null) => {
             return [];
         const value = _get(transaction, 'transfers[0].value', '0')
         return [{
+            txHash: _get(transaction, 'txHash', ''),
+            transactionHash: _get(transaction, 'transactionHash', ''),
             safeTxHash: _get(transaction, 'txHash', "0"),
             rejectionSafeTxHash: null,
             nonce: _get(transaction, 'nonce', 0),
@@ -308,7 +331,8 @@ export default (safeAddress: string | null) => {
             canRejectTxn: false,
             executor: _get(transaction, 'executor', '0x'),
             submissionDate: _get(transaction, 'submissionDate', null),
-            executionDate: _get(transaction, 'executionDate', null)
+            executionDate: _get(transaction, 'executionDate', null),
+            isCredit: true
         }]
     }
 
@@ -344,9 +368,18 @@ export default (safeAddress: string | null) => {
                 const arr: any = output[index];
                 for (let j = 0; j < arr.length; j++) {
                     let element = arr[j];
-                    if(element.value !== 0) {
-                        element = { ...element, label: _get(_find(labels, (l:any) => l?.recipient?.toLowerCase() === element.to.toLowerCase() && l?.safeTxHash === element.safeTxHash), "label", null) }
-                        exportData.push(_pick(element, ['safeTxHash', 'rejectionSafeTxHash', 'offChain', 'formattedValue', 'symbol', 'label', 'to', 'executor', 'submissionDate', 'executionDate']));
+                    if(element.value !== 0 && !element.offChain) {
+                        element = { 
+                            transaction_hash: _get(element, 'transactionHash', '') === '' ? _get(element, 'txHash', '') : _get(element, 'transactionHash', ''),
+                            incoming_amount: element.isCredit ? _get(element, 'formattedValue', '') : '',
+                            incoming_token:  element.isCredit ? _get(element, 'symbol', '')  : '',
+                            outgoing_amount: !element.isCredit ? _get(element, 'formattedValue', '') : '',
+                            outgoing_token:  !element.isCredit ? _get(element, 'symbol', '')  : '',
+                            description: _get(_find(labels, (l:any) => l?.recipient?.toLowerCase() === element.to.toLowerCase() && l?.safeTxHash === element.safeTxHash), "label", null),
+                            recipient_wallet: _get(element, 'to', ''),
+                            execution_date: _get(element, 'executionDate', null) ? _get(element, 'executionDate', "") : 'Pending'
+                        }
+                        exportData.push(element)
                     }
                 }
             }

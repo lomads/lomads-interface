@@ -1,5 +1,5 @@
 import './LinksArea.css';
-import BootstrapTooltip from "./WalkThrough/HelpToolTip"
+import BootstrapTooltip from "./WalkThrough/HelpTooltip"
 import { SiNotion } from "react-icons/si";
 import { BsDiscord, BsGoogle, BsGithub, BsLink, BsTwitter, BsGlobe } from "react-icons/bs";
 import useRole from "hooks/useRole";

@@ -573,7 +573,7 @@ const Dashboard = () => {
 	}
 
 	const startWalkThroughAtStepOne = () => {
-		setShowWalkThrough(true)
+		//setShowWalkThrough(true)
 		const workspace = Steps[1]
 		setWalkThroughObj(workspace)
 		anchorRef.current = document.getElementById(workspace.id)
@@ -745,7 +745,6 @@ const Dashboard = () => {
 					toggleShowMember={toggleShowMember}
 				/>
 			)}
-
 			<div className={`help-option ${isHelpIconOpen ? 'z-index-1000' : ''}`}
 				id="question-mark"
 				ref={questionMarkRef}
@@ -759,12 +758,6 @@ const Dashboard = () => {
 							onClick={startWalkThroughAtStepOne}>
 							Play walk through
             			</PlayWalkThroughButton>
-						{/* <Button
-              				variant="contained"
-              				onClick={incrementWalkThroughSteps}
-              				size="small">
-              				Lomads’Telegram
-            			</Button> */}
 						<HideHelpIconButton
 							startIcon={<CloseIcon />}
 							onClick={()=> questionMarkRef.current.style.display = 'none'}

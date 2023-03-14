@@ -20,19 +20,19 @@ axiosConfig.interceptors.request.use(
 );
 
 const interceptor = axiosConfig.interceptors.response.use(
-		response => response,
-		error => {
-				// TODO:: implement Global error response handler here
-				console.log(error)
-				if (_get(error, 'response.status', 500) !== 401) {
-						return Promise.reject(error);
-				} 
-				if (_get(error, 'response.status', 500) == 401) {
-					localStorage.clear()
-					window.location.href = '/login'
-				} 
-				axiosConfig.interceptors.response.eject(interceptor);
+	response => response,
+	error => {
+		// TODO:: implement Global error response handler here
+		console.log(error)
+		if (_get(error, 'response.status', 500) !== 401) {
+			return Promise.reject(error);
 		}
+		if (_get(error, 'response.status', 500) == 401) {
+			localStorage.clear()
+			window.location.href = '/login'
+		}
+		axiosConfig.interceptors.response.eject(interceptor);
+	}
 );
 
 // Retry for network errors.
