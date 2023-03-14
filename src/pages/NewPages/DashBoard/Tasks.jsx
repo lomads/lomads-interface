@@ -12,7 +12,7 @@ import useTerminology from 'hooks/useTerminology';
 import archiveIcon from '../../../assets/svg/archiveIcon.svg';
 import expandIcon from '../../../assets/svg/expand.svg';
 import moment from 'moment';
-import BootstrapTooltip from "./WalkThrough/HelpTooltip"
+import BootstrapTooltip from "./WalkThrough/HelpToolTip"
 
 const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
     const navigate = useNavigate();
