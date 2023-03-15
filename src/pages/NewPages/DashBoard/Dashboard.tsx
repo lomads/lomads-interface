@@ -629,12 +629,15 @@ const Dashboard = () => {
 			?  <>
 			{(showWalkThrough || isHelpIconOpen)
 				&& <div className="walkThroughOverlay"></div>}
+			{(!checkLoading && validDaoChain && DAO && !DAOLoading && daoURL && DAO && DAO.url === daoURL)
+			?
 			<WalkThroughModal
 				incrementWalkThroughSteps={incrementWalkThroughSteps}
 				showConfirmation={showWalkThrough && currWalkThroughObj.step === 0}
 				endWalkThrough={endWalkThrough}
 				obj={currWalkThroughObj}
-			/>
+			/> : null
+			}
 			<WalkThroughPopover
 				displayPopover={showWalkThrough && currWalkThroughObj.step > 0}
 				obj={currWalkThroughObj}
