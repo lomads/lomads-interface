@@ -14,14 +14,10 @@ import { SupportedChainId } from 'constants/chains';
 export type SBTParams = {
     name: string,
     symbol: string,
-    payToken: string,
-    owner: string | undefined,
+    mintToken: string,
     treasury: string,
     mintPrice: string,
-    whitelisted: number,
-    members: Array<string>,
-    discounts: Array<number>,
-    inviteCodes: Array<string>
+    whitelisted: number
 }
 
 
@@ -75,7 +71,7 @@ const useContractDeployer = (abi: any) => {
         return ethers.utils.parseUnits(price, payToken?.decimals)
     }
 
-    const deploy = async ({ name, symbol, owner, payToken, treasury, mintPrice, whitelisted, discounts, inviteCodes, members }: SBTParams) => {
+    const deploy = async ({ name, symbol, mintToken, treasury, mintPrice, whitelisted }: SBTParams) => {
         setDeployLoading(true);
         try {
             if(chainId && account && deployerContract?.signer) {
@@ -83,14 +79,10 @@ const useContractDeployer = (abi: any) => {
                 const tx = await deployerContract?.deployNewSBT(
                     name, 
                     symbol, 
-                    owner,
-                    payToken,
+                    weth(mintPrice, mintToken),
+                    mintToken,
                     treasury,
-                    weth(mintPrice, payToken),
-                    whitelisted ? 1 : 0,
-                    discounts,
-                    inviteCodes,
-                    members
+                    whitelisted ? 1 : 0
                 );
                 const txn = await tx.wait();
                 if(!txn) {

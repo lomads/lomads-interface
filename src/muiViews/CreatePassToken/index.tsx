@@ -182,7 +182,7 @@ export default () => {
     const [state, setState] = useState<any>({
         logo: null,
         symbol: null,
-        supply: null,
+        supply: 0,
         whitelisted: false,
         whitelist: {
             members: [],
@@ -244,18 +244,14 @@ export default () => {
 
     const deployContract = async () => {
         try {
-            //setDeployContractLoading(true)
+            setDeployContractLoading(true)
             const params: SBTParams = {
                 name: `${state?.symbol} SBT`,
                 symbol: state?.symbol,
-                owner: account,
-                payToken: state?.price?.token,
-                treasury: state?.treasury,
                 mintPrice: `${state?.price?.value}`,
-                whitelisted: state?.whitelisted ? 1 : 0,
-                members: state?.whitelisted ? state?.whitelist?.members : [],
-                discounts: state?.whitelisted ? state?.whitelist?.discounts.map((d:any) => parseFloat(d) * 10) : [],
-                inviteCodes: state?.whitelisted ? state?.whitelist?.inviteCodes : []
+                mintToken: state?.price?.token,
+                treasury: state?.treasury,
+                whitelisted: state?.whitelisted ? 1 : 0
             }
 
             const contractAddr = await deploy(params)
@@ -279,7 +275,7 @@ export default () => {
                 axiosHttp.post('contract', contractJSON)
                 .then(res => {
                     toast.success('SBT Deployed successfully')
-                    setTimeout(() => navigate('/'), 200)
+                    setTimeout(() => navigate(`/${_get(DAO, 'url', '')}`), 200)
                 })
                 .finally(() =>  setDeployContractLoading(false))
             }
@@ -343,14 +339,14 @@ export default () => {
                                 }}/>
                             </Box>
                         </Box>
-                        <TextInput value={state?.supply} type="number"
+                        {/* <TextInput value={state?.supply} type="number"
                         error={errors['supply']}
                         helperText={errors['supply']}
                         onChange={(e: any) => {
                             setErrors({})
                             setState((prev: any) => { return { ...prev, supply: e.target.value } } ) 
                         }}
-                        placeholder="Number of existing tokens" sx={{ my: 1 }} fullWidth label="Supply" labelChip={<Chip sx={{ m:1 }} className={classes.chip} label="Optional" size="small" />} />
+                        placeholder="Number of existing tokens" sx={{ my: 1 }} fullWidth label="Supply" labelChip={<Chip sx={{ m:1 }} className={classes.chip} label="Optional" size="small" />} /> */}
                         
                         <TextInput value={state?.treasury}
                         error={errors['treasury']}
@@ -434,7 +430,7 @@ export default () => {
                                 <Typography className={classes.tokenName}>{ state?.symbol }</Typography>
                             </Box>
                             <Box display="flex" flexDirection="row" alignItems="center">
-                               { state?.supply && <Typography className={classes.tokenSupply}>{ `X ${ state?.supply }` }</Typography> }
+                               {/* { state?.supply && <Typography className={classes.tokenSupply}>{ `X ${ state?.supply }` }</Typography> } */}
                                 <div className={classes.verLine}></div>
                                 <IconButton onClick={() => setEditMode(true)}>
                                     <img src={EDIT_SVG} />

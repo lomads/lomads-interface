@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { Grid, Box, Typography, Paper, Chip, FormControl, FormLabel } from "@mui/material"
 import clsx from "clsx"
 import { get as _get, find as _find } from 'lodash'
@@ -47,7 +47,8 @@ import { addDaoMember, getCurrentUser, getDao, updateCurrentUser } from "state/d
 import { Container } from "@mui/system"
 import useEncryptDecrypt from "hooks/useEncryptDecrypt";
 import useRole from "hooks/useRole"
-
+import { USDC_GOERLI, USDC_POLYGON } from 'constants/tokens'
+import { useTokenContract } from 'hooks/useContract'
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -99,6 +100,7 @@ export default () => {
     const { mint, estimateGas, getStats, checkDiscount } = useMintSBT(contractId)
     const { onOpen, onResetAuth, authorization, isAuthenticating } = useDCAuth("identify")
     const { encryptMessage, decryptMessage } = useEncryptDecrypt()
+    const tokenContract = useTokenContract(contract?.mintPriceToken)
 
     useEffect(() => {
         console.log("balance..getStats", balance)
@@ -210,14 +212,26 @@ export default () => {
     //     .finally(() => setContractLoading(false))
     // }, [contractId])
 
+    const isNativeToken = useMemo(() => {
+        const tokenId = contract?.mintPriceToken;
+        if(tokenId === USDC_GOERLI.address || tokenId === USDC_POLYGON.address)
+            return false;
+        return true;
+    }, [contract])
+
     useEffect(() => {
         const calculatePriceAndGasFees = async () => {
             try {
                 if (contract?.mintPrice && chainId) {
-                    console.log("://api.coingecko.com/api/v3/coins", contract.mintPrice)
+                    let coinId = SUPPORTED_ASSETS[`${chainId}`].id
+
+                    if(!isNativeToken)
+                        coinId = 'usd-coin'
+
                     const request = await axios.get(
-                    `https://api.coingecko.com/api/v3/coins/${SUPPORTED_ASSETS[`${chainId}`].id}`
+                        `https://api.coingecko.com/api/v3/coins/${coinId}`
                     );
+                    console.log("://api.coingecko.com/api/v3/coins", request.data)
                     const price = await request.data.market_data?.current_price["usd"];
                     const mintPriceinUsd = parseFloat(contract?.mintPrice) * price;
         
@@ -226,29 +240,33 @@ export default () => {
                         mintPriceinUsd: mintPriceinUsd.toString()
                     })
                     
-                    
+                    if(isNativeToken) {
+                        let estimateTransactionCost = await estimateGas();
+                        let estimateinUsd =
+                        parseFloat(
+                            ethers.utils.formatUnits(estimateTransactionCost.toString(), "gwei")
+                        ) * price;
+                
+                
+                        setPrice({
+                            mintPrice: _get(contract, 'mintPrice', '0'),
+                            mintPriceinUsd: mintPriceinUsd.toString(),
+                            estimateinUsd: estimateinUsd.toString(),
+                            gas: ethers.utils.formatUnits(estimateTransactionCost.toString(), "gwei")
+                        })
+                    } else {
+                        setPrice({
+                            mintPrice: _get(contract, 'mintPrice', '0'),
+                            mintPriceinUsd: mintPriceinUsd.toString(),
+                            estimateinUsd: 0,
+                            gas: 0
+                        })
+                    }
 
-                    const estimateTransactionCost = await estimateGas(
-                    ethers.utils.parseUnits(contract?.mintPrice, ).toString(),
-                    state?.referralCode
-                    );
-            
-                    const estimateinUsd =
-                    parseFloat(
-                        ethers.utils.formatUnits(estimateTransactionCost.toString(), "gwei")
-                    ) * price;
-            
-            
-                    setPrice({
-                        mintPrice: _get(contract, 'mintPrice', '0'),
-                        mintPriceinUsd: mintPriceinUsd.toString(),
-                        estimateinUsd: estimateinUsd.toString(),
-                        gas: ethers.utils.formatUnits(estimateTransactionCost.toString(), "gwei")
-                    })
                 }
             } catch (e) {
                 setNetworkError(e)
-                setTimeout(() => setNetworkError(null), 2000)
+                //setTimeout(() => setNetworkError(null), 2000)
             }
         };
     
@@ -338,15 +356,14 @@ export default () => {
         if(Object.keys(err).length > 0)
             return setErrors(err)
         setMintLoading(true)
-        const msg = await encryptMessage(JSON.stringify({ email: _get(state, 'email', ''), discord: _get(state, 'discord', ''), telegram: _get(state, 'telegram', ''), github: _get(state, 'github', '') }))
         try {
+            const msg = await encryptMessage(JSON.stringify({ email: _get(state, 'email', ''), discord: _get(state, 'discord', ''), telegram: _get(state, 'telegram', ''), github: _get(state, 'github', '') }))
+            const stats: any = await getStats();
+            const tokenId = parseFloat(stats[1].toString());
             const whitelistSignature = await axiosHttp.get(`contract/whitelist-signature`).then(res => res?.data?.signature)
-            console.log("whitelistSignature", whitelistSignature)
-            return;
-            const token = await mint({ referralCode: state?.referralCode, mintPrice: price?.mintPrice })
             const metadataJSON = {
-                id: token,
-                description: `${contract?.symbol} SBT TOKEN`,
+                id: tokenId,
+                description: `${contract?.token} SBT TOKEN`,
                 daoUrl: DAO?.url,
                 name: state?.name,
                 image: contract?.image,
@@ -386,6 +403,8 @@ export default () => {
                 ],
                 contract: contract?.address,
               };
+                const ipfsURL: string = await axiosHttp.post(`metadata/ipfs-metadata`, { metadata: metadataJSON, tokenURI: `${process.env.REACT_APP_NODE_BASE_URL}/v1/${contract?.address}/${tokenId}` }).then(res => res.data)
+                const token = await mint(ipfsURL, tokenContract);
                 await axiosHttp.post(`metadata/${metadataJSON.contract}`, metadataJSON);
                 await axiosHttp.patch(`dao/${_get(DAO, 'url', '')}/update-user-discord`, {
                     discordId: state?.discord || null,
@@ -453,7 +472,7 @@ export default () => {
                                     </Box> */}
                                 </Box>
                                 { balance === 0 ?
-                                <Box mx={2} mt={0.5} px={3} style={{ borderRadius: 5, width: '100%', backgroundColor: '#FFF'  }}>
+                                <Box mx={2} mt={0.5} px={3} py={2} style={{ borderRadius: 5, width: '100%', backgroundColor: '#FFF'  }}>
                                     <Box py={2} style={{  display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                         <Typography style={{ fontSize: 16, fontWeight: 700 }}>
                                             Price
@@ -461,9 +480,10 @@ export default () => {
                                         <Box mx={2} mt={1} style={{ flexGrow: 1, borderBottom: '1px dotted rgba(27, 43, 65, 0.2)' }}></Box>
                                         <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                             <Typography style={{ fontSize: 14, fontWeight: 400, color: "#76808D" }}>${ parseFloat(_get(price, 'mintPriceinUsd', 0)).toFixed(2) } /</Typography>
-                                            <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ parseFloat(_get(price, 'mintPrice', 0)).toFixed(5) } ETH</Typography>
+                                            <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ parseFloat(_get(price, 'mintPrice', 0)).toFixed(5) } { contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : 'ETH' }</Typography>
                                         </Box>
                                     </Box>
+                                    { isNativeToken ?
                                     <Box py={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                         <Typography style={{ fontSize: 16, fontWeight: 700 }}>
                                             Gas Fees
@@ -473,9 +493,21 @@ export default () => {
                                         </Box>
                                         <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                             <Typography style={{ fontSize: 14, fontWeight: 400, color: "#76808D" }}>${ parseFloat(_get(price, 'estimateinUsd', 0)).toFixed(2)} /</Typography>
-                                            <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ parseFloat(_get(price, 'gas', 0)).toFixed(5) } ETH</Typography>
+                                            <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ parseFloat(_get(price, 'gas', 0)).toFixed(5) } {'ETH'}</Typography>
                                         </Box>
+                                    </Box> : 
+                                    <Box py={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                        {/* <Typography style={{ fontSize: 16, fontWeight: 700 }}>
+                                            + Gas Fees
+                                        </Typography> */}
+                                        <Box mx={2} mt={1} style={{ flexGrow: 1, borderBottom: '1px dotted rgba(27, 43, 65, 0.2)' }}>
+
+                                        </Box>
+                                        <Typography style={{ fontSize: 16, fontWeight: 700 }}>
+                                            + Gas Fees
+                                        </Typography>
                                     </Box>
+                                    }
                                     {/* <Box py={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                         <Typography style={{ fontSize: 16, fontWeight: 700 }}>
                                             Processing Fees
@@ -488,19 +520,21 @@ export default () => {
                                             <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>2 MATIC</Typography>
                                         </Box>
                                     </Box> */}
-                                    <Box py={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                        <Typography style={{ fontSize: 16, fontWeight: 700 }}>
-                                            Total
-                                        </Typography>
-                                        <Box mx={2} mt={1} style={{ flexGrow: 1, borderBottom: '1px dotted red' }}>
+                                    { isNativeToken &&
+                                        <Box py={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                            <Typography style={{ fontSize: 16, fontWeight: 700 }}>
+                                                Total
+                                            </Typography>
+                                            <Box mx={2} mt={1} style={{ flexGrow: 1, borderBottom: '1px dotted red' }}>
 
+                                            </Box>
+                                            <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                <Typography style={{ fontSize: 14, fontWeight: 400, color: "#76808D" }}>${ (parseFloat(_get(price, 'mintPriceinUsd', 0)) + parseFloat(_get(price, 'estimateinUsd', 0))).toFixed(2) } /</Typography>
+                                                <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ (parseFloat(_get(price, 'mintPrice', 0)) + parseFloat(_get(price, 'gas', 0))).toFixed(5) } {contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : 'ETH'}</Typography>
+                                            </Box>
                                         </Box>
-                                        <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                            <Typography style={{ fontSize: 14, fontWeight: 400, color: "#76808D" }}>${ (parseFloat(_get(price, 'mintPriceinUsd', 0)) + parseFloat(_get(price, 'estimateinUsd', 0))).toFixed(2) } /</Typography>
-                                            <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ (parseFloat(_get(price, 'mintPrice', 0)) + parseFloat(_get(price, 'gas', 0))).toFixed(5) } ETH</Typography>
-                                        </Box>
-                                    </Box>
-                                    { balance == 0 &&
+                                    }
+                                    {/* { balance == 0 &&
                                     <Box mt={2} display="flex" flexDirection="row" alignItems="center">
                                     <TextInput 
                                         value={state["referralCode"]}
@@ -509,7 +543,7 @@ export default () => {
                                         onChange={(e: any) => setState((prev: any) => { return { ...prev, referralCode: e.target.value } } )}
                                         placeholder="Go Gondor" sx={{ my: 1 }} fullWidth label="Discount code" />
                                         <Button loading={discountCheckLoading} disabled={ !state?.referralCode || state?.referralCode === "" || discountCheckLoading} onClick={() => handleApplyDiscount()} style={{ marginLeft: 16, marginTop: 22 }} size="small" variant="outlined">Apply</Button>
-                                    </Box> }
+                                    </Box> } */}
                                     { balance == 0 &&
                                         <Button onClick={() => setShowDrawer(true)} style={{ margin: '32px 0 16px 0' }} variant="contained" fullWidth>MINT YOUR SBT</Button>
                                     }

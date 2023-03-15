@@ -124,6 +124,6 @@ export const DAOTOKEN_ADDRESSES: AddressMap = {
 
 /* SBT DEPLOYER ADDRESS */
 export const SBT_DEPLOYER_ADDRESSES : AddressMap = {
-  [SupportedChainId.GOERLI]: "0xD123b939B5022608241b08c41ece044059bE00f5",
+  [SupportedChainId.GOERLI]: "0x72D5020993c43ffdFCe2aEdd0442b776A9617097",
   [SupportedChainId.POLYGON]: '0x022e58834d2c91Ed9C06E977B6e8aaDf019b514D',
 } 
