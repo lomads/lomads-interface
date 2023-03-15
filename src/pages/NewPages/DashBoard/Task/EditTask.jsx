@@ -201,14 +201,20 @@ const EditTask = ({ close, task, daoURL }) => {
             taskOb.deadline = deadline;
             taskOb.submissionLink = tempSub ? tempSub : '';
             taskOb.compensation = { currency: currency.currency, amount, symbol };
+            taskOb.contributionType = contributionType;
+            taskOb.isSingleContributor = isSingleContributor;
+            taskOb.isFilterRoles = isFilterRoles;
+            taskOb.validRoles = isFilterRoles ? validRoles : [];
+            taskOb.applicant = selectedUser;
+            // taskOb.members = selectedUser ? [{member : selectedUser._id}] : [];
             console.log("task ob : ", taskOb)
             dispatch(editTask({ payload: taskOb, daoUrl: daoURL, taskId: task._id }))
         }
     }
 
-    // const eligibleContributors = useMemo(() => {
-    //     return _get(DAO, 'members', []).filter(m => (reviewer || "").toLowerCase() !== m.member._id && m.member._id !== user._id)
-    // }, [DAO, selectedUser, reviewer])
+    const eligibleContributors = useMemo(() => {
+        return _get(DAO, 'members', []).filter(m => (reviewer || "").toLowerCase() !== m.member._id && m.member._id !== user._id)
+    }, [DAO, selectedUser, reviewer])
 
     const eligibleReviewers = useMemo(() => {
         return _get(DAO, 'members', []).filter(m => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase())
@@ -378,9 +384,22 @@ const EditTask = ({ close, task, daoURL }) => {
                                         <div className='createTask-inputRow'>
                                             <span>Contribution</span>
                                             <div className='createTask-buttonRow'>
-                                                <button onClick={() => { setContributionType('open'); setSelectedUser(null) }} className={contributionType === 'open' ? 'active' : null} disabled style={{ cursor: 'not-allowed' }}>OPEN</button>
-                                                <button onClick={() => { setContributionType('assign'); setIsFilterRoles(false); setValidRoles([]); setIsSingleContributor(false); }} className={contributionType === 'assign' ? 'active' : null} disabled style={{ cursor: 'not-allowed' }}>ASSIGN MEMBER</button>
-
+                                                <button
+                                                    onClick={() => { setContributionType('open'); setSelectedUser(null) }}
+                                                    className={contributionType === 'open' ? 'active' : null}
+                                                // disabled
+                                                // style={{ cursor: 'not-allowed' }}
+                                                >
+                                                    OPEN
+                                                </button>
+                                                <button
+                                                    onClick={() => { setContributionType('assign'); setIsFilterRoles(false); setValidRoles([]); setIsSingleContributor(false); }}
+                                                    className={contributionType === 'assign' ? 'active' : null}
+                                                // disabled
+                                                // style={{ cursor: 'not-allowed' }}
+                                                >
+                                                    ASSIGN MEMBER
+                                                </button>
                                             </div>
                                         </div>
 
@@ -392,19 +411,25 @@ const EditTask = ({ close, task, daoURL }) => {
                                                     name="member"
                                                     id="member"
                                                     className="tokenDropdown"
-                                                    style={{ width: '100%', cursor: 'not-allowed' }}
+                                                    style={{ width: '100%' }}
+                                                    // style={{ width: '100%', cursor: 'not-allowed' }}
                                                     onChange={(e) => handleSetApplicant(e.target.value)}
-                                                    disabled
+                                                // disabled
                                                 >
-
-                                                    <option value={null}>{_find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.name && _find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.name !== "" ? `${_find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.name}  (${beautifyHexToken(_find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.wallet)})` : beautifyHexToken(_find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.wallet)}</option>
-                                                    {/* {
+                                                    {
+                                                        task.contributionType === 'assign'
+                                                            ?
+                                                            <option value={null}>{_find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.name && _find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.name !== "" ? `${_find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.name}  (${beautifyHexToken(_find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.wallet)})` : beautifyHexToken(_find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.wallet)}</option>
+                                                            :
+                                                            <option value={null}>Select member</option>
+                                                    }
+                                                    {
                                                         eligibleContributors.map((item, index) => {
                                                             return (
                                                                 <option value={`${item.member._id}`}>{item.member.name && item.member.name !== "" ? `${item.member.name}  (${beautifyHexToken(item.member.wallet)})` : beautifyHexToken(item.member.wallet)}</option>
                                                             )
                                                         })
-                                                    } */}
+                                                    }
                                                 </select>
                                                 <span className='error-msg' id="error-applicant"></span>
                                             </div>
@@ -415,7 +440,13 @@ const EditTask = ({ close, task, daoURL }) => {
                                             <div className='contributor-section'>
                                                 <div className='contributor-check'>
                                                     <label class="switch">
-                                                        <input disabled style={{ cursor: 'not-allowed' }} defaultChecked={isSingleContributor} onChange={(e) => setIsSingleContributor(!isSingleContributor)} type="checkbox" />
+                                                        <input
+                                                            // disabled
+                                                            // style={{ cursor: 'not-allowed' }}
+                                                            defaultChecked={isSingleContributor}
+                                                            onChange={(e) => setIsSingleContributor(!isSingleContributor)}
+                                                            type="checkbox"
+                                                        />
                                                         <span class="slider check round"></span>
                                                     </label>
                                                     <div>
@@ -425,7 +456,13 @@ const EditTask = ({ close, task, daoURL }) => {
                                                 </div>
                                                 <div className='contributor-check'>
                                                     <label class="switch">
-                                                        <input disabled style={{ cursor: 'not-allowed' }} defaultChecked={isFilterRoles} onChange={(e) => setIsFilterRoles(!isFilterRoles)} type="checkbox" />
+                                                        <input
+                                                            // disabled
+                                                            // style={{ cursor: 'not-allowed' }}
+                                                            defaultChecked={isFilterRoles}
+                                                            onChange={(e) => setIsFilterRoles(!isFilterRoles)}
+                                                            type="checkbox"
+                                                        />
                                                         <span class="slider check round"></span>
                                                     </label>
 
@@ -465,7 +502,11 @@ const EditTask = ({ close, task, daoURL }) => {
                                                         }
                                                     </div>
                                                     <div className='roles-right'>
-                                                        <button onClick={toggleSelect} disabled style={{ cursor: 'not-allowed' }}>
+                                                        <button
+                                                            onClick={toggleSelect}
+                                                        // disabled 
+                                                        // style={{ cursor: 'not-allowed' }}
+                                                        >
                                                             <HiOutlinePlus size={24} color='#C94B32' />
                                                         </button>
                                                     </div>
@@ -510,7 +551,6 @@ const EditTask = ({ close, task, daoURL }) => {
                                                         setCurrency({ currency: e.target.value })
                                                     }}
                                                     value={currency.currency}
-                                                // disabled
                                                 >
 
                                                     <option value={null}>
