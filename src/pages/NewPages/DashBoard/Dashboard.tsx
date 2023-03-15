@@ -62,10 +62,19 @@ import { default as MuiButton, ButtonProps  } from '@mui/material/Button';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import Stack from '@mui/material/Stack';
-import { grey } from '@mui/material/colors';
-
 import Button from "muiComponents/Button";
+
 const { toChecksumAddress } = require('ethereum-checksum-address')
+type WalkThroughObjType = {
+    step: number;
+    id: string;
+    title: string;
+    content: string;
+    buttonText: string;
+    imgPath: string;
+    placement: string;
+  }
+
 const HideHelpIconButton = styled(Button)<ButtonProps>(({ theme }) => ({
 	color: '#ffffff',
 	backgroundColor: '#1B2B41',
@@ -558,10 +567,13 @@ const Dashboard = () => {
 			nextStep++
 		}
 		const nextObj = Steps[nextStep]
+		setWalkThroughStyle(nextObj)
 		setWalkThroughObj(nextObj)
+		
+	}
+    const setWalkThroughStyle = (nextObj: WalkThroughObjType) => {
 		anchorRef.current = document.getElementById(nextObj.id)
 		anchorRef.current.style.zIndex = 2500
-		anchorRef.current.style.paddingTop = 100
 		anchorRef.current.scrollIntoView({
 			behavior: 'smooth',
 			block: 'end',
@@ -571,18 +583,11 @@ const Dashboard = () => {
 			anchorRef.current.style.boxShadow = '0px 0px 20px rgba(181, 28, 72, 0.6)'
 		}
 	}
-
 	const startWalkThroughAtStepOne = () => {
 		setShowWalkThrough(true)
 		const workspace = Steps[1]
 		setWalkThroughObj(workspace)
-		anchorRef.current = document.getElementById(workspace.id)
-		anchorRef.current.scrollIntoView({
-			behavior: 'smooth',
-			block: 'end',
-			inline: 'end'
-		});
-		anchorRef.current.style.zIndex = 2500
+		setWalkThroughStyle(workspace)
 	}
 
 	const expandHelpOptions = () => {
