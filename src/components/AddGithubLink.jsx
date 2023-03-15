@@ -21,7 +21,7 @@ import { nanoid } from "@reduxjs/toolkit";
 import { SupportedChainId } from "constants/chains";
 import useGithubAuth from "hooks/useGithubAuth";
 
-export default ({ title, desc, link, roleName, accessControl, okButton, onGuildCreateSuccess, renderButton = undefined, onSuccess, validate = true, innerRef, ...props }) => {
+export default ({ title, desc, link, loading, roleName, accessControl, okButton, onGuildCreateSuccess, renderButton = undefined, onSuccess, validate = true, innerRef, ...props }) => {
 
     const { onOpen, onResetAuth, authorization, isAuthenticating } = useGithubAuth();
     const [addLinkLoading, setAddLinkLoading] = useState(null);
@@ -105,14 +105,22 @@ export default ({ title, desc, link, roleName, accessControl, okButton, onGuildC
                     <SimpleLoadButton condition={addLinkLoading} disabled={addLinkLoading} title="OK" bgColor="#C94B32" className="button" fontsize={16} fontweight={400} height={40} width={129} onClick={() => handleAddResource()} /> :
                     <>
                         {
-                            <IconButton
-                                className="addButton"
-                                onClick={() => handleAddResource()}
-                                Icon={addLinkLoading ? <LeapFrog size={20} color="#C84A32" /> : <AiOutlinePlus color="#FFF" size={25} />}
-                                height={40}
-                                width={40}
-                                bgColor={'#C84A32'}
-                            />
+                            loading
+                                ?
+                                <button className="addButton" disabled style={{ background: '#C84A32', height: '40px', width: '40px' }}>
+                                    <LeapFrog size={20} color="#FFF" />
+                                </button>
+                                :
+                                <IconButton
+                                    className="addButton"
+                                    onClick={() => handleAddResource()}
+                                    Icon={addLinkLoading ? <LeapFrog size={20} color="#C84A32" /> : <AiOutlinePlus color="#FFF" size={25} />}
+                                    height={40}
+                                    width={40}
+                                    bgColor={'#C84A32'}
+                                />
+
+
                             // <button
                             //     style={{ background: link !== '' && title !== '' && !addLinkLoading ? '#C84A32' : 'rgba(27, 43, 65, 0.2)', width: 50, height: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                             //     disabled={link === '' || title === '' || addLinkLoading}
