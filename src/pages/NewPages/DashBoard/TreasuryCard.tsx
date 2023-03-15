@@ -842,7 +842,10 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 					{
 						pendingTxn !== undefined && executedTxn !== undefined &&
 						(pendingTxn && executedTxn && (pendingTxn.length !== 0 || executedTxn.length !== 0)) &&
-						<div id="treasuryTransactions">
+						<div id="treasuryTransactions" style={props.isHelpIconOpen ? {overflow: 'hidden'} : {}}>
+								{props.isHelpIconOpen && <div className="help-card">
+										Managing and automating your treasury has never been easier! Here you can approve and send token payments manually, or set up recurring payments to team members!
+								</div>}
 							<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%' }}>
 								<div className="dashboardText" style={{ marginBottom: '6px', flexGrow: 1 }}>Last Transactions</div>
 								{/* { lowBalanceError && <div className="dashboardText" style={{ marginBottom: '6px', color: 'red' }}>Low token balance</div> } */}

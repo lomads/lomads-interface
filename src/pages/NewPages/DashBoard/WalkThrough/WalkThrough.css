@@ -24,7 +24,7 @@
     border-radius: '10%';
 }
 
-.tooltip-right {
+.walkthroughContainer-right {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
@@ -33,7 +33,7 @@
     padding: 30px;
 }
 
-.tooltip-left {
+.walkthroughContainer-left {
     background: #F0F0F0;
     border-radius: 10px 0px 0px 10px;
     width: 186px;
@@ -42,11 +42,7 @@
     padding: 20px;
 }
 
-.MuiTooltip-arrow {
-    color: #FFF !important;
-}
-
-.tooltip {
+.walkthroughContainer {
     position: relative;
     display: flex;
     flex-direction: row;
@@ -92,19 +88,3 @@
     letter-spacing: -0.011em;
     color: #76808D;
 }
-
-.arrow {
-    position: absolute;
-    font-size: 7px;
-    width: 3em;
-    height: 3em;
-  }
-
-.arrow :before {
-    content: '';
-    margin: auto;
-    display: block;
-    width: 0;
-    height: 0;
-    border-style: solid;
-  }

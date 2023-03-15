@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { get as _get } from 'lodash'
+import BootstrapTooltip from "./WalkThrough/HelpToolTip";
 import "../../../styles/pages/DashBoard/DashBoard.css";
 import plus from "../../../assets/svg/plus.svg";
 import { useAppSelector, useAppDispatch } from "state/hooks";
@@ -87,8 +88,11 @@ const SideBar = (props: any) => {
 	};
 	return (
 		<>
+		<BootstrapTooltip open={props.isHelpIconOpen} 
+			placement="right-start"
+			title="All your organisations are here">
 			<div
-				className="navBarInitialBox"
+				className={`navBarInitialBox ${props.isHelpIconOpen ? 'z-index-1000' : ''}`}
 				onMouseEnter={() => {
 					props.showSideBar(true);
 				}}
@@ -109,6 +113,7 @@ const SideBar = (props: any) => {
 					}
 				</div>
 			</div>
+			</BootstrapTooltip>
 			{props.showNavBar && <SideBarStrip />}
 		</>
 	);

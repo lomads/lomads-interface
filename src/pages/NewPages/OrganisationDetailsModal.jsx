@@ -455,7 +455,7 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 														// 	className={linkTitle.length > 0 && isValidUrl(link) ? "githubAddButton active" : "githubAddButton"}
 														// 	buttonText="+"
 														// />
-														<AddGithubLink onSuccess={onSuccess} title={linkTitle} link={link} />
+														<AddGithubLink onSuccess={onSuccess} title={linkTitle} link={link} loading={isAuthenticating} />
 													}
 												</>
 												:

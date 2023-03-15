@@ -13,7 +13,7 @@ import { getCurrentUser } from "state/dashboard/actions";
 import moment from 'moment';
 import { beautifyHexToken } from 'utils'
 
-export default () => {
+export default ({ isHelpIconOpen }) => {
 
 	const { daoURL } = useParams();
     const { user, DAO,  DAOLoading } = useAppSelector((state) => state.dashboard);
@@ -110,7 +110,10 @@ export default () => {
 
     return (
         <div className="notifications">
-            <div className='my_notifications'>
+            <div className='my_notifications' style={isHelpIconOpen ? {overflow: 'hidden'} : {}}>
+                {isHelpIconOpen && <div className="help-card">
+                    Find important personnal notifications here.
+				</div>}
                 <div className='list-container'>
                     {
                         myNotifications.map(notification => {

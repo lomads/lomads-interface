@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from "react";
+import React, { useEffect, useRef, useState, useMemo, useLayoutEffect } from "react";
 import { usePrevious } from "@chakra-ui/react"
 import { get as _get, find as _find } from 'lodash';
 import lomadsfulllogo from "../../../assets/svg/lomadsfulllogo.svg";
@@ -62,10 +62,19 @@ import { default as MuiButton, ButtonProps  } from '@mui/material/Button';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import Stack from '@mui/material/Stack';
-import { grey } from '@mui/material/colors';
-
 import Button from "muiComponents/Button";
+
 const { toChecksumAddress } = require('ethereum-checksum-address')
+type WalkThroughObjType = {
+    step: number;
+    id: string;
+    title: string;
+    content: string;
+    buttonText: string;
+    imgPath: string;
+    placement: string;
+  }
+
 const HideHelpIconButton = styled(Button)<ButtonProps>(({ theme }) => ({
 	color: '#ffffff',
 	backgroundColor: '#1B2B41',
@@ -105,7 +114,8 @@ const Dashboard = () => {
 	console.log("DAO : ", DAO);
 	const [update, setUpdate] = useState(0);
 	const treasuryRef = useRef<any>();
-	const anchorRef = useRef<any>()
+	const anchorRef = useRef<any>();
+	const questionMarkRef = useRef<any>();
 	const { provider, account, chainId, connector } = useWeb3React();
 	console.log("chainId : ", chainId, provider);
 	const safeAddress = useAppSelector((state) => state.flow.safeAddress);
@@ -186,11 +196,10 @@ const Dashboard = () => {
 		// requestReposIssues('Lomads-Technologies/soulbound-token');
 	}, [DAO]);
 
-	// useEffect(() => {
-	// 	console.log("ser?.onboardingViewCount", user)
-	// 	if(DAO && user && (!user?.onboardingViewCount || ( user?.onboardingViewCount && user?.onboardingViewCount.indexOf(_get(DAO, '_id', '')) === -1 && user?.onboardingViewCount.length < 2 )))
-	// 		setShowWalkThrough(true)
-	// }, [DAO, user])
+	useEffect(() => {
+		if(DAO && user && (!user?.onboardingViewCount || ( user?.onboardingViewCount && user?.onboardingViewCount.indexOf(_get(DAO, '_id', '')) === -1 && user?.onboardingViewCount.length < 2 )))
+			setShowWalkThrough(true)
+	}, [DAO, user])
 
 	const amIAdmin = useMemo(() => {
 		if (DAO) {
@@ -329,8 +338,7 @@ const Dashboard = () => {
 	}
 
 	useEffect(() => {
-		if (chainId) {
-			if (DAO && DAO.sbt && DAO.sbt && account) {
+			if (chainId && DAO && DAO.sbt && DAO.sbt && account) {
 				getStats().then(res => {
 					const balanceOf = res[0];
 					if (chainId === DAO.chainId) {
@@ -368,7 +376,6 @@ const Dashboard = () => {
 					}
 				})
 			}
-		}
 	}, [chainId, DAO, getStats, account]);
 
 	useEffect(() => {
@@ -415,8 +422,9 @@ const Dashboard = () => {
 
 
 	useEffect(() => {
-		if (DAO && chainId && DAO.chainId === chainId)
+		if (DAO && chainId && DAO.chainId === chainId){
 			dispatch(updateSafeAddress(_get(DAO, 'safe.address', '')))
+		}
 	}, [DAO, chainId])
 
 	const prepare = async (_safeAddress: string) => {
@@ -450,6 +458,7 @@ const Dashboard = () => {
 				)
 				.then((tokens: any) => {
 					setSafeTokens(tokens.data);
+					setCheckLoading(false)
 				});
 	};
 
@@ -536,6 +545,7 @@ const Dashboard = () => {
 		dispatch(updateUserOnboardingCount({ payload: { daoId: _get(DAO, '_id','') }}))
 		setShowWalkThrough(false)
 		clearWalkThroughStyles()
+		setWalkThroughObj(Steps[0])
 	}
 
 	const clearWalkThroughStyles = () => {
@@ -543,51 +553,66 @@ const Dashboard = () => {
 			anchorRef.current.style = {}
 		}
 	}
-	
 	const incrementWalkThroughSteps = () => {
 		clearWalkThroughStyles()
-
 		if (currWalkThroughObj.step === 7) {
 			endWalkThrough()
 			return
 		}
-		const nextObj = Steps[currWalkThroughObj.step + 1]
-		anchorRef.current = document.getElementById(nextObj.id)
-		anchorRef.current.scrollIntoView({
-			behavior: 'auto',
-			block: 'center',
-			inline: 'center'
-		});
-		anchorRef.current.style.zIndex = 35
 
-		if (nextObj.step >= 6) {
-			if (nextObj.step === 6) {
-				anchorRef.current.style.boxShadow = '0px 0px 20px rgba(181, 28, 72, 0.6)'
-			}
-			else {
-				anchorRef.current.style.boxShadow = 'none'
-			}
+		let nextStep =  currWalkThroughObj.step + 1
+		while(showWalkThrough 
+	   		 && !document.getElementById(Steps[nextStep]?.id)
+	         &&  nextStep < 7 ){
+			nextStep++
 		}
+		const nextObj = Steps[nextStep]
+		setWalkThroughStyles(nextObj)
 		setWalkThroughObj(nextObj)
-
 	}
 
+    const setWalkThroughStyles = (nextObj: WalkThroughObjType) => {
+		anchorRef.current = document.getElementById(nextObj.id)
+		anchorRef.current.style.zIndex = 2500
+		anchorRef.current.scrollIntoView({
+			behavior: 'smooth',
+			block: 'end',
+			inline: 'end'
+		});
+		if (nextObj.step === 6) {
+			anchorRef.current.style.boxShadow = '0px 0px 20px rgba(181, 28, 72, 0.6)'
+		}
+	}
 	const startWalkThroughAtStepOne = () => {
-		//setShowWalkThrough(true)
+		setShowWalkThrough(true)
 		const workspace = Steps[1]
 		setWalkThroughObj(workspace)
-		anchorRef.current = document.getElementById(workspace.id)
-		anchorRef.current.scrollIntoView({
-			behavior: 'auto',
-			block: 'center',
-			inline: 'center'
-		});
-		anchorRef.current.style.zIndex = 35
+		setWalkThroughStyles(workspace)
 	}
 
 	const expandHelpOptions = () => {
 		setIsHelpIconOpen(!isHelpIconOpen)
 	}
+
+	const getQuestionImage = (): string => {
+		return ((showWalkThrough && currWalkThroughObj.step === 7) || isHelpIconOpen)
+					? questionMarkDark
+					: questionMarkLight
+	}
+
+	useEffect(() => {
+        function handleClick(event: any) {
+			if(isHelpIconOpen && (event.target.matches('div.help-card')
+				|| event.target.matches('div.walkThroughOverlay') 
+				|| event.target.matches('span.bold-text')
+				|| event.target.matches('span.help-card-content'))){
+					event.preventDefault()
+					setIsHelpIconOpen(false)
+				}
+		}
+		document.addEventListener("click", handleClick); 
+		return () => document.removeEventListener("click", handleClick);
+	});
 
 	return (
 		<>
@@ -600,21 +625,27 @@ const Dashboard = () => {
 						<LeapFrog size={50} color="#C94B32" />
 					</div>
 				</div> : null}
+			{(!checkLoading && validDaoChain && DAO && !DAOLoading && daoURL && DAO && DAO.url === daoURL)
+			?  <>
 			{(showWalkThrough || isHelpIconOpen)
-				&& <div className="overlay"></div>}
+				&& <div className="walkThroughOverlay"></div>}
+			{(!checkLoading && validDaoChain && DAO && !DAOLoading && daoURL && DAO && DAO.url === daoURL)
+			?
 			<WalkThroughModal
-				beginWalkThrough={incrementWalkThroughSteps}
+				incrementWalkThroughSteps={incrementWalkThroughSteps}
 				showConfirmation={showWalkThrough && currWalkThroughObj.step === 0}
 				endWalkThrough={endWalkThrough}
 				obj={currWalkThroughObj}
-			/>
+			/> : null
+			}
 			<WalkThroughPopover
 				displayPopover={showWalkThrough && currWalkThroughObj.step > 0}
 				obj={currWalkThroughObj}
 				incrementWalkThroughSteps={incrementWalkThroughSteps}
 				endWalkThrough={endWalkThrough}
 				anchorEl={anchorRef.current}
-			/>
+			/></> : null
+			}
 			<div
 				className="dashBoardBody"
 				onMouseEnter={() => {
@@ -679,9 +710,12 @@ const Dashboard = () => {
 					</div>
 				</div>
 
-				<LinksArea links={_get(DAO, 'links', [])} />
+				<LinksArea 
+					links={_get(DAO, 'links', [])} 
+					isHelpIconOpen={isHelpIconOpen}
+				/>
 
-				<Notifications />
+				<Notifications isHelpIconOpen={isHelpIconOpen} />
 
 				{/* {pendingTransactions !== undefined &&
 					pendingTransactions?.count >= 1 &&
@@ -694,8 +728,11 @@ const Dashboard = () => {
 					)} */}
 
 
-				<MyProject />
-				<Tasks toggleShowCreateTask={toggleShowCreateTask} onlyProjects={false} />
+				<MyProject isHelpIconOpen={isHelpIconOpen} />
+				<Tasks
+					toggleShowCreateTask={toggleShowCreateTask} 
+					onlyProjects={false} 
+					isHelpIconOpen={isHelpIconOpen} />
 				{(can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') &&
 					<TreasuryCard
 						innerRef={treasuryRef}
@@ -710,12 +747,14 @@ const Dashboard = () => {
 						onChangePendingTransactions={(tx: any) => setPendingTransactions(tx)}
 						tokens={safeTokens}
 						toggleShowCreateRecurring={toggleShowCreateRecurring}
+						isHelpIconOpen={isHelpIconOpen}
 					/>}
 				{can(myRole, 'members.view') &&
 					<MemberCard
 						totalMembers={totalMembers}
 						toggleShowMember={toggleShowMember}
 						toggleShowEditMember={toggleShowEditMember}
+						isHelpIconOpen={isHelpIconOpen}
 					/>
 				}
 				<Footer theme="dark" />
@@ -731,9 +770,9 @@ const Dashboard = () => {
 					toggleShowMember={toggleShowMember}
 				/>
 			)}
-
-			{/* <div className={`help-option ${isHelpIconOpen ? 'z-index-60' : ''}`}
+			<div className={`help-option ${isHelpIconOpen ? 'z-index-1000' : ''}`}
 				id="question-mark"
+				ref={questionMarkRef}
 				onClick={expandHelpOptions}>
 				{isHelpIconOpen
 					&&
@@ -746,20 +785,19 @@ const Dashboard = () => {
             			</PlayWalkThroughButton>
 						<HideHelpIconButton
 							startIcon={<CloseIcon />}
-							onClick={() => setIsHelpIconOpen(false)}
+							onClick={()=> questionMarkRef.current.style.display = 'none'}
 							variant="contained">
 							Hide help icon
 						</HideHelpIconButton>
 					</Stack>
 				}
-				<img src={((showWalkThrough && currWalkThroughObj.step === 7) || isHelpIconOpen)
-					? questionMarkDark
-					: questionMarkLight} />
-			</div> */}
+				<img src={getQuestionImage()} />
+			</div>
 			<SideBar
 				name={_get(DAO, 'name', '')}
 				showSideBar={showSideBar}
 				showNavBar={showNavBar}
+				isHelpIconOpen={isHelpIconOpen}
 			/>
 			{showAddMember && <AddMember toggleShowMember={toggleShowMember} />}
 			{showEditMember && <EditMember toggleShowEditMember={toggleShowEditMember} DAO={DAO} amIAdmin={amIAdmin} account={account} />}
