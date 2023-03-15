@@ -329,8 +329,7 @@ const Dashboard = () => {
 	}
 
 	useEffect(() => {
-		if (chainId) {
-			if (DAO && DAO.sbt && DAO.sbt && account) {
+			if (chainId && DAO && DAO.sbt && DAO.sbt && account) {
 				getStats().then(res => {
 					const balanceOf = res[0];
 					if (chainId === DAO.chainId) {
@@ -368,7 +367,6 @@ const Dashboard = () => {
 					}
 				})
 			}
-		}
 	}, [chainId, DAO, getStats, account]);
 
 	useEffect(() => {
@@ -415,8 +413,9 @@ const Dashboard = () => {
 
 
 	useEffect(() => {
-		if (DAO && chainId && DAO.chainId === chainId)
+		if (DAO && chainId && DAO.chainId === chainId){
 			dispatch(updateSafeAddress(_get(DAO, 'safe.address', '')))
+		}
 	}, [DAO, chainId])
 
 	const prepare = async (_safeAddress: string) => {
@@ -450,6 +449,7 @@ const Dashboard = () => {
 				)
 				.then((tokens: any) => {
 					setSafeTokens(tokens.data);
+					setCheckLoading(false)
 				});
 	};
 
@@ -620,6 +620,8 @@ const Dashboard = () => {
 						<LeapFrog size={50} color="#C94B32" />
 					</div>
 				</div> : null}
+			{(!checkLoading && validDaoChain && DAO && !DAOLoading && daoURL && DAO && DAO.url === daoURL)
+			?  <>
 			{(showWalkThrough || isHelpIconOpen)
 				&& <div className="walkThroughOverlay"></div>}
 			<WalkThroughModal
@@ -634,7 +636,8 @@ const Dashboard = () => {
 				incrementWalkThroughSteps={incrementWalkThroughSteps}
 				endWalkThrough={endWalkThrough}
 				anchorEl={anchorRef.current}
-			/>
+			/></> : null
+			}
 			<div
 				className="dashBoardBody"
 				onMouseEnter={() => {
