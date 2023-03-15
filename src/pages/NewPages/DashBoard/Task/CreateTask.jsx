@@ -19,7 +19,9 @@ import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
 import { SupportedChainId } from "constants/chains";
 import { beautifyHexToken, getSafeTokens } from '../../../../utils'
 
-import useRole from '../../../../hooks/useRole'
+import useRole from '../../../../hooks/useRole';
+
+import SimpleLoadButton from "UIpack/SimpleLoadButton";
 
 import {
     Input,
@@ -79,15 +81,15 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
 
     const getroleColor = (roleId) => {
 
-        if( roleId == "role1" || roleId == "role2" || roleId == "role3" || roleId == "role4") {
-            if(roleId === 'role1')
-                return { pill: 'rgba(146, 225, 168, 0.3)', circle: 'rgba(146, 225, 168, 1)' }; 
-            else if(roleId === 'role2')
-                return { pill: 'rgba(137,179,229,0.3)', circle: 'rgba(137,179,229,1)' }; 
-            else if(roleId === 'role3')
+        if (roleId == "role1" || roleId == "role2" || roleId == "role3" || roleId == "role4") {
+            if (roleId === 'role1')
+                return { pill: 'rgba(146, 225, 168, 0.3)', circle: 'rgba(146, 225, 168, 1)' };
+            else if (roleId === 'role2')
+                return { pill: 'rgba(137,179,229,0.3)', circle: 'rgba(137,179,229,1)' };
+            else if (roleId === 'role3')
                 return { pill: 'rgba(234,100,71,0.3)', circle: 'rgba(234,100,71,1)' };
-            else if(roleId === 'role4')
-                return { pill: 'rgba(146, 225, 168, 0.3)', circle: 'rgba(146, 225, 168, 1)' };  
+            else if (roleId === 'role4')
+                return { pill: 'rgba(146, 225, 168, 0.3)', circle: 'rgba(146, 225, 168, 1)' };
         }
         for (let index = 0; index < Object.keys(_get(DAO, 'discord', {})).length; index++) {
             const element = Object.keys(_get(DAO, 'discord', {}))[index];
@@ -547,12 +549,14 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                                     <div className='roles-li'>
                                                                         <div
                                                                             className='roles-pill'
-                                                                            style={{ background: getroleColor(item).pill
-                                                                             }}
+                                                                            style={{
+                                                                                background: getroleColor(item).pill
+                                                                            }}
                                                                         >
                                                                             <div
                                                                                 className='roles-circle'
-                                                                                style={{ background: getroleColor(item).circle
+                                                                                style={{
+                                                                                    background: getroleColor(item).circle
                                                                                 }}
                                                                             ></div>
 
@@ -668,9 +672,19 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                         {/* <button onClick={handleDraftTask}>
                                             SAVE AS DRAFT
                                         </button> */}
-                                        <button onClick={handleCreateTask}>
+                                        <SimpleLoadButton
+                                            title={`CREATE`}
+                                            height={50}
+                                            width={225}
+                                            fontsize={16}
+                                            fontweight={400}
+                                            onClick={handleCreateTask}
+                                            bgColor={"#C94B32"}
+                                            condition={createTaskLoading}
+                                        />
+                                        {/* <button onClick={handleCreateTask}>
                                             CREATE
-                                        </button>
+                                        </button> */}
                                     </div>
                                 </>
                         }
