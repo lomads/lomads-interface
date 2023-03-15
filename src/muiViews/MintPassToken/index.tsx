@@ -360,7 +360,6 @@ export default () => {
             const msg = await encryptMessage(JSON.stringify({ email: _get(state, 'email', ''), discord: _get(state, 'discord', ''), telegram: _get(state, 'telegram', ''), github: _get(state, 'github', '') }))
             const stats: any = await getStats();
             const tokenId = parseFloat(stats[1].toString());
-            const whitelistSignature = await axiosHttp.get(`contract/whitelist-signature`).then(res => res?.data?.signature)
             const metadataJSON = {
                 id: tokenId,
                 description: `${contract?.token} SBT TOKEN`,

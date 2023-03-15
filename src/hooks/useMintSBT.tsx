@@ -97,8 +97,10 @@ const useMintSBT = (contractAddress: string | undefined) => {
             }).then(res => res?.data?.signature)
           }
 
-          if(mintToken !== process.env.REACT_APP_MATIC_TOKEN_ADDRESS)
-             await tokenContract?.approve(contractAddress, mintPrice)
+          if(mintToken !== process.env.REACT_APP_MATIC_TOKEN_ADDRESS) {
+            const txtx = await tokenContract?.approve(contractAddress, mintPrice)
+            await txtx?.wait()
+          }
 
           try {
             const tx = await mintContract?.safeMint(
