@@ -57,7 +57,7 @@ const EditTask = ({ close, task, daoURL }) => {
     const [description, setDescription] = useState(task.description);
     const [dchannel, setDChannel] = useState(task.discussionChannel);
     const [deadline, setDeadline] = useState(task.deadline ? new Date(task.deadline).toISOString().substring(0, 10) : new Date());
-    const [projectId, setProjectId] = useState(task.project?._id);
+    const [projectId, setProjectId] = useState(task.project ? task.project._id : null);
     const [subLink, setSubLink] = useState(task.submissionLink);
     const [reviewer, setReviewer] = useState(null);
     const [currency, setCurrency] = useState({ currency: task.compensation.currency });
@@ -173,6 +173,12 @@ const EditTask = ({ close, task, daoURL }) => {
             e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             return;
         }
+        else if (contributionType === 'assign' && selectedUser === null) {
+            let e = document.getElementById('error-applicant');
+            e.innerHTML = 'Select one applicant for the task';
+            e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+            return;
+        }
         else {
             let tempLink, tempSub = null;
             if (dchannel && dchannel !== '') {
@@ -205,15 +211,14 @@ const EditTask = ({ close, task, daoURL }) => {
             taskOb.isSingleContributor = isSingleContributor;
             taskOb.isFilterRoles = isFilterRoles;
             taskOb.validRoles = isFilterRoles ? validRoles : [];
-            taskOb.applicant = selectedUser;
-            // taskOb.members = selectedUser ? [{member : selectedUser._id}] : [];
+            taskOb.members = selectedUser ? [{ member: selectedUser._id, status: 'approved' }] : [];
             console.log("task ob : ", taskOb)
             dispatch(editTask({ payload: taskOb, daoUrl: daoURL, taskId: task._id }))
         }
     }
 
     const eligibleContributors = useMemo(() => {
-        return _get(DAO, 'members', []).filter(m => (reviewer || "").toLowerCase() !== m.member._id && m.member._id !== user._id)
+        return _get(DAO, 'members', []).filter(m => (reviewer || "").toLowerCase() !== m.member._id && m.member._id !== user._id && m.member._id !== _find(_get(task, 'members', []), m => m?.status === 'approved')?.member?._id)
     }, [DAO, selectedUser, reviewer])
 
     const eligibleReviewers = useMemo(() => {
@@ -418,10 +423,8 @@ const EditTask = ({ close, task, daoURL }) => {
                                                 >
                                                     {
                                                         task.contributionType === 'assign'
-                                                            ?
-                                                            <option value={null}>{_find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.name && _find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.name !== "" ? `${_find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.name}  (${beautifyHexToken(_find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.wallet)})` : beautifyHexToken(_find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.wallet)}</option>
-                                                            :
-                                                            <option value={null}>Select member</option>
+                                                        &&
+                                                        <option value={null}>{_find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.name && _find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.name !== "" ? `${_find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.name}  (${beautifyHexToken(_find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.wallet)})` : beautifyHexToken(_find(_get(task, 'members', []), m => m?.status === 'approved')?.member?.wallet)}</option>
                                                     }
                                                     {
                                                         eligibleContributors.map((item, index) => {
