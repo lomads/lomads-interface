@@ -567,11 +567,11 @@ const Dashboard = () => {
 			nextStep++
 		}
 		const nextObj = Steps[nextStep]
-		setWalkThroughStyle(nextObj)
+		setWalkThroughStyles(nextObj)
 		setWalkThroughObj(nextObj)
-		
 	}
-    const setWalkThroughStyle = (nextObj: WalkThroughObjType) => {
+
+    const setWalkThroughStyles = (nextObj: WalkThroughObjType) => {
 		anchorRef.current = document.getElementById(nextObj.id)
 		anchorRef.current.style.zIndex = 2500
 		anchorRef.current.scrollIntoView({
@@ -587,7 +587,7 @@ const Dashboard = () => {
 		setShowWalkThrough(true)
 		const workspace = Steps[1]
 		setWalkThroughObj(workspace)
-		setWalkThroughStyle(workspace)
+		setWalkThroughStyles(workspace)
 	}
 
 	const expandHelpOptions = () => {
