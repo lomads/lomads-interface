@@ -165,7 +165,7 @@ const MemberCard = (props: any) => {
 
 					</div>
 				</div>
-				<div className="membersListWrapper">
+				<div className="membersListWrapper" style={props.isHelpIconOpen ? {overflow: 'hidden'} : {}}>
 				{props.isHelpIconOpen && <div className="help-card">
 							This allows you to add new members and manage details and roles of existing members.
 						</div>}

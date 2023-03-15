@@ -88,19 +88,3 @@
     letter-spacing: -0.011em;
     color: #76808D;
 }
-
-.arrow {
-    position: absolute;
-    font-size: 7px;
-    width: 3em;
-    height: 3em;
-  }
-
-.arrow :before {
-    content: '';
-    margin: auto;
-    display: block;
-    width: 0;
-    height: 0;
-    border-style: solid;
-  }

@@ -275,7 +275,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
                 <div className="tasks-buttons">
                     <div style={{ marginRight: '20px' }}>
                     <BootstrapTooltip open={isHelpIconOpen} 
-			            placement="top-start" arrow
+			            placement="top-start"
 			            title="Open">
                         <button 
                             className={`archive-btn ${isHelpIconOpen ? 'help-highlight':''}`}
@@ -285,8 +285,9 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
                     </BootstrapTooltip>
                     </div>
                     <div style={{ marginRight: '20px' }}>
-                    <BootstrapTooltip open={isHelpIconOpen} 
-			            placement="bottom" arrow
+                    <BootstrapTooltip 
+                        open={isHelpIconOpen} 
+			            placement="bottom"
 			            title="Archives">
                         <button
                             className={`archive-btn ${isHelpIconOpen ? 'help-highlight':''}`}
@@ -299,8 +300,9 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
                     </div>
                     {
                         can(myRole, 'task.create') && 
-                        <BootstrapTooltip open={isHelpIconOpen} 
-			                placement="top-start" arrow
+                        <BootstrapTooltip 
+                            open={isHelpIconOpen} 
+			                placement="top-start"
 			                title="Create Task">
                             <div className={`${isHelpIconOpen ? 'help-highlight':''}`}>
                             <SafeButton
@@ -324,9 +326,9 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
                 (tab === 2 && manageTasks && manageTasks.length > 0) ||
                 (tab === 3 && draftTasks && draftTasks.length > 0) ||
                 (tab === 4 && otherTasks && otherTasks.length > 0) ?
-                <div className='tasks-body'>
+                <div className='tasks-body' style={isHelpIconOpen ? {overflow: 'hidden'} : {}}>
                       {isHelpIconOpen && <div className="help-card">
-                            <span>By creating tasks, you can <span className="bold-text"> track progress, deadlines, </span> and <span className="bold-text"> rewards on bounties, </span> and <span className="bold-text"> assign contributors </span> to each task.</span>
+                            <span className="help-card-content">By creating tasks, you can <span className="bold-text"> track progress, deadlines, </span> and <span className="bold-text"> rewards on bounties, </span> and <span className="bold-text"> assign contributors </span> to each task.</span>
                         </div>}
                     {
                         tab === 1 && myTasks && myTasks.filter((item, index) => index < 6).map((item, index) => {

@@ -66,7 +66,7 @@ const LinksArea = ({ links, isHelpIconOpen }) => {
             {
                 can(myRole, 'settings') &&
                 <BootstrapTooltip open={isHelpIconOpen} 
-                    placement="left-start" arrow
+                    placement="left-start"
                     title="Global Settings">
                 <button
                     className={`settings ${isHelpIconOpen ? 'help-highlight':''}`}
