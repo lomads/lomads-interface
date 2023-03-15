@@ -1,10 +1,12 @@
 import { get as _get, find as _find } from 'lodash'
 import { useWeb3React } from "@web3-react/core";
-import { useContract } from "hooks/useContract";
+import { useContract, useTokenContract } from "hooks/useContract";
 import { SupportedChainId } from "constants/chains";
 import { ethers } from "ethers";
 import MultiCall from "@indexed-finance/multicall";
+import axiosHttp from 'api'
 import { USDC } from 'constants/tokens';
+import { USDC_GOERLI, USDC_POLYGON } from 'constants/tokens'
 
 export type SBTParams = {
     name: string,
@@ -40,7 +42,6 @@ const useMintSBT = (contractAddress: string | undefined) => {
   }
 
     const getStats = async () => {
-        console.log("balance..", contractAddress, account)
         if(account) {
           const calls: any = [
             {
@@ -48,31 +49,26 @@ const useMintSBT = (contractAddress: string | undefined) => {
               function: "balanceOf",
               args: [account],
             },
-            // {
-            //   target: contractAddress,
-            //   function: "name",
-            //   args: [],
-            // },
-            // {
-            //   target: contractAddress,
-            //   function: "totalSupply",
-            //   args: [],
-            // },
-            // {
-            //   target: contractAddress,
-            //   function: "mintToken",
-            //   args: [],
-            // },
-            // {
-            //   target: contractAddress,
-            //   function: "mintPrice",
-            //   args: [],
-            // },
-            // {
-            //   target: contractAddress,
-            //   function: "codeOwner",
-            //   args: [""],
-            // },
+            {
+              target: contractAddress,
+              function: "MINTED",
+              args: [],
+            },
+            {
+              target: contractAddress,
+              function: "mintPrice",
+              args: [],
+            },
+            {
+              target: contractAddress,
+              function: "mintToken",
+              args: [],
+            },
+            {
+              target: contractAddress,
+              function: "mustBeWhitelisted",
+              args: [],
+            }
           ]
           const multicall = new MultiCall(provider);
           const [, res] = await multicall.multiCall(
@@ -85,30 +81,42 @@ const useMintSBT = (contractAddress: string | undefined) => {
         return [null, null, null, null]
     }
 
-    const mint = async ({ referralCode, mintPrice }: { referralCode: string, mintPrice: string }) => {
+    const mint = async (tokenURI: string, tokenContract: any) => {
         try {
-            const stats = await getStats()
-            console.log(stats)
-            const currentIndex =
-            parseFloat(stats[2].toString()) === 0
-              ? "1"
-              : stats[2].toString();
-            const mintToken = stats[4];
+          const stats = await getStats();
+          const tokenId = parseFloat(stats[1].toString());
+          const mintPrice = (stats[2]).toString()
+          const mintToken = (stats[3]).toString()
+          const isWhitelisted = stats[4];
+          let signature = null;
+          if(isWhitelisted) {
+            signature = await axiosHttp.post(`contract/whitelist-signature`, {
+              tokenId, 
+              contract: contractAddress,
+              chainId
+            }).then(res => res?.data?.signature)
+          }
 
-            if(chainId && account && mintContract?.signer) {
-                console.log(referralCode, mintPrice)
-                const tx = await mintContract?.safeMint(
-                    `${process.env.REACT_APP_NODE_BASE_URL}/v1/${contractAddress}/${currentIndex}`, 
-                    referralCode, 
-                {
-                    from: account,
-                    value: weth(mintPrice, mintToken)
-                });
-                await tx.wait();
-                return currentIndex;
-            } else {
-                throw 'Error during mint'
-            }
+          if(mintToken !== process.env.REACT_APP_MATIC_TOKEN_ADDRESS) {
+            const txtx = await tokenContract?.approve(contractAddress, mintPrice)
+            await txtx?.wait()
+          }
+
+          try {
+            const tx = await mintContract?.safeMint(
+              tokenURI,
+              tokenId,
+              signature
+              , {
+              from: account,
+              value: mintPrice,
+            });
+            const txn = await tx?.wait();
+            return txn;
+          } catch (e) {
+            console.log(e)
+            throw _get(e, 'message', 'Error while minting')
+          }
         }
         catch (e) {
            console.log(e)
@@ -116,10 +124,26 @@ const useMintSBT = (contractAddress: string | undefined) => {
         }
     }
 
-    const estimateGas = async ( mintPrice: string, referralCode: string) => {
+    const estimateGas = async () => {
         if (mintContract?.signer) {
+          const stats = await getStats();
+          const tokenId = parseFloat(stats[1].toString());
+          const mintPrice = (stats[2]).toString()
+          const isWhitelisted = stats[4];
+          let signature = null;
+          if(isWhitelisted) {
+            signature = await axiosHttp.post(`contract/whitelist-signature`, {
+              tokenId, 
+              contract: contractAddress,
+              chainId
+            }).then(res => res?.data?.signature)
+          }
           try {
-            const tx = await mintContract?.estimateGas.safeMint("", referralCode, {
+            const tx = await mintContract?.estimateGas.safeMint(
+              "",
+              tokenId,
+              signature
+              , {
               from: account,
               value: mintPrice,
             });
