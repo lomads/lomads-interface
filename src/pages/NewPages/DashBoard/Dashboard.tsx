@@ -62,10 +62,19 @@ import { default as MuiButton, ButtonProps  } from '@mui/material/Button';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import Stack from '@mui/material/Stack';
-import { grey } from '@mui/material/colors';
-
 import Button from "muiComponents/Button";
+
 const { toChecksumAddress } = require('ethereum-checksum-address')
+type WalkThroughObjType = {
+    step: number;
+    id: string;
+    title: string;
+    content: string;
+    buttonText: string;
+    imgPath: string;
+    placement: string;
+  }
+
 const HideHelpIconButton = styled(Button)<ButtonProps>(({ theme }) => ({
 	color: '#ffffff',
 	backgroundColor: '#1B2B41',
@@ -329,8 +338,7 @@ const Dashboard = () => {
 	}
 
 	useEffect(() => {
-		if (chainId) {
-			if (DAO && DAO.sbt && DAO.sbt && account) {
+			if (chainId && DAO && DAO.sbt && DAO.sbt && account) {
 				getStats().then(res => {
 					const balanceOf = res[0];
 					if (chainId === DAO.chainId) {
@@ -368,7 +376,6 @@ const Dashboard = () => {
 					}
 				})
 			}
-		}
 	}, [chainId, DAO, getStats, account]);
 
 	useEffect(() => {
@@ -415,8 +422,9 @@ const Dashboard = () => {
 
 
 	useEffect(() => {
-		if (DAO && chainId && DAO.chainId === chainId)
+		if (DAO && chainId && DAO.chainId === chainId){
 			dispatch(updateSafeAddress(_get(DAO, 'safe.address', '')))
+		}
 	}, [DAO, chainId])
 
 	const prepare = async (_safeAddress: string) => {
@@ -450,6 +458,7 @@ const Dashboard = () => {
 				)
 				.then((tokens: any) => {
 					setSafeTokens(tokens.data);
+					setCheckLoading(false)
 				});
 	};
 
@@ -558,10 +567,13 @@ const Dashboard = () => {
 			nextStep++
 		}
 		const nextObj = Steps[nextStep]
+		setWalkThroughStyles(nextObj)
 		setWalkThroughObj(nextObj)
+	}
+
+    const setWalkThroughStyles = (nextObj: WalkThroughObjType) => {
 		anchorRef.current = document.getElementById(nextObj.id)
 		anchorRef.current.style.zIndex = 2500
-		anchorRef.current.style.paddingTop = 100
 		anchorRef.current.scrollIntoView({
 			behavior: 'smooth',
 			block: 'end',
@@ -571,22 +583,14 @@ const Dashboard = () => {
 			anchorRef.current.style.boxShadow = '0px 0px 20px rgba(181, 28, 72, 0.6)'
 		}
 	}
-
 	const startWalkThroughAtStepOne = () => {
 		setShowWalkThrough(true)
 		const workspace = Steps[1]
 		setWalkThroughObj(workspace)
-		anchorRef.current = document.getElementById(workspace.id)
-		anchorRef.current.scrollIntoView({
-			behavior: 'smooth',
-			block: 'center',
-			inline: 'center'
-		});
-		anchorRef.current.style.zIndex = 2500
+		setWalkThroughStyles(workspace)
 	}
 
 	const expandHelpOptions = () => {
-		console.log('....help icon....')
 		setIsHelpIconOpen(!isHelpIconOpen)
 	}
 
@@ -594,7 +598,21 @@ const Dashboard = () => {
 		return ((showWalkThrough && currWalkThroughObj.step === 7) || isHelpIconOpen)
 					? questionMarkDark
 					: questionMarkLight
-	}	
+	}
+
+	useEffect(() => {
+        function handleClick(event: any) {
+			if(isHelpIconOpen && (event.target.matches('div.help-card')
+				|| event.target.matches('div.walkThroughOverlay') 
+				|| event.target.matches('span.bold-text')
+				|| event.target.matches('span.help-card-content'))){
+					event.preventDefault()
+					setIsHelpIconOpen(false)
+				}
+		}
+		document.addEventListener("click", handleClick); 
+		return () => document.removeEventListener("click", handleClick);
+	});
 
 	return (
 		<>
@@ -607,6 +625,8 @@ const Dashboard = () => {
 						<LeapFrog size={50} color="#C94B32" />
 					</div>
 				</div> : null}
+			{(!checkLoading && validDaoChain && DAO && !DAOLoading && daoURL && DAO && DAO.url === daoURL)
+			?  <>
 			{(showWalkThrough || isHelpIconOpen)
 				&& <div className="walkThroughOverlay"></div>}
 			<WalkThroughModal
@@ -621,7 +641,8 @@ const Dashboard = () => {
 				incrementWalkThroughSteps={incrementWalkThroughSteps}
 				endWalkThrough={endWalkThrough}
 				anchorEl={anchorRef.current}
-			/>
+			/></> : null
+			}
 			<div
 				className="dashBoardBody"
 				onMouseEnter={() => {

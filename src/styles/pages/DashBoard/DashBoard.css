@@ -1607,14 +1607,14 @@ body.active-modal {
     align-items: center;
     justify-content: center;
     color: #FFFFFF;
+    overflow: hidden;
     background-color: #76808D;
     z-index: 999;
     width: 100%;
     height: 100%;
     opacity: 0.8;
     text-align: center;
-    padding-left: 15px;
-    padding-right: 15px;
+    cursor: pointer;
 }
 
 .bold-text {
