@@ -7,7 +7,6 @@ import { useAppSelector, useAppDispatch } from "state/hooks";
 import { useNavigate } from "react-router-dom";
 import { setDAO } from "state/dashboard/reducer";
 import { getDao } from "state/dashboard/actions";
-import BootstrapTooltip from "./WalkThrough/HelpToolTip";
 
 const SideBar = (props: any) => {
 	const navigate = useNavigate();
