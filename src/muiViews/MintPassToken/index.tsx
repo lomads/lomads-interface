@@ -49,6 +49,10 @@ import useEncryptDecrypt from "hooks/useEncryptDecrypt";
 import useRole from "hooks/useRole"
 import { USDC_GOERLI, USDC_POLYGON } from 'constants/tokens'
 import { useTokenContract } from 'hooks/useContract'
+import mime from 'mime'
+import moment from 'moment'
+const { NFTStorage, File } = require("nft.storage")
+const client = new NFTStorage({ token: process.env.REACT_APP_NFT_STORAGE })
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -402,6 +406,7 @@ export default () => {
                 ],
                 contract: contract?.address,
               };
+                //const ipfsURL: any =  await uploadNFT(metadataJSON, `${process.env.REACT_APP_NODE_BASE_URL}/v1/${contract?.address}/${tokenId}`)
                 const ipfsURL: string = await axiosHttp.post(`metadata/ipfs-metadata`, { metadata: metadataJSON, tokenURI: `${process.env.REACT_APP_NODE_BASE_URL}/v1/${contract?.address}/${tokenId}` }).then(res => res.data)
                 const token = await mint(ipfsURL, tokenContract);
                 await axiosHttp.post(`metadata/${metadataJSON.contract}`, metadataJSON);
