@@ -87,6 +87,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	console.log("useWeb3React", chainId, rest)
 	const { daoURL } = useParams()
 	const dispatch = useAppDispatch()
+	const treasuryCardRef  = useRef<HTMLDivElement>()
 	const [copy, setCopy] = useState<boolean>(false);
 	const [isAddressValid, setisAddressValid] = useState<boolean>(false);
 	const [owner, setOwner] = useState<boolean>(false);
