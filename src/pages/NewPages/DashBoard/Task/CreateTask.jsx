@@ -149,7 +149,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
             setDeadline('');
             setProjectId(null);
             setSubLink('');
-            //setReviewer(null);
+            setReviewer(null);
             setCurrency(null);
             setAmount(0);
 
@@ -218,12 +218,12 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
             e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             return;
         }
-        // else if (reviewer === null) {
-        //     let e = document.getElementById('error-reviewer');
-        //     e.innerHTML = 'Select a reviewer';
-        //     e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
-        //     return;
-        // }
+        else if (reviewer === null) {
+            let e = document.getElementById('error-reviewer');
+            e.innerHTML = 'Select a reviewer';
+            e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+            return;
+        }
         else {
             let tempLink, tempSub = null;
             if (dchannel && dchannel !== '') {
@@ -255,7 +255,8 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
             task.deadline = deadline;
             task.submissionLink = tempSub ? tempSub : '';
             task.compensation = { currency: currency.currency, amount, symbol };
-            task.reviewer = user._id;
+            // task.reviewer = user._id;
+            task.reviewer = reviewer;
             task.contributionType = contributionType;
             task.isSingleContributor = isSingleContributor;
             task.isFilterRoles = isFilterRoles;
@@ -299,7 +300,8 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
         task.deadline = deadline;
         task.submissionLink = tempSub ? tempSub : '';
         task.compensation = { currency: currency?.currency, amount, symbol };
-        task.reviewer = user._id;
+        // task.reviewer = user._id;
+        task.reviewer = reviewer;
         task.contributionType = contributionType;
         task.isSingleContributor = isSingleContributor;
         task.isFilterRoles = isFilterRoles;
@@ -310,11 +312,11 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
     }
 
     const eligibleContributors = useMemo(() => {
-        return _get(DAO, 'members', []).filter(m => (reviewer || "").toLowerCase() !== m.member._id && m.member._id !== user._id)
+        return _get(DAO, 'members', []).filter(m => (reviewer || "").toLowerCase() !== m.member._id)
     }, [DAO, selectedUser, reviewer])
 
     const eligibleReviewers = useMemo(() => {
-        return _get(DAO, 'members', []).filter(m => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase())
+        return _get(DAO, 'members', []).filter(m => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase() && m.member._id !== user._id)
     }, [DAO, reviewer, selectedUser])
 
     const eligibleProjects = useMemo(() => {
@@ -645,7 +647,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                             <span className='error-msg' id="error-compensation"></span>
                                         </div>
 
-                                        {/* <div className='createTask-inputRow'>
+                                        <div className='createTask-inputRow'>
                                             <span>Reviewer</span>
                                             <select
                                                 name="reviewer"
@@ -664,7 +666,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                 }
                                             </select>
                                             <span className='error-msg' id="error-reviewer"></span>
-                                        </div> */}
+                                        </div>
 
                                     </div>
 
