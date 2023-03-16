@@ -1607,7 +1607,6 @@ body.active-modal {
     align-items: center;
     justify-content: center;
     color: #FFFFFF;
-    overflow: hidden;
     background-color: #76808D;
     z-index: 999;
     width: 100%;
