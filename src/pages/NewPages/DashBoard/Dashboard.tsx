@@ -625,6 +625,8 @@ const Dashboard = () => {
 						<LeapFrog size={50} color="#C94B32" />
 					</div>
 				</div> : null}
+			{(!checkLoading && validDaoChain && DAO && !DAOLoading && daoURL && DAO && DAO.url === daoURL)
+			?  <>
 			{(showWalkThrough || isHelpIconOpen)
 				&& <div className="walkThroughOverlay"></div>}
 			{(!checkLoading && validDaoChain && DAO && !DAOLoading && daoURL && DAO && DAO.url === daoURL)
@@ -642,7 +644,8 @@ const Dashboard = () => {
 				incrementWalkThroughSteps={incrementWalkThroughSteps}
 				endWalkThrough={endWalkThrough}
 				anchorEl={anchorRef.current}
-			/>
+			/></> : null
+			}
 			<div
 				className="dashBoardBody"
 				onMouseEnter={() => {

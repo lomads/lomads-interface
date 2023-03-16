@@ -295,6 +295,15 @@ export const storeGithubIssues = createAsyncThunk(
 	}
 )
 
+export const syncTrelloData = createAsyncThunk(
+	'dao/syncTrelloData',
+	async (params: any, thunkApi) => {
+		return axiosHttp.post(`utility/sync-trello-data`, params.payload)
+			.then(res => res.data)
+			.catch(e => thunkApi.rejectWithValue(e))
+	}
+)
+
 export const createTask = createAsyncThunk(
 	'dao/createTask',
 	async (params: any, thunkApi) => {

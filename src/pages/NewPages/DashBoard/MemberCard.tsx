@@ -103,10 +103,10 @@ const MemberCard = (props: any) => {
 														<span>{item.name}</span>
 													</div>
 												)
-											} 
+											}
 											return <div className="role-count" onClick={() => setShow(prev => !prev)}>
-											<span>{ show ? 'Hide' : `+${roles.length - 4}`}</span>
-										</div>
+												<span>{show ? 'Hide' : `+${roles.length - 4}`}</span>
+											</div>
 										})
 									}
 								</div>
@@ -178,7 +178,7 @@ const MemberCard = (props: any) => {
 								<div className="dashboardText" style={{ marginLeft: '40px' }}>Joined</div>
 							</div>
 						</div>
-						{_sortBy(_uniqBy(membersArray, (m: any) => m.member.wallet.toLowerCase()), (m:any) => _get(m, 'member.name', '').toLowerCase(), 'asc').map((result: any, index: any) => {
+						{_sortBy(_uniqBy(membersArray, (m: any) => m.member.wallet.toLowerCase()), (m: any) => _get(m, 'member.name', '').toLowerCase(), 'asc').map((result: any, index: any) => {
 							return (
 								<NameAndAvatar
 									user={result}

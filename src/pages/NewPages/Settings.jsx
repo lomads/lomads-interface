@@ -36,6 +36,7 @@ import coin from "../../assets/svg/coin.svg";
 import Footer from "components/Footer";
 import { ChevronRight } from "react-feather";
 import { IoMdCloseCircle } from "react-icons/io";
+import { CgTrello } from 'react-icons/cg';
 
 // ASSETS
 import OrganistionDetails from "../../assets/images/settings-page/1-ogranisation-details.svg";
@@ -51,7 +52,7 @@ import OrganisationDetailsModal from "./OrganisationDetailsModal";
 import RolesPermissionsModal from "./RolesPermissionsModal";
 import SafeModal from "./SafeModal";
 import XpPointsModal from "./XpPointsModal";
-import PassTokenModal from "./PassTokenModal";
+import PassTokenModal from "muiModals/PassTokenModal";
 import TerminologyModal from "./TerminologyModal";
 import DiscordModal from "./DiscordModal";
 import { useAppDispatch, useAppSelector } from "state/hooks";
@@ -63,6 +64,10 @@ import CompensateMembersDoneModal from "./CompensateMembersDoneModal";
 import DisableXpPointDailog from "./DisableXpPointDailog";
 import eventEmitter from "utils/eventEmmiter";
 import RolesAndPermissionModal from "muiModals/RolesAndPermissionModal";
+
+import TrelloOrganizationsModal from "muiModals/TrelloOrganizationsModal";
+
+import { LeapFrog } from "@uiball/loaders";
 
 const Settings = () => {
 	const navigate = useNavigate();
@@ -88,6 +93,10 @@ const Settings = () => {
 	const [name, setName] = useState(_get(DAO, 'name', ''));
 
 	const [code, setCode] = useState('');
+
+	const [organizations, setOrganizations] = useState([]);
+	const [trelloLoading, setTrelloLoading] = useState(false);
+	const [openTrelloModal, setOpenTrelloModal] = useState(false);
 
 	useEffect(() => {
 		setName(_get(DAO, 'name', ''))
@@ -136,6 +145,41 @@ const Settings = () => {
 		setOpenCreatePassToken(prev => !prev);
 	};
 	const daoName = name.split(" ");
+
+	const authorizeTrello = () => {
+		setTrelloLoading(true);
+		window.Trello.authorize({
+			type: 'popup',
+			persist: true,
+			interactive: true,
+			name: "Trello Authentication",
+			scope: {
+				read: "true",
+				write: "true",
+				account: "true"
+			},
+			expiration: "never",
+			success: function () {
+				var trelloToken = localStorage.getItem("trello_token");
+				axiosHttp.get(`utility/get-trello-organizations?accessToken=${trelloToken}`)
+					.then((organizations) => {
+						if (organizations.data.type === 'success') {
+							setTrelloLoading(false);
+							setOrganizations(organizations.data.data);
+							setOpenTrelloModal(true);
+						}
+						else {
+							setTrelloLoading(false);
+							alert(organizations.data.message);
+						}
+					})
+			},
+			error: function (e) {
+				console.log("Error : ", e);
+				setTrelloLoading(false);
+			},
+		});
+	};
 
 	return (
 		<>
@@ -227,10 +271,7 @@ const Settings = () => {
 
 							<div className="settings-organisation-child"
 								onClick={() => {
-									if(DAO?.sbt)
-										togglePassToken()
-									else
-										toggleCreatePassTokenModal()
+									togglePassToken()
 								}}
 							>
 								<div
@@ -313,6 +354,32 @@ const Settings = () => {
 								</div>
 							</div>
 						</div>
+
+						{/* Trello */}
+						<div className="settings-organisation-flexbox">
+							<div className="settings-organisation-child"
+								onClick={authorizeTrello}
+							>
+								<div style={{ padding: "20px" }}>
+									{
+										trelloLoading
+											?
+											<LeapFrog size={24} color="#76808D" />
+											:
+											<CgTrello size={35} color="#76808D" />
+									}
+
+									<Link
+										className="style-content"
+										style={{ color: "#C94B32" }}
+									>
+										Trello
+										<ChevronRight />
+									</Link>
+								</div>
+							</div>
+						</div>
+
 					</div>
 
 					<Footer theme="light" />
@@ -343,17 +410,17 @@ const Settings = () => {
 			{openSafe && (
 				<SafeModal toggleS={toggleS} />
 			)}
-			{openPassToken && (
-				<PassTokenModal
-					togglePassToken={togglePassToken}
-				/>
-			)}
-			{openCreatePassToken && (
+			{/* // !-------------  Pass Token ------------ */}
+			<PassTokenModal
+				open={openPassToken}
+				onClose={() => setOpenPassToken(false)}
+			/>
+			{/* {openCreatePassToken && (
 				<CreateMorePassTokenModal
 					navFromSetting={true}
 					toggleCreatePassTokenModal={toggleCreatePassTokenModal}
 				/>
-			)}
+			)} */}
 			{/* // !-------------  SWEAT Points ------------ */}
 			{openXpPoints && (
 				<XpPointsModal toggleXp={toggleXp} />
@@ -368,6 +435,11 @@ const Settings = () => {
 			{/* {openDiscord && (
 				<DiscordModal toggleDiscord={toggleDiscord} />
 			)} */}
+			<TrelloOrganizationsModal
+				open={openTrelloModal}
+				onClose={() => setOpenTrelloModal(false)}
+				organizationData={organizations}
+			/>
 		</>
 	);
 };
