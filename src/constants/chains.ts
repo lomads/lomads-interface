@@ -112,5 +112,5 @@ export const SUPPORTED_ASSETS = {
   [`${SupportedChainId.POLYGON}`]: {
     id: "wmatic",
     symbol: "MATIC",
-  },
+  }
 };
