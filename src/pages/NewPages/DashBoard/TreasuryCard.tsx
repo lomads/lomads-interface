@@ -87,6 +87,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	console.log("useWeb3React", chainId, rest)
 	const { daoURL } = useParams()
 	const dispatch = useAppDispatch()
+	const treasuryCardRef  = useRef<HTMLDivElement>()
 	const [copy, setCopy] = useState<boolean>(false);
 	const [isAddressValid, setisAddressValid] = useState<boolean>(false);
 	const [owner, setOwner] = useState<boolean>(false);
@@ -167,6 +168,11 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		}
 	}, [DAO, prevDAO])
 
+	useEffect(() => {
+		if(props.isHelpIconOpen) {
+			treasuryCardRef.current.scrollTop = 0
+		}
+	}, [props.isHelpIconOpen])
 
 	useImperativeHandle(props.innerRef, () => ({
 		reload: (event: any) => {
@@ -842,7 +848,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 					{
 						pendingTxn !== undefined && executedTxn !== undefined &&
 						(pendingTxn && executedTxn && (pendingTxn.length !== 0 || executedTxn.length !== 0)) &&
-						<div id="treasuryTransactions" style={props.isHelpIconOpen ? {overflow: 'hidden'} : {}}>
+						<div id="treasuryTransactions" ref={treasuryCardRef} style={props.isHelpIconOpen ? {overflow: 'hidden'} : {}}>
 								{props.isHelpIconOpen && <div className="help-card">
 										Managing and automating your treasury has never been easier! Here you can approve and send token payments manually, or set up recurring payments to team members!
 								</div>}
