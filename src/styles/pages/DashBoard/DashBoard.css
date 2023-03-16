@@ -1607,7 +1607,6 @@ body.active-modal {
     align-items: center;
     justify-content: center;
     color: #FFFFFF;
-    overflow: hidden;
     background-color: #76808D;
     z-index: 999;
     width: 100%;
@@ -1615,12 +1614,16 @@ body.active-modal {
     opacity: 0.8;
     text-align: center;
     cursor: pointer;
+    padding: 10px;
 }
 
 .bold-text {
     font-weight: 800;
 }
 
+.position-relative {
+    position: relative;
+}
 /* 
 input:checked+.inner-check:before {
     -webkit-transform: translateX(35px);

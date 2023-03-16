@@ -87,7 +87,6 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	console.log("useWeb3React", chainId, rest)
 	const { daoURL } = useParams()
 	const dispatch = useAppDispatch()
-	const treasuryCardRef  = useRef<HTMLDivElement>()
 	const [copy, setCopy] = useState<boolean>(false);
 	const [isAddressValid, setisAddressValid] = useState<boolean>(false);
 	const [owner, setOwner] = useState<boolean>(false);
@@ -167,12 +166,6 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 			setPendingTxn(undefined)
 		}
 	}, [DAO, prevDAO])
-
-	useEffect(() => {
-		if(props.isHelpIconOpen) {
-			treasuryCardRef.current.scrollTop = 0
-		}
-	}, [props.isHelpIconOpen])
 
 	useImperativeHandle(props.innerRef, () => ({
 		reload: (event: any) => {
@@ -848,10 +841,11 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 					{
 						pendingTxn !== undefined && executedTxn !== undefined &&
 						(pendingTxn && executedTxn && (pendingTxn.length !== 0 || executedTxn.length !== 0)) &&
-						<div id="treasuryTransactions" ref={treasuryCardRef} style={props.isHelpIconOpen ? {overflow: 'hidden'} : {}}>
+						<div className="position-relative">
 								{props.isHelpIconOpen && <div className="help-card">
 										Managing and automating your treasury has never been easier! Here you can approve and send token payments manually, or set up recurring payments to team members!
 								</div>}
+							<div id="treasuryTransactions">
 							<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%' }}>
 								<div className="dashboardText" style={{ marginBottom: '6px', flexGrow: 1 }}>Last Transactions</div>
 								{/* { lowBalanceError && <div className="dashboardText" style={{ marginBottom: '6px', color: 'red' }}>Low token balance</div> } */}
@@ -875,6 +869,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 								)
 							}
 						</div>
+					 </div>
 					}
 				</> :
 				<>
