@@ -52,14 +52,14 @@ const EditTask = ({ close, task, daoURL }) => {
     const [isFilterRoles, setIsFilterRoles] = useState(task.isFilterRoles);
     const [select, setSelect] = useState(false);
     const [validRoles, setValidRoles] = useState(task.validRoles);
-    const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedUser, setSelectedUser] = useState(_find(_get(task, 'members', []), m => m?.status === 'approved')?.member);
     const [name, setName] = useState(task.name);
     const [description, setDescription] = useState(task.description);
     const [dchannel, setDChannel] = useState(task.discussionChannel);
     const [deadline, setDeadline] = useState(task.deadline ? new Date(task.deadline).toISOString().substring(0, 10) : new Date());
     const [projectId, setProjectId] = useState(task.project ? task.project._id : null);
     const [subLink, setSubLink] = useState(task.submissionLink);
-    const [reviewer, setReviewer] = useState(null);
+    const [reviewer, setReviewer] = useState(task.reviewer ? task.reviewer._id : null);
     const [currency, setCurrency] = useState({ currency: task.compensation.currency });
     const [amount, setAmount] = useState(task.compensation.amount);
     const [safeTokens, setSafeTokens] = useState([]);
@@ -179,6 +179,12 @@ const EditTask = ({ close, task, daoURL }) => {
             e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
             return;
         }
+        else if (reviewer === null) {
+            let e = document.getElementById('error-reviewer');
+            e.innerHTML = 'Select a reviewer';
+            e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
+            return;
+        }
         else {
             let tempLink, tempSub = null;
             if (dchannel && dchannel !== '') {
@@ -212,17 +218,18 @@ const EditTask = ({ close, task, daoURL }) => {
             taskOb.isFilterRoles = isFilterRoles;
             taskOb.validRoles = isFilterRoles ? validRoles : [];
             taskOb.members = selectedUser ? [{ member: selectedUser._id, status: 'approved' }] : [];
+            taskOb.reviewer = reviewer;
             console.log("task ob : ", taskOb)
             dispatch(editTask({ payload: taskOb, daoUrl: daoURL, taskId: task._id }))
         }
     }
 
     const eligibleContributors = useMemo(() => {
-        return _get(DAO, 'members', []).filter(m => (reviewer || "").toLowerCase() !== m.member._id && m.member._id !== user._id && m.member._id !== _find(_get(task, 'members', []), m => m?.status === 'approved')?.member?._id)
+        return _get(DAO, 'members', []).filter(m => (reviewer || "").toLowerCase() !== m.member._id && m.member._id !== _find(_get(task, 'members', []), m => m?.status === 'approved')?.member?._id)
     }, [DAO, selectedUser, reviewer])
 
     const eligibleReviewers = useMemo(() => {
-        return _get(DAO, 'members', []).filter(m => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase())
+        return _get(DAO, 'members', []).filter(m => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase() && m.member._id !== user._id)
     }, [DAO, reviewer, selectedUser])
 
     const eligibleProjects = useMemo(() => {
@@ -601,7 +608,7 @@ const EditTask = ({ close, task, daoURL }) => {
                                             <span className='error-msg' id="error-compensation"></span>
                                         </div>
 
-                                        {/* <div className='createTask-inputRow'>
+                                        <div className='createTask-inputRow'>
                                             <span>Reviewer</span>
                                             <select
                                                 name="reviewer"
@@ -620,7 +627,7 @@ const EditTask = ({ close, task, daoURL }) => {
                                                 }
                                             </select>
                                             <span className='error-msg' id="error-reviewer"></span>
-                                        </div> */}
+                                        </div>
 
                                     </div>
 
