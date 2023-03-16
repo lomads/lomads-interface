@@ -274,8 +274,7 @@ export default () => {
                 }
                 axiosHttp.post('contract', contractJSON)
                 .then(res => {
-                    toast.success('SBT Deployed successfully')
-                    setTimeout(() => navigate(`/${_get(DAO, 'url', '')}`), 200)
+                    setTimeout(() => { window.location.href = `/${_get(DAO, 'url', '')}` }, 500)
                 })
                 .finally(() =>  setDeployContractLoading(false))
             }

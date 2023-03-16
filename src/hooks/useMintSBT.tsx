@@ -85,7 +85,8 @@ const useMintSBT = (contractAddress: string | undefined) => {
         try {
           const stats = await getStats();
           const tokenId = parseFloat(stats[1].toString());
-          const mintPrice = (stats[2]).toString()
+          console.log("mintPrice", stats[2])
+          const mintPrice = (stats[2] ? stats[2] : 0).toString()
           const mintToken = (stats[3]).toString()
           const isWhitelisted = stats[4];
           let signature = null;
