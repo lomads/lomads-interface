@@ -103,14 +103,11 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
           const mintPrice = (stats[2] ? stats[2] : 0).toString()
           const mintToken = (stats[3] ? stats[3] : process.env.REACT_APP_MATIC_TOKEN_ADDRESS).toString()
           const isWhitelisted = stats[4] ? stats[4] : 0
-          let signature = null;
-          if(isWhitelisted) {
-            signature = await axiosHttp.post(`contract/whitelist-signature`, {
+          let signature = await axiosHttp.post(`contract/whitelist-signature`, {
               tokenId, 
               contract: contractAddress,
               chainId
             }).then(res => res?.data?.signature)
-          }
 
           if(mintToken && (mintToken !== process.env.REACT_APP_MATIC_TOKEN_ADDRESS)) {
             const txtx = await tokenContract?.approve(contractAddress, mintPrice)
@@ -152,14 +149,11 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
           const tokenId = parseFloat(stats[1].toString());
           const mintPrice = (stats[2]).toString()
           const isWhitelisted = stats[4];
-          let signature = null;
-          if(isWhitelisted) {
-            signature = await axiosHttp.post(`contract/whitelist-signature`, {
-              tokenId, 
-              contract: contractAddress,
-              chainId
-            }).then(res => res?.data?.signature)
-          }
+          let signature = await axiosHttp.post(`contract/whitelist-signature`, {
+            tokenId, 
+            contract: contractAddress,
+            chainId
+          }).then(res => res?.data?.signature)
           try {
             const tx = await mintContract?.estimateGas.safeMint(
               "",
