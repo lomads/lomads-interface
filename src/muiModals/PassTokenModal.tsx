@@ -108,7 +108,7 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
     const {  DAO } = useAppSelector(store => store.dashboard)
     const [contract, setContract] = useState<any>(null);
     const [updateContractLoading, setUpdateContractLoading] = useState<boolean | null>(null)
-    const { updateContract, getStats } = useMintSBT(_get(contract, 'address', ''))
+    const { updateContract, getStats } = useMintSBT(_get(contract, 'address', ''), _get(contract, 'version', ''))
     const [tokens, setTokens] = useState<any>([])
     const [state, setState] = useState<any>({
         whitelisted: false,
@@ -181,7 +181,7 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
         // }
         try {
             setUpdateContractLoading(true)
-            if((state?.price?.token !== prevState?.price?.token) || (state?.price?.value !== prevState?.price?.value)) {
+            if(contract?.version === "1" && (state?.price?.token !== prevState?.price?.token) || (state?.price?.value !== prevState?.price?.value)) {
                 await updateContract(state?.price?.value, state?.price?.token)
             }
             await axiosHttp.patch(`contract/${contract?.address}`, {
@@ -259,9 +259,9 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
                                     <img style={{ width: 20, borderRadius: 10, marginLeft: 8, height: 20 }} src={_get(CHAIN_INFO, chainId).logoUrl} />
                                 </Box> }
                             </Box>
-                            <Box display="flex" flexDirection="row" alignItems="center">
+                            {/* <Box display="flex" flexDirection="row" alignItems="center">
                                { contract?.tokenSupply && <Typography className={classes.tokenSupply}>{ `X ${ contract?.tokenSupply }` }</Typography> }
-                            </Box>
+                            </Box> */}
                         </Box>
                         <Box my={3} mx={1}>
                             <Typography
@@ -284,6 +284,7 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
                                 checked={state?.whitelisted} label="WHITELISTED"/>
                             </Box>
                         </Box>
+                        { contract?.version === "1" &&
                         <Box my={4} mx={1}>
                             <Typography
                                 style={{
@@ -317,7 +318,7 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
                                     }
                                 </Box>
                             </Box>
-                        </Box>
+                        </Box> }
                         <Box style={{ height: 4, width: 200, alignSelf: 'center', margin: '60px auto', backgroundColor: palette.primary.main }}></Box>
                         <Box className={classes.paperDetailsSocial}>
                             <Box>

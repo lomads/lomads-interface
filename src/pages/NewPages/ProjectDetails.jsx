@@ -148,7 +148,7 @@ const ProjectDetails = () => {
     const [openKRA, setOpenKRA] = useState(false);
     const [openWorkspaceInfo, setOpenWorkspaceInfo] = useState(false);
     const { decryptMessage } = useEncryptDecrypt()
-    const { getStats } = useMintSBT(DAO?.sbt?.address)
+    const { getStats } = useMintSBT(DAO?.sbt?.address, DAO?.sbt?.version)
 
     useEffect(() => {
         if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))

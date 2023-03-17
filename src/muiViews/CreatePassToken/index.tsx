@@ -263,6 +263,7 @@ export default () => {
                     image: state?.logo,
                     tokenSupply: state?.supply,
                     address: contractAddr,
+                    version: 1,
                     treasury: state?.treasury,
                     mintPrice: `${state?.price?.value}`,
                     mintPriceToken: `${state?.price?.token}`,

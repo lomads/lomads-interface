@@ -101,10 +101,10 @@ export default () => {
     })
     const [price, setPrice] = useState<any>({})
     const [hasClickedAuth, setHasClickedAuth] = useState<any>(false)
-    const { mint, estimateGas, getStats, checkDiscount } = useMintSBT(contractId)
+    const { mint, estimateGas, getStats, checkDiscount } = useMintSBT(contractId, contract?.version)
     const { onOpen, onResetAuth, authorization, isAuthenticating } = useDCAuth("identify")
     const { encryptMessage, decryptMessage } = useEncryptDecrypt()
-    const tokenContract = useTokenContract(contract?.mintPriceToken)
+    const tokenContract = useTokenContract(contract?.mintPriceToken || undefined)
 
     useEffect(() => {
         console.log("balance..getStats", balance)
@@ -363,7 +363,7 @@ export default () => {
         try {
             const msg = await encryptMessage(JSON.stringify({ email: _get(state, 'email', ''), discord: _get(state, 'discord', ''), telegram: _get(state, 'telegram', ''), github: _get(state, 'github', '') }))
             const stats: any = await getStats();
-            const tokenId = parseFloat(stats[1].toString());
+            let tokenId = parseFloat(stats[1].toString());
             const metadataJSON = {
                 id: tokenId,
                 description: `${contract?.token} SBT TOKEN`,
@@ -407,8 +407,12 @@ export default () => {
                 contract: contract?.address,
               };
                 //const ipfsURL: any =  await uploadNFT(metadataJSON, `${process.env.REACT_APP_NODE_BASE_URL}/v1/${contract?.address}/${tokenId}`)
-                const ipfsURL: string = await axiosHttp.post(`metadata/ipfs-metadata`, { metadata: metadataJSON, tokenURI: `${process.env.REACT_APP_NODE_BASE_URL}/v1/${contract?.address}/${tokenId}` }).then(res => res.data)
-                const token = await mint(ipfsURL, tokenContract);
+                if(contract?.version === '1') {
+                    const ipfsURL: string = await axiosHttp.post(`metadata/ipfs-metadata`, { metadata: metadataJSON, tokenURI: `${process.env.REACT_APP_NODE_BASE_URL}/v1/${contract?.address}/${tokenId}` }).then(res => res.data)
+                    const token = await mint(ipfsURL, tokenContract);
+                } else {
+                    const token = await mint(undefined, undefined);
+                }
                 await axiosHttp.post(`metadata/${metadataJSON.contract}`, metadataJSON);
                 await axiosHttp.patch(`dao/${_get(DAO, 'url', '')}/update-user-discord`, {
                     discordId: state?.discord || null,
