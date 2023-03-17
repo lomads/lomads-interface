@@ -34,6 +34,7 @@ import BaseLayout from "muiLayouts/BaseLayout";
 
 import CreatePassToken from "muiViews/CreatePassToken";
 import MintPassToken from "muiViews/MintPassToken";
+// import LoginPage from "muiViews/LoginPage";
 
 export default [
     {
