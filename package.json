@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@biconomy/mexa": "^3.0.6",
     "@chakra-ui/react": "^2.2.4",
     "@coinbase/wallet-sdk": "^3.3.0",
     "@emotion/react": "^11.9.3",
@@ -79,6 +80,7 @@
     "moralis": "1.11.0",
     "moralis-v1": "^1.11.0",
     "ms.macro": "^2.0.0",
+    "net": "^1.0.2",
     "next-tick": "^1.1.0",
     "nft.storage": "^7.0.3",
     "node-cron": "^3.0.2",
@@ -122,6 +124,7 @@
     "styled-components": "^5.3.5",
     "swr": "^1.3.0",
     "throttle-debounce": "^5.0.0",
+    "tls": "^0.0.1",
     "typechain": "^5.0.0",
     "typescript": "^4.4.2",
     "ua-parser-js": "^1.0.2",

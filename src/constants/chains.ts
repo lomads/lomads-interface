@@ -40,7 +40,10 @@ export const SUPPORTED_CHAIN_IDS: SupportedChainId[] = [
   // SupportedChainId.MAINNET,
   SupportedChainId.POLYGON,
   SupportedChainId.GOERLI,
+  SupportedChainId.POLYGON_MUMBAI
 ]
+
+//gsf : take out polygon mumbai it was added because we used it
 
 export const SUPPORTED_GAS_ESTIMATE_CHAIN_IDS = [
   SupportedChainId.MAINNET,

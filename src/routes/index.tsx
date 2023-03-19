@@ -10,7 +10,7 @@ import AddNewSafe from "../pages/NewPages/AddNewSafe";
 import Dashboard from "../pages/NewPages/DashBoard/Dashboard";
 import Settings from "../pages/NewPages/Settings";
 import SettingsOlder from "../pages/NewPages/SettingsOlder";
-import DCAuth from '../pages/NewPages/DCAuth';
+import DCAuth from "../pages/NewPages/DCAuth";
 //import CreatePassToken from "../pages/NewPages/CreatePassToken";
 //import MintPassToken from "../pages/NewPages/MintPassToken";
 import CreatePassSucess from "../pages/NewPages/CreatePassSucess";
@@ -36,126 +36,126 @@ import CreatePassToken from "muiViews/CreatePassToken";
 import MintPassToken from "muiViews/MintPassToken";
 
 export default [
-    {
-        path: '/',
-        component: Dashboard
-    },
-    {
-        path: '/login',
-        component: LoginPage
-    },
-    {
-        path: '/createorg',
-        component: NameDAO
-    },
-    {
-        path: '/createdao',
-        component: NameDAO
-    },
-    {
-        path: '/invitegang',
-        component: InviteGang
-    },
-    {
-        path: '/startsafe',
-        component: StartSafe
-    },
-    {
-        path: '/addsafe',
-        component: AddExistingSafe
-    },
-    {
-        path: '/newsafe',
-        component: AddNewSafe
-    },
-    {
-        path: '/success',
-        component: DAOsuccess
-    },
-    {
-        path: '/noaccess',
-        component: DAONoAccess
-    },
-    {
-        path: '/only-whitelisted',
-        component: OnlyWhitelisted
-    },
-    {
-        path: '/:daoURL/create-pass-token',
-        component: CreatePassToken,
-        layout: PrimaryLayout
-    },
-    {
-        path: '/:daoURL/mint/:contractId',
-        component: MintPassToken,
-        layout: BaseLayout
-    },
-    {
-        path: '/sbt/success/:contractAddr',
-        component: CreatePassSucess
-    },
-    {
-        path: '/createProject',
-        component: CreateProject
-    },
-    {
-        path: '/dcauth',
-        component: DCAuth
-    },
-    {
-        path: '/githubauth',
-        component: GithubAuth
-    },
-    {
-        path: '/:daoURL/project/:projectId',
-        component: ProjectDetails
-    },
-    {
-        path: '/:daoURL/project/:projectId/preview',
-        component: ProjectDetailsPreview
-    },
-    {
-        path: '/:daoURL/project/:projectId/archiveKra',
-        component: ArchiveKRA
-    },
-    {
-        path: '/:daoURL/projects',
-        component: AllProjects
-    },
-    {
-        path: '/:daoURL/task/:taskId',
-        component: TaskDetails
-    },
-    {
-        path: '/:daoURL/task/:taskId/preview',
-        component: TaskDetailsPreview
-    },
-    {
-        path: '/:daoURL/settings',
-        component: Settings
-    },
-    {
-        path: '/archives',
-        component: ArchiveProjects
-    },
-    {
-        path: '/:daoURL/archiveTasks',
-        component: ArchiveTasks
-    },
-    {
-        path: '/:daoURL/archiveTasks/:projectId',
-        component: ArchiveProjectTasks
-    },
-    {
-        path: '/:daoURL/tasks',
-        component: AllTasks
-    },
-    {
-        path: '/:daoURL/tasks/:projectId',
-        component: AllProjectTasks
-    },
-    {
-        path: '/:daoURL',
-        component: Dashboard
-    }
-]
+  {
+    path: "/",
+    component: Dashboard,
+  },
+  {
+    path: "/login",
+    component: LoginPage,
+  },
+  {
+    path: "/createorg",
+    component: NameDAO,
+  },
+  {
+    path: "/createdao",
+    component: NameDAO,
+  },
+  {
+    path: "/invitegang",
+    component: InviteGang,
+  },
+  {
+    path: "/startsafe",
+    component: StartSafe,
+  },
+  {
+    path: "/addsafe",
+    component: AddExistingSafe,
+  },
+  {
+    path: "/newsafe",
+    component: AddNewSafe,
+  },
+  {
+    path: "/success",
+    component: DAOsuccess,
+  },
+  {
+    path: "/noaccess",
+    component: DAONoAccess,
+  },
+  {
+    path: "/only-whitelisted",
+    component: OnlyWhitelisted,
+  },
+  {
+    path: "/:daoURL/create-pass-token",
+    component: CreatePassToken,
+    layout: PrimaryLayout,
+  },
+  {
+    path: "/:daoURL/mint/:contractId",
+    component: MintPassToken,
+    layout: BaseLayout,
+  },
+  {
+    path: "/sbt/success/:contractAddr",
+    component: CreatePassSucess,
+  },
+  {
+    path: "/createProject",
+    component: CreateProject,
+  },
+  {
+    path: "/dcauth",
+    component: DCAuth,
+  },
+  {
+    path: "/githubauth",
+    component: GithubAuth,
+  },
+  {
+    path: "/:daoURL/project/:projectId",
+    component: ProjectDetails,
+  },
+  {
+    path: "/:daoURL/project/:projectId/preview",
+    component: ProjectDetailsPreview,
+  },
+  {
+    path: "/:daoURL/project/:projectId/archiveKra",
+    component: ArchiveKRA,
+  },
+  {
+    path: "/:daoURL/projects",
+    component: AllProjects,
+  },
+  {
+    path: "/:daoURL/task/:taskId",
+    component: TaskDetails,
+  },
+  {
+    path: "/:daoURL/task/:taskId/preview",
+    component: TaskDetailsPreview,
+  },
+  {
+    path: "/:daoURL/settings",
+    component: Settings,
+  },
+  {
+    path: "/archives",
+    component: ArchiveProjects,
+  },
+  {
+    path: "/:daoURL/archiveTasks",
+    component: ArchiveTasks,
+  },
+  {
+    path: "/:daoURL/archiveTasks/:projectId",
+    component: ArchiveProjectTasks,
+  },
+  {
+    path: "/:daoURL/tasks",
+    component: AllTasks,
+  },
+  {
+    path: "/:daoURL/tasks/:projectId",
+    component: AllProjectTasks,
+  },
+  {
+    path: "/:daoURL",
+    component: Dashboard,
+  },
+];
