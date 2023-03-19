@@ -147,7 +147,7 @@ const Dashboard = () => {
 	const { getENSAddress, getENSName } = useEns()
 
 	//const { contractNamebalanceOf,  } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '', chainId);
-	const { getStats } = useMintSBT(DAO?.sbt?.address)
+	const { getStats } = useMintSBT(DAO?.sbt?.address, DAO?.sbt?.version)
 
 	const token = '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';
 
@@ -341,6 +341,7 @@ const Dashboard = () => {
 			if (chainId && DAO && DAO.sbt && DAO.sbt && account) {
 				getStats().then(res => {
 					const balanceOf = res[0];
+					console.log("balanceOf", balanceOf)
 					if (chainId === DAO.chainId) {
 						if (DAO?.sbt?.whitelisted) {
 							if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
@@ -625,8 +626,6 @@ const Dashboard = () => {
 						<LeapFrog size={50} color="#C94B32" />
 					</div>
 				</div> : null}
-			{(!checkLoading && validDaoChain && DAO && !DAOLoading && daoURL && DAO && DAO.url === daoURL)
-			?  <>
 			{(showWalkThrough || isHelpIconOpen)
 				&& <div className="walkThroughOverlay"></div>}
 			{(!checkLoading && validDaoChain && DAO && !DAOLoading && daoURL && DAO && DAO.url === daoURL)
@@ -644,8 +643,7 @@ const Dashboard = () => {
 				incrementWalkThroughSteps={incrementWalkThroughSteps}
 				endWalkThrough={endWalkThrough}
 				anchorEl={anchorRef.current}
-			/></> : null
-			}
+			/>
 			<div
 				className="dashBoardBody"
 				onMouseEnter={() => {

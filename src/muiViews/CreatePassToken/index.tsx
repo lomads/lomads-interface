@@ -263,6 +263,7 @@ export default () => {
                     image: state?.logo,
                     tokenSupply: state?.supply,
                     address: contractAddr,
+                    version: 1,
                     treasury: state?.treasury,
                     mintPrice: `${state?.price?.value}`,
                     mintPriceToken: `${state?.price?.token}`,
@@ -274,8 +275,7 @@ export default () => {
                 }
                 axiosHttp.post('contract', contractJSON)
                 .then(res => {
-                    toast.success('SBT Deployed successfully')
-                    setTimeout(() => navigate(`/${_get(DAO, 'url', '')}`), 200)
+                    setTimeout(() => { window.location.href = `/${_get(DAO, 'url', '')}` }, 500)
                 })
                 .finally(() =>  setDeployContractLoading(false))
             }

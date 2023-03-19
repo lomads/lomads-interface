@@ -7,7 +7,7 @@ import SafeButton from "UIpack/SafeButton";
 import SimpleInputField from "UIpack/SimpleInputField";
 import SimpleButton from "UIpack/SimpleButton";
 import { InviteGangType } from "types/UItype";
-import { Checkbox } from "@chakra-ui/react";
+import Checkbox from "muiComponents/Checkbox";
 import { useAppSelector } from "state/hooks";
 import { useAppDispatch } from "state/hooks";
 import {
@@ -318,11 +318,11 @@ const AddNewSafe = () => {
 											<>
 												<Checkbox
 													size="lg"
-													colorScheme="orange"
+													colorScheme="orange"s
 													id={index}
 													name="owner"
 													value={result.address}
-													onChange={(event) => handleCheck(event)}
+													onChange={(event:any) => handleCheck(event)}
 												/>
 											</>
 										) : (
