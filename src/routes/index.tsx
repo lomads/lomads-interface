@@ -1,4 +1,4 @@
-import LoginPage from "../pages/LoginPage";
+//import LoginPage from "../pages/LoginPage";
 import Header from "components/Header";
 import DAOsuccess from "../pages/NewPages/DAOsuccess";
 import DAONoAccess from "../pages/NewPages/DAONoAccess";
@@ -34,7 +34,8 @@ import BaseLayout from "muiLayouts/BaseLayout";
 
 import CreatePassToken from "muiViews/CreatePassToken";
 import MintPassToken from "muiViews/MintPassToken";
-// import LoginPage from "muiViews/LoginPage";
+import LoginPage from "muiViews/LoginPage";
+import createDaoOrg from "muiViews/CreateDaoOrg"
 
 export default [
     {
@@ -47,11 +48,11 @@ export default [
     },
     {
         path: '/createorg',
-        component: NameDAO
+        component: createDaoOrg
     },
     {
         path: '/createdao',
-        component: NameDAO
+        component: createDaoOrg
     },
     {
         path: '/invitegang',

@@ -24,7 +24,7 @@ import toast from 'react-hot-toast';
 import metamaskError from 'utils/metamaskError';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-
+// 0xEb42ab42685cF1C2Ad2A49d67C7f1363f2e7D807
 const useStyles = makeStyles((theme: any) => ({
     root: {
          height: "100vh",
