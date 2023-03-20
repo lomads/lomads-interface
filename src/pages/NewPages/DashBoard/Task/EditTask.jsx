@@ -416,6 +416,27 @@ const EditTask = ({ close, task, daoURL }) => {
                                         <div className='hr-line'></div>
 
                                         <div className='createTask-inputRow'>
+                                            <span>Reviewer</span>
+                                            <select
+                                                name="reviewer"
+                                                id="reviewer"
+                                                className="tokenDropdown"
+                                                style={{ width: '100%' }}
+                                                onChange={(e) => { setReviewer(e.target.value); document.getElementById('error-reviewer').innerHTML = '' }}
+                                            >
+                                                {/* <option value={null}>Select member</option> */}
+                                                {
+                                                    eligibleReviewers.map((item, index) => {
+                                                        return (
+                                                            <option value={`${item.member._id}`} selected={reviewer === item.member._id}>{item.member.name}</option>
+                                                        )
+                                                    })
+                                                }
+                                            </select>
+                                            <span className='error-msg' id="error-reviewer"></span>
+                                        </div>
+
+                                        <div className='createTask-inputRow'>
                                             <span>Contribution</span>
                                             <div className='createTask-buttonRow'>
                                                 <button
@@ -628,27 +649,6 @@ const EditTask = ({ close, task, daoURL }) => {
                                                 </NumberInput>
                                             </div>
                                             <span className='error-msg' id="error-compensation"></span>
-                                        </div>
-
-                                        <div className='createTask-inputRow'>
-                                            <span>Reviewer</span>
-                                            <select
-                                                name="reviewer"
-                                                id="reviewer"
-                                                className="tokenDropdown"
-                                                style={{ width: '100%' }}
-                                                onChange={(e) => { setReviewer(e.target.value); document.getElementById('error-reviewer').innerHTML = '' }}
-                                            >
-                                                {/* <option value={null}>Select member</option> */}
-                                                {
-                                                    eligibleReviewers.map((item, index) => {
-                                                        return (
-                                                            <option value={`${item.member._id}`} selected={reviewer === item.member._id}>{item.member.name}</option>
-                                                        )
-                                                    })
-                                                }
-                                            </select>
-                                            <span className='error-msg' id="error-reviewer"></span>
                                         </div>
 
                                     </div>
