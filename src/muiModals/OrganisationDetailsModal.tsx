@@ -1,208 +1,352 @@
 import React from 'react';
-import { useState } from 'react'
-import clsx from 'clsx';
-import { get as _get } from 'lodash'
+import { AiOutlineClose, AiOutlinePlus } from "react-icons/ai";
 import {
-    Drawer, Box, Typography, Paper
+    Drawer, Box, Typography, Paper,TextField
 } from '@mui/material';
-import IconButton from 'muiComponents/IconButton';
 import Button from 'muiComponents/Button';
 import Switch from "muiComponents/Switch";
-import CurrencyInput from "muiComponents/CurrencyInput"
+
 import CloseSVG from 'assets/svg/close-new.svg'
-import RP from "assets/images/drawer-icons/RP.svg";
+import PlusSVG from 'assets/svg/plus.svg'
+import OD from "assets/images/drawer-icons/OD.svg";
 import palette from 'muiTheme/palette';
 import { makeStyles } from '@mui/styles';
-import PT from "assets/images/drawer-icons/PT.svg";
+import { isValidUrl } from "utils";
 
-import { styled } from '@mui/material/styles';
-import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
-import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
-import MuiAccordionSummary, {
-    AccordionSummaryProps,
-} from '@mui/material/AccordionSummary';
-import MuiAccordionDetails from '@mui/material/AccordionDetails';
+import Dropzone from 'muiComponents/Dropzone';
+import { IsideModalNew } from "types/DashBoardType";
+import IconButton  from "UIpack/IconButton";
 
-import TotalAccess from "assets/images/drawer-icons/StatusAccess.svg";
-import ViewOnly from "assets/images/drawer-icons/StatusViewOnly.svg";
-import NoAccess from "assets/images/drawer-icons/StatusNoAccess.svg";
 
-const Accordion = styled((props: AccordionProps) => (
-    <MuiAccordion disableGutters elevation={0} square {...props} />
-))(({ theme }) => ({
-    // border: `1px solid ${theme.palette.divider}`,
-    '&:not(:last-child)': {
-        borderBottom: 0,
-    },
-    '&:before': {
-        display: 'none',
-    },
-}));
+import { default as MuiIconButton } from 'muiComponents/IconButton'
+import { Image, Input, Textarea } from "@chakra-ui/react";
+import { useAppSelector } from "state/hooks";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { get as _get, find as _find } from 'lodash';
+import { useDispatch } from "react-redux";
+import axiosHttp from 'api'
+import { updateDao, updateDaoLinks, storeGithubIssues, deleteDaoLink } from 'state/dashboard/actions';
+import AddDiscordLink from 'components/AddDiscordLink';
+import { setDAO, resetStoreGithubIssuesLoader, resetDeleteDaoLinkLoader } from "state/dashboard/reducer";
+import AddGithubLink from "components/AddGithubLink";
 
-const AccordionSummary = styled((props: AccordionSummaryProps) => (
-    <MuiAccordionSummary
-        expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.9rem' }} />}
-        {...props}
-    />
-))(({ theme }) => ({
-    backgroundColor:
-        theme.palette.mode === 'dark'
-            ? 'rgba(255, 255, 255, .05)'
-            : 'rgba(0, 0, 0, .03)',
-    '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
-        transform: 'rotate(90deg)',
-    },
-}));
+import TextInput from "muiComponents/TextInput";
 
-const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
-    padding: '0px',
-}));
+import ReactS3Uploader from 'components/ReactS3Uploader';
+import { LeapFrog } from "@uiball/loaders";
+import { nanoid } from "@reduxjs/toolkit";
+import { useDropzone } from 'react-dropzone'
+import uploadIcon from '../../assets/svg/ico-upload.svg';
+
+import LoginGithub from 'react-login-github';
+import { title } from "process";
+import useGithubAuth from "hooks/useGithubAuth";
+import { AppDispatch } from 'state';
 
 
 const useStyles = makeStyles((theme: any) => ({
-    tableHead: {
-        display: 'flex',
-        justifyContent: 'flex-end',
-        width: '100%',
-        padding: '10px 0'
-    },
-    tableHeadBox: {
-        width: '165px',
-        display: 'flex',
-        alignitems: 'center',
-        justifyContent: 'center',
-    },
-    tableRow: {
-        width: '100%',
-        height: '65px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    tableRowFirstBox: {
-        width: '260px',
-        height: '100%',
-        padding: '0 15px',
-        display: 'flex',
-        alignItems: 'center',
-        borderRight: '1px solid #76808D22'
-    },
-    tableRowBox: {
-        width: '165px',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRight: '1px solid #76808D22'
-    },
-}));
-
-const organisationPermissions = [
+    organisationDetails:
     {
-        id: 1,
-        name: "Access",
-        admin: "Yes",
-        coreContributor: null,
-        activeContributor: null,
-        contributor: null,
+        display:"flex", 
+        flexDirection:"column", 
+        marginBottom:'35px',
+        marginTop:'87px',
+        alignItems:"center"
+    },
+    organisationDetailsText:
+    {
+        color: palette.primary.main, 
+        fontSize: '30px', 
+        fontWeight: 400
+    },
+    heading:
+    {
+        marginBottom:'35px', 
+        paddingLeft:'86px',
+        paddingRight:'90px'
+    },
+    optionalHeading:
+    {
+        borderRadius: '100px',
+        backgroundColor:'rgba(118, 128, 141, 0.05)',
+        fontSize: '16px !important',
+        fontWeight: '700 !important',
+        border:'0px solid rgba(118, 128, 141, 0.05)', 
+        width:'141px',
+        textAlign :'center'
+    },
+    dropzoneContainer:
+    {
+        display:"flex" ,
+        flexDirection:"row" ,
+        justifyContent:"flex-start",
+        alignItems:"center",
+        marginTop:'17px'
+    },
+    borderContainer:
+    {
+    border:'2px solid #C94B32',
+    width:'208px',
+    margin:'auto',
+    marginBottom:'35px'
+    },
+    addLinksContainer:
+    {
+        width:"456px",
+        height:'115px',
+        marginLeft:'58px',
+        marginRight:'61px',
+        padding:'0 22px'
     }
-];
 
-const treasuryPermissions = [
-    {
-        id: 1,
-        name: "Create Transaction (single/batch, recurring)",
-        admin: "All",
-        coreContributor: null,
-        activeContributor: null,
-        contributor: null,
-    },
-    {
-        id: 2,
-        name: "Modify signer",
-        admin: "Yes",
-        coreContributor: null,
-        activeContributor: null,
-        contributor: null,
-    },
-    {
-        id: 3,
-        name: "View Transactions",
-        admin: "Yes",
-        coreContributor: 'Yes*',
-        activeContributor: null,
-        contributor: null,
-    },
-]
+    
+    
 
-const membersPermissions = [
-    {
-        id: 1,
-        name: "View members",
-        admin: "All",
-        coreContributor: "All",
-        activeContributor: "Yes",
-        contributor: "Yes",
-    },
-    {
-        id: 2,
-        name: "Add/Remove (DAO level)",
-        admin: "Yes",
-        coreContributor: null,
-        activeContributor: null,
-        contributor: null,
-    },
-    {
-        id: 3,
-        name: "Add/Remove (Workspace level)",
-        admin: "Yes",
-        coreContributor: 'Yes',
-        activeContributor: null,
-        contributor: null,
-    },
-    {
-        id: 4,
-        name: "Change access level",
-        admin: "Yes",
-        coreContributor: null,
-        activeContributor: null,
-        contributor: null,
-    },
-]
+    
 
-const workspacePermissions = [
-    {
-        id: 1,
-        name: "View",
-        admin: "All",
-        coreContributor: "All",
-        activeContributor: "Only eligible",
-        contributor: "Only eligible",
-    },
-    {
-        id: 2,
-        name: "Create, Modify",
-        admin: "Yes",
-        coreContributor: "All",
-        activeContributor: null,
-        contributor: null,
-    },
-]
-
+    
+   
+}));
 
 export default ({ open, onClose }: { open: boolean, onClose: any }) => {
     const classes = useStyles();
 
-    const [panels, setPanels] = useState<any>([]);
+    //const [panels, setPanels] = useState<any>([]);
+    const[url,setUrl] = useState<string>("");
+    const[linkTitle,setLinkTitle] = useState<string>("");
+    const[link,setLink] = useState<string>("");
 
-    const handleChange = (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
-        if (panels.indexOf(panel) > -1) {
-            setPanels(panels.filter((i: string) => i !== panel));
+    const githubRef = useRef();
+	const { DAO, updateDaoLoading, updateDaoLinksLoading, storeGithubIssuesLoading, deleteDaoLinkLoading } = useAppSelector((state) => state.dashboard);
+	const [name, setName] = useState(_get(DAO, 'name', ''));
+	const [oUrl, setOUrl] = useState(_get(DAO, 'url', ''));
+	const [description, setDescription] = useState(_get(DAO, 'description', ''));
+	const [daoLinks, setDaoLinks] = useState(_get(DAO, 'links', []));
+	const [image, setImage] = useState(_get(DAO, 'image', ''));
+	const [droppedfiles, setDroppedfiles] = useState([]);
+	const [uploadLoading, setUploadLoading] = useState(false);
+	const [pullIssues, setPullIssues] = useState(false);
+	const [importRoles, setImportRoles] = useState(false);
+	const [isAuthenticating, setIsAuthenticating] = useState(false);
+	const { onResetAuth } = useGithubAuth();
+	const dispatch = useDispatch<AppDispatch>();
+
+	useEffect(() => {
+        setDaoLinks(_get(DAO, 'links', []));
+    }, [DAO])
+    
+    useEffect(() => {
+        if (storeGithubIssuesLoading === false) {
+            dispatch(resetStoreGithubIssuesLoader());
+            setIsAuthenticating(false);
+            addLink();
+        }
+    }, [storeGithubIssuesLoading]);
+    
+    useEffect(() => {
+        if (deleteDaoLinkLoading === false) {
+            dispatch(resetDeleteDaoLinkLoader);
+        }
+    }, [deleteDaoLinkLoading])
+    
+    const addLink = useCallback(() => {
+        if (!linkTitle || !link || (linkTitle && linkTitle === '') || (link && link === ''))
+            return;
+        let tempLink = link
+        if (tempLink.indexOf('https://') === -1 && tempLink.indexOf('http://') === -1) {
+            tempLink = 'https://' + link;
+        }
+        setDaoLinks([...daoLinks, { title: linkTitle, link: tempLink }]);
+        setLinkTitle("")
+        setLink("")
+    
+    }, [link, linkTitle]);
+    
+    // const saveChanges = () => {
+    // 	dispatch(updateDao({ url: DAO?.url, payload: { name, description, image } }))
+    // 	// dispatch(updateDaoLinks({ url: DAO?.url, payload: { links: daoLinks } }))
+    // 	toggleOrganisationDetailsModal();
+    // }
+    
+    const addNewLink = (e:any) => {
+        let errorCount = 0;
+        for (var i = 0; i < daoLinks.length; i++) {
+            const title = daoLinks[i].title;
+            const link = daoLinks[i].link;
+            if (title === '') {
+                errorCount += 1;
+                document.getElementById(`title${i}`)!.innerHTML = 'Please enter title'
+            }
+            else if (link === '') {
+                errorCount += 1;
+                document.getElementById(`link${i}`)!.innerHTML = 'Please enter link'
+            }
+        }
+        if (errorCount === 0) {
+            console.log("DAo links : ", daoLinks);
+            // dispatch(updateDaoLinks({ url: DAO?.url, payload: { links: daoLinks } }))
+        }
+    }
+    
+    const deleteLink = (response:any, item:any) => {
+        if (item.link.indexOf('github.') > -1) {
+            let repoInfo = extractGitHubRepoPath(item.link);
+            let ob = _get(DAO, `github.${repoInfo}`, null)
+            if (ob) {
+                axiosHttp.get(`utility/getGithubAccessToken?code=${response.code}&repoInfo=${repoInfo}`)
+                    .then((res) => {
+                        if (res.data) {
+                            dispatch(deleteDaoLink({ url: DAO?.url, payload: { link: item, repoInfo, webhookId: ob.webhookId, token: res.data.access_token } }))
+                        }
+                        else {
+                            console.log("No res : Something went wrong");
+                        }
+                        onResetAuth();
+                    })
+                    .catch((e) => {
+                        onResetAuth()
+                        console.log("error : ", e);
+                    })
+    
+            }
+            else {
+                // no import issues github link
+                let links = daoLinks.filter((l:any) => !(l.title === item.title && l.link === item.link))
+                setDaoLinks(links);
+            }
         }
         else {
-            setPanels([...panels, panel]);
+            let links = daoLinks.filter((l:any) => !(l.title === item.title && l.link === item.link))
+            setDaoLinks(links);
         }
-    };
+    }
+    
+    const handleOnServerAdded = (serverId:any) => {
+        if (importRoles) {
+            axiosHttp.post(`discord/guild/${serverId}/sync-roles`, { daoId: _get(DAO, '_id') })
+                .then(res => {
+                    addLink()
+                })
+        } else {
+            addLink()
+        }
+    }
+    
+    const onDrop = useCallback((acceptedFiles:any) => { setDroppedfiles(acceptedFiles) }, [])
+    
+    const { getRootProps, getInputProps } = useDropzone({ onDrop, multiple: false })
+    
+    const getSignedUploadUrl = (file:any, callback:any) => {
+        console.log(file)
+        const filename = `DAOThumbnail/${nanoid(32)}.${file.type.split('/')[1]}`
+        return axiosHttp.post(`utility/upload-url`, { key: filename, mime: file.type }).then(res => callback(res.data))
+    }
+    
+    const onUploadProgress = (progress:any, message:any, file:any) => { }
+    
+    const onUploadError = (error:any) => { setDroppedfiles([]); setUploadLoading(false) }
+    
+    const onUploadStart = (file:any, next:any) => { setUploadLoading(true); return next(file); }
+    
+    const onFinish = (finish:any) => {
+        setDroppedfiles([])
+        setUploadLoading(false);
+        var arr = finish.signedUrl.split('?');
+        console.log("image : ", arr[0]);
+        setImage(arr[0]);
+    }
+    
+    const onSuccess = (response:any) => {
+        setIsAuthenticating(true);
+        const repoInfo = extractGitHubRepoPath(link);
+        console.log("repo info : ", repoInfo);
+        axiosHttp.get(`utility/getGithubAccessToken?code=${response.code}&repoInfo=${repoInfo}`)
+            .then((res) => {
+                if (res.data) {
+                    console.log("response : ", res.data);
+                    // check if issues has been previously pulled --- inside DAO object
+                    const githubOb = _get(DAO, 'github', null);
+    
+                    if (githubOb) {
+                        console.log("githubOb : ", githubOb);
+                        if (_get(DAO, `github.${repoInfo}`, null)) {
+                            console.log("exists")
+                            const e = document.getElementById('error-msg');
+                            e!.innerHTML = 'Repository already added';
+                            setIsAuthenticating(false);
+                            return;
+                        }
+                        else {
+                            console.log("doesnt exists")
+                            handleGithub(res.data.access_token, repoInfo);
+                        }
+                    }
+                    else {
+                        console.log("githubOb doesnt exists");
+                        handleGithub(res.data.access_token, repoInfo);
+                    }
+                }
+                else {
+                    alert("No res : Something went wrong");
+                    setIsAuthenticating(false);
+                }
+                onResetAuth();
+            })
+            .catch((e) => {
+                onResetAuth()
+                console.log("error : ", e);
+                alert("Something went wrong");
+                setIsAuthenticating(false);
+            })
+    }
+    
+    const extractGitHubRepoPath = (url:any) => {
+        if (!url) return null;
+        const match = url.match(
+            /^https?:\/\/(www\.)?github.com\/(?<owner>[\w.-]+)\/(?<name>[\w.-]+)/
+        );
+        if (!match || !(match.groups?.owner && match.groups?.name)) return null;
+        return `${match.groups.owner}/${match.groups.name}`;
+    }
+    
+    const handleGithub = (token:any, repoInfo:any) => {
+        axiosHttp.get(`utility/get-issues?token=${token}&repoInfo=${repoInfo}&daoId=${_get(DAO, '_id', null)}`)
+            .then((result) => {
+                console.log("issues : ", result.data);
+                if (result.data.message === 'error') {
+                    console.log("Not allowed");
+                    const e = document.getElementById('error-msg');
+                    e!.innerHTML = 'Please check repository for ownership or typography error';
+                    setIsAuthenticating(false);
+                    return;
+                }
+                else {
+                    console.log("Allowed to pull and store issues")
+                    dispatch(storeGithubIssues({
+                        payload:
+                        {
+                            daoId: _get(DAO, '_id', null),
+                            issueList: result.data.data,
+                            token,
+                            repoInfo,
+                            linkOb: { title: linkTitle, link: link }
+                        }
+                    }));
+                }
+            })
+    }
+    
+    const onFailure = (response:any) => console.error("git res : ", response);
+
+
+    // const handleChange = (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
+    //     if (panels.indexOf(panel) > -1) {
+    //         setPanels(panels.filter((i: string) => i !== panel));
+    //     }
+    //     else {
+    //         setPanels([...panels, panel]);
+    //     }
+    // };
 
     return (
         <Drawer
@@ -211,424 +355,227 @@ export default ({ open, onClose }: { open: boolean, onClose: any }) => {
             anchor={'right'}
             open={open}
             onClose={() => onClose()}>
-            <Box sx={{ width: 960, flex: 1, paddingBottom: '80px', paddingLeft: '40px', borderRadius: '20px 0px 0px 20px' }}>
-                <IconButton sx={{ position: 'fixed', right: 32, top: 32 }} onClick={() => onClose()}>
-                    <img src={CloseSVG} />
-                </IconButton>
-                <Box display="flex" flexDirection="column" my={6} alignItems="center">
-                    <img src={RP} />
-                    <Typography my={2} style={{ color: palette.primary.main, fontSize: '30px', fontWeight: 400 }}>Roles & Permissions</Typography>
-                    <Typography style={{ color: '#76808d' }}>Default member roles and permissions are set and ready, based<br /> on industry best practices. Customization options coming soon!</Typography>
+            <Box sx={{ width: 575, flex:1,paddingBottom: '80px', borderRadius: '20px 0px 0px 20px' }}>
+                <MuiIconButton sx={{ position: 'fixed', right:'27px' , top: '36px', borderRadius:'0px'}} onClick={() => onClose()}>
+                    <img src={CloseSVG} style={{width:"15px" , height:"15px"}} />
+                </MuiIconButton>
+                <Box className={classes.organisationDetails}>
+                    <img src={OD}  />
+                    <Typography my={2} style={{ color: palette.primary.main, fontSize: '30px', fontWeight: 400 }}>Organisation Details</Typography>
                 </Box>
 
-                <Box className={classes.tableHead}>
-                    <Box className={classes.tableHeadBox}>
-                        <Typography sx={{ fontWeight: '700' }}>Admin</Typography>
+                
+                <Box className={classes.heading}>
+                    <Typography  style={{
+                                    color: '#76808d',
+                                    fontSize: '16px',
+                                    fontWeight: 700,
+                                    lineHeight: '18px'
+                                }}>Name</Typography>
+                    <TextInput placeholder="Fashion Fusion"  sx={{ marginTop:'10px'}} fullWidth />
+                </Box>
+                <Box className={classes.heading}>
+                    <Typography  style={{
+                                    color: '#76808d',
+                                    fontSize: '16px',
+                                    fontWeight: 700,
+                                    lineHeight: '18px'
+                                }}>Description</Typography>
+                    <TextInput placeholder="DAO description"  sx={{ marginTop:'10px'}} fullWidth multiline rows={4}/>
+                </Box>
+                <Box className={classes.heading}>
+                    <Typography  style={{
+                                    color: '#76808d',
+                                    fontSize: '16px',
+                                    fontWeight: 700,
+                                    lineHeight: '18px'
+                                }}>Organisation's URL</Typography>
+                    <TextInput placeholder="https://app.loamads.xyz/Name" sx={{marginTop:'10px'}} fullWidth />
+                </Box>
+
+                <Box className={classes.heading}>
+                    <Box display="flex" flexDirection="row" justifyContent="space-between">
+                        <Typography  style={{
+                                    color: '#76808d',
+                                    fontSize: '16px',
+                                    fontWeight: 700
+                                }}>Import Thumbnail</Typography>
+                        <Box >
+                                        Optional
+                        </Box>
                     </Box>
-                    <Box className={classes.tableHeadBox}>
-                        <Typography sx={{ fontWeight: '700' }}>Core Contributor</Typography>
-                    </Box>
-                    <Box className={classes.tableHeadBox}>
-                        <Typography sx={{ fontWeight: '700' }}>Active Contributor</Typography>
-                    </Box>
-                    <Box className={classes.tableHeadBox}>
-                        <Typography sx={{ fontWeight: '700' }}>Contributor</Typography>
+                    <Box className={classes.dropzoneContainer}>
+                                    <Dropzone value={url} onUpload={(value:any)=>
+                                    {
+                                        setUrl(value);
+                                            //console.log(value);
+                                    }}></Dropzone>
+                                    <Typography style={{
+                                    color: 'rgba(118, 128, 141, 0.5)',
+                                    fontSize: '16px',
+                                    fontWeight: 400,
+                                    lineHeight: '16px',
+                                    width:'147px',
+                                    marginLeft:'13px'
+                                }}>Accepted formats: jpg, svg or png</Typography>
                     </Box>
                 </Box>
 
-                <Accordion expanded={panels.includes('panel1')} onChange={handleChange('panel1')}>
-                    <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
-                        <Box>
-                            <Typography>ORGANISATION SETTINGS</Typography>
-                        </Box>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                        <Box className={classes.tableRow}>
-                            <Box className={classes.tableRowFirstBox}>
-                                <Typography>Access</Typography>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>Yes</Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                        </Box>
-                    </AccordionDetails>
-                </Accordion>
+                <Box className={classes.borderContainer}>
+                </Box>
 
-                <Accordion expanded={panels.includes('panel2')} onChange={handleChange('panel2')}>
-                    <AccordionSummary aria-controls="panel2d-content" id="panel2d-header">
-                        <Box>
-                            <Typography>TREASURY</Typography>
-                        </Box>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                        <Box className={classes.tableRow}>
-                            <Box className={classes.tableRowFirstBox}>
-                                <Typography>Create Transaction<br />(single/batch, recurring)</Typography>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>All</Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                        </Box>
-                        <Box className={classes.tableRow}>
-                            <Box className={classes.tableRowFirstBox}>
-                                <Typography>Modify signer</Typography>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>Yes</Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                        </Box>
-                        <Box className={classes.tableRow}>
-                            <Box className={classes.tableRowFirstBox}>
-                                <Typography>View Transactions</Typography>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>Yes</Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>Yes*</Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                        </Box>
-                    </AccordionDetails>
-                </Accordion>
+                <Box className={classes.addLinksContainer}>
+                        <Typography style={{
+                                    color: '#76808d',
+                                    fontSize: '16px',
+                                    fontWeight: 700,
+                                    lineHeight: '18px',marginBottom:'10px'}}>Add links</Typography>
+                                <Box display="flex" flexDirection="row" alignItems="center" justify-content="center">
+                                    <TextInput placeholder="Homepage" sx={ {width:"144px" ,marginRight:'12px'}} value={linkTitle} onChange={(e:any)=>setLinkTitle(e.target.value)}
+                                    ></TextInput>
+                                    <TextInput placeholder="http//discord..." sx={{width:"193px",marginRight:'13px',height:"50px"}} value={link} onChange={(e:any)=>setLink(e.target.value)} 
+                                    ></TextInput>
+                                    {/* <IconButton sx={{width:'50px', height:'50px',borderRadius:'5px',backGround:'rgba(27, 43, 65, 0.2)'}}>
+                                    <img src={PlusSVG} style={{width:"15px" , height:"15px"}} /> */}
+                                    {/* </IconButton> */}
+                                    {link && link.indexOf('discord.') > -1 ?
+									<AddDiscordLink
+                                renderButton={<IconButton
+                                    className="addButton"
+                                    Icon={<AiOutlinePlus style={{ height: 30, width: 30 }} />}
+                                    height={40}
+                                    width={40}
+                                    bgColor={(linkTitle.length > 0 && isValidUrl(link))
+                                        ? "#C94B32"
+                                        : "rgba(27, 43, 65, 0.2)"} />}
+                                onGuildCreateSuccess={handleOnServerAdded}
+                                accessControl={true}
+                                link={link} title={undefined} desc={undefined} roleName={undefined} okButton={undefined} onLinkError={undefined}/>
+									:
+									<>
+										{console.log(link)}
+										{
 
-                <Accordion expanded={panels.includes('panel3')} onChange={handleChange('panel3')}>
-                    <AccordionSummary aria-controls="panel3d-content" id="panel3d-header">
-                        <Box>
-                            <Typography>MEMBERS</Typography>
-                        </Box>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                        <Box className={classes.tableRow}>
-                            <Box className={classes.tableRowFirstBox}>
-                                <Typography>View members</Typography>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
+											link && link.indexOf('github.') > -1 && pullIssues
+												?
+												<>
+													{
+														// isAuthenticating
+														// 	?
+														// 	<button className="githubAddButton active" disabled>
+														// 		<LeapFrog size={20} color="#FFF" />
+														// 	</button>
+														// 	:
+														// <LoginGithub
+														// 	clientId={process.env.REACT_APP_GITHUB_CLIENT_ID}
+														// 	scope="repo user admin:repo_hook admin:org"
+														// 	onSuccess={onSuccess}
+														// 	onFailure={onFailure}
+														// 	className={linkTitle.length > 0 && isValidUrl(link) ? "githubAddButton active" : "githubAddButton"}
+														// 	buttonText="+"
+														// />
+														<AddGithubLink onSuccess={onSuccess} title={linkTitle} link={link} desc={undefined} roleName={undefined} accessControl={undefined} okButton={undefined} onGuildCreateSuccess={undefined} innerRef={undefined} renderButton={undefined} />
+													}
+												</>
+												:
+												<IconButton
+													className="addButton"
+													Icon={<AiOutlinePlus style={{ height: 30, width: 30 }} />}
+													height={40}
+													width={40}
+													onClick={() => addLink()}
+													bgColor={
+														(linkTitle.length > 0 && isValidUrl(link))
+															? "#C94B32"
+															: "rgba(27, 43, 65, 0.2)"
+													}
+												/>
+										}
+									</>
+								}
                                 </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>All</Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>All</Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>Yes</Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>Yes</Typography>
-                                </Box>
-                            </Box>
-                        </Box>
-                        <Box className={classes.tableRow}>
-                            <Box className={classes.tableRowFirstBox}>
-                                <Typography>Add/Remove (DAO level)</Typography>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>Yes</Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                        </Box>
-                        <Box className={classes.tableRow}>
-                            <Box className={classes.tableRowFirstBox}>
-                                <Typography>Add/Remove (Workspace level)</Typography>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>Yes</Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>Yes</Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                        </Box>
-                        <Box className={classes.tableRow}>
-                            <Box className={classes.tableRowFirstBox}>
-                                <Typography>Change access level</Typography>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>Yes</Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                        </Box>
-                    </AccordionDetails>
-                </Accordion>
+                                {
+								link && link.indexOf('github.') > -1
+									?
+									<Box ml={2} my={2}>
+										<Switch checked={pullIssues} onChange={() => setPullIssues(prev => !prev)} label="IMPORT ISSUES" />
+									</Box>
+									:
+									<>
+										{
+											link && link.indexOf('discord.') > -1
+												?
+												<Box ml={2} my={2}>
+													<Switch checked={importRoles} onChange={() => setImportRoles(prev => !prev)} label="IMPORT ROLES" />
+												</Box>
+												:
+												null
+										}
+									</>
+							}
+							{/* <span className="error-msg" id="error-msg"></span> */}
+							{daoLinks.length > 0 &&
+								<Box
+									style={{
+										marginTop: "9px",
+										padding: "9px 20px 9px 20px",
+										backgroundColor: "#edf2f7",
+										color: "#718096",
+										borderRadius: "5px",
+										justifyContent: 'space-between'
+									}}>
+									{daoLinks.map((item:any, index:any) => {
+										return (
+											<Box
+												style={{
+													display: "flex",
+													flexDirection: "row",
+													marginTop: "9px",
+													color: "#718096",
+													justifyContent: 'space-between'
+												}}>
+												<Box
+													style={{
+														display: "flex",
+														flexDirection: "row"
+													}}
+												>
+													<Box width="50%">{item.title.length > 7 ? item.title.substring(0, 7) + "..." : item.title}</Box>
+													<Box width="50%" style={{
+														paddingLeft: 8,
+														width: 250,
+														whiteSpace: 'nowrap',
+														overflow: 'hidden',
+														textOverflow: 'ellipsis'
+													}}>{item.link}</Box>
+												</Box>
+												{
+													item.link && item.link.indexOf('github.') > -1
+														?
+														<AddGithubLink
+                                                            renderButton={
+                                                                    <AiOutlineClose style={{ height: 15, width: 15 }} />
+                                                                    
+                                                            }
+                                                            onSuccess={(res: any) => deleteLink(res, item)}
+                                                            validate={false}
+                                                            link={item.link} title={undefined} desc={undefined} roleName={undefined} accessControl={undefined} okButton={undefined} onGuildCreateSuccess={undefined} innerRef={undefined}														/>
+														:
+														<Box
+															className="deleteButton"
+															onClick={() => {
+																deleteLink(null, item);
+															}}
+														>
+															<AiOutlineClose style={{ height: 15, width: 15 }} />
+														</Box>
 
-                <Accordion expanded={panels.includes('panel4')} onChange={handleChange('panel4')}>
-                    <AccordionSummary aria-controls="panel4d-content" id="panel4d-header">
-                        <Box>
-                            <Typography>WORKSPACES</Typography>
+												}
+											</Box>
+										)
+									})}
                         </Box>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                        <Box className={classes.tableRow}>
-                            <Box className={classes.tableRowFirstBox}>
-                                <Typography>View</Typography>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>All</Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>All</Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={ViewOnly} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#0D5263' }}>Only eligible</Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={ViewOnly} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#0D5263' }}>Only eligible</Typography>
-                                </Box>
-                            </Box>
-                        </Box>
-                        <Box className={classes.tableRow}>
-                            <Box className={classes.tableRowFirstBox}>
-                                <Typography>Create, Modify</Typography>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>Yes</Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>All <br /><span style={{ fontSize: '12px', fontWeight: '400', color: '#188C7C', fontStyle: 'italic' }}>(created by them)</span></Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>All <br /><span style={{ fontSize: '12px', fontWeight: '400', color: '#188C7C', fontStyle: 'italic' }}>(created by them)</span></Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                        </Box>
-                        <Box className={classes.tableRow}>
-                            <Box className={classes.tableRowFirstBox}>
-                                <Typography>Validate milestones and KPIs</Typography>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>All</Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>All <br /><span style={{ fontSize: '12px', fontWeight: '400', color: '#188C7C', fontStyle: 'italic' }}>(created by them)</span></Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                        </Box>
-                    </AccordionDetails>
-                </Accordion>
-
-                <Accordion expanded={panels.includes('panel5')} onChange={handleChange('panel5')}>
-                    <AccordionSummary aria-controls="panel5d-content" id="panel5d-header">
-                        <Box>
-                            <Typography>TASKS</Typography>
-                        </Box>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                        <Box className={classes.tableRow}>
-                            <Box className={classes.tableRowFirstBox}>
-                                <Typography>View</Typography>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>All</Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>All</Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>All</Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={ViewOnly} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#0D5263' }}>Only eligible</Typography>
-                                </Box>
-                            </Box>
-                        </Box>
-                        <Box className={classes.tableRow}>
-                            <Box className={classes.tableRowFirstBox}>
-                                <Typography>Create, Modify, Review</Typography>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>Yes</Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                                <Box sx={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <img src={TotalAccess} style={{ marginRight: '5px' }} />
-                                </Box>
-                                <Box sx={{ width: '70%' }}>
-                                    <Typography sx={{ fontWeight: '700', color: '#188C7C' }}>All <br /><span style={{ fontSize: '12px', fontWeight: '400', color: '#188C7C', fontStyle: 'italic' }}>(created by them)</span></Typography>
-                                </Box>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                            <Box className={classes.tableRowBox}>
-                            </Box>
-                        </Box>
-                    </AccordionDetails>
-                </Accordion>
-
-                <Box sx={{ marginTop: '30px' }}>
-                    <Typography sx={{ fontWeight: '700', color: '#76808D', marginBottom: '10px' }}>Notes</Typography>
-                    <Typography sx={{ fontWeight: '700', fontSize: '14px', fontStyle: 'italic', color: '#76808D', marginBottom: '10px' }}>*Next release: Toggle (on/off)</Typography>
-                    <Typography sx={{ fontSize: '14px', fontStyle: 'italic', color: '#76808D', marginBottom: '10px' }}>Admins are by default those who are signatories of the organisation’s safe.</Typography>
-                    <Typography sx={{ fontSize: '14px', fontStyle: 'italic', color: '#76808D', marginBottom: '10px' }}>If a member is removed as a safe signatory then their status is changed to contributor.</Typography>
-                    <Typography sx={{ fontSize: '14px', fontStyle: 'italic', color: '#76808D', marginBottom: '10px' }}>If a member is added as a safe signatory, their status is changed to the Admin.</Typography>
+                }
                 </Box>
             </Box>
         </Drawer>

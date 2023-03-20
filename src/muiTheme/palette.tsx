@@ -11,7 +11,8 @@ export default {
 		contrastText: white,
 		dark: '#B12F15',
 		main: '#C94B32',
-		light: '#EA6447'
+		light: '#EA6447',
+		grey: '#F5F5F5'
 	},
 	secondary: {
 		contrastText: '#76808D',

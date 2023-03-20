@@ -28,7 +28,7 @@ export default {
 				fontWeight: 400,
 				fontSize: '16px',
 				lineHeight: '18px',
-				color: 'rgba(27, 45, 65, 0.2)'
+				color: '#76808D'
 			}
 		},
 		notchedOutline: {

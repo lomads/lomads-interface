@@ -54,15 +54,15 @@ export default ({ value, onUpload }) => {
                 }}
                 contentDisposition="auto"
             />
-            <div style={{ display: 'flex',  borderRadius: 10, margin: '16px 0', height: 200, width: 200, backgroundColor: '#F5F5F5', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+            <div style={{ display: 'flex',  borderRadius: 10, height: 150, width: 150, backgroundColor: '#F5F5F5',boxShadow:'inset 1px 0px 4px rgba(27, 43, 65, 0.1)', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
                 {uploadLoading ?
                     <LeapFrog size={24} color="#C94B32" /> :
                     <>
                         { !url ?
                         <div style={{  display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                            <img style={{ marginBottom: 32 }} src={uploadIcon} alt="upload-icon" />
-                            <Typography style={{ textAlign: 'center', color: '#1B2D41', opacity: 0.6, fontSise: 16 }} variant='subtitle2'>Choose <br/> or drag an image</Typography>
-                            <Typography style={{ color: '#1B2D41', opacity: 0.2, fontSise: 14 }} variant='body2'>maximum size 2mb</Typography>
+                            <img style={{ marginBottom: 11 }} src={uploadIcon} alt="upload-icon" />
+                            <Typography style={{ textAlign: 'center', color: '#C94B32', fontSise: '16px',letterSpacing: '-0.011em',lineHeight:'18px' }} variant='subtitle2'>Choose or <br/>drag an image</Typography>
+                            <Typography style={{ color: '#1B2D41', opacity: 0.2, fontSise: 14,fontWeight:400,lineHeight:'22px' }} variant='body2'>maximum size 2mb</Typography>
                         </div> :
                         <img src={url} style={{ objectFit: 'cover', height: 200, width: 200, borderRadius: 10,  }}></img> 
                         }

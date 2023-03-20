@@ -9,7 +9,7 @@ const useStyles = makeStyles((theme: any) => ({
       background: 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%) !important',
       width: '37px !important',
       height: '37px !important',
-      borderRadius: '5px !important',
+      borderRadius: '5px',
       '&:hover': {
         backgroundColor: 'linear-gradient(180deg, #fcebe6 0%, #dfe3e8 100%) !important',
       },

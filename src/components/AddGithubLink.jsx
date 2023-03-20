@@ -21,7 +21,7 @@ import { nanoid } from "@reduxjs/toolkit";
 import { SupportedChainId } from "constants/chains";
 import useGithubAuth from "hooks/useGithubAuth";
 
-export default ({ title, desc, link, roleName, accessControl, okButton, onGuildCreateSuccess, renderButton = undefined, onSuccess, validate = true, innerRef, ...props }) => {
+export default ({ title, desc, link, roleName, accessControl, okButton, onGuildCreateSuccess, renderButton , onSuccess, validate = true, innerRef, ...props }) => {
 
     const { onOpen, onResetAuth, authorization, isAuthenticating } = useGithubAuth();
     const [addLinkLoading, setAddLinkLoading] = useState(null);
