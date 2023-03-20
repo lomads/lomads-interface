@@ -108,7 +108,7 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
     const {  DAO } = useAppSelector(store => store.dashboard)
     const [contract, setContract] = useState<any>(null);
     const [updateContractLoading, setUpdateContractLoading] = useState<boolean | null>(null)
-    const { updateContract, getStats } = useMintSBT(_get(contract, 'address', ''), _get(contract, 'version', ''))
+    const { updateContract, getStats, withdraw } = useMintSBT(_get(contract, 'address', ''), _get(contract, 'version', ''))
     const [tokens, setTokens] = useState<any>([])
     const [state, setState] = useState<any>({
         whitelisted: false,
@@ -319,6 +319,9 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
                                 </Box>
                             </Box>
                         </Box> }
+                        <Box>
+                            <Button onClick={async () => await withdraw()} size="small" variant="contained">Withdraw</Button>
+                        </Box>
                         <Box style={{ height: 4, width: 200, alignSelf: 'center', margin: '60px auto', backgroundColor: palette.primary.main }}></Box>
                         <Box className={classes.paperDetailsSocial}>
                             <Box>

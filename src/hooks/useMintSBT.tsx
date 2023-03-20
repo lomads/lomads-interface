@@ -172,6 +172,43 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
         throw 'Could not estimate gas. Please try after sometime'
       };
 
+    const withdraw = async () => {
+      if (mintContract?.signer) {
+
+        const  overrides = {
+          gasLimit: 3000000,
+          gasPrice: ethers.utils.parseUnits('300', 'gwei').toString(),
+          type: 1,
+          accessList: [
+            {
+              address: "0xbd062EB9720c78f00c68770F3dE62118e66be404", // admin gnosis safe proxy address
+              storageKeys: [
+                  "0x0000000000000000000000000000000000000000000000000000000000000000"
+              ]
+            },
+            {
+              address: "0xEb42ab42685cF1C2Ad2A49d67C7f1363f2e7D807", // proceedsRecipient gnosis safe proxy address
+              storageKeys: [
+                  "0x0000000000000000000000000000000000000000000000000000000000000000"
+              ]
+            },
+            {
+              address: '0x3E5c63644E683549055b9Be8653de26E0B4CD36E',  // gnosis safe master address
+              storageKeys: []
+            }
+          ]
+        }
+
+        try {
+          const value = await mintContract?.withdraw(overrides)
+        } catch (e) {
+          console.log(e)
+          throw _get(e, 'message', 'Could not withdraw')
+        }
+      }
+      throw 'Could not withdraw. Please try after sometime'
+    }
+
     const checkDiscount = async (inviteCode: string) => {
       if (mintContract?.signer) {
         try {
@@ -209,7 +246,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
       }
     }
 
-    return { mint, estimateGas, getStats, checkDiscount, updateContract }
+    return { mint, estimateGas, getStats, checkDiscount, updateContract, withdraw }
 
 }
 
