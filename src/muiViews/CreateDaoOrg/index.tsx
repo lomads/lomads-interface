@@ -16,8 +16,7 @@ import ReactS3Uploader from 'components/ReactS3Uploader';
 import { nanoid } from "@reduxjs/toolkit";
 import { useDropzone } from 'react-dropzone'
 import uploadIcon from '../../assets/svg/ico-upload.svg';
-import Container from '@mui/material/Container';
-import { Grid, Button, Typography } from "@mui/material"
+import { Container, Grid, Button, Typography, Input } from "@mui/material"
 import { makeStyles } from '@mui/styles';
 
 const { debounce } = require('throttle-debounce');
@@ -31,40 +30,19 @@ const useStyles = makeStyles((theme: any) => ({
          alignItems: 'center',
          justifyContent: 'center',
          overflow: 'hidden !important'
-    },
-    logo: {
-        width: 138,
-        height: 81
-    },
-    cheers: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyItems: 'center'
-    },
-    metamaskButton: {
-        height: '111px !important',
-        cursor: 'pointer',
-        alignContent: "inherit",
-        background: "#fff",
-        borderColor: "#c94b32",
-        borderRadius: '10px !important',
-        borderWidth: 0,
-        filter: "drop-shadow(3px 5px 4px rgba(27,43,65,.05)) drop-shadow(-3px -3px 8px rgba(201,75,50,.1)) !important",
-        margin: "10px",
-        padding: 40
-    },
-    select: {
-        background: '#FFF',
-        borderRadius: '10px !important',
-        boxShadow: 'none !important',
-        fontSize: '16px !important',
-        minWidth: 'inherit !importnt',
-        padding: '0px !important'
 	},
+	text: {
+		fontFamily: 'Inter, sans-serif',
+		fontStyle: 'normal',
+		fontWeight: '400',
+		fontSize: '14px',
+		lineHeight: '15px',
+		letterSpacing: '-0.011em',
+		color: '#76808D'
+	},
+    logo: {
+		marginLeft: '110px',
+    },
 	title: {
         fontFamily: 'Inter, sans-serif',
         fontStyle: 'normal',
@@ -88,6 +66,20 @@ const useStyles = makeStyles((theme: any) => ({
 	},
 	createName: {
 		margin: '25px 0px 15px 0px'
+	},
+	lomadsLogoParent: { 
+		backgroundColor: '#FFF',
+		height: '100vh',
+		zIndex: 99999, 
+		position: 'absolute', 
+		top: 0, 
+		left: 0,
+		right: 0,
+		bottom: 0,
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center' 
 	}
   }));
 
@@ -209,19 +201,7 @@ export default () => {
 	return (
 		<>
 			{DAOListLoading ?
-				<div style={{ 
-						backgroundColor: '#FFF',
-						height: '100vh',
-						zIndex: 99999, 
-						position: 'absolute', 
-						top: 0, 
-						left: 0,
-						right: 0,
-						bottom: 0,
-						display: 'flex',
-						flexDirection: 'column',
-						alignItems: 'center',
-						justifyContent: 'center' }}>
+				<div className={classes.lomadsLogoParent}>
 					<div className="logo">
 						<img src={lomadsfulllogo} alt="" />
 					</div>
@@ -243,7 +223,7 @@ export default () => {
 						<div>
 							<div className={classes.inputFieldTitle}>Name Your Organisation</div>
 							<SimpleInputField
-								className="inputField"
+								className={classes.inputFieldTitle}
 								height={50}
 								width={460}
 								placeholder="Epic Organisation"
@@ -261,7 +241,7 @@ export default () => {
 								{urlCheckLoading && <LeapFrog size={20} color="#C94B32" />}
 							</div>
 							<SimpleInputField
-								className="inputField"
+								className={classes.inputFieldTitle}
 								height={50}
 								width={460}
 								disabled
@@ -320,7 +300,7 @@ export default () => {
 
 									}
 								</div>
-								<p className="text">Accepted formats:<br />jpg, svg or png</p>
+								<p className={classes.text}>Accepted formats:<br />jpg, svg or png</p>
 							</div>
 						</div>
 					</div>

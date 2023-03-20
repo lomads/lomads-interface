@@ -26,8 +26,77 @@ import { SupportedChainId } from "constants/chains";
 import { DEFAULT_ROLES } from "constants/terminology";
 import useEns from 'hooks/useEns';
 import useTerminology from "hooks/useTerminology";
+import { makeStyles } from '@mui/styles';
+import { Container, Box } from "@mui/material"
+
+const useStyles = makeStyles((theme: any) => ({
+  InviteGang: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100vh',
+    position: 'relative'
+},
+ headerText: {
+    fontFamily: 'Insignia',
+    fontStyle: 'normal',
+    fontWeight: '400',
+    fontSize: '35px',
+    lineHeight: '35px',
+    paddingBottom: '30px',
+    textAlign: 'center',
+    color: '#C94B32'
+},
+centerInputCard: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyItems: 'flex-start',
+    background: '#FFFFFF',
+    boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
+    borderRadius: '5px',
+    maxHeight: 'fit-content',
+    padding: '26px 22px 30px 22px',
+    gap: '10px'
+},
+inputTitle: {
+    fontFamily: 'Inter, sans-serif',
+    fontStyle: 'normal',
+    fontWeight: '700',
+    fontSize: '16px',
+    lineHeight: '18px',
+    letterSpacing: '-0.011em',
+    color: '#76808D',
+    margin: '0vh 0px 0vh 1vh'
+},
+inputArea: {
+    display: 'flex',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    width: '100%'
+},
+inputField: {
+    width: '500px',
+    height: '90px',
+    textAlign: 'justify',
+    paddingLeft: '10px',
+    background: '#f5f5f5',
+    boxShadow: 'inset 1px 0px 4px rgba(27, 43, 65, 0.1)',
+    borderRadius: '10px',
+    borderWidth: '0px',
+    fontFamily: 'Inter, sans-serif',
+    fontStyle: 'normal',
+    fontWeight: '400',
+    fontSize: '16px',
+    lineHeight: '18px',
+    color: '#76808D'
+}
+}))
+
 
 const InviteGang = () => {
+	const classes = useStyles()
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const [uploadLoading, setUploadLoading] = useState<boolean>(false);
@@ -264,17 +333,18 @@ const InviteGang = () => {
 
 	return (
 		<>
-			<div className="InviteGang">
-				<div className="headerText">2/3 Original Gang</div>
-				<div className="centerInputCard">
-					<div style={{ width: '100%', marginBottom: 8, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-						<div className="inputTitle">Add member :</div>
+		<Container>
+			<Box className={classes.InviteGang}>
+				<Box className={classes.headerText}>2/3 Original Gang</Box>
+				<Box className={classes.centerInputCard}>
+					<Box style={{ width: '100%', marginBottom: 8, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+						<Box className={classes.inputTitle}>Add member :</Box>
 						{uploadLoading ? <LeapFrog size={24} color="#C94B32" /> : <Uploader onComplete={handleInsertWallets} />}
-					</div>
-					<div className="inputArea">
-						<div style={{ marginRight: '10px' }}>
+					</Box>
+					<Box className={classes.inputArea}>
+						<Box style={{ marginRight: '10px' }}>
 							<SimpleInputField
-								className="inputField"
+								className={classes.inputField}
 								height={50}
 								width={144}
 								placeholder="Name"
@@ -283,10 +353,10 @@ const InviteGang = () => {
 									ownerName.length <= 12 && setOwnerName(event.target.value);
 								}}
 							/>
-						</div>
-						<div style={{ marginRight: '10px' }}>
+						</Box>
+						<Box sx={{ marginRight: '10px' }}>
 							<AddressInputField
-								className="inputField"
+								className={classes.inputField}
 								height={50}
 								width={251}
 								placeholder="ENS Domain and Wallet Address"
@@ -297,8 +367,8 @@ const InviteGang = () => {
 								}}
 								isInvalid={errors.ownerAddress}
 							/>
-						</div>
-						<div style={{ marginRight: '10px' }}>
+						</Box>
+						<Box sx={{ marginRight: '10px' }}>
 							<select
 								name="role"
 								className="tokenDropdown"
@@ -311,8 +381,8 @@ const InviteGang = () => {
 								<option value="role3">Active Contributor</option>
 								<option value="role4">Contributor</option>
 							</select>
-						</div>
-						<div>
+						</Box>
+						<Box>
 							<IconButton
 								className="addButton"
 								Icon={<AiOutlinePlus style={{ height: 30, width: 30 }} />}
@@ -327,28 +397,28 @@ const InviteGang = () => {
 										: "rgba(27, 43, 65, 0.2)"
 								}
 							/>
-						</div>
-					</div>
-				</div>
+						</Box>
+					</Box>
+				</Box>
 				{invitedMembers.length >= 1 && (
 					<>
-						<div className="invitedMembers">
+						<Box className="invitedMembers">
 							{invitedMembers.map((result: any, index: any) => {
 								return (
-									<div key={index} className="owner">
-										<div className="avatarPlusName">
+									<Box key={index} className="owner">
+										<Box className="avatarPlusName">
 											<img src={daoMember2} alt={result.address} />
 											<p className="nameText">{result.name}</p>
-										</div>
-										<div className="avatarAddress">
+										</Box>
+										<Box className="avatarAddress">
 											<p className="text">
 												{result.address &&
 													result.address.slice(0, 6) +
 													"..." +
 													result.address.slice(-4)}
 											</p>
-										</div>
-										<div className="avatarRole">
+										</Box>
+										<Box className="avatarRole">
 											<p className="text">
 												{
 													result.address !== undefined && result.address === account
@@ -358,9 +428,9 @@ const InviteGang = () => {
 														transformRole(result?.role).label
 												}
 											</p>
-										</div>
+										</Box>
 
-										<div className="avatarBtn">
+										<Box className="avatarBtn">
 											{result.address !== account && (
 												<button
 													className="deleteButton"
@@ -371,15 +441,15 @@ const InviteGang = () => {
 													<AiOutlineClose style={{ height: 15, width: 15 }} />
 												</button>
 											)}
-										</div>
+										</Box>
 
-									</div>
+									</Box>
 								);
 							})}
-						</div>
+						</Box>
 					</>
 				)}
-				<div className="inviteGang">
+				<Box className="inviteGang">
 					<SimpleButton
 						className="inviteButton"
 						title="INVITE"
@@ -392,44 +462,44 @@ const InviteGang = () => {
 						}
 						onClick={handleNavigate}
 					/>
-				</div>
-				<div
+				</Box>
+				<Box
 					className="infoText"
 					onClick={() => {
 						navigate("/startsafe");
 					}}
 				>
 					skip
-				</div>
+				</Box>
 
 
 				{/* Dsiplay modal for uploaded users */}
 				{
 					showModal &&
-					<div className="membersModal">
-						<div className="membersModal-header">
+					<Box className="membersModal">
+						<Box className="membersModal-header">
 							<img src={createProjectSvg} alt="create-project-svg" />
 							<h1>Add Members</h1>
-						</div>
-						<div className="membersModal-body">
+						</Box>
+						<Box className="membersModal-body">
 							{
 								validMembers.length > 0
 									?
 									<>
 										{
 											validMembers.map((item, index) => (
-												<div className="membersModal-row" key={index}>
+												<Box className="membersModal-row" key={index}>
 													{
 														deleteMembers.includes(item.address)
 															?
-															<div className='row-overcast'></div>
+															<Box className='row-overcast'></Box>
 															:
 															null
 													}
-													<div>
+													<Box>
 														<img src={memberIcon} alt="memberIcon" />
 														<SimpleInputField
-															className="inputField"
+															className={classes.inputField}
 															id="nameInput"
 															height={50}
 															width={135}
@@ -438,7 +508,7 @@ const InviteGang = () => {
 															name="name"
 															onchange={(e) => handleChangeState(e, index)}
 														/>
-													</div>
+													</Box>
 													<span>{item.address.slice(0, 6) + "..." + item.address.slice(-4)}</span>
 													<select
 														name="role"
@@ -470,15 +540,15 @@ const InviteGang = () => {
 															</button>
 													}
 
-												</div>
+												</Box>
 											))
 										}
 									</>
 									:
 									<p>All the users have been already added</p>
 							}
-						</div>
-						<div className="membersModal-footer">
+						</Box>
+						<Box className="membersModal-footer">
 							<button onClick={handleCloseModal} className="cancel-btn">
 								CANCEL
 							</button>
@@ -487,10 +557,11 @@ const InviteGang = () => {
 									ADD MEMBERS
 								</button>
 							}
-						</div>
-					</div>
+						</Box>
+					</Box>
 				}
-			</div>
+			</Box>
+		</Container>
 		</>
 	);
 };
