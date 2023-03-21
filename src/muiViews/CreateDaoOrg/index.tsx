@@ -99,6 +99,25 @@ const useStyles = makeStyles((theme: any) => ({
 		lineHeight: '16px',
 		color: 'rgba(118, 128, 141, 0.5)',
 		marginLeft: '13px',
+	},
+	imagePickerWrapper: {
+		width: '100%',
+		display: 'flex',
+		alignItems: 'center',
+	},
+	imagePickerContainer: {
+		width: '200px',
+		height: '200px',
+		borderRadius: '10px',
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center',
+		background: '#F5F5F5',
+		boxShadow: 'inset 1px 0px 4px rgba(27, 43, 65, 0.1)',
+		margin: '1rem 0',
+		cursor: 'pointer',
+		position: 'relative',
 	}
 }));
 
@@ -277,25 +296,8 @@ export default () => {
 										Optional
 							</Box>
 									</Box>
-									<Box sx={{
-										width: '100%',
-										display: 'flex',
-										alignItems: 'center',
-									}}>
-										<Box sx={{
-											width: '200px',
-											height: '200px',
-											borderRadius: '10px',
-											display: 'flex',
-											flexDirection: 'column',
-											alignItems: 'center',
-											justifyContent: 'center',
-											background: '#F5F5F5',
-											boxShadow: 'inset 1px 0px 4px rgba(27, 43, 65, 0.1)',
-											margin: '1rem 0',
-											cursor: 'pointer',
-											position: 'relative',
-										}}>
+									<Box className={classes.imagePickerWrapper}>
+										<Box className={classes.imagePickerContainer}>
 											{
 												image
 													?

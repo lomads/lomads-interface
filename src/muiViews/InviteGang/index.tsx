@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import _ from "lodash";
-import IconButton from "UIpack/IconButton";
+import IconButton from "muiComponents/IconButton";
 import SimpleInputField from "UIpack/SimpleInputField";
 import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
@@ -88,6 +88,28 @@ const useStyles = makeStyles((theme: any) => ({
 		fontSize: '16px',
 		lineHeight: '18px',
 		color: '#76808D'
+	},
+	membersModalFooter: {
+		width: '768px',
+		height: '100px',
+		position: 'fixed',
+		bottom: '0',
+		right: '0',
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	membersModalFooterCancelBtn: {
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+		borderRadius: '5px',
+		height: '40px',
+		background: '#FFFFFF',
+		border: '1px solid #C94B32',
+		color: '#C94B32',
+		width: '130px',
+		marginRight: '20px',
 	}
 }))
 
@@ -385,7 +407,7 @@ const InviteGang = () => {
 									Icon={<AiOutlinePlus style={{ height: 30, width: 30 }} />}
 									height={50}
 									width={50}
-									onClick={(e) => {
+									onClick={() => {
 										handleClick(ownerName, ownerAddress, ownerRole);
 									}}
 									bgColor={
@@ -545,8 +567,8 @@ const InviteGang = () => {
 										<p>All the users have been already added</p>
 								}
 							</Box>
-							<Box className="membersModal-footer">
-								<button onClick={handleCloseModal} className="cancel-btn">
+							<Box className={classes.membersModalFooter}>
+								<button onClick={handleCloseModal} className={classes.membersModalFooterCancelBtn}>
 									CANCEL
 							</button>
 								{

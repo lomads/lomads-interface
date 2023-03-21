@@ -114,7 +114,7 @@ const DAOsuccess = () => {
 					return (
 						<Box
 							className={classes.colors}
-							style={{
+							sx={{
 								backgroundColor: result.backgroudColor,
 								left: result.left,
 								right: result.right,

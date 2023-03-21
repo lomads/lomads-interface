@@ -510,7 +510,7 @@ const AddNewSafe = () => {
 							return (
 								<>
 									<Box key={index} className={classes.owner}>
-										<Box className="avatarName">
+										<Box className={classes.avatarName}>
 											<img src={daoMember2} alt={result.address} />
 											<p className={classes.nameText}>{result.name}</p>
 										</Box>
