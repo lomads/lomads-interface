@@ -1,9 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import _ from "lodash";
-import "../../styles/pages/AddNewSafe.css";
-import "../../styles/Global.css";
-import SafeButton from "UIpack/SafeButton";
 import SimpleInputField from "UIpack/SimpleInputField";
 import SimpleButton from "UIpack/SimpleButton";
 import { InviteGangType } from "types/UItype";
@@ -30,9 +27,149 @@ import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import { createDAO } from '../../state/flow/actions';
 import { loadDao } from '../../state/dashboard/actions';
 import { CHAIN_GAS_STATION, SupportedChainId } from "constants/chains";
+import { Box, Typography, Button } from "@mui/material"
+import { makeStyles } from '@mui/styles';
 import axios from "axios";
 
+const useStyles = makeStyles((theme: any) => ({
+	text: {
+		fontFamily: 'Inter, sans-serif',
+		fontStyle: 'normal',
+		fontWeight: '400',
+		fontSize: '14px',
+		lineHeight: '15px',
+		letterSpacing: '-0.011em',
+		color: '#76808D'
+	},
+	inputFieldTitle: {
+		fontFamily: 'Inter, sans-serif',
+		fontStyle: 'normal',
+		fontWeight: '700',
+		fontSize: '16px',
+		lineHeight: '18px',
+		letterSpacing: '-0.011em',
+		color: '#76808D',
+		margin: '15px 0px 15px 0px'
+	},
+	centerCard: {
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'flex-start',
+		justifyItems: 'flex-start',
+		background: '#FFFFFF',
+		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
+		borderRadius: '5px',
+		maxHeight: 'fit-content',
+		width: '554.75px',
+		padding: '20px',
+		marginTop: '35px',
+	},
+	thresholdText: {
+		fontFamily: 'Inter, sans-serif',
+		fontStyle: 'normal',
+		fontWeight: '400',
+		fontSize: '16px',
+		lineHeight: '15px',
+		letterSpacing: '-0.011em',
+		color: '#76808D'
+	},
+	StartSafe: {
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center',
+		height: 'fit-content',
+		padding: '20vh 0vh 10vh 0vh'
+	},
+	addOwner: {
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'flex-start',
+		justifyItems: 'flex-start',
+		background: '#FFFFFF',
+		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
+		borderRadius: '5px',
+		maxHeight: 'fit-content',
+		width: '500px',
+		padding: '20px',
+		marginTop: '35px',
+		marginBottom: '35px'
+	},
+	owner: {
+		width: '100%',
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		margin: '2vh 0vh 2vh 0vh'
+	},
+	avatarName: {
+		display: 'flex',
+		justifyContent: 'flex-start',
+		alignItems: 'center',
+		width: '30%'
+	},
+	nameText: {
+		fontFamily: 'Inter, sans-serif',
+		fontStyle: 'normal',
+		fontWeight: '400',
+		fontSize: '14px',
+		lineHeight: '15px',
+		letterSpacing: '-0.011em',
+		color: '#76808D',
+		marginLeft: '16px',
+		textAlign: 'center',
+	},
+	cardButton: {
+		marginTop: '25px',
+		width: '100%',
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	buttonArea: {
+		display: 'flex',
+		width: '500px',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		paddingBottom: '35px'
+	},
+	selectionArea: {
+		width: '100%',
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'flex-start',
+		alignItems: 'center',
+		textAlign: 'center'
+	},
+	thresholdCount: {
+		fontFamily: 'Inter, sans-serif',
+		fontStyle: 'normal',
+		fontWeight: '400',
+		fontSize: '16px',
+		lineHeight: '15px',
+		letterSpacing: '-0.011em',
+		color: '#76808D',
+	},
+	headerText: {
+		fontFamily: 'Insignia',
+		fontStyle: 'normal',
+		fontWeight: '400',
+		fontSize: '35px',
+		lineHeight: '35px',
+		paddingBottom: '30px',
+		textAlign: 'center',
+		color: '#C94B32'
+	},
+	centerText: {
+		fontSize: '20px',
+		fontWeight: '400',
+		color: '#C94B32'
+	},
+}));
+
 const AddNewSafe = () => {
+	const classes = useStyles()
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const { provider, account, chainId } = useWeb3React();
@@ -295,21 +432,19 @@ const AddNewSafe = () => {
 	const AddOwners = () => {
 		return (
 			<>
-				<div className="divider">
-					<hr />
-				</div>
-				<div className="addOwner">
-					<div className="inputFieldTitle">Select Owners</div>
-					<div className="ownerArea">
+				<hr />
+				<Box className={classes.addOwner}>
+					<Box className={classes.inputFieldTitle}>Select Owners</Box>
+					<Box sx={{ width: '100%;' }}>
 						{invitedMembers.map((result: any, index: any) => {
 							return (
 								<>
-									<div key={index} className="owner">
-										<div className="avatarName">
+									<Box key={index} className={classes.owner}>
+										<Box className={classes.avatarName}>
 											<img src={daoMember2} alt={result.address} />
-											<p className="nameText">{result.name}</p>
-										</div>
-										<p className="text">
+											<p className={classes.nameText}>{result.name}</p>
+										</Box>
+										<p className={classes.text}>
 											{result.address.slice(0, 6) +
 												"..." +
 												result.address.slice(-4)}
@@ -320,27 +455,27 @@ const AddNewSafe = () => {
 													size="lg"
 													colorScheme="orange"
 													id={index}
-													name="owner"
+													name={classes.owner}
 													value={result.address}
 													onChange={(event) => handleCheck(event)}
 												/>
 											</>
 										) : (
-											<>
-												<Checkbox
-													size="lg"
-													colorScheme="orange"
-													name="owner"
-													defaultChecked={true}
-													disabled={true}
-												/>
-											</>
-										)}
-									</div>
+												<>
+													<Checkbox
+														size="lg"
+														colorScheme="orange"
+														name={classes.owner}
+														defaultChecked={true}
+														disabled={true}
+													/>
+												</>
+											)}
+									</Box>
 								</>
 							);
 						})}
-						<div className="cardButton">
+						<Box className={classes.cardButton}>
 							<SimpleButton
 								className="button"
 								title="NEXT"
@@ -353,9 +488,9 @@ const AddNewSafe = () => {
 									}
 								}}
 							/>
-						</div>
-					</div>
-				</div>
+						</Box>
+					</Box>
+				</Box>
 			</>
 		);
 	};
@@ -363,31 +498,31 @@ const AddNewSafe = () => {
 	const SelectedOwners = () => {
 		return (
 			<>
-				<div className="divider">
+				<Box>
 					<hr />
-				</div>
-				<div className="addOwner">
-					<div className="inputFieldTitle">Owners</div>
-					<div className="ownerArea">
+				</Box>
+				<Box className={classes.addOwner}>
+					<Box className={classes.inputFieldTitle}>Owners</Box>
+					<Box sx={{ width: '100%;' }}>
 						{Myvalue.current.map((result: any, index: any) => {
 							return (
 								<>
-									<div key={index} className="owner">
-										<div className="avatarName">
+									<Box key={index} className={classes.owner}>
+										<Box className={classes.avatarName}>
 											<img src={daoMember2} alt={result.address} />
-											<p className="nameText">{result.name}</p>
-										</div>
-										<p className="text">
+											<p className={classes.nameText}>{result.name}</p>
+										</Box>
+										<p className={classes.text}>
 											{result.address.slice(0, 6) +
 												"..." +
 												result.address.slice(-4)}
 										</p>
-									</div>
+									</Box>
 								</>
 							);
 						})}
-					</div>
-				</div>
+					</Box>
+				</Box>
 				<SelectThreshold />
 			</>
 		);
@@ -421,37 +556,35 @@ const AddNewSafe = () => {
 	const SelectThreshold = () => {
 		return (
 			<>
-				<div className="divider">
-					<hr />
-				</div>
-				<div className="centerCard">
-					<div>
-						<div className="thresholdText">
+				<hr />
+				<Box className={classes.centerCard}>
+					<Box>
+						<Box className={classes.thresholdText}>
 							Any transaction requires the confirmation of
-						</div>
-					</div>
-					<div className="selectionArea">
-						<div>
+						</Box>
+					</Box>
+					<Box className={classes.selectionArea}>
+						<Box>
 							<DropDown value={Myvalue} threshold={thresholdValue} />
-						</div>
-						<div className="thresholdCount">
+						</Box>
+						<Box className={classes.thresholdCount}>
 							of {Myvalue.current.length} owner(s)
-						</div>
-					</div>
-				</div>
-				<div className="safe-footer">
+						</Box>
+					</Box>
+				</Box>
+				<Box className="safe-footer">
 					By continuing you consent to the terms of use and privacy policy of
 					Gnosis Safe
-				</div>
-				<div className="safe-footer">
+				</Box>
+				<Box className="safe-footer">
 					You’re about to create a new safe and will have to confirm a
 					transaction with your curentry connected wallet.
 					<span className="boldText">
 						{chainId && +chainId === SupportedChainId.POLYGON && polygonGasEstimate ? `The creation will cost approximately ${polygonGasEstimate?.standard?.maxFee} GWei.` : `The creation will cost approximately 0.01256 GOR.`}
 					</span>
 					The exact amount will be determinated by your wallet.
-				</div>
-				<div className="createButton">
+				</Box>
+				<Box sx={{ marginTop: '35px' }}>
 					<SimpleLoadButton
 						title="CREATE SAFE"
 						bgColor={isLoading ? 'grey' : "#C94B32"}
@@ -462,50 +595,54 @@ const AddNewSafe = () => {
 						onClick={deployNewSafeDelayed}
 						condition={isLoading}
 					/>
-				</div>
+				</Box>
 			</>
 		);
 	};
 
 	return (
 		<>
-			<div className="StartSafe">
-				<div className="headerText">3/3 DAO Treasury</div>
-				<div className="buttonArea">
-					<div>
-						<SafeButton
-							title="CREATE NEW SAFE"
-							titleColor="#C94B32"
-							bgColor="#FFFFFF"
-							height={58}
-							width={228}
-							fontsize={20}
-							fontweight={400}
-							disabled={false}
-						/>
-					</div>
-					<div className="centerText">or</div>
-					<div>
-						<SafeButton
-							title="ADD EXISTING SAFE"
-							titleColor="rgba(201, 75, 50, 0.6)"
-							bgColor="#FFFFFF"
-							height={58}
-							width={228}
-							fontsize={20}
-							fontweight={400}
-							disabled={false}
-							opacity="0.6"
+			<Box className={classes.StartSafe}>
+				<Box className={classes.headerText}>3/3 DAO Treasury</Box>
+				<Box className={classes.buttonArea}>
+					<Box>
+						<Button
+							style={{
+								color: "#C94B32",
+								backgroundColor: "#FFFFFF",
+								height: 58,
+								width: 228,
+								fontSize: 20,
+								fontWeight: 400,
+							}}
+							variant='contained'>
+							CREATE NEW SAFE
+							</Button>
+					</Box>
+					<Box className={classes.centerText}>or</Box>
+					<Box>
+						<Button
+							style={{
+								backgroundColor: "#FFFFFF",
+								height: 58,
+								width: 228,
+								fontSize: 20,
+								fontWeight: 400,
+								opacity: 0.6,
+								color: 'rgba(201, 75, 50, 0.6)'
+							}}
 							onClick={() => navigate('/addsafe')}
-						/>
-					</div>
-				</div>
-				<div className="divider">
+							variant='contained'>
+							ADD EXISTING SAFE
+							</Button>
+					</Box>
+				</Box>
+				<Box>
 					<hr />
-				</div>
-				<div className="centerCard">
-					<div>
-						<div className="inputFieldTitle">Safe Name</div>
+				</Box>
+				<Box className={classes.centerCard}>
+					<Box>
+						<Typography className={classes.inputFieldTitle}>Safe Name</Typography>
 						<SimpleInputField
 							className="inputField"
 							height={50}
@@ -517,11 +654,11 @@ const AddNewSafe = () => {
 							}}
 							isInvalid={errors.safeName}
 						/>
-					</div>
-				</div>
+					</Box>
+				</Box>
 				{showContinue ? (
 					<>
-						<div className="continueButton">
+						<Box sx={{ marginTop: '25px' }}>
 							<SimpleButton
 								className="button"
 								title="CONTINUE"
@@ -536,18 +673,18 @@ const AddNewSafe = () => {
 										: undefined
 								}
 							/>
-						</div>
+						</Box>
 					</>
 				) : invitedMembers.length >= 1 ? (
 					ownerSelected ? (
 						<SelectedOwners />
 					) : (
-						<AddOwners />
-					)
+							<AddOwners />
+						)
 				) : (
-					<SelectedOwners />
-				)}
-			</div>
+							<SelectedOwners />
+						)}
+			</Box>
 		</>
 	);
 };
