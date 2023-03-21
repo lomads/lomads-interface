@@ -1,6 +1,4 @@
 import React, { useEffect } from "react";
-import "../../styles/pages/DAOSuccess.css";
-import "../../styles/Global.css";
 import lomadslogodark from "../../assets/svg/lomadslogodark.svg";
 import GroupEnjoy from "../../assets/svg/GroupEnjoy.svg";
 import { colors } from "assets/colors";

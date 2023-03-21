@@ -1,10 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import _ from "lodash";
 import IconButton from "UIpack/IconButton";
-import SimpleButton from "UIpack/SimpleButton";
 import SimpleInputField from "UIpack/SimpleInputField";
-import "../../styles/Global.css";
-import "../../styles/pages/InviteGang.css";
 import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import AddressInputField from "UIpack/AddressInputField";
