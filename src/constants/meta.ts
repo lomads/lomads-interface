@@ -1,11 +1,13 @@
 import { SUPPORTED_CHAIN_IDS, SupportedChainId } from "./chains";
 import MumbaiAbi from "../abisPolygon/MetaSBTDeployer.json"
+
 export const domainType = [
   { name: "name", type: "string" },
   { name: "version", type: "string" },
   { name: "verifyingContract", type: "address" },
   { name: "salt", type: "bytes32" },
 ];
+
 export const metaTransactionType = [
   { name: "nonce", type: "uint256" },
   { name: "from", type: "address" },
@@ -39,7 +41,7 @@ export const META_ABI = {
 }
 
 export const META_ADDRESS = {
-  [`${SupportedChainId.POLYGON_MUMBAI}`]: "0x0c46bf973eaA2a7cbD22Ce246876b4C0D5d76ba6",
+  [`${SupportedChainId.POLYGON_MUMBAI}`]: "0x2E0fb9Ab0e4c7A41054521557Ba5637534743825",
 }
 
 // gsf : meta constants 
