@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import _ from "lodash";
 import SimpleInputField from "UIpack/SimpleInputField";
-import SimpleButton from "UIpack/SimpleButton";
 import { InviteGangType } from "types/UItype";
 import { Checkbox } from "@chakra-ui/react";
 import { useAppSelector } from "state/hooks";
@@ -476,18 +475,20 @@ const AddNewSafe = () => {
 							);
 						})}
 						<Box className={classes.cardButton}>
-							<SimpleButton
-								className="button"
-								title="NEXT"
-								height={40}
-								bgColor="#C94B32"
-								width={180}
+							<Button 
+							   style={{
+									backgroundColor: "#C94B32",
+									height: 40,
+									width: 180,
+								}}
 								onClick={() => {
 									if (Myvalue.current.length >= 1) {
 										setOwnerSelected(true);
 									}
 								}}
-							/>
+								variant='contained'>
+								NEXT
+							</Button>
 						</Box>
 					</Box>
 				</Box>
@@ -659,20 +660,20 @@ const AddNewSafe = () => {
 				{showContinue ? (
 					<>
 						<Box sx={{ marginTop: '25px' }}>
-							<SimpleButton
-								className="button"
-								title="CONTINUE"
-								height={50}
-								width={250}
-								fontsize={20}
-								onClick={handleSafeName}
-								bgColor={safeName ? "#C94B32" : "rgba(27, 43, 65, 0.2)"}
-								shadow={
-									safeName
+						<Button 
+							   style={{
+									height: 50,
+									width: 250,
+									fontSize: 20,
+									backgroundColor: safeName ? "#C94B32" : "rgba(27, 43, 65, 0.2)",
+								boxShadow:  safeName
 										? "3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)"
-										: undefined
-								}
-							/>
+										: undefined,
+								}}
+								onClick={handleSafeName}
+								variant='contained'>
+								CONTINUE
+							</Button>
 						</Box>
 					</>
 				) : invitedMembers.length >= 1 ? (

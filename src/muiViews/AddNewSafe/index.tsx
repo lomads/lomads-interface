@@ -661,20 +661,20 @@ const AddNewSafe = () => {
 				{showContinue ? (
 					<>
 						<Box sx={{ marginTop: '25px' }}>
-							<SimpleButton
-								className="button"
-								title="CONTINUE"
-								height={50}
-								width={250}
-								fontsize={20}
-								onClick={handleSafeName}
-								bgColor={safeName ? "#C94B32" : "rgba(27, 43, 65, 0.2)"}
-								shadow={
-									safeName
+						<Button 
+							   style={{
+									height: 50,
+									width: 250,
+									fontSize: 20,
+									backgroundColor: safeName ? "#C94B32" : "rgba(27, 43, 65, 0.2)",
+								boxShadow:  safeName
 										? "3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)"
-										: undefined
-								}
-							/>
+										: undefined,
+								}}
+								onClick={handleSafeName}
+								variant='contained'>
+								CONTINUE
+							</Button>
 						</Box>
 					</>
 				) : invitedMembers.length >= 1 ? (
