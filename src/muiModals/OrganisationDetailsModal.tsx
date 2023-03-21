@@ -489,7 +489,7 @@
                                     {
                                     link && link.indexOf('github.') > -1
                                         ?
-                                        <Box>
+                                        <Box ml={2} my={2}>
                                             <Switch sx={{marginBottom:'30px'}} checked={pullIssues} onChange={() => setPullIssues(prev => !prev)} label="IMPORT ISSUES" />
                                         </Box>
                                         :
