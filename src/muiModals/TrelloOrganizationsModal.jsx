@@ -23,7 +23,8 @@ const useStyles = makeStyles((theme) => ({}));
 export default ({ open, onClose, organizationData }) => {
     const classes = useStyles();
     const dispatch = useDispatch()
-    const { DAO, syncTrelloDataLoading } = useAppSelector((state) => state.dashboard);
+    const { DAO,user, syncTrelloDataLoading } = useAppSelector((state) => state.dashboard);
+    console.log("User : ",user);
 
     const [selectedValue, setSelectedValue] = useState(null);
     const [boardsLoading, setBoardsLoading] = useState(false);
@@ -46,6 +47,7 @@ export default ({ open, onClose, organizationData }) => {
                     var trelloToken = localStorage.getItem("trello_token");
                     dispatch(syncTrelloData({
                         payload: {
+                            user:{id:_get(user,'_id',null),address: _get(user,'wallet',null)},
                             daoId: _get(DAO, '_id', null),
                             boardsArray: boards.data.data,
                             accessToken: trelloToken,
