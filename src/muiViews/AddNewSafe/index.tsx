@@ -1,9 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import _ from "lodash";
-import SafeButton from "UIpack/SafeButton";
 import SimpleInputField from "UIpack/SimpleInputField";
-import SimpleButton from "UIpack/SimpleButton";
 import { InviteGangType } from "types/UItype";
 import { Checkbox } from "@chakra-ui/react";
 import { useAppSelector } from "state/hooks";
@@ -28,26 +26,35 @@ import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import { createDAO } from '../../state/flow/actions';
 import { loadDao } from '../../state/dashboard/actions';
 import { CHAIN_GAS_STATION, SupportedChainId } from "constants/chains";
-import { Box, Button, Typography } from "@mui/material"
+import { Box, Button, Typography, Container, Grid } from "@mui/material"
 import axios from "axios";
 import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles((theme: any) => ({
+	root: {
+		height: "100vh",
+		maxHeight: 'fit-content',
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center',
+		overflow: 'hidden !important'
+	},
 	text: {
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
-		fontWeight: '400',
-		fontSize: '14px',
-		lineHeight: '15px',
+		fontWeight: 400,
+		fontSize: 14,
+		lineHeight: 15,
 		letterSpacing: '-0.011em',
 		color: '#76808D'
 	},
 	inputFieldTitle: {
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
-		fontWeight: '700',
-		fontSize: '16px',
-		lineHeight: '18px',
+		fontWeight: 700,
+		fontSize: 16,
+		lineHeight: 18,
 		letterSpacing: '-0.011em',
 		color: '#76808D',
 		margin: '15px 0px 15px 0px'
@@ -59,18 +66,18 @@ const useStyles = makeStyles((theme: any) => ({
 		justifyItems: 'flex-start',
 		background: '#FFFFFF',
 		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
-		borderRadius: '5px',
+		borderRadius: 5,
 		maxHeight: 'fit-content',
 		width: '554.75px',
-		padding: '20px',
-		marginTop: '35px',
+		padding: 20,
+		marginTop: 35,
 	},
 	thresholdText: {
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
-		fontWeight: '400',
-		fontSize: '16px',
-		lineHeight: '15px',
+		fontWeight: 400,
+		fontSize: 16,
+		lineHeight: 15,
 		letterSpacing: '-0.011em',
 		color: '#76808D'
 	},
@@ -89,12 +96,12 @@ const useStyles = makeStyles((theme: any) => ({
 		justifyItems: 'flex-start',
 		background: '#FFFFFF',
 		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
-		borderRadius: '5px',
+		borderRadius: 5,
 		maxHeight: 'fit-content',
-		width: '500px',
-		padding: '20px',
-		marginTop: '35px',
-		marginBottom: '35px'
+		width: 500,
+		padding: 20,
+		marginTop: 35,
+		marginBottom: 35
 	},
 	owner: {
 		width: '100%',
@@ -113,24 +120,24 @@ const useStyles = makeStyles((theme: any) => ({
 	nameText: {
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
-		fontWeight: '400',
-		fontSize: '14px',
-		lineHeight: '15px',
+		fontWeight: 400,
+		fontSize: 14,
+		lineHeight: 15,
 		letterSpacing: '-0.011em',
 		color: '#76808D',
-		marginLeft: '16px',
+		marginLeft: 16,
 		textAlign: 'center',
 	},
 	cardButton: {
-		marginTop: '25px',
+		marginTop: 25,
 		width: '100%',
 		display: 'flex',
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
 	centerText: {
-		fontSize: '20px',
-		fontWeight: '400',
+		fontSize: 20,
+		fontWeight: 400,
 		color: '#C94B32'
 	},
 	buttonArea: {
@@ -138,7 +145,7 @@ const useStyles = makeStyles((theme: any) => ({
 		width: '500px',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		paddingBottom: '35px'
+		paddingBottom: 35
 	},
 	selectionArea: {
 		width: '100%',
@@ -151,25 +158,40 @@ const useStyles = makeStyles((theme: any) => ({
 	thresholdCount: {
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
-		fontWeight: '400',
-		fontSize: '16px',
-		lineHeight: '15px',
+		fontWeight: 400,
+		fontSize: 16,
+		lineHeight: 15,
 		letterSpacing: '-0.011em',
 		color: '#76808D',
 	},
 	headerText: {
 		fontFamily: 'Insignia',
 		fontStyle: 'normal',
-		fontWeight: '400',
-		fontSize: '35px',
-		lineHeight: '35px',
-		paddingBottom: '30px',
+		fontWeight: 400,
+		fontSize: 35,
+		lineHeight: 35,
+		paddingBottom: 30,
 		textAlign: 'center',
 		color: '#C94B32'
+	},
+	boldText: {
+		fontWeight: 800
+	},
+	safeFooter: {
+		fontFamily: 'Inter, sans-serif',
+		fontStyle: 'normal',
+		fontWeight: '400',
+		fontSize: '14px',
+		lineHeight: '15px',
+		letterSpacing: '-0.011em',
+		color: '#76808D',
+		width: '480px',
+		textAlign: 'center',
+		marginBottom: '9px',
 	}
 }));
 
-const AddNewSafe = () => {
+export default () => {
 	const classes = useStyles()
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
@@ -563,9 +585,9 @@ const AddNewSafe = () => {
 				</Box>
 				<Box className={classes.centerCard}>
 					<Box>
-						<Box className={classes.thresholdText}>
+						<Typography className={classes.thresholdText}>
 							Any transaction requires the confirmation of
-						</Box>
+						</Typography>
 					</Box>
 					<Box className={classes.selectionArea}>
 						<Box>
@@ -576,14 +598,14 @@ const AddNewSafe = () => {
 						</Box>
 					</Box>
 				</Box>
-				<Box className="safe-footer">
+				<Typography className={classes.safeFooter}>
 					By continuing you consent to the terms of use and privacy policy of
 					Gnosis Safe
-				</Box>
-				<Box className="safe-footer">
+				</Typography>
+				<Box className={classes.safeFooter}>
 					You’re about to create a new safe and will have to confirm a
 					transaction with your curentry connected wallet.
-					<span className="boldText">
+					<span className={classes.boldText}>
 						{chainId && +chainId === SupportedChainId.POLYGON && polygonGasEstimate ? `The creation will cost approximately ${polygonGasEstimate?.standard?.maxFee} GWei.` : `The creation will cost approximately 0.01256 GOR.`}
 					</span>
 					The exact amount will be determinated by your wallet.
@@ -605,19 +627,18 @@ const AddNewSafe = () => {
 	};
 
 	return (
-		<>
+		<Container>
+			<Grid container className={classes.root}>
 			<Box className={classes.StartSafe}>
 				<Typography className={classes.headerText}>3/3 DAO Treasury</Typography>
 				<Box className={classes.buttonArea}>
 					<Box>
-						<Button style={{
+						<Button 
+						 style={{
 							color: "#C94B32",
 							backgroundColor: "#FFFFFF",
-							height: 58,
-							width: 228,
-							fontSize: 20,
 							fontWeight: 400,
-							opacity: 0.6,
+							minWidth: 'max-content'
 						}}
 							variant='contained'>
 							CREATE NEW SAFE
@@ -628,9 +649,7 @@ const AddNewSafe = () => {
 						<Button
 							style={{
 								backgroundColor: "#FFFFFF",
-								height: 58,
-								width: 228,
-								fontSize: 20,
+								minWidth: 'max-content',
 								fontWeight: 400,
 								opacity: 0.6,
 								color: 'rgba(201, 75, 50, 0.6)'
@@ -643,7 +662,6 @@ const AddNewSafe = () => {
 				</Box>
 				<hr />
 				<Box className={classes.centerCard}>
-					<Box>
 						<Typography className={classes.inputFieldTitle}>Safe Name</Typography>
 						<SimpleInputField
 							className="inputField"
@@ -656,16 +674,13 @@ const AddNewSafe = () => {
 							}}
 							isInvalid={errors.safeName}
 						/>
-					</Box>
 				</Box>
 				{showContinue ? (
 					<>
-						<Box sx={{ marginTop: '25px' }}>
+						<Box sx={{ marginTop: 25 }}>
 						<Button 
 							   style={{
-									height: 50,
-									width: 250,
-									fontSize: 20,
+									maxWidth: 'max-content',
 									backgroundColor: safeName ? "#C94B32" : "rgba(27, 43, 65, 0.2)",
 								boxShadow:  safeName
 										? "3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)"
@@ -687,8 +702,8 @@ const AddNewSafe = () => {
 							<SelectedOwners />
 						)}
 			</Box>
-		</>
+			</Grid>
+		</Container>
 	);
 };
 
-export default AddNewSafe;

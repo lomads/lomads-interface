@@ -167,7 +167,7 @@ const useStyles = makeStyles((theme: any) => ({
 	},
 }));
 
-const AddNewSafe = () => {
+export default () => {
 	const classes = useStyles()
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
@@ -690,4 +690,3 @@ const AddNewSafe = () => {
 	);
 };
 
-export default AddNewSafe;

@@ -1,9 +1,18 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { makeStyles } from '@mui/styles';
-import { Box, Button } from "@mui/material"
+import { Box, Button, Container, Grid } from "@mui/material"
 
 const useStyles = makeStyles((theme: any) => ({
+	root: {
+		height: "100vh",
+		maxHeight: 'fit-content',
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center',
+		overflow: 'hidden !important'
+	},
 	infoText: {
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'italic',
@@ -72,48 +81,49 @@ const StartSafe = () => {
 		navigate("/addsafe");
 	};
 	return (
-		<>
-			<Box className={classes.StartSafe}>
-				<Box className={classes.headerText}>3/3 DAO Treasury</Box>
-				<Box className={classes.buttonArea}>
-					<Box>
-						<Button
-							style={{
+			<Container>
+				<Grid container className={classes.root}>
+				<Box className={classes.StartSafe}>
+					<Box className={classes.headerText}>3/3 DAO Treasury</Box>
+					<Box className={classes.buttonArea}>
+						<Box>
+							<Button
+								style={{
+									color: "#C94B32",
+									backgroundColor: "#FFFFFF",
+									fontWeight: 400,
+									minWidth: 'max-content'
+								}}
+								variant='contained'
+								size="medium">
+								CREATE NEW SAFE
+							</Button>
+						</Box>
+						<Box className={classes.centerText}>or</Box>
+						<Box>
+							<Button style={{
 								color: "#C94B32",
 								backgroundColor: "#FFFFFF",
-								height: 55,
-								width: 225,
-								fontSize: 20,
 								fontWeight: 400,
+								minWidth: 'max-content'
 							}}
-							variant='contained'>
-							CREATE NEW SAFE
-							</Button>
-					</Box>
-					<Box className={classes.centerText}>or</Box>
-					<Box>
-						<Button style={{
-							color: "#C94B32",
-							backgroundColor: "#FFFFFF",
-							height: 58,
-							width: 228,
-							fontSize: 20,
-							fontWeight: 400
-						}}
-							onClick={importExistingSafe}
-							variant='contained'>
-							ADD EXISTING SAFE
+								onClick={importExistingSafe}
+								variant='contained'
+								size="medium"
+								>
+								ADD EXISTING SAFE
 						</Button>
+						</Box>
+					</Box>
+					<Box className={classes.infoText}>
+						Powered By{" "}
+						<a href="https://gnosis-safe.io/" className={classes.link}>
+							Gnosis Safe
+					</a>
 					</Box>
 				</Box>
-				<Box className={classes.infoText}>
-					Powered By{" "}
-					<a href="https://gnosis-safe.io/" className={classes.link}>
-						Gnosis Safe
-					</a>
-				</Box>
-			</Box>
-		</>
+				</Grid>
+		</Container>
 	);
 };
 

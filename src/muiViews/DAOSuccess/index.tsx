@@ -66,6 +66,17 @@ const useStyles = makeStyles((theme: any) => ({
 		position: 'absolute',
 		top: '0',
 		right: '0'
+	},
+	groupenjoy: {
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
+		position: 'absolute',
+		bottom: '0px',
+		left: '0px',
+		right: '0px',
+		margin: 'auto',
+		width: '300px',
 	}
 }));
 
@@ -98,17 +109,17 @@ export default () => {
 		<>
 			<Box className={classes.DAOsuccess}>
 				<Box className={classes.itemsGroup}>
-					<Box sx={{marginLeft: '110px'}}>
+					<Box>
 						<img src={lomadslogodark} alt="logo" />
 					</Box>
-					<Typography className={classes.congrats}>Well done!</Typography>
-					<Typography className={classes.header}>Your DAO is live</Typography>
+					<Box className={classes.congrats}>Well done!</Box>
+					<Box className={classes.header}>Your DAO is live</Box>
 					<Box className={classes.redirectText} onClick={handleClick}>
 						you will be redirected to the dashboard in a few seconds
 					</Box>
-					<img src={GroupEnjoy} alt="Congrats" className="groupenjoy" />
+					<img src={GroupEnjoy} alt="Congrats" className={classes.groupenjoy} />
 				</Box>
-				<img src={GroupEnjoy} alt="Congrats" className="groupenjoy" />
+				<img src={GroupEnjoy} alt="Congrats" className={classes.groupenjoy} />
 
 				{colors.map((result: Colorstype) => {
 					return (

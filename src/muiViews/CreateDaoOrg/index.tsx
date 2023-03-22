@@ -38,9 +38,6 @@ const useStyles = makeStyles((theme: any) => ({
 		letterSpacing: '-0.011em',
 		color: '#76808D'
 	},
-	logo: {
-		marginLeft: '110px',
-	},
 	title: {
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
@@ -203,7 +200,6 @@ export default () => {
 	const checkAvailabilityAsync = useRef(_.debounce(checkAvailability, 500)).current
 
 	const handleNavigate = () => {
-		console.log("esfsffsf");
 		daoName.length >= 1 && navigate("/invitegang");
 	};
 	const handleDaoName = (event: any) => {
@@ -237,17 +233,14 @@ export default () => {
 	}
 
 	return (
-		<>
+		<Container>
+		<Grid container className={classes.root}>
 			{DAOListLoading ?
 				<Box className={classes.lomadsLogoParent}>
-					<Box className="logo">
 						<img src={lomadsfulllogo} alt="" />
-					</Box>
 					<LeapFrog size={50} color="#C94B32" />
 				</Box> : null
 			}
-			<Container>
-				<Grid container className={classes.root}>
 					<Grid item sm={12}
 						display="flex"
 						flexDirection="column"
@@ -356,6 +349,5 @@ export default () => {
 					</Grid>
 				</Grid>
 			</Container>
-		</>
 	);
 };
