@@ -78,24 +78,22 @@ const AllTasks = () => {
 
     const taskApplicationCount = (task) => {
         if (task) {
-            if (task.taskStatus === 'open') {
-                let applications = _get(task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_rejected'))
+            if (task.taskStatus === 'open' && task.isSingleContributor) {
+                let applications = _get(task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
                 if (applications)
                     return applications.length
             }
-            return 0
         }
         return 0;
     };
 
     const taskSubmissionCount = (task) => {
-        if (task) {
+        if ((task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign') {
             let submissions = _get(task, 'members', []).filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
             if (submissions)
                 return submissions.length
-            return 0
         }
-        return 0;
+        return 0
     };
 
     useEffect(() => {

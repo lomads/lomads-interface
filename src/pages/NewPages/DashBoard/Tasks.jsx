@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import './Tasks.css';
-import { get as _get, find as _find, orderBy as _orderBy } from 'lodash';
+import { get as _get, find as _find, orderBy as _orderBy, uniqBy as _uniqBy } from 'lodash';
 
 import SafeButton from "UIpack/SafeButton";
 
@@ -132,11 +132,12 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
 
     const fetchProjectTasks = () => {
         if (Project && user) {
-            const myTasks = _get(Project, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && amIEligible(task) && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || (task.contributionType === 'open' && !task.isSingleContributor))))
+            const myTasks = _get(Project, 'tasks', []).filter(task => task.reviewer !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && amIEligible(task) && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || (task.contributionType === 'open' && !task.isSingleContributor))))
             setMyTasks(_orderBy(myTasks, i => moment(i.deadline).unix(), 'desc'))
-            let manageTasks = _get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id));
+            let manageTasks = _get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.reviewer === user._id));
             manageTasks = manageTasks.map(t => {
                 let tsk = { ...t, notification: 0 };
+                console.log("fetchProjectTasks",((t.contributionType === 'open' && !t.isSingleContributor) || t.contributionType === 'assign') )
                 if (((t.contributionType === 'open' && !t.isSingleContributor) || t.contributionType === 'assign') && taskSubmissionCount(t) > 0) {
                     tsk['notification'] = 1
                 } else {
@@ -150,15 +151,15 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
             setDraftTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null && (task.creator === user._id || task.provider === 'Github')));
             // setDraftTasks(_get(Project, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null && task.creator === user._id));
             const otherTasks = _get(Project, 'tasks', []).filter(task => !_find(myTasks, t => t._id === task._id) && !task.deletedAt && !task.archivedAt && !task.draftedAt && !(task.creator === user._id || task.reviewer === user._id))
-            setOtherTasks([..._orderBy(otherTasks, i => moment(i.deadline).unix(), 'desc'), ..._orderBy(myTasks.concat(manageTasks), i => moment(i.deadline).unix(), 'desc')]);
+            setOtherTasks(_uniqBy([..._orderBy(otherTasks, i => moment(i.deadline).unix(), 'desc'), ..._orderBy(myTasks.concat(manageTasks), i => moment(i.deadline).unix(), 'desc')]), t => t._id);
         }
     }
 
     const fetchDaoTasks = () => {
         if (DAO && user) {
-            const myTasks = _get(DAO, 'tasks', []).filter(task => task.creator !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && amIEligible(task) && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || (task.contributionType === 'open' && !task.isSingleContributor))))
+            const myTasks = _get(DAO, 'tasks', []).filter(task => task.reviewer !== user._id && (!task.deletedAt && !task.archivedAt && !task.draftedAt && amIEligible(task) && ((task.contributionType === 'open' && !task.isSingleContributor) || !isOthersApproved(task)) && (_find(task.members, m => m.member.wallet.toLowerCase() === account.toLowerCase()) || (task.contributionType === 'open' && !task.isSingleContributor))))
             setMyTasks(_orderBy(myTasks, i => moment(i.deadline).unix(), 'asc'))
-            let manageTasks = _get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.creator === user._id || task.reviewer === user._id));
+            let manageTasks = _get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && !task.draftedAt && (task.reviewer === user._id));
             manageTasks = manageTasks.map(t => {
                 let tsk = { ...t, notification: 0 };
                 if (((t.contributionType === 'open' && !t.isSingleContributor) || t.contributionType === 'assign') && taskSubmissionCount(t) > 0) {
@@ -170,11 +171,12 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                 }
                 return tsk
             })
+            console.log("fetchProjectTasks", manageTasks )
             setManageTasks(_orderBy(manageTasks, ['notification', i => moment(i.deadline).unix()], ['desc', 'desc']));
             // setDraftTasks(_get(DAO, 'tasks', []).filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null && task.creator === user._id));
             setDraftTasks(_get(DAO, 'tasks', []).filter(task => (!task.deletedAt && !task.archivedAt && task.draftedAt !== null && (task.creator === user._id || task.provider === 'Github'))));
             const otherTasks = _get(DAO, 'tasks', []).filter(task => !_find(myTasks, t => t._id === task._id) && !task.deletedAt && !task.archivedAt && !task.draftedAt && !(task.creator === user._id || task.reviewer === user._id))
-            setOtherTasks([..._orderBy(otherTasks, i => moment(i.deadline).unix(), 'desc'), ..._orderBy(myTasks.concat(manageTasks), i => moment(i.deadline).unix(), 'desc')]);
+            setOtherTasks(_uniqBy([..._orderBy(otherTasks, i => moment(i.deadline).unix(), 'desc'), ..._orderBy(myTasks.concat(manageTasks), i => moment(i.deadline).unix(), 'desc')], t => t._id));
         }
     }
 
