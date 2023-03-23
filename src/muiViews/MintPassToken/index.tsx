@@ -51,6 +51,7 @@ import { USDC_GOERLI, USDC_POLYGON } from 'constants/tokens'
 import { useTokenContract } from 'hooks/useContract'
 import mime from 'mime'
 import moment from 'moment'
+import useTransak from 'hooks/useTransak'
 const { NFTStorage, File } = require("nft.storage")
 const client = new NFTStorage({ token: process.env.REACT_APP_NFT_STORAGE })
 
@@ -74,6 +75,7 @@ const useStyles = makeStyles((theme: any) => ({
 
 export default () => {
     const { account, provider, chainId } = useWeb3React();
+    const { initTransak } = useTransak();
     const navigate = useNavigate()
     const { daoURL } = useParams()
     const classes = useStyles()
@@ -349,7 +351,7 @@ export default () => {
         .catch(e => console.log(e))
     }
 
-    const handleMint = async () => {
+    const handleMint = async (paymentId: string = "") => {
         let err: any = {}
         setErrors({})
         if(state?.name == null || state?.name == "") { err['name'] = 'Enter valid name' }
@@ -409,9 +411,9 @@ export default () => {
                 //const ipfsURL: any =  await uploadNFT(metadataJSON, `${process.env.REACT_APP_NODE_BASE_URL}/v1/${contract?.address}/${tokenId}`)
                 if(contract?.version === '1') {
                     const ipfsURL: string = await axiosHttp.post(`metadata/ipfs-metadata`, { metadata: metadataJSON, tokenURI: `${process.env.REACT_APP_NODE_BASE_URL}/v1/${contract?.address}/${tokenId}` }).then(res => res.data)
-                    const token = await mint(ipfsURL, tokenContract);
+                    const token = await mint(ipfsURL, tokenContract, paymentId);
                 } else {
-                    const token = await mint(undefined, undefined);
+                    const token = await mint(undefined, undefined, undefined);
                 }
                 await axiosHttp.post(`metadata/${metadataJSON.contract}`, metadataJSON);
                 await axiosHttp.patch(`dao/${_get(DAO, 'url', '')}/update-user-discord`, {
@@ -441,6 +443,29 @@ export default () => {
             setDiscountCheckLoading(null)
         } catch(e) {
             setDiscountCheckLoading(null)
+            console.log(e)
+        }
+    }
+
+    const handleBuyCrypto = async () => {
+        try {
+            const stats: any = await getStats();
+            const treasury = stats[5];
+            let token = contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : 'MATIC'
+            let amount: any = +_get(price, 'mintPrice', 0)
+            if(token === 'MATIC'){
+                amount = (parseFloat(_get(price, 'mintPrice', 0)) + (parseFloat(_get(price, 'gas', 0))) * 2).toFixed(5)
+            }
+             const order: any = await initTransak({
+                token,
+                amount,
+                treasury
+            })
+            if(order && order?.eventName === "TRANSAK_ORDER_SUCCESSFUL")
+                handleMint(_get(order, 'status.id', ''))
+            
+        }
+        catch(e) {
             console.log(e)
         }
     }
@@ -488,7 +513,7 @@ export default () => {
                                         <Box mx={2} mt={1} style={{ flexGrow: 1, borderBottom: '1px dotted rgba(27, 43, 65, 0.2)' }}></Box>
                                         <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                             <Typography style={{ fontSize: 14, fontWeight: 400, color: "#76808D" }}>${ parseFloat(_get(price, 'mintPriceinUsd', 0)).toFixed(2) } /</Typography>
-                                            <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ parseFloat(_get(price, 'mintPrice', 0)).toFixed(5) } { contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : 'ETH' }</Typography>
+                                            <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ parseFloat(_get(price, 'mintPrice', 0)).toFixed(5) } { contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : SupportedChainId.POLYGON === chainId ? 'MATIC' : 'ETH' }</Typography>
                                         </Box>
                                     </Box>
                                     { isNativeToken ?
@@ -501,7 +526,7 @@ export default () => {
                                         </Box>
                                         <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                             <Typography style={{ fontSize: 14, fontWeight: 400, color: "#76808D" }}>${ parseFloat(_get(price, 'estimateinUsd', 0)).toFixed(2)} /</Typography>
-                                            <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ parseFloat(_get(price, 'gas', 0)).toFixed(5) } {'ETH'}</Typography>
+                                            <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ parseFloat(_get(price, 'gas', 0)).toFixed(5) } {SupportedChainId.POLYGON === chainId ? 'MATIC' : 'ETH'}</Typography>
                                         </Box>
                                     </Box> : 
                                     <Box py={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
@@ -538,7 +563,7 @@ export default () => {
                                             </Box>
                                             <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                                 <Typography style={{ fontSize: 14, fontWeight: 400, color: "#76808D" }}>${ (parseFloat(_get(price, 'mintPriceinUsd', 0)) + parseFloat(_get(price, 'estimateinUsd', 0))).toFixed(2) } /</Typography>
-                                                <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ (parseFloat(_get(price, 'mintPrice', 0)) + parseFloat(_get(price, 'gas', 0))).toFixed(5) } {contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : 'ETH'}</Typography>
+                                                <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ (parseFloat(_get(price, 'mintPrice', 0)) + parseFloat(_get(price, 'gas', 0))).toFixed(5) } {contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : SupportedChainId.POLYGON === chainId ? 'MATIC' : 'ETH'}</Typography>
                                             </Box>
                                         </Box>
                                     }
@@ -688,7 +713,10 @@ export default () => {
                                 }
                             </Box>
                             {   balance === 0 ?
-                                <Button loading={mintLoading} disabled={mintLoading} onClick={() => handleMint()} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">PAY</Button> : 
+                                <>
+                                    <Button loading={mintLoading} disabled={mintLoading} onClick={() => handleMint()} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">PAY</Button>
+                                    <Button loading={mintLoading} disabled={mintLoading} onClick={() =>{ setShowDrawer(false); handleBuyCrypto(); } } style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">PAY BY CARD</Button>
+                                </> : 
                                 <Button loading={mintLoading} disabled={mintLoading} onClick={() => handleUpdateMetadata()} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">UPDATE</Button>
                             }
 

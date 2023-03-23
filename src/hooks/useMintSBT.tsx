@@ -72,6 +72,11 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
               target: contractAddress,
               function: "mustBeWhitelisted",
               args: [],
+            },
+            {
+              target: contractAddress,
+              function: "treasuryAddress",
+              args: [],
             }] : [
               {
                 target: contractAddress,
@@ -96,7 +101,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
         return [null, null, null, null]
     }, [version, contractAddress, provider, account])
 
-    const mint = async (tokenURI: string | null | undefined, tokenContract: any) => {
+    const mint = async (tokenURI: string | null | undefined, tokenContract: any, paymentId: string | undefined) => {
         try {
           const stats = await getStats();
           let tokenId = parseFloat(stats[1].toString());
@@ -120,6 +125,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
               tx = await mintContract?.safeMint(
                 tokenURI,
                 tokenId,
+                paymentId,
                 signature
                 , {
                 from: account,
@@ -152,14 +158,16 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
           let signature = await axiosHttp.post(`contract/whitelist-signature`, {
             tokenId, 
             contract: contractAddress,
-            chainId
+            chainId,
+            payment: ''
           }).then(res => res?.data?.signature)
           try {
             const tx = await mintContract?.estimateGas.safeMint(
               "",
               tokenId,
-              signature
-              , {
+              '',
+              signature,
+              {
               from: account,
               value: mintPrice,
             });
@@ -174,7 +182,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
 
     const withdraw = async () => {
       if (mintContract?.signer) {
-
+        const stats = await getStats();
         const  overrides = {
           gasLimit: 3000000,
           gasPrice: ethers.utils.parseUnits('300', 'gwei').toString(),
@@ -200,7 +208,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
         }
 
         try {
-          const value = await mintContract?.withdraw(overrides)
+          const value = await mintContract?.withdraw({gasPrice: ethers.utils.parseUnits('150', 'gwei'), gasLimit: 500000})
         } catch (e) {
           console.log(e)
           throw _get(e, 'message', 'Could not withdraw')

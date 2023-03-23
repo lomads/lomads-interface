@@ -319,9 +319,9 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
                                 </Box>
                             </Box>
                         </Box> }
-                        {/* <Box>
+                        <Box>
                             <Button onClick={async () => await withdraw()} size="small" variant="contained">Withdraw</Button>
-                        </Box> */}
+                        </Box>
                         <Box style={{ height: 4, width: 200, alignSelf: 'center', margin: '60px auto', backgroundColor: palette.primary.main }}></Box>
                         <Box className={classes.paperDetailsSocial}>
                             <Box>

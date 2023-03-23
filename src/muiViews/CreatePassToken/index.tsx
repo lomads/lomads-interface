@@ -201,7 +201,7 @@ export default () => {
         if(chainId) {
             setTokens([
                 {
-                    label: 'ETH',
+                    label: chainId === SupportedChainId.POLYGON ? 'MATIC' : 'ETH',
                     value: "0x0000000000000000000000000000000000000000",
                     decimals: 18
                 },

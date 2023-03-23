@@ -57,7 +57,7 @@ const useContractDeployer = (abi: any) => {
     const weth = (price: string, token: string): any => {
         const tokens = [
             {
-                label: 'ETH',
+                label: chainId === SupportedChainId.POLYGON ? 'MATIC' : 'ETH',
                 value: "0x0000000000000000000000000000000000000000",
                 decimals: 18
             },
@@ -76,10 +76,12 @@ const useContractDeployer = (abi: any) => {
         try {
             if(chainId && account && deployerContract?.signer) {
                 const currentTokenId: BigNumber = await deployerContract?.counter();
+                console.log("currentTokenId", currentTokenId)
+                console.log("currentTokenId", name, symbol, weth(mintPrice, mintToken).toString(), mintToken, treasury, whitelisted ? true : false)
                 const tx = await deployerContract?.deployNewSBT(
                     name, 
                     symbol, 
-                    weth(mintPrice, mintToken),
+                    weth(mintPrice, mintToken).toString(),
                     mintToken,
                     treasury,
                     whitelisted ? 1 : 0
