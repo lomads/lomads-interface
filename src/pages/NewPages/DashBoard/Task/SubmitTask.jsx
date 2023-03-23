@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { get as _get, find as _find, uniqBy as _uniqBy } from 'lodash';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { get as _get, find as _find, uniqBy as _uniqBy, debounce as _debounce } from 'lodash';
 import { Box } from '@mui/material';
 import Button from 'muiComponents/Button';
 import { CgClose } from 'react-icons/cg';
@@ -99,6 +99,7 @@ const SubmitTask = ({ task, close }) => {
     }
 
     const handleSubmitWork = useCallback(() => {
+        console.log("note", note)
         if (note === '') {
             document.getElementById('note-error').innerHTML = 'Please enter a note';
             return;
@@ -120,6 +121,8 @@ const SubmitTask = ({ task, close }) => {
             dispatch(submitTaskAction(payload))
         }
     }, [note, resourceList, task])
+
+    const handleSubmitWorkAsync = _debounce(handleSubmitWork, 1000)
 
     return (
         <div className="taskApply-overlay">
@@ -229,11 +232,12 @@ const SubmitTask = ({ task, close }) => {
                         </div>
                 }
             </div>
+            { !submissionDone &&
             <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 575, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
                 <Box display="flex" justifyContent="center" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
-                    <Button onClick={() => handleSubmitWork()} sx={{ ml:1 }}  variant='contained' size="small">Save</Button>
+                    <Button disabled={submitTaskLoading} loading={submitTaskLoading} onClick={() => handleSubmitWorkAsync()} sx={{ ml:1 }}  variant='contained' size="small">Save</Button>
                 </Box>
-            </Box>
+            </Box> }
         </div>
     )
 }

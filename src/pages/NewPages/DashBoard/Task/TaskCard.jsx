@@ -69,12 +69,11 @@ const TaskCard = ({ task, daoUrl, preview = false, previewFromProject = false })
 
     const applicationCount = useMemo(() => {
         if (task) {
-            if (task.taskStatus === 'open') {
+            if (task.taskStatus === 'open' && task.isSingleContributor) {
                 let applications = _get(task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
                 if (applications)
                     return applications.length
             }
-            return 0
         }
         return 0;
     }, [task]);
@@ -91,9 +90,11 @@ const TaskCard = ({ task, daoUrl, preview = false, previewFromProject = false })
 
     const submissionCount = useMemo(() => {
         if (task) {
-            let submissions = _get(task, 'members', []).filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
-            if (submissions)
-                return submissions.length
+            if ((task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign') {
+                let submissions = _get(task, 'members', []).filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+                if (submissions)
+                    return submissions.length
+            }
             return 0
         }
         return 0;
@@ -102,7 +103,7 @@ const TaskCard = ({ task, daoUrl, preview = false, previewFromProject = false })
 
     return (
         <div className='tasks-card' onClick={() => navigate(`/${daoUrl}/task/${task._id}${preview ? '/preview' : ''}`, { state: { task, previewFromProject } })}>
-            {( ( ( (task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign' ) && submissionCount > 0  ) || applicationCount > 0) && task.creator === user._id &&
+            {( ( ( (task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign' ) && submissionCount > 0  ) || applicationCount > 0) && task.reviewer === user._id &&
                 <div className='tasks-card-icons'>
                     {((task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign' ) && submissionCount > 0 ?
                         <div className='icon-container'>
