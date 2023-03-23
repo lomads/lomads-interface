@@ -37,6 +37,27 @@ export default ({ open, onClose, organizationData }) => {
     }, [syncTrelloDataLoading]);
 
     const getAllBoards = () => {
+        // check if webhook already exists
+        const trelloOb = _get(DAO, 'trello', null);
+        if(trelloOb){
+            console.log("trello Ob exists...");
+            if (_get(DAO, `trello.${selectedValue}`, null)) {
+                console.log("org exists");
+                alert("This organisation has already been synced!");
+                return;
+            }
+            else {
+                console.log("org doesnt exists...call handleTrello");
+                handleTrello(selectedValue);
+            }
+        }
+        else {
+            console.log("trello ob doesnt exists...call handleTrello");
+            handleTrello(selectedValue);
+        }
+    }
+
+    const handleTrello = (selectedValue) => {
         setBoardsLoading(true);
         var trelloToken = localStorage.getItem("trello_token");
         axiosHttp.get(`utility/get-trello-boards?orgId=${selectedValue}&accessToken=${trelloToken}`)
