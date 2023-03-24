@@ -40,7 +40,7 @@ export default (rawTasks: Array<any>) => {
     };
     
     const parsedTasks = useMemo(() => {
-        if(account) {
+        if(account && user) {
             let tasks = _filter(rawTasks, rt => !rt.deletedAt && !rt.archivedAt && !rt.draftedAt);
             let manage = _filter(tasks, tsk => tsk.reviewer === user._id)
             let manageN = _orderBy(_filter(manage, (m:any) => moment(m.deadline).isSameOrAfter(moment())), t => moment(t.deadline).unix(), 'asc')
