@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { IconButton } from "@mui/material"
 import { makeStyles } from '@mui/styles';
 import React from 'react'
+import { important } from "polished";
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
@@ -9,7 +10,7 @@ const useStyles = makeStyles((theme: any) => ({
       background: 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%) !important',
       width: '37px !important',
       height: '37px !important',
-      borderRadius: '5px',
+      borderRadius: '5px !important',
       '&:hover': {
         backgroundColor: 'linear-gradient(180deg, #fcebe6 0%, #dfe3e8 100%) !important',
       },

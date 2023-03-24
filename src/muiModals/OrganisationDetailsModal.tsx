@@ -6,21 +6,14 @@
     import Button from 'muiComponents/Button';
     import Switch from "muiComponents/Switch";
     import SimpleLoadButton from "UIpack/SimpleLoadButton";
-
-    import CloseSVG from 'assets/svg/close-new.svg'
-    import PlusSVG from 'assets/svg/plus.svg'
+    import CloseSVG from 'assets/svg/close-new.svg';
     import OD from "assets/images/drawer-icons/OD.svg";
     import palette from 'muiTheme/palette';
     import { makeStyles } from '@mui/styles';
     import { isValidUrl } from "utils";
-
     import Dropzone from 'muiComponents/Dropzone';
-    import { IsideModalNew } from "types/DashBoardType";
     import IconButton  from "UIpack/IconButton";
-
-
     import { default as MuiIconButton } from 'muiComponents/IconButton'
-    import { Image, Input, Textarea } from "@chakra-ui/react";
     import { useAppSelector } from "state/hooks";
     import { useCallback, useEffect, useRef, useState } from "react";
     import { get as _get, find as _find } from 'lodash';
@@ -28,24 +21,14 @@
     import axiosHttp from 'api'
     import { updateDao, updateDaoLinks, storeGithubIssues, deleteDaoLink } from 'state/dashboard/actions';
     import AddDiscordLink from 'components/AddDiscordLink';
-    import { setDAO, resetStoreGithubIssuesLoader, resetDeleteDaoLinkLoader } from "state/dashboard/reducer";
+    import { resetStoreGithubIssuesLoader, resetDeleteDaoLinkLoader } from "state/dashboard/reducer";
     import AddGithubLink from "components/AddGithubLink";
-
     import TextInput from "muiComponents/TextInput";
-
-    import ReactS3Uploader from 'components/ReactS3Uploader';
-    import { LeapFrog } from "@uiball/loaders";
     import { nanoid } from "@reduxjs/toolkit";
     import { useDropzone } from 'react-dropzone'
-    import uploadIcon from '../../assets/svg/ico-upload.svg';
-
-    import LoginGithub from 'react-login-github';
-    import { title } from "process";
     import useGithubAuth from "hooks/useGithubAuth";
     import { AppDispatch } from 'state';
-    import toggleOrganisationDetailsModal from 'pages/NewPages/Settings.jsx';
-
-
+  
     const useStyles = makeStyles((theme: any) => ({
         organisationDetails:
         {
@@ -95,17 +78,50 @@
         addLinksContainer:
         {
             width:"456px",
-            height:'115px',
             marginLeft:'58px',
             marginRight:'61px',
-            padding:'0 22px'
-        } 
+            padding:'0 22px',
+
+        },
+        linksContainer:
+        {
+            marginTop: "20px",
+            padding: "2px 22px 26px 22px",
+            backgroundColor: "rgba(118, 128, 141, 0.05)",
+            color: "#718096",
+            borderRadius: "5px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-start",
+            boxShadow: "inset 1px 0px 4px rgba(27, 43, 65, 0.1)",
+            marginBottom: "83px",
+            marginLeft:"86px",
+            marginRight:"90px"
+        },
+        linkContainer:{
+            display: "flex",
+            flexDirection: "row",
+            color: "#76808D",
+            marginTop:"25px",
+            justifyContent: 'space-between',
+            fontFamily:"Open Sans",
+            fontWeight: "400",
+            fontSize: "14px"
+        },
+        link:
+        {
+                paddingLeft: 8,
+                width: 250,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                fontStyle: "italic",
+                fontSize: "14px"
+        }
     }));
 
     export default ({ open, onClose }: { open: boolean, onClose: any }) => {
         const classes = useStyles();
-
-        //const [panels, setPanels] = useState<any>([]);
         const[url,setUrl] = useState<string>("");
         const[linkTitle,setLinkTitle] = useState<string>("");
         const[link,setLink] = useState<string>("");
@@ -364,7 +380,7 @@
                                         fontWeight: 700,
                                         lineHeight: '18px'
                                     }}>Name</Typography>
-                        <TextInput placeholder="Fashion Fusion"  sx={{ marginTop:'10px'}} fullWidth />
+                        <TextInput placeholder="Fashion Fusion"  sx={{ marginTop:'10px',"&::placeholder":{fontStyle:'italic'}}} fullWidth />
                     </Box>
                     <Box className={classes.heading}>
                         <Typography  style={{
@@ -392,7 +408,7 @@
                                         fontSize: '16px',
                                         fontWeight: 700
                                     }}>Import Thumbnail</Typography>
-                            <Box >
+                            <Box className={classes.optionalHeading}>
                                             Optional
                             </Box>
                         </Box>
@@ -422,10 +438,10 @@
                                         fontSize: '16px',
                                         fontWeight: 700,
                                         lineHeight: '18px',marginBottom:'10px'}}>Add links</Typography>
-                                    <Box display="flex" flexDirection="row" marginBottom="10px" justifyContent="space-between" alignItems="center">
+                                    <Box display="flex" flexDirection="row" justifyContent="space-between" alignItems="center">
                                         <TextInput placeholder="Homepage" sx={ {width:"144px" ,marginRight:'12px'}} value={linkTitle} onChange={(e:any)=>setLinkTitle(e.target.value)}
                                         ></TextInput>
-                                        <TextInput placeholder="http//discord..." sx={{width:"193px",marginRight:'13px',height:"50px"}} value={link} onChange={(e:any)=>setLink(e.target.value)} 
+                                        <TextInput placeholder="http://discord..." sx={{width:"193px",marginRight:'13px'}} value={link} onChange={(e:any)=>setLink(e.target.value)} 
                                         ></TextInput>
                                         {/* <IconButton sx={{width:'50px', height:'50px',borderRadius:'5px',backGround:'rgba(27, 43, 65, 0.2)'}}>
                                         <img src={PlusSVG} style={{width:"15px" , height:"15px"}} /> */}
@@ -452,20 +468,6 @@
                                                     ?
                                                     <>
                                                         {
-                                                            // isAuthenticating
-                                                            // 	?
-                                                            // 	<button className="githubAddButton active" disabled>
-                                                            // 		<LeapFrog size={20} color="#FFF" />
-                                                            // 	</button>
-                                                            // 	:
-                                                            // <LoginGithub
-                                                            // 	clientId={process.env.REACT_APP_GITHUB_CLIENT_ID}
-                                                            // 	scope="repo user admin:repo_hook admin:org"
-                                                            // 	onSuccess={onSuccess}
-                                                            // 	onFailure={onFailure}
-                                                            // 	className={linkTitle.length > 0 && isValidUrl(link) ? "githubAddButton active" : "githubAddButton"}
-                                                            // 	buttonText="+"
-                                                            // />
                                                             <AddGithubLink onSuccess={onSuccess} title={linkTitle} link={link} desc={undefined} roleName={undefined} accessControl={undefined} okButton={undefined} onGuildCreateSuccess={undefined} innerRef={undefined} renderButton={undefined} />
                                                         }
                                                     </>
@@ -486,18 +488,19 @@
                                         </>
                                     }
                                     </Box>
+                                    </Box>
                                     {
                                     link && link.indexOf('github.') > -1
                                         ?
-                                        <Box ml={2} my={2}>
-                                            <Switch sx={{marginBottom:'30px'}} checked={pullIssues} onChange={() => setPullIssues(prev => !prev)} label="IMPORT ISSUES" />
+                                        <Box style={{marginLeft:"93px", marginTop:'10px'}}>
+                                            <Switch checked={pullIssues} onChange={() => setPullIssues(prev => !prev)} label="IMPORT ISSUES" />
                                         </Box>
                                         :
                                         <>
                                             {
                                                 link && link.indexOf('discord.') > -1
                                                     ?
-                                                    <Box ml={2} my={2}>
+                                                    <Box style={{marginLeft:"93px", marginTop:'10px'}}>
                                                         <Switch checked={importRoles} onChange={() => setImportRoles(prev => !prev)} label="IMPORT ROLES" />
                                                     </Box>
                                                     :
@@ -507,68 +510,27 @@
                                 }
                                 {/* <span className="error-msg" id="error-msg"></span> */}
                                 {daoLinks.length > 0 &&
-                                    <Box
-                                        style={{
-                                            marginTop: "9px",
-                                            padding: "9px 20px 9px 20px",
-                                            backgroundColor: "#edf2f7",
-                                            color: "#718096",
-                                            borderRadius: "5px",
-                                            justifyContent: 'space-between'
-                                        }}>
+                                    <Box className={classes.linksContainer}>
                                         {daoLinks.map((item:any, index:any) => {
                                             return (
-                                                <Box
-                                                    style={{
-                                                        display: "flex",
-                                                        flexDirection: "row",
-                                                        marginTop: "9px",
-                                                        color: "#718096",
-                                                        justifyContent: 'space-between'
-                                                    }}>
+                                                <Box className={classes.linkContainer}>
+                                                        <span style={{width:"50%",fontStyle: "normal",fontSize: "14px"}}>{item.title.length > 7 ? item.title.substring(0, 7) + "..." : item.title}</span>
+													<span className={classes.link}>{item.link}</span>
                                                     <Box
-                                                        style={{
-                                                            display: "flex",
-                                                            flexDirection: "row"
-                                                        }}
-                                                    >
-                                                        <Box width="50%">{item.title.length > 7 ? item.title.substring(0, 7) + "..." : item.title}</Box>
-                                                        <Box width="50%" style={{
-                                                            paddingLeft: 8,
-                                                            width: 250,
-                                                            whiteSpace: 'nowrap',
-                                                            overflow: 'hidden',
-                                                            textOverflow: 'ellipsis'
-                                                        }}>{item.link}</Box>
-                                                    </Box>
-                                                    {
-                                                        item.link && item.link.indexOf('github.') > -1
-                                                            ?
-                                                            <AddGithubLink
-                                                                renderButton={
-                                                                        <AiOutlineClose style={{ height: 15, width: 15 }} />
-                                                                        
-                                                                }
-                                                                onSuccess={(res: any) => deleteLink(res, item)}
-                                                                validate={false}
-                                                                link={item.link} title={undefined} desc={undefined} roleName={undefined} accessControl={undefined} okButton={undefined} onGuildCreateSuccess={undefined} innerRef={undefined}														/>
-                                                            :
-                                                            <Box
                                                                 className="deleteButton"
                                                                 onClick={() => {
                                                                     deleteLink(null, item);
                                                                 }}
                                                             >
                                                                 <AiOutlineClose style={{ height: 15, width: 15 }} />
-                                                            </Box>
+                                                    </Box>
 
-                                                    }
+                                                    
                                                 </Box>
                                             )
                                         })}
                                     </Box>
                                 }
-                    </Box>
                     {/* <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: '567px', position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px', padding: "30px 0 20px" }}> */}
                                      <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: '567px', position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px', padding: "30px 0 20px" }}>
 							<Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row" justifyContent="space-between">

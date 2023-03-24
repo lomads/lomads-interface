@@ -353,6 +353,11 @@ const Settings = () => {
 			{openXpPoints && (
 				<XpPointsModal toggleXp={toggleXp} />
 			)}
+			{/* <XpPointsModal 
+			open={openXpPoints}
+			onClose={()=> setOpenXpPoints(false)}
+			/> */}
+			
 			{/* // !-------------  Terminology ------------ */}
 			{openTerminology && (
 				<TerminologyModal
