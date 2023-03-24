@@ -38,23 +38,24 @@ export default ({ open, onClose, organizationData }) => {
 
     const getAllBoards = () => {
         // check if webhook already exists
-        const trelloOb = _get(DAO, 'trello', null);
-        if(trelloOb){
-            console.log("trello Ob exists...");
-            if (_get(DAO, `trello.${selectedValue}`, null)) {
-                console.log("org exists");
-                alert("This organisation has already been synced!");
-                return;
-            }
-            else {
-                console.log("org doesnt exists...call handleTrello");
-                handleTrello(selectedValue);
-            }
-        }
-        else {
-            console.log("trello ob doesnt exists...call handleTrello");
-            handleTrello(selectedValue);
-        }
+        // const trelloOb = _get(DAO, 'trello', null);
+        // if(trelloOb){
+        //     console.log("trello Ob exists...");
+        //     if (_get(DAO, `trello.${selectedValue}`, null)) {
+        //         console.log("org exists");
+        //         alert("This organisation has already been synced!");
+        //         return;
+        //     }
+        //     else {
+        //         console.log("org doesnt exists...call handleTrello");
+        //         handleTrello(selectedValue);
+        //     }
+        // }
+        // else {
+        //     console.log("trello ob doesnt exists...call handleTrello");
+        //     handleTrello(selectedValue);
+        // }
+        handleTrello(selectedValue);
     }
 
     const handleTrello = (selectedValue) => {
