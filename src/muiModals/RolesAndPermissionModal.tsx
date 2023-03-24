@@ -51,6 +51,7 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
             : 'rgba(0, 0, 0, .03)',
     justifyContent: 'flex-start',
     '& .MuiAccordionSummary-content': {
+        minWidth: 200,
         flexGrow: 'inherit'
     },
     '& .MuiAccordionSummary-expandIconWrapper': {

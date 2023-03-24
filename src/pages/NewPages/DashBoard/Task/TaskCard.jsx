@@ -125,6 +125,11 @@ const TaskCard = ({ task, daoUrl, preview = false, previewFromProject = false })
                 <p className="t-name">{task.name.length > 20 ? task.name.substring(0, 20) + "..." : task.name}</p>
             </div>
             <div>
+                { task.draftedAt ? 
+                    <div style={{ border: '1px solid #C94B32', borderRadius: 16, marginTop: 8, padding: '4px 16px' }}>
+                        <span style={{ color: '#C94B32' }}>Draft</span>
+                    </div> :
+                <>
                 {/* Task status */}
                 {
                     (task.contributionType === 'assign' || task.contributionType === 'open') && task.taskStatus === 'submitted'
@@ -344,6 +349,8 @@ const TaskCard = ({ task, daoUrl, preview = false, previewFromProject = false })
                         <img src={calendarIcon} alt="calendarIcon" />
                         {moment(task.deadline).fromNow()}
                     </span>
+                }
+                </>
                 }
             </div>
 

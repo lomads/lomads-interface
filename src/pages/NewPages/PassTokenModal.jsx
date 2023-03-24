@@ -146,7 +146,7 @@ const PassTokenModal = ({ togglePassToken }) => {
 										)
 									}}><img style={{ width: 20, height: 20, objectFit: 'contain', marginLeft: 16 }} src={chainId === SupportedChainId.GOERLI ? GOERLI_LOGO : POLYGON_LOGO} /></span>
 								</div>
-								{DAO?.sbt?.tokenSupply && <div id="#number-100">X{DAO?.sbt?.tokenSupply}</div>}
+								{DAO?.sbt?.tokenSupply && <div id="#number-100"></div>}
 							</div>
 						</div>
 						{/* <div id="create-more-section">
