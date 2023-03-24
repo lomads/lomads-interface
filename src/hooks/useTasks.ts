@@ -55,7 +55,7 @@ export default (rawTasks: Array<any>) => {
                     _find(tsk.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())
                 )
             }), (mt: any) => moment(mt.deadline).unix(), 'desc');
-            let drafts = rawTasks.filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null && (task.creator === user._id || task.provider === 'Github'))
+            let drafts = rawTasks.filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null && (task.creator === user._id || task.provider === 'Github' || task.provider === 'Trello'))
             let allTaskN = _orderBy(_filter([...manage, ...tasks], (m:any) => moment(m.deadline).isSameOrAfter(moment())), t => moment(t.deadline).unix(), 'asc')
             let allTaskO = _orderBy(_filter([...manage, ...tasks], (m:any) => moment(m.deadline).isBefore(moment())), t => moment(t.deadline).unix(), 'desc')
             let allTasks = _uniqBy([...allTaskN, ...allTaskO], t => t._id)
