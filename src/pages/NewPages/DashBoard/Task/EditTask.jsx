@@ -95,6 +95,8 @@ const EditTask = ({ close, task, daoURL }) => {
         return () => { };
     }, [DAO]);
 
+    useEffect(() => { setReviewer(task.reviewer ? task?.reviewer?._id : null) }, [task])
+
     useEffect(() => {
         var date = new Date();
         var tdate = date.getDate();
@@ -229,11 +231,11 @@ const EditTask = ({ close, task, daoURL }) => {
     }, [DAO, selectedUser, reviewer])
 
     const eligibleReviewers = useMemo(() => {
-        return _get(DAO, 'members', []).filter(m => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase() && m.member._id !== user._id)
+        return _get(DAO, 'members', []).filter(m => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase())
     }, [DAO, reviewer, selectedUser])
 
     const eligibleProjects = useMemo(() => {
-        return _get(DAO, 'projects', []).filter(p => _find(p.members, m => m._id === user._id) && p._id !== task.project?._id)
+        return _get(DAO, 'projects', []).filter(p => _find(p?.members, m => m?._id === user?._id) && p?._id !== task?.project?._id)
     }, [DAO, reviewer, selectedUser])
 
     return (
@@ -614,6 +616,7 @@ const EditTask = ({ close, task, daoURL }) => {
                                                 name="reviewer"
                                                 id="reviewer"
                                                 className="tokenDropdown"
+                                                value={reviewer}
                                                 style={{ width: '100%' }}
                                                 onChange={(e) => { setReviewer(e.target.value); document.getElementById('error-reviewer').innerHTML = '' }}
                                             >
