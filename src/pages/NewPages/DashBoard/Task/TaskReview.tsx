@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { get as _get, find as _find, uniqBy as _uniqBy, findIndex as _findIndex } from 'lodash';
+import { get as _get, find as _find, uniqBy as _uniqBy, findIndex as _findIndex, debounce as _debounce } from 'lodash';
 import './TaskReview.css';
 import { CgClose } from 'react-icons/cg';
 import { IoIosArrowBack } from 'react-icons/io'
 import userPlaceholder from 'assets/svg/user-placeholder.svg';
 import clipboard from 'assets/svg/clipboard.svg';
 import editIcon from 'assets/svg/editButton.svg';
+import Button from 'muiComponents/Button';
 import compensationIcon from 'assets/svg/compensation.svg';
 import polygonIcon from 'assets/svg/polygon.svg';
 import starIcon from 'assets/svg/star.svg';
@@ -217,6 +218,8 @@ const TaskReview = ({ task, close }: any) => {
         }
     }
 
+    const handleApproveTaskAsync = _debounce(handleApproveTask, 500)
+
     const handleRejectTask = () => {
         dispatch(rejectTask({
             payload:
@@ -339,8 +342,8 @@ const TaskReview = ({ task, close }: any) => {
                 </div>
                 { error && (typeof error === 'string') && <div style={{ color: 'red', marginBottom: 16, textAlign: 'center' }}>{ error }</div> }
                 <div className='task-review-foot'>
-                    <button onClick={() => { setRejectUser(submission.member._id); setShowRejectSubmission(true) }}>REJECT</button>
-                    <button disabled={approveLoading} style={{ backgroundColor: approveLoading ? 'grey' : '#C94B32' }} onClick={() => handleApproveTask()}>APPROVE</button>
+                    <Button disabled={approveLoading || rejectTaskLoading} loading={rejectTaskLoading} onClick={() => { setRejectUser(submission.member._id); setShowRejectSubmission(true) }}>REJECT</Button>
+                    <Button disabled={approveLoading || rejectTaskLoading} loading={approveLoading} style={{ backgroundColor: approveLoading ? 'grey' : '#C94B32' }} onClick={() => handleApproveTaskAsync()}>APPROVE</Button>
                 </div>
             </div>
         )

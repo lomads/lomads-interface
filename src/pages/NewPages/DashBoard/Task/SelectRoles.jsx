@@ -78,9 +78,6 @@ const SelectRoles = ({ toggleSelect, validRoles, handleValidRoles }) => {
                 all_roles && all_roles.length > 0
                     ?
                     <>
-                        <div className='selectRoles-header'>
-                            <span>Discord Roles</span>
-                        </div>
                         {
                             all_roles.map((discord_value, index) => {
                                 return (
