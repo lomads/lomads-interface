@@ -56,7 +56,7 @@ import ApplyTask from "./DashBoard/Task/ApplyTask";
 import assign from '../../assets/svg/assign.svg'
 import submitted from '../../assets/svg/submitted.svg'
 import applied from '../../assets/svg/applied.svg'
-import open from '../../assets/svg/open.svg'
+import openSvg from '../../assets/svg/open.svg'
 import memberIcon from '../../assets/svg/memberIcon.svg';
 import SubmitTask from "./DashBoard/Task/SubmitTask";
 import ApplicantList from "./DashBoard/Task/ApplicantList";
@@ -263,7 +263,7 @@ const TaskDetails = () => {
 
     const submissionCount = useMemo(() => {
         if (Task) {
-            let submissions = _get(Task, 'members', []).filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+            let submissions = _get(Task, 'members', [])?.filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
             if (submissions)
                 return submissions.length
             return 0
@@ -448,6 +448,11 @@ const TaskDetails = () => {
 
                                                 {/* Task status */}
                                                 {/* If task was manually assigned---check if current user is approved applicant or other user*/}
+                                                { Task.draftedAt ? 
+                                                <div style={{ border: '1px solid #C94B32', borderRadius: 16, padding: '4px 16px' }}>
+                                                    <span style={{ color: '#C94B32' }}>Draft</span>
+                                                </div> :
+                                                <>
                                                 {
                                                     (Task.contributionType === 'assign' || Task.contributionType === 'open') && Task.taskStatus === 'submitted'
                                                         ?
@@ -542,7 +547,7 @@ const TaskDetails = () => {
                                                                                 </div>
                                                                                 :
                                                                                 <div>
-                                                                                    <img src={open} style={{ marginRight: '5px' }} />
+                                                                                    <img src={openSvg} style={{ marginRight: '5px' }} />
                                                                                     <span style={{ color: '#4BA1DB' }}>Open</span>
                                                                                 </div>
                                                                         }
@@ -609,7 +614,7 @@ const TaskDetails = () => {
                                                                                 </div>
                                                                                 :
                                                                                 <div>
-                                                                                    <img src={open} style={{ marginRight: '5px' }} />
+                                                                                    <img src={openSvg} style={{ marginRight: '5px' }} />
                                                                                     <span style={{ color: '#4BA1DB' }}>Open</span>
                                                                                 </div>
                                                                         }
@@ -658,8 +663,7 @@ const TaskDetails = () => {
                                                         :
                                                         null
                                                 }
-
-
+                                                </> }
                                                 {/* edit and menu button visible only to the creator */}
                                                 {
                                                     // account.toLowerCase() === Task?.creator.toLowerCase()

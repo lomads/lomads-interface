@@ -23,6 +23,7 @@ import TaskCard from './DashBoard/Task/TaskCard';
 import useRole from '../../hooks/useRole';
 
 import CreateTask from "./DashBoard/Task/CreateTask";
+import useTasks from 'hooks/useTasks';
 
 const AllTasks = () => {
     const navigate = useNavigate();
@@ -38,6 +39,7 @@ const AllTasks = () => {
     const [otherTasks, setOtherTasks] = useState([]);
     const [initialCheck, setInitialCheck] = useState(false);
     const [currentTasks, setCurrentTasks] = useState([]);
+    const  { parsedTasks } = useTasks(_get(DAO, 'tasks', []))
 
     const { myRole, can } = useRole(DAO, account)
 
@@ -78,22 +80,24 @@ const AllTasks = () => {
 
     const taskApplicationCount = (task) => {
         if (task) {
-            if (task.taskStatus === 'open' && task.isSingleContributor) {
-                let applications = _get(task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+            if (task.taskStatus === 'open') {
+                let applications = _get(task, 'members', []).filter(m => (m.status !== 'rejected' && m.status !== 'submission_rejected'))
                 if (applications)
                     return applications.length
             }
+            return 0
         }
         return 0;
     };
 
     const taskSubmissionCount = (task) => {
-        if ((task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign') {
-            let submissions = _get(task, 'members', []).filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+        if (task) {
+            let submissions = _get(task, 'members', [])?.filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
             if (submissions)
                 return submissions.length
+            return 0
         }
-        return 0
+        return 0;
     };
 
     useEffect(() => {
@@ -126,16 +130,16 @@ const AllTasks = () => {
 
     useEffect(() => {
         if (tab === 1) {
-            setCurrentTasks(myTasks);
+            setCurrentTasks(parsedTasks['myTask']);
         }
         else if (tab === 2) {
-            setCurrentTasks(manageTasks);
+            setCurrentTasks(parsedTasks['manage']);
         }
         else if (tab === 3) {
-            setCurrentTasks(draftTasks);
+            setCurrentTasks(parsedTasks['drafts']);
         }
         else {
-            setCurrentTasks(otherTasks);
+            setCurrentTasks(parsedTasks['allTasks']);
         }
     }, [tab, myTasks, manageTasks, draftTasks, otherTasks]);
 

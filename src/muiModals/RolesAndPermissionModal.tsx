@@ -49,6 +49,14 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
         theme.palette.mode === 'dark'
             ? 'rgba(255, 255, 255, .05)'
             : 'rgba(0, 0, 0, .03)',
+    justifyContent: 'flex-start',
+    '& .MuiAccordionSummary-content': {
+        minWidth: 200,
+        flexGrow: 'inherit'
+    },
+    '& .MuiAccordionSummary-expandIconWrapper': {
+        marginLeft: 16
+    },
     '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
         transform: 'rotate(90deg)',
     },
