@@ -675,9 +675,9 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                     </div>
 
                                     <div className='createTask-footer'>
-                                        {/* <button onClick={handleDraftTask}>
+                                        <button onClick={handleDraftTask}>
                                             SAVE AS DRAFT
-                                        </button> */}
+                                        </button>
                                         <SimpleLoadButton
                                             title={`CREATE`}
                                             height={50}
