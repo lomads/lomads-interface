@@ -91,7 +91,7 @@ const TaskCard = ({ task, daoUrl, preview = false, previewFromProject = false })
     const submissionCount = useMemo(() => {
         if (task) {
             if ((task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign') {
-                let submissions = _get(task, 'members', []).filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+                let submissions = _get(task, 'members', [])?.filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
                 if (submissions)
                     return submissions.length
             }

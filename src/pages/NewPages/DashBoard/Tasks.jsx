@@ -124,7 +124,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
 
     const taskSubmissionCount = (task) => {
         if (task) {
-            let submissions = _get(task, 'members', []).filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+            let submissions = _get(task, 'members', [])?.filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
             if (submissions)
                 return submissions.length
             return 0
@@ -204,7 +204,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
             for (let index = 0; index < manageTasks.length; index++) {
                 const task = manageTasks[index];
                 if ((task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign') {
-                    let submissions = _get(task, 'members', []).filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+                    let submissions = _get(task, 'members', [])?.filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
                     if (submissions)
                         sum = sum + submissions.length
                 }

@@ -92,7 +92,7 @@ const AllTasks = () => {
 
     const taskSubmissionCount = (task) => {
         if (task) {
-            let submissions = _get(task, 'members', []).filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+            let submissions = _get(task, 'members', [])?.filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
             if (submissions)
                 return submissions.length
             return 0

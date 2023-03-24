@@ -236,7 +236,7 @@ const TaskDetails = () => {
 
     const submissionCount = useMemo(() => {
         if (Task) {
-            let submissions = _get(Task, 'members', []).filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+            let submissions = _get(Task, 'members', [])?.filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
             if (submissions)
                 return submissions.length
             return 0
