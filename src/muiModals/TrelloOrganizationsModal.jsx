@@ -23,7 +23,8 @@ const useStyles = makeStyles((theme) => ({}));
 export default ({ open, onClose, organizationData }) => {
     const classes = useStyles();
     const dispatch = useDispatch()
-    const { DAO, syncTrelloDataLoading } = useAppSelector((state) => state.dashboard);
+    const { DAO,user, syncTrelloDataLoading } = useAppSelector((state) => state.dashboard);
+    console.log("User : ",user);
 
     const [selectedValue, setSelectedValue] = useState(null);
     const [boardsLoading, setBoardsLoading] = useState(false);
@@ -36,6 +37,27 @@ export default ({ open, onClose, organizationData }) => {
     }, [syncTrelloDataLoading]);
 
     const getAllBoards = () => {
+        // check if webhook already exists
+        const trelloOb = _get(DAO, 'trello', null);
+        if(trelloOb){
+            console.log("trello Ob exists...");
+            if (_get(DAO, `trello.${selectedValue}`, null)) {
+                console.log("org exists");
+                alert("This organisation has already been synced!");
+                return;
+            }
+            else {
+                console.log("org doesnt exists...call handleTrello");
+                handleTrello(selectedValue);
+            }
+        }
+        else {
+            console.log("trello ob doesnt exists...call handleTrello");
+            handleTrello(selectedValue);
+        }
+    }
+
+    const handleTrello = (selectedValue) => {
         setBoardsLoading(true);
         var trelloToken = localStorage.getItem("trello_token");
         axiosHttp.get(`utility/get-trello-boards?orgId=${selectedValue}&accessToken=${trelloToken}`)
@@ -46,6 +68,7 @@ export default ({ open, onClose, organizationData }) => {
                     var trelloToken = localStorage.getItem("trello_token");
                     dispatch(syncTrelloData({
                         payload: {
+                            user:{id:_get(user,'_id',null),address: _get(user,'wallet',null)},
                             daoId: _get(DAO, '_id', null),
                             boardsArray: boards.data.data,
                             accessToken: trelloToken,
