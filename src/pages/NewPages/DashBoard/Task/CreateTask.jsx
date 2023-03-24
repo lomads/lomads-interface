@@ -133,6 +133,8 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
         return () => { };
     }, [DAO]);
 
+    useEffect(() => { setReviewer(user._id) }, [user])
+
     useEffect(() => {
         if (createTaskLoading === false || draftTaskLoading === false) {
             dispatch(resetCreateTaskLoader());
@@ -316,7 +318,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
     }, [DAO, selectedUser, reviewer])
 
     const eligibleReviewers = useMemo(() => {
-        return _get(DAO, 'members', []).filter(m => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase() && m.member._id !== user._id)
+        return _get(DAO, 'members', []).filter(m => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase())
     }, [DAO, reviewer, selectedUser])
 
     const eligibleProjects = useMemo(() => {
@@ -471,6 +473,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                             <select
                                                 name="reviewer"
                                                 id="reviewer"
+                                                value={reviewer}
                                                 className="tokenDropdown"
                                                 style={{ width: '100%' }}
                                                 onChange={(e) => { setReviewer(e.target.value); document.getElementById('error-reviewer').innerHTML = '' }}

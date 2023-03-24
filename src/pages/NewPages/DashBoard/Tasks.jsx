@@ -13,11 +13,13 @@ import useTerminology from 'hooks/useTerminology';
 import archiveIcon from '../../../assets/svg/archiveIcon.svg';
 import expandIcon from '../../../assets/svg/expand.svg';
 import moment from 'moment';
+import useTasks from 'hooks/useTasks';
 
 const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
     const navigate = useNavigate();
     const { DAO, user, Project } = useAppSelector((state) => state.dashboard);
     const { transformTask } = useTerminology(_get(DAO, 'terminologies', null))
+    const { parsedTasks } = useTasks(_get(DAO, 'tasks', []))
     const { account } = useWeb3React();
     const [tab, setTab] = useState(4);
     const [myTasks, setMyTasks] = useState([]);
@@ -314,7 +316,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                 (tab === 4 && otherTasks && otherTasks.length > 0) ?
                 <div className='tasks-body'>
                     {
-                        tab === 1 && myTasks && myTasks.filter((item, index) => index < 6).map((item, index) => {
+                        tab === 1 && parsedTasks['myTask'] && parsedTasks['myTask'].filter((item, index) => index < 6).map((item, index) => {
                             if (index <= 4) {
                                 return (
                                     <div key={index}>
@@ -335,7 +337,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                         })
                     }
                     {
-                        tab === 2 && manageTasks && manageTasks.filter((item, index) => index < 6).map((item, index) => {
+                        tab === 2 && parsedTasks['manage'] && parsedTasks['manage'].filter((item, index) => index < 6).map((item, index) => {
                             if (index <= 4) {
                                 return (
                                     <div key={index}>
@@ -356,7 +358,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                         })
                     }
                     {
-                        tab === 3 && draftTasks && draftTasks.filter((item, index) => index < 6).map((item, index) => {
+                        tab === 3 && parsedTasks['drafts'] && parsedTasks['drafts'].filter((item, index) => index < 6).map((item, index) => {
                             if (index <= 4) {
                                 return (
                                     <div key={index}>
@@ -377,7 +379,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects }) => {
                         })
                     }
                     {
-                        tab === 4 && otherTasks && otherTasks.filter((item, index) => index < 6).map((item, index) => {
+                        tab === 4 && parsedTasks['allTasks'] && parsedTasks['allTasks'].filter((item, index) => index < 6).map((item, index) => {
                             if (index <= 4) {
                                 return (
                                     <div key={index}>
