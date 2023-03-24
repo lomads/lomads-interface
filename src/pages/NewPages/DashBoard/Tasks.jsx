@@ -19,7 +19,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
     const navigate = useNavigate();
     const { DAO, user, Project } = useAppSelector((state) => state.dashboard);
     const { transformTask } = useTerminology(_get(DAO, 'terminologies', null))
-    const { parsedTasks } = useTasks(_get(DAO, 'tasks', []))
+    const { parsedTasks } = useTasks(onlyProjects ? _get(Project, 'tasks', []) : _get(DAO, 'tasks', []))
     const { account } = useWeb3React();
     const [tab, setTab] = useState(4);
     const [myTasks, setMyTasks] = useState([]);
