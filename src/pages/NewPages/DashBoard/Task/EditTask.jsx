@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { find as _find, get as _get, debounce as _debounce } from 'lodash';
+import { find as _find, get as _get, debounce as _debounce, isEqual as _isEqual } from 'lodash';
 import './CreateTask.css';
 import { CgClose } from 'react-icons/cg'
 import createProjectSvg from '../../../../assets/svg/createProject.svg';
@@ -52,7 +52,7 @@ const EditTask = ({ close, task, daoURL }) => {
     const [isFilterRoles, setIsFilterRoles] = useState(task.isFilterRoles);
     const [select, setSelect] = useState(false);
     const [validRoles, setValidRoles] = useState(task.validRoles);
-    const [selectedUser, setSelectedUser] = useState(_find(_get(task, 'members', []), m => m?.status === 'approved')?.member);
+    const [selectedUser, setSelectedUser] = useState(null);
     const [name, setName] = useState(task.name);
     const [description, setDescription] = useState(task.description);
     const [dchannel, setDChannel] = useState(task.discussionChannel);
@@ -229,6 +229,21 @@ const EditTask = ({ close, task, daoURL }) => {
             if (!symbol)
                 symbol = currency.currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
 
+            let members = _get(task, 'members', [])
+
+            console.log(task.contributionType !== contributionType, task.isSingleContributor !== isSingleContributor, task.isFilterRoles !== isFilterRoles, !_isEqual(task.validRoles, validRoles))
+
+            if(
+                (task.contributionType !== contributionType) || 
+                (task.isSingleContributor !== isSingleContributor) ||
+                (task.isFilterRoles !== isFilterRoles) ||
+                !_isEqual(task.validRoles, validRoles)
+            ) {
+                members = []
+            }
+
+            members = contributionType === 'assign' && selectedUser ? [{ member: selectedUser._id, status: 'approved' }] : members;
+
             let taskOb = {};
             taskOb.name = name;
             taskOb.description = description;
@@ -241,7 +256,7 @@ const EditTask = ({ close, task, daoURL }) => {
             taskOb.isSingleContributor = isSingleContributor;
             taskOb.isFilterRoles = isFilterRoles;
             taskOb.validRoles = isFilterRoles ? validRoles : [];
-            taskOb.members = selectedUser ? [{ member: selectedUser._id, status: 'approved' }] : [];
+            taskOb.members = members
             taskOb.reviewer = reviewer;
             console.log("task ob : ", taskOb)
             dispatch(editTask({ payload: taskOb, daoUrl: daoURL, taskId: task._id }))
