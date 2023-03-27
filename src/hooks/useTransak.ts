@@ -22,7 +22,8 @@ export default () => {
                 walletAddress: treasury,
                 defaultNetwork: 'polygon',
                 defaultCryptoAmount: amount < 27 ? 27 : amount,
-                defaultCryptoCurrency: token
+                defaultCryptoCurrency: token,
+                disablePaymentMethods: "pm_pse,pm_gcash,pm_shopeepay,pm_grabpay,pm_ubp,pm_rcbc,pm_bpi,pm_paymaya,pm_webpay,pm_boleto,pm_pix,pm_scb_easy_pay,pm_scb_bank_mobile,pm_bangkok_bank_ipay,pm_bangkok_bank_mobile,google_pay,apple_pay,mobikwik_wallet,inr_bank_transfer,inr_upi,pm_jwire,pm_jach,pm_cash_app,pm_open_banking,gbp_bank_transfer,sepa_bank_transfer"
               });
               transak.init();
     

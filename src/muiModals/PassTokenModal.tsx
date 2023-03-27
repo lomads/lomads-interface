@@ -24,6 +24,7 @@ import { useNavigate } from 'react-router-dom';
 import { USDC } from 'constants/tokens';
 import { CHAIN_INFO } from 'constants/chainInfo';
 import { setDAO } from 'state/dashboard/reducer';
+import useWithdraw from 'hooks/useWithdraw';
 
 const LOCK_SVG = `<svg width="13" height="15" viewBox="0 0 13 15" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g clip-path="url(#clip0_2971_2676)">
@@ -108,7 +109,8 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
     const {  DAO } = useAppSelector(store => store.dashboard)
     const [contract, setContract] = useState<any>(null);
     const [updateContractLoading, setUpdateContractLoading] = useState<boolean | null>(null)
-    const { updateContract, getStats, withdraw } = useMintSBT(_get(contract, 'address', ''), _get(contract, 'version', ''))
+    const { updateContract, getStats } = useMintSBT(_get(contract, 'address', ''), _get(contract, 'version', ''))
+    const { withdraw } = useWithdraw()
     const [tokens, setTokens] = useState<any>([])
     const [state, setState] = useState<any>({
         whitelisted: false,
@@ -210,6 +212,14 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
                 contact: prev?.contact.indexOf(key) > -1 ? prev.contact.filter((c: string) => c !== key) : [...prev?.contact, key]
             }
         })
+    }
+
+    const handleWithdraw = async () => {
+        try {
+            await withdraw()
+        } catch (e) {
+            console.log(e)
+        }
     }
 
     return (
@@ -320,7 +330,7 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
                             </Box>
                         </Box> }
                         <Box>
-                            <Button onClick={async () => await withdraw()} size="small" variant="contained">Withdraw</Button>
+                            <Button onClick={async () => handleWithdraw()} size="small" variant="contained">Withdraw</Button>
                         </Box>
                         <Box style={{ height: 4, width: 200, alignSelf: 'center', margin: '60px auto', backgroundColor: palette.primary.main }}></Box>
                         <Box className={classes.paperDetailsSocial}>

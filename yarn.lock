@@ -5338,7 +5338,7 @@
 
 "@typechain/ethers-v5@^7.0.0":
   version "7.2.0"
-  resolved "https://registry.npmjs.org/@typechain/ethers-v5/-/ethers-v5-7.2.0.tgz"
+  resolved "https://registry.yarnpkg.com/@typechain/ethers-v5/-/ethers-v5-7.2.0.tgz#d559cffe0efe6bdbc20e644b817f6fa8add5e8f8"
   integrity sha512-jfcmlTvaaJjng63QsT49MT6R1HFhtO/TBMWbyzPFSzMmVIqb2tL6prnKBs4ZJrSvmgIXWy+ttSjpaxCTq8D/Tw==
   dependencies:
     lodash "^4.17.15"
@@ -11889,7 +11889,7 @@ ethers@^4.0.0-beta.1, ethers@^4.0.32:
     uuid "2.0.1"
     xmlhttprequest "1.8.0"
 
-ethers@^5.0.1, ethers@^5.0.13, ethers@^5.0.17, ethers@^5.0.2, ethers@^5.0.30, ethers@^5.5.2, ethers@^5.6.1:
+ethers@^5.0.1, ethers@^5.0.13, ethers@^5.0.17, ethers@^5.0.2, ethers@^5.0.30, ethers@^5.5.2, ethers@^5.6.1, ethers@^5.6.9:
   version "5.7.2"
   resolved "https://registry.yarnpkg.com/ethers/-/ethers-5.7.2.tgz#3a7deeabbb8c030d4126b24f84e525466145872e"
   integrity sha512-wswUsmWo1aOK8rR7DIKiWSw9DbLWe6x98Jrn8wcTflTVvaXhAMaB5zGAXy0GYQEQp9iO1iSHWVyARQm11zUtyg==
@@ -11925,7 +11925,7 @@ ethers@^5.0.1, ethers@^5.0.13, ethers@^5.0.17, ethers@^5.0.2, ethers@^5.0.30, et
     "@ethersproject/web" "5.7.1"
     "@ethersproject/wordlists" "5.7.0"
 
-ethers@^5.5.4, ethers@^5.6.8, ethers@^5.6.9, ethers@^5.7.1:
+ethers@^5.5.4, ethers@^5.6.8, ethers@^5.7.1:
   version "5.7.1"
   resolved "https://registry.npmjs.org/ethers/-/ethers-5.7.1.tgz"
   integrity sha512-5krze4dRLITX7FpU8J4WscXqADiKmyeNlylmmDLbS95DaZpBhDe2YSwRQwKXWNyXcox7a3gBgm/MkGXV1O1S/Q==

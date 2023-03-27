@@ -159,13 +159,13 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
             tokenId, 
             contract: contractAddress,
             chainId,
-            payment: ''
+            payment: "0"
           }).then(res => res?.data?.signature)
           try {
             const tx = await mintContract?.estimateGas.safeMint(
               "",
               tokenId,
-              '',
+              "",
               signature,
               {
               from: account,
@@ -182,20 +182,19 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
 
     const withdraw = async () => {
       if (mintContract?.signer) {
-        const stats = await getStats();
         const  overrides = {
-          gasLimit: 3000000,
-          gasPrice: ethers.utils.parseUnits('300', 'gwei').toString(),
+          gasLimit: 500000,
+          gasPrice: ethers.utils.parseUnits('150', 'gwei').toString(),
           type: 1,
           accessList: [
             {
-              address: "0xbd062EB9720c78f00c68770F3dE62118e66be404", // admin gnosis safe proxy address
+              address: "0xEb42ab42685cF1C2Ad2A49d67C7f1363f2e7D807", // proceedsRecipient gnosis safe proxy address
               storageKeys: [
                   "0x0000000000000000000000000000000000000000000000000000000000000000"
               ]
             },
             {
-              address: "0xEb42ab42685cF1C2Ad2A49d67C7f1363f2e7D807", // proceedsRecipient gnosis safe proxy address
+              address: "0x4693ff12771459aa60C9F25929505Ec1571c3aCa", // admin gnosis safe proxy address
               storageKeys: [
                   "0x0000000000000000000000000000000000000000000000000000000000000000"
               ]
@@ -208,13 +207,12 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
         }
 
         try {
-          const value = await mintContract?.withdraw({gasPrice: ethers.utils.parseUnits('150', 'gwei'), gasLimit: 500000})
+          const value = await mintContract?.withdraw({ overrides })
         } catch (e) {
           console.log(e)
           throw _get(e, 'message', 'Could not withdraw')
         }
       }
-      throw 'Could not withdraw. Please try after sometime'
     }
 
     const checkDiscount = async (inviteCode: string) => {
@@ -225,7 +223,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
           return ethValue
         } catch (e) {
           console.log(e)
-          throw _get(e, 'message', 'Could not estimate gas. Please try after sometime')
+          throw e
         }
       }
       throw 'Could not estimate gas. Please try after sometime'

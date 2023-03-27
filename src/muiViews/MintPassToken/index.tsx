@@ -239,9 +239,11 @@ export default () => {
                     );
                     console.log("://api.coingecko.com/api/v3/coins", request.data)
                     const price = await request.data.market_data?.current_price["usd"];
+                    const priceEur = await request.data.market_data?.current_price["eur"];
                     const mintPriceinUsd = parseFloat(contract?.mintPrice) * price;
         
                     setPrice({
+                        priceEur,
                         mintPrice: _get(contract, 'mintPrice', '0'),
                         mintPriceinUsd: mintPriceinUsd.toString()
                     })
@@ -255,6 +257,7 @@ export default () => {
                 
                 
                         setPrice({
+                            priceEur,
                             mintPrice: _get(contract, 'mintPrice', '0'),
                             mintPriceinUsd: mintPriceinUsd.toString(),
                             estimateinUsd: estimateinUsd.toString(),
@@ -262,6 +265,7 @@ export default () => {
                         })
                     } else {
                         setPrice({
+                            priceEur,
                             mintPrice: _get(contract, 'mintPrice', '0'),
                             mintPriceinUsd: mintPriceinUsd.toString(),
                             estimateinUsd: 0,
@@ -715,7 +719,7 @@ export default () => {
                             {   balance === 0 ?
                                 <>
                                     <Button loading={mintLoading} disabled={mintLoading} onClick={() => handleMint()} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">PAY</Button>
-                                    <Button loading={mintLoading} disabled={mintLoading} onClick={() =>{ setShowDrawer(false); handleBuyCrypto(); } } style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">PAY BY CARD</Button>
+                                    { _get(price, 'priceEur', 0) >= 27 && <Button loading={mintLoading} disabled={mintLoading} onClick={() =>{ setShowDrawer(false); handleBuyCrypto(); } } style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">PAY BY CARD</Button> }
                                 </> : 
                                 <Button loading={mintLoading} disabled={mintLoading} onClick={() => handleUpdateMetadata()} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">UPDATE</Button>
                             }
