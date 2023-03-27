@@ -303,6 +303,28 @@ const EditDraftTask = ({ close, task, daoURL }) => {
         return _get(DAO, 'projects', []).filter(p => _find(p?.members, m => m?._id === user?._id) && p?._id !== task?.project?._id)
     }, [DAO, reviewer, selectedUser])
 
+    const getroleColor = (roleId) => {
+
+        if (roleId == "role1" || roleId == "role2" || roleId == "role3" || roleId == "role4") {
+            if (roleId === 'role1')
+                return { pill: 'rgba(146, 225, 168, 0.3)', circle: 'rgba(146, 225, 168, 1)' };
+            else if (roleId === 'role2')
+                return { pill: 'rgba(137,179,229,0.3)', circle: 'rgba(137,179,229,1)' };
+            else if (roleId === 'role3')
+                return { pill: 'rgba(234,100,71,0.3)', circle: 'rgba(234,100,71,1)' };
+            else if (roleId === 'role4')
+                return { pill: 'rgba(146, 225, 168, 0.3)', circle: 'rgba(146, 225, 168, 1)' };
+        }
+        for (let index = 0; index < Object.keys(_get(DAO, 'discord', {})).length; index++) {
+            const element = Object.keys(_get(DAO, 'discord', {}))[index];
+            const rolename_discord = _find(DAO.discord[element].roles, r => r.id === roleId)
+            if (rolename_discord) {
+                return { pill: `${_get(rolename_discord, 'roleColor', '#99aab5')}50`, circle: _get(rolename_discord, 'roleColor', '#99aab5') }
+            }
+        }
+        return { pill: '#99aab550', circle: '#99aab5' };
+    };
+
     return (
         <div className="createTaskOverlay">
             {
@@ -545,11 +567,11 @@ const EditDraftTask = ({ close, task, daoURL }) => {
                                                                     <div className='roles-li'>
                                                                         <div
                                                                             className='roles-pill'
-                                                                            style={{ background: '#99aab550' }}
+                                                                            style={{ background: getroleColor(item).pill  }}
                                                                         >
                                                                             <div
                                                                                 className='roles-circle'
-                                                                                style={{ background: '#99aab5' }}
+                                                                                style={{ background: getroleColor(item).circle }}
                                                                             ></div>
                                                                             <span>{item == "role1" || item == "role2" || item == "role3" || item == "role4" ? transformRole(item).label : getrolename(item)}</span>
                                                                         </div>

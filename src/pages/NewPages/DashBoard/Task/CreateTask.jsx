@@ -302,13 +302,11 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
         task.deadline = deadline;
         task.submissionLink = tempSub ? tempSub : '';
         task.compensation = { currency: currency?.currency, amount, symbol };
-        // task.reviewer = user._id;
         task.reviewer = reviewer;
         task.contributionType = contributionType;
         task.isSingleContributor = isSingleContributor;
         task.isFilterRoles = isFilterRoles;
         task.validRoles = validRoles;
-        // alert("sds")
 
         dispatch(draftTask({ payload: task }))
     }
@@ -674,7 +672,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                     </div>
 
                                     <div className='createTask-footer'>
-                                        <button onClick={handleDraftTask}>
+                                        <button onClick={handleDraftTask} style={{height:'50px'}}>
                                             SAVE AS DRAFT
                                         </button>
                                         <SimpleLoadButton
