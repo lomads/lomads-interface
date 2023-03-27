@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { find as _find, get as _get, debounce as _debounce } from 'lodash';
+import { find as _find, get as _get, debounce as _debounce, isEqual as _isEqual } from 'lodash';
 import './CreateTask.css';
 import { CgClose } from 'react-icons/cg'
 import createProjectSvg from '../../../../assets/svg/createProject.svg';
@@ -59,7 +59,7 @@ const EditDraftTask = ({ close, task, daoURL }) => {
     const [deadline, setDeadline] = useState(task.deadline ? new Date(_get(task, 'deadline', '')).toISOString().substring(0, 10) : new Date());
     const [projectId, setProjectId] = useState(task.project?._id);
     const [subLink, setSubLink] = useState(_get(task, 'submissionLink', ''));
-    const [reviewer, setReviewer] = useState(null);
+    const [reviewer, setReviewer] = useState(task.reviewer ? task.reviewer._id : null);
     const [currency, setCurrency] = useState({ currency: task.compensation ? task.compensation.currency : null });
     const [amount, setAmount] = useState(task.compensation ? task.compensation.amount : 0);
     const [safeTokens, setSafeTokens] = useState([]);
@@ -216,22 +216,36 @@ const EditDraftTask = ({ close, task, daoURL }) => {
             if (!symbol)
                 symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
 
-            let tsk = {};
-            tsk.name = name;
-            tsk.description = description;
-            tsk.applicant = selectedUser;
-            tsk.projectId = projectId;
-            tsk.discussionChannel = tempLink;
-            tsk.deadline = deadline;
-            tsk.submissionLink = tempSub ? tempSub : '';
-            tsk.compensation = { currency: currency?.currency, amount, symbol };
-            tsk.reviewer = user._id;
-            tsk.contributionType = contributionType;
-            tsk.isSingleContributor = isSingleContributor;
-            tsk.isFilterRoles = isFilterRoles;
-            tsk.validRoles = validRoles;
+                let members = _get(task, 'members', [])
 
-            dispatch(convertDraftTask({ payload: tsk, daoUrl: daoURL, taskId: _get(task, '_id', '') }))
+                if(
+                    (task.contributionType !== contributionType) || 
+                    (task.isSingleContributor !== isSingleContributor) ||
+                    (task.isFilterRoles !== isFilterRoles) ||
+                    !_isEqual(task.validRoles, validRoles)
+                ) {
+                    members = []
+                }
+    
+                members = contributionType === 'assign' && selectedUser ? [{ member: selectedUser._id, status: 'approved' }] : members;
+    
+                let taskOb = {};
+                taskOb.name = name;
+                taskOb.description = description;
+                taskOb.projectId = projectId;
+                taskOb.discussionChannel = tempLink;
+                taskOb.deadline = deadline;
+                taskOb.submissionLink = tempSub ? tempSub : '';
+                taskOb.compensation = { currency: currency.currency, amount, symbol };
+                taskOb.contributionType = contributionType;
+                taskOb.isSingleContributor = isSingleContributor;
+                taskOb.isFilterRoles = isFilterRoles;
+                taskOb.validRoles = isFilterRoles ? validRoles : [];
+                taskOb.members = members
+                taskOb.reviewer = reviewer;
+                console.log("task ob : ", taskOb)
+
+            dispatch(convertDraftTask({ payload: taskOb, daoUrl: daoURL, taskId: _get(task, '_id', '') }))
         }
     }
 
@@ -278,15 +292,15 @@ const EditDraftTask = ({ close, task, daoURL }) => {
     }
 
     const eligibleContributors = useMemo(() => {
-        return _get(DAO, 'members', []).filter(m => (reviewer || "").toLowerCase() !== m.member._id && m.member._id !== user._id)
+        return _get(DAO, 'members', []).filter(m => (reviewer || "")?.toLowerCase() !== m.member._id && m.member?._id !== _find(_get(task, 'members', []), m => m?.status === 'approved')?.member?._id)
     }, [DAO, selectedUser, reviewer])
 
-    // const eligibleReviewers = useMemo(() => {
-    //     return _get(DAO, 'members', []).filter(m => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase())
-    // }, [DAO, reviewer, selectedUser])
+    const eligibleReviewers = useMemo(() => {
+        return _get(DAO, 'members', []).filter(m => _get(selectedUser, "_id", "")?.toLowerCase() !== m.member?._id?.toLowerCase())
+    }, [DAO, reviewer, selectedUser])
 
     const eligibleProjects = useMemo(() => {
-        return _get(DAO, 'projects', []).filter(p => _find(p.members, m => m._id === user._id))
+        return _get(DAO, 'projects', []).filter(p => _find(p?.members, m => m?._id === user?._id) && p?._id !== task?.project?._id)
     }, [DAO, reviewer, selectedUser])
 
     return (
@@ -437,6 +451,28 @@ const EditDraftTask = ({ close, task, daoURL }) => {
                                         </div>
 
                                         <div className='hr-line'></div>
+
+                                        <div className='createTask-inputRow'>
+                                            <span>Reviewer</span>
+                                            <select
+                                                name="reviewer"
+                                                id="reviewer"
+                                                value={reviewer}
+                                                className="tokenDropdown"
+                                                style={{ width: '100%' }}
+                                                onChange={(e) => { setReviewer(e.target.value); document.getElementById('error-reviewer').innerHTML = '' }}
+                                            >
+                                                <option value={null}>Select member</option>
+                                                {
+                                                    eligibleReviewers.map((item, index) => {
+                                                        return (
+                                                            <option value={`${item.member._id}`}>{item.member.name}</option>
+                                                        )
+                                                    })
+                                                }
+                                            </select>
+                                            <span className='error-msg' id="error-reviewer"></span>
+                                        </div>
 
                                         <div className='createTask-inputRow'>
                                             <span>Contribution</span>
@@ -617,27 +653,6 @@ const EditDraftTask = ({ close, task, daoURL }) => {
                                             </div>
                                             <span className='error-msg' id="error-compensation"></span>
                                         </div>
-
-                                        {/* <div className='createTask-inputRow'>
-                                            <span>Reviewer</span>
-                                            <select
-                                                name="reviewer"
-                                                id="reviewer"
-                                                className="tokenDropdown"
-                                                style={{ width: '100%' }}
-                                                onChange={(e) => { setReviewer(e.target.value); document.getElementById('error-reviewer').innerHTML = '' }}
-                                            >
-                                                <option value={null}>Select member</option>
-                                                {
-                                                    eligibleReviewers.map((item, index) => {
-                                                        return (
-                                                            <option value={`${item.member._id}`}>{item.member.name}</option>
-                                                        )
-                                                    })
-                                                }
-                                            </select>
-                                            <span className='error-msg' id="error-reviewer"></span>
-                                        </div> */}
 
                                     </div>
 
