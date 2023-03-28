@@ -1,13 +1,20 @@
-import react, { useMemo } from 'react'
+import react, { useEffect, useMemo } from 'react'
 import { filter as _filter, get as _get, find as _find, orderBy as _orderBy, uniqBy as _uniqBy} from 'lodash'
-import { useAppSelector } from 'state/hooks';
+import { useAppDispatch, useAppSelector } from 'state/hooks';
 import { useWeb3React } from '@web3-react/core';
 import moment from 'moment';
+import { getCurrentUser } from 'state/dashboard/actions';
 
 export default (rawTasks: Array<any>) => {
-
+    const dispatch = useAppDispatch()
     const { account } = useWeb3React();
     const { DAO, user } = useAppSelector((state) => state.dashboard);
+
+    useEffect(() => {
+        if(!user) {
+            dispatch(getCurrentUser({}))
+        }
+    }, [user])
 
     const canApply =(task: any) => {
         if(task.contributionType === 'open') {
@@ -62,7 +69,7 @@ export default (rawTasks: Array<any>) => {
             return { tasks, manage, myTask, drafts, allTasks  }
         }
         return { tasks: [], manage: [], myTask: [], drafts: [], allTasks: [] }
-    }, [rawTasks, account])
+    }, [rawTasks, account, user])
 
     return { parsedTasks, canApply }
 

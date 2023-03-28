@@ -29,7 +29,6 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
     const [reasonText, setReasonText] = useState({});
     //const [editMode, setEditMode] = useState(null);
     const dispatch = useAppDispatch()
-    const {safeTokens} = useSafeTokens(safeAddress)
     //const threshold = useAppSelector((state) => state.flow.safeThreshold);
 
     const { amount, tokenSymbol, recipient, reason, decimal, isAllowanceTransaction, isOwnerModificaitonTransaction } = useMemo(() => {

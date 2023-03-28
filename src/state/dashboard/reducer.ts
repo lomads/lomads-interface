@@ -100,6 +100,7 @@ export interface DashboardState {
 	editProjectKraLoading: boolean | null;
 	updateMilestoneLoading: boolean | null;
 	editProjectMilestoneLoading: boolean | null;
+	safeTokens: any;
 }
 
 const initialState: DashboardState = {
@@ -150,12 +151,16 @@ const initialState: DashboardState = {
 	editProjectKraLoading: null,
 	updateMilestoneLoading: null,
 	editProjectMilestoneLoading: null,
+	safeTokens: null
 };
 
 const dashboardSlice = createSlice({
 	name: "dashboard",
 	initialState,
 	reducers: {
+		setSafeTokens(state, action) {
+			state.safeTokens = action.payload
+		},
 		setUser(state, action) {
 			state.user = action.payload
 		},
@@ -721,6 +726,7 @@ const dashboardSlice = createSlice({
 });
 
 export const {
+	setSafeTokens,
 	setDAOList,
 	resetProject,
 	setDAO,

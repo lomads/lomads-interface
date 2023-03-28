@@ -3,8 +3,8 @@ import '../../styles/pages/AllTasks.css';
 import { find as _find, get as _get, debounce as _debounce } from 'lodash';
 import { orderBy as _orderBy } from 'lodash';
 import moment from 'moment';
-import { useAppSelector } from "state/hooks";
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from "state/hooks";
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useWeb3React } from "@web3-react/core";
 import useTerminology from 'hooks/useTerminology';
 import { IoIosArrowBack } from 'react-icons/io';
@@ -24,10 +24,13 @@ import useRole from '../../hooks/useRole';
 
 import CreateTask from "./DashBoard/Task/CreateTask";
 import useTasks from 'hooks/useTasks';
+import { getDao } from 'state/dashboard/actions';
 
 const AllTasks = () => {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch()
     const location = useLocation();
+    const { daoURL } = useParams();
     const { DAO, user } = useAppSelector((state) => state.dashboard);
     const { account } = useWeb3React();
     const daoName = _get(DAO, 'name', '').split(" ");
@@ -44,6 +47,11 @@ const AllTasks = () => {
     const { myRole, can } = useRole(DAO, account)
 
     const [showCreateTask, setShowCreateTask] = useState(false);
+
+    useEffect(() => {
+        if (daoURL && (!DAO || (DAO && DAO._id !== daoURL)))
+            dispatch(getDao(daoURL));
+    }, [daoURL, DAO])
 
     const amIEligible = (Task) => {
         if (DAO && Task && Task.contributionType === 'open') {
@@ -141,7 +149,7 @@ const AllTasks = () => {
         else {
             setCurrentTasks(parsedTasks['allTasks']);
         }
-    }, [tab, myTasks, manageTasks, draftTasks, otherTasks]);
+    }, [tab, parsedTasks]);
 
     // const amIApproved = useMemo(() => {
     //     if (task) {
