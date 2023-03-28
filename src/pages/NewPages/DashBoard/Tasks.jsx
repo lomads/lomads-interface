@@ -263,8 +263,16 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
                                 </button>
                                 <div className="divider"></div>
 
-                                <button className={tab === 3 ? 'active' : null} onClick={() => setTab(3)}>
-                                    Drafts
+                                <button style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}  className={tab === 3 ? 'active' : null} onClick={() => setTab(3)}>
+                                    <div>Drafts</div>
+                                    <div className='tasks-card-icons'>
+                                        {
+                                            parsedTasks['drafts'].length > 0 &&
+                                            <div className='icon-container'>
+                                                <p>{parsedTasks['drafts'].length}</p>
+                                            </div>
+                                        }
+                                    </div>
                                 </button>
                                 <div className="divider"></div>
                             </>

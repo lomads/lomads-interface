@@ -558,30 +558,40 @@ const AllProjectTasks = () => {
 
                 {/* Draft tasks */}
                 {
-                    tab === 3 && currentTasks && currentTasks.map((item, index) => {
-                        return (
-                            <div key={index}>
-                                <TaskCard
-                                    task={item}
-                                    daoUrl={DAO?.url}
-                                />
-                            </div>
-                        )
-                    })
+                    tab === 3 &&
+                    <div className='allTask-container'>
+                        {
+                            currentTasks && currentTasks.map((item, index) => {
+                                return (
+                                    <div key={index}>
+                                        <TaskCard
+                                            task={item}
+                                            daoUrl={DAO?.url}
+                                        />
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
                 }
 
                 {/* other tasks */}
                 {
-                    tab === 4 && currentTasks && currentTasks.map((item, index) => {
-                        return (
-                            <div key={index}>
-                                <TaskCard
-                                    task={item}
-                                    daoUrl={DAO?.url}
-                                />
-                            </div>
-                        )
-                    })
+                    tab === 3 &&
+                    <div className='allTask-container'>
+                        {
+                            currentTasks && currentTasks.map((item, index) => {
+                                return (
+                                    <div key={index}>
+                                        <TaskCard
+                                            task={item}
+                                            daoUrl={DAO?.url}
+                                        />
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
                 }
 
 
