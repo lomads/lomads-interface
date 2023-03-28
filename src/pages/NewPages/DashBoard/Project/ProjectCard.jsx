@@ -2,12 +2,17 @@ import { useEffect, useState, useMemo } from "react";
 import { get as _get, groupBy as _groupBy } from 'lodash'
 import { useNavigate } from "react-router-dom";
 
-import { BsDiscord } from 'react-icons/bs';
+import { BsDiscord,BsTrello } from 'react-icons/bs';
+import { FaTrello } from 'react-icons/fa';
 
 import { ProgressBar, Step } from "react-step-progress-bar";
 
+import { useAppSelector } from "state/hooks";
+
 const ProjectCard = ({ project, daoUrl, tab }) => {
     const navigate = useNavigate();
+
+    const { DAO } = useAppSelector((state) => state.dashboard);
 
     const notifications = useMemo(() => {
         let count = [];
@@ -41,7 +46,19 @@ const ProjectCard = ({ project, daoUrl, tab }) => {
                         }
                     </div>
                     :
-                    null
+                    <>
+                    {
+                        project.provider === 'Trello'
+                        ?
+                        <div className='myproject-card-icons'>
+                            <div className='icon-container'>
+                                <FaTrello color='#FFF' size={20} />
+                            </div>
+                        </div> 
+                        :
+                        null
+                    }
+                    </>
             }
             <div className="container">
                 <div className="project-name">

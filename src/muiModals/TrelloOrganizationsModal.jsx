@@ -88,7 +88,6 @@ export default ({ open, onClose, organizationData }) => {
         axiosHttp.get(`utility/get-trello-boards?orgId=${selectedValue}&accessToken=${trelloToken}`)
             .then((boards) => {
                 if (boards.data.type === 'success') {
-                    // setBoardsLoading(false);
                     console.log("Boards : ", boards.data.data);
                     var trelloToken = localStorage.getItem("trello_token");
                     dispatch(syncTrelloData({
@@ -96,6 +95,19 @@ export default ({ open, onClose, organizationData }) => {
                             user:{id:_get(user,'_id',null),address: _get(user,'wallet',null)},
                             daoId: _get(DAO, '_id', null),
                             boardsArray: boards.data.data,
+                            accessToken: trelloToken,
+                            idModel: selectedValue
+                        }
+                    }));
+                }
+                else if(boards.data.type === 'error' && boards.data.message === 'No boards found') {
+                    console.log("no boards...")
+                    var trelloToken = localStorage.getItem("trello_token");
+                    dispatch(syncTrelloData({
+                        payload: {
+                            user:{id:_get(user,'_id',null),address: _get(user,'wallet',null)},
+                            daoId: _get(DAO, '_id', null),
+                            boardsArray: [],
                             accessToken: trelloToken,
                             idModel: selectedValue
                         }
