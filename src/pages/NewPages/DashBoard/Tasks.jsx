@@ -3,8 +3,8 @@ import './Tasks.css';
 import { get as _get, find as _find, orderBy as _orderBy, uniqBy as _uniqBy } from 'lodash';
 
 import SafeButton from "UIpack/SafeButton";
-import { useNavigate } from "react-router-dom";
-import { useAppSelector } from "state/hooks";
+import { useNavigate, useParams } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "state/hooks";
 import { useWeb3React } from "@web3-react/core";
 import TaskCard from './Task/TaskCard';
 import useRole from '../../../hooks/useRole'
@@ -14,12 +14,16 @@ import expandIcon from '../../../assets/svg/expand.svg';
 import moment from 'moment';
 import BootstrapTooltip from "./WalkThrough/HelpToolTip"
 import useTasks from 'hooks/useTasks';
+import { getProject } from 'state/dashboard/actions';
 
 const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const { projectId, daoURL } = useParams();
     const { DAO, user, Project } = useAppSelector((state) => state.dashboard);
     const { transformTask } = useTerminology(_get(DAO, 'terminologies', null))
     const { parsedTasks } = useTasks(onlyProjects ? _get(Project, 'tasks', []) : _get(DAO, 'tasks', []))
+    console.log("parsedTasks", parsedTasks)
     const { account } = useWeb3React();
     const [tab, setTab] = useState(4);
     const [myTasks, setMyTasks] = useState([]);
@@ -29,6 +33,12 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
     const [initialCheck, setInitialCheck] = useState(false);
     const { myRole, can } = useRole(DAO, account)
     console.log("My roel : ", myRole);
+
+    useEffect(() => {
+        console.log("projectId", projectId)
+        if (projectId && (!Project || (Project && Project._id !== projectId)))
+            dispatch(getProject(projectId));
+    }, [projectId])
 
     useEffect(() => {
         if (onlyProjects) {

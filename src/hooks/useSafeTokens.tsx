@@ -3,12 +3,17 @@ import { get as _get, find as _find } from 'lodash'
 import axios from "axios";
 import { GNOSIS_SAFE_BASE_URLS, SupportedChainId } from 'constants/chains';
 import { useWeb3React } from "@web3-react/core";
+import { usePrevious } from "./usePrevious";
+import axiosHttp from '../api'
+import { setSafeTokens } from "state/dashboard/reducer";
+import { useAppDispatch, useAppSelector } from "state/hooks";
 
 const useSafeTokens = (safeAddress: string | null) => {
 
     const { chainId } = useWeb3React();
-    const [safeTokens, setSafeTokens] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const dispatch = useAppDispatch();
+    //const [safeTokens, setSafeTokens] = useState([]);
+    const { safeTokens } = useAppSelector(store => store.dashboard)
 
     const tokenBalance = (token: any) => {
         if(safeTokens && safeTokens.length > 0) {
@@ -20,10 +25,13 @@ const useSafeTokens = (safeAddress: string | null) => {
         return 0
     }
 
+    const prevSafeAddress = usePrevious(safeAddress)
+
     useEffect(() => {
-        if(chainId && safeAddress !== null){
+        if(chainId && safeAddress !== null && (prevSafeAddress !== safeAddress) && !safeTokens){
+            console.log('calling safe tokens..', prevSafeAddress, safeAddress)
             axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`, {withCredentials: false })
-            .then(res => {
+            .then((res: any) => {
                 let tokens = res.data.map((t: any) => {
                     let tkn = t
                     if(!tkn.tokenAddress){
@@ -38,13 +46,16 @@ const useSafeTokens = (safeAddress: string | null) => {
                     }
                     return t 
                 })
-                setSafeTokens(tokens)
-            })
-            .finally(() => {
-                setLoading(false)
+                if(tokens && tokens.length > 0) {
+                    let total = tokens.reduce((a:any, b:any) => {
+                        return a + parseFloat(_get(b, 'fiatBalance', 0))
+                    }, 0);
+                    axiosHttp.post(`/safe/${safeAddress}/sync`, { tokens, balance: total })
+                }
+                dispatch(setSafeTokens(tokens))
             })
         }
-    }, [chainId, safeAddress])
+    }, [chainId, safeAddress, prevSafeAddress, safeTokens])
 
     return { safeTokens, tokenBalance }
 

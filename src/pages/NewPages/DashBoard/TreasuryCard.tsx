@@ -116,7 +116,6 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
 	const { createSafeTransaction, createSafeTxnLoading } = useSafeTransaction(_get(DAO, 'safe.address', ''))
 
-	const { tokenBalance } = useSafeTokens(_get(DAO, 'safe.address', ''))
 	const { transform }  = useGnosisTxnTransform(_get(DAO, 'safe.address', ''))
 
 	const { myRole, can, isSafeOwner } = useRole(DAO, account);
@@ -142,7 +141,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
 	console.log("exportableData", exportableData)
 
-	const getSafeTokens = async () => {
+	const getSafeTokens = useCallback(async () => {
 		if (!chainId) return [];
 		let tokens = props.tokens.map((t: any) => {
 			let tkn = t
@@ -159,7 +158,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 			return t
 		})
 		return tokens
-	}
+	}, [chainId])
 
 	useEffect(() => {
 		if (prevDAO && !DAO) {
