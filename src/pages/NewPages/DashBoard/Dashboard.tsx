@@ -626,7 +626,7 @@ const Dashboard = () => {
 						<LeapFrog size={50} color="#C94B32" />
 					</div>
 				</div> : null}
-			{(showWalkThrough || isHelpIconOpen)
+			{(!checkLoading && validDaoChain && DAO && !DAOLoading && daoURL && DAO && DAO.url === daoURL) && (showWalkThrough || isHelpIconOpen)
 				&& <div className="walkThroughOverlay"></div>}
 			{(!checkLoading && validDaoChain && DAO && !DAOLoading && daoURL && DAO && DAO.url === daoURL)
 			?
