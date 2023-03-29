@@ -596,7 +596,13 @@ export default () => {
                                 }
                                 </> : 
                                 <Box mx={2} mt={0.5} px={3} py={2} style={{ borderRadius: 5, width: '100%', backgroundColor: '#FFF'  }}>
-                                                                            <Button onClick={() => setShowDrawer(true)} style={{ margin: '32px 0 16px 0' }} variant="contained" fullWidth>MINT YOUR SBT</Button>
+                                     { balance === 1 && metadata ?
+                                        <Button onClick={() => { 
+                                            updateMetadata()
+                                        }} style={{ margin: '32px 0 16px 0' }} variant="contained" fullWidth>UPDATE</Button> : 
+                                        <Button onClick={() => setShowDrawer(true)} style={{ margin: '32px 0 16px 0' }} variant="contained" fullWidth>{"MINT YOUR SBT" }</Button>
+                                    }
+                                                                            
                                 </Box>
                                 }
                             </Grid>
