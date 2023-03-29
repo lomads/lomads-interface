@@ -17,6 +17,7 @@ import {
 	deleteProjectMember,
 	editProjectMembers,
 	archiveProject,
+	updateViewProject,
 	deleteProject,
 	updateProjectLink,
 	editProjectLinks,
@@ -74,6 +75,7 @@ export interface DashboardState {
 	deleteProjectMemberLoading: boolean | null;
 	editProjectMemberLoading: boolean | null;
 	archiveProjectLoading: boolean | null;
+	updateViewProjectLoading: boolean | null;
 	deleteProjectLoading: boolean | null;
 	addProjectLinksLoading: boolean | null;
 	editProjectLinksLoading: boolean | null;
@@ -125,6 +127,7 @@ const initialState: DashboardState = {
 	deleteProjectMemberLoading: null,
 	editProjectMemberLoading: null,
 	archiveProjectLoading: null,
+	updateViewProjectLoading:null,
 	deleteProjectLoading: null,
 	addProjectLinksLoading: null,
 	editProjectLinksLoading: null,
@@ -211,6 +214,9 @@ const dashboardSlice = createSlice({
 		},
 		resetArchiveProjectLoader(state) {
 			state.archiveProjectLoading = null
+		},
+		resetUpdateViewProjectLoader(state) {
+			state.updateViewProjectLoading = null
 		},
 		resetDeleteProjectLoader(state) {
 			state.deleteProjectLoading = null
@@ -496,6 +502,15 @@ const dashboardSlice = createSlice({
 		[`${archiveProject.pending}`]: (state) => {
 			state.archiveProjectLoading = true;
 		},
+		// update view Project
+		[`${updateViewProject.fulfilled}`]: (state, action) => {
+			state.updateViewProjectLoading = false;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
+		},
+		[`${updateViewProject.pending}`]: (state) => {
+			state.updateViewProjectLoading = true;
+		},
 		// Delete project
 		[`${deleteProject.fulfilled}`]: (state, action) => {
 			state.deleteProjectLoading = false;
@@ -747,6 +762,7 @@ export const {
 	resetDeleteProjectMemberLoader,
 	resetEditProjectMemberLoader,
 	resetArchiveProjectLoader,
+	resetUpdateViewProjectLoader,
 	resetDeleteProjectLoader,
 	resetAddProjectLinksLoader,
 	resetEditProjectLinksLoader,

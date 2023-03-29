@@ -227,6 +227,18 @@ export const archiveProject = createAsyncThunk(
 	}
 );
 
+export const updateViewProject = createAsyncThunk(
+	'dao/updateViewProject',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`project/${params.projectId}/updateView?daoUrl=${params.daoUrl}`)
+			.then(res => res.data)
+			.catch(e => {
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
+	}
+);
+
 export const deleteProject = createAsyncThunk(
 	'dao/deleteProject',
 	async (params: any, thunkApi) => {
