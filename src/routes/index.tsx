@@ -83,7 +83,7 @@ export default [
     {
         path: '/:daoURL/create-pass-token',
         component: CreatePassToken,
-        layout: PrimaryLayout
+        //layout: PrimaryLayout
     },
     {
         path: '/:daoURL/mint/:contractId',
