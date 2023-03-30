@@ -593,7 +593,7 @@ const AllProjectTasks = () => {
 
                 {/* other tasks */}
                 {
-                    tab === 3 &&
+                    tab === 4 &&
                     <div className='allTask-container'>
                         {
                             currentTasks && currentTasks.map((item, index) => {
