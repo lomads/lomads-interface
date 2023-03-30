@@ -90,6 +90,7 @@ export default () => {
     const [errors, setErrors] = useState<any>({})
     const [balance, setBalance] = useState<any>(0)
     const [metadata, setMetadata] = useState<any>(null)
+    const [payment, setPayment] = useState<any>(null)
     const [discountCheckLoading, setDiscountCheckLoading] = useState<boolean|null>(null)
     const [state, setState] = useState<any>({
         referralCode: "",
@@ -101,10 +102,17 @@ export default () => {
     })
     const [price, setPrice] = useState<any>({})
     const [hasClickedAuth, setHasClickedAuth] = useState<any>(false)
-    const { mint, estimateGas, getStats, checkDiscount } = useMintSBT(contractId, contract?.version)
+    const { mint, estimateGas, getStats, checkDiscount, payByCrypto } = useMintSBT(contractId, contract?.version)
     const { onOpen, onResetAuth, authorization, isAuthenticating } = useDCAuth("identify")
     const { encryptMessage, decryptMessage } = useEncryptDecrypt()
     const tokenContract = useTokenContract(contract?.mintPriceToken || undefined)
+
+    useEffect(() => {
+        if(account && contract) {
+            axiosHttp.get(`mint-payment/${contract?.address}`)
+            .then(res => setPayment(res.data))
+        }
+    }, [account, contract])
 
     useEffect(() => {
         console.log("balance..getStats", balance)
@@ -352,7 +360,77 @@ export default () => {
         .catch(e => console.log(e))
     }
 
-    const handleMint = async () => {
+    const handlePayByCrypto = async () => {
+        const stats: any = await getStats();
+        let tokenId = parseFloat(stats[1].toString());
+        if(!payment) {
+            const response = await payByCrypto(tokenContract);
+            setPayment(response?.transactionHash)
+            await axiosHttp.post(`mint-payment/verify`, {
+                chainId, 
+                contract: contract?.address,
+                txnReference: response?.transactionHash,
+                tokenId,
+                paymentType: 'crypto',
+            })
+            .then(res => {
+                if(res.data) {
+                    handleMint(response?.transactionHash, res?.data?.signature)
+                }
+            })
+            .catch(e => {
+                console.log(e)
+            })
+        } else {
+            await axiosHttp.get(`mint-payment/signature?contract=${contract?.address}&tokenId=${tokenId}`)
+            .then(res => {
+                if(res.data) {
+                    handleMint(payment, res?.data?.signature)
+                }
+            })
+            .catch(e => {
+                console.log(e)
+            })
+        }
+    }
+
+    const handlePayByCard = async () => {
+        const stats: any = await getStats();
+        let tokenId = parseFloat(stats[1].toString());
+        if(!payment) {
+            const response = await payByCrypto(tokenContract);
+            setPayment(response?.transactionHash)
+            
+        } else {
+            await axiosHttp.get(`mint-payment/signature?contract=${contract?.address}&tokenId=${tokenId}`)
+            .then(res => {
+                if(res.data) {
+                    handleMint(payment, res?.data?.signature)
+                }
+            })
+            .catch(e => {
+                console.log(e)
+            })
+        }
+    }
+
+    const mintFree = async () => {
+        const stats: any = await getStats();
+        let tokenId = parseFloat(stats[1].toString());
+        await axiosHttp.post(`contract/whitelist-signature`, {
+            tokenId, 
+            payment: "",
+            contract: contract?.address,
+            chainId
+          }).then(res => {
+            handleMint("", res?.data?.signature)
+          })
+          .catch(e => {
+            console.log(e)
+        })
+    }
+
+    const handleMint = async (payment: string, signature: string) => {
         let err: any = {}
         setErrors({})
         if(state?.name == null || state?.name == "") { err['name'] = 'Enter valid name' }
@@ -412,9 +490,9 @@ export default () => {
                 //const ipfsURL: any =  await uploadNFT(metadataJSON, `${process.env.REACT_APP_NODE_BASE_URL}/v1/${contract?.address}/${tokenId}`)
                 if(contract?.version === '1') {
                     const ipfsURL: string = await axiosHttp.post(`metadata/ipfs-metadata`, { metadata: metadataJSON, tokenURI: `${process.env.REACT_APP_NODE_BASE_URL}/v1/${contract?.address}/${tokenId}` }).then(res => res.data)
-                    const token = await mint(ipfsURL, tokenContract);
+                    const token = await mint(ipfsURL, payment, signature, tokenContract);
                 } else {
-                    const token = await mint(undefined, undefined);
+                    const token = await mint(undefined, undefined, undefined, undefined);
                 }
                 await axiosHttp.post(`metadata/${metadataJSON.contract}`, metadataJSON);
                 await axiosHttp.patch(`dao/${_get(DAO, 'url', '')}/update-user-discord`, {
@@ -706,8 +784,28 @@ export default () => {
                             </Box>
                             <Typography mt={2} variant='body1' style={{ textAlign: 'center' }}>Your contact details are encrypted using advanced public key encryption technology, ensuring that your personal information stays safe and secure.</Typography>
                             {   balance === 0 ?
-                                <Button loading={mintLoading} disabled={mintLoading} onClick={() => handleMint()} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">{ contract?.version && contract?.version === "1" ? "PAY":"MINT" }</Button> : 
+                                <Button loading={mintLoading} disabled={mintLoading} onClick={() => {
+                                    if(contract?.mintPrice !== "0") {
+                                        handlePayByCrypto() 
+                                    } else {
+                                        mintFree()
+                                    }
+                                }} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">{ 
+                                    contract?.version && contract?.version === "1" ? 
+                                    payment ? "MINT" : contract?.mintPrice === "0" ? "MINT" : "PAY BY CRYPTO" : "MINT" }</Button> : 
                                 <Button loading={mintLoading} disabled={mintLoading} onClick={() => handleUpdateMetadata()} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">UPDATE</Button>
+                            }
+
+                            {   balance === 0 && contract && +contract?.mintPrice > 30 &&
+                                <Button loading={mintLoading} disabled={mintLoading} onClick={() => {
+                                    if(contract?.mintPrice !== "0") {
+                                        handlePayByCard() 
+                                    } else {
+                                        mintFree()
+                                    }
+                                }} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">{ 
+                                    contract?.version && contract?.version === "1" ? 
+                                    payment ? "MINT" : contract?.mintPrice === "0" ? "MINT" : "PAY BY CARD" : "MINT" }</Button> 
                             }
 
                             {networkError && typeof networkError === 'string' && <Typography my={2} textAlign="center" color="error" variant="body2">{ networkError }</Typography> }

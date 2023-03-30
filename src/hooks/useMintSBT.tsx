@@ -72,6 +72,11 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
               target: contractAddress,
               function: "mustBeWhitelisted",
               args: [],
+            },
+            {
+              target: contractAddress,
+              function: "treasuryAddress",
+              args: [],
             }] : [
               {
                 target: contractAddress,
@@ -81,7 +86,6 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
             ]),
             
           ]
-          console.log("useMintSBT-calls", calls)
           const multicall = new MultiCall(provider);
           const [, res] = await multicall.multiCall(
               version === "1" ? chainId === SupportedChainId.GOERLI ? require('abis/SBT.json') :
@@ -96,23 +100,58 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
         return [null, null, null, null]
     }, [version, contractAddress, provider, account])
 
-    const mint = async (tokenURI: string | null | undefined, tokenContract: any) => {
+    const payByCrypto = async (tokenContract: any) => {
+      if(window.ethereum) {
+        const stats = await getStats();
+        const treasury = stats[5];
+        console.log(stats[2].toString())
+        const mintToken = (stats[3] ? stats[3] : process.env.REACT_APP_MATIC_TOKEN_ADDRESS).toString()
+        let mintPrice = stats[2]._hex
+        if(mintToken === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS) {
+          const params = {
+            from: account, to: treasury, value: mintPrice
+          }
+          /* @ts-ignore */
+          const txHash = await window?.ethereum?.request({
+            method: 'eth_sendTransaction',
+            params: [params],
+          });
+          const result = await new Promise((resolve, reject) => {
+            const interval = setInterval(async ()=>{
+              console.log("Attempting to get transaction receipt...");
+              /* @ts-ignore */
+              let receipt = await window?.ethereum?.request({
+                method: 'eth_getTransactionReceipt',
+                params: [txHash],
+              });
+              if(receipt) {
+                clearInterval(interval)
+                resolve(receipt)
+              }
+            }, 2000);
+          })
+          console.log("receipt", result)
+          return result
+        } else {
+          const tx = await tokenContract.transfer(treasury, stats[2]._hex)
+          return await tx.wait()
+        }
+      }
+      return null
+    }
+
+    const mint = async (tokenURI: string | null | undefined, payment: string | undefined, signature: string | undefined, tokenContract: any) => {
         try {
           const stats = await getStats();
           let tokenId = parseFloat(stats[1].toString());
           const mintPrice = (stats[2] ? stats[2] : 0).toString()
           const mintToken = (stats[3] ? stats[3] : process.env.REACT_APP_MATIC_TOKEN_ADDRESS).toString()
           const isWhitelisted = stats[4] ? stats[4] : 0
-          let signature = await axiosHttp.post(`contract/whitelist-signature`, {
-              tokenId, 
-              contract: contractAddress,
-              chainId
-            }).then(res => res?.data?.signature)
 
-          if(mintToken && (mintToken !== process.env.REACT_APP_MATIC_TOKEN_ADDRESS)) {
-            const txtx = await tokenContract?.approve(contractAddress, mintPrice)
-            await txtx?.wait()
-          }
+          // if(mintToken && (mintToken !== process.env.REACT_APP_MATIC_TOKEN_ADDRESS)) {
+          //   const txtx = await tokenContract?.approve(contractAddress, mintPrice)
+          //   await txtx?.wait()
+          // }
 
           try {
             let tx = null;
@@ -120,11 +159,9 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
               tx = await mintContract?.safeMint(
                 tokenURI,
                 tokenId,
+                payment,
                 signature
-                , {
-                from: account,
-                value: mintPrice,
-              });
+              );
             } else {
               if(mintContract?.signer) {
                 tx = await mintContract?.mintSBT(account);
@@ -149,17 +186,17 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
           const tokenId = parseFloat(stats[1].toString());
           const mintPrice = (stats[2]).toString()
           const isWhitelisted = stats[4];
+          const payment = '0x'
           let signature = await axiosHttp.post(`contract/whitelist-signature`, {
             tokenId, 
+            payment,
             contract: contractAddress,
             chainId
           }).then(res => res?.data?.signature)
           try {
-            const tx = await mintContract?.estimateGas.safeMint(
-              "",
-              tokenId,
-              signature
-              , {
+            const tx = await mintContract?.estimateGas.payableMint(
+              "", 
+              {
               from: account,
               value: mintPrice,
             });
@@ -246,7 +283,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
       }
     }
 
-    return { mint, estimateGas, getStats, checkDiscount, updateContract, withdraw }
+    return { mint, estimateGas, getStats, checkDiscount, updateContract, withdraw, payByCrypto }
 
 }
 
