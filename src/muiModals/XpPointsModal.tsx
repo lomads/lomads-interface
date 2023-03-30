@@ -63,7 +63,7 @@ export default ({ open, onClose }: { open: boolean; onClose: any }) => {
   const { user, DAOList, DAOLoading } = useAppSelector(
     (state) => state.dashboard
   );
-  const [sweatValue, setSweatValue] = useState(null);
+  const [sweatValue, setSweatValue] = useState<any>(null);
   const [currency, setCurrency] = useState<any>(null);
   const [showCompensateMembersDoneModal, setShowCompensateMembersDoneModal] =
     useState(false);
@@ -182,7 +182,7 @@ export default ({ open, onClose }: { open: boolean; onClose: any }) => {
         );
         return {
           ...m,
-          amount: _get(sweat, "value", 0) * (sweatValue ? sweatValue : 0),
+          amount: _get(sweat, "value", 0) * sweatValue,
         };
       });
       return members;
@@ -198,7 +198,7 @@ export default ({ open, onClose }: { open: boolean; onClose: any }) => {
         _get(m, "member.earnings", []),
         (e) => e.currency === "SWEAT" && e.daoId === _get(DAO, "_id", "")
       );
-      t = t + _get(sweat, "value", 0) * (sweatValue ? sweatValue : 0);
+      t = t + _get(sweat, "value", 0) * sweatValue;
     }
     return t;
   }, [sweatMembers]);
@@ -261,7 +261,7 @@ export default ({ open, onClose }: { open: boolean; onClose: any }) => {
                 }}
                 className="roleText"
               >
-                {_get(sweat, "value", 0) * (sweatValue ? sweatValue : 0)}
+                {_get(sweat, "value", 0) * sweatValue}
               </Box>
               <Box style={{ float: "right" }}>
                 {_get(
@@ -514,6 +514,7 @@ export default ({ open, onClose }: { open: boolean; onClose: any }) => {
             onClick={() => {
               setShowCompensateMembersDescriptionModals(false);
               setShowCompensateMembersModals(false);
+              setSweatValue(0);
               eventEmitter.emit("close-xp-modal");
             }}
           >
@@ -653,6 +654,7 @@ export default ({ open, onClose }: { open: boolean; onClose: any }) => {
                   // toggleModal();
                   setShowCompensateMembersDescriptionModals(false);
                   setShowCompensateMembersModals(false);
+                  setSweatValue(0);
                 }}
               >
                 Cancel
@@ -694,6 +696,7 @@ export default ({ open, onClose }: { open: boolean; onClose: any }) => {
             }}
             onClick={() => {
               setShowCompensateMembersModals(false);
+              setSweatValue(0);
               eventEmitter.emit("close-xp-modal");
             }}
           >
@@ -748,7 +751,7 @@ export default ({ open, onClose }: { open: boolean; onClose: any }) => {
                 <Box style={{ marginLeft: 8 }}>{"1 SWT = "}</Box>
               </Box>
               <CurrencyInput
-                value={sweatValue ? sweatValue : 0}
+                value={sweatValue}
                 onChange={(value: any) => {
                   setSweatValue(value);
                 }}
