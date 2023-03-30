@@ -63,6 +63,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import Stack from '@mui/material/Stack';
 import Button from "muiComponents/Button";
+import steps from "./WalkThrough/steps";
 
 const { toChecksumAddress } = require('ethereum-checksum-address')
 type WalkThroughObjType = {
@@ -138,7 +139,7 @@ const Dashboard = () => {
 	const [recurringTxn, setRecurringTxn] = useState<any>(null);
 	const [safeOwners, setSafeOwners] = useState<any>(null);
 	const [checkLoading, setCheckLoading] = useState<boolean>(true);
-	const [currWalkThroughObj, setWalkThroughObj] = useState<any>(Steps[0]);
+	const [currWalkThroughObj, setWalkThroughObj] = useState<any>(null);
 	const [showWalkThrough, setShowWalkThrough] = useState<boolean>(false);
 	const [isHelpIconOpen, setIsHelpIconOpen] = useState<boolean>(false);
 	const [displayHelpOptions, setDisplayHelpOptions] = useState<boolean>(false);
@@ -186,6 +187,11 @@ const Dashboard = () => {
 				// dispatch(storeGithubIssues({ payload: { daoId: _get(DAO, '_id', null), issueList: newArray } }))
 			})
 	}
+
+	useEffect(() => {
+		if(myRole)
+			setWalkThroughObj(steps(myRole)[0])
+	}, [myRole])
 
 	useEffect(() => {
 		// if (DAO && !DAO.githubIssues) {
@@ -546,7 +552,7 @@ const Dashboard = () => {
 		dispatch(updateUserOnboardingCount({ payload: { daoId: _get(DAO, '_id','') }}))
 		setShowWalkThrough(false)
 		clearWalkThroughStyles()
-		setWalkThroughObj(Steps[0])
+		setWalkThroughObj(Steps(myRole)[0])
 	}
 
 	const clearWalkThroughStyles = () => {
@@ -563,11 +569,11 @@ const Dashboard = () => {
 
 		let nextStep =  currWalkThroughObj.step + 1
 		while(showWalkThrough 
-	   		 && !document.getElementById(Steps[nextStep]?.id)
+	   		 && !document.getElementById(Steps(myRole)[nextStep]?.id)
 	         &&  nextStep < 7 ){
 			nextStep++
 		}
-		const nextObj = Steps[nextStep]
+		const nextObj = Steps(myRole)[nextStep]
 		setWalkThroughStyles(nextObj)
 		setWalkThroughObj(nextObj)
 	}
@@ -586,7 +592,7 @@ const Dashboard = () => {
 	}
 	const startWalkThroughAtStepOne = () => {
 		setShowWalkThrough(true)
-		const workspace = Steps[1]
+		const workspace = Steps(myRole)[1]
 		setWalkThroughObj(workspace)
 		setWalkThroughStyles(workspace)
 	}

@@ -49,7 +49,7 @@ const AllTasks = () => {
     const [showCreateTask, setShowCreateTask] = useState(false);
 
     useEffect(() => {
-        if (daoURL && (!DAO || (DAO && DAO._id !== daoURL)))
+        if (daoURL && (!DAO || (DAO && DAO?.url !== daoURL)))
             dispatch(getDao(daoURL));
     }, [daoURL, DAO])
 

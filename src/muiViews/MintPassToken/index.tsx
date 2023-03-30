@@ -43,7 +43,7 @@ import useDCAuth from "hooks/useDCAuth"
 import { usePrevious } from "hooks/usePrevious"
 import { beautifyHexToken } from "utils"
 import { useAppDispatch, useAppSelector } from "state/hooks"
-import { addDaoMember, getCurrentUser, getDao, updateCurrentUser } from "state/dashboard/actions"
+import { addDaoMember, getCurrentUser, getDao, loadDao, updateCurrentUser } from "state/dashboard/actions"
 import { Container } from "@mui/system"
 import useEncryptDecrypt from "hooks/useEncryptDecrypt";
 import useRole from "hooks/useRole"
@@ -113,8 +113,9 @@ export default () => {
     }, [account])
 
     useEffect(() => {
-        if(!DAO)
+        if(!DAO) {
             dispatch(getDao(daoURL))
+        }
     }, [DAO])
 
     const updateMetadata = async () => {
@@ -269,7 +270,9 @@ export default () => {
 
                 }
             } catch (e) {
-                setNetworkError(e)
+                console.log(e)
+                if(typeof e === 'string')
+                    setNetworkError(e)
                 //setTimeout(() => setNetworkError(null), 2000)
             }
         };
@@ -426,7 +429,8 @@ export default () => {
                 window.location.href = `/${DAO.url}`
                 return;
         } catch (e) {
-            setNetworkError(e)
+            if(typeof e === 'string')
+                setNetworkError(e)
             setTimeout(() => setNetworkError(null), 3000)
             setMintLoading(false)
         }
@@ -479,6 +483,8 @@ export default () => {
                                         </IconButton>
                                     </Box> */}
                                 </Box>
+                                { contract?.version && contract?.version !== "0" ?
+                                <>
                                 { balance === 0 ?
                                 <Box mx={2} mt={0.5} px={3} py={2} style={{ borderRadius: 5, width: '100%', backgroundColor: '#FFF'  }}>
                                     <Box py={2} style={{  display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
@@ -588,6 +594,17 @@ export default () => {
                                     }
                                 </Box>
                                 }
+                                </> : 
+                                <Box mx={2} mt={0.5} px={3} py={2} style={{ borderRadius: 5, width: '100%', backgroundColor: '#FFF'  }}>
+                                     { balance === 1 && metadata ?
+                                        <Button onClick={() => { 
+                                            updateMetadata()
+                                        }} style={{ margin: '32px 0 16px 0' }} variant="contained" fullWidth>UPDATE</Button> : 
+                                        <Button onClick={() => setShowDrawer(true)} style={{ margin: '32px 0 16px 0' }} variant="contained" fullWidth>{"MINT YOUR SBT" }</Button>
+                                    }
+                                                                            
+                                </Box>
+                                }
                             </Grid>
                         </Grid>
                     </Box>
@@ -603,8 +620,8 @@ export default () => {
                             <img src={CloseSVG} />
                         </IconButton>
                         <Box display="flex" flexDirection="column" my={6} alignItems="center">
-                            <img src={PaymentSVG} />
-                            <Typography my={4} style={{ color: palette.primary.main, fontSize: '30px', fontWeight: 400 }}>{ balance === 1 ? "Update details" : "Paiement"}</Typography>
+                            <img src={MintSBTSvg} />
+                            <Typography my={4} style={{ color: palette.primary.main, fontSize: '30px', fontWeight: 400 }}>{ balance === 1 ? "Update details" : "Contact details"}</Typography>
                         </Box>
                         <Box px={12}>
                             <TextInput 
@@ -687,8 +704,9 @@ export default () => {
                                     </Box>
                                 }
                             </Box>
+                            <Typography mt={2} variant='body1' style={{ textAlign: 'center' }}>Your contact details are encrypted using advanced public key encryption technology, ensuring that your personal information stays safe and secure.</Typography>
                             {   balance === 0 ?
-                                <Button loading={mintLoading} disabled={mintLoading} onClick={() => handleMint()} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">PAY</Button> : 
+                                <Button loading={mintLoading} disabled={mintLoading} onClick={() => handleMint()} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">{ contract?.version && contract?.version === "1" ? "PAY":"MINT" }</Button> : 
                                 <Button loading={mintLoading} disabled={mintLoading} onClick={() => handleUpdateMetadata()} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">UPDATE</Button>
                             }
 

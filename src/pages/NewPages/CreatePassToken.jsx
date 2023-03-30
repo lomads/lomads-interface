@@ -13,7 +13,7 @@ import { useSBTDeployerContract } from "hooks/useContract";
 import { createNewSBT, getCurrentId, getContractById } from "hooks/SBT/sbtDeployer";
 import { APInewContract } from "hooks/SBT/sbtAPI";
 import { toast, ToastContainer } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import trimAddress from "utils/sliceAddr";
 import { useAppDispatch, useAppSelector } from "state/hooks";
@@ -29,11 +29,13 @@ import { SupportedChainId } from "constants/chains";
 import { BigNumber } from '@ethersproject/bignumber';
 import { off } from "process";
 import useEns from 'hooks/useEns';
+import { getDao } from "state/dashboard/actions";
 
 
 const CreatePassToken = () => {
     const { account, provider, chainId } = useWeb3React();
     const navigate = useNavigate();
+    const {daoURL} = useParams()
     const dispatch = useAppDispatch();
     const { DAO } = useAppSelector((state) => state.dashboard);
     console.log("DAO data : ", DAO);
@@ -57,6 +59,12 @@ const CreatePassToken = () => {
     const { getENSAddress, getENSName } = useEns();
 
     const daoName = _get(DAO, 'name', '').split(" ");
+
+    useEffect(() => {
+        if(!DAO || (DAO && DAO?.url !== daoURL)) {
+            dispatch(getDao(daoURL))
+        }
+    }, [daoURL, DAO])
 
 
     const { createContractLoading } = useAppSelector(store => store.contract)
@@ -266,7 +274,7 @@ const CreatePassToken = () => {
                         contactDetail: selectedOptions,
                         metadata: [],
                         membersList: memberList,
-                        daoId: DAO._id
+                        daoId: _get(DAO, '_id', '')
                     }
                     dispatch(createContract(contractJSON))
                 }
