@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Grid, Box, Typography, Paper, Chip, FormControl, FormLabel } from "@mui/material"
 import clsx from "clsx"
-import { get as _get, find as _find } from 'lodash'
+import { get as _get, find as _find, debounce as _debounce } from 'lodash'
 import SETTINGS_SVG from 'assets/svg/settings.svg'
 import LINK_SVG from 'assets/svg/ico-link.svg'
 import { makeStyles } from '@mui/styles';
@@ -51,6 +51,7 @@ import { USDC_GOERLI, USDC_POLYGON } from 'constants/tokens'
 import { useTokenContract } from 'hooks/useContract'
 import mime from 'mime'
 import moment from 'moment'
+import useTransak from 'hooks/useTransak'
 const { NFTStorage, File } = require("nft.storage")
 const client = new NFTStorage({ token: process.env.REACT_APP_NFT_STORAGE })
 
@@ -105,6 +106,7 @@ export default () => {
     const { mint, estimateGas, getStats, checkDiscount, payByCrypto } = useMintSBT(contractId, contract?.version)
     const { onOpen, onResetAuth, authorization, isAuthenticating } = useDCAuth("identify")
     const { encryptMessage, decryptMessage } = useEncryptDecrypt()
+    const { initTransak } = useTransak();
     const tokenContract = useTokenContract(contract?.mintPriceToken || undefined)
 
     useEffect(() => {
@@ -281,7 +283,7 @@ export default () => {
                 console.log(e)
                 if(typeof e === 'string')
                     setNetworkError(e)
-                //setTimeout(() => setNetworkError(null), 2000)
+                setTimeout(() => setNetworkError(null), 3000)
             }
         };
     
@@ -360,12 +362,28 @@ export default () => {
         .catch(e => console.log(e))
     }
 
+    const valid = () => {
+        let err: any = {}
+        setErrors({})
+        if(state?.name == null || state?.name == "") { err['name'] = 'Enter valid name' }
+        if(contract?.contactDetail.indexOf('email') > -1 && ( state?.email == null || state?.email == "")) { err['email'] = 'Enter valid email' }
+        if(contract?.contactDetail.indexOf('discord') > -1 && ( state?.discord == null || state?.discord == "")) { err['discord'] = 'Enter valid discord' }
+        if(contract?.contactDetail.indexOf('github') > -1 && ( state?.github == null || state?.github == "")) { err['github'] = 'Enter valid github' }
+        if(contract?.contactDetail.indexOf('telegram') > -1 && ( state?.telegram == null || state?.telegram == "")) { err['telegram'] = 'Enter valid telegram' }
+        if(Object.keys(err).length > 0) {
+            setErrors(err)
+            return false
+        }
+        return true
+    }
+
     const handlePayByCrypto = async () => {
+        if(!valid()) return;
+        setMintLoading(true)
         const stats: any = await getStats();
         let tokenId = parseFloat(stats[1].toString());
         if(!payment) {
             const response = await payByCrypto(tokenContract);
-            setPayment(response?.transactionHash)
             await axiosHttp.post(`mint-payment/verify`, {
                 chainId, 
                 contract: contract?.address,
@@ -380,6 +398,7 @@ export default () => {
             })
             .catch(e => {
                 console.log(e)
+                setMintLoading(false)
             })
         } else {
             await axiosHttp.get(`mint-payment/signature?contract=${contract?.address}&tokenId=${tokenId}`)
@@ -390,17 +409,43 @@ export default () => {
             })
             .catch(e => {
                 console.log(e)
+                setMintLoading(false)
             })
         }
     }
 
     const handlePayByCard = async () => {
+        if(!valid()) return;
+        setMintLoading(true)
         const stats: any = await getStats();
         let tokenId = parseFloat(stats[1].toString());
+        const treasury = stats[5];
+
         if(!payment) {
-            const response = await payByCrypto(tokenContract);
-            setPayment(response?.transactionHash)
-            
+            let token = contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : 'MATIC'
+            let amount: any = +_get(price, 'mintPrice', 0)
+            if(token === 'MATIC'){
+                amount = (parseFloat(_get(price, 'mintPrice', 0)) + (parseFloat(_get(price, 'gas', 0))) * 2).toFixed(5)
+            }
+            const order: any = await initTransak({ token, amount, treasury })
+            if(order && order?.eventName === "TRANSAK_ORDER_SUCCESSFUL"){
+                await axiosHttp.post(`mint-payment/verify`, {
+                    chainId, 
+                    contract: contract?.address,
+                    txnReference: _get(order, 'status.id', null),
+                    tokenId,
+                    paymentType: 'card',
+                })
+                .then(res => {
+                    if(res.data) {
+                        handleMint(_get(order, 'status.id', ''), res?.data?.signature)
+                    }
+                })
+                .catch(e => {
+                    console.log(e)
+                    setMintLoading(false)
+                })
+            }
         } else {
             await axiosHttp.get(`mint-payment/signature?contract=${contract?.address}&tokenId=${tokenId}`)
             .then(res => {
@@ -410,11 +455,14 @@ export default () => {
             })
             .catch(e => {
                 console.log(e)
+                setMintLoading(false)
             })
         }
     }
 
     const mintFree = async () => {
+        if(!valid()) return;
+        setMintLoading(true)
         const stats: any = await getStats();
         let tokenId = parseFloat(stats[1].toString());
         await axiosHttp.post(`contract/whitelist-signature`, {
@@ -426,20 +474,13 @@ export default () => {
             handleMint("", res?.data?.signature)
           })
           .catch(e => {
+            setMintLoading(false)
             console.log(e)
         })
     }
 
     const handleMint = async (payment: string, signature: string) => {
-        let err: any = {}
-        setErrors({})
-        if(state?.name == null || state?.name == "") { err['name'] = 'Enter valid name' }
-        if(contract?.contactDetail.indexOf('email') > -1 && ( state?.email == null || state?.email == "")) { err['email'] = 'Enter valid email' }
-        if(contract?.contactDetail.indexOf('discord') > -1 && ( state?.discord == null || state?.discord == "")) { err['discord'] = 'Enter valid discord' }
-        if(contract?.contactDetail.indexOf('github') > -1 && ( state?.github == null || state?.github == "")) { err['github'] = 'Enter valid github' }
-        if(contract?.contactDetail.indexOf('telegram') > -1 && ( state?.telegram == null || state?.telegram == "")) { err['telegram'] = 'Enter valid telegram' }
-        if(Object.keys(err).length > 0)
-            return setErrors(err)
+        if(!valid()) return;
         setMintLoading(true)
         try {
             const msg = await encryptMessage(JSON.stringify({ email: _get(state, 'email', ''), discord: _get(state, 'discord', ''), telegram: _get(state, 'telegram', ''), github: _get(state, 'github', '') }))
@@ -637,7 +678,7 @@ export default () => {
                                         <Button loading={discountCheckLoading} disabled={ !state?.referralCode || state?.referralCode === "" || discountCheckLoading} onClick={() => handleApplyDiscount()} style={{ marginLeft: 16, marginTop: 22 }} size="small" variant="outlined">Apply</Button>
                                     </Box> } */}
                                     { balance == 0 &&
-                                        <Button onClick={() => setShowDrawer(true)} style={{ margin: '32px 0 16px 0' }} variant="contained" fullWidth>MINT YOUR SBT</Button>
+                                        <Button loading={mintLoading} onClick={() => setShowDrawer(true)} style={{ margin: '32px 0 16px 0' }} variant="contained" fullWidth>MINT YOUR SBT</Button>
                                     }
                                   {networkError && <Typography my={2} textAlign="center" color="error" variant="body2">{ networkError }</Typography> }
                                 </Box> : 
@@ -796,16 +837,13 @@ export default () => {
                                 <Button loading={mintLoading} disabled={mintLoading} onClick={() => handleUpdateMetadata()} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">UPDATE</Button>
                             }
 
-                            {   balance === 0 && contract && +contract?.mintPrice > 30 &&
+                            {   !payment && balance === 0 && contract && +contract?.mintPrice >= 27 &&
                                 <Button loading={mintLoading} disabled={mintLoading} onClick={() => {
-                                    if(contract?.mintPrice !== "0") {
+                                    if(valid()) {
+                                        setShowDrawer(false)
                                         handlePayByCard() 
-                                    } else {
-                                        mintFree()
                                     }
-                                }} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">{ 
-                                    contract?.version && contract?.version === "1" ? 
-                                    payment ? "MINT" : contract?.mintPrice === "0" ? "MINT" : "PAY BY CARD" : "MINT" }</Button> 
+                                }} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">PAY BY CARD</Button> 
                             }
 
                             {networkError && typeof networkError === 'string' && <Typography my={2} textAlign="center" color="error" variant="body2">{ networkError }</Typography> }

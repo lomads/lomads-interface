@@ -187,12 +187,6 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
           const mintPrice = (stats[2]).toString()
           const isWhitelisted = stats[4];
           const payment = '0x'
-          let signature = await axiosHttp.post(`contract/whitelist-signature`, {
-            tokenId, 
-            payment,
-            contract: contractAddress,
-            chainId
-          }).then(res => res?.data?.signature)
           try {
             const tx = await mintContract?.estimateGas.payableMint(
               "", 
@@ -203,7 +197,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
             return tx;
           } catch (e) {
             console.log(e)
-            throw _get(e, 'message', 'Could not estimate gas. Please try after sometime')
+            throw _get(e, 'data.message', _get(e, 'message', 'Could not estimate gas. Please try after sometime'))
           }
         }
         throw 'Could not estimate gas. Please try after sometime'

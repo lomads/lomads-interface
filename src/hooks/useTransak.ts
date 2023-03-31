@@ -10,9 +10,25 @@ export type initTransak = {
 }
 
 export default () => {
-    const { provider, chainId, account } = useWeb3React();
     const initTransak = async ({ token, amount, treasury }: initTransak) => {
         return new Promise((resolve, reject) => {
+
+            const user = {
+                "firstName": "Satoshi",
+                "lastName": "Nakamoto",
+                "email": "email@gmail.com",
+                "mobileNumber": "+19692154942",
+                "dob": "1990-11-26",
+                "address": {
+                    "addressLine1": "170 Pine St",
+                    "addressLine2": "San Francisco",
+                    "city": "San Francisco",
+                    "state": "CA",
+                    "postCode": "94111",
+                    "countryCode": "US"
+                }
+            }
+
             let transak = new transakSDK({
                 apiKey: '591a2431-8555-4faa-958e-174a5fc45c77',
                 environment: 'STAGING',
@@ -21,8 +37,11 @@ export default () => {
                 networks: "polygon",
                 walletAddress: treasury,
                 defaultNetwork: 'polygon',
+                isDisableCrypto:true,
                 defaultCryptoAmount: amount < 27 ? 27 : amount,
-                defaultCryptoCurrency: token
+                defaultCryptoCurrency: token,
+                disableWalletAddressForm: false,
+                disablePaymentMethods: "pm_pse,pm_gcash,pm_shopeepay,pm_grabpay,pm_ubp,pm_rcbc,pm_bpi,pm_paymaya,pm_webpay,pm_boleto,pm_pix,pm_scb_easy_pay,pm_scb_bank_mobile,pm_bangkok_bank_ipay,pm_bangkok_bank_mobile,google_pay,apple_pay,mobikwik_wallet,inr_bank_transfer,inr_upi,pm_jwire,pm_jach,pm_cash_app,pm_open_banking,gbp_bank_transfer,sepa_bank_transfer"
               });
               transak.init();
     
