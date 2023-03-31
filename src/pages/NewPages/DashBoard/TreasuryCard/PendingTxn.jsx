@@ -81,11 +81,11 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
     }, [transaction, labels, tokens])
 
     const { confirmReached, hasMyConfirmVote, rejectReached, hasMyRejectVote } = useMemo(() => {
-        let confirmReached = _get(transaction, 'confirmations', []).length == threshold
+        let confirmReached = _get(transaction, 'confirmations', [])?.length || 0 == threshold
         let hasMyConfirmVote = !!_find(_get(transaction, 'confirmations', []), v => v.owner.toLowerCase() === account?.toLowerCase())
         let rejectReached, hasMyRejectVote = undefined;
         if (transaction.rejectedTxn) {
-            rejectReached = _get(transaction, 'rejectedTxn.confirmations', []).length == threshold
+            rejectReached = _get(transaction, 'rejectedTxn.confirmations', [])?.length || 0 == threshold
             hasMyRejectVote = !!_find(_get(transaction, 'rejectedTxn.confirmations', []), v => v.owner.toLowerCase() === account?.toLowerCase())
         }
         return { confirmReached, hasMyConfirmVote, rejectReached, hasMyRejectVote }
@@ -196,10 +196,10 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
                                 threshold && _get(transaction, 'rejectedTxn', null) && !confirmReached && !rejectReached ?
                                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                     <div className="vote-view reject">
-                                        <img src={CloseBtn} /> {_get(transaction, 'rejectedTxn.confirmations', []).length}/{threshold} sign
+                                        <img src={CloseBtn} /> {_get(transaction, 'rejectedTxn.confirmations', [])?.length || 0}/{threshold} sign
                                     </div>
                                     <div className="vote-view accept">
-                                        <img src={CheckBtn} /> {_get(transaction, 'confirmations', []).length}/{threshold} sign
+                                        <img src={CheckBtn} /> {_get(transaction, 'confirmations', [])?.length || 0}/{threshold} sign
                                     </div>
                                 </div> : 
                                 <>
@@ -338,14 +338,14 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
                                     threshold && _get(transaction, 'rejectedTxn', null) && !confirmReached && !rejectReached ?
                                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                         <div className="vote-view reject">
-                                            <img src={CloseBtn} /> {_get(transaction, 'rejectedTxn.confirmations', []).length}/{threshold} sign
+                                            <img src={CloseBtn} /> {_get(transaction, 'rejectedTxn.confirmations', [])?.length || 0}/{threshold} sign
                                         </div>
                                         <div className="vote-view accept">
-                                            <img src={CheckBtn} /> {_get(transaction, 'confirmations', []).length}/{threshold} sign
+                                            <img src={CheckBtn} /> {_get(transaction, 'confirmations', [])?.length || 0}/{threshold} sign
                                         </div>
                                     </div> : 
                                     <>
-                                        {rejectReached ? `${_get(transaction, 'rejectedTxn.confirmations', []).length}/${threshold} sign` : `${_get(transaction, 'confirmations', []).length}/${threshold} sign`}
+                                        {rejectReached ? `${_get(transaction, 'rejectedTxn.confirmations', []).length || 0}/${threshold} sign` : `${_get(transaction, 'confirmations', [])?.length || 0}/${threshold} sign`}
                                     </>
                                 }
                             </div> 
