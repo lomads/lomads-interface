@@ -564,7 +564,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				.finally(() => setExecuteTxLoading(null))
 		} else {
 			if (!reject && amount && !isAllowanceTransaction) {
-				const balance = _get(safeToken, 'balance', 0) / 10 ** _get(safeToken, 'token.decimals', 18)
+				const balance = _get(safeToken, 'balance', 0) / 10 ** _get(safeToken, 'token.decimal', _get(safeToken, 'token.decimals', 18))
 				if (+amount > +balance) {
 					setLowBalanceError(`Low token balance`)
 					setTimeout(() => setLowBalanceError(null), 1000)
