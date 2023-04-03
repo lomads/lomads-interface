@@ -143,21 +143,24 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
 	const getSafeTokens = useCallback(async () => {
 		if (!chainId) return [];
-		let tokens = props.tokens.map((t: any) => {
-			let tkn = t
-			if (!tkn.tokenAddress) {
-				return {
-					...t,
-					tokenAddress: chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS,
-					token: {
-						symbol: chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR',
-						decimals: 18
+		return axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${DAO?.safe?.address}/balances/usd/`, {withCredentials: false })
+		.then((res: any) => {
+			let tokens = res.data.map((t: any) => {
+				let tkn = t
+				if(!tkn.tokenAddress){
+					return {
+						...t,
+						tokenAddress: chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS,
+						token: {
+							symbol: chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR',
+							decimal: 18
+						}
 					}
 				}
-			}
-			return t
+				return t 
+			})
+			return tokens
 		})
-		return tokens
 	}, [chainId])
 
 	useEffect(() => {
@@ -540,8 +543,10 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	};
 
 	const handleExecuteTransactions = async (txn: any, reject: boolean | undefined, syncOwners = false, amount = null, isAllowanceTransaction = false) => {
+		console.log(txn)
 		const safeTokens = await getSafeTokens();
-		let safeToken = _find(safeTokens, t => t.tokenAddress === _get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', '')))
+		let safeToken = _find(safeTokens, t => toChecksumAddress(t.tokenAddress) === toChecksumAddress(_get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', ''))))
+		console.log("safeTokensafeToken",safeTokens, safeToken, _get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', '')))
 		if (!safeToken)
 			safeToken = _find(safeTokens || [], (st: any) => _get(st, 'tokenAddress', '') === (chainId === SupportedChainId.GOERLI ? process.env.REACT_APP_GOERLI_TOKEN_ADDRESS : process.env.REACT_APP_MATIC_TOKEN_ADDRESS))
 		let _txs = txn;
