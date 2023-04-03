@@ -54,7 +54,7 @@ import SafeModal from "./SafeModal";
 import XpPointsModal from "muiModals/XpPointsModal";
 // import XpPointsModal from "./XpPointsModal";
 import PassTokenModal from "muiModals/PassTokenModal";
-import TerminologyModal from "./TerminologyModal";
+import TerminologyModal from "muiModals/TerminologyModal";
 import DiscordModal from "./DiscordModal";
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import CreateMorePassTokenModal from "./CreateMorePassTokenModal";
@@ -347,9 +347,14 @@ const Settings = () => {
       }
 
       {/* // !-------------  Terminology ------------ */}
-      {openTerminology && (
+      {/* {openTerminology && (
         <TerminologyModal toggleTerminology={toggleTerminology} />
-      )}
+      )} */}
+
+      <TerminologyModal
+        open={openTerminology}
+        onClose={() => setOpenTerminology(false)}
+      />
       {/* // !-------------  Discord ------------ */}
       {/* {openDiscord && (
 				<DiscordModal toggleDiscord={toggleDiscord} />
