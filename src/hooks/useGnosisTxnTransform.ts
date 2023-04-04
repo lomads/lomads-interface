@@ -56,8 +56,8 @@ export default (safeAddress: string | null) => {
             return [];
         const hasMyConfirmation = _find(transaction.confirmations, (c:any) => c.owner === account)
         const hasMyRejection = _find(_get(transaction, 'rejectedTxn.confirmations', []), (c:any) => c.owner === account)
-        const canExecuteTxn = _get(transaction, 'confirmationsRequired', 0) === _get(transaction, 'confirmations', []).length
-        const canRejectTxn = _get(transaction, 'rejectedTxn.confirmations', 0) === _get(transaction, 'rejectedTxn.confirmations', []).length
+        const canExecuteTxn = _get(transaction, 'confirmationsRequired', 0) === (_get(transaction, 'confirmations', [])?.length || 0)
+        const canRejectTxn = _get(transaction, 'rejectedTxn.confirmations', 0) === _get(transaction, 'rejectedTxn.confirmations', [])?.length
         return [{
             txHash: _get(transaction, 'txHash', ''),
             transactionHash: _get(transaction, 'transactionHash', ''),
@@ -71,11 +71,11 @@ export default (safeAddress: string | null) => {
             decimals: nativeToken?.decimals,
             to: _get(transaction, 'to', "0x"),
             confimationsRequired: _get(transaction, 'confirmationsRequired', 0),
-            confirmations: _get(transaction, 'confirmations', []).length,
+            confirmations: _get(transaction, 'confirmations', [])?.length || 0,
             hasMyConfirmation: hasMyConfirmation ? true: false,
             hasRejection: transaction?.rejectedTxn ? true : false,
             hasMyRejection: hasMyRejection ? true : false,
-            rejections: _get(transaction, 'rejectedTxn.confirmations', []).length,
+            rejections: _get(transaction, 'rejectedTxn.confirmations', [])?.length || 0,
             canExecuteTxn,
             canRejectTxn,
             executor: _get(transaction, 'executor', '0x'),
@@ -91,11 +91,11 @@ export default (safeAddress: string | null) => {
             return [];
         const hasMyConfirmation = _find(transaction.confirmations, (c:any) => c?.owner === account)
         const hasMyRejection = _find(_get(transaction, 'rejectedTxn.confirmations', []), (c:any) => c.owner === account)
-        const canExecuteTxn = _get(transaction, 'confirmationsRequired', 0) === _get(transaction, 'confirmations', []).length
-        const canRejectTxn = _get(transaction, 'rejectedTxn.confirmations', 0) === _get(transaction, 'rejectedTxn.confirmations', []).length
+        const canExecuteTxn = _get(transaction, 'confirmationsRequired', 0) === (_get(transaction, 'confirmations', [])?.length || 0)
+        const canRejectTxn = _get(transaction, 'rejectedTxn.confirmations', 0) === (_get(transaction, 'rejectedTxn.confirmations', [])?.length | 0)
         let op = [];
         if(_get(transaction, 'dataDecoded.parameters[0].valueDecoded')) {
-            for (let index = 0; index < _get(transaction, 'dataDecoded.parameters').length; index++) {
+            for (let index = 0; index < _get(transaction, 'dataDecoded.parameters')?.length; index++) {
                 const parameters = _get(transaction, 'dataDecoded.parameters')[index];
                 const setAllowanceTxn = _find(parameters?.valueDecoded, vd => vd?.dataDecoded?.method === 'setAllowance');
                 console.log("transaction", transaction)
@@ -117,11 +117,11 @@ export default (safeAddress: string | null) => {
                                     decimals: nativeToken?.decimals,
                                     to: _get(decoded, 'to', "0x"),
                                     confimationsRequired: _get(transaction, 'confirmationsRequired', 0),
-                                    confirmations: _get(transaction, 'confirmations', []).length,
+                                    confirmations: _get(transaction, 'confirmations', [])?.length || 0,
                                     hasMyConfirmation: hasMyConfirmation ? true: false,
                                     hasRejection: transaction?.rejectedTxn ? true : false,
                                     hasMyRejection: hasMyRejection ? true : false,
-                                    rejections: _get(transaction, 'rejectedTxn.confirmations', []).length,
+                                    rejections: _get(transaction, 'rejectedTxn.confirmations', [])?.length || 0,
                                     canExecuteTxn,
                                     canRejectTxn,
                                     executor: _get(transaction, 'executor', '0x'),
@@ -148,11 +148,11 @@ export default (safeAddress: string | null) => {
                                     decimals: erc20Token?.token?.decimal || erc20Token?.token?.decimals,
                                     to: to,
                                     confimationsRequired: _get(transaction, 'confirmationsRequired', 0),
-                                    confirmations: _get(transaction, 'confirmations', []).length,
+                                    confirmations: _get(transaction, 'confirmations', [])?.length || 0,
                                     hasMyConfirmation: hasMyConfirmation ? true: false,
                                     hasRejection: transaction?.rejectedTxn ? true : false,
                                     hasMyRejection: hasMyRejection ? true : false,
-                                    rejections: _get(transaction, 'rejectedTxn.confirmations', []).length,
+                                    rejections: _get(transaction, 'rejectedTxn.confirmations', [])?.length || 0,
                                     canExecuteTxn,
                                     canRejectTxn,
                                     executor: _get(transaction, 'executor', '0x'),
@@ -183,11 +183,11 @@ export default (safeAddress: string | null) => {
                         decimals: (allowanceToken?.token?.decimal || allowanceToken?.token?.decimals),
                         to: to,
                         confimationsRequired: _get(transaction, 'confirmationsRequired', 0),
-                        confirmations: _get(transaction, 'confirmations', []).length,
+                        confirmations: _get(transaction, 'confirmations', [])?.length || 0,
                         hasMyConfirmation: hasMyConfirmation ? true: false,
                         hasRejection: transaction?.rejectedTxn ? true : false,
                         hasMyRejection: hasMyRejection ? true : false,
-                        rejections: _get(transaction, 'rejectedTxn.confirmations', []).length,
+                        rejections: _get(transaction, 'rejectedTxn.confirmations', [])?.length || 0,
                         canExecuteTxn,
                         canRejectTxn,
                         executor: _get(transaction, 'executor', '0x'),
@@ -214,11 +214,11 @@ export default (safeAddress: string | null) => {
                 decimals: transaction?.token?.decimals,
                 to: to,
                 confimationsRequired: _get(transaction, 'confirmationsRequired', 0),
-                confirmations: _get(transaction, 'confirmations', []).length,
+                confirmations: _get(transaction, 'confirmations', [])?.length || 0,
                 hasMyConfirmation: hasMyConfirmation ? true: false,
                 hasRejection: transaction?.rejectedTxn ? true : false,
                 hasMyRejection: hasMyRejection ? true : false,
-                rejections: _get(transaction, 'rejectedTxn.confirmations', []).length,
+                rejections: _get(transaction, 'rejectedTxn.confirmations', [])?.length || 0,
                 canExecuteTxn,
                 canRejectTxn,
                 executor: _get(transaction, 'executor', '0x'),
@@ -236,8 +236,8 @@ export default (safeAddress: string | null) => {
             return [];
         const hasMyConfirmation = _find(transaction.confirmations, (c:any) => c?.owner === account)
         const hasMyRejection = _find(_get(transaction, 'rejectedTxn.confirmations', []), (c:any) => c.owner === account)
-        const canExecuteTxn = _get(transaction, 'confirmationsRequired', 0) === _get(transaction, 'confirmations', []).length
-        const canRejectTxn = _get(transaction, 'rejectedTxn.confirmations', 0) === _get(transaction, 'rejectedTxn.confirmations', []).lengths
+        const canExecuteTxn = _get(transaction, 'confirmationsRequired', 0) === (_get(transaction, 'confirmations', [])?.length || 0)
+        const canRejectTxn = _get(transaction, 'rejectedTxn.confirmations', 0) === (_get(transaction, 'rejectedTxn.confirmations', [])?.length || 0)
         const parameters = _get(transaction, 'dataDecoded.parameters');
         const to = _get(_find(parameters, p => p.name === 'to'), 'value', '0x')
         const value = _get(_find(parameters, p => p.name === 'value'), 'value', 0)
@@ -255,11 +255,11 @@ export default (safeAddress: string | null) => {
             decimals: erc20Token?.token?.decimal || erc20Token?.token?.decimals,
             to: to,
             confimationsRequired: _get(transaction, 'confirmationsRequired', 0),
-            confirmations: _get(transaction, 'confirmations', []).length,
+            confirmations: _get(transaction, 'confirmations', [])?.length || 0,
             hasMyConfirmation: hasMyConfirmation ? true: false,
             hasRejection: transaction?.rejectedTxn ? true : false,
             hasMyRejection: hasMyRejection ? true : false,
-            rejections: _get(transaction, 'rejectedTxn.confirmations', []).length,
+            rejections: (_get(transaction, 'rejectedTxn.confirmations', [])?.length || 0),
             canExecuteTxn,
             canRejectTxn,
             executor: _get(transaction, 'executor', '0x'),
@@ -273,8 +273,8 @@ export default (safeAddress: string | null) => {
     const transformOperationTxn = (transaction: any) => {
         const hasMyConfirmation = _find(transaction.confirmations, (c:any) => c?.owner === account)
         const hasMyRejection = _find(_get(transaction, 'rejectedTxn.confirmations', []), (c:any) => c.owner === account)
-        const canExecuteTxn = _get(transaction, 'confirmationsRequired', 0) === _get(transaction, 'confirmations', []).length
-        const canRejectTxn = _get(transaction, 'rejectedTxn.confirmations', 0) === _get(transaction, 'rejectedTxn.confirmations', []).length
+        const canExecuteTxn = _get(transaction, 'confirmationsRequired', 0) === (_get(transaction, 'confirmations', [])?.length || 0)
+        const canRejectTxn = _get(transaction, 'rejectedTxn.confirmations', 0) === (_get(transaction, 'rejectedTxn.confirmations', [])?.length || 0)
         let op = [];
         op.push({
             txHash: _get(transaction, 'txHash', ''),
@@ -289,11 +289,11 @@ export default (safeAddress: string | null) => {
             decimals: "",
             to: "0x",
             confimationsRequired: _get(transaction, 'confirmationsRequired', 0),
-            confirmations: _get(transaction, 'confirmations', []).length,
+            confirmations: _get(transaction, 'confirmations', [])?.length || 0,
             hasMyConfirmation: hasMyConfirmation ? true: false,
             hasRejection: transaction?.rejectedTxn ? true : false,
             hasMyRejection: hasMyRejection ? true : false,
-            rejections: _get(transaction, 'rejectedTxn.confirmations', []).length,
+            rejections: _get(transaction, 'rejectedTxn.confirmations', [])?.length || 0,
             canExecuteTxn,
             canRejectTxn,
             executor: _get(transaction, 'executor', '0x'),
@@ -322,7 +322,7 @@ export default (safeAddress: string | null) => {
             decimals: _get(transaction, 'transfers[0].tokenInfo.decimals', null),
             to: _get(transaction, 'to', "0x"),
             confimationsRequired: _get(transaction, 'confirmationsRequired', 0),
-            confirmations: _get(transaction, 'confirmations', []).length,
+            confirmations: _get(transaction, 'confirmations', [])?.length || 0,
             hasMyConfirmation: false,
             hasRejection: false,
             hasMyRejection: false,

@@ -167,6 +167,8 @@ const AllProjectTasks = () => {
     //     return false;
     // }, [account, task]);
 
+    console.log("current task  : ",currentTasks);
+
     return (
         <div className='allTasks-container'>
 
