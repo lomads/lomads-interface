@@ -5,7 +5,7 @@ import { loadDao } from 'state/dashboard/actions';
 import SideBar from "../../pages/NewPages/DashBoard/SideBar";
 import { useAppDispatch } from "state/hooks";
 import { useWeb3React } from "@web3-react/core";
-import { Box, Typography, Container, Grid } from "@mui/material"
+import { Box, Container, Grid } from "@mui/material"
 import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles((theme: any) => ({

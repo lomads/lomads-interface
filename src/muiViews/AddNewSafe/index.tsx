@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import _ from "lodash";
-import SimpleInputField from "UIpack/SimpleInputField";
+import TextInput from '../../muiComponents/TextInput'
 import { InviteGangType } from "types/UItype";
 import { Checkbox } from "@chakra-ui/react";
 import { useAppSelector } from "state/hooks";
@@ -10,14 +10,12 @@ import {
 	updateOwners,
 	updateSafeAddress,
 	updatesafeName,
-	updateThreshold,
 	updateTotalMembers,
 	resetCreateDAOLoader,
 	updateDaoName,
 	updateInvitedGang
 } from "state/flow/reducer";
 import daoMember2 from "../../assets/svg/daoMember2.svg";
-import { updateHolder } from "state/proposal/reducer";
 import { useWeb3React } from "@web3-react/core";
 import EthersAdapter from "@gnosis.pm/safe-ethers-lib";
 import { SafeFactory, SafeAccountConfig } from "@gnosis.pm/safe-core-sdk";
@@ -27,8 +25,8 @@ import { createDAO } from '../../state/flow/actions';
 import { loadDao } from '../../state/dashboard/actions';
 import { CHAIN_GAS_STATION, SupportedChainId } from "constants/chains";
 import { Box, Button, Typography, Container, Grid } from "@mui/material"
-import axios from "axios";
 import { makeStyles } from '@mui/styles';
+import axios from "axios";
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
@@ -628,7 +626,7 @@ export default () => {
 
 	return (
 		<Container>
-			<Grid container className={classes.root}>
+			<Grid className={classes.root}>
 			<Box className={classes.StartSafe}>
 				<Typography className={classes.headerText}>3/3 DAO Treasury</Typography>
 				<Box className={classes.buttonArea}>
@@ -663,13 +661,13 @@ export default () => {
 				<hr />
 				<Box className={classes.centerCard}>
 						<Typography className={classes.inputFieldTitle}>Safe Name</Typography>
-						<SimpleInputField
+						<TextInput
 							className="inputField"
 							height={50}
 							width={460}
 							placeholder="Pied Piper"
 							value={safeName}
-							onchange={(e) => {
+							onchange={(e: any) => {
 								dispatch(updatesafeName(e.target.value));
 							}}
 							isInvalid={errors.safeName}

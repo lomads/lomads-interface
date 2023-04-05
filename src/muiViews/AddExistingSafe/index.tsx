@@ -1,51 +1,64 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import _ from "lodash";
+import "../../styles/pages/AddExistingSafe.css";
+import "../../styles/Global.css";
+import SafeButton from "UIpack/SafeButton";
 import SimpleInputField from "UIpack/SimpleInputField";
-import { InviteGangType } from "types/UItype";
-import { Checkbox } from "@chakra-ui/react";
-import { useAppSelector } from "state/hooks";
-import { useAppDispatch } from "state/hooks";
+import SimpleButton from "UIpack/SimpleButton";
+import { useNavigate } from "react-router-dom";
+import { useWeb3React } from "@web3-react/core";
+import { updateHolder } from "state/proposal/reducer";
+import { useAppDispatch, useAppSelector } from "state/hooks";
+import { ImportSafe } from "connection/SafeCall";
 import {
-	updateOwners,
 	updateSafeAddress,
 	updatesafeName,
-	updateThreshold,
 	updateTotalMembers,
 	resetCreateDAOLoader,
+	updateDaoAddress,
 	updateDaoName,
 	updateInvitedGang
 } from "state/flow/reducer";
-import daoMember2 from "../../assets/svg/daoMember2.svg";
-import { updateHolder } from "state/proposal/reducer";
-import { useWeb3React } from "@web3-react/core";
-import EthersAdapter from "@gnosis.pm/safe-ethers-lib";
-import { SafeFactory, SafeAccountConfig } from "@gnosis.pm/safe-core-sdk";
 import { ethers } from "ethers";
-import SimpleLoadButton from "UIpack/SimpleLoadButton";
-import { createDAO } from '../../state/flow/actions';
-import { loadDao } from '../../state/dashboard/actions';
-import { CHAIN_GAS_STATION, SupportedChainId } from "constants/chains";
-import { Box, Typography, Button } from "@mui/material"
-import { makeStyles } from '@mui/styles';
+import { Box, Button, Typography, Container, Grid } from "@mui/material"
+import AddressInputField from "UIpack/AddressInputField";
+import coin from "../../assets/svg/coin.svg";
 import axios from "axios";
+import SimpleLoadButton from "UIpack/SimpleLoadButton";
+import OutlineButton from "UIpack/OutlineButton";
+import { InviteGangType } from "types/UItype";
+import { createDAO } from '../../state/flow/actions';
+import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
+import { SupportedChainId, SUPPORTED_CHAIN_IDS, CHAIN_IDS_TO_NAMES } from 'constants/chains'
+import { usePrevious } from "hooks/usePrevious";
+import { makeStyles } from '@mui/styles';
+import { updateDaoMember } from "state/dashboard/actions";
 
 const useStyles = makeStyles((theme: any) => ({
+	root: {
+		height: "100vh",
+		maxHeight: 'fit-content',
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center',
+		overflow: 'hidden !important'
+	},
 	text: {
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
-		fontWeight: '400',
-		fontSize: '14px',
-		lineHeight: '15px',
+		fontWeight: 400,
+		fontSize: 14,
+		lineHeight: 15,
 		letterSpacing: '-0.011em',
 		color: '#76808D'
 	},
 	inputFieldTitle: {
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
-		fontWeight: '700',
-		fontSize: '16px',
-		lineHeight: '18px',
+		fontWeight: 700,
+		fontSize: 16,
+		lineHeight: 18,
 		letterSpacing: '-0.011em',
 		color: '#76808D',
 		margin: '15px 0px 15px 0px'
@@ -57,18 +70,18 @@ const useStyles = makeStyles((theme: any) => ({
 		justifyItems: 'flex-start',
 		background: '#FFFFFF',
 		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
-		borderRadius: '5px',
+		borderRadius: 5,
 		maxHeight: 'fit-content',
 		width: '554.75px',
-		padding: '20px',
-		marginTop: '35px',
+		padding: 20,
+		marginTop: 35,
 	},
 	thresholdText: {
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
-		fontWeight: '400',
-		fontSize: '16px',
-		lineHeight: '15px',
+		fontWeight: 400,
+		fontSize: 16,
+		lineHeight: 15,
 		letterSpacing: '-0.011em',
 		color: '#76808D'
 	},
@@ -87,12 +100,12 @@ const useStyles = makeStyles((theme: any) => ({
 		justifyItems: 'flex-start',
 		background: '#FFFFFF',
 		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
-		borderRadius: '5px',
+		borderRadius: 5,
 		maxHeight: 'fit-content',
-		width: '500px',
-		padding: '20px',
-		marginTop: '35px',
-		marginBottom: '35px'
+		width: 500,
+		padding: 20,
+		marginTop: 35,
+		marginBottom: 35
 	},
 	owner: {
 		width: '100%',
@@ -111,27 +124,32 @@ const useStyles = makeStyles((theme: any) => ({
 	nameText: {
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
-		fontWeight: '400',
-		fontSize: '14px',
-		lineHeight: '15px',
+		fontWeight: 400,
+		fontSize: 14,
+		lineHeight: 15,
 		letterSpacing: '-0.011em',
 		color: '#76808D',
-		marginLeft: '16px',
+		marginLeft: 16,
 		textAlign: 'center',
 	},
 	cardButton: {
-		marginTop: '25px',
+		marginTop: 25,
 		width: '100%',
 		display: 'flex',
 		justifyContent: 'center',
 		alignItems: 'center',
+	},
+	centerText: {
+		fontSize: 20,
+		fontWeight: 400,
+		color: '#C94B32'
 	},
 	buttonArea: {
 		display: 'flex',
 		width: '500px',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		paddingBottom: '35px'
+		paddingBottom: 35
 	},
 	selectionArea: {
 		width: '100%',
@@ -144,102 +162,132 @@ const useStyles = makeStyles((theme: any) => ({
 	thresholdCount: {
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
-		fontWeight: '400',
-		fontSize: '16px',
-		lineHeight: '15px',
+		fontWeight: 400,
+		fontSize: 16,
+		lineHeight: 15,
 		letterSpacing: '-0.011em',
 		color: '#76808D',
 	},
 	headerText: {
 		fontFamily: 'Insignia',
 		fontStyle: 'normal',
-		fontWeight: '400',
-		fontSize: '35px',
-		lineHeight: '35px',
-		paddingBottom: '30px',
+		fontWeight: 400,
+		fontSize: 35,
+		lineHeight: 35,
+		paddingBottom: 30,
 		textAlign: 'center',
 		color: '#C94B32'
 	},
-	centerText: {
-		fontSize: '20px',
-		fontWeight: '400',
-		color: '#C94B32'
+	boldText: {
+		fontWeight: 800
 	},
+	safeFooter: {
+		fontFamily: 'Inter, sans-serif',
+		fontStyle: 'normal',
+		fontWeight: '400',
+		fontSize: '14px',
+		lineHeight: '15px',
+		letterSpacing: '-0.011em',
+		color: '#76808D',
+		width: '480px',
+		textAlign: 'center',
+		marginBottom: '9px',
+	},
+	findSafe: {
+		margin: '25px 0px 15px 0px'
+	}
 }));
 
 export default () => {
 	const classes = useStyles()
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
-	const { provider, account, chainId } = useWeb3React();
-	const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
-	const [myowers, setMyOwers] = useState<InviteGangType[]>(invitedMembers);
-	const [showContinue, setshowContinue] = useState<boolean>(true);
-	const [ownerSelected, setOwnerSelected] = useState<boolean>(false);
-	const [errors, setErrors] = useState<any>({});
-	const [isLoading, setisLoading] = useState<boolean>(false);
+	const safeAddress = useAppSelector((state) => state.flow.safeAddress);
 	const safeName = useAppSelector((state) => state.flow.safeName);
 	const selectedOwners = useAppSelector((state) => state.flow.owners);
-	const safeAddress = useAppSelector((state) => state.flow.safeAddress);
-	const createDAOLoading = useAppSelector((state) => state.flow.createDAOLoading);
-	const { DAOList } = useAppSelector((state) => state.dashboard);
+	const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
+	const [safeOwners, setSafeOwners] = useState<string[]>([]);
+	const [tokens, setTokens] = useState<any>([]);
+	const [errors, setErrors] = useState<any>({});
+	const [balance, setBalance] = useState<string>("");
+	const [isLoading, setisLoading] = useState<boolean>(false);
+	const owners = useRef<InviteGangType[]>([]);
+	const safeNameRef = useRef<string>("");
+	const [showSafeDetails, setShowSafeDetails] = useState<boolean>(false);
 	const flow = useAppSelector((state) => state.flow);
-	let Myvalue = useRef<Array<InviteGangType>>([]);
-	const [polygonGasEstimate, setPolygonGasEstimate] = useState<any>(null)
+	const createDAOLoading = useAppSelector((state) => state.flow.createDAOLoading);
 
-	//let thresholdValue = useRef<string>("");
-	const [thresholdValue, setThresholdValue] = useState<number>(1);
+	const { provider, account, chainId } = useWeb3React();
 
-	useEffect(() => {
-		if (invitedMembers && invitedMembers.length > 0) {
-			const { name, address } = invitedMembers[0];
-			const creator = { name: name, address: address };
-			const check = Myvalue.current.some(
-				(owner) => owner.address === creator.address
-			);
-			if (!check) {
-				Myvalue.current.push(creator);
-			}
-		}
-	}, [invitedMembers]);
 
 	useEffect(() => {
-		if (chainId && +chainId === SupportedChainId.POLYGON) {
-			axios.get(CHAIN_GAS_STATION[`${chainId}`].url)
-				.then(res => setPolygonGasEstimate(res.data))
-		}
-	}, [chainId])
+		dispatch(updateSafeAddress(""));
+		dispatch(updateTotalMembers([]))
+	}, [])
 
-	useEffect(() => {
-		if (chainId)
-			dispatch(loadDao({ chainId }))
-	}, [chainId])
-
-	const handleCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
-		// const index: number = parseInt(event.target.value);
-		const checked = event.target.checked;
-		if (checked) {
-			const index = myowers.findIndex(
-				(result: InviteGangType) => result.address === event.target.value
-			);
-			const newData: InviteGangType = myowers[index];
-			Myvalue.current.push(newData);
-		} else {
-			const refIndex = Myvalue.current.findIndex(
-				(result: InviteGangType) => result.address === event.target.value
-			);
-			Myvalue.current.splice(refIndex, 1);
+	const UseExistingSafe = useCallback(async () => {
+		if (isLoading) return;
+		if (chainId) {
+			owners.current = [];
+			setisLoading(true);
+			ImportSafe(provider, safeAddress)
+				.then(async safeSDK => {
+					dispatch(updateHolder(safeSDK.getAddress() as string));
+					const safeowners: string[] = await safeSDK.getOwners();
+					safeowners.map((ownerAddress: string, index: number) => {
+						let obj: InviteGangType = { name: "", address: "" };
+						obj["address"] = ownerAddress;
+						if (!_.find(owners.current, (w: any) => w.address.toLowerCase() === obj.address.toLowerCase()))
+							owners.current.push(obj);
+					});
+					const bal = await safeSDK.getBalance();
+					setBalance(bal.toString());
+					await getTokens(safeAddress);
+					setShowSafeDetails(true);
+					setisLoading(false);
+				})
+				.catch(e => {
+					setisLoading(false);
+					console.log(e)
+					if (e.message === "SafeProxy contract is not deployed on the current network") {
+						if (chainId) {
+							const chain = chainId || 137;
+							setErrors({ issafeAddress: `This safe is not on ${CHAIN_IDS_TO_NAMES[chain]}` });
+						}
+					}
+				})
 		}
+	}, [chainId, safeAddress]);
+
+
+	const getTokens = async (safeAddress: string) => {
+		chainId &&
+			axios
+				.get(
+					`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`
+				)
+				.then((tokens: any) => {
+					setTokens(tokens.data);
+				});
+	};
+
+	const isAddressValid = (holderAddress: string) => {
+		const isValid: boolean = ethers.utils.isAddress(holderAddress);
+		return isValid;
 	};
 
 	useEffect(() => {
+		isAddressValid(safeAddress);
+	}, [safeAddress]);
+
+	useEffect(() => {
 		if (createDAOLoading == false) {
-			setisLoading(false)
 			dispatch(updateSafeAddress(''))
 			dispatch(updatesafeName(''))
 			dispatch(updateDaoName(''))
 			dispatch(updateInvitedGang([]))
 			dispatch(updateTotalMembers([]))
+			setisLoading(false)
 			dispatch(resetCreateDAOLoader())
 			return navigate(`/success?dao=${flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, '')}`);
 		}
@@ -247,446 +295,296 @@ export default () => {
 			setisLoading(true)
 	}, [createDAOLoading])
 
-	const handleSafeName = () => {
-		let terrors: any = {};
-		if (!safeName) {
-			terrors.safeName = " * safe Name is required";
-		}
-		if (_.isEmpty(terrors)) {
-			setshowContinue(false);
-		} else {
-			setErrors(terrors);
-		}
-	};
-
-
-	const runAfterCreation = async (addr: string, owners: any) => {
-		console.log("runAfterCreation", "safe addr", addr)
-		if (!addr) return;
-		dispatch(updateSafeAddress(addr as string));
-		const totalAddresses = [...invitedMembers, ...Myvalue.current];
+	const handleAddSafe = useCallback(() => {
+		const totalAddresses = [...invitedMembers, ...owners.current];
 		const value = totalAddresses.reduce((final: any, current: any) => {
-			let object = final.find(
-				(item: any) => item.address === current.address
-			);
+			let object = final.find((item: any) => item.address === current.address);
 			if (object) {
 				return final;
 			}
 			return final.concat([current]);
 		}, []);
 		dispatch(updateTotalMembers(value));
-		//setisLoading(false);
 		const payload: any = {
-			contractAddress: '',
 			chainId,
+			contractAddress: '',
 			name: flow.daoName,
 			url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
 			image: flow.daoImage,
 			members: value.map((m: any) => {
-				return {
-					...m, creator: m.address.toLowerCase() === account?.toLowerCase()
+				if (m.address.toLowerCase() === account?.toLowerCase()) {
+					return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : 'role2' }
 				}
+				return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4' }
 			}),
 			safe: {
 				name: safeName,
-				address: addr,
-				owners: owners,
+				address: safeAddress,
+				owners: owners.current.map(o => o.address),
 			}
 		}
 		dispatch(createDAO(payload))
-		setisLoading(false);
-	}
+	}, [chainId, safeAddress]);
 
-	const waitFor = (milliseconds: number) => new Promise((resolve) => setTimeout(resolve, milliseconds));
-
-	const retry = (promise: any, onRetry: any, maxRetries: number) => {
-		const retryWithBackoff: any = async (retries: number) => {
-			try {
-				if (retries > 0) {
-					const timeToWait = 2 ** retries * 1000;
-					console.log(`waiting for ${timeToWait}ms...`);
-					await waitFor(timeToWait);
-				}
-				return await promise();
-			} catch (e) {
-				if (retries < maxRetries) {
-					onRetry();
-					return retryWithBackoff(retries + 1);
-				} else {
-					console.warn("Max retries reached. Bubbling the error up");
-					throw e;
-				}
-			}
+	const handleClick = useCallback(() => {
+		console.log("clicked")
+		let terrors: any = {};
+		if (!isAddressValid(safeAddress)) {
+			terrors.issafeAddress = " * Safe Address is not valid.";
 		}
-		return retryWithBackoff(0);
-	}
-
-	const hasNewSafe = async (currentSafes: any) => {
-		try {
-			const latestSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
-			if (latestSafes.length > currentSafes.length)
-				return latestSafes
-			else
-				throw 'SAFE NOT FOUND'
-		} catch (e) {
-			throw e
+		if (_.isEmpty(terrors)) {
+			UseExistingSafe();
 		}
-	}
-
-	const checkNewSafe = async (currentSafes: any, owners: any) => {
-		const latestSafes = await retry(
-			() => hasNewSafe(currentSafes),
-			() => { console.log('retry called...') },
-			50
-		)
-		if (latestSafes) {
-			let newSafeAddr = _.find(latestSafes, ls => currentSafes.indexOf(ls) === -1)
-			console.log("FOUND NEW SAFE", newSafeAddr)
-			if (newSafeAddr)
-				runAfterCreation(newSafeAddr, owners)
-			else
-				console.log("checkNewSafe", "Could not find new safe")
-		} else {
-			setisLoading(false);
+		else {
+			setErrors(terrors);
 		}
-	}
+	}, [safeAddress]);
 
-
-	const deployNewSafe = async () => {
-		setisLoading(true);
-		dispatch(updateOwners(Myvalue.current));
-		const safeOwner = provider?.getSigner(0);
-
-		const ethAdapter = new EthersAdapter({
-			ethers,
-			signer: safeOwner as any,
-		});
-		const safeFactory = await SafeFactory.create({
-			ethAdapter,
-		});
-		const owners: any = Myvalue.current.map((result) => {
-			return result.address;
-		});
-		console.log(owners);
-		const threshold: number = thresholdValue;
-		console.log(threshold);
-		const safeAccountConfig: SafeAccountConfig = {
-			owners,
-			threshold,
-		};
-
-		let currentSafes: Array<string> = []
-		if (chainId === SupportedChainId.POLYGON)
-			currentSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
-
-		console.log("currentSafes", currentSafes)
-
-		await safeFactory
-			.deploySafe({ safeAccountConfig })
-			.then(async (tx) => {
-				dispatch(updateSafeAddress(tx.getAddress() as string));
-				const totalAddresses = [...invitedMembers, ...Myvalue.current];
-				const value = totalAddresses.reduce((final: any, current: any) => {
-					let object = final.find(
-						(item: any) => item.address === current.address
-					);
-					if (object) {
-						return final;
-					}
-					return final.concat([current]);
-				}, []);
-				dispatch(updateTotalMembers(value));
-				//setisLoading(false);
-				const payload: any = {
-					contractAddress: '',
-					chainId,
-					name: flow.daoName,
-					url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
-					image: null,
-					members: value.map((m: any) => {
-						return {
-							...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: owners.map((a: any) => a.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4'
-						}
-					}),
-					safe: {
-						name: safeName,
-						address: tx.getAddress(),
-						owners: owners,
-					}
-				}
-				dispatch(createDAO(payload))
-			})
-			.catch(async (err) => {
-				console.log("An error occured while creating safe", err);
-				if (chainId === SupportedChainId.POLYGON) {
-					checkNewSafe(currentSafes, owners)
-				} else {
-					setisLoading(false);
-				}
-			});
-	};
-
-	const deployNewSafeDelayed = useCallback(_.debounce(deployNewSafe, 1000), [deployNewSafe])
-
-	const AddOwners = () => {
-		return (
-			<>
-				<hr />
-				<Box className={classes.addOwner}>
-					<Box className={classes.inputFieldTitle}>Select Owners</Box>
-					<Box sx={{ width: '100%;' }}>
-						{invitedMembers.map((result: any, index: any) => {
-							return (
-								<>
-									<Box key={index} className={classes.owner}>
-										<Box className={classes.avatarName}>
-											<img src={daoMember2} alt={result.address} />
-											<p className={classes.nameText}>{result.name}</p>
-										</Box>
-										<p className={classes.text}>
-											{result.address.slice(0, 6) +
-												"..." +
-												result.address.slice(-4)}
-										</p>
-										{result.address !== account ? (
-											<>
-												<Checkbox
-													size="lg"
-													colorScheme="orange"
-													id={index}
-													name={classes.owner}
-													value={result.address}
-													onChange={(event) => handleCheck(event)}
-												/>
-											</>
-										) : (
-												<>
-													<Checkbox
-														size="lg"
-														colorScheme="orange"
-														name={classes.owner}
-														defaultChecked={true}
-														disabled={true}
-													/>
-												</>
-											)}
-									</Box>
-								</>
-							);
-						})}
-						<Box className={classes.cardButton}>
-							<Button 
-							   style={{
-									backgroundColor: "#C94B32",
-									height: 40,
-									width: 180,
-								}}
-								onClick={() => {
-									if (Myvalue.current.length >= 1) {
-										setOwnerSelected(true);
-									}
-								}}
-								variant='contained'>
-								NEXT
-							</Button>
-						</Box>
-					</Box>
-				</Box>
-			</>
-		);
-	};
-
-	const SelectedOwners = () => {
-		return (
-			<>
-				<Box>
-					<hr />
-				</Box>
-				<Box className={classes.addOwner}>
-					<Box className={classes.inputFieldTitle}>Owners</Box>
-					<Box sx={{ width: '100%;' }}>
-						{Myvalue.current.map((result: any, index: any) => {
-							return (
-								<>
-									<Box key={index} className={classes.owner}>
-										<Box className={classes.avatarName}>
-											<img src={daoMember2} alt={result.address} />
-											<p className={classes.nameText}>{result.name}</p>
-										</Box>
-										<p className={classes.text}>
-											{result.address.slice(0, 6) +
-												"..." +
-												result.address.slice(-4)}
-										</p>
-									</Box>
-								</>
-							);
-						})}
-					</Box>
-				</Box>
-				<SelectThreshold />
-			</>
-		);
-	};
-
-	const DropDown = React.memo((props: any) => {
-		return (
-			<>
-				<select
-					name="chain"
-					id="chain"
-					className="dropdown"
-					onChange={(event) => {
-						//props.threshold.current = event.target.value;
-						setThresholdValue(+event.target.value)
-					}}
-					defaultValue={thresholdValue}
-				>
-					{props.value.current.map((result: any, index: any) => {
-						return (
-							<option value={index + 1} key={index}>
-								{index + 1}
-							</option>
-						);
-					})}
-				</select>
-			</>
-		);
-	});
-
-	const SelectThreshold = () => {
-		return (
-			<>
-				<hr />
-				<Box className={classes.centerCard}>
-					<Box>
-						<Box className={classes.thresholdText}>
-							Any transaction requires the confirmation of
-						</Box>
-					</Box>
-					<Box className={classes.selectionArea}>
-						<Box>
-							<DropDown value={Myvalue} threshold={thresholdValue} />
-						</Box>
-						<Box className={classes.thresholdCount}>
-							of {Myvalue.current.length} owner(s)
-						</Box>
-					</Box>
-				</Box>
-				<Box className="safe-footer">
-					By continuing you consent to the terms of use and privacy policy of
-					Gnosis Safe
-				</Box>
-				<Box className="safe-footer">
-					You’re about to create a new safe and will have to confirm a
-					transaction with your curentry connected wallet.
-					<span className="boldText">
-						{chainId && +chainId === SupportedChainId.POLYGON && polygonGasEstimate ? `The creation will cost approximately ${polygonGasEstimate?.standard?.maxFee} GWei.` : `The creation will cost approximately 0.01256 GOR.`}
-					</span>
-					The exact amount will be determinated by your wallet.
-				</Box>
-				<Box sx={{ marginTop: '35px' }}>
-					<SimpleLoadButton
-						title="CREATE SAFE"
-						bgColor={isLoading ? 'grey' : "#C94B32"}
-						height={50}
-						width={250}
-						fontsize={20}
-						disabled={isLoading}
-						onClick={deployNewSafeDelayed}
-						condition={isLoading}
-					/>
-				</Box>
-			</>
-		);
-	};
+	const handleClickDelayed = useCallback(_.debounce(handleClick, 1000), [handleClick, safeAddress])
 
 	return (
 		<>
-			<Box className={classes.StartSafe}>
+			<Box className={classes.startSafe}>
 				<Box className={classes.headerText}>3/3 DAO Treasury</Box>
 				<Box className={classes.buttonArea}>
 					<Box>
-						<Button
-							style={{
-								color: "#C94B32",
-								backgroundColor: "#FFFFFF",
-								height: 58,
-								width: 228,
-								fontSize: 20,
-								fontWeight: 400,
-							}}
-							variant='contained'>
-							CREATE NEW SAFE
-							</Button>
+						<SafeButton
+							title="CREATE NEW SAFE"
+							titleColor="rgba(201, 75, 50, 0.6)"
+							bgColor="#FFFFFF"
+							height={58}
+							width={228}
+							fontsize={20}
+							fontweight={400}
+							disabled={false}
+							opacity="0.6"
+							onClick={() => navigate("/newsafe")}
+						/>
 					</Box>
 					<Box className={classes.centerText}>or</Box>
 					<Box>
-						<Button
-							style={{
-								backgroundColor: "#FFFFFF",
-								height: 58,
-								width: 228,
-								fontSize: 20,
-								fontWeight: 400,
-								opacity: 0.6,
-								color: 'rgba(201, 75, 50, 0.6)'
-							}}
-							onClick={() => navigate('/addsafe')}
-							variant='contained'>
-							ADD EXISTING SAFE
-							</Button>
-					</Box>
-				</Box>
-				<Box>
-					<hr />
-				</Box>
-				<Box className={classes.centerCard}>
-					<Box>
-						<Typography className={classes.inputFieldTitle}>Safe Name</Typography>
-						<SimpleInputField
-							className="inputField"
-							height={50}
-							width={460}
-							placeholder="Pied Piper"
-							value={safeName}
-							onchange={(e) => {
-								dispatch(updatesafeName(e.target.value));
-							}}
-							isInvalid={errors.safeName}
+						<SafeButton
+							title="ADD EXISTING SAFE"
+							titleColor="#C94B32"
+							bgColor="#FFFFFF"
+							height={58}
+							width={228}
+							fontsize={20}
+							fontweight={400}
+							disabled={false}
 						/>
 					</Box>
 				</Box>
-				{showContinue ? (
+				<Box className={classes.boxider}>
+					<hr />
+				</Box>
+				{owners.current.length >= 1 && showSafeDetails ? (
 					<>
-						<Box sx={{ marginTop: '25px' }}>
-						<Button 
-							   style={{
-									height: 50,
-									width: 250,
-									fontSize: 20,
-									backgroundColor: safeName ? "#C94B32" : "rgba(27, 43, 65, 0.2)",
-								boxShadow:  safeName
-										? "3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)"
-										: undefined,
-								}}
-								onClick={handleSafeName}
-								variant='contained'>
-								CONTINUE
-							</Button>
+						<Box className={classes.safeInfo}>
+							<Box className={classes.safeData}>
+								<Box className={classes.safeName}>
+									{safeName ? (
+										safeName
+									) : (
+										<>
+											<SimpleInputField
+												className={classes.inputField}
+												height={30}
+												width={151}
+												placeholder="Pied Piper"
+												name="safeName"
+												onchange={(e) => {
+													safeNameRef.current = e.target.value;
+												}}
+											/>
+										</>
+									)}
+								</Box>
+								<Box className={classes.safeBoxider}>
+									<hr />
+								</Box>
+								<Box className={classes.address}>
+									{safeAddress.slice(0, 6) + "..." + safeAddress.slice(-4)}
+								</Box>
+							</Box>
+							{/* assets */}
+							<Box className={classes.safedata}>
+								<Box className={classes.balance}>
+									<img src={coin} alt="coin" />
+									<Box className={classes.safeBalance}>
+										$ {tokens.length >= 1 && tokens[0].fiatBalance}
+									</Box>
+								</Box>
+								<Box className={classes.tokenAssets}>
+									{tokens.length > 1 ? (
+										<>
+											<Box className={classes.balance}>
+												<Box className={classes.asset}>
+													<Box className={classes.safeName}>
+														{tokens[1].token.symbol.slice(0, 1) +
+															tokens[1].token.symbol.slice(-1)}
+													</Box>
+												</Box>
+												<Box className={classes.amount}>
+													{tokens[1].balance / 10 ** 18}
+												</Box>
+											</Box>
+										</>
+									) : null}
+									{tokens.length === 3 ? (
+										<>
+											<Box className={classes.balance}>
+												<Box className={classes.asset}>
+													<Box className={classes.safeName}>
+														{tokens[2].token.symbol.slice(0, 1) +
+															tokens[2].token.symbol.slice(-1)}
+													</Box>
+												</Box>
+												<Box className={classes.amount}>
+													{tokens[2].balance / 10 ** 18}
+												</Box>
+											</Box>
+										</>
+									) : null}
+								</Box>
+							</Box>
+							<Box className={classes.safeOwners}>
+								<Box className={classes.ownerCount}>
+									{owners.current.length} Owners :
+								</Box>
+								<Box className={classes.ownerList}>
+									{owners.current.map(
+										(result: InviteGangType, index: number) => {
+											return (
+												<>
+													<Box className={classes.safeOwner} key={index}>
+														<SimpleInputField
+															className="inputField"
+															height={30}
+															width={151}
+															placeholder="Name"
+															type="text"
+															onchange={(e) => {
+																owners.current[index].name = e.target.value;
+															}}
+														/>
+														<Box className={classes.address}>
+															{result.address.slice(0, 6) +
+																"..." +
+																result.address.slice(-4)}
+														</Box>
+													</Box>
+												</>
+											);
+										}
+									)}
+								</Box>
+							</Box>
+							<Box className={classes.footerText}>
+								By continuing you consent to the terms of use and privacy policy
+								of Gnosis Safe
+							</Box>
+							<Box className={classes.buttonArea}>
+								<Box>
+									<OutlineButton
+										title="CHANGE SAFE"
+										borderColor="#C94B32"
+										bgColor="#FFFFFF"
+										height={55}
+										width={225}
+										fontsize={20}
+										fontweight={400}
+										onClick={(e) => {
+											setShowSafeDetails(false);
+										}}
+									/>
+								</Box>
+								<Box>
+									<SimpleButton
+										className="button"
+										title="ADD SAFE"
+										bgColor="#C94B32"
+										height={55}
+										width={225}
+										fontsize={20}
+										fontweight={400}
+										onClick={() => {
+											handleAddSafe();
+										}}
+									/>
+								</Box>
+							</Box>
 						</Box>
 					</>
-				) : invitedMembers.length >= 1 ? (
-					ownerSelected ? (
-						<SelectedOwners />
-					) : (
-							<AddOwners />
-						)
 				) : (
-							<SelectedOwners />
-						)}
+					<>
+						<Box className="centerCard">
+							{/* <Box className="chainDetails">
+								<Box>
+									<Box className="inputFieldTitle">
+										Select the network on which the Safe was created
+									</Box>
+								</Box>
+								<select name="chain" id="chain" className="drop">
+									{ SUPPORTED_CHAIN_IDS.map(chain => <option value={+chain}>{CHAIN_IDS_TO_NAMES[chain]}</option>) }
+								</select>
+							</Box> */}
+							<Box className={classes.inputArea}>
+								<Box>
+									<Box>
+										<Box className={classes.inputFieldTitle}>Safe Name</Box>
+									</Box>
+									<SimpleInputField
+										className="inputField"
+										height={50}
+										width={150}
+										placeholder="Pied Piper"
+										name="safeName"
+										value={safeName}
+										onchange={(e) => {
+											dispatch(updatesafeName(e.target.value));
+										}}
+									/>
+								</Box>
+								<Box>
+									<Box>
+										<Box className={classes.inputFieldTitle}>Safe Address</Box>
+									</Box>
+									<AddressInputField
+										className="inputField"
+										height={50}
+										width={280}
+										placeholder="0xbeee39"
+										value={safeAddress}
+										name="safeAddress"
+										onchange={(e) => {
+											setErrors({ issafeAddress: "" });
+											dispatch(updateSafeAddress(e.target.value));
+										}}
+										isInvalid={errors.issafeAddress}
+									/>
+								</Box>
+							</Box>
+						</Box>
+						<Box className={classes.findSafe}>
+							<SimpleLoadButton
+								title="FIND SAFE"
+								height={50}
+								width={160}
+								fontsize={20}
+								fontweight={400}
+								onClick={handleClickDelayed}
+								bgColor={
+									isAddressValid(safeAddress)
+										? "#C94B32"
+										: "rgba(27, 43, 65, 0.2)"
+								}
+								condition={isLoading}
+							/>
+						</Box>
+					</>
+				)}
 			</Box>
 		</>
 	);
 };
-

@@ -3,7 +3,7 @@ import _ from 'lodash';
 import lomadsfulllogo from "../../assets/svg/lomadsfulllogo.svg";
 import { useNavigate, useLocation } from "react-router-dom";
 import SimpleButton from "UIpack/SimpleButton";
-import SimpleInputField from "UIpack/SimpleInputField";
+import TextInput from '../../muiComponents/TextInput'
 import { useAppSelector } from "state/hooks";
 import { useAppDispatch } from "state/hooks";
 import { setDAOList } from 'state/dashboard/reducer';
@@ -13,7 +13,7 @@ import axiosHttp from '../../api'
 import ReactS3Uploader from 'components/ReactS3Uploader';
 import { nanoid } from "@reduxjs/toolkit";
 import { useDropzone } from 'react-dropzone'
-import uploadIcon from '../../assets/svg/ico-upload.svg';
+import uploadIconOrange from '../../assets/svg/ico-upload-orange.svg';
 import { Container, Grid, Button, Typography, Box } from "@mui/material"
 import { makeStyles } from '@mui/styles';
 
@@ -83,11 +83,12 @@ const useStyles = makeStyles((theme: any) => ({
 		justifyItems: 'flex-start',
 		background: '#FFFFFF',
 		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
-		borderRadius: '5px',
+		borderRadius: 5,
 		maxHeight: 'fit-content',
-		width: '554.75px',
-		padding: '20px',
-		marginTop: '35px',
+		width: 394,
+		height: 440,
+		padding: 20,
+		marginTop: 35,
 	},
 	imagePickerWrapperText: {
 		fontStyle: 'normal',
@@ -234,7 +235,7 @@ export default () => {
 
 	return (
 		<Container>
-		<Grid container className={classes.root}>
+		<Grid className={classes.root}>
 			{DAOListLoading ?
 				<Box className={classes.lomadsLogoParent}>
 						<img src={lomadsfulllogo} alt="" />
@@ -253,13 +254,13 @@ export default () => {
 							<Box>
 								<Box>
 									<Box className={classes.inputFieldTitle}>Name Your Organisation</Box>
-									<SimpleInputField
+									<TextInput
 										className={classes.inputFieldTitle}
 										height={50}
-										width={460}
+										fullWidth
 										placeholder="Epic Organisation"
 										value={daoName}
-										onchange={(event) => {
+										onChange={(event: any) => {
 											checkAvailabilityAsync(event)
 											handleDaoName(event);
 										}}
@@ -271,14 +272,14 @@ export default () => {
 										<Box className={classes.inputFieldTitle} style={{ marginRight: '16px' }}>Organisation address</Box>
 										{urlCheckLoading && <LeapFrog size={20} color="#C94B32" />}
 									</Box>
-									<SimpleInputField
+									<TextInput
 										className={classes.inputFieldTitle}
 										height={50}
-										width={460}
+										fullWidth
 										disabled
 										value={daoAddress}
 										placeholder="https://app.lomads.xyz/Name_of_the_Organisation"
-										onchange={(e) => {
+										onChange={(e: any) => {
 											dispatch(updateDaoAddress(e.target.value));
 										}}
 										isInvalid={errors.daoAddress}
@@ -306,7 +307,7 @@ export default () => {
 															droppedfiles={droppedfiles}
 															getSignedUrl={getSignedUploadUrl}
 															accept="image/png,image/jpeg,image/jpg"
-															className={{ display: 'none' }}
+															className={{ display: 'none', width: 150, height: 150 }}
 															onProgress={onUploadProgress}
 															onError={onUploadError}
 															preprocess={onUploadStart}
@@ -316,13 +317,15 @@ export default () => {
 															}}
 															contentDisposition="auto"
 														/>
-														<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+														<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
 															{uploadLoading ?
 																<LeapFrog size={24} color="#C94B32" /> :
 																<>
-																	<img src={uploadIcon} alt="upload-icon" />
-																	<p>Choose <br /> or drag an image</p>
-																	<span>maximum size 2mb</span>
+																	<img src={uploadIconOrange} alt="upload-icon" />
+																	<Typography color="#C94B32" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+																	         Choose <br /> or drag an image
+																			 <span>maximum size 2mb</span>
+																	</Typography>
 																</>
 															}
 														</Box>

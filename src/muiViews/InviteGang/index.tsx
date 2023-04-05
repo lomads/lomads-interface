@@ -1,25 +1,22 @@
 import React, { useEffect, useState, useCallback } from "react";
 import _ from "lodash";
-import IconButton from "muiComponents/IconButton";
-import SimpleInputField from "UIpack/SimpleInputField";
-import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai";
+import IconButton from "../../muiComponents/IconButton";
+import TextInput from '../../muiComponents/TextInput';
+import { AiOutlineClose } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
-import AddressInputField from "UIpack/AddressInputField";
 import { useAppSelector } from "state/hooks";
 import { LeapFrog } from "@uiball/loaders";
 import { useAppDispatch } from "state/hooks";
 import { updateInvitedGang, appendInviteMembers } from "state/flow/reducer";
 import { ethers } from "ethers";
-import { InviteGangType } from "types/UItype";
 import daoMember2 from "../../assets/svg/daoMember2.svg";
 import { useWeb3React } from "@web3-react/core";
-import { useEnsAddress } from "react-moralis";
 import Uploader from 'components/XlsxUploader';
 import createProjectSvg from '../../assets/svg/createProject.svg';
 import memberIcon from '../../assets/svg/memberIcon.svg';
 import binRed from '../../assets/svg/bin-red.svg';
 import binWhite from '../../assets/svg/bin-white.svg';
-import { SupportedChainId } from "constants/chains";
+import plusIcon from '../../assets/svg/plusIcon.svg';
 import { DEFAULT_ROLES } from "constants/terminology";
 import useEns from 'hooks/useEns';
 import useTerminology from "hooks/useTerminology";
@@ -110,9 +107,171 @@ const useStyles = makeStyles((theme: any) => ({
 		color: '#C94B32',
 		width: '130px',
 		marginRight: '20px',
+	},
+	nameText: {
+		fontFamily: 'Inter, sans-serif',
+		fontStyle: 'normal',
+		fontWeight: 400,
+		fontSize: '14px',
+		lineHeight: '15px',
+		letterSpacing: '-0.011em',
+		color: '#76808D',
+		marginLeft: '16px',
+		textAlign: 'center'
+	},
+	inviteGang: {
+		margin: '35px 0px 15px 0px'
+	},
+	invitedMembers: {
+		padding: '26px 22px',
+		backgroundColor: 'rgba(118, 128, 141, 0.09)',
+		boxShadow: 'inset 1px 0px 4px rgba(27, 43, 65, 0.1)',
+		borderRadius: '0px 0px 5px 5px',
+		width: '500px',
+		maxHeight: '500px',
+		overflow: 'hidden',
+		overflowY: 'auto'
+	},
+	owner: {
+		width: '100%',
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		margin: '1vh 0vh',
+	},
+	avatarPlusName: {
+		display: 'flex',
+		justifyContent: 'flex-start',
+		alignItems: 'center',
+		width: '30%',
+	},
+	avatarAddress: {
+		display: 'flex',
+		justifyContent: 'flex-start',
+		alignItems: 'center',
+		width: '25%',
+	},
+	avatarRole: {
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
+		width: '35%',
+	},
+	tokenDropdown: {
+		background: 'linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%)',
+		borderRadius: '10px',
+		width: '13vw',
+		height: '50px',
+		fontFamily: 'Inter, sans-serif',
+		fontStyle: 'normal',
+		fontWeight: '400',
+		fontSize: '16px',
+		lineHeight: '18px',
+		letterSpacing: '-0.011em',
+		color: '#76808D',
+		padding: '0px 15px 0px 15px',
+		marginTop: '10px',
+		marginRight: '25px',
+	},
+	membersModal: {
+		width: '768px',
+		height: '768px',
+		backgroundColor: 'white',
+		position: 'absolute',
+		top: '50%',
+		right: '50%',
+		transform: 'translate(50%, -50%)',
+		borderRadius: '20px',
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		padding: '65px 65px 0 65px',
+		zIndex: '999'
+	},
+	membersModalHeader: {
+		width: '100%',
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		marginBottom: '20px'
+	},
+	membersModalBody: {
+		width: '100%',
+		alignItems: 'center',
+		justifyContent: 'center',
+		flexDirection: 'column',
+		overflowY: 'scroll',
+		marginBottom: '100px',
+	},
+	membersModalRow: {
+		width: '100%',
+    	display: 'flex',
+    	alignItems: 'center',
+    	justifyContent: 'space-between',
+    	marginBottom: '20px',
+    	position: 'relative',
+	},
+	rowOvercast: {
+		width: '100%',
+    	height: '100%',
+    	backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    	position: 'absolute',
+    	zIndex: '998'
+	},
+	addButton: {
+		padding: '0px 10px 0px 10px',
+		borderRadius: '5px',
+		borderWidth: '0px',
+		borderColor: '#FFFFFF',
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
+		color: '#FFFFFF'
+	},
+	text: {
+		fontFamily: 'Inter, sans-serif',
+    	fontStyle: 'normal',
+    	fontWeight: '400',
+    	fontSize: '14px',
+    	lineHeight: '15px',
+    	letterSpacing: '-0.011em',
+    	color: '#76808D',
+	},
+	avatarBtn: {
+		display: 'flex',
+		justifyContent: 'flex-end',
+		alignItems: 'center',
+		width: '10%',
+	},
+	deleteButton: {
+		backgroundColor: '#76808D',
+		padding: '5px',
+		borderRadius: '5px',
+		color: '#FFFFFF',
+		cursor: 'pointer',
+	},
+	confirmBtn: {
+		background: '#C94B32',
+		color: '#FFF',
+		width: '210px',
+	},
+	selected: {
+		background: '#B12F15'
+	},
+	infoText: {
+		fontFamily: 'Inter, sans-serif',
+		fontStyle: 'italic',
+		fontWeight: '400',
+		fontSize: '16px',
+		lineHeight: '25px',
+		textAlign: 'center',
+		letterSpacing: '-0.011em',
+		color: '#76808D',
+		textDecoration: 'underline',
+		cursor: 'pointer',
 	}
 }))
-
 
 const InviteGang = () => {
 	const classes = useStyles()
@@ -362,25 +521,23 @@ const InviteGang = () => {
 						</Box>
 						<Box className={classes.inputArea}>
 							<Box style={{ marginRight: '10px' }}>
-								<SimpleInputField
-									className={classes.inputField}
+								<TextInput
 									height={50}
 									width={144}
 									placeholder="Name"
 									value={ownerName}
-									onchange={(event) => {
+									onChange={(event: any) => {
 										ownerName.length <= 12 && setOwnerName(event.target.value);
 									}}
 								/>
 							</Box>
 							<Box sx={{ marginRight: '10px' }}>
-								<AddressInputField
-									className={classes.inputField}
+								<TextInput
 									height={50}
 									width={251}
 									placeholder="ENS Domain and Wallet Address"
 									value={ownerAddress}
-									onchange={(event) => {
+									onChange={(event: any) => {
 										setErrors({ ownerAddress: "" });
 										setOwnerAddress(event.target.value);
 									}}
@@ -390,7 +547,7 @@ const InviteGang = () => {
 							<Box sx={{ marginRight: '10px' }}>
 								<select
 									name="role"
-									className="tokenDropdown"
+									className={classes.tokenDropdown}
 									defaultValue={ownerRole}
 									onChange={(e) => setOwnerRole(e.target.value)}
 									style={{ margin: '0' }}
@@ -403,42 +560,38 @@ const InviteGang = () => {
 							</Box>
 							<Box>
 								<IconButton
-									className="addButton"
-									Icon={<AiOutlinePlus style={{ height: 30, width: 30 }} />}
+									className={classes.addButton}
 									height={50}
 									width={50}
 									onClick={() => {
 										handleClick(ownerName, ownerAddress, ownerRole);
 									}}
-									bgColor={
-										isAddressValid(ownerAddress)
-											? "#C94B32"
-											: "rgba(27, 43, 65, 0.2)"
-									}
-								/>
+								>
+									<img src={plusIcon} alt={"add plus"} />
+								</IconButton>
 							</Box>
 						</Box>
 					</Box>
 					{invitedMembers.length >= 1 && (
 						<>
-							<Box className="invitedMembers">
+							<Box className={classes.invitedMembers}>
 								{invitedMembers.map((result: any, index: any) => {
 									return (
-										<Box key={index} className="owner">
-											<Box className="avatarPlusName">
+										<Box key={index} className={classes.owner}>
+											<Box className={classes.avatarPlusName}>
 												<img src={daoMember2} alt={result.address} />
-												<p className="nameText">{result.name}</p>
+												<p className={classes.nameText}>{result.name}</p>
 											</Box>
-											<Box className="avatarAddress">
-												<p className="text">
+											<Box className={classes.avatarAddress}>
+												<p className={classes.text}>
 													{result.address &&
 														result.address.slice(0, 6) +
 														"..." +
 														result.address.slice(-4)}
 												</p>
 											</Box>
-											<Box className="avatarRole">
-												<p className="text">
+											<Box className={classes.avatarRole}>
+												<p className={classes.text}>
 													{
 														result.address !== undefined && result.address === account
 															?
@@ -449,16 +602,16 @@ const InviteGang = () => {
 												</p>
 											</Box>
 
-											<Box className="avatarBtn">
+											<Box className={classes.avatarBtn}>
 												{result.address !== account && (
-													<button
-														className="deleteButton"
+													<Button
+														className={classes.deleteButton}
 														onClick={() => {
 															deleteMember(result.address);
 														}}
 													>
 														<AiOutlineClose style={{ height: 15, width: 15 }} />
-													</button>
+													</Button>
 												)}
 											</Box>
 
@@ -468,7 +621,7 @@ const InviteGang = () => {
 							</Box>
 						</>
 					)}
-					<Box className="inviteGang">
+					<Box className={classes.inviteGang}>
 						<Button
 							style={{
 								height: 51,
@@ -479,11 +632,11 @@ const InviteGang = () => {
 							}}
 							onClick={handleNavigate}
 							variant='contained'>
-								INVITE
+							INVITE
 							</Button>
 					</Box>
 					<Box
-						className="infoText"
+						className={classes.infoText}
 						onClick={() => {
 							navigate("/startsafe");
 						}}
@@ -495,29 +648,29 @@ const InviteGang = () => {
 					{/* Dsiplay modal for uploaded users */}
 					{
 						showModal &&
-						<Box className="membersModal">
-							<Box className="membersModal-header">
+						<Box className={classes.membersModal}>
+							<Box className={classes.membersModalHeader}>
 								<img src={createProjectSvg} alt="create-project-svg" />
 								<h1>Add Members</h1>
 							</Box>
-							<Box className="membersModal-body">
+							<Box className={classes.membersModalBody}>
 								{
 									validMembers.length > 0
 										?
 										<>
 											{
 												validMembers.map((item, index) => (
-													<Box className="membersModal-row" key={index}>
+													<Box className={classes.membersModalRow} key={index}>
 														{
 															deleteMembers.includes(item.address)
 																?
-																<Box className='row-overcast'></Box>
+																<Box className={classes.rowOvercast}></Box>
 																:
 																null
 														}
 														<Box>
 															<img src={memberIcon} alt="memberIcon" />
-															<SimpleInputField
+															<TextInput
 																className={classes.inputField}
 																id="nameInput"
 																height={50}
@@ -525,13 +678,13 @@ const InviteGang = () => {
 																placeholder="Name"
 																value={item.name}
 																name="name"
-																onchange={(e) => handleChangeState(e, index)}
+																onchange={(e: any) => handleChangeState(e, index)}
 															/>
 														</Box>
 														<span>{item.address.slice(0, 6) + "..." + item.address.slice(-4)}</span>
 														<select
 															name="role"
-															className="tokenDropdown"
+															className={classes.tokenDropdown}
 															defaultValue={item.role}
 															onChange={(e) => handleChangeState(e, index)}
 														>
@@ -550,13 +703,13 @@ const InviteGang = () => {
 														{
 															deleteMembers.includes(item.address)
 																?
-																<button onClick={() => handleDeleteUser(item.address)} className="selected">
+																<Button onClick={() => handleDeleteUser(item.address)} className={classes.selected}>
 																	<img src={binWhite} alt="bin-white" />
-																</button>
+																</Button>
 																:
-																<button onClick={() => handleDeleteUser(item.address)}>
+																<Button onClick={() => handleDeleteUser(item.address)}>
 																	<img src={binRed} alt="bin-red" />
-																</button>
+																</Button>
 														}
 
 													</Box>
@@ -568,13 +721,13 @@ const InviteGang = () => {
 								}
 							</Box>
 							<Box className={classes.membersModalFooter}>
-								<button onClick={handleCloseModal} className={classes.membersModalFooterCancelBtn}>
+								<Button onClick={handleCloseModal} className={classes.membersModalFooterCancelBtn}>
 									CANCEL
-							</button>
+							</Button>
 								{
-									validMembers.length > 0 && <button onClick={handleAppendUploadedMembers} className="confirm-btn">
+									validMembers.length > 0 && <Button onClick={handleAppendUploadedMembers} className={classes.confirmBtn}>
 										ADD MEMBERS
-								</button>
+								</Button>
 								}
 							</Box>
 						</Box>
