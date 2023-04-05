@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import _ from "lodash";
-import "../../styles/pages/AddExistingSafe.css";
-import "../../styles/Global.css";
 import TextInput from '../../muiComponents/TextInput';
 import { useNavigate } from "react-router-dom";
 import { useWeb3React } from "@web3-react/core";
@@ -19,7 +17,6 @@ import {
 } from "state/flow/reducer";
 import { ethers } from "ethers";
 import { Box, Button, Typography, Container, Grid } from "@mui/material"
-import AddressInputField from "UIpack/AddressInputField";
 import coin from "../../assets/svg/coin.svg";
 import axios from "axios";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
@@ -49,14 +46,13 @@ const useStyles = makeStyles((theme: any) => ({
 		color: '#76808D'
 	},
 	inputFieldTitle: {
-		fontFamily: 'Inter, sans-serif',
+		fontFamily: 'Open Sans',
 		fontStyle: 'normal',
-		fontWeight: 700,
-		fontSize: 16,
-		lineHeight: 18,
+		fontWeight: '700',
+		fontSize: '16px',
+		lineHeight: '18px',
 		letterSpacing: '-0.011em',
 		color: '#76808D',
-		margin: '15px 0px 15px 0px'
 	},
 	centerCard: {
 		display: 'flex',
@@ -131,22 +127,6 @@ const useStyles = makeStyles((theme: any) => ({
 		justifyContent: 'space-around',
 		alignItems: 'center',
 		width: '100%'
-	},
-	inputField: {
-		width: '500px',
-		height: '90px',
-		textAlign: 'justify',
-		paddingLeft: '10px',
-		background: '#f5f5f5',
-		boxShadow: 'inset 1px 0px 4px rgba(27, 43, 65, 0.1)',
-		borderRadius: '10px',
-		borderWidth: '0px',
-		fontFamily: 'Inter, sans-serif',
-		fontStyle: 'normal',
-		fontWeight: '400',
-		fontSize: '16px',
-		lineHeight: '18px',
-		color: '#76808D'
 	},
 	safeInfo: {
 		display: 'flex',
@@ -467,9 +447,10 @@ export default () => {
 										) : (
 												<>
 													<TextInput
-														className={classes.inputField}
-														height={30}
-														width={151}
+													    sx={{
+															height: 30,
+															width: 179
+														}}
 														placeholder="Pied Piper"
 														name="safeName"
 														onChange={(e: any) => {
@@ -535,9 +516,10 @@ export default () => {
 													<>
 														<Box className={classes.safeOwner} key={index}>
 															<TextInput
-																className={classes.inputField}
-																height={30}
-																width={151}
+																sx={{
+																	height: 30,
+																	width: 179
+																}}
 																placeholder="Name"
 																type="text"
 																onChange={(e: any) => {
@@ -617,8 +599,10 @@ export default () => {
 												</Typography>
 											</Box>
 											<TextInput
-												height={50}
-												width={150}
+												sx={{
+													height: 50,
+													width: 179
+												}}
 												placeholder="Pied Piper"
 												name="safeName"
 												value={safeName}
@@ -634,14 +618,15 @@ export default () => {
 													Safe Address
 												</Typography>
 											</Box>
-											<AddressInputField
-												className={classes.inputField}
-												height={50}
-												width={280}
+											<TextInput
+												sx={{
+													height: 50,
+													width: 311
+												}}
 												placeholder="0xbeee39"
 												value={safeAddress}
 												name="safeAddress"
-												onchange={(e) => {
+												onChange={(e: any) => {
 													setErrors({ issafeAddress: "" });
 													dispatch(updateSafeAddress(e.target.value));
 												}}
