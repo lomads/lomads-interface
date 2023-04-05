@@ -68,6 +68,18 @@ export const addDaoMember = createAsyncThunk(
 	}
 );
 
+export const createDaoOption = createAsyncThunk(
+	'dao/createOption',
+	async (params: any, thunkApi) => {
+		return axiosHttp.patch(`dao/${params.url}/create-option`, params.payload)
+			.then(res => res.data)
+			.catch(e => {
+				//toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
+	}
+);
+
 export const addDaoMemberList = createAsyncThunk(
 	'dao/addmemberList',
 	async (params: any, thunkApi) => {

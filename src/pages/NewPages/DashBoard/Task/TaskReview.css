@@ -57,7 +57,7 @@
 
 .task-review-overlay .task-review-container .task-review-slider {
     width: 100%;
-    height: 80vh;
+    height: 90vh;
     display: flex;
     align-items: center;
 }
@@ -96,11 +96,12 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
+    padding: 25px 0;
 }
 
 .task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body {
     width: 100%;
-    height: 95%;
     overflow-y: scroll;
     display: flex;
     flex-direction: column;
@@ -141,19 +142,19 @@
     color: #76808D;
 }
 
-.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container {
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .detail-container {
     width: 95%;
-    margin: 30px 0;
+    margin: 16px 0;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
 }
 
-.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container:last-child {
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .detail-container:last-child {
     margin: 0 0 30px 0;
 }
 
-.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container span {
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .detail-container span {
     font-style: normal;
     font-weight: 700;
     font-size: 16px;
@@ -166,7 +167,7 @@
     color: #76808D;
 }
 
-.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container textarea {
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .detail-container textarea {
     resize: none;
     margin-top: 16px;
     height: 75px;
@@ -174,7 +175,7 @@
     padding: 15px;
 }
 
-.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container .note {
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .detail-container .note {
     font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 400;
@@ -186,7 +187,7 @@
     min-height: 120px;
 }
 
-.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container button {
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .detail-container button {
     background: #FFFFFF;
     /* Color-drop */
     box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
@@ -212,7 +213,7 @@
     margin-top: 10px;
 }
 
-.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-body .detail-container .submitLink-btn {
+.task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .detail-container .submitLink-btn {
     background: #FFFFFF;
     box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);
     border-radius: 5px;
@@ -222,7 +223,8 @@
 
 .task-review-overlay .task-review-container .task-review-slider .slider-content .task-review-card .task-review-foot {
     width: 100%;
-    height: 10%;
+    /* height: 10%; */
+    margin-top: 10px;
     display: flex;
     align-items: flex-end;
     justify-content: center;
@@ -282,8 +284,9 @@
 .task-review-compensation-main {
     margin-bottom: 12px;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
     padding: 15px 22px;
     gap: 10px;
     background: #FFFFFF;

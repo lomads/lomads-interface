@@ -64,6 +64,8 @@ import { styled } from '@mui/material/styles';
 import Stack from '@mui/material/Stack';
 import Button from "muiComponents/Button";
 import steps from "./WalkThrough/steps";
+import Dropdown from "muiComponents/Dropdown";
+import Avatar from "muiComponents/Avatar";
 
 const { toChecksumAddress } = require('ethereum-checksum-address')
 type WalkThroughObjType = {
@@ -730,7 +732,6 @@ const Dashboard = () => {
 							showNotificationArea={showNotificationArea}
 						/>
 					)} */}
-
 
 				<MyProject isHelpIconOpen={isHelpIconOpen} />
 				<Tasks
