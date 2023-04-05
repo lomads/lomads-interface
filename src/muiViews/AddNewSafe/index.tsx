@@ -66,7 +66,7 @@ const useStyles = makeStyles((theme: any) => ({
 		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
 		borderRadius: 5,
 		maxHeight: 'fit-content',
-		width: '554.75px',
+		width: 551,
 		padding: 20,
 		marginTop: 35,
 	},
@@ -167,7 +167,6 @@ const useStyles = makeStyles((theme: any) => ({
 		fontStyle: 'normal',
 		fontWeight: 400,
 		fontSize: 35,
-		lineHeight: 35,
 		paddingBottom: 30,
 		textAlign: 'center',
 		color: '#C94B32'
@@ -627,79 +626,80 @@ export default () => {
 	return (
 		<Container>
 			<Grid className={classes.root}>
-			<Box className={classes.StartSafe}>
-				<Typography className={classes.headerText}>3/3 DAO Treasury</Typography>
-				<Box className={classes.buttonArea}>
-					<Box>
-						<Button 
-						 style={{
-							color: "#C94B32",
-							backgroundColor: "#FFFFFF",
-							fontWeight: 400,
-							minWidth: 'max-content'
-						}}
-							variant='contained'>
-							CREATE NEW SAFE
+				<Box className={classes.StartSafe}>
+					<Box className={classes.headerText}>3/3 DAO Treasury</Box>
+					<Box className={classes.buttonArea}>
+						<Box>
+							<Button
+								style={{
+									color: "#C94B32",
+									backgroundColor: "#FFFFFF",
+									fontWeight: 400,
+									minWidth: 'max-content'
+								}}
+								variant='contained'>
+								CREATE NEW SAFE
 							</Button>
-					</Box>
-					<Typography className={classes.centerText}>or</Typography>
-					<Box>
-						<Button
-							style={{
-								backgroundColor: "#FFFFFF",
-								minWidth: 'max-content',
-								fontWeight: 400,
-								opacity: 0.6,
-								color: 'rgba(201, 75, 50, 0.6)'
-							}}
-							onClick={() => navigate('/addsafe')}
-							variant='contained'>
-							ADD EXISTING SAFE
+						</Box>
+						<Box className={classes.centerText}>or</Box>
+						<Box>
+							<Button
+								style={{
+									backgroundColor: "#FFFFFF",
+									minWidth: 'max-content',
+									fontWeight: 400,
+									opacity: 0.6,
+									color: 'rgba(201, 75, 50, 0.6)'
+								}}
+								onClick={() => navigate('/addsafe')}
+								variant='contained'>
+								ADD EXISTING SAFE
 							</Button>
+						</Box>
 					</Box>
-				</Box>
-				<hr />
-				<Box className={classes.centerCard}>
+					<hr />
+					<Box className={classes.centerCard}>
 						<Typography className={classes.inputFieldTitle}>Safe Name</Typography>
 						<TextInput
-							className="inputField"
-							height={50}
-							width={460}
+						   sx={{
+							height: 50,
+							width: 507
+						   }}
 							placeholder="Pied Piper"
 							value={safeName}
-							onchange={(e: any) => {
+							onChange={(e: any) => {
 								dispatch(updatesafeName(e.target.value));
 							}}
 							isInvalid={errors.safeName}
 						/>
-				</Box>
-				{showContinue ? (
-					<>
-						<Box sx={{ marginTop: 25 }}>
-						<Button 
-							   style={{
-									maxWidth: 'max-content',
-									backgroundColor: safeName ? "#C94B32" : "rgba(27, 43, 65, 0.2)",
-								boxShadow:  safeName
-										? "3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)"
-										: undefined,
-								}}
-								onClick={handleSafeName}
-								variant='contained'>
-								CONTINUE
-							</Button>
-						</Box>
-					</>
-				) : invitedMembers.length >= 1 ? (
-					ownerSelected ? (
-						<SelectedOwners />
-					) : (
-							<AddOwners />
-						)
-				) : (
+					</Box>
+					{showContinue ? (
+						<>
+							<Box sx={{ marginTop: 25 }}>
+								<Button
+									style={{
+										maxWidth: 'max-content',
+										backgroundColor: safeName ? "#C94B32" : "rgba(27, 43, 65, 0.2)",
+										boxShadow: safeName
+											? "3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)"
+											: undefined,
+									}}
+									onClick={handleSafeName}
+									variant='contained'>
+									CONTINUE
+								</Button>
+							</Box>
+						</>
+					) : invitedMembers.length >= 1 ? (
+						ownerSelected ? (
 							<SelectedOwners />
-						)}
-			</Box>
+						) : (
+								<AddOwners />
+							)
+					) : (
+								<SelectedOwners />
+							)}
+				</Box>
 			</Grid>
 		</Container>
 	);

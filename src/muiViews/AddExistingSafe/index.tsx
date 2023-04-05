@@ -410,177 +410,176 @@ export default () => {
 					<Box className={classes.buttonArea}>
 						<Box>
 							<Button
-								variant="outlined"
-								sx={{
-									color: "rgba(201, 75, 50, 0.6)",
-									height: 58,
-									width: 228,
-									fontsize: 20,
-									fontweight: 400,
-									opacity: 0.6
+								style={{
+									backgroundColor: "#FFFFFF",
+									minWidth: 'max-content',
+									fontWeight: 400,
+									opacity: 0.6,
+									color: 'rgba(201, 75, 50, 0.6)'
 								}}
-								onClick={() => navigate("/newsafe")}
-							>CREATE NEW SAFE</Button>
+								onClick={() => navigate('/newsafe')}
+								variant='contained'>
+								CREATE NEW SAFE
+							</Button>
 						</Box>
 						<Box className={classes.centerText}>or</Box>
 						<Box>
 							<Button
-								variant="contained"
-								sx={{
-									titleColor: "#C94B32",
-									bgColor: "#FFFFFF",
-									height: 58,
-									width: 228,
-									fontsize: 20,
-									fontweight: 400
+								style={{
+									color: "#C94B32",
+									backgroundColor: "#FFFFFF",
+									fontWeight: 400,
+									minWidth: 'max-content'
 								}}
-							>ADD EXISTING SAFE</Button>
+								variant='contained'>
+								ADD EXISTING SAFE
+							</Button>
 						</Box>
-					</Box>
-					{owners.current.length >= 1 && showSafeDetails ? (
-						<>
-							<Box className={classes.safeInfo}>
-								<Box className={classes.safeData}>
-									<Box className={classes.safeName}>
-										{safeName ? (
-											safeName
-										) : (
-												<>
-													<TextInput
-													    sx={{
-															height: 30,
-															width: 179
-														}}
-														placeholder="Pied Piper"
-														name="safeName"
-														onChange={(e: any) => {
-															safeNameRef.current = e.target.value;
-														}}
-													/>
-												</>
-											)}
-									</Box>
-									<Box className={classes.address}>
-										{safeAddress.slice(0, 6) + "..." + safeAddress.slice(-4)}
-									</Box>
-								</Box>
-								{/* assets */}
-								<Box className={classes.safeData}>
-									<Box className={classes.balance}>
-										<img src={coin} alt="coin" />
-										<Box className={classes.safeBalance}>
-											$ {tokens.length >= 1 && tokens[0].fiatBalance}
+						</Box>
+						{owners.current.length >= 1 && showSafeDetails ? (
+							<>
+								<Box className={classes.safeInfo}>
+									<Box className={classes.safeData}>
+										<Box className={classes.safeName}>
+											{safeName ? (
+												safeName
+											) : (
+													<>
+														<TextInput
+															sx={{
+																height: 30,
+																width: 179
+															}}
+															placeholder="Pied Piper"
+															name="safeName"
+															onChange={(e: any) => {
+																safeNameRef.current = e.target.value;
+															}}
+														/>
+													</>
+												)}
+										</Box>
+										<Box className={classes.address}>
+											{safeAddress.slice(0, 6) + "..." + safeAddress.slice(-4)}
 										</Box>
 									</Box>
-									<Box className={classes.tokenAssets}>
-										{tokens.length > 1 ? (
-											<>
-												<Box className={classes.balance}>
-													<Box className={classes.asset}>
-														<Box className={classes.safeName}>
-															{tokens[1].token.symbol.slice(0, 1) +
-																tokens[1].token.symbol.slice(-1)}
-														</Box>
-													</Box>
-													<Box className={classes.amount}>
-														{tokens[1].balance / 10 ** 18}
-													</Box>
-												</Box>
-											</>
-										) : null}
-										{tokens.length === 3 ? (
-											<>
-												<Box className={classes.balance}>
-													<Box className={classes.asset}>
-														<Box className={classes.safeName}>
-															{tokens[2].token.symbol.slice(0, 1) +
-																tokens[2].token.symbol.slice(-1)}
-														</Box>
-													</Box>
-													<Box className={classes.amount}>
-														{tokens[2].balance / 10 ** 18}
-													</Box>
-												</Box>
-											</>
-										) : null}
-									</Box>
-								</Box>
-								<Box className={classes.safeOwners}>
-									<Box className={classes.ownerCount}>
-										{owners.current.length} Owners :
-								</Box>
-									<Box className={classes.ownerList}>
-										{owners.current.map(
-											(result: InviteGangType, index: number) => {
-												return (
-													<>
-														<Box className={classes.safeOwner} key={index}>
-															<TextInput
-																sx={{
-																	height: 30,
-																	width: 179
-																}}
-																placeholder="Name"
-																type="text"
-																onChange={(e: any) => {
-																	owners.current[index].name = e.target.value;
-																}}
-															/>
-															<Box className={classes.address}>
-																{result.address.slice(0, 6) +
-																	"..." +
-																	result.address.slice(-4)}
+									{/* assets */}
+									<Box className={classes.safeData}>
+										<Box className={classes.balance}>
+											<img src={coin} alt="coin" />
+											<Box className={classes.safeBalance}>
+												$ {tokens.length >= 1 && tokens[0].fiatBalance}
+											</Box>
+										</Box>
+										<Box className={classes.tokenAssets}>
+											{tokens.length > 1 ? (
+												<>
+													<Box className={classes.balance}>
+														<Box className={classes.asset}>
+															<Box className={classes.safeName}>
+																{tokens[1].token.symbol.slice(0, 1) +
+																	tokens[1].token.symbol.slice(-1)}
 															</Box>
 														</Box>
-													</>
-												);
-											}
-										)}
+														<Box className={classes.amount}>
+															{tokens[1].balance / 10 ** 18}
+														</Box>
+													</Box>
+												</>
+											) : null}
+											{tokens.length === 3 ? (
+												<>
+													<Box className={classes.balance}>
+														<Box className={classes.asset}>
+															<Box className={classes.safeName}>
+																{tokens[2].token.symbol.slice(0, 1) +
+																	tokens[2].token.symbol.slice(-1)}
+															</Box>
+														</Box>
+														<Box className={classes.amount}>
+															{tokens[2].balance / 10 ** 18}
+														</Box>
+													</Box>
+												</>
+											) : null}
+										</Box>
+									</Box>
+									<Box className={classes.safeOwners}>
+										<Box className={classes.ownerCount}>
+											{owners.current.length} Owners :
+								</Box>
+										<Box className={classes.ownerList}>
+											{owners.current.map(
+												(result: InviteGangType, index: number) => {
+													return (
+														<>
+															<Box className={classes.safeOwner} key={index}>
+																<TextInput
+																	sx={{
+																		height: 30,
+																		width: 179
+																	}}
+																	placeholder="Name"
+																	type="text"
+																	onChange={(e: any) => {
+																		owners.current[index].name = e.target.value;
+																	}}
+																/>
+																<Box className={classes.address}>
+																	{result.address.slice(0, 6) +
+																		"..." +
+																		result.address.slice(-4)}
+																</Box>
+															</Box>
+														</>
+													);
+												}
+											)}
+										</Box>
+									</Box>
+									<Box className={classes.footerText}>
+										By continuing you consent to the terms of use and privacy policy
+										of Gnosis Safe
+							</Box>
+									<Box className={classes.buttonArea}>
+										<Box>
+											<Button
+												variant="outlined"
+												sx={{
+													borderColor: "#C94B32",
+													bgColor: "#FFFFFF",
+													height: 55,
+													width: 225,
+													fontsize: 20,
+													fontweight: 400
+												}}
+												onClick={(e) => {
+													setShowSafeDetails(false);
+												}}
+											>CHANGE SAFE</Button>
+										</Box>
+										<Box>
+											<Button
+												variant="contained"
+												sx={{
+													backgroundColor: "#C94B32",
+													height: 55,
+													width: 225,
+													fontsize: 20,
+													fontweight: 400
+												}}
+												onClick={() => {
+													handleAddSafe();
+												}}
+											>ADD SAFE</Button>
+										</Box>
 									</Box>
 								</Box>
-								<Box className={classes.footerText}>
-									By continuing you consent to the terms of use and privacy policy
-									of Gnosis Safe
-							</Box>
-								<Box className={classes.buttonArea}>
-									<Box>
-										<Button
-											variant="outlined"
-											sx={{
-												borderColor: "#C94B32",
-												bgColor: "#FFFFFF",
-												height: 55,
-												width: 225,
-												fontsize: 20,
-												fontweight: 400
-											}}
-											onClick={(e) => {
-												setShowSafeDetails(false);
-											}}
-										>CHANGE SAFE</Button>
-									</Box>
-									<Box>
-										<Button
-											variant="contained"
-											sx={{
-												backgroundColor: "#C94B32",
-												height: 55,
-												width: 225,
-												fontsize: 20,
-												fontweight: 400
-											}}
-											onClick={() => {
-												handleAddSafe();
-											}}
-										>ADD SAFE</Button>
-									</Box>
-								</Box>
-							</Box>
-						</>
-					) : (
-							<>
-								<Box className={classes.centerCard}>
-									{/* <Box className="chainDetails">
+							</>
+						) : (
+								<>
+									<Box className={classes.centerCard}>
+										{/* <Box className="chainDetails">
 								<Box>
 									<Box className="inputFieldTitle">
 										Select the network on which the Safe was created
@@ -590,70 +589,70 @@ export default () => {
 									{ SUPPORTED_CHAIN_IDS.map(chain => <option value={+chain}>{CHAIN_IDS_TO_NAMES[chain]}</option>) }
 								</select>
 							</Box> */}
-									<Box className={classes.inputArea}>
-										<Box>
+										<Box className={classes.inputArea}>
 											<Box>
-												<Typography
-												  className={classes.inputFieldTitle}>
-													  Safe Name
+												<Box>
+													<Typography
+														className={classes.inputFieldTitle}>
+														Safe Name
 												</Typography>
+												</Box>
+												<TextInput
+													sx={{
+														height: 50,
+														width: 179
+													}}
+													placeholder="Pied Piper"
+													name="safeName"
+													value={safeName}
+													onChange={(e: any) => {
+														dispatch(updatesafeName(e.target.value));
+													}}
+												/>
 											</Box>
-											<TextInput
-												sx={{
-													height: 50,
-													width: 179
-												}}
-												placeholder="Pied Piper"
-												name="safeName"
-												value={safeName}
-												onChange={(e: any) => {
-													dispatch(updatesafeName(e.target.value));
-												}}
-											/>
-										</Box>
-										<Box>
 											<Box>
-												<Typography
-													className={classes.inputFieldTitle}>
-													Safe Address
+												<Box>
+													<Typography
+														className={classes.inputFieldTitle}>
+														Safe Address
 												</Typography>
+												</Box>
+												<TextInput
+													sx={{
+														height: 50,
+														width: 311
+													}}
+													placeholder="0xbeee39"
+													value={safeAddress}
+													name="safeAddress"
+													onChange={(e: any) => {
+														setErrors({ issafeAddress: "" });
+														dispatch(updateSafeAddress(e.target.value));
+													}}
+													isInvalid={errors.issafeAddress}
+												/>
 											</Box>
-											<TextInput
-												sx={{
-													height: 50,
-													width: 311
-												}}
-												placeholder="0xbeee39"
-												value={safeAddress}
-												name="safeAddress"
-												onChange={(e: any) => {
-													setErrors({ issafeAddress: "" });
-													dispatch(updateSafeAddress(e.target.value));
-												}}
-												isInvalid={errors.issafeAddress}
-											/>
 										</Box>
 									</Box>
-								</Box>
-								<Box className={classes.findSafe}>
-									<SimpleLoadButton
-										title="FIND SAFE"
-										height={50}
-										width={160}
-										fontsize={20}
-										fontweight={400}
-										onClick={handleClickDelayed}
-										bgColor={
-											isAddressValid(safeAddress)
-												? "#C94B32"
-												: "rgba(27, 43, 65, 0.2)"
-										}
-										condition={isLoading}
-									/>
-								</Box>
-							</>
-						)}
-				</Box>
+									<Box className={classes.findSafe}>
+										<SimpleLoadButton
+											title="FIND SAFE"
+											height={50}
+											width={160}
+											fontsize={20}
+											fontweight={400}
+											onClick={handleClickDelayed}
+											bgColor={
+												isAddressValid(safeAddress)
+													? "#C94B32"
+													: "rgba(27, 43, 65, 0.2)"
+											}
+											condition={isLoading}
+										/>
+									</Box>
+								</>
+							)}
+					</Box>
 			</Grid>
 		</Container>
 	);
