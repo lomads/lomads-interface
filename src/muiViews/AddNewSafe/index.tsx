@@ -36,14 +36,12 @@ const useStyles = makeStyles((theme: any) => ({
 		flexDirection: 'column',
 		alignItems: 'center',
 		justifyContent: 'center',
-		overflow: 'hidden !important'
 	},
 	text: {
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
 		fontWeight: 400,
 		fontSize: 14,
-		lineHeight: 15,
 		letterSpacing: '-0.011em',
 		color: '#76808D'
 	},
@@ -52,7 +50,6 @@ const useStyles = makeStyles((theme: any) => ({
 		fontStyle: 'normal',
 		fontWeight: 700,
 		fontSize: 16,
-		lineHeight: 18,
 		letterSpacing: '-0.011em',
 		color: '#76808D',
 		margin: '15px 0px 15px 0px'
@@ -75,7 +72,6 @@ const useStyles = makeStyles((theme: any) => ({
 		fontStyle: 'normal',
 		fontWeight: 400,
 		fontSize: 16,
-		lineHeight: 15,
 		letterSpacing: '-0.011em',
 		color: '#76808D'
 	},
@@ -120,7 +116,6 @@ const useStyles = makeStyles((theme: any) => ({
 		fontStyle: 'normal',
 		fontWeight: 400,
 		fontSize: 14,
-		lineHeight: 15,
 		letterSpacing: '-0.011em',
 		color: '#76808D',
 		marginLeft: 16,
@@ -158,7 +153,6 @@ const useStyles = makeStyles((theme: any) => ({
 		fontStyle: 'normal',
 		fontWeight: 400,
 		fontSize: 16,
-		lineHeight: 15,
 		letterSpacing: '-0.011em',
 		color: '#76808D',
 	},
@@ -179,7 +173,6 @@ const useStyles = makeStyles((theme: any) => ({
 		fontStyle: 'normal',
 		fontWeight: '400',
 		fontSize: '14px',
-		lineHeight: '15px',
 		letterSpacing: '-0.011em',
 		color: '#76808D',
 		width: '480px',
