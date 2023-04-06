@@ -82,9 +82,8 @@ const HEADERS = [
 
 
 const TreasuryCard = (props: ItreasuryCardType) => {
-	const { provider, account, chainId, ...rest } = useWeb3React();
-
-	console.log("useWeb3React", chainId, rest)
+	const { provider, account, ...rest } = useWeb3React();
+	const [chainId, setChainId] = useState(null);
 	const { daoURL } = useParams()
 	const dispatch = useAppDispatch()
 	const treasuryCardRef  = useRef<HTMLDivElement>()
@@ -112,7 +111,13 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	const [labels, setLabels] = useState<Array<any>>();
 	const { DAO, recurringPayments } = useAppSelector(store => store.dashboard);
 
-	//const { safeTokens, tokenBalance } = useSafeTokens(_get(DAO, 'safeAddress', ''))
+	useEffect(() => {
+		if(DAO?.chainId) {
+			setChainId(DAO?.chainId)
+		}
+	}, [DAO])
+
+	const { safeTokens, tokenBalance } = useSafeTokens(_get(DAO, 'safeAddress', ''))
 
 	const { createSafeTransaction, createSafeTxnLoading } = useSafeTransaction(_get(DAO, 'safe.address', ''))
 
@@ -191,11 +196,13 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	}, [account, DAO])
 
 	const isOwner = async (_safeAddress: string) => {
-		const safeSDK = await ImportSafe(provider, _safeAddress);
-		const condition = await safeSDK.isOwner(account as string);
-		const threshold = await safeSDK.getThreshold();
-		setOwner(condition)
-		setThreshold(threshold)
+		const safe = await axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${_safeAddress}`, {withCredentials: false }).then(res => res.data)
+		// const safeSDK = await ImportSafe(provider, _safeAddress);
+		// const condition = await safeSDK.isOwner(account as string);
+		// const threshold = await safeSDK.getThreshold();
+		setOwner(safe?.owners?.indexOf(account) > -1)
+		setThreshold(safe.threshold)
+		// setThreshold(threshold)
 	};
 
 	const loadRecurringTxnQueue = () => {
@@ -323,15 +330,15 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	}, [DAO, daoURL, chainId])
 
 	useEffect(() => {
-		if (props.tokens) {
-			console.log("tokens:", props.tokens)
+		if (safeTokens) {
+			console.log("tokens:", safeTokens)
 			let total = 0;
-			props.tokens.map((t: any) => {
+			safeTokens.map((t: any) => {
 				total = +t.fiatBalance + total
 			})
 			setTotalUSD(total.toFixed(2))
 		}
-	}, [props.tokens])
+	}, [safeTokens])
 
 
 	const createOnChainTxn = async (txn: any, action: string | null) => {
@@ -401,9 +408,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		} else {
 			try {
 				setConfirmTxLoading(_safeTxHashs);
-				const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
-				const isOwner = await safeSDK.isOwner(account as string);
-				if (isOwner) {
+				// const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
+				// const isOwner = await safeSDK.isOwner(account as string);
+				if (isSafeOwner) {
 					const senderSignature = await safeSDK.signTransactionHash(_safeTxHashs);
 					await (await safeService(provider, `${chainId}`))
 						.confirmTransaction(_safeTxHashs, senderSignature.data)
@@ -533,22 +540,28 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	};
 
 	const ownersCount = async (_safeAddress: string) => {
-		const safeSDK = await ImportSafe(provider, _safeAddress);
-		const owners = await safeSDK.getOwners();
-		const threshold = await safeSDK.getThreshold();
+		// const safeSDK = await ImportSafe(provider, _safeAddress);
+		// const owners = await safeSDK.getOwners();
+		// const threshold = await safeSDK.getThreshold();
+		const safe = await axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}`, {withCredentials: false }).then(res => res.data)
+		// const safeSDK = await ImportSafe(provider, _safeAddress);
+		// const condition = await safeSDK.isOwner(account as string);
+		// const threshold = await safeSDK.getThreshold();
+		// setOwner(safe?.owners?.indexOf(account) > -1)
+		// setThreshold(safe?.threshold)
 		isOwner(_safeAddress)
-		dispatch(updateSafeThreshold(threshold));
-		const dao = await axiosHttp.patch(`dao/${DAO.url}/sync-safe-owners`, owners)
+		dispatch(updateSafeThreshold(safe?.threshold));
+		const dao = await axiosHttp.patch(`dao/${DAO.url}/sync-safe-owners`, safe?.owners)
 		return dao;
 	};
 
 	const handleExecuteTransactions = async (txn: any, reject: boolean | undefined, syncOwners = false, amount = null, isAllowanceTransaction = false) => {
 		console.log(txn)
-		const safeTokens = await getSafeTokens();
-		let safeToken = _find(safeTokens, t => toChecksumAddress(t.tokenAddress) === toChecksumAddress(_get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', ''))))
-		console.log("safeTokensafeToken",safeTokens, safeToken, _get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', '')))
+		const st = await getSafeTokens();
+		let safeToken = _find(st, t => toChecksumAddress(t.tokenAddress) === toChecksumAddress(_get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', ''))))
+		console.log("safeTokensafeToken",st, safeToken, _get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', '')))
 		if (!safeToken)
-			safeToken = _find(safeTokens || [], (st: any) => _get(st, 'tokenAddress', '') === (chainId === SupportedChainId.GOERLI ? process.env.REACT_APP_GOERLI_TOKEN_ADDRESS : process.env.REACT_APP_MATIC_TOKEN_ADDRESS))
+			safeToken = _find(st || [], (st: any) => _get(st, 'tokenAddress', '') === (chainId === SupportedChainId.GOERLI ? process.env.REACT_APP_GOERLI_TOKEN_ADDRESS : process.env.REACT_APP_MATIC_TOKEN_ADDRESS))
 		let _txs = txn;
 		if (txn.offChain && _get(txn, 'token.symbol') === 'SWEAT') {
 			setExecuteTxLoading(txn.safeTxHash)
@@ -656,26 +669,26 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
 
 	const hasValidToken = useMemo(() => {
-		if (props.tokens && props.tokens.length > 0) {
-			let valid = props.tokens.some((t: any) => +t.balance > 0)
+		if (safeTokens && safeTokens.length > 0) {
+			let valid = safeTokens.some((t: any) => +t.balance > 0)
 			return valid
 		}
 		return false
-	}, [props.tokens])
+	}, [safeTokens])
 
 
 	const tokenDecimal = useCallback((addr: any) => {
-		if (props.tokens) {
+		if (safeTokens) {
 			if (!addr || addr === SupportedChainId.POLYGON || addr === SupportedChainId.GOERLI || addr === 'SWEAT')
 				return 18
-			const tkn = _find(props.tokens, (stkn: any) => stkn.tokenAddress === addr)
+			const tkn = _find(safeTokens, (stkn: any) => stkn.tokenAddress === addr)
 			if (tkn) {
 				console.log("tokenDecimal", tkn)
 				return _get(tkn, 'token.decimals', 18)
 			}
 			return 18
 		}
-	}, [props.tokens])
+	}, [safeTokens])
 
 	// const tokenDecimal = (addr:string) => {
 	// 	if(!addr) return 18
@@ -756,7 +769,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 								<img src={copyIcon} alt="copy" className="safeCopyImage" />
 							</div>
 						</Tooltip>
-						<div className="dashboardText">{`${_get(props, 'safeAddress', '').slice(0, 6)}...${_get(props, 'safeAddress', '').slice(-4)}`}</div>
+						<div className="dashboardText">{`${_get(DAO, 'safe.address', '').slice(0, 6)}...${_get(DAO, 'safe.address', '').slice(-4)}`}</div>
 					</div>
 					{/* <div className="copyArea">
 						{
@@ -805,7 +818,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 					<Tooltip isOpen={lowBalanceError} label={"Low token balance"}>
 						<div className="treasuryTokens-right">
 							{
-								props.tokens.map((token: any) => {
+								safeTokens.map((token: any) => {
 									return (
 										<>
 											<div className="tokenDiv">

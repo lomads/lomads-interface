@@ -9,8 +9,14 @@ import { setSafeTokens } from "state/dashboard/reducer";
 import { useAppDispatch, useAppSelector } from "state/hooks";
 
 const useSafeTokens = (safeAddress: string | null) => {
-
-    const { chainId } = useWeb3React();
+    const { DAO } = useAppSelector(store => store.dashboard)
+    // const { chainId } = useWeb3React();
+    const [chainId, setChainId] = useState(null)
+    useEffect(() => {
+        if(DAO?.chainId) {
+            setChainId(DAO?.chainId)
+        }
+    }, [DAO])
     const dispatch = useAppDispatch();
     //const [safeTokens, setSafeTokens] = useState([]);
     const { safeTokens } = useAppSelector(store => store.dashboard)
@@ -28,7 +34,7 @@ const useSafeTokens = (safeAddress: string | null) => {
     const prevSafeAddress = usePrevious(safeAddress)
 
     useEffect(() => {
-        if(chainId && safeAddress !== null && (prevSafeAddress !== safeAddress) && !safeTokens){
+        if(chainId && safeAddress !== null && !safeTokens){
             console.log('calling safe tokens..', prevSafeAddress, safeAddress)
             axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`, {withCredentials: false })
             .then((res: any) => {

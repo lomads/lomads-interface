@@ -112,20 +112,18 @@ const Dashboard = () => {
 	const location = useLocation()
 	const from = location?.state?.from;
 	const { user, DAO, DAOList, DAOLoading } = useAppSelector((state) => state.dashboard);
-	console.log("DAO : ", DAO);
 	const [update, setUpdate] = useState(0);
 	const treasuryRef = useRef<any>();
 	const anchorRef = useRef<any>();
 	const questionMarkRef = useRef<any>();
 	const { provider, account, chainId, connector } = useWeb3React();
-	console.log("chainId : ", chainId, provider);
 	const safeAddress = useAppSelector((state) => state.flow.safeAddress);
 	const totalMembers = useAppSelector((state) => state.flow.totalMembers);
 	const [pendingTransactions, setPendingTransactions] =
 		useState<SafeMultisigTransactionListResponse>();
 	const [executedTransactions, setExecutedTransactions] =
 		useState<AllTransactionsListResponse>();
-	const [validDaoChain, setValidDaoChain] = useState<boolean>(false);
+	const [validDaoChain, setValidDaoChain] = useState<boolean>(true);
 	const [showModal, setShowModal] = useState<boolean>(false);
 	const [ownerCount, setOwnerCount] = useState<number>();
 	const [safeTokens, setSafeTokens] = useState<Array<any>>([]);
@@ -392,18 +390,18 @@ const Dashboard = () => {
 	}, [account, chainId, user])
 
 
-	useEffect(() => {
-		if (DAO && chainId) {
-			const manualSwitch = sessionStorage.getItem('___lmds_chain_switch');
-			sessionStorage.clear()
-			if (((DAO.chainId !== chainId) && !manualSwitch)) {
-				setValidDaoChain(false)
-				switchChain(connector, DAO.chainId)
-			}
-			else
-				setValidDaoChain(true)
-		}
-	}, [DAO, chainId, manualChainSwitch]);
+	// useEffect(() => {
+	// 	if (DAO && chainId) {
+	// 		const manualSwitch = sessionStorage.getItem('___lmds_chain_switch');
+	// 		sessionStorage.clear()
+	// 		if (((DAO.chainId !== chainId) && !manualSwitch)) {
+	// 			setValidDaoChain(false)
+	// 			switchChain(connector, DAO.chainId)
+	// 		}
+	// 		else
+	// 			setValidDaoChain(true)
+	// 	}
+	// }, [DAO, chainId, manualChainSwitch]);
 
 	useEffect(() => {
 		if (DAO && account && chainId) {
