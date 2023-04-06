@@ -818,6 +818,24 @@ const TaskDetails = () => {
                                                     <span>{moment(Task.deadline).format('L')}</span>
                                                 </div>
                                             }
+                                            { Task?.contributionType === 'open' && !Task?.isSingleContributor && _get(Task, 'members', []).filter(t => t.status === 'submission_accepted').length > 0 &&
+                                                <div style={{ 
+                                                    fontStyle: 'normal',
+                                                    marginLeft: 8,
+                                                    fontWeight: 400,
+                                                    fontSize: '16px',
+                                                    lineHeight: '18px',
+                                                    display: 'flex',
+                                                    alignItems: 'flex-end',
+                                                    letterSpacing: '-0.011em',
+                                                    color: '#76808D',
+                                                    flex: 'none',
+                                                    order: 0,
+                                                    flexGrow: 0,
+                                                 }}>
+                                                    <span style={{ fontWeight: 'bold', marginRight: 3 }}>{ _get(Task, 'members', []).filter(t => t.status === 'submission_accepted').length }</span> Submission(s) Approved
+                                                </div>
+                                            }
                                         </div>
 
                                     </div>

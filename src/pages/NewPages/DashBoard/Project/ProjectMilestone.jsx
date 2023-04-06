@@ -35,6 +35,7 @@ import { resetEditProjectMilestoneLoader } from 'state/dashboard/reducer';
 
 import { editProjectMilestone } from "state/dashboard/actions";
 
+import Button from 'muiComponents/Button'
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 
 const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation, list, editMilestones }) => {
@@ -270,7 +271,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                     </button>
                 </div>
                 <div style={{ width: '100%', height: '100%', overflow: 'scroll' }}>
-                    <div className='milestone-body'>
+                    <div className='milestone-body' style={{ paddingBottom: 60 }}>
                         <img src={createTaskSvg} alt="frame-icon" />
                         <h1>{transformWorkspace().label} Milestones</h1>
                         <span>Organise and link payments to milestones</span>
@@ -431,7 +432,14 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                             })
                         }
                     </div>
-                    <div className='milestone-footer'>
+                    <div style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: '500px',  position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
+                        <div style={{ width: 350,  margin: '0 auto', display: 'flex', flexDirection: 'row', alignSelf: 'center', }}>
+                            <Button size="small" sx={{mr:1}} variant="outlined" fullWidth onClick={() => toggleShowMilestone()}>CANCEL</Button>
+                            <Button size="small" fullWidth variant="contained" loading={false} 
+                                onClick={handleSubmit}>SAVE</Button>
+                        </div>
+					</div>
+                    {/* <div className='milestone-footer'>
                         <button onClick={() => toggleShowMilestone()}>
                             CANCEL
                         </button>
@@ -455,7 +463,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                                     ADD
                                 </button>
                         }
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>

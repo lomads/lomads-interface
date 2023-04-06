@@ -221,7 +221,7 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
 
   return (
     <>
-      <div className="sidebarModal">
+      <div className="sidebarModal" style={{ overflowY: 'auto' }}>
         <div
           onClick={() => {
             eventEmitter.emit('close-xp-modal')
@@ -300,9 +300,10 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
             All SWEAT counter will be reset to 0.
           </div>
           {/* //! FOOTER */}
-          <Box position="fixed" backgroundColor='#FFF' bottom={0} pb={3} pt={2} display="flex" flexDirection="row">
+          <Box position="fixed" width={400} backgroundColor='#FFF' bottom={0} pb={3} pt={2} display="flex" flexDirection="row">
             <Button
               variant="outlined"
+              fullWidth
               sx={{ mr: 1 }}
               onClick={() => {
                // toggleModal();
@@ -311,7 +312,7 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
             >
               Cancel
             </Button>
-            <Button disabled={loading || safeTokens.length == 0} fullWidth style={{ backgroundColor: loading ? 'grey' : '#C94B32' }} onClick={() => createTransaction()} id="button-save">SEND TOKENS</Button>
+            <Button  disabled={loading || safeTokens.length == 0} fullWidth style={{ backgroundColor: loading ? 'grey' : '#C94B32' }} onClick={() => createTransaction()} id="button-save">SEND</Button>
           </Box>
         </div>
       </div>
