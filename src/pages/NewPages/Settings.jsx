@@ -50,7 +50,8 @@ import SideModal from "./DashBoard/SideModal";
 // import OrganisationDetailsModal from "./OrganisationDetailsModal";
 import OrganisationDetailsModal from "muiModals/OrganisationDetailsModal";
 import RolesPermissionsModal from "./RolesPermissionsModal";
-import SafeModal from "./SafeModal";
+import SafeModal from "muiModals/SafeModal";
+import renderConfirmation from "muiModals/renderConfirmation";
 import XpPointsModal from "muiModals/XpPointsModal";
 // import XpPointsModal from "./XpPointsModal";
 import PassTokenModal from "muiModals/PassTokenModal";
@@ -323,18 +324,20 @@ const Settings = () => {
 				<RolesPermissionsModal toggleRP={toggleRP} />
 			)} */}
       {/* // !-------------  Safe ------------ */}
-      {openSafe && <SafeModal toggleS={toggleS} />}
+      {/* {openSafe && <SafeModal toggleS={toggleS} />} */}
+      <SafeModal open={openSafe} onClose={() => setOpenSafe(false)} />
+      {/* <renderConfirmation open={openSafe} onClose={() => setOpenSafe(false)} /> */}
       {/* // !-------------  Pass Token ------------ */}
       <PassTokenModal
         open={openPassToken}
         onClose={() => setOpenPassToken(false)}
       />
       {/* {openCreatePassToken && (
-				<CreateMorePassTokenModal
-					navFromSetting={true}
-					toggleCreatePassTokenModal={toggleCreatePassTokenModal}
-				/>
-			)} */}
+        <CreateMorePassTokenModal
+          navFromSetting={true}
+          toggleCreatePassTokenModal={toggleCreatePassTokenModal}
+        />
+      )} */}
       {/* // !-------------  SWEAT Points ------------ */}
       {/* {openXpPoints && (
 				<XpPointsModal toggleXp={toggleXp} />
