@@ -13,6 +13,8 @@ import SimpleInputField from "UIpack/SimpleInputField";
 import useRole from "hooks/useRole";
 import useTerminology from 'hooks/useTerminology';
 
+import {BsArrowRight} from 'react-icons/bs'
+
 const MemberCard = (props: any) => {
 	const dispatch = useAppDispatch();
 	const { provider, account } = useWeb3React();
@@ -191,6 +193,12 @@ const MemberCard = (props: any) => {
 								/>
 							);
 						})}
+					</div>
+					<div style={{padding:'0 22px 26px 22px',width:'100%'}}>
+					<div className="invite-gang-box" onClick={() => props.toggleShowMember()}>
+						<span>INVITE YOUR GANG</span>
+						<BsArrowRight color='rgba(118, 128, 141, 0.5)' size={20}/>
+					</div>
 					</div>
 				</div>
 			</div>

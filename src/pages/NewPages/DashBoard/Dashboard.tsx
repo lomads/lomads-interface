@@ -732,12 +732,12 @@ const Dashboard = () => {
 							showNotificationArea={showNotificationArea}
 						/>
 					)} */}
-
-				<MyProject isHelpIconOpen={isHelpIconOpen} />
 				<Tasks
 					toggleShowCreateTask={toggleShowCreateTask} 
 					onlyProjects={false} 
 					isHelpIconOpen={isHelpIconOpen} />
+				<MyProject isHelpIconOpen={isHelpIconOpen} />
+				
 				{(can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') &&
 					<TreasuryCard
 						innerRef={treasuryRef}

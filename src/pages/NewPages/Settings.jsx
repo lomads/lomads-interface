@@ -71,12 +71,12 @@ import { LeapFrog } from "@uiball/loaders";
 
 const Settings = () => {
 	const navigate = useNavigate();
-	const { daoURL } = useParams();
+	const { daoURL,openState } = useParams();
 
 	const dispatch = useAppDispatch();
 
 	//! CONST DECLARATION
-	const [openOrganisationDetails, setOpenOrganisationDetails] = useState(false);
+	const [openOrganisationDetails, setOpenOrganisationDetails] = useState(openState && openState === 'openOrganisation'?true:false);
 	const [openRolesPermissions, setOpenRolesPermissions] = useState(false);
 	const [openSafe, setOpenSafe] = useState(false);
 	const [openPassToken, setOpenPassToken] = useState(false);

@@ -11,7 +11,7 @@ export default ({name,wallet,...props }: any) => {
             <Avatar
                 size={32}
                 name={name}
-                variant="pixel"
+                variant="bauhaus"
                 colors={["#E67C40", "#EDCD27", "#8ECC3E", "#2AB87C", "#188C8C"]}
             />
             <Box style={{marginLeft:'12px',display:'flex',flexDirection:'column',alignItems:'flex-start'}}>

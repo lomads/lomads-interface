@@ -6,6 +6,9 @@
     flex-direction: row;
 }
 
+.notifications.no-content{
+    height: 100px;
+}
 .notifications .my_notifications {
     width: 60%;
     height: 100%;
@@ -25,6 +28,20 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.notifications .my_notifications .list-container .no-action-list{
+    width: 80%;
+    height: 50px;
+    border-radius: 5px;
+    border: 1px dashed rgba(118, 128, 141, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notifications .my_notifications .list-container .no-action-list span{
+    color: rgba(118, 128, 141, 0.5);
 }
 
 .notifications .my_notifications .list-container .notification-item {
