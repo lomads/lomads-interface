@@ -333,7 +333,7 @@ const Settings = () => {
 								</div>
 							</div>
 
-							<div className="settings-organisation-child disabled"
+							{/* <div className="settings-organisation-child disabled"
 								onClick={() => {
 									setOpenDiscord(true);
 								}}
@@ -352,11 +352,7 @@ const Settings = () => {
 										<ChevronRight />
 									</Link>
 								</div>
-							</div>
-						</div>
-
-						{/* Trello */}
-						<div className="settings-organisation-flexbox">
+							</div> */}
 							<div className="settings-organisation-child"
 								onClick={authorizeTrello}
 							>
@@ -378,6 +374,31 @@ const Settings = () => {
 									</Link>
 								</div>
 							</div>
+						</div>
+
+						{/* Trello */}
+						<div className="settings-organisation-flexbox">
+							{/* <div className="settings-organisation-child"
+								onClick={authorizeTrello}
+							>
+								<div style={{ padding: "20px" }}>
+									{
+										trelloLoading
+											?
+											<LeapFrog size={24} color="#76808D" />
+											:
+											<CgTrello size={35} color="#76808D" />
+									}
+
+									<Link
+										className="style-content"
+										style={{ color: "#C94B32" }}
+									>
+										Trello
+										<ChevronRight />
+									</Link>
+								</div>
+							</div> */}
 						</div>
 
 					</div>

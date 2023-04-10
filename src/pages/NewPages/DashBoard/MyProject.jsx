@@ -71,8 +71,8 @@ const MyProject = ({ isHelpIconOpen }) => {
 
     useEffect(() => {
         if (!initialCheck) {
+            setInitialCheck(true)
             if (myProjects.length > 0) {
-                setInitialCheck(true)
                 setTab(1);
             } else {
                 setTab(2)
@@ -154,7 +154,7 @@ const MyProject = ({ isHelpIconOpen }) => {
                 </div>
             </div>
             {
-                tab === 1 && myProjects && myProjects.length > 0
+                tab === 1 
                     ?
                     <div className='myproject-body-fixed' style={isHelpIconOpen ? {overflow: 'hidden'} : {}}>
                     {isHelpIconOpen && <div className="help-card">
@@ -205,7 +205,7 @@ const MyProject = ({ isHelpIconOpen }) => {
             }
 
             {
-                tab === 2 && otherProjects && otherProjects.length > 0
+                tab === 2 
                     ?
                     <>
                         {

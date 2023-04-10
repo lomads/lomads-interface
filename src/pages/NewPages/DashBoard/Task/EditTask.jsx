@@ -244,7 +244,7 @@ const EditTask = ({ close, task, daoURL }) => {
     }, [DAO, selectedUser, reviewer])
 
     const eligibleReviewers = useMemo(() => {
-        return _get(DAO, 'members', []).filter(m => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase())
+        return _get(DAO, 'members', []).filter(m => _get(selectedUser, "_id", "")?.toLowerCase() !== m?.member?._id?.toLowerCase() && (m?.role === 'role1' || m?.role === 'role2'))
     }, [DAO, reviewer, selectedUser])
 
     const eligibleProjects = useMemo(() => {

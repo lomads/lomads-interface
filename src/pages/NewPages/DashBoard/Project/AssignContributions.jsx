@@ -18,6 +18,7 @@ import useRole from "hooks/useRole";
 import { nanoid } from "@reduxjs/toolkit";
 import moment from "moment";
 import axiosHttp from '../../../../api';
+import Button from 'muiComponents/Button'
 
 import { getDao, updateMilestone } from "state/dashboard/actions";
 
@@ -419,7 +420,12 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                                     </div>
                                 </div>
                                 { error && <div style={{ color: 'red', textAlign: 'center', margin: '0 0 8px 0' }}>{ error }</div> }
-                                <div className='milestone-footer'>
+                                <div style={{ display: 'flex', flexDirection: 'row', background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: '500px',  position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
+                                    <Button sx={{mr:1}} size="small" variant="outlined" fullWidth onClick={() => toggleShowAssign()}>CANCEL</Button>
+                                    <Button fullWidth size="small" variant="contained" loading={false} 
+                                        onClick={handleSubmit}>SAVE</Button>
+                                </div>
+                                {/* <div className='milestone-footer'>
                                     <button onClick={() => toggleShowAssign()} disabled={isLoading} style={isLoading ? { cursor: 'not-allowed' } : null}>
                                         CANCEL
                                     </button>
@@ -433,7 +439,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                                         bgColor={"#C94B32"}
                                         condition={isLoading}
                                     />
-                                </div>
+                                </div> */}
                             </div>
                         </>
                 }

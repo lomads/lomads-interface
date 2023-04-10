@@ -88,6 +88,7 @@
     background: #FFFFFF;
     border-radius: 5px;
     display: flex;
+    min-height: 150px;
     /* align-items: center; */
     flex-wrap: wrap;
     position: relative;
