@@ -40,7 +40,9 @@ root.render(
                       <MuiThemeProvider theme={muiTheme}>
                         <App />
                       </MuiThemeProvider>
-                      <Toaster position="bottom-right" />
+                      <Toaster toastOptions={{
+                        style: {zIndex: 1000001}
+                      }} position="bottom-left" />
                     </MoralisProvider>
                   </ChakraProvider>
                 </BrowserRouter>

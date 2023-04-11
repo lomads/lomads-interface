@@ -7,6 +7,7 @@ import {
 	TransactionDataType,
 } from "types/DashBoardType";
 import { InviteGangType } from "types/UItype";
+import { switchChain } from "utils/switchChain";
 import SelectRecipient from "./SideModal/SelectRecipient";
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import TransactionSend from "./SideModal/TransactionSend";
@@ -24,7 +25,7 @@ import axios from "axios";
 import { getDao } from "state/dashboard/actions";
 import { updateTotalMembers } from "state/flow/reducer";
 import axiosHttp from '../../../api'
-import { SupportedChainId } from "constants/chains";
+import { CHAIN_IDS_TO_NAMES, SupportedChainId } from "constants/chains";
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
 import { nanoid } from "@reduxjs/toolkit";
 import moment from "moment";
@@ -33,7 +34,7 @@ import useSafeTransaction from "hooks/useSafeTransaction";
 
 const SideModal = (props: IsideModal) => {
 	const dispatch = useAppDispatch();
-	const { provider, account, chainId } = useWeb3React();
+	const { provider, account, chainId, connector } = useWeb3React();
 	const [selectedToken, setSelectedToken] = useState<string>("");
 	const [addNewRecipient, setAddNewRecipient] = useState<boolean>(false);
 	const [modalNavigation, setModalNavigation] = useState({
@@ -167,8 +168,13 @@ const SideModal = (props: IsideModal) => {
 		if (selectedToken === 'SWEAT') {
 			return createOffChainTxn()
 		}
-		try {
+		if(chainId !== _get(DAO, 'chainId', '')) {
+			switchChain(connector, _get(DAO, 'chainId', ''))
+			.catch(e => { console.log(e) })
+		}
 
+		
+		try {
 			const txnResponse = await createSafeTransaction({ tokenAddress: selectedToken, send: setRecipient.current });
 			if (txnResponse?.safeTxHash) {
 				dispatch(getDao(DAO.url))

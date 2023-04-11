@@ -117,7 +117,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		}
 	}, [DAO])
 
-	const { safeTokens, tokenBalance } = useSafeTokens(_get(DAO, 'safeAddress', ''))
+	const { safeTokens, tokenBalance } = useSafeTokens(_get(DAO, 'safe.address', ''))
 
 	const { createSafeTransaction, createSafeTxnLoading } = useSafeTransaction(_get(DAO, 'safe.address', ''))
 
@@ -557,11 +557,6 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
 	const handleExecuteTransactions = async (txn: any, reject: boolean | undefined, syncOwners = false, amount = null, isAllowanceTransaction = false) => {
 		console.log(txn)
-		const st = await getSafeTokens();
-		let safeToken = _find(st, t => toChecksumAddress(t.tokenAddress) === toChecksumAddress(_get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', ''))))
-		console.log("safeTokensafeToken",st, safeToken, _get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', '')))
-		if (!safeToken)
-			safeToken = _find(st || [], (st: any) => _get(st, 'tokenAddress', '') === (chainId === SupportedChainId.GOERLI ? process.env.REACT_APP_GOERLI_TOKEN_ADDRESS : process.env.REACT_APP_MATIC_TOKEN_ADDRESS))
 		let _txs = txn;
 		if (txn.offChain && _get(txn, 'token.symbol') === 'SWEAT') {
 			setExecuteTxLoading(txn.safeTxHash)
@@ -581,6 +576,11 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				.catch(e => console.log(e))
 				.finally(() => setExecuteTxLoading(null))
 		} else {
+			const st = await getSafeTokens();
+			let safeToken = _find(st, t => toChecksumAddress(t.tokenAddress) === toChecksumAddress(_get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', ''))))
+			console.log("safeTokensafeToken",st, safeToken, _get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', '')))
+			if (!safeToken)
+				safeToken = _find(st || [], (st: any) => _get(st, 'tokenAddress', '') === (chainId === SupportedChainId.GOERLI ? process.env.REACT_APP_GOERLI_TOKEN_ADDRESS : process.env.REACT_APP_MATIC_TOKEN_ADDRESS))
 			if (!reject && amount && !isAllowanceTransaction) {
 				const balance = _get(safeToken, 'balance', 0) / 10 ** _get(safeToken, 'token.decimal', _get(safeToken, 'token.decimals', 18))
 				if (+amount > +balance) {
@@ -796,7 +796,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
 			{/* For treasury --- token details */}
 			{
-				tab === 1 && props.tokens && props.tokens.length > 0 &&
+				tab === 1 && safeTokens && safeTokens.length > 0 &&
 				<div className="treasuryTokens">
 					<div className="treasuryTokens-left">
 						{

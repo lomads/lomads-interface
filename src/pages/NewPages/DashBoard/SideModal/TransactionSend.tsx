@@ -19,6 +19,7 @@ import AddRecipient from "./AddRecipient";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import { ImportSafe } from "connection/SafeCall";
 import { SupportedChainId } from "constants/chains";
+import useSafeTokens from "hooks/useSafeTokens";
 import { useWeb3React } from "@web3-react/core";
 import { useAppSelector } from "state/hooks";
 import {
@@ -36,6 +37,7 @@ import {
 const TransactionSend = (props: IselectTransactionSend) => {
 	console.log("error : ", props.error)
 	const { DAO } = useAppSelector((state) => state?.dashboard);
+	const { safeTokens } = useSafeTokens(_get(DAO, 'safe.address', ''))
 	const { chainId } = useWeb3React();
 	const managePreviousNavigation = () => {
 		const length = props.setRecipient.current.length;
@@ -76,12 +78,12 @@ const TransactionSend = (props: IselectTransactionSend) => {
 							}}
 							defaultValue={props.selectedToken}
 						>
-							{props.tokens.map((result: any, index: any) => {
+							{safeTokens.map((result: any, index: any) => {
 								return (
 									(
 										<>
-											<option value={result?.tokenAddress ? result.tokenAddress : chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS} key={index}>
-												{_get(result, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}
+											<option value={result?.tokenAddress} key={index}>
+												{_get(result, 'token.symbol')}
 											</option>
 										</>
 									)

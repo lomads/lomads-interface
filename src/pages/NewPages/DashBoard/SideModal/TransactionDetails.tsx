@@ -8,11 +8,13 @@ import doubleEuro from "../../../../assets/svg/doubleEuro.svg";
 import { ItransactionDetailsType } from "types/DashBoardType";
 import { SupportedChainId } from "constants/chains";
 import { useWeb3React } from "@web3-react/core";
+import useSafeTokens from "hooks/useSafeTokens";
 import { useAppDispatch, useAppSelector } from "state/hooks";
 
 const TransactionDetails = (props: ItransactionDetailsType) => {
   const { chainId } = useWeb3React();
   const { DAO } = useAppSelector((state) => state.dashboard);
+  const { safeTokens } = useSafeTokens(_get(DAO, 'safe.address', ''))
   return (
     <>
       <div id="transactionDetailsPage">
@@ -36,13 +38,13 @@ const TransactionDetails = (props: ItransactionDetailsType) => {
               <option value="" disabled={true}>
                 select a token
               </option>
-              {props.tokens.map((result: any, index: any) => {
+              {safeTokens.map((result: any, index: any) => {
                 console.log("tokens_RESULT", result)
                 return (
                   (
                     <>
-                      <option value={result.tokenAddress ? result.tokenAddress : chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS} key={index}>
-                        {_get(result, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}
+                      <option value={result.tokenAddress} key={index}>
+                        {_get(result, 'token.symbol')}
                       </option>
                     </>
                   )

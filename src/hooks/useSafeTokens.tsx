@@ -34,7 +34,7 @@ const useSafeTokens = (safeAddress: string | null) => {
     const prevSafeAddress = usePrevious(safeAddress)
 
     useEffect(() => {
-        if(chainId && safeAddress !== null && !safeTokens){
+        if(chainId && safeAddress !== "" && safeAddress !== null && !safeTokens){
             console.log('calling safe tokens..', prevSafeAddress, safeAddress)
             axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`, {withCredentials: false })
             .then((res: any) => {
