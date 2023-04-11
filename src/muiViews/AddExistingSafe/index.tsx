@@ -648,7 +648,7 @@ export default () => {
 								<Button
 									style={{
 										backgroundColor: safeAddress ? "#C94B32" : "rgba(27, 43, 65, 0.2)",
-										color: "#C94B32",
+										color: '#FFF',
 										fontWeight: 400,
 										minWidth: 'max-content'
 									}}
