@@ -20,7 +20,6 @@ import { useWeb3React } from "@web3-react/core";
 import EthersAdapter from "@gnosis.pm/safe-ethers-lib";
 import { SafeFactory, SafeAccountConfig } from "@gnosis.pm/safe-core-sdk";
 import { ethers } from "ethers";
-import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import { createDAO } from '../../state/flow/actions';
 import { loadDao } from '../../state/dashboard/actions';
 import { CHAIN_GAS_STATION, SupportedChainId } from "constants/chains";
@@ -31,11 +30,10 @@ import axios from "axios";
 const useStyles = makeStyles((theme: any) => ({
 	root: {
 		height: "100vh",
-		maxHeight: 'fit-content',
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'center',
-		justifyContent: 'center',
+		justifyContent: 'center'
 	},
 	text: {
 		fontFamily: 'Inter, sans-serif',
@@ -63,9 +61,9 @@ const useStyles = makeStyles((theme: any) => ({
 		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
 		borderRadius: 5,
 		maxHeight: 'fit-content',
-		width: 551,
 		padding: 20,
-		marginTop: 35,
+		margin: 35,
+		width: 551
 	},
 	thresholdText: {
 		fontFamily: 'Inter, sans-serif',
@@ -92,7 +90,7 @@ const useStyles = makeStyles((theme: any) => ({
 		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
 		borderRadius: 5,
 		maxHeight: 'fit-content',
-		width: 500,
+		width: 551,
 		padding: 20,
 		marginTop: 35,
 		marginBottom: 35
@@ -131,11 +129,11 @@ const useStyles = makeStyles((theme: any) => ({
 	centerText: {
 		fontSize: 20,
 		fontWeight: 400,
-		color: '#C94B32'
+		color: '#C94B32',
+		padding: 16
 	},
 	buttonArea: {
 		display: 'flex',
-		width: '500px',
 		justifyContent: 'space-between',
 		alignItems: 'center',
 		paddingBottom: 35
@@ -171,13 +169,21 @@ const useStyles = makeStyles((theme: any) => ({
 	safeFooter: {
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
-		fontWeight: '400',
-		fontSize: '14px',
+		fontWeight: 400,
+		fontSize: 14,
 		letterSpacing: '-0.011em',
 		color: '#76808D',
-		width: '480px',
+		width: 480,
 		textAlign: 'center',
-		marginBottom: '9px',
+		marginBottom: 9
+	},
+	bottomLine: {
+		margin: 10,
+		width: 210,
+		height: 2,
+		backgroundColor: '#C94B32',
+		border: '2px solid #C94B32',
+		position: 'relative'
 	}
 }));
 
@@ -373,7 +379,7 @@ export default () => {
 
 		const ethAdapter = new EthersAdapter({
 			ethers,
-			signer: safeOwner as any,
+			signerOrProvider: safeOwner as any,
 		});
 		const safeFactory = await SafeFactory.create({
 			ethAdapter,
@@ -474,16 +480,16 @@ export default () => {
 												/>
 											</>
 										) : (
-												<>
-													<Checkbox
-														size="lg"
-														colorScheme="orange"
-														name="owner"
-														defaultChecked={true}
-														disabled={true}
-													/>
-												</>
-											)}
+											<>
+												<Checkbox
+													size="lg"
+													colorScheme="orange"
+													name="owner"
+													defaultChecked={true}
+													disabled={true}
+												/>
+											</>
+										)}
 									</Box>
 								</>
 							);
@@ -512,9 +518,7 @@ export default () => {
 	const SelectedOwners = () => {
 		return (
 			<>
-				<Box>
-					<hr />
-				</Box>
+				<Box className={classes.bottomLine} />
 				<Box className={classes.addOwner}>
 					<Box className={classes.inputFieldTitle}>Owners</Box>
 					<Box sx={{ width: '100%;' }}>
@@ -570,9 +574,7 @@ export default () => {
 	const SelectThreshold = () => {
 		return (
 			<>
-				<Box>
-					<hr />
-				</Box>
+				<Box className={classes.bottomLine} />
 				<Box className={classes.centerCard}>
 					<Box>
 						<Typography className={classes.thresholdText}>
@@ -600,35 +602,37 @@ export default () => {
 					</span>
 					The exact amount will be determinated by your wallet.
 				</Box>
-				<Box sx={{ marginTop: '35px' }}>
-					<SimpleLoadButton
-						title="CREATE SAFE"
-						bgColor={isLoading ? 'grey' : "#C94B32"}
-						height={50}
-						width={250}
-						fontsize={20}
-						disabled={isLoading}
-						onClick={deployNewSafeDelayed}
-						condition={isLoading}
-					/>
-				</Box>
+				<Button
+					variant='contained'
+					onClick={deployNewSafeDelayed}
+					sx={{
+						bgColor: isLoading ? 'grey' : "#C94B32",
+						height: 50,
+						width: 250,
+						fontsize: 20,
+						boxShadow: '3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)'
+					}}>
+					CREATE SAFE
+				</Button>
 			</>
 		);
 	};
 
 	return (
 		<Container>
-			<Grid className={classes.root}>
+			<Grid container className={classes.root}>
 				<Box className={classes.StartSafe}>
 					<Box className={classes.headerText}>3/3 DAO Treasury</Box>
 					<Box className={classes.buttonArea}>
 						<Box>
 							<Button
-								style={{
+								sx={{
 									color: "#C94B32",
 									backgroundColor: "#FFFFFF",
 									fontWeight: 400,
-									minWidth: 'max-content'
+									minWidth: 'max-content',
+									width: 228,
+									boxShadow: '3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)'
 								}}
 								variant='contained'>
 								CREATE NEW SAFE
@@ -637,12 +641,14 @@ export default () => {
 						<Box className={classes.centerText}>or</Box>
 						<Box>
 							<Button
-								style={{
+								sx={{
 									backgroundColor: "#FFFFFF",
 									minWidth: 'max-content',
 									fontWeight: 400,
 									opacity: 0.6,
-									color: 'rgba(201, 75, 50, 0.6)'
+									color: 'rgba(201, 75, 50, 0.6)',
+									width: 228,
+									boxShadow: '3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)'
 								}}
 								onClick={() => navigate('/addsafe')}
 								variant='contained'>
@@ -650,20 +656,20 @@ export default () => {
 							</Button>
 						</Box>
 					</Box>
-					<hr />
+					<Box className={classes.bottomLine} />
 					<Box className={classes.centerCard}>
 						<Typography className={classes.inputFieldTitle}>Safe Name</Typography>
 						<TextInput
-						   sx={{
-							height: 50,
-							width: 507
-						   }}
+							sx={{
+								height: 50,
+								width: 507
+							}}
 							placeholder="Pied Piper"
 							value={safeName}
 							onChange={(e: any) => {
 								dispatch(updatesafeName(e.target.value));
 							}}
-							isInvalid={errors.safeName}
+							helperText={errors.safeName}
 						/>
 					</Box>
 					{showContinue ? (
@@ -687,11 +693,11 @@ export default () => {
 						ownerSelected ? (
 							<SelectedOwners />
 						) : (
-								<AddOwners />
-							)
+							<AddOwners />
+						)
 					) : (
-								<SelectedOwners />
-							)}
+						<SelectedOwners />
+					)}
 				</Box>
 			</Grid>
 		</Container>

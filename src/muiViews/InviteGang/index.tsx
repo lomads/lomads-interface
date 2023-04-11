@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import _ from "lodash";
 import IconButton from "../../muiComponents/IconButton";
 import TextInput from '../../muiComponents/TextInput';
@@ -11,17 +11,19 @@ import { updateInvitedGang, appendInviteMembers } from "state/flow/reducer";
 import { ethers } from "ethers";
 import daoMember2 from "../../assets/svg/daoMember2.svg";
 import { useWeb3React } from "@web3-react/core";
-import Uploader from 'components/XlsxUploader';
+import uploadIcon from '../../assets/svg/uploadIcon.svg';
 import createProjectSvg from '../../assets/svg/createProject.svg';
 import memberIcon from '../../assets/svg/memberIcon.svg';
 import binRed from '../../assets/svg/bin-red.svg';
 import binWhite from '../../assets/svg/bin-white.svg';
 import plusIcon from '../../assets/svg/plusIcon.svg';
+import GreyAddIcon from '../../assets/svg/ADD.svg';
 import { DEFAULT_ROLES } from "constants/terminology";
 import useEns from 'hooks/useEns';
 import useTerminology from "hooks/useTerminology";
 import { makeStyles } from '@mui/styles';
-import { Container, Box, Button } from "@mui/material"
+import { Container, Box, Button, Tooltip } from "@mui/material"
+import { read, utils } from 'xlsx';
 
 const useStyles = makeStyles((theme: any) => ({
 	InviteGang: {
@@ -206,18 +208,18 @@ const useStyles = makeStyles((theme: any) => ({
 	},
 	membersModalRow: {
 		width: '100%',
-    	display: 'flex',
-    	alignItems: 'center',
-    	justifyContent: 'space-between',
-    	marginBottom: '20px',
-    	position: 'relative',
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		marginBottom: 20,
+		position: 'relative',
 	},
 	rowOvercast: {
 		width: '100%',
-    	height: '100%',
-    	backgroundColor: 'rgba(255, 255, 255, 0.5)',
-    	position: 'absolute',
-    	zIndex: '998'
+		height: '100%',
+		backgroundColor: 'rgba(255, 255, 255, 0.5)',
+		position: 'absolute',
+		zIndex: 998
 	},
 	addButton: {
 		padding: '0px 10px 0px 10px',
@@ -231,12 +233,12 @@ const useStyles = makeStyles((theme: any) => ({
 	},
 	text: {
 		fontFamily: 'Inter, sans-serif',
-    	fontStyle: 'normal',
-    	fontWeight: '400',
-    	fontSize: '14px',
-    	lineHeight: '15px',
-    	letterSpacing: '-0.011em',
-    	color: '#76808D',
+		fontStyle: 'normal',
+		fontWeight: '400',
+		fontSize: '14px',
+		lineHeight: '15px',
+		letterSpacing: '-0.011em',
+		color: '#76808D',
 	},
 	avatarBtn: {
 		display: 'flex',
@@ -274,6 +276,7 @@ const useStyles = makeStyles((theme: any) => ({
 }))
 
 const InviteGang = () => {
+	const hiddenFileInput = useRef<HTMLInputElement>(null);
 	const classes = useStyles()
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
@@ -509,6 +512,30 @@ const InviteGang = () => {
 		}
 	}
 
+	const getAddIcon = () => {
+		return (ownerName && ownerAddress && !errors) ? plusIcon : GreyAddIcon
+	}
+	const uploadClicked = () => {
+		hiddenFileInput?.current?.click()
+	  };
+	const handleUpload = async (f: any) => {
+		const d = await f.arrayBuffer();
+		console.log(d, '...d....')
+		let wb = read(d);
+		console.log(wb, '...wb....', read)
+		const ws = wb.Sheets[wb.SheetNames[0]];
+		const data: any = utils.sheet_to_json(ws);
+		console.log(data, '...data...')
+		handleInsertWallets(data)
+	  }
+	  const uploadFiles = (event: any) => {
+		event.preventDefault();
+		console.log(event.target, '....event...')
+		const fileUploaded = event.target?.files[0];
+		event.target.value = ''
+		handleUpload(fileUploaded);
+	  };
+
 	return (
 		<>
 			<Container>
@@ -517,7 +544,28 @@ const InviteGang = () => {
 					<Box className={classes.centerInputCard}>
 						<Box style={{ width: '100%', marginBottom: 8, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
 							<Box className={classes.inputTitle}>Add member :</Box>
-							{uploadLoading ? <LeapFrog size={24} color="#C94B32" /> : <Uploader onComplete={handleInsertWallets} />}
+							{uploadLoading ? <LeapFrog size={24} color="#C94B32" /> :
+							<Tooltip title="Please upload .xlsx file with columns containing member name and wallet address">
+								<Button
+									variant="contained"
+									sx={{
+										backgroundColor: '#fff',
+										boxShadow: '3px 5px 4px rgba(27,43,65,.05), -3px -3px 8px rgba(201,75,50,.1)',
+										color: '#76808d',
+										fontSize: 16,
+										fontStyle: 'normal',
+										fontWeight: 400,
+										height: 40,
+										lineHeight: 18,
+										width: 185,
+									}}
+									onClick={uploadClicked}
+								>
+									<img src={uploadIcon} alt="uploadIcon" />
+									<span className={classes.text}> OR UPLOAD FILE</span>
+									<input hidden type="file" ref={hiddenFileInput} multiple onChange={uploadFiles}/>
+								</Button>
+								</Tooltip>}
 						</Box>
 						<Box className={classes.inputArea}>
 							<Box style={{ marginRight: '10px' }}>
@@ -541,7 +589,8 @@ const InviteGang = () => {
 										setErrors({ ownerAddress: "" });
 										setOwnerAddress(event.target.value);
 									}}
-									isInvalid={errors.ownerAddress}
+									error={!!errors.ownerAddress}
+									helperText={errors.ownerAddress}
 								/>
 							</Box>
 							<Box sx={{ marginRight: '10px' }}>
@@ -567,7 +616,7 @@ const InviteGang = () => {
 										handleClick(ownerName, ownerAddress, ownerRole);
 									}}
 								>
-									<img src={plusIcon} alt={"add plus"} />
+									<img src={getAddIcon()} alt={"add plus"} />
 								</IconButton>
 							</Box>
 						</Box>
@@ -633,7 +682,7 @@ const InviteGang = () => {
 							onClick={handleNavigate}
 							variant='contained'>
 							INVITE
-							</Button>
+						</Button>
 					</Box>
 					<Box
 						className={classes.infoText}
@@ -642,7 +691,7 @@ const InviteGang = () => {
 						}}
 					>
 						skip
-				</Box>
+					</Box>
 
 
 					{/* Dsiplay modal for uploaded users */}
@@ -675,6 +724,8 @@ const InviteGang = () => {
 																id="nameInput"
 																height={50}
 																width={135}
+																error={!!errors.ownerAddress}
+																helperText={errors.ownerAddress}
 																placeholder="Name"
 																value={item.name}
 																name="name"
@@ -723,11 +774,11 @@ const InviteGang = () => {
 							<Box className={classes.membersModalFooter}>
 								<Button onClick={handleCloseModal} className={classes.membersModalFooterCancelBtn}>
 									CANCEL
-							</Button>
+								</Button>
 								{
 									validMembers.length > 0 && <Button onClick={handleAppendUploadedMembers} className={classes.confirmBtn}>
 										ADD MEMBERS
-								</Button>
+									</Button>
 								}
 							</Box>
 						</Box>

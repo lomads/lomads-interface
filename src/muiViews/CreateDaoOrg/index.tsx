@@ -2,11 +2,9 @@ import React, { useState, useRef, useEffect, useMemo, useCallback } from "react"
 import _ from 'lodash';
 import lomadsfulllogo from "../../assets/svg/lomadsfulllogo.svg";
 import { useNavigate, useLocation } from "react-router-dom";
-import SimpleButton from "UIpack/SimpleButton";
 import TextInput from '../../muiComponents/TextInput'
 import { useAppSelector } from "state/hooks";
 import { useAppDispatch } from "state/hooks";
-import { setDAOList } from 'state/dashboard/reducer';
 import { updateDaoAddress, updateDaoImage, updateDaoName } from "state/flow/reducer";
 import { LeapFrog } from "@uiball/loaders";
 import axiosHttp from '../../api'
@@ -29,14 +27,30 @@ const useStyles = makeStyles((theme: any) => ({
 		justifyContent: 'center',
 		overflow: 'hidden !important'
 	},
+	maxText: {
+		color: '#1B2D41',
+		opacity: 0.2,
+		letterSpacing: '-0.011em',
+		fontFamily: 'Inter, sans-serif',
+		fontWeight: 400,
+		fontSize: 14,
+	},
+	chooseText: {
+		color: "#C94B32",
+		alignSelf: 'center',
+		letterSpacing: '-0.011em',
+		fontFamily: 'Inter, sans-serif',
+		fontWeight: 400,
+		fontSize: 16
+	},
 	text: {
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
-		fontWeight: '400',
-		fontSize: '14px',
-		lineHeight: '15px',
+		fontWeight: 400,
+		fontSize: 14,
 		letterSpacing: '-0.011em',
-		color: '#76808D'
+		color: '#76808d',
+		marginLeft: 13,
 	},
 	title: {
 		fontFamily: 'Inter, sans-serif',
@@ -80,13 +94,12 @@ const useStyles = makeStyles((theme: any) => ({
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'flex-start',
-		justifyItems: 'flex-start',
+		justifyItems: 'center',
 		background: '#FFFFFF',
 		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
 		borderRadius: 5,
-		maxHeight: 'fit-content',
-		width: 394,
-		height: 440,
+		minWidth: 394,
+		minHeight: 'fit-content',
 		padding: 20,
 		marginTop: 35,
 	},
@@ -116,6 +129,23 @@ const useStyles = makeStyles((theme: any) => ({
 		margin: '1rem 0',
 		cursor: 'pointer',
 		position: 'relative',
+	},
+	informationPerm: {
+		fontFamily: 'Inter, sans-serif',
+		fontStyle: 'italic',
+		weight: 400,
+		fontSize: 14,
+		textAlign: 'center',
+		color: '#76808D'
+	},
+	selectedImg: {
+		width: '100%',
+		height: '100%',
+		borderRadius: 10,
+		objectFit: 'cover'
+	},
+	uploadIcon: {
+		margin: 10
 	}
 }));
 
@@ -235,122 +265,126 @@ export default () => {
 
 	return (
 		<Container>
-		<Grid className={classes.root}>
-			{DAOListLoading ?
-				<Box className={classes.lomadsLogoParent}>
+			<Grid className={classes.root}>
+				{DAOListLoading ?
+					<Box className={classes.lomadsLogoParent}>
 						<img src={lomadsfulllogo} alt="" />
-					<LeapFrog size={50} color="#C94B32" />
-				</Box> : null
-			}
-					<Grid item sm={12}
-						display="flex"
-						flexDirection="column"
-						alignItems="center"
-						justifyContent="center">
-						<Typography sx={{ mt: 2 }} className={classes.title}>
-							1/3 Name of your Organisation
-						</Typography>
-						<Box className={classes.centerCard}>
+						<LeapFrog size={50} color="#C94B32" />
+					</Box> : null
+				}
+				<Grid item sm={12}
+					display="flex"
+					flexDirection="column"
+					alignItems="center"
+					justifyContent="center">
+					<Typography sx={{ mt: 2 }} className={classes.title}>
+						1/3 Name of your Organisation
+					</Typography>
+					<Box className={classes.centerCard}>
+						<Box>
 							<Box>
-								<Box>
-									<Box className={classes.inputFieldTitle}>Name Your Organisation</Box>
-									<TextInput
-										className={classes.inputFieldTitle}
-										height={50}
-										fullWidth
-										placeholder="Epic Organisation"
-										value={daoName}
-										onChange={(event: any) => {
-											checkAvailabilityAsync(event)
-											handleDaoName(event);
-										}}
-										isInvalid={errors.daoName}
-									/>
-								</Box>
-								<Box>
-									<Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-										<Box className={classes.inputFieldTitle} style={{ marginRight: '16px' }}>Organisation address</Box>
-										{urlCheckLoading && <LeapFrog size={20} color="#C94B32" />}
-									</Box>
-									<TextInput
-										className={classes.inputFieldTitle}
-										height={50}
-										fullWidth
-										disabled
-										value={daoAddress}
-										placeholder="https://app.lomads.xyz/Name_of_the_Organisation"
-										onChange={(e: any) => {
-											dispatch(updateDaoAddress(e.target.value));
-										}}
-										isInvalid={errors.daoAddress}
-									/>
-								</Box>
-								<Box>
-									<Box className={classes.inputFieldTitle} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>Import Thumbnail  <Box className='option-Box'>
-										Optional
+								<Box className={classes.inputFieldTitle}>Name Your Organisation</Box>
+								<TextInput
+									className={classes.inputFieldTitle}
+									height={50}
+									fullWidth
+									placeholder="Epic Organisation"
+									value={daoName}
+									onChange={(event: any) => {
+										checkAvailabilityAsync(event)
+										handleDaoName(event);
+									}}
+									helperText={errors.daoName}
+								/>
 							</Box>
-									</Box>
-									<Box className={classes.imagePickerWrapper}>
-										<Box className={classes.imagePickerContainer}>
-											{
-												image
-													?
-													<Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
-														<Box onClick={() => { setImage(null); dispatch(updateDaoImage(null)); }} style={{ cursor: 'pointer' }}>
-															<img style={{ width: 18, height: 18, position: 'absolute', right: 8, top: 8, opacity: 0.7 }} src={require('../../assets/images/close.png')} />
-														</Box>
-														<img src={image} alt="selected-token-icon" className="selected-img" />
+							<Box>
+								<Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+									<Box className={classes.inputFieldTitle} style={{ marginRight: '16px' }}>Organisation address</Box>
+									{urlCheckLoading && <LeapFrog size={20} color="#C94B32" />}
+								</Box>
+								<TextInput
+									className={classes.inputFieldTitle}
+									height={50}
+									fullWidth
+									disabled
+									value={daoAddress}
+									placeholder="https://app.lomads.xyz/Name_of_the_Organisation"
+									onChange={(e: any) => {
+										dispatch(updateDaoAddress(e.target.value));
+									}}
+									helperText={errors.daoAddress}
+								/>
+							</Box>
+							<Box>
+								<Box className={classes.inputFieldTitle} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>Import Thumbnail  <Box className='option-Box'>
+									Optional
+								</Box>
+								</Box>
+								<Box className={classes.imagePickerWrapper}>
+									<Box className={classes.imagePickerContainer}>
+										{
+											image
+												?
+												<Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
+													<Box onClick={() => { setImage(null); dispatch(updateDaoImage(null)); }} style={{ cursor: 'pointer' }}>
+														<img style={{ width: 18, height: 18, position: 'absolute', right: 8, top: 8, opacity: 0.7 }} src={require('../../assets/images/close.png')} />
 													</Box>
-													:
-													<Box {...getRootProps()}>
-														<ReactS3Uploader
-															droppedfiles={droppedfiles}
-															getSignedUrl={getSignedUploadUrl}
-															accept="image/png,image/jpeg,image/jpg"
-															className={{ display: 'none', width: 150, height: 150 }}
-															onProgress={onUploadProgress}
-															onError={onUploadError}
-															preprocess={onUploadStart}
-															onFinish={onFinish}
-															multiple
-															uploadRequestHeaders={{
-															}}
-															contentDisposition="auto"
-														/>
-														<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-															{uploadLoading ?
-																<LeapFrog size={24} color="#C94B32" /> :
-																<>
-																	<img src={uploadIconOrange} alt="upload-icon" />
-																	<Typography color="#C94B32" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-																	         Choose <br /> or drag an image
-																			 <span>maximum size 2mb</span>
-																	</Typography>
-																</>
-															}
-														</Box>
-
-														<input {...getInputProps()} />
+													<img src={image} alt="selected-token-icon" className={classes.selectedImg} />
+												</Box>
+												:
+												<Box {...getRootProps()}>
+													<ReactS3Uploader
+														droppedfiles={droppedfiles}
+														getSignedUrl={getSignedUploadUrl}
+														accept="image/png,image/jpeg,image/jpg"
+														className={{ display: 'none', width: 150, height: 150 }}
+														onProgress={onUploadProgress}
+														onError={onUploadError}
+														preprocess={onUploadStart}
+														onFinish={onFinish}
+														multiple
+														uploadRequestHeaders={{
+														}}
+														contentDisposition="auto"
+													/>
+													<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+														{uploadLoading ?
+															<LeapFrog size={24} color="#C94B32" /> :
+															<>
+																<img src={uploadIconOrange} alt="upload-icon" className={classes.uploadIcon}/>
+																<Typography sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+																	<span className={classes.chooseText}>Choose or </span>
+																	<span className={classes.chooseText}> drag an image</span>
+																	<span className={classes.maxText}>maximum size 2mb</span>
+																</Typography>
+															</>
+														}
 													</Box>
 
-											}
-										</Box>
-										<p className={classes.text}>Accepted formats:<br />jpg, svg or png</p>
+													<input {...getInputProps()} />
+												</Box>
+
+										}
 									</Box>
+									<p className={classes.text}>Accepted formats:<br />jpg, svg or png</p>
 								</Box>
 							</Box>
 						</Box>
-						<Box className={classes.createName}>
-							<Button
-								variant='contained'
-								size="medium"
-								onClick={handleClick}
-							>
-								CREATE PUBLIC ADDRESS
-					</Button>
-						</Box>
-					</Grid>
+					</Box>
+					<Box className={classes.createName}>
+						<Button
+							variant='contained'
+							size="medium"
+							onClick={handleClick}
+						>
+							CREATE PUBLIC ADDRESS
+						</Button>
+						<Typography sx={{ mt: 2 }} className={classes.informationPerm}>
+							This infomation is permanent
+						</Typography>
+					</Box>
 				</Grid>
-			</Container>
+			</Grid>
+		</Container>
 	);
 };

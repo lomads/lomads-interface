@@ -26,8 +26,7 @@ import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
-         height: "100vh",
-         maxHeight: 'fit-content',
+         height: '100vh',
          display: 'flex',
          flexDirection: 'column',
          alignItems: 'center',
@@ -185,7 +184,7 @@ export default () => {
                 <Box zIndex={0} position="absolute" bottom={0}>
                     <img src={CHEERS} style={{ marginBottom: '-5px' }} />
                 </Box>
-                <Box mb={12} mt={3}>
+                <Box mb={0} mt={3}>
                     <img src={LOMADS_LOGO} />
                 </Box>
                 <Typography my={1} variant="subtitle1">Hello there !</Typography>

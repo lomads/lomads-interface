@@ -63,7 +63,8 @@ const useStyles = makeStyles((theme: any) => ({
 	centerText: {
 		fontSize: '20px',
 		fontWeight: '400',
-		color: '#C94B32'
+		color: '#C94B32',
+		padding: 16
 	},
 	link: {
 		textDecoration: 'underline',
@@ -88,24 +89,28 @@ const StartSafe = () => {
 					<Box className={classes.buttonArea}>
 						<Box>
 							<Button
-								style={{
+								sx={{
 									color: "#C94B32",
 									backgroundColor: "#FFFFFF",
 									fontWeight: 400,
-									minWidth: 'max-content'
+									minWidth: 'max-content',
+									width: 228
 								}}
 								variant='contained'
-								size="medium">
+								size="medium"
+								onClick={createNewSafe}
+								>
 								CREATE NEW SAFE
 							</Button>
 						</Box>
 						<Box className={classes.centerText}>or</Box>
 						<Box>
-							<Button style={{
+							<Button sx={{
 								color: "#C94B32",
 								backgroundColor: "#FFFFFF",
 								fontWeight: 400,
-								minWidth: 'max-content'
+								minWidth: 'max-content',
+								width: 228
 							}}
 								onClick={importExistingSafe}
 								variant='contained'
