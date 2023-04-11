@@ -169,11 +169,9 @@ const SideModal = (props: IsideModal) => {
 			return createOffChainTxn()
 		}
 		if(chainId !== _get(DAO, 'chainId', '')) {
-			switchChain(connector, _get(DAO, 'chainId', ''))
-			.catch(e => { console.log(e) })
+			return await switchChain(connector, _get(DAO, 'chainId', ''))
 		}
 
-		
 		try {
 			const txnResponse = await createSafeTransaction({ tokenAddress: selectedToken, send: setRecipient.current });
 			if (txnResponse?.safeTxHash) {

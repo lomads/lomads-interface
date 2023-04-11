@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from "state/hooks";
 import SafeButton from "UIpack/SafeButton";
 import { useWeb3React } from "@web3-react/core";
 import { EthSignSignature } from "@gnosis.pm/safe-core-sdk";
+import { switchChain } from "utils/switchChain";
 import { SafeTransactionData } from "@gnosis.pm/safe-core-sdk-types/dist/src/types";
 import copyIcon from "../../../assets/svg/copyIcon.svg";
 import {
@@ -82,7 +83,7 @@ const HEADERS = [
 
 
 const TreasuryCard = (props: ItreasuryCardType) => {
-	const { provider, account, ...rest } = useWeb3React();
+	const { provider, connector, account, ...rest } = useWeb3React();
 	const [chainId, setChainId] = useState(null);
 	const { daoURL } = useParams()
 	const dispatch = useAppDispatch()
@@ -398,6 +399,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				.catch(e => console.log(e))
 				.finally(() => setConfirmTxLoading(null))
 		} else if (txn.offChain && _get(txn, 'token.symbol') !== 'SWEAT') {
+			if(chainId !== _get(DAO, 'chainId', '')) {
+				return await switchChain(connector, _get(DAO, 'chainId', ''))
+			}
 			try {
 				await createOnChainTxn(txn, 'confirm')
 				loadPendingTxn();
@@ -406,6 +410,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				console.log(e)
 			}
 		} else {
+			if(chainId !== _get(DAO, 'chainId', '')) {
+				return await switchChain(connector, _get(DAO, 'chainId', ''))
+			}
 			try {
 				setConfirmTxLoading(_safeTxHashs);
 				// const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
@@ -576,6 +583,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				.catch(e => console.log(e))
 				.finally(() => setExecuteTxLoading(null))
 		} else {
+			if(chainId !== _get(DAO, 'chainId', '')) {
+				return await switchChain(connector, _get(DAO, 'chainId', ''))
+			}
 			const st = await getSafeTokens();
 			let safeToken = _find(st, t => toChecksumAddress(t.tokenAddress) === toChecksumAddress(_get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', ''))))
 			console.log("safeTokensafeToken",st, safeToken, _get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', '')))
