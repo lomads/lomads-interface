@@ -26,6 +26,8 @@ import SimpleLoadButton from "UIpack/SimpleLoadButton";
 
 import { resetUpdateMilestoneLoader } from 'state/dashboard/reducer';
 import useSafeTokens from 'hooks/useSafeTokens';
+import Dropdown from 'muiComponents/Dropdown';
+import Avatar from 'muiComponents/Avatar';
 
 const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL }) => {
     console.log("data : ", data);
@@ -358,26 +360,32 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                                     <h1>Assign Contributions</h1>
                                     <span>Mark the milestone as completed and reward the contributors</span>
 
-                                    <SafeButton
-                                        height={40}
-                                        width={260}
-                                        titleColor="#C94B32"
-                                        title="SPLIT EQUALLY"
-                                        bgColor="#FFFFFF"
-                                        opacity="1"
-                                        disabled={false}
-                                        fontweight={400}
-                                        fontsize={16}
-                                        onClick={() => handleSplitEqually()}
-                                    />
+                                   <div style={{display:'flex'}}>
+                                        <div style={{marginRight:'16px'}}>
+                                        <SafeButton
+                                            height={40}
+                                            width={140}
+                                            titleColor="#C94B32"
+                                            title="SPLIT EQUALLY"
+                                            bgColor="#FFFFFF"
+                                            opacity="1"
+                                            disabled={false}
+                                            fontweight={400}
+                                            fontsize={16}
+                                            onClick={() => handleSplitEqually()}
+                                        />
+                                        </div>
+                                        <div style={{width:'192px'}}>
+                                            <Dropdown />
+                                        </div>
+                                   </div>
 
                                     <div className='members-section'>
                                         {
                                             temp && temp.map((item, index) => (
                                                 <div className='member-row' key={item.wallet}>
                                                     <div>
-                                                        <img src={memberIcon} alt="memberIcon" />
-                                                        <span>{item.name}</span>
+                                                        <Avatar name={item.name} wallet={item.wallet}/>
                                                     </div>
                                                     <div>
                                                         <div

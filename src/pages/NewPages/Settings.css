@@ -526,12 +526,12 @@
 
     /* Note */
     font-family: 'Inter', sans-serif;
-    font-style: italic;
+    /* font-style: italic; */
     font-weight: 400;
     font-size: 14px;
     line-height: 18px;
     /* identical to box height, or 129% */
-    text-align: center;
+    /* text-align: center; */
     letter-spacing: -0.011em;
     margin-top: 35px;
     /* Grey */

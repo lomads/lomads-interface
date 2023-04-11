@@ -27,6 +27,8 @@ import { tokenCallSafe } from "connection/DaoTokenCall";
 import { ImportSafe, safeService } from "connection/SafeCall";
 import axiosHttp from 'api'
 import { getDao } from "state/dashboard/actions";
+import Avatar from "muiComponents/Avatar";
+import Dropdown from "muiComponents/Dropdown";
 
 
 const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleModal, toggleCompensate }) => {
@@ -88,7 +90,8 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
 
   const NameAndAvatar = ({data}) => {
     console.log(data)
-    const name = _get(data, 'member.name', '') !== '' ? _get(data, 'member.name', '') : beautifyHexToken(_get(data, 'member.wallet', ''))
+    const name = _get(data, 'member.name', '') !== '' ? _get(data, 'member.name', '') : beautifyHexToken(_get(data, 'member.wallet', ''));
+    const wallet = beautifyHexToken(_get(data, 'member.wallet', ''));
     const sweat = _find(_get(data, 'member.earnings', []), e => e.currency === 'SWEAT' && e.daoId === _get(DAO, '_id', ''))
 
 		return (
@@ -96,8 +99,9 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
 				<div style={{margin:'12px 0'}}>
 					<div className="memberRow">
 						<div className="avatarAndName" style={{ minWidth: "25%", flexGrow: 1 }}>
-							<img src={daoMember2} alt="avatar" />
-							<div style={{marginRight:11, minWidth:92}} className="dashboardText">{name}</div>
+              <Avatar name={name} wallet={wallet}/>
+							{/* <img src={daoMember2} alt="avatar" />
+							<div style={{marginRight:11, minWidth:92}} className="dashboardText">{name}</div> */}
 						</div>
             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
               <div>
@@ -262,7 +266,7 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
           </div>
 
           {/* //! BODY */}
-          <div style={{minWidth:'300px'}}>
+        <div style={{minWidth:'380px'}}>
           {
           //  _uniqBy([{},{}], (m) => m.member.wallet.toLowerCase())
           sweatMembers.map((result, index) => {
@@ -272,32 +276,30 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
 							/>
 						);
 					})}
-          <div style={{display:'flex', alignItems: 'center', flexDirection:'row', justifyContent:'flex-end', marginTop:'20px'}}>
-            <div className="dashboardText" style={{
-              clear: 'both',
-              display: 'inline-block !important',
-              overflow: 'hidden',
-              whiteSpace: 'nowrap'
-            }}>{"Total ="}</div>
-              {/* <div className="memberdivider">
-                <hr />
-              </div> */}
-              <div style={{marginLeft:"20px"}} className="roleText">
-                {total}
-              </div>
-              <div>
-                { _get(_find(safeTokens, s => s.tokenAddress === currency), 'token.symbol', '') === 'MATIC' ?
-                  <PolygonIcon style={{height:"20px", width:"20px", margin:'0 0 0 8px'}}/> :
-                  _get(_find(safeTokens, s => s.tokenAddress === currency), 'token.symbol', '') === 'GOR' ?
-                  <img src={GoerliIcon} style={{height:"20px", width:"20px", margin:'0 0 0 8px'}}/> :
-                  <StarIcon style={{height:"18px", width:"18px", margin:'0 2px 0 12px'}}/>
-                }
-              </div>
-            </div>
-          </div>
+			<div style={{display:'flex', alignItems: 'center', flexDirection:'row', justifyContent:'flex-end', marginTop:'20px'}}>
+				<div className="dashboardText" style={{
+				clear: 'both',
+				display: 'inline-block !important',
+				overflow: 'hidden',
+				whiteSpace: 'nowrap'
+				}}>{"Total ="}</div>
+				<div style={{marginLeft:"20px"}} className="roleText">
+					{total}
+				</div>
+				<div>
+					{ _get(_find(safeTokens, s => s.tokenAddress === currency), 'token.symbol', '') === 'MATIC' ?
+					<PolygonIcon style={{height:"20px", width:"20px", margin:'0 0 0 8px'}}/> :
+					_get(_find(safeTokens, s => s.tokenAddress === currency), 'token.symbol', '') === 'GOR' ?
+					<img src={GoerliIcon} style={{height:"20px", width:"20px", margin:'0 0 0 8px'}}/> :
+					<StarIcon style={{height:"18px", width:"18px", margin:'0 2px 0 12px'}}/>
+					}
+				</div>
+			</div>
+        </div>
           <div id="cm-info" style={{ paddingBottom : 120 }}
           >
             All SWEAT counter will be reset to 0.
+			<Dropdown />
           </div>
           {/* //! FOOTER */}
           <Box position="fixed" width={400} backgroundColor='#FFF' bottom={0} pb={3} pt={2} display="flex" flexDirection="row">

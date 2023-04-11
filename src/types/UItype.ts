@@ -4,6 +4,7 @@ export interface InputFieldType {
   className?: string;
   height?: number | string;
   width?: number | string;
+  padding?: number | string;
   name?: string;
   onKeyDown?: any;
   autoFocus?:boolean | undefined;

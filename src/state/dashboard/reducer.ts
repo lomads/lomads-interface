@@ -5,6 +5,7 @@ import {
 	loadDao,
 	updateDao,
 	addDaoMember,
+	createDaoOption,
 	addDaoMemberList,
 	updateDaoMember,
 	manageDaoMember,
@@ -60,6 +61,7 @@ export interface DashboardState {
 	DAOList: Array<DAOType> | null;
 	updateDaoLoading: boolean | null;
 	addMemberLoading: boolean | null;
+	createOptionLoading: boolean | null;
 	addMemberListLoading: boolean | null;
 	updateMemberLoading: boolean | null;
 	manageMemberLoading: boolean | null;
@@ -112,6 +114,7 @@ const initialState: DashboardState = {
 	DAOList: null,
 	updateDaoLoading: null,
 	addMemberLoading: null,
+	createOptionLoading: null,
 	addMemberListLoading: null,
 	updateMemberLoading: null,
 	manageMemberLoading: null,
@@ -175,6 +178,9 @@ const dashboardSlice = createSlice({
 		},
 		resetAddMemberLoader(state) {
 			state.addMemberLoading = null
+		},
+		resetCreateOptionLoader(state) {
+			state.createOptionLoading = null
 		},
 		resetAddMemberListLoader(state) {
 			state.addMemberListLoading = null
@@ -372,6 +378,14 @@ const dashboardSlice = createSlice({
 		},
 		[`${addDaoMember.pending}`]: (state) => {
 			state.addMemberLoading = true
+		},
+		// create dao options
+		[`${createDaoOption.fulfilled}`]: (state, action) => {
+			state.createOptionLoading = false
+			state.DAO = action.payload
+		},
+		[`${createDaoOption.pending}`]: (state) => {
+			state.createOptionLoading = true
 		},
 
 		// add dao members list
@@ -788,5 +802,6 @@ export const {
 	resetEditProjectMilestoneLoader,
 	resetDeleteDaoLinkLoader,
 	resetSyncTrelloDataLoader,
+	resetCreateOptionLoader,
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

@@ -16,6 +16,8 @@ import BootstrapTooltip from "./WalkThrough/HelpToolTip"
 import useTasks from 'hooks/useTasks';
 import { getProject } from 'state/dashboard/actions';
 
+import {BsArrowRight} from 'react-icons/bs'
+
 const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
@@ -32,7 +34,8 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
     const [otherTasks, setOtherTasks] = useState([]);
     const [initialCheck, setInitialCheck] = useState(false);
     const { myRole, can } = useRole(DAO, account)
-    console.log("My roel : ", myRole);
+
+    const showCreateTask = localStorage.getItem("create_first_task");
 
     useEffect(() => {
         console.log("projectId", projectId)
@@ -344,14 +347,16 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
                     }
                 </div>
             </div>
-            {(tab === 1 && myTasks && myTasks.length > 0) ||
-                (tab === 2 && manageTasks && manageTasks.length > 0) ||
-                (tab === 3 && draftTasks && draftTasks.length > 0) ||
-                (tab === 4 && otherTasks && otherTasks.length > 0) ?
+            {
+                (tab === 1 && myTasks && myTasks.length > 0)
+                ?
                 <div className='tasks-body' style={isHelpIconOpen ? {overflow: 'hidden'} : {}}>
-                      {isHelpIconOpen && <div className="help-card">
+                    {
+                        isHelpIconOpen && 
+                        <div className="help-card">
                             <span className="help-card-content">By creating tasks, you can <span className="bold-text"> track progress, deadlines, </span> and <span className="bold-text"> rewards on bounties, </span> and <span className="bold-text"> assign contributors </span> to each task.</span>
-                        </div>}
+                        </div>
+                    }
                     {
                         tab === 1 && parsedTasks['myTask'] && parsedTasks['myTask'].filter((item, index) => index < 6).map((item, index) => {
                             if (index <= 4) {
@@ -372,6 +377,30 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
                                 )
                             }
                         })
+                    }
+                    {
+                        !showCreateTask && 
+                        <div
+                            className='create-new-task'
+                            onClick={() => {toggleShowCreateTask() }}
+                        >
+                            <span>CREATE YOUR FIRST TASK</span>
+                            <BsArrowRight color='rgba(118, 128, 141, 0.5)' size={20}/>
+                        </div>
+                    }
+                </div>
+                :
+                null
+            }
+            {
+                (tab === 2 && manageTasks && manageTasks.length > 0) 
+                ?
+                <div className='tasks-body' style={isHelpIconOpen ? {overflow: 'hidden'} : {}}>
+                    {
+                        isHelpIconOpen && 
+                        <div className="help-card">
+                            <span className="help-card-content">By creating tasks, you can <span className="bold-text"> track progress, deadlines, </span> and <span className="bold-text"> rewards on bounties, </span> and <span className="bold-text"> assign contributors </span> to each task.</span>
+                        </div>
                     }
                     {
                         tab === 2 && parsedTasks['manage'] && parsedTasks['manage'].filter((item, index) => index < 6).map((item, index) => {
@@ -395,6 +424,30 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
                         })
                     }
                     {
+                        !showCreateTask && 
+                        <div
+                            className='create-new-task'
+                            onClick={() => { toggleShowCreateTask() }}
+                        >
+                            <span>CREATE YOUR FIRST TASK</span>
+                            <BsArrowRight color='rgba(118, 128, 141, 0.5)' size={20}/>
+                        </div>
+                    }
+                </div>
+                :
+                null
+            }
+            {
+                (tab === 3 && draftTasks && draftTasks.length > 0)
+                ?
+                <div className='tasks-body' style={isHelpIconOpen ? {overflow: 'hidden'} : {}}>
+                    {
+                        isHelpIconOpen && 
+                        <div className="help-card">
+                            <span className="help-card-content">By creating tasks, you can <span className="bold-text"> track progress, deadlines, </span> and <span className="bold-text"> rewards on bounties, </span> and <span className="bold-text"> assign contributors </span> to each task.</span>
+                        </div>
+                    }
+                    {
                         tab === 3 && parsedTasks['drafts'] && parsedTasks['drafts'].filter((item, index) => index < 6).map((item, index) => {
                             if (index <= 4) {
                                 return (
@@ -414,6 +467,21 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
                                 )
                             }
                         })
+                    }
+                    
+                </div>
+                :
+                null
+            }
+            {
+                (tab === 4 && otherTasks && otherTasks.length > 0) 
+                ?
+                <div className='tasks-body' style={isHelpIconOpen ? {overflow: 'hidden'} : {}}>
+                    {
+                        isHelpIconOpen && 
+                        <div className="help-card">
+                            <span className="help-card-content">By creating tasks, you can <span className="bold-text"> track progress, deadlines, </span> and <span className="bold-text"> rewards on bounties, </span> and <span className="bold-text"> assign contributors </span> to each task.</span>
+                        </div>
                     }
                     {
                         tab === 4 && parsedTasks['allTasks'] && parsedTasks['allTasks'].filter((item, index) => index < 6).map((item, index) => {
@@ -436,8 +504,11 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
                             }
                         })
                     }
-                </div> : null
-            }
+                   
+                </div>
+                :
+                null
+            } 
         </div>
     )
 }
