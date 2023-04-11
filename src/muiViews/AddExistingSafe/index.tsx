@@ -258,7 +258,8 @@ const useStyles = makeStyles((theme: any) => ({
 		height: 2,
 		backgroundColor: '#C94B32',
 		border: '2px solid #C94B32',
-		position: 'relative'
+		position: 'relative',
+		borderRadius: 50
 	}
 }));
 
