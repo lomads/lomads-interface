@@ -159,7 +159,9 @@ const TransactionSend = (props: IselectTransactionSend) => {
 											/>
 										</div>
 										<div style={{width:'192px'}}>
-											<Dropdown />
+											<Dropdown 
+												onChangeOption={(value:any) => props.selectTag(value)}
+											/>
 										</div>
 										
 									</div>

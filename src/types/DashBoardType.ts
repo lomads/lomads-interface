@@ -65,6 +65,7 @@ export interface IselectTransactionSend {
   setRecipient: React.MutableRefObject<IsetRecipientType[]>;
   tokens: any;
   selectToken: (_tokenAddress: string) => void;
+  selectTag: (_tag: string) => void;
   selectedToken: string;
   toggleAddNewRecipient: () => void;
   addNewRecipient: boolean;

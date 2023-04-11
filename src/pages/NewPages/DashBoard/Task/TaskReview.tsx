@@ -61,6 +61,7 @@ const TaskReview = ({ task, close }: any) => {
     const [selectedUser, setSelectedUser] = useState<any>(null);
     const [rejectUser, setRejectUser] = useState<any>(null);
     const [error, setError] = useState<any>(null);
+    const [selectedTag, setSelectedTag] = useState<any>(null);
 
     const { createSafeTransaction } = useSafeTransaction(_get(DAO, 'safe.address', ''))
 
@@ -130,7 +131,7 @@ const TaskReview = ({ task, close }: any) => {
             try {
                 if (!chainId) return;
                 const send = [{ recipient: activeSubmission.member.wallet, amount: newCompensation }]
-                const txnResponse = await createSafeTransaction({ tokenAddress: _get(task, 'compensation.currency', null), send, confirm: isSafeOwner, createLabel: false })
+                const txnResponse = await createSafeTransaction({ tokenAddress: _get(task, 'compensation.currency', null), send, confirm: isSafeOwner, createLabel: false,tag:selectedTag })
                 if(txnResponse) {
                     resolve(txnResponse.safeTxHash)
                 }
@@ -344,7 +345,7 @@ const TaskReview = ({ task, close }: any) => {
                                 </button>
                             </div>
                             <div style={{width:'100%'}}>
-                                <Dropdown />
+                                <Dropdown onChangeOption={(value:any) => setSelectedTag(value)}/>
                             </div>
                         </div>
                     </div>
