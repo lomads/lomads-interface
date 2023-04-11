@@ -845,7 +845,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				<>
 					{
 						pendingTxn !== undefined && executedTxn !== undefined &&
-						(pendingTxn && executedTxn && (pendingTxn.length !== 0 || executedTxn.length !== 0)) &&
+						(pendingTxn && executedTxn && (pendingTxn.length !== 0 || executedTxn.length !== 0)) 
+						?
+						<>
 						<div className="position-relative">
 								{props.isHelpIconOpen && <div className="help-card">
 										Managing and automating your treasury has never been easier! Here you can approve and send token payments manually, or set up recurring payments to team members!
@@ -874,7 +876,16 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 								)
 							}
 						</div>
+						
 					 </div>
+						</>
+						:
+						<div className="no-transactions">
+							<h1>Last transactions</h1>
+							<div className="no-trans-outlined">
+								<span>NO TRANSACTION YET</span>
+							</div>
+						</div>
 					}
 				</> :
 				<>
