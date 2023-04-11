@@ -25,11 +25,12 @@ import { loadDao } from '../../state/dashboard/actions';
 import { CHAIN_GAS_STATION, SupportedChainId } from "constants/chains";
 import { Box, Button, Typography, Container, Grid } from "@mui/material"
 import { makeStyles } from '@mui/styles';
+import SimpleListMenu from '../../muiComponents/List'
 import axios from "axios";
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
-		height: "100vh",
+		minHeight: "100vh",
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'center',
@@ -168,14 +169,15 @@ const useStyles = makeStyles((theme: any) => ({
 	},
 	safeFooter: {
 		fontFamily: 'Inter, sans-serif',
-		fontStyle: 'normal',
+		fontStyle: 'italic',
 		fontWeight: 400,
 		fontSize: 14,
 		letterSpacing: '-0.011em',
 		color: '#76808D',
 		width: 480,
 		textAlign: 'center',
-		marginBottom: 9
+		paddingBottom: 9,
+		marginBottom: 35
 	},
 	bottomLine: {
 		margin: 10,
@@ -452,7 +454,7 @@ export default () => {
 	const AddOwners = () => {
 		return (
 			<>
-				<hr />
+				<Box className={classes.bottomLine} />
 				<Box className={classes.addOwner}>
 					<Box className={classes.inputFieldTitle}>Select Owners</Box>
 					<Box sx={{ width: '100%' }}>
@@ -549,26 +551,15 @@ export default () => {
 
 	const DropDown = React.memo((props: any) => {
 		return (
-			<>
-				<select
-					name="chain"
-					id="chain"
-					className="dropdown"
-					onChange={(event) => {
-						//props.threshold.current = event.target.value;
+			 <SimpleListMenu
+			 	defaultText={props.value.current.length ? thresholdValue: '0'}
+				options={props.value.current}
+				updateThresholdValue={(event: any) => {
+					if(event.target.value){
 						setThresholdValue(+event.target.value)
-					}}
-					defaultValue={thresholdValue}
-				>
-					{props.value.current.map((result: any, index: any) => {
-						return (
-							<option value={index + 1} key={index}>
-								{index + 1}
-							</option>
-						);
-					})}
-				</select>
-			</>
+					}
+				}}
+			 />
 		);
 	});
 
@@ -592,8 +583,7 @@ export default () => {
 					</Box>
 				</Box>
 				<Typography className={classes.safeFooter}>
-					By continuing you consent to the terms of use and privacy policy of
-					Gnosis Safe
+					By continuing you consent to the terms of use and privacy policy of Gnosis Safe
 				</Typography>
 				<Box className={classes.safeFooter}>
 					You’re about to create a new safe and will have to confirm a
@@ -621,7 +611,7 @@ export default () => {
 
 	return (
 		<Container>
-			<Grid container className={classes.root}>
+			<Grid className={classes.root}>
 				<Box className={classes.StartSafe}>
 					<Box className={classes.headerText}>3/3 DAO Treasury</Box>
 					<Box className={classes.buttonArea}>

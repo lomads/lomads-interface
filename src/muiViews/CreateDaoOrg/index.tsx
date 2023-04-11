@@ -19,7 +19,7 @@ const { debounce } = require('throttle-debounce');
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
-		height: "100vh",
+		minHeight: "100vh",
 		maxHeight: 'fit-content',
 		display: 'flex',
 		flexDirection: 'column',

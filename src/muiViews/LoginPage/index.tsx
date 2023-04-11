@@ -26,7 +26,7 @@ import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles((theme: any) => ({
     root: {
-         height: '100vh',
+        minHeight: '100vh',
          display: 'flex',
          flexDirection: 'column',
          alignItems: 'center',
