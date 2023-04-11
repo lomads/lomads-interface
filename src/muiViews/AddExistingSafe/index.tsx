@@ -420,8 +420,7 @@ export default () => {
 									fontWeight: 400,
 									opacity: 0.6,
 									width: 228,
-									color: 'rgba(201, 75, 50, 0.6)',
-									boxShadow: '3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)'
+									color: 'rgba(201, 75, 50, 0.6)'
 								}}
 								onClick={() => navigate('/newsafe')}
 								variant='contained'>
