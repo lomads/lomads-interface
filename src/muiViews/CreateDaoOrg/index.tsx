@@ -117,8 +117,8 @@ const useStyles = makeStyles((theme: any) => ({
 		alignItems: 'center',
 	},
 	imagePickerContainer: {
-		width: '200px',
-		height: '200px',
+		width: 150,
+		height: 150,
 		borderRadius: '10px',
 		display: 'flex',
 		flexDirection: 'column',
@@ -294,6 +294,7 @@ export default () => {
 										checkAvailabilityAsync(event)
 										handleDaoName(event);
 									}}
+									error={errors.daoName}
 									helperText={errors.daoName}
 								/>
 							</Box>
@@ -312,6 +313,7 @@ export default () => {
 									onChange={(e: any) => {
 										dispatch(updateDaoAddress(e.target.value));
 									}}
+									error={errors.daoAddress}
 									helperText={errors.daoAddress}
 								/>
 							</Box>

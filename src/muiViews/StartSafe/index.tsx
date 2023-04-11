@@ -94,7 +94,8 @@ const StartSafe = () => {
 									backgroundColor: "#FFFFFF",
 									fontWeight: 400,
 									minWidth: 'max-content',
-									width: 228
+									width: 228,
+									boxShadow: '3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)'
 								}}
 								variant='contained'
 								size="medium"
@@ -110,7 +111,8 @@ const StartSafe = () => {
 								backgroundColor: "#FFFFFF",
 								fontWeight: 400,
 								minWidth: 'max-content',
-								width: 228
+								width: 228,
+								boxShadow: '3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)'
 							}}
 								onClick={importExistingSafe}
 								variant='contained'

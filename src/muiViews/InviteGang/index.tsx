@@ -512,25 +512,19 @@ const InviteGang = () => {
 		}
 	}
 
-	const getAddIcon = () => {
-		return (ownerName && ownerAddress && !errors) ? plusIcon : GreyAddIcon
-	}
 	const uploadClicked = () => {
 		hiddenFileInput?.current?.click()
-	  };
+	};
+
 	const handleUpload = async (f: any) => {
 		const d = await f.arrayBuffer();
-		console.log(d, '...d....')
 		let wb = read(d);
-		console.log(wb, '...wb....', read)
 		const ws = wb.Sheets[wb.SheetNames[0]];
 		const data: any = utils.sheet_to_json(ws);
-		console.log(data, '...data...')
 		handleInsertWallets(data)
 	  }
 	  const uploadFiles = (event: any) => {
 		event.preventDefault();
-		console.log(event.target, '....event...')
 		const fileUploaded = event.target?.files[0];
 		event.target.value = ''
 		handleUpload(fileUploaded);
@@ -616,7 +610,7 @@ const InviteGang = () => {
 										handleClick(ownerName, ownerAddress, ownerRole);
 									}}
 								>
-									<img src={getAddIcon()} alt={"add plus"} />
+									<img src={ownerName && ownerAddress ? plusIcon: GreyAddIcon} alt={"add plus"} />
 								</IconButton>
 							</Box>
 						</Box>

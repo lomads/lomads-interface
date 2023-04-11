@@ -674,7 +674,7 @@ export default () => {
 					</Box>
 					{showContinue ? (
 						<>
-							<Box sx={{ marginTop: 25 }}>
+							<Box>
 								<Button
 									style={{
 										maxWidth: 'max-content',

@@ -113,9 +113,9 @@ const useStyles = makeStyles((theme: any) => ({
 		lineHeight: '15px',
 		letterSpacing: '-0.011em',
 		color: '#76808D',
-		width: '480px',
+		width: 480,
 		textAlign: 'center',
-		marginBottom: '9px',
+		marginBottom: 9,
 	},
 	findSafe: {
 		margin: '25px 0px 15px 0px'
@@ -131,7 +131,7 @@ const useStyles = makeStyles((theme: any) => ({
 		flexDirection: 'column',
 		justifyContent: 'start',
 		alignItems: 'center',
-		marginTop: '35px',
+		marginTop: 35,
 	},
 	safeData: {
 		display: 'flex',
@@ -140,18 +140,17 @@ const useStyles = makeStyles((theme: any) => ({
 		justifyContent: 'space-between',
 		background: '#FFFFFF',
 		border: '1px solid #f1f4f4',
-		borderRadius: '5px',
+		borderRadius: 5,
 		maxHeight: 'fit-content',
-		width: '500px',
-		padding: '20px',
-		marginTop: '2px',
+		width: 500,
+		padding: 20,
+		marginTop: 2
 	},
 	safeName: {
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
-		fontWeight: '600',
-		fontSize: '16px',
-		lineHeight: '35px',
+		fontWeight: 600,
+		fontSize: 16,
 		textAlign: 'center',
 		color: '#76808D',
 	},
@@ -177,9 +176,8 @@ const useStyles = makeStyles((theme: any) => ({
 	address: {
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
-		fontWeight: '400',
-		fontSize: '16px',
-		lineHeight: '35px',
+		fontWeight: 400,
+		fontSize: 16,
 		textAlign: 'center',
 		color: '#76808D',
 		marginLeft: '2vh'
@@ -193,9 +191,9 @@ const useStyles = makeStyles((theme: any) => ({
 	footerText: {
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
-		fontWeight: '400',
-		fontSize: '14px',
-		lineHeight: '15px',
+		fontWeight: 400,
+		fontSize: 14,
+		lineHeight: 15,
 		letterSpacing: '-0.011em',
 		color: '#76808D',
 		width: '480px',
@@ -650,8 +648,8 @@ export default () => {
 							<Box className={classes.findSafe}>
 								<Button
 									style={{
+										backgroundColor: safeAddress ? "#C94B32" : "rgba(27, 43, 65, 0.2)",
 										color: "#C94B32",
-										backgroundColor: "#FFFFFF",
 										fontWeight: 400,
 										minWidth: 'max-content'
 									}}
