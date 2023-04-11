@@ -11,16 +11,16 @@ import moment from "moment";
 import axiosHttp from '../../../../api';
 import { updateSafeTransaction } from "state/dashboard/reducer";
 import { SupportedChainId } from "constants/chains";
-import useSafeTokens from "hooks/useSafeTokens";
+import {useSafeTokens} from "hooks/useSafeTokens";
 import { legacy_createStore } from "@reduxjs/toolkit";
 
-const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress, onLoadLabels, editMode, onSetEditMode }: any) => {
-	const { chainId } = useWeb3React();
+const CompleteTxn = ({ chainId, labels, transaction, tokens, owner, isAdmin, safeAddress, onLoadLabels, editMode, onSetEditMode }: any) => {
+	//const { chainId } = useWeb3React();
     const threshold = useAppSelector((state) => state.flow.safeThreshold);
     const { DAO } = useAppSelector(store => store.dashboard);
     const [reasonText, setReasonText] = useState({});
     //const [editMode, setEditMode] = useState(null);
-    const {safeTokens} = useSafeTokens(safeAddress)
+    const {safeTokens} = useSafeTokens()
     const dispatch = useAppDispatch()
 
     const { isCredit, amount, tokenSymbol, symbol, recipient, date, reason, txHash, isAllowanceTransaction, isOwnerModificaitonTransaction } = useMemo(() => {

@@ -19,7 +19,7 @@ import AddRecipient from "./AddRecipient";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import { ImportSafe } from "connection/SafeCall";
 import { SupportedChainId } from "constants/chains";
-import useSafeTokens from "hooks/useSafeTokens";
+import {useSafeTokens} from "hooks/useSafeTokens";
 import { useWeb3React } from "@web3-react/core";
 import { useAppSelector } from "state/hooks";
 import {
@@ -37,7 +37,7 @@ import {
 const TransactionSend = (props: IselectTransactionSend) => {
 	console.log("error : ", props.error)
 	const { DAO } = useAppSelector((state) => state?.dashboard);
-	const { safeTokens } = useSafeTokens(_get(DAO, 'safe.address', ''))
+	const { safeTokens } = useSafeTokens()
 	const { chainId } = useWeb3React();
 	const managePreviousNavigation = () => {
 		const length = props.setRecipient.current.length;

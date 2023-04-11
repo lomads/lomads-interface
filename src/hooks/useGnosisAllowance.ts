@@ -3,7 +3,7 @@ import { get as _get, find as _find } from 'lodash';
 import { MetaTransactionData, SafeTransactionDataPartial } from "@gnosis.pm/safe-core-sdk-types";
 import { useWeb3React } from "@web3-react/core"
 import axiosHttp from 'api'
-import useSafeTokens from "./useSafeTokens";
+import {useSafeTokens} from "hooks/useSafeTokens";
 import { ImportSafe, safeService } from "connection/SafeCall";
 import { GNOSIS_SAFE_ALLOWANCE_MODULE_CONTRACT, SupportedChainId } from 'constants/chains';
 import { SafeTransactionOptionalProps } from "@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/types";
@@ -19,7 +19,7 @@ const useGnosisAllowance = (safeAddress: string | null) => {
     const [gnosisAllowanceLoading, setGnosisAllowanceLoading] = useState(false);
     const [createSafeTxnLoading, setCreateSafeTxnLoading] = useState(false);
 	const allowanceContract = useAllowanceContract(GNOSIS_SAFE_ALLOWANCE_MODULE_CONTRACT[`${chainId}`])
-    const { safeTokens, tokenBalance } = useSafeTokens(safeAddress)
+    const { safeTokens, tokenBalance } = useSafeTokens()
 
     const checkModuleEnabled = async () => {
         if(!safeAddress) return;

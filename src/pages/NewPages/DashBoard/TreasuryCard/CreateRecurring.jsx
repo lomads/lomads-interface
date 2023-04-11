@@ -33,7 +33,7 @@ import { beautifyHexToken, getSafeTokens } from '../../../../utils'
 
 import useRole from '../../../../hooks/useRole'
 import { ReactComponent as PolygonIcon } from 'assets/svg/polygon.svg';
-import useSafeTokens from 'hooks/useSafeTokens'
+import {useSafeTokens} from 'hooks/useSafeTokens'
 
 import axios from "axios";
 import { isValidUrl } from 'utils';
@@ -53,7 +53,7 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
     const { chainId, provider, account } = useWeb3React();
     const { myRole, can } = useRole(DAO, account);
     const { gnosisAllowanceLoading, setAllowance, getSpendingAllowance, createAllowanceTransaction } = useGnosisAllowance(_get(DAO, 'safe.address', null));
-    const { safeTokens } = useSafeTokens(_get(DAO, 'safe.address', null))
+    const { safeTokens } = useSafeTokens()
     const [showSuccess, setShowSuccess] = useState(false);
     const [error, setError] = useState(null)
     const [selectedUser, setSelectedUser] = useState(null);

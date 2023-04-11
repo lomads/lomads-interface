@@ -23,6 +23,7 @@ import ProjectDetails from "./NewPages/ProjectDetails";
 import { ProjectContext } from "context/ProjectContext";
 
 import routes from '../routes';
+import { SafeTokensProvider } from "hooks/useSafeTokens";
 
 export default function App() {
 	const landingPage = useMatch("/login");
@@ -31,21 +32,23 @@ export default function App() {
 
 	return (
 		<div className="body">
-			<ProjectContext.Provider value={{ projects, setProjects }}>
-				<Routes>
-					{
-						routes.map((route: any) => <Route path={route.path} element={ route.layout ?
-							<route.layout>
-								<route.component/>
-							</route.layout> : 
-							<>
-								{!landingPage && !previewPage && <Header />}
-								<route.component/>
-							</>
-						} />)
-					}
-				</Routes>
-			</ProjectContext.Provider>
+			<SafeTokensProvider>
+				<ProjectContext.Provider value={{ projects, setProjects }}>
+					<Routes>
+						{
+							routes.map((route: any) => <Route path={route.path} element={ route.layout ?
+								<route.layout>
+									<route.component/>
+								</route.layout> : 
+								<>
+									{!landingPage && !previewPage && <Header />}
+									<route.component/>
+								</>
+							} />)
+						}
+					</Routes>
+				</ProjectContext.Provider>
+			</SafeTokensProvider>
 		</div>
 	);
 }

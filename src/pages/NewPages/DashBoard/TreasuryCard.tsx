@@ -39,7 +39,7 @@ import { setDAO, setRecurringPayments } from "state/dashboard/reducer";
 import { getCurrentUser, loadRecurringPayments } from "state/dashboard/actions";
 import GOERLI_LOGO from '../../../assets/images/goerli.png';
 import POLYGON_LOGO from '../../../assets/images/polygon.png';
-import useSafeTokens from "hooks/useSafeTokens";
+import {useSafeTokens} from "hooks/useSafeTokens";
 import useSafeTransaction from "hooks/useSafeTransaction";
 import axios from "axios";
 import { GNOSIS_SAFE_BASE_URLS, SupportedChainId } from 'constants/chains';
@@ -83,7 +83,7 @@ const HEADERS = [
 
 
 const TreasuryCard = (props: ItreasuryCardType) => {
-	const { provider, connector, account, ...rest } = useWeb3React();
+	const { provider, connector, account, chainId: currentChainId, ...rest } = useWeb3React();
 	const [chainId, setChainId] = useState(null);
 	const { daoURL } = useParams()
 	const dispatch = useAppDispatch()
@@ -118,7 +118,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		}
 	}, [DAO])
 
-	const { safeTokens, tokenBalance } = useSafeTokens(_get(DAO, 'safe.address', ''))
+	const { safeTokens, tokenBalance } = useSafeTokens()
 
 	const { createSafeTransaction, createSafeTxnLoading } = useSafeTransaction(_get(DAO, 'safe.address', ''))
 
@@ -399,7 +399,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				.catch(e => console.log(e))
 				.finally(() => setConfirmTxLoading(null))
 		} else if (txn.offChain && _get(txn, 'token.symbol') !== 'SWEAT') {
-			if(chainId !== _get(DAO, 'chainId', '')) {
+			if(currentChainId !== _get(DAO, 'chainId', '')) {
 				return await switchChain(connector, _get(DAO, 'chainId', ''))
 			}
 			try {
@@ -410,7 +410,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				console.log(e)
 			}
 		} else {
-			if(chainId !== _get(DAO, 'chainId', '')) {
+			if(currentChainId !== _get(DAO, 'chainId', '')) {
 				return await switchChain(connector, _get(DAO, 'chainId', ''))
 			}
 			try {
@@ -583,7 +583,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				.catch(e => console.log(e))
 				.finally(() => setExecuteTxLoading(null))
 		} else {
-			if(chainId !== _get(DAO, 'chainId', '')) {
+			if(currentChainId !== _get(DAO, 'chainId', '')) {
 				return await switchChain(connector, _get(DAO, 'chainId', ''))
 			}
 			const st = await getSafeTokens();
@@ -880,7 +880,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 							</div>
 							{
 								recurringTreasuryData.map((rtx :any) => 
-									<RecurringTxnTreasury onExecute={async (data: any) => {
+									<RecurringTxnTreasury chainId={_get(DAO, 'chainId')} onExecute={async (data: any) => {
 										await loadTxnLabel()
 										dispatch(setRecurringPayments(data))
 									}} transaction={rtx}/>
@@ -888,12 +888,12 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 							}
 							{
 								pendingTxn.map((ptx, index) =>
-									<PendingTxn editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} executeFirst={executeFirst} isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
+									<PendingTxn chainId={+_get(DAO, 'chainId', 5)} editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} executeFirst={executeFirst} isAdmin={amIAdmin} owner={isSafeOwner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
 								)
 							}
 							{
 								executedTxn.map((ptx, index) =>
-									<CompleteTxn editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} isAdmin={amIAdmin} owner={owner} transaction={ptx} tokens={props.tokens} />
+									<CompleteTxn chainId={+_get(DAO, 'chainId', 5)} editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} isAdmin={amIAdmin} owner={isSafeOwner} transaction={ptx} tokens={props.tokens} />
 								)
 							}
 						</div>

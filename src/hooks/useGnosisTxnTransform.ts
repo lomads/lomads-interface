@@ -1,14 +1,14 @@
 import React, { useCallback } from 'react';
 import { get as _get, find as _find, pick as _pick } from 'lodash'
 import { useWeb3React } from "@web3-react/core"
-import useSafeTokens from "hooks/useSafeTokens";
+import {useSafeTokens} from "hooks/useSafeTokens";
 import { ethers } from 'ethers';
 import { CHAIN_INFO } from 'constants/chainInfo';
 import moment from 'moment';
 
 export default (safeAddress: string | null) => {
     const { account, chainId } = useWeb3React();
-    const { safeTokens } = useSafeTokens(safeAddress)
+    const { safeTokens } = useSafeTokens()
 
     const getERC20Token = useCallback((tokenAddr: string) => {
         console.log(safeTokens)

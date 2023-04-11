@@ -20,7 +20,7 @@ import { useWeb3React } from "@web3-react/core";
 import Checkbox from "components/Checkbox";
 import { beautifyHexToken } from "utils";
 import { off } from "process";
-import useSafeTokens from "hooks/useSafeTokens";
+import {useSafeTokens} from "hooks/useSafeTokens";
 import useSafeTransaction from "hooks/useSafeTransaction";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 

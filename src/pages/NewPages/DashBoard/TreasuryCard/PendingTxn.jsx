@@ -15,7 +15,7 @@ import { AiOutlineClose, AiOutlineCheck } from "react-icons/ai";
 import CloseBtn from '../../../../assets/svg/close-btn.svg';
 import CheckBtn from '../../../../assets/svg/check-btn.svg';
 import { SupportedChainId } from "constants/chains";
-import useSafeTokens from "hooks/useSafeTokens";
+import {useSafeTokens} from "hooks/useSafeTokens";
 
 const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
       <div style={{ flex : 1}} ref={ref} {...rest}>
@@ -23,13 +23,13 @@ const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
       </div>
   ))
 
-const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, executeFirst = '', threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions, confirmTxLoading, rejectTxLoading, executeTxLoading, isAdmin, onLoadLabels }) => {
-    const { provider, account, chainId } = useWeb3React();
+const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, executeFirst = '', threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions, confirmTxLoading, rejectTxLoading, executeTxLoading, isAdmin, onLoadLabels, chainId }) => {
+    const { provider, account } = useWeb3React();
     const { DAO } = useAppSelector(store => store.dashboard);
     const [reasonText, setReasonText] = useState({});
     //const [editMode, setEditMode] = useState(null);
     const dispatch = useAppDispatch()
-    const {safeTokens} = useSafeTokens(safeAddress)
+    const {safeTokens} = useSafeTokens()
     //const threshold = useAppSelector((state) => state.flow.safeThreshold);
 
     const { amount, tokenSymbol, recipient, reason, decimal, isAllowanceTransaction, isOwnerModificaitonTransaction } = useMemo(() => {

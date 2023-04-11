@@ -8,13 +8,13 @@ import doubleEuro from "../../../../assets/svg/doubleEuro.svg";
 import { ItransactionDetailsType } from "types/DashBoardType";
 import { SupportedChainId } from "constants/chains";
 import { useWeb3React } from "@web3-react/core";
-import useSafeTokens from "hooks/useSafeTokens";
+import {useSafeTokens} from "hooks/useSafeTokens";
 import { useAppDispatch, useAppSelector } from "state/hooks";
 
 const TransactionDetails = (props: ItransactionDetailsType) => {
   const { chainId } = useWeb3React();
   const { DAO } = useAppSelector((state) => state.dashboard);
-  const { safeTokens } = useSafeTokens(_get(DAO, 'safe.address', ''))
+  const { safeTokens } = useSafeTokens()
   return (
     <>
       <div id="transactionDetailsPage">

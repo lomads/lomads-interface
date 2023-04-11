@@ -24,7 +24,7 @@ import { getDao, updateMilestone } from "state/dashboard/actions";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 
 import { resetUpdateMilestoneLoader } from 'state/dashboard/reducer';
-import useSafeTokens from 'hooks/useSafeTokens';
+import {useSafeTokens} from 'hooks/useSafeTokens';
 
 const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL }) => {
     console.log("data : ", data);
@@ -42,7 +42,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
     const safeAddress = useAppSelector((state) => state.flow.safeAddress);
 
     const { isSafeOwner } = useRole(DAO, account);
-    const { safeTokens } = useSafeTokens(_get(DAO, 'safe.address', ''))
+    const { safeTokens } = useSafeTokens()
 
     const [temp, setTemp] = useState([]);
 

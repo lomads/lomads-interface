@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { SafeTransactionDataPartial, MetaTransactionData } from "@gnosis.pm/safe-core-sdk-types";
 import { SafeTransactionOptionalProps } from "@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/types";
-import useSafeTokens from "./useSafeTokens";
+import {useSafeTokens} from "hooks/useSafeTokens";
 import { get as _get, find as _find } from 'lodash';
 import { tokenCallSafe } from "connection/DaoTokenCall";
 import { ImportSafe, safeService } from "connection/SafeCall";
@@ -17,7 +17,7 @@ const { toChecksumAddress } = require('ethereum-checksum-address')
 const useSafeTransaction = (safeAddress: string) => {
 
     const { provider, chainId, account } = useWeb3React();
-    const { safeTokens, tokenBalance } = useSafeTokens(safeAddress)
+    const { safeTokens, tokenBalance } = useSafeTokens()
     //const currentNonce = useAppSelector((state) => state.flow.currentNonce);
     const [createSafeTxnLoading, setCreateSafeTxnLoading] = useState(false);
     const [updateOwnerLoading, setUpdateOwnerLoading] = useState(false);
