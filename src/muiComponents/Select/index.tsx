@@ -6,7 +6,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 type propTypes = {
   options: string[],
   selected: string | undefined,
-  selectStyle?: {},
+  selectStyle?: any,
   setSelectedValue: (event: any) => void
 }
 
