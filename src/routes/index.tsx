@@ -36,8 +36,8 @@ import CreatePassToken from "muiViews/CreatePassToken";
 import MintPassToken from "muiViews/MintPassToken";
 import LoginPage from "muiViews/LoginPage";
 import createDaoOrg from "muiViews/CreateDaoOrg"
-import StartSafe from "muiViews/StartSafe";
-import InviteGang from "muiViews/InviteGang";
+//import StartSafe from "muiViews/StartSafe";
+//import InviteGang from "muiViews/InviteGang";
 import AddExistingSafe from "muiViews/AddExistingSafe";
 import AddNewSafe from "muiViews/AddNewSafe";
 import DAOsuccess from "muiViews/DAOSuccess";
@@ -60,14 +60,14 @@ export default [
         path: '/createdao',
         component: createDaoOrg
     },
-    {
-        path: '/invitegang',
-        component: InviteGang
-    },
-    {
-        path: '/startsafe',
-        component: StartSafe
-    },
+    // {
+    //     path: '/invitegang',
+    //     component: InviteGang
+    // },
+    // {
+    //     path: '/startsafe',
+    //     component: StartSafe
+    // },
     {
         path: '/addsafe',
         component: AddExistingSafe

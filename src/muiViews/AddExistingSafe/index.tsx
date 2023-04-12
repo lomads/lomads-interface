@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import _ from "lodash";
-import TextInput from '../../muiComponents/TextInput';
 import { useNavigate } from "react-router-dom";
 import { useWeb3React } from "@web3-react/core";
 import { updateHolder } from "state/proposal/reducer";
@@ -16,13 +15,14 @@ import {
 } from "state/flow/reducer";
 import { ethers } from "ethers";
 import { Box, Button, Typography, Container, Grid } from "@mui/material"
-import coin from "../../assets/svg/coin.svg";
+import MuiSelect from '../../muiComponents/Select'
 import axios from "axios";
 import { InviteGangType } from "types/UItype";
-import { createDAO } from '../../state/flow/actions';
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
 import { CHAIN_IDS_TO_NAMES } from 'constants/chains'
 import { makeStyles } from '@mui/styles';
+import downArrow from '../../assets/svg/downArrow.svg'
+import seeklogo from '../../assets/svg/seeklogo.svg'
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
@@ -48,15 +48,14 @@ const useStyles = makeStyles((theme: any) => ({
 		fontStyle: 'normal',
 		fontWeight: 700,
 		fontSize: 16,
-		lineHeight: 18,
 		letterSpacing: '-0.011em',
 		color: '#76808D',
 	},
-	centerCard: {
+	listItem: {
 		display: 'flex',
-		flexDirection: 'column',
+		flexDirection: 'row',
 		alignItems: 'flex-start',
-		justifyItems: 'flex-start',
+		justifyContent: 'space-between',
 		background: '#FFFFFF',
 		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
 		borderRadius: 5,
@@ -70,8 +69,7 @@ const useStyles = makeStyles((theme: any) => ({
 		flexDirection: 'column',
 		alignItems: 'center',
 		justifyContent: 'center',
-		height: 'fit-content',
-		padding: '20vh 0vh 10vh 0vh'
+		height: 'fit-content'
 	},
 	owner: {
 		width: '100%',
@@ -102,15 +100,12 @@ const useStyles = makeStyles((theme: any) => ({
 		textAlign: 'center',
 		color: '#C94B32'
 	},
-	boldText: {
-		fontWeight: 800
-	},
 	safeFooter: {
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
 		fontWeight: '400',
-		fontSize: '14px',
-		lineHeight: '15px',
+		fontSize: 14,
+		lineHeight: 15,
 		letterSpacing: '-0.011em',
 		color: '#76808D',
 		width: 480,
@@ -118,7 +113,7 @@ const useStyles = makeStyles((theme: any) => ({
 		marginBottom: 9,
 	},
 	findSafe: {
-		margin: '25px 0px 15px 0px'
+		margin: 25
 	},
 	inputArea: {
 		display: 'flex',
@@ -135,8 +130,8 @@ const useStyles = makeStyles((theme: any) => ({
 	},
 	safeData: {
 		display: 'flex',
-		flexDirection: 'row',
-		alignItems: 'center',
+		flexDirection: 'column',
+		alignItems: 'flex-start',
 		justifyContent: 'space-between',
 		background: '#FFFFFF',
 		border: '1px solid #f1f4f4',
@@ -163,7 +158,7 @@ const useStyles = makeStyles((theme: any) => ({
 		border: '1px solid #f1f4f4',
 		borderRadius: '5px',
 		maxHeight: 'fit-content',
-		width: '500px',
+		width: 500,
 		padding: '20px',
 		marginTop: '2px',
 	},
@@ -196,7 +191,7 @@ const useStyles = makeStyles((theme: any) => ({
 		lineHeight: 15,
 		letterSpacing: '-0.011em',
 		color: '#76808D',
-		width: '480px',
+		width: 480,
 		textAlign: 'center',
 		marginTop: '25px',
 		marginBottom: '25px',
@@ -205,8 +200,7 @@ const useStyles = makeStyles((theme: any) => ({
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
 		fontWeight: '400',
-		fontSize: '16px',
-		lineHeight: '35px',
+		fontSize: 16,
 		textAlign: 'center',
 		color: '#188C7C',
 	},
@@ -229,8 +223,7 @@ const useStyles = makeStyles((theme: any) => ({
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
 		fontWeight: '400',
-		fontSize: '16px',
-		lineHeight: '35px',
+		fontSize: 16,
 		textAlign: 'center',
 		color: '#76808D',
 		marginLeft: '1vh',
@@ -239,8 +232,7 @@ const useStyles = makeStyles((theme: any) => ({
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
 		fontWeight: '800',
-		fontSize: '18px',
-		lineHeight: '35px',
+		fontSize: 18,
 		textAlign: 'center',
 		color: '#76808D',
 		marginLeft: '1vh',
@@ -250,16 +242,29 @@ const useStyles = makeStyles((theme: any) => ({
 		flexDirection: 'row',
 		justifyContent: 'flex-start',
 		alignItems: 'center',
-		marginTop: '10px',
+		marginTop: 10,
 	},
 	bottomLine: {
-		margin: 10,
+		margin: 20,
 		width: 210,
 		height: 2,
 		backgroundColor: '#C94B32',
 		border: '2px solid #C94B32',
 		position: 'relative',
 		borderRadius: 50
+	},
+	downArrow: {
+		minWidth: 'fit-content'
+	},
+	seeklogo: {
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: '#D1D4D9',
+		borderRadius: '50%',
+		width: 32,
+		height: 32
 	}
 }));
 
@@ -269,19 +274,17 @@ export default () => {
 	const navigate = useNavigate();
 	const safeAddress = useAppSelector((state) => state.flow.safeAddress);
 	const safeName = useAppSelector((state) => state.flow.safeName);
-	const selectedOwners = useAppSelector((state) => state.flow.owners);
 	const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
 	const [safeOwners, setSafeOwners] = useState<string[]>([]);
 	const [tokens, setTokens] = useState<any>([]);
 	const [errors, setErrors] = useState<any>({});
 	const [balance, setBalance] = useState<string>("");
 	const [isLoading, setisLoading] = useState<boolean>(false);
+	const [safeList, setSafeList] = useState<any>([]);
 	const owners = useRef<InviteGangType[]>([]);
-	const safeNameRef = useRef<string>("");
-	const [showSafeDetails, setShowSafeDetails] = useState<boolean>(false);
+	const [selectedChain, setSelectedChain] = useState<string>('')
 	const flow = useAppSelector((state) => state.flow);
 	const createDAOLoading = useAppSelector((state) => state.flow.createDAOLoading);
-
 	const { provider, account, chainId } = useWeb3React();
 
 
@@ -308,7 +311,6 @@ export default () => {
 					const bal = await safeSDK.getBalance();
 					setBalance(bal.toString());
 					await getTokens(safeAddress);
-					setShowSafeDetails(true);
 					setisLoading(false);
 				})
 				.catch(e => {
@@ -360,36 +362,36 @@ export default () => {
 			setisLoading(true)
 	}, [createDAOLoading])
 
-	const handleAddSafe = useCallback(() => {
-		const totalAddresses = [...invitedMembers, ...owners.current];
-		const value = totalAddresses.reduce((final: any, current: any) => {
-			let object = final.find((item: any) => item.address === current.address);
-			if (object) {
-				return final;
-			}
-			return final.concat([current]);
-		}, []);
-		dispatch(updateTotalMembers(value));
-		const payload: any = {
-			chainId,
-			contractAddress: '',
-			name: flow.daoName,
-			url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
-			image: flow.daoImage,
-			members: value.map((m: any) => {
-				if (m.address.toLowerCase() === account?.toLowerCase()) {
-					return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : 'role2' }
-				}
-				return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4' }
-			}),
-			safe: {
-				name: safeName,
-				address: safeAddress,
-				owners: owners.current.map(o => o.address),
-			}
-		}
-		dispatch(createDAO(payload))
-	}, [chainId, safeAddress]);
+	// const handleAddSafe = useCallback(() => {
+	// 	const totalAddresses = [...invitedMembers, ...owners.current];
+	// 	const value = totalAddresses.reduce((final: any, current: any) => {
+	// 		let object = final.find((item: any) => item.address === current.address);
+	// 		if (object) {
+	// 			return final;
+	// 		}
+	// 		return final.concat([current]);
+	// 	}, []);
+	// 	dispatch(updateTotalMembers(value));
+	// 	const payload: any = {
+	// 		chainId,
+	// 		contractAddress: '',
+	// 		name: flow.daoName,
+	// 		url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
+	// 		image: flow.daoImage,
+	// 		members: value.map((m: any) => {
+	// 			if (m.address.toLowerCase() === account?.toLowerCase()) {
+	// 				return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : 'role2' }
+	// 			}
+	// 			return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4' }
+	// 		}),
+	// 		safe: {
+	// 			name: safeName,
+	// 			address: safeAddress,
+	// 			owners: owners.current.map(o => o.address),
+	// 		}
+	// 	}
+	// 	dispatch(createDAO(payload))
+	// }, [chainId, safeAddress]);
 
 	const handleClick = useCallback(() => {
 		console.log("clicked")
@@ -406,6 +408,7 @@ export default () => {
 	}, [safeAddress]);
 
 	const handleClickDelayed = useCallback(_.debounce(handleClick, 1000), [handleClick, safeAddress])
+	const handleDownClick = () => ''
 
 	return (
 		<Container>
@@ -445,221 +448,67 @@ export default () => {
 						</Box>
 					</Box>
 					<Box className={classes.bottomLine} />
-					{owners.current.length >= 1 && showSafeDetails ? (
-						<>
-							<Box className={classes.safeInfo}>
-								<Box className={classes.safeData}>
-									<Box className={classes.safeName}>
-										{safeName ? (
-											safeName
-										) : (
-											<>
-												<TextInput
-													sx={{
-														height: 30,
-														width: 179
-													}}
-													placeholder="Pied Piper"
-													name="safeName"
-													onChange={(e: any) => {
-														safeNameRef.current = e.target.value;
-													}}
-												/>
-											</>
-										)}
-									</Box>
-									<Box className={classes.address}>
-										{safeAddress.slice(0, 6) + "..." + safeAddress.slice(-4)}
-									</Box>
+					<Box className={classes.safeData}>
+						<Typography className={classes.inputFieldTitle}>Select Chain</Typography>
+						<MuiSelect
+							selected={selectedChain}
+							options={[
+								'Polygon',
+							]}
+							selectStyle={{ py: 1 }}
+							setSelectedValue={(value) => {
+								setSelectedChain(value)
+								//add api call
+								setSafeList([
+									{
+										name: 'asdas'
+									}
+								])
+							}}
+						/>
+					</Box>
+					{safeList.length ? <Box className={classes.StartSafe}>
+						<Box className={classes.bottomLine} />
+						{safeList.map((item: any, index: any) => (
+							<Box
+								key={index}
+								className={classes.listItem}
+								sx={{ width: 500, boxShadow: 'none' }}>
+								<Box className={classes.seeklogo}>
+										<img src={seeklogo} alt="seek-logo" />
 								</Box>
-								<Box className={classes.safeData}>
-									<Box className={classes.balance}>
-										<img src={coin} alt="coin" />
-										<Box className={classes.safeBalance}>
-											$ {tokens.length >= 1 && tokens[0].fiatBalance}
-										</Box>
-									</Box>
-									<Box className={classes.tokenAssets}>
-										{tokens.length > 1 ? (
-											<>
-												<Box className={classes.balance}>
-													<Box className={classes.asset}>
-														<Box className={classes.safeName}>
-															{tokens[1].token.symbol.slice(0, 1) +
-																tokens[1].token.symbol.slice(-1)}
-														</Box>
-													</Box>
-													<Box className={classes.amount}>
-														{tokens[1].balance / 10 ** 18}
-													</Box>
-												</Box>
-											</>
-										) : null}
-										{tokens.length === 3 ? (
-											<>
-												<Box className={classes.balance}>
-													<Box className={classes.asset}>
-														<Box className={classes.safeName}>
-															{tokens[2].token.symbol.slice(0, 1) +
-																tokens[2].token.symbol.slice(-1)}
-														</Box>
-													</Box>
-													<Box className={classes.amount}>
-														{tokens[2].balance / 10 ** 18}
-													</Box>
-												</Box>
-											</>
-										) : null}
-									</Box>
-								</Box>
-								<Box className={classes.bottomLine} />
-								<Box className={classes.safeOwners}>
-									<Box className={classes.ownerCount}>
-										{owners.current.length} Owners :
-									</Box>
-									<Box className={classes.ownerList}>
-										{owners.current.map(
-											(result: InviteGangType, index: number) => {
-												return (
-													<>
-														<Box className={classes.safeOwner} key={index}>
-															<TextInput
-																sx={{
-																	height: 30,
-																	width: 179
-																}}
-																placeholder="Name"
-																type="text"
-																onChange={(e: any) => {
-																	owners.current[index].name = e.target.value;
-																}}
-															/>
-															<Box className={classes.address}>
-																{result.address.slice(0, 6) +
-																	"..." +
-																	result.address.slice(-4)}
-															</Box>
-														</Box>
-													</>
-												);
-											}
-										)}
-									</Box>
-								</Box>
-								<Box className={classes.footerText}>
-									By continuing you consent to the terms of use and privacy policy
-									of Gnosis Safe
-								</Box>
-								<Box className={classes.buttonArea}>
-									<Box>
-										<Button
-											variant="outlined"
-											sx={{
-												borderColor: "#C94B32",
-												bgColor: "#FFFFFF",
-												height: 55,
-												width: 225,
-												fontsize: 20,
-												fontweight: 400
-											}}
-											onClick={(e) => {
-												setShowSafeDetails(false);
-											}}
-										>CHANGE SAFE</Button>
-									</Box>
-									<Box>
-										<Button
-											variant="contained"
-											sx={{
-												backgroundColor: "#C94B32",
-												height: 55,
-												width: 225,
-												fontsize: 20,
-												fontweight: 400,
-												boxShadow: '3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)'
-											}}
-											onClick={() => {
-												handleAddSafe();
-											}}
-										>ADD SAFE</Button>
-									</Box>
-								</Box>
-							</Box>
-						</>
-					) : (
-						<>
-							<Box className={classes.centerCard}>
-								{/* <Box className="chainDetails">
 								<Box>
-									<Box className="inputFieldTitle">
-										Select the network on which the Safe was created
-									</Box>
+									<Typography className={classes.safeName}>Safe Name</Typography>
+									<Typography>{item.name}</Typography>
 								</Box>
-								<select name="chain" id="chain" className="drop">
-									{ SUPPORTED_CHAIN_IDS.map(chain => <option value={+chain}>{CHAIN_IDS_TO_NAMES[chain]}</option>) }
-								</select>
-							</Box> */}
-								<Box className={classes.inputArea}>
-									<Box>
-										<Box>
-											<Typography
-												className={classes.inputFieldTitle}>
-												Safe Name
-											</Typography>
-										</Box>
-										<TextInput
-											sx={{
-												height: 50,
-												width: 179
-											}}
-											placeholder="Pied Piper"
-											name="safeName"
-											value={safeName}
-											onChange={(e: any) => {
-												dispatch(updatesafeName(e.target.value));
-											}}
-										/>
-									</Box>
-									<Box>
-										<Box>
-											<Typography
-												className={classes.inputFieldTitle}>
-												Safe Address
-											</Typography>
-										</Box>
-										<TextInput
-											sx={{
-												height: 50,
-												width: 311
-											}}
-											placeholder="0xbeee39"
-											value={safeAddress}
-											name="safeAddress"
-											onChange={(e: any) => {
-												setErrors({ issafeAddress: "" });
-												dispatch(updateSafeAddress(e.target.value));
-											}}
-											error={errors.issafeAddress}
-											helperText={errors.issafeAddress}
-										/>
-									</Box>
-								</Box>
-							</Box>
-							<Box className={classes.findSafe}>
-								<Button
-									style={{
-										backgroundColor: safeAddress ? "#C94B32" : "rgba(27, 43, 65, 0.2)",
-										color: '#FFF',
-										fontWeight: 400,
-										minWidth: 'max-content'
-									}}
-									variant='contained'
-									onClick={handleClickDelayed}
-								>FIND SAFE
+								<Button className={classes.downArrow} onClick={() => handleDownClick}>
+									<img src={downArrow} alt="down-arrow" />
 								</Button>
 							</Box>
-						</>
-					)}
+						))}
+						<Box className={classes.findSafe}>
+							<Button
+								style={{
+									fontWeight: 400,
+									minWidth: 'max-content'
+								}}
+								variant='outlined'
+								onClick={handleClickDelayed}
+							>CANCEL
+							</Button>
+							<Button
+								style={{
+									color: '#FFF',
+									fontWeight: 400,
+									minWidth: 'max-content'
+								}}
+								variant='contained'
+								onClick={handleClickDelayed}
+							>FIND SAFE
+							</Button>
+						</Box></Box>
+						: ''
+					}
 				</Box>
 			</Grid>
 		</Container>

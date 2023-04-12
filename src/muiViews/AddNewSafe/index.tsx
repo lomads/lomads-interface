@@ -191,7 +191,7 @@ const useStyles = makeStyles((theme: any) => ({
 		marginBottom: 35
 	},
 	bottomLine: {
-		margin: 10,
+		margin: 20,
 		width: 210,
 		height: 2,
 		backgroundColor: '#C94B32',
@@ -317,19 +317,19 @@ const useStyles = makeStyles((theme: any) => ({
 		marginRight: '25px',
 	},
 	membersModal: {
-		width: '768px',
-		height: '768px',
+		width: 768,
+		height: 768,
 		backgroundColor: 'white',
 		position: 'absolute',
 		top: '50%',
 		right: '50%',
 		transform: 'translate(50%, -50%)',
-		borderRadius: '20px',
+		borderRadius: 20,
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'center',
 		padding: '65px 65px 0 65px',
-		zIndex: '999'
+		zIndex: 999
 	},
 	membersModalHeader: {
 		width: '100%',
@@ -1149,7 +1149,6 @@ export default () => {
 							selected={selectedChain}
 							options={[
 								'Polygon',
-								 
 							]}
 							selectStyle={{ py: 1 }}
 							setSelectedValue={(value) => {

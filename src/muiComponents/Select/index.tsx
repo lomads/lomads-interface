@@ -19,10 +19,11 @@ export default function MuiSelect({
   const [activeOption, setActiveOption] = React.useState(selected);
 
   const handleChange = (event: SelectChangeEvent) => {
-    setActiveOption(event.target.value);
-    setSelectedValue(event.target.value)
+    if(!!event.target.value){
+      setActiveOption(event.target.value);
+      setSelectedValue(event.target.value)
+    }
   };
-
   return (
     <FormControl sx={{ width: '100%', ...selectStyle}}>
       <Select
