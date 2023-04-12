@@ -174,10 +174,10 @@ export default () => {
 	const handleClick = () => {
 		let terrors: any = {};
 		if (!daoName) {
-			terrors.daoName = " * DAO name is required.";
+			terrors.daoName = " * Organisation name is required.";
 		}
 		if (!daoAddress) {
-			terrors.daoAddress = " * DAO Address is required.";
+			terrors.daoAddress = " * Organisation Address is required.";
 		}
 		if (_.isEmpty(terrors)) {
 			handleNavigate();
@@ -231,8 +231,9 @@ export default () => {
 	const checkAvailabilityAsync = useRef(_.debounce(checkAvailability, 500)).current
 
 	const handleNavigate = () => {
-		daoName.length >= 1 && navigate("/invitegang");
+		daoName.length >= 1 && navigate("/newsafe");
 	};
+	
 	const handleDaoName = (event: any) => {
 		refSafeName.current = event.target.value.replace(/[^a-z0-9 ]/gi, "");
 		dispatch(updateDaoName(refSafeName.current.toString()));
@@ -278,7 +279,7 @@ export default () => {
 					alignItems="center"
 					justifyContent="center">
 					<Typography sx={{ mt: 2 }} className={classes.title}>
-						1/3 Name of your Organisation
+						1/2 Name of your Organisation
 					</Typography>
 					<Box className={classes.centerCard}>
 						<Box>

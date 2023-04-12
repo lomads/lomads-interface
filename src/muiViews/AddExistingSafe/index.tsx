@@ -411,7 +411,7 @@ export default () => {
 		<Container>
 			<Grid className={classes.root}>
 				<Box className={classes.StartSafe}>
-					<Box className={classes.headerText}>3/3 DAO Treasury</Box>
+					<Box className={classes.headerText}>2/2 Organisation Treasury</Box>
 					<Box className={classes.buttonArea}>
 						<Box>
 							<Button

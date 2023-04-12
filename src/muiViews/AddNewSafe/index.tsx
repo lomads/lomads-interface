@@ -25,7 +25,7 @@ import { loadDao } from '../../state/dashboard/actions';
 import { CHAIN_GAS_STATION, SupportedChainId } from "constants/chains";
 import { Box, Button, Typography, Container, Grid } from "@mui/material"
 import { makeStyles } from '@mui/styles';
-import SimpleListMenu from '../../muiComponents/List'
+import MuiSelect from '../../muiComponents/Select'
 import axios from "axios";
 
 const useStyles = makeStyles((theme: any) => ({
@@ -200,6 +200,7 @@ export default () => {
 	const [showContinue, setshowContinue] = useState<boolean>(true);
 	const [ownerSelected, setOwnerSelected] = useState<boolean>(false);
 	const [errors, setErrors] = useState<any>({});
+	const [selectedChain, setSelectedChain] = useState<string>('')
 	const [isLoading, setisLoading] = useState<boolean>(false);
 	const safeName = useAppSelector((state) => state.flow.safeName);
 	const selectedOwners = useAppSelector((state) => state.flow.owners);
@@ -453,7 +454,7 @@ export default () => {
 
 	const AddOwners = () => {
 		return (
-			<>
+			<div style={{border: '1px solid green'}}>
 				<Box className={classes.bottomLine} />
 				<Box className={classes.addOwner}>
 					<Box className={classes.inputFieldTitle}>Select Owners</Box>
@@ -518,48 +519,25 @@ export default () => {
 		);
 	};
 
-	const SelectedOwners = () => {
+	const InviteMembersBlock = () => {
 		return (
-			<>
+			<div style={{border: '1px solid red'}}>
 				<Box className={classes.bottomLine} />
-				<Box className={classes.addOwner}>
-					<Box className={classes.inputFieldTitle}>Owners</Box>
-					<Box sx={{ width: '100%;' }}>
-						{Myvalue.current.map((result: any, index: any) => {
-							return (
-								<>
-									<Box key={index} className={classes.owner}>
-										<Box className={classes.avatarName}>
-											<img src={daoMember2} alt={result.address} />
-											<p className={classes.nameText}>{result.name}</p>
-										</Box>
-										<p className={classes.text}>
-											{result.address.slice(0, 6) +
-												"..." +
-												result.address.slice(-4)}
-										</p>
-									</Box>
-								</>
-							);
-						})}
-					</Box>
-				</Box>
+				
 				<SelectThreshold />
-			</>
+			</div>
 		);
 	};
 
 	const DropDown = React.memo((props: any) => {
 		return (
-			 <SimpleListMenu
-			 	defaultText={props.value.current.length ? thresholdValue: '0'}
+			<MuiSelect
+				selected={'0'}
 				options={props.value.current}
-				updateThresholdValue={(event: any) => {
-					if(event.target.value){
-						setThresholdValue(+event.target.value)
-					}
+				setSelectedValue={(value) => {
+					setThresholdValue(+value)
 				}}
-			 />
+			/>
 		);
 	});
 
@@ -613,7 +591,7 @@ export default () => {
 		<Container>
 			<Grid className={classes.root}>
 				<Box className={classes.StartSafe}>
-					<Box className={classes.headerText}>3/3 DAO Treasury</Box>
+					<Box className={classes.headerText}>2/2 Organisation Treasury</Box>
 					<Box className={classes.buttonArea}>
 						<Box>
 							<Button
@@ -648,6 +626,18 @@ export default () => {
 					</Box>
 					<Box className={classes.bottomLine} />
 					<Box className={classes.centerCard}>
+					   <Typography className={classes.inputFieldTitle}>Select Chain</Typography>
+						<MuiSelect
+							selected={selectedChain}
+							options={[
+								'Polygon',
+
+							]}
+							selectStyle={{py: 1}}
+							setSelectedValue={(value) => {
+								setSelectedChain(value)
+							}}
+						/>
 						<Typography className={classes.inputFieldTitle}>Safe Name</Typography>
 						<TextInput
 							sx={{
@@ -679,15 +669,7 @@ export default () => {
 								</Button>
 							</Box>
 						</>
-					) : invitedMembers.length >= 1 ? (
-						ownerSelected ? (
-							<SelectedOwners />
-						) : (
-							<AddOwners />
-						)
-					) : (
-						<SelectedOwners />
-					)}
+					) : <InviteMembersBlock />}
 				</Box>
 			</Grid>
 		</Container>
