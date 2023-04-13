@@ -26,14 +26,15 @@ import {
 	updateInvitedGang,
 	appendInviteMembers
 } from "state/flow/reducer";
+import {SUPPORTED_CHAIN_IDS, SupportedChainId, CHAIN_GAS_STATION } from 'constants/chains'
 import daoMember2 from "../../assets/svg/daoMember2.svg";
 import { useWeb3React } from "@web3-react/core";
 import EthersAdapter from "@gnosis.pm/safe-ethers-lib";
 import { SafeFactory, SafeAccountConfig } from "@gnosis.pm/safe-core-sdk";
 import { ethers } from "ethers";
+import { CHAIN_INFO } from 'constants/chainInfo';
 import { createDAO } from '../../state/flow/actions';
 import { loadDao } from '../../state/dashboard/actions';
-import { CHAIN_GAS_STATION, SupportedChainId } from "constants/chains";
 import { Box, Button, Typography, Container, Grid } from "@mui/material"
 import { makeStyles } from '@mui/styles';
 import MuiSelect from '../../muiComponents/Select'
@@ -416,7 +417,7 @@ export default () => {
 	const [showContinue, setshowContinue] = useState<boolean>(true);
 	const [ownerSelected, setOwnerSelected] = useState<boolean>(false);
 	const [errors, setErrors] = useState<any>({});
-	const [selectedChain, setSelectedChain] = useState<string>('')
+	const [selectedChainId, setSelectedChainId] = useState<number>(SupportedChainId.GOERLI)
 	const [isLoading, setisLoading] = useState<boolean>(false);
 	const safeName = useAppSelector((state) => state.flow.safeName);
 	const selectedOwners = useAppSelector((state) => state.flow.owners);
@@ -848,7 +849,7 @@ export default () => {
 				<Box className={classes.InviteGang}>
 					<Box className={classes.centerInputCard}>
 						<Box style={{ width: '100%', marginBottom: 8, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-							<Box className={classes.inputTitle}>Add member :</Box>
+							<Box className={classes.inputTitle}>Add Owner :</Box>
 						</Box>
 						<Box className={classes.inputArea}>
 							<Box style={{ marginRight: '10px' }}>
@@ -875,20 +876,6 @@ export default () => {
 									error={!!errors.ownerAddress}
 									helperText={errors.ownerAddress}
 								/>
-							</Box>
-							<Box sx={{ marginRight: '10px' }}>
-								<select
-									name="role"
-									className={classes.tokenDropdown}
-									defaultValue={ownerRole}
-									onChange={(e) => setOwnerRole(e.target.value)}
-									style={{ margin: '0' }}
-								>
-									{/* <option value="role1">Admin</option> */}
-									<option value="role2">Core Contributor</option>
-									<option value="role3">Active Contributor</option>
-									<option value="role4">Contributor</option>
-								</select>
 							</Box>
 							<Box>
 								<IconButton
@@ -1050,7 +1037,7 @@ export default () => {
 	const DropDown = React.memo((props: any) => {
 		return (
 			<MuiSelect
-				selected={'0'}
+				selected={thresholdValue}
 				options={props.value.current}
 				setSelectedValue={(value) => {
 					setThresholdValue(+value)
@@ -1146,13 +1133,11 @@ export default () => {
 					<Box className={classes.centerCard}>
 						<Typography className={classes.inputFieldTitle}>Select Chain</Typography>
 						<MuiSelect
-							selected={selectedChain}
-							options={[
-								'Polygon',
-							]}
+							selected={selectedChainId}
+							options={SUPPORTED_CHAIN_IDS.map(item=> ({label: CHAIN_INFO[item].label, value: item}))}
 							selectStyle={{ py: 1 }}
 							setSelectedValue={(value) => {
-								setSelectedChain(value)
+								setSelectedChainId(value)
 							}}
 						/>
 						<Typography className={classes.inputFieldTitle}>Safe Name</Typography>

@@ -5,6 +5,7 @@ import { useWeb3React } from "@web3-react/core";
 import { updateHolder } from "state/proposal/reducer";
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import { ImportSafe } from "connection/SafeCall";
+import coin from "../../assets/svg/coin.svg";
 import {
 	updateSafeAddress,
 	updatesafeName,
@@ -14,15 +15,17 @@ import {
 	updateInvitedGang
 } from "state/flow/reducer";
 import { ethers } from "ethers";
+import TextInput from '../../muiComponents/TextInput'
 import { Box, Button, Typography, Container, Grid } from "@mui/material"
 import MuiSelect from '../../muiComponents/Select'
 import axios from "axios";
 import { InviteGangType } from "types/UItype";
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
-import { CHAIN_IDS_TO_NAMES } from 'constants/chains'
+import { CHAIN_IDS_TO_NAMES, SUPPORTED_CHAIN_IDS, SupportedChainId } from 'constants/chains'
 import { makeStyles } from '@mui/styles';
+import { CHAIN_INFO } from 'constants/chainInfo';
 import downArrow from '../../assets/svg/downArrow.svg'
-import seeklogo from '../../assets/svg/seeklogo.svg'
+import { beautifyHexToken } from "utils"
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
@@ -51,18 +54,26 @@ const useStyles = makeStyles((theme: any) => ({
 		letterSpacing: '-0.011em',
 		color: '#76808D',
 	},
-	listItem: {
+	List: {
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'flex-start',
+		justifyContent: 'center',
+		background: '#FFFFFF',
+		borderRadius: 5,
+		maxHeight: 'fit-content',
+		margin: 8
+	},
+	ListItem: {
 		display: 'flex',
 		flexDirection: 'row',
 		alignItems: 'flex-start',
 		justifyContent: 'space-between',
 		background: '#FFFFFF',
-		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
 		borderRadius: 5,
-		maxHeight: 'fit-content',
-		width: '554.75px',
-		padding: 20,
-		margin: 35,
+		width: 500,
+		padding: 10,
+		height: 64
 	},
 	StartSafe: {
 		display: 'flex',
@@ -156,11 +167,11 @@ const useStyles = makeStyles((theme: any) => ({
 		justifyContent: 'flex-start',
 		background: '#FFFFFF',
 		border: '1px solid #f1f4f4',
-		borderRadius: '5px',
+		borderRadius: 5,
 		maxHeight: 'fit-content',
 		width: 500,
-		padding: '20px',
-		marginTop: '2px',
+		padding: 20,
+		marginTop: 2
 	},
 	ownerList: {
 		display: 'flex',
@@ -254,9 +265,9 @@ const useStyles = makeStyles((theme: any) => ({
 		borderRadius: 50
 	},
 	downArrow: {
-		minWidth: 'fit-content'
+		maxWidth: 'fit-content'
 	},
-	seeklogo: {
+	ChainLogo: {
 		display: 'flex',
 		flexDirection: 'row',
 		justifyContent: 'center',
@@ -264,7 +275,15 @@ const useStyles = makeStyles((theme: any) => ({
 		backgroundColor: '#D1D4D9',
 		borderRadius: '50%',
 		width: 32,
-		height: 32
+		height: 32,
+		margin: 10
+	},
+	safeContainer: {
+		display: 'flex',
+		flexDirection: 'column',
+		justifyContent: 'center',
+		alignItems: 'center',
+		overflow: 'scroll'
 	}
 }));
 
@@ -272,33 +291,43 @@ export default () => {
 	const classes = useStyles()
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
-	const safeAddress = useAppSelector((state) => state.flow.safeAddress);
-	const safeName = useAppSelector((state) => state.flow.safeName);
-	const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
+	const safeAddress = useAppSelector((state: any) => state.flow.safeAddress);
+	const safeName = useAppSelector((state: any) => state.flow.safeName);
+	const invitedMembers = useAppSelector((state: any) => state.flow.invitedGang);
 	const [safeOwners, setSafeOwners] = useState<string[]>([]);
 	const [tokens, setTokens] = useState<any>([]);
 	const [errors, setErrors] = useState<any>({});
 	const [balance, setBalance] = useState<string>("");
+	const [selectedSafeAddress, setSelectedSafeAddress] = useState<string>("");
+	const [expand, setExpand] = useState<boolean>(false);
 	const [isLoading, setisLoading] = useState<boolean>(false);
 	const [safeList, setSafeList] = useState<any>([]);
 	const owners = useRef<InviteGangType[]>([]);
-	const [selectedChain, setSelectedChain] = useState<string>('')
-	const flow = useAppSelector((state) => state.flow);
-	const createDAOLoading = useAppSelector((state) => state.flow.createDAOLoading);
+	const [selectedChainId, setSelectedChainId] = useState<number>(SupportedChainId.GOERLI)
+	const flow = useAppSelector((state: any) => state.flow);
+	const createDAOLoading = useAppSelector((state: any) => state.flow.createDAOLoading);
 	const { provider, account, chainId } = useWeb3React();
-
 
 	useEffect(() => {
 		dispatch(updateSafeAddress(""));
 		dispatch(updateTotalMembers([]))
 	}, [])
 
-	const UseExistingSafe = useCallback(async () => {
+	const getSafeDetails = (item: string) => {
+		if(!expand || selectedSafeAddress !== item){
+			setExpand(true)
+			setSelectedSafeAddress(item)
+			UseExistingSafe()
+			return
+		} 
+		setExpand(false)
+	}
+	const UseExistingSafe = useCallback(async (value: string = selectedSafeAddress) => {
 		if (isLoading) return;
 		if (chainId) {
 			owners.current = [];
 			setisLoading(true);
-			ImportSafe(provider, safeAddress)
+			ImportSafe(provider, value)
 				.then(async safeSDK => {
 					dispatch(updateHolder(safeSDK.getAddress() as string));
 					const safeowners: string[] = await safeSDK.getOwners();
@@ -362,37 +391,6 @@ export default () => {
 			setisLoading(true)
 	}, [createDAOLoading])
 
-	// const handleAddSafe = useCallback(() => {
-	// 	const totalAddresses = [...invitedMembers, ...owners.current];
-	// 	const value = totalAddresses.reduce((final: any, current: any) => {
-	// 		let object = final.find((item: any) => item.address === current.address);
-	// 		if (object) {
-	// 			return final;
-	// 		}
-	// 		return final.concat([current]);
-	// 	}, []);
-	// 	dispatch(updateTotalMembers(value));
-	// 	const payload: any = {
-	// 		chainId,
-	// 		contractAddress: '',
-	// 		name: flow.daoName,
-	// 		url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
-	// 		image: flow.daoImage,
-	// 		members: value.map((m: any) => {
-	// 			if (m.address.toLowerCase() === account?.toLowerCase()) {
-	// 				return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : 'role2' }
-	// 			}
-	// 			return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4' }
-	// 		}),
-	// 		safe: {
-	// 			name: safeName,
-	// 			address: safeAddress,
-	// 			owners: owners.current.map(o => o.address),
-	// 		}
-	// 	}
-	// 	dispatch(createDAO(payload))
-	// }, [chainId, safeAddress]);
-
 	const handleClick = useCallback(() => {
 		console.log("clicked")
 		let terrors: any = {};
@@ -408,8 +406,94 @@ export default () => {
 	}, [safeAddress]);
 
 	const handleClickDelayed = useCallback(_.debounce(handleClick, 1000), [handleClick, safeAddress])
-	const handleDownClick = () => ''
+	const handleDownClick = () => {
+		axios.get(`${GNOSIS_SAFE_BASE_URLS[selectedChainId]}/api/v1/owners/0xbd062EB9720c78f00c68770F3dE62118e66be404/safes/`)
+			.then((response: any) => {
+				// response
+			});
+	}
 
+	const getSafes = () => {
+		axios.get(`${GNOSIS_SAFE_BASE_URLS[selectedChainId]}/api/v1/owners/0xbd062EB9720c78f00c68770F3dE62118e66be404/safes/`)
+			.then((response: any) => {
+				setSafeList(response.data.safes)
+			});
+	}
+
+	const SafeDetails = () => {
+		return <Box className={classes.StartSafe}>
+			<Box className={classes.safeData}>
+				<Box className={classes.balance}>
+					<img src={coin} alt="coin" />
+					<Box className={classes.safeBalance}>
+						$ {tokens.length >= 1 && tokens[0].fiatBalance}
+					</Box>
+				</Box>
+				<Box className={classes.tokenAssets}>
+					{tokens.length > 1 ? (
+						<>
+							<Box className={classes.balance}>
+								<Box className={classes.asset}>
+									<Box className={classes.safeName}>
+										{tokens[1].token.symbol.slice(0, 1) +
+											tokens[1].token.symbol.slice(-1)}
+									</Box>
+								</Box>
+								<Box className={classes.amount}>
+									{tokens[1].balance / 10 ** 18}
+								</Box>
+							</Box>
+						</>
+					) : null}
+					{tokens.length === 3 ? (
+						<>
+							<Box className={classes.balance}>
+								<Box className={classes.asset}>
+									<Box className={classes.safeName}>
+										{tokens[2].token.symbol.slice(0, 1) +
+											tokens[2].token.symbol.slice(-1)}
+									</Box>
+								</Box>
+								<Box className={classes.amount}>
+									{tokens[2].balance / 10 ** 18}
+								</Box>
+							</Box>
+						</>
+					) : null}
+				</Box>
+			</Box>
+			<Box className={classes.safeOwners}>
+				<Box className={classes.ownerCount}>
+					{owners.current.length} Owners :
+				</Box>
+				<Box className={classes.ownerList}>
+					{owners.current.map(
+						(result: InviteGangType, index: number) => {
+							return (
+								<>
+									<Box className={classes.safeOwner} key={index}>
+										<TextInput
+											placeholder="Name"
+											type="text"
+											onChange={(e: any) => {
+												owners.current[index].name = e.target.value;
+											}}
+										/>
+										<Box className="address">
+											{result.address.slice(0, 6) +
+												"..." +
+												result.address.slice(-4)}
+										</Box>
+									</Box>
+								</>
+							);
+						}
+					)}
+				</Box>
+			</Box>
+		</Box>
+	}
+	console.log(safeList, '....safeList....')
 	return (
 		<Container>
 			<Grid className={classes.root}>
@@ -451,51 +535,54 @@ export default () => {
 					<Box className={classes.safeData}>
 						<Typography className={classes.inputFieldTitle}>Select Chain</Typography>
 						<MuiSelect
-							selected={selectedChain}
-							options={[
-								'Polygon',
-							]}
+							selected={selectedChainId}
+							options={SUPPORTED_CHAIN_IDS.map(item => ({ label: CHAIN_INFO[item].label, value: item }))}
 							selectStyle={{ py: 1 }}
 							setSelectedValue={(value) => {
-								setSelectedChain(value)
-								//add api call
-								setSafeList([
-									{
-										name: 'asdas'
-									}
-								])
+								setSelectedChainId(value)
+								if(safeList.length) {
+									getSafes()
+								}
 							}}
 						/>
 					</Box>
-					{safeList.length ? <Box className={classes.StartSafe}>
-						<Box className={classes.bottomLine} />
-						{safeList.map((item: any, index: any) => (
-							<Box
-								key={index}
-								className={classes.listItem}
-								sx={{ width: 500, boxShadow: 'none' }}>
-								<Box className={classes.seeklogo}>
-										<img src={seeklogo} alt="seek-logo" />
-								</Box>
-								<Box>
-									<Typography className={classes.safeName}>Safe Name</Typography>
-									<Typography>{item.name}</Typography>
-								</Box>
-								<Button className={classes.downArrow} onClick={() => handleDownClick}>
-									<img src={downArrow} alt="down-arrow" />
+					{safeList.length ?
+						<Box className={classes.StartSafe}>
+							<Box className={classes.bottomLine} />
+							<Box className={classes.safeContainer}>
+								{safeList.map((item: any, index: any) => (
+									<Box key={index} className={classes.List}>
+										<Box
+											className={classes.ListItem}>
+											<Box className={classes.ChainLogo}>
+												<img src={CHAIN_INFO[selectedChainId].logoUrl} alt="seek-logo" />
+											</Box>
+											<Box>
+												<Typography className={classes.safeName}>Safe Name</Typography>
+												<Typography>{beautifyHexToken(item)}</Typography>
+											</Box>
+											<Button className={classes.downArrow} onClick={() => getSafeDetails(item)}>
+												<img src={downArrow} alt="down-arrow" />
+											</Button>
+										</Box>
+										{expand && selectedSafeAddress === item ? <SafeDetails /> :''}
+									</Box>
+								))}
+							</Box>
+							<Box className={classes.findSafe}>
+								<Button
+									style={{
+										color: '#FFF',
+										fontWeight: 400,
+										minWidth: 'max-content'
+									}}
+									variant='contained'
+									onClick={handleClickDelayed}
+								>ADD SAFE
 								</Button>
 							</Box>
-						))}
-						<Box className={classes.findSafe}>
-							<Button
-								style={{
-									fontWeight: 400,
-									minWidth: 'max-content'
-								}}
-								variant='outlined'
-								onClick={handleClickDelayed}
-							>CANCEL
-							</Button>
+						</Box>
+						: <Box className={classes.findSafe}>
 							<Button
 								style={{
 									color: '#FFF',
@@ -503,11 +590,10 @@ export default () => {
 									minWidth: 'max-content'
 								}}
 								variant='contained'
-								onClick={handleClickDelayed}
+								onClick={getSafes}
 							>FIND SAFE
 							</Button>
-						</Box></Box>
-						: ''
+						</Box>
 					}
 				</Box>
 			</Grid>

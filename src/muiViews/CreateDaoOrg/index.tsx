@@ -55,7 +55,7 @@ const useStyles = makeStyles((theme: any) => ({
 	title: {
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
-		fontWeight: '500',
+		fontWeight: 500,
 		fontSize: '30px !important',
 		lineHeight: '33px !important',
 		display: 'flex',
@@ -66,9 +66,9 @@ const useStyles = makeStyles((theme: any) => ({
 	inputFieldTitle: {
 		fontFamily: 'Inter, sans-serif',
 		fontStyle: 'normal',
-		fontWeight: '700',
-		fontSize: '16px',
-		lineHeight: '18px',
+		fontWeight: 700,
+		fontSize: 16,
+		lineHeight: 18,
 		letterSpacing: '-0.011em',
 		color: '#76808D',
 		margin: '15px 0px 15px 0px'
@@ -105,11 +105,11 @@ const useStyles = makeStyles((theme: any) => ({
 	},
 	imagePickerWrapperText: {
 		fontStyle: 'normal',
-		fontWeight: '400',
-		fontSize: '16px',
-		lineHeight: '16px',
+		fontWeight: 400,
+		fontSize: 16,
+		lineHeight: 16,
 		color: 'rgba(118, 128, 141, 0.5)',
-		marginLeft: '13px',
+		marginLeft: 13
 	},
 	imagePickerWrapper: {
 		width: '100%',
@@ -119,7 +119,7 @@ const useStyles = makeStyles((theme: any) => ({
 	imagePickerContainer: {
 		width: 150,
 		height: 150,
-		borderRadius: '10px',
+		borderRadius: 10,
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'center',
