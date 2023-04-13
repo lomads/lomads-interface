@@ -37,6 +37,7 @@ const SideModal = (props: IsideModal) => {
 	const dispatch = useAppDispatch();
 	const { provider, account, chainId, connector } = useWeb3React();
 	const [selectedToken, setSelectedToken] = useState<string>("");
+	const [selectedTag, setSelectedTag] = useState<any>(null);
 	const [addNewRecipient, setAddNewRecipient] = useState<boolean>(false);
 	const [modalNavigation, setModalNavigation] = useState({
 		showRecipient: false,
@@ -48,8 +49,14 @@ const SideModal = (props: IsideModal) => {
 	//const [safeTokens, setSafeTokens] = useState<Array<any>>([]);
 	const { safeTokens } = useSafeTokens()
 	const totalMembers = useAppSelector((state) => state.flow.totalMembers);
+
 	const selectToken = (_tokenAddress: string) => {
 		setSelectedToken(_tokenAddress);
+	};
+
+	const selectTag = (_tag: any) => {
+		setSelectedTag(_tag);
+		console.log("selected tag : ",_tag);
 	};
 
 	const selectedRecipients = useRef<InviteGangType[]>([]);
@@ -151,7 +158,8 @@ const SideModal = (props: IsideModal) => {
 						safeAddress: _get(DAO, 'safe.address', null),
 						safeTxHash: res.data.safeTxHash,
 						recipient: r.recipient,
-						label: _get(r, 'reason', null)
+						label: _get(r, 'reason', null),
+						tag:selectedTag
 					})
 				})
 				axiosHttp.post(`transaction/label`, payload)
@@ -166,12 +174,14 @@ const SideModal = (props: IsideModal) => {
 	}
 
 	const createTransaction = async () => {
+		console.log("selected tag : ",selectedTag);
 		setError(null)
 		if (selectedToken === 'SWEAT') {
 			return createOffChainTxn()
 		}
 		try {
-			const txnResponse = await createSafeTransaction({ tokenAddress: selectedToken, send: setRecipient.current });
+
+			const txnResponse = await createSafeTransaction({ tokenAddress: selectedToken, send: setRecipient.current,tag:selectedTag });
 			if (txnResponse?.safeTxHash) {
 				dispatch(getDao(DAO.url))
 				await props.getPendingTransactions();
@@ -266,6 +276,7 @@ const SideModal = (props: IsideModal) => {
 								setRecipient={setRecipient}
 								tokens={props.tokens}
 								selectToken={selectToken}
+								selectTag={selectTag}
 								selectedToken={selectedToken}
 								toggleAddNewRecipient={toggleAddNewRecipient}
 								addNewRecipient={addNewRecipient}

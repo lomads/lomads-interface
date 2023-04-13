@@ -18,6 +18,8 @@ import useTerminology from 'hooks/useTerminology';
 import moment from 'moment';
 import BootstrapTooltip from "./WalkThrough/HelpToolTip"
 
+import {BsArrowRight} from 'react-icons/bs'
+
 const MyProject = ({ isHelpIconOpen }) => {
     const navigate = useNavigate();
     const { daoURL } = useParams();
@@ -30,6 +32,7 @@ const MyProject = ({ isHelpIconOpen }) => {
     const { myRole, can } = useRole(DAO, account)
     const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies', null))
 
+    const showCreateProject = localStorage.getItem("create_first_project");
 
     const notificationCount = (project) => {
         let count = [];
@@ -68,8 +71,8 @@ const MyProject = ({ isHelpIconOpen }) => {
 
     useEffect(() => {
         if (!initialCheck) {
+            setInitialCheck(true)
             if (myProjects.length > 0) {
-                setInitialCheck(true)
                 setTab(1);
             } else {
                 setTab(2)
@@ -151,7 +154,7 @@ const MyProject = ({ isHelpIconOpen }) => {
                 </div>
             </div>
             {
-                tab === 1 && myProjects && myProjects.length > 0
+                tab === 1 
                     ?
                     <div className='myproject-body-fixed' style={isHelpIconOpen ? {overflow: 'hidden'} : {}}>
                     {isHelpIconOpen && <div className="help-card">
@@ -184,13 +187,25 @@ const MyProject = ({ isHelpIconOpen }) => {
                                 }
                             })
                         }
+                        {
+                            !showCreateProject || myProjects.length < 2 &&
+                            <div
+                                className='create-new-project'
+                                onClick={() => {
+                                    navigate("/createProject");
+                                }}
+                            >
+                                <span>CREATE A WORKSPACE</span>
+                                <BsArrowRight color='rgba(118, 128, 141, 0.5)' size={20}/>
+                            </div>
+                        }
                     </div>
                     :
                     null
             }
 
             {
-                tab === 2 && otherProjects && otherProjects.length > 0
+                tab === 2 
                     ?
                     <>
                         {

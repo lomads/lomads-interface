@@ -18,6 +18,7 @@ import useRole from "hooks/useRole";
 import { nanoid } from "@reduxjs/toolkit";
 import moment from "moment";
 import axiosHttp from '../../../../api';
+import Button from 'muiComponents/Button'
 
 import { getDao, updateMilestone } from "state/dashboard/actions";
 
@@ -27,6 +28,8 @@ import { resetUpdateMilestoneLoader } from 'state/dashboard/reducer';
 import {useSafeTokens} from 'hooks/useSafeTokens';
 import SwitchChain from 'components/SwitchChain';
 import { toast } from 'react-hot-toast';
+import Dropdown from 'muiComponents/Dropdown';
+import Avatar from 'muiComponents/Avatar';
 
 const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL }) => {
     console.log("data : ", data);
@@ -53,6 +56,8 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
     const [showSuccess, setShowSuccess] = useState(false);
 
     const [isSplit, setIsSplit] = useState(false);
+
+    const [selectedTag, setSelectedTag] = useState(null);
 
     useEffect(() => {
         if(DAO)
@@ -204,7 +209,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
         return new Promise(async (resolve, reject) => {
             try {
                 if (!chainId) return;
-                const txnResponse = await createSafeTransaction({ tokenAddress: _get(compensation, 'currency', null), send, confirm: isSafeOwner, createLabel: true })
+                const txnResponse = await createSafeTransaction({ tokenAddress: _get(compensation, 'currency', null), send, confirm: isSafeOwner, createLabel: true,tag:selectedTag })
                 if(txnResponse) {
                     resolve(txnResponse.safeTxHash)
                 } else {
@@ -295,7 +300,8 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
 						safeAddress: _get(DAO, 'safe.address', null),
 						safeTxHash: res.data.safeTxHash,
 						recipient: r.recipient,
-						label: _get(r, 'reason', null)
+						label: _get(r, 'reason', null),
+                        tag:selectedTag
 					})
 				})
 				await axiosHttp.post(`transaction/label`, payload)
@@ -369,26 +375,32 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                                     <h1>Assign Contributions</h1>
                                     <span>Mark the milestone as completed and reward the contributors</span>
 
-                                    <SafeButton
-                                        height={40}
-                                        width={260}
-                                        titleColor="#C94B32"
-                                        title="SPLIT EQUALLY"
-                                        bgColor="#FFFFFF"
-                                        opacity="1"
-                                        disabled={false}
-                                        fontweight={400}
-                                        fontsize={16}
-                                        onClick={() => handleSplitEqually()}
-                                    />
+                                   <div style={{display:'flex'}}>
+                                        <div style={{marginRight:'16px'}}>
+                                        <SafeButton
+                                            height={40}
+                                            width={140}
+                                            titleColor="#C94B32"
+                                            title="SPLIT EQUALLY"
+                                            bgColor="#FFFFFF"
+                                            opacity="1"
+                                            disabled={false}
+                                            fontweight={400}
+                                            fontsize={16}
+                                            onClick={() => handleSplitEqually()}
+                                        />
+                                        </div>
+                                        <div style={{width:'192px'}}>
+                                            <Dropdown onChangeOption={(value) => setSelectedTag(value)}/>
+                                        </div>
+                                   </div>
 
                                     <div className='members-section'>
                                         {
                                             temp && temp.map((item, index) => (
                                                 <div className='member-row' key={item.wallet}>
                                                     <div>
-                                                        <img src={memberIcon} alt="memberIcon" />
-                                                        <span>{item.name}</span>
+                                                        <Avatar name={item.name} wallet={item.wallet}/>
                                                     </div>
                                                     <div>
                                                         <div
@@ -423,7 +435,12 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                                     </div>
                                 </div>
                                 { error && <div style={{ color: 'red', textAlign: 'center', margin: '0 0 8px 0' }}>{ error }</div> }
-                                <div className='milestone-footer'>
+                                <div style={{ display: 'flex', flexDirection: 'row', background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: '500px',  position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
+                                    <Button sx={{mr:1}} size="small" variant="outlined" fullWidth onClick={() => toggleShowAssign()}>CANCEL</Button>
+                                    <Button fullWidth size="small" variant="contained" loading={false} 
+                                        onClick={handleSubmit}>SAVE</Button>
+                                </div>
+                                {/* <div className='milestone-footer'>
                                     <button onClick={() => toggleShowAssign()} disabled={isLoading} style={isLoading ? { cursor: 'not-allowed' } : null}>
                                         CANCEL
                                     </button>
@@ -437,7 +454,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                                         bgColor={"#C94B32"}
                                         condition={isLoading}
                                     />
-                                </div>
+                                </div> */}
                             </div>
                         </>
                 }

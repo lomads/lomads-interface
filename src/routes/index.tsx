@@ -135,6 +135,10 @@ export default [
         component: Settings
     },
     {
+        path: '/:daoURL/settings/:openState',
+        component: Settings
+    },
+    {
         path: '/archives',
         component: ArchiveProjects
     },

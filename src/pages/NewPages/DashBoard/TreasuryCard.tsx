@@ -233,7 +233,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
 	const loadTxnLabel = async () => {
 		axiosHttp.get(`transaction/label?safeAddress=${_get(DAO, 'safe.address', '')}`)
-			.then(res => setLabels(res.data))
+			.then(res => {console.log("labels :",res.data );setLabels(res.data)})
 	}
 
 	const fetchDao = async () => {
@@ -304,7 +304,8 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				loadExecutedTxn()
 				loadOffChainTxn()
 				loadTxnLabel()
-			} else {
+			} 
+			else {
 				setPendingTxn(undefined);
 				setExecutedTxn(undefined);
 				setOffChainPendingTxn(undefined);
@@ -322,7 +323,8 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				loadExecutedTxn()
 				loadOffChainTxn()
 				loadTxnLabel()
-			} else {
+			} 
+			else {
 				setPendingTxn(undefined);
 				setExecutedTxn(undefined);
 				setOffChainPendingTxn(undefined);
@@ -875,38 +877,49 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				<>
 					{
 						pendingTxn !== undefined && executedTxn !== undefined &&
-						(pendingTxn && executedTxn && (pendingTxn.length !== 0 || executedTxn.length !== 0)) &&
-						<div className="position-relative">
-								{props.isHelpIconOpen && <div className="help-card">
-										Managing and automating your treasury has never been easier! Here you can approve and send token payments manually, or set up recurring payments to team members!
-								</div>}
-							<div id="treasuryTransactions">
-							<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%' }}>
-								<div className="dashboardText" style={{ marginBottom: '6px', flexGrow: 1 }}>Last Transactions</div>
-								{/* { lowBalanceError && <div className="dashboardText" style={{ marginBottom: '6px', color: 'red' }}>Low token balance</div> } */}
+						(pendingTxn && executedTxn && (pendingTxn.length !== 0 || executedTxn.length !== 0)) 
+						?
+						<>
+							<div className="position-relative">
+									{props.isHelpIconOpen && <div className="help-card">
+											Managing and automating your treasury has never been easier! Here you can approve and send token payments manually, or set up recurring payments to team members!
+									</div>}
+								<div id="treasuryTransactions">
+									<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%' }}>
+										<div className="dashboardText" style={{ marginBottom: '6px', flexGrow: 1 }}>Last Transactions</div>
+										{/* { lowBalanceError && <div className="dashboardText" style={{ marginBottom: '6px', color: 'red' }}>Low token balance</div> } */}
+									</div>
+									{
+										recurringTreasuryData.map((rtx :any) => 
+											<RecurringTxnTreasury chainId={+_get(DAO, 'chainId', 5)} onExecute={async (data: any) => {
+												await loadTxnLabel()
+												dispatch(setRecurringPayments(data))
+											}} transaction={rtx}/>
+										)
+									}
+									{
+										pendingTxn.map((ptx, index) =>
+											<PendingTxn chainId={+_get(DAO, 'chainId', 5)} editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} executeFirst={executeFirst} isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
+										)
+									}
+									{
+										executedTxn.map((ptx, index) =>
+											<CompleteTxn chainId={+_get(DAO, 'chainId', 5)} editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} isAdmin={amIAdmin} owner={owner} transaction={ptx} tokens={props.tokens} />
+										)
+									}
+								</div>
 							</div>
-							{
-								recurringTreasuryData.map((rtx :any) => 
-									<RecurringTxnTreasury chainId={_get(DAO, 'chainId')} onExecute={async (data: any) => {
-										await loadTxnLabel()
-										dispatch(setRecurringPayments(data))
-									}} transaction={rtx}/>
-								)
-							}
-							{
-								pendingTxn.map((ptx, index) =>
-									<PendingTxn chainId={+_get(DAO, 'chainId', 5)} editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} executeFirst={executeFirst} isAdmin={amIAdmin} owner={isSafeOwner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
-								)
-							}
-							{
-								executedTxn.map((ptx, index) =>
-									<CompleteTxn chainId={+_get(DAO, 'chainId', 5)} editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} isAdmin={amIAdmin} owner={isSafeOwner} transaction={ptx} tokens={props.tokens} />
-								)
-							}
+						</>
+						:
+						<div className="no-transactions">
+							<h1>Last transactions</h1>
+							<div className="no-trans-outlined">
+								<span>NO TRANSACTION YET</span>
+							</div>
 						</div>
-					 </div>
 					}
-				</> :
+				</> 
+				:
 				<>
 					{
 						recurringPayments && recurringPayments.length > 0 &&

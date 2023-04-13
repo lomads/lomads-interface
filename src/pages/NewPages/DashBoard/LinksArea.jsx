@@ -58,9 +58,15 @@ const LinksArea = ({ links, isHelpIconOpen }) => {
         <div className='links-container'>
             <div className='links-container-links'>
                 {
-                    links && links.map((item, index) => {
+                    links && links.length > 0
+                    ?
+                    links.map((item, index) => {
                         return renderLinks(item)
                     })
+                    :
+                    <div className='link-add-btn' onClick={() => { navigate(`/${DAO.url}/settings/${'openOrganisation'}`) }}>
+                        <span>ADD USEFUL LINKS HERE</span>
+                    </div>
                 }
             </div>
             {

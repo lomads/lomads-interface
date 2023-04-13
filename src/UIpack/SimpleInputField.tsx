@@ -8,7 +8,7 @@ const SimpleInputField = (props: InputFieldType) => {
       <Input
         id={props.id}
         className={props.className}
-        style={{ height: props.height, width: props.width }}
+        style={{ height: props.height, width: props.width,padding:props.padding }}
         name={props.name}
         value={props.value}
         placeholder={props.placeholder}

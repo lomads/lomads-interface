@@ -44,6 +44,7 @@ import useSafeTransaction from 'hooks/useSafeTransaction';
 import { toast } from 'react-hot-toast';
 import SwitchChain from 'components/SwitchChain';
 import { useSafeTokens } from 'hooks/useSafeTokens';
+import Dropdown from 'muiComponents/Dropdown';
 
 const TaskReview = ({ task, close }: any) => {
     console.log("task review : ", task);
@@ -65,6 +66,7 @@ const TaskReview = ({ task, close }: any) => {
     const [rejectUser, setRejectUser] = useState<any>(null);
     const [error, setError] = useState<any>(null);
     const [chainId, setChainId] = useState(null)
+    const [selectedTag, setSelectedTag] = useState<any>(null);
 
     const { createSafeTransaction } = useSafeTransaction(_get(DAO, 'safe.address', ''))
 
@@ -139,7 +141,7 @@ const TaskReview = ({ task, close }: any) => {
             try {
                 if (!chainId) return;
                 const send = [{ recipient: activeSubmission.member.wallet, amount: newCompensation }]
-                const txnResponse = await createSafeTransaction({ tokenAddress: _get(task, 'compensation.currency', null), send, confirm: isSafeOwner, createLabel: false })
+                const txnResponse = await createSafeTransaction({ tokenAddress: _get(task, 'compensation.currency', null), send, confirm: isSafeOwner, createLabel: false,tag:selectedTag })
                 if(txnResponse) {
                     resolve(txnResponse.safeTxHash)
                 }
@@ -317,6 +319,9 @@ const TaskReview = ({ task, close }: any) => {
                         <span>Note</span>
                         <div className='note'>{submission.submission.note}</div>
                     </div>
+                    
+                </div>
+                <div style={{width:'100%',display:'flex',flexDirection:'column'}}>
                     <div className='detail-container'>
                         {task && _get(task, 'submissionLink', []).length == 0 ?
                             <>
@@ -338,25 +343,30 @@ const TaskReview = ({ task, close }: any) => {
                             </>
                         }
                     </div>
-                </div>
-                <div className='task-review-compensation'>
-                    <div className='task-review-compensation-main'>
-                        <div className='container'>
-                            <div>Compensation</div>
-                            <img src={starIcon} />
-                            <div className='amount'>{_get(task, 'compensation.amount', 0)}</div>
-                            {(newCompensation - _get(task, 'compensation.amount', 0)) !== 0 && <div className='extra'>{`${(newCompensation - _get(task, 'compensation.amount', 0)) > 0 ? '+' : ''} ${(newCompensation - _get(task, 'compensation.amount', 0))}`}</div>}
-                            <div>{_get(task, 'compensation.symbol', "SWEAT")}</div>
+                    <div className='task-review-compensation'>
+                        <div className='task-review-compensation-main'>
+                            <div style={{width:'100%',display:'flex'}}>
+                                <div className='container'>
+                                    <div>Compensation</div>
+                                    <img src={starIcon} />
+                                    <div className='amount'>{_get(task, 'compensation.amount', 0)}</div>
+                                    {(newCompensation - _get(task, 'compensation.amount', 0)) !== 0 && <div className='extra'>{`${(newCompensation - _get(task, 'compensation.amount', 0)) > 0 ? '+' : ''} ${(newCompensation - _get(task, 'compensation.amount', 0))}`}</div>}
+                                    <div>{_get(task, 'compensation.symbol', "SWEAT")}</div>
+                                </div>
+                                <button onClick={() => { setError(null); setShowModifyCompensation(true) }}>
+                                    <img src={editIcon} alt="edit-icon" />
+                                </button>
+                            </div>
+                            <div style={{width:'100%'}}>
+                                <Dropdown onChangeOption={(value:any) => setSelectedTag(value)}/>
+                            </div>
                         </div>
-                        <button onClick={() => { setError(null); setShowModifyCompensation(true) }}>
-                            <img src={editIcon} alt="edit-icon" />
-                        </button>
                     </div>
-                </div>
-                { error && (typeof error === 'string') && <div style={{ color: 'red', marginBottom: 16, textAlign: 'center' }}>{ error }</div> }
-                <div className='task-review-foot'>
-                    <Button disabled={approveLoading || rejectTaskLoading} loading={rejectTaskLoading} onClick={() => { setRejectUser(submission.member._id); setShowRejectSubmission(true) }}>REJECT</Button>
-                    <Button disabled={approveLoading || rejectTaskLoading} loading={approveLoading} style={{ backgroundColor: approveLoading ? 'grey' : '#C94B32' }} onClick={() => handleApproveTaskAsync()}>APPROVE</Button>
+                    { error && (typeof error === 'string') && <div style={{ color: 'red', marginBottom: 16, textAlign: 'center' }}>{ error }</div> }
+                    <div className='task-review-foot'>
+                        <Button disabled={approveLoading || rejectTaskLoading} loading={rejectTaskLoading} onClick={() => { setRejectUser(submission.member._id); setShowRejectSubmission(true) }}>REJECT</Button>
+                        <Button disabled={approveLoading || rejectTaskLoading} loading={approveLoading} style={{ backgroundColor: approveLoading ? 'grey' : '#C94B32' }} onClick={() => handleApproveTaskAsync()}>APPROVE</Button>
+                    </div>
                 </div>
             </div>
         )
