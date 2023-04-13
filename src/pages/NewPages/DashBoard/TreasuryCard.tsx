@@ -416,7 +416,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 		} else {
 			try {
 				setConfirmTxLoading(_safeTxHashs);
-				// const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
+				const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
 				// const isOwner = await safeSDK.isOwner(account as string);
 				if (isSafeOwner) {
 					const senderSignature = await safeSDK.signTransactionHash(_safeTxHashs);
