@@ -57,7 +57,6 @@ const useStyles = makeStyles((theme: any) => ({
 		fontStyle: 'normal',
 		fontWeight: 500,
 		fontSize: '30px !important',
-		lineHeight: '33px !important',
 		display: 'flex',
 		alignItems: 'center',
 		textAlign: 'center',
@@ -68,7 +67,6 @@ const useStyles = makeStyles((theme: any) => ({
 		fontStyle: 'normal',
 		fontWeight: 700,
 		fontSize: 16,
-		lineHeight: 18,
 		letterSpacing: '-0.011em',
 		color: '#76808D',
 		margin: '15px 0px 15px 0px'
@@ -107,7 +105,6 @@ const useStyles = makeStyles((theme: any) => ({
 		fontStyle: 'normal',
 		fontWeight: 400,
 		fontSize: 16,
-		lineHeight: 16,
 		color: 'rgba(118, 128, 141, 0.5)',
 		marginLeft: 13
 	},

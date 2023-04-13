@@ -750,7 +750,6 @@ export default () => {
 				Myvalue.current.push(member)
 			}
 			if (!isPresent(member.address) && isRightAddress(member.address)) {
-				console.log(invitedMembers)
 				const newMember = [...invitedMembers, member];
 				dispatch(updateInvitedGang(newMember));
 				setOwnerName("");
@@ -1022,7 +1021,7 @@ export default () => {
 						<Box>
 							<MuiSelect
 								selected={thresholdValue}
-								options={Myvalue.current}
+								options={Myvalue.current.map((item, index)=> ({label: index+1, value: index+1}))}
 								setSelectedValue={(value) => {
 									setThresholdValue(+value)
 								}}
