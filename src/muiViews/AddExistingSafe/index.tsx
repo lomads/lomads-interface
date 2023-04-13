@@ -16,7 +16,7 @@ import {
 } from "state/flow/reducer";
 import { ethers } from "ethers";
 import TextInput from '../../muiComponents/TextInput'
-import { Box, Button, Typography, Container, Grid } from "@mui/material"
+import { Box, Button, Typography, Container, Grid, IconButton } from "@mui/material"
 import MuiSelect from '../../muiComponents/Select'
 import axios from "axios";
 import { InviteGangType } from "types/UItype";
@@ -67,13 +67,20 @@ const useStyles = makeStyles((theme: any) => ({
 	ListItem: {
 		display: 'flex',
 		flexDirection: 'row',
-		alignItems: 'flex-start',
+		alignItems: 'center',
 		justifyContent: 'space-between',
 		background: '#FFFFFF',
 		borderRadius: 5,
-		width: 500,
+		width: 360,
 		padding: 10,
-		height: 64
+		height: 64,
+		cursor: 'pointer'
+	},
+	ListContent: {
+		display: 'flex',
+		flexDirection: 'row',
+		alignItems: 'center',
+		background: '#FFFFFF',
 	},
 	StartSafe: {
 		display: 'flex',
@@ -124,20 +131,13 @@ const useStyles = makeStyles((theme: any) => ({
 		marginBottom: 9,
 	},
 	findSafe: {
-		margin: 25
+		margin: 10
 	},
 	inputArea: {
 		display: 'flex',
 		justifyContent: 'space-around',
 		alignItems: 'center',
 		width: '100%'
-	},
-	safeInfo: {
-		display: 'flex',
-		flexDirection: 'column',
-		justifyContent: 'start',
-		alignItems: 'center',
-		marginTop: 35,
 	},
 	safeData: {
 		display: 'flex',
@@ -148,7 +148,7 @@ const useStyles = makeStyles((theme: any) => ({
 		border: '1px solid #f1f4f4',
 		borderRadius: 5,
 		maxHeight: 'fit-content',
-		width: 500,
+		width: 385,
 		padding: 20,
 		marginTop: 2
 	},
@@ -169,7 +169,6 @@ const useStyles = makeStyles((theme: any) => ({
 		border: '1px solid #f1f4f4',
 		borderRadius: 5,
 		maxHeight: 'fit-content',
-		width: 500,
 		padding: 20,
 		marginTop: 2
 	},
@@ -283,7 +282,7 @@ const useStyles = makeStyles((theme: any) => ({
 		flexDirection: 'column',
 		justifyContent: 'center',
 		alignItems: 'center',
-		overflow: 'scroll'
+		height: 576
 	}
 }));
 
@@ -314,12 +313,11 @@ export default () => {
 	}, [])
 
 	const getSafeDetails = (item: string) => {
-		if(!expand || selectedSafeAddress !== item){
+		if (!expand || selectedSafeAddress !== item) {
 			setExpand(true)
-			setSelectedSafeAddress(item)
 			UseExistingSafe()
 			return
-		} 
+		}
 		setExpand(false)
 	}
 	const UseExistingSafe = useCallback(async (value: string = selectedSafeAddress) => {
@@ -422,7 +420,7 @@ export default () => {
 
 	const SafeDetails = () => {
 		return <Box className={classes.StartSafe}>
-			<Box className={classes.safeData}>
+			<Box className={classes.safeOwners}>
 				<Box className={classes.balance}>
 					<img src={coin} alt="coin" />
 					<Box className={classes.safeBalance}>
@@ -493,7 +491,7 @@ export default () => {
 			</Box>
 		</Box>
 	}
-	console.log(safeList, '....safeList....')
+
 	return (
 		<Container>
 			<Grid className={classes.root}>
@@ -540,7 +538,7 @@ export default () => {
 							selectStyle={{ py: 1 }}
 							setSelectedValue={(value) => {
 								setSelectedChainId(value)
-								if(safeList.length) {
+								if (safeList.length) {
 									getSafes()
 								}
 							}}
@@ -549,32 +547,46 @@ export default () => {
 					{safeList.length ?
 						<Box className={classes.StartSafe}>
 							<Box className={classes.bottomLine} />
-							<Box className={classes.safeContainer}>
-								{safeList.map((item: any, index: any) => (
-									<Box key={index} className={classes.List}>
-										<Box
-											className={classes.ListItem}>
-											<Box className={classes.ChainLogo}>
-												<img src={CHAIN_INFO[selectedChainId].logoUrl} alt="seek-logo" />
+							<Box sx={{
+								overflow: 'scroll'
+							}}>
+								<Box className={classes.safeContainer}>
+									{safeList.map((item: any, index: any) => (
+										<Box key={index} className={classes.List}>
+											<Box
+												className={classes.ListItem}
+												sx={{
+													border: selectedSafeAddress == item
+														? '1px solid #C94B32'
+														: ''
+												}}
+												onClick={() => setSelectedSafeAddress(item)}
+											>
+												<Box className={classes.ListContent}>
+													<Box className={classes.ChainLogo}>
+														<img src={CHAIN_INFO[selectedChainId].logoUrl} alt="seek-logo" />
+													</Box>
+													<Box>
+														<Typography className={classes.safeName}>Safe Name</Typography>
+														<Typography>{beautifyHexToken(item)}</Typography>
+													</Box>
+												</Box>
+												<IconButton className={classes.downArrow} onClick={() => getSafeDetails(item)}>
+													<img src={downArrow} alt="down-arrow" />
+												</IconButton>
 											</Box>
-											<Box>
-												<Typography className={classes.safeName}>Safe Name</Typography>
-												<Typography>{beautifyHexToken(item)}</Typography>
-											</Box>
-											<Button className={classes.downArrow} onClick={() => getSafeDetails(item)}>
-												<img src={downArrow} alt="down-arrow" />
-											</Button>
+											{expand && selectedSafeAddress === item ? <SafeDetails /> : ''}
 										</Box>
-										{expand && selectedSafeAddress === item ? <SafeDetails /> :''}
-									</Box>
-								))}
+									))}
+								</Box>
 							</Box>
 							<Box className={classes.findSafe}>
 								<Button
 									style={{
 										color: '#FFF',
 										fontWeight: 400,
-										minWidth: 'max-content'
+										minWidth: 'max-content',
+										backgroundColor: selectedSafeAddress ? "#C94B32" : "rgba(27, 43, 65, 0.2)",
 									}}
 									variant='contained'
 									onClick={handleClickDelayed}
@@ -591,7 +603,7 @@ export default () => {
 								}}
 								variant='contained'
 								onClick={getSafes}
-							>FIND SAFE
+							>FIND MY SAFE
 							</Button>
 						</Box>
 					}

@@ -9,10 +9,9 @@ import memberIcon from '../../assets/svg/memberIcon.svg';
 import binRed from '../../assets/svg/bin-red.svg';
 import binWhite from '../../assets/svg/bin-white.svg';
 import plusIcon from '../../assets/svg/plusIcon.svg';
+import closeOrange from '../../assets/svg/closeOrange.svg';
 import GreyAddIcon from '../../assets/svg/ADD.svg';
-import { DEFAULT_ROLES } from "constants/terminology";
 import useEns from 'hooks/useEns';
-import { AiOutlineClose } from "react-icons/ai";
 import useTerminology from "hooks/useTerminology";
 import { useAppSelector } from "state/hooks";
 import { useAppDispatch } from "state/hooks";
@@ -26,7 +25,7 @@ import {
 	updateInvitedGang,
 	appendInviteMembers
 } from "state/flow/reducer";
-import {SUPPORTED_CHAIN_IDS, SupportedChainId, CHAIN_GAS_STATION } from 'constants/chains'
+import { SUPPORTED_CHAIN_IDS, SupportedChainId, CHAIN_GAS_STATION } from 'constants/chains'
 import daoMember2 from "../../assets/svg/daoMember2.svg";
 import { useWeb3React } from "@web3-react/core";
 import EthersAdapter from "@gnosis.pm/safe-ethers-lib";
@@ -50,7 +49,7 @@ const useStyles = makeStyles((theme: any) => ({
 	},
 	text: {
 		fontFamily: 'Inter, sans-serif',
-		fontStyle: 'normal',
+		fontStyle: 'italic',
 		fontWeight: 400,
 		fontSize: 14,
 		letterSpacing: '-0.011em',
@@ -129,7 +128,7 @@ const useStyles = makeStyles((theme: any) => ({
 		fontSize: 14,
 		letterSpacing: '-0.011em',
 		color: '#76808D',
-		marginLeft: 16,
+		marginLeft: 26,
 		textAlign: 'center',
 	},
 	cardButton: {
@@ -592,7 +591,6 @@ export default () => {
 		}
 	}
 
-
 	const deployNewSafe = async () => {
 		setisLoading(true);
 		dispatch(updateOwners(Myvalue.current));
@@ -748,6 +746,8 @@ export default () => {
 				else {
 					member.name = _ownerName;
 				}
+
+				Myvalue.current.push(member)
 			}
 			if (!isPresent(member.address) && isRightAddress(member.address)) {
 				console.log(invitedMembers)
@@ -785,13 +785,10 @@ export default () => {
 		);
 		dispatch(updateInvitedGang(deleteMember));
 		console.log(newContract);
-		console.log("rest length:", deleteMember);
-	};
-
-	const handleNavigate = () => {
-		if (invitedMembers.length >= 1) {
-			navigate("/startsafe");
-		}
+		const refIndex = Myvalue.current.findIndex(
+			(result: InviteGangType) => result.address === _address
+		);
+		Myvalue.current.splice(refIndex, 1);
 	};
 
 	const handleCloseModal = () => {
@@ -854,8 +851,10 @@ export default () => {
 						<Box className={classes.inputArea}>
 							<Box style={{ marginRight: '10px' }}>
 								<TextInput
-									height={50}
-									width={144}
+									sx={{
+										height: 50,
+										width: 144
+									}}
 									placeholder="Name"
 									value={ownerName}
 									onChange={(event: any) => {
@@ -865,8 +864,10 @@ export default () => {
 							</Box>
 							<Box sx={{ marginRight: '10px' }}>
 								<TextInput
-									height={50}
-									width={251}
+									sx={{
+										height: 50,
+										width: 251
+									}}
 									placeholder="ENS Domain and Wallet Address"
 									value={ownerAddress}
 									onChange={(event: any) => {
@@ -899,38 +900,27 @@ export default () => {
 										<Box key={index} className={classes.owner}>
 											<Box className={classes.avatarPlusName}>
 												<img src={daoMember2} alt={result.address} />
-												<p className={classes.nameText}>{result.name}</p>
+												<Typography variant="body1" className={classes.nameText}>{result.name}</Typography>
 											</Box>
 											<Box className={classes.avatarAddress}>
-												<p className={classes.text}>
+												<Typography className={classes.text}>
 													{result.address &&
 														result.address.slice(0, 6) +
 														"..." +
 														result.address.slice(-4)}
-												</p>
-											</Box>
-											<Box className={classes.avatarRole}>
-												<p className={classes.text}>
-													{
-														result.address !== undefined && result.address === account
-															?
-															transformRole('role2').label
-															:
-															transformRole(result?.role).label
-													}
-												</p>
+												</Typography>
 											</Box>
 
 											<Box className={classes.avatarBtn}>
 												{result.address !== account && (
-													<Button
+													<IconButton
 														className={classes.deleteButton}
 														onClick={() => {
 															deleteMember(result.address);
 														}}
 													>
-														<AiOutlineClose style={{ height: 15, width: 15 }} />
-													</Button>
+														<img src={closeOrange} alt="close-svg" />
+													</IconButton>
 												)}
 											</Box>
 
@@ -945,7 +935,7 @@ export default () => {
 						<Box className={classes.membersModal}>
 							<Box className={classes.membersModalHeader}>
 								<img src={createProjectSvg} alt="create-project-svg" />
-								<h1>Add Members</h1>
+								<Typography variant="h1">Add Members</Typography>
 							</Box>
 							<Box className={classes.membersModalBody}>
 								{
@@ -967,35 +957,19 @@ export default () => {
 															<TextInput
 																className={classes.inputField}
 																id="nameInput"
-																height={50}
-																width={135}
+																sx={{
+																	height: 50,
+																	width: 135
+																}}
 																error={!!errors.ownerAddress}
 																helperText={errors.ownerAddress}
 																placeholder="Name"
 																value={item.name}
 																name="name"
-																onchange={(e: any) => handleChangeState(e, index)}
+																onChange={(e: any) => handleChangeState(e, index)}
 															/>
 														</Box>
-														<span>{item.address.slice(0, 6) + "..." + item.address.slice(-4)}</span>
-														<select
-															name="role"
-															className={classes.tokenDropdown}
-															defaultValue={item.role}
-															onChange={(e) => handleChangeState(e, index)}
-														>
-															{/* <option value="role1">Admin</option> */}
-															{/* <option value="role2">Core Contributor</option>
-														<option value="role3">Active Contributor</option>
-														<option value="role4">Contributor</option> */}
-															{
-																Object.keys(DEFAULT_ROLES).map((key: any) => {
-																	if (key !== 'role1')
-																		return <option value={key}>{_.get(DEFAULT_ROLES, `[${key}].label`)}</option>
-																	return null
-																})
-															}
-														</select>
+														<Typography>{item.address.slice(0, 6) + "..." + item.address.slice(-4)}</Typography>
 														{
 															deleteMembers.includes(item.address)
 																?
@@ -1013,7 +987,7 @@ export default () => {
 											}
 										</>
 										:
-										<p>All the users have been already added</p>
+										<Typography variant="body1">All the users have been already added</Typography>
 								}
 							</Box>
 							<Box className={classes.membersModalFooter}>
@@ -1034,18 +1008,6 @@ export default () => {
 		);
 	};
 
-	const DropDown = React.memo((props: any) => {
-		return (
-			<MuiSelect
-				selected={thresholdValue}
-				options={props.value.current}
-				setSelectedValue={(value) => {
-					setThresholdValue(+value)
-				}}
-			/>
-		);
-	});
-
 	const SelectThreshold = () => {
 		return (
 			<>
@@ -1058,7 +1020,13 @@ export default () => {
 					</Box>
 					<Box className={classes.selectionArea}>
 						<Box>
-							<DropDown value={Myvalue} threshold={thresholdValue} />
+							<MuiSelect
+								selected={thresholdValue}
+								options={Myvalue.current}
+								setSelectedValue={(value) => {
+									setThresholdValue(+value)
+								}}
+							/>
 						</Box>
 						<Box className={classes.thresholdCount}>
 							of {Myvalue.current.length} owner(s)
@@ -1071,9 +1039,9 @@ export default () => {
 				<Box className={classes.safeFooter}>
 					You’re about to create a new safe and will have to confirm a
 					transaction with your curentry connected wallet.
-					<span className={classes.boldText}>
+					<Typography variant="body1" className={classes.boldText}>
 						{chainId && +chainId === SupportedChainId.POLYGON && polygonGasEstimate ? `The creation will cost approximately ${polygonGasEstimate?.standard?.maxFee} GWei.` : `The creation will cost approximately 0.01256 GOR.`}
-					</span>
+					</Typography>
 					The exact amount will be determinated by your wallet.
 				</Box>
 				<Button
@@ -1134,7 +1102,7 @@ export default () => {
 						<Typography className={classes.inputFieldTitle}>Select Chain</Typography>
 						<MuiSelect
 							selected={selectedChainId}
-							options={SUPPORTED_CHAIN_IDS.map(item=> ({label: CHAIN_INFO[item].label, value: item}))}
+							options={SUPPORTED_CHAIN_IDS.map(item => ({ label: CHAIN_INFO[item].label, value: item }))}
 							selectStyle={{ py: 1 }}
 							setSelectedValue={(value) => {
 								setSelectedChainId(value)
