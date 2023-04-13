@@ -13,15 +13,18 @@ import { updateSafeTransaction } from "state/dashboard/reducer";
 import { SupportedChainId } from "constants/chains";
 import {useSafeTokens} from "hooks/useSafeTokens";
 import { legacy_createStore } from "@reduxjs/toolkit";
+import Dropdown from "muiComponents/Dropdown";
+import Avatar from "muiComponents/Avatar";
 import { CHAIN_INFO } from "constants/chainInfo";
 
-const CompleteTxn = ({ chainId, labels, transaction, tokens, owner, isAdmin, safeAddress, onLoadLabels, editMode, onSetEditMode }: any) => {
+const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress, onLoadLabels, editMode, onSetEditMode, editTag,onSetEditTag }: any) => {
 	//const { chainId } = useWeb3React();
     const threshold = useAppSelector((state) => state.flow.safeThreshold);
     const { DAO } = useAppSelector(store => store.dashboard);
     const [reasonText, setReasonText] = useState({});
     //const [editMode, setEditMode] = useState(null);
     const {safeTokens} = useSafeTokens()
+    //const [editTag, setEditTag] = useState(false);
     const dispatch = useAppDispatch()
 
     const { isCredit, amount, tokenSymbol, symbol, recipient,tag, date, reason, txHash, isAllowanceTransaction, isOwnerModificaitonTransaction } = useMemo(() => {
@@ -34,7 +37,7 @@ const CompleteTxn = ({ chainId, labels, transaction, tokens, owner, isAdmin, saf
         if(_get(transaction, 'transfers[0].tokenAddress', null))
             symbol = _get(transaction, 'transfers[0].tokenInfo.symbol', '')
         else
-            symbol = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol))
+            symbol = _get(_find(safeTokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol))
         let recipient = _get(transaction, 'transfers[0].to', _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'to' || p.name === '_to'), 'value', _get(transaction, 'to', '')))
         let tokenSymbol = undefined;
         const setAllowance =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => _get(vd, 'dataDecoded.method', '') === "setAllowance")
@@ -81,7 +84,7 @@ const CompleteTxn = ({ chainId, labels, transaction, tokens, owner, isAdmin, saf
         let date = _get(transaction, 'executionDate', null) ? moment.utc(_get(transaction, 'executionDate', null)).local().format('MM/DD hh:mm') : moment.utc(_get(transaction, 'submissionDate', null)).local().format('MM/DD hh:mm')
         console.log('reason', reason)
         return { isCredit, amount, tokenSymbol, symbol, recipient, date, reason,tag, txHash, isAllowanceTransaction, isOwnerModificaitonTransaction }
-    }, [transaction, safeTokens, tokens, labels])
+    }, [transaction, safeTokens, safeTokens, labels])
 
     const _handleReasonKeyDown = (safeTxHash: string, recipient: string, reasonText: string) => {
         if (reasonText && reasonText !== '') {
@@ -101,6 +104,19 @@ const CompleteTxn = ({ chainId, labels, transaction, tokens, owner, isAdmin, saf
         }
     }
 
+    const _handleSelectTag = (safeTxHash:string, recipient:string, tagText:any) => {
+        if (tagText && tagText !== '') {
+            axiosHttp.patch('transaction/tag', { safeAddress, tag: tagText, safeTxHash, recipient })
+                .then(res => { 
+                    onLoadLabels(res.data);
+                    // setEditTag(false);
+                    if (editTag && editTag === `${safeTxHash}-${recipient}`) {
+                        onSetEditTag(null)
+                    }
+                })
+        }
+    }
+
     const handleEnableEditMode = (text: any, reason: string) => {
         if (isAdmin || owner) {
             onSetEditMode(text);
@@ -113,6 +129,24 @@ const CompleteTxn = ({ chainId, labels, transaction, tokens, owner, isAdmin, saf
         }
     }
 
+    const handleEnableEditTag = (text:string) => {
+        if (isAdmin) {
+            onSetEditTag(text);
+        }
+    }
+
+    const handleRenderAvatar = (reciever:any) => {
+        const user = _find(_get(DAO,'members',[]),item => _get(item, 'member.wallet', '') === reciever);
+        if(user){
+            return(
+                <Avatar name={user.member.name} wallet={user.member.wallet}/>
+            )
+        }
+        else{
+            return `to ${beautifyHexToken(reciever)}`
+        }
+    }
+
     const renderItem = (item: any, index: number) => {
         const mulAmount = _get(item, 'dataDecoded.parameters[1].value',  _get(item, 'value', 0))
         let mulRecipient = _get(item, 'dataDecoded.parameters[0].value', _get(item, 'to', 0))
@@ -121,13 +155,13 @@ const CompleteTxn = ({ chainId, labels, transaction, tokens, owner, isAdmin, saf
         if(_get(transaction, 'transfers[0].tokenAddress', null))
             token = _get(transaction, 'transfers[0].tokenInfo.symbol', '')
         else
-            token = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', _get(transaction, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol))
+            token = _get(_find(safeTokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', _get(transaction, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol))
 
         let muldecimal = 18;
         if(_get(transaction, 'transfers[0].tokenAddress', null))
             muldecimal = _get(transaction, 'transfers[0].tokenInfo.decimals', 18)
         else
-            muldecimal = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.decimals', _get(transaction, 'token.decimals', 18))
+            muldecimal = _get(_find(safeTokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.decimals', _get(transaction, 'token.decimals', 18))
 
         console.log("muldecimal", muldecimal)
 
@@ -192,17 +226,42 @@ const CompleteTxn = ({ chainId, labels, transaction, tokens, owner, isAdmin, saf
                     </div>
                 <div className="transactionAddress">
                     <div className="dashboardText">
-                        {`to ${beautifyHexToken(mulRecipient)}`}
+                    {handleRenderAvatar(mulRecipient)}
                     </div>
                 </div>
                 <div className="transactionAddress">
                             {
-                                mulTag &&
-                                <div className="dashboardText" style={{background:`${mulTag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px'}}>
-                                    <span style={{color:mulTag.color,fontWeight:'700',fontSize:'10px'}}>{mulTag.value}</span>
-                                </div>
+                                mulTag
+                                ?
+                                <>
+                                {
+                                    (!editTag || (editTag && editTag !== `${txHash}-${mulRecipient}`))
+                                    ?
+                                    <div onClick={() => handleEnableEditTag(`${txHash}-${mulRecipient}`)} className="dashboardText" style={{background:`${mulTag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer'}}>
+                                        <span style={{color:mulTag.color,fontWeight:'700',fontSize:'10px'}}>{mulTag.value}</span>
+                                    </div>
+                                    :
+                                    <Dropdown onChangeOption={(value:any) => _handleSelectTag(_get(transaction, 'safeTxHash', _get(transaction, 'txHash', undefined)), mulRecipient,value)}/>
+                                   
+                                }
+                                </>
+                                :
+                                <>
+                                {
+                                    (!editTag || (editTag && editTag !== `${txHash}-${mulRecipient}`))
+                                    ?
+                                    
+                                    <div className="add-label-btn" onClick={() => handleEnableEditTag(`${txHash}-${mulRecipient}`)}>
+                                        <span style={{color:'#111111',fontWeight:'700',fontSize:'10px'}}>Add Label +</span>
+                                    </div>
+                                    :
+                                    <Dropdown onChangeOption={(value:any) => _handleSelectTag(_get(transaction, 'safeTxHash', _get(transaction, 'txHash', undefined)), mulRecipient,value)}/>
+                                    
+                                }
+                            </>
+                                
                             }
-                        </div>
+                </div>
                 <div id="voteArea">
                     {/* {threshold && index == 0 && <div className="dashboardTextBold">
                         {_get(transaction, 'confirmations', null) ? `${_get(transaction, 'confirmations', []).length}/${threshold} sign` : ''}
@@ -265,15 +324,38 @@ const CompleteTxn = ({ chainId, labels, transaction, tokens, owner, isAdmin, saf
                         </div>
                     <div className="transactionAddress">
                         <div className="dashboardText">
-                            {`to ${beautifyHexToken(recipient)}`}
+                        {handleRenderAvatar(recipient)}
                         </div>
                     </div>
                     <div className="transactionAddress">
                             {
-                                tag &&
-                                <div className="dashboardText" style={{background:`${tag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px'}}>
-                                    <span style={{color:tag.color,fontWeight:'700',fontSize:'10px'}}>{tag.value}</span>
-                                </div>
+                                tag
+                                ?
+                                <>
+                                {
+                                    (!editTag || (editTag && editTag !== `${txHash}-${recipient}`))
+                                    ?
+                                    <div onClick={() => handleEnableEditTag(`${txHash}-${recipient}`)} className="dashboardText" style={{background:`${tag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer'}}>
+                                        <span style={{color:tag.color,fontWeight:'700',fontSize:'10px'}}>{tag.value}</span>
+                                    </div>
+                                    :
+                                    <Dropdown onChangeOption={(value:any) => _handleSelectTag(_get(transaction, 'safeTxHash', _get(transaction, 'txHash', undefined)), recipient,value)}/>
+                                    
+                                }
+                                </>
+                                :
+                                <>
+                                    {
+                                        (!editTag || (editTag && editTag !== `${txHash}-${recipient}`))
+                                        ?
+                                        <div className="add-label-btn" onClick={() => handleEnableEditTag(`${txHash}-${recipient}`)}>
+                                            <span style={{color:'#111111',fontWeight:'700',fontSize:'10px'}}>Add Label +</span>
+                                        </div>
+                                        :
+                                        <Dropdown onChangeOption={(value:any) => _handleSelectTag(_get(transaction, 'safeTxHash', _get(transaction, 'txHash', undefined)), recipient,value)}/>
+                                        
+                                    }
+                                </>
                             }
                         </div>
                     <div id="voteArea">

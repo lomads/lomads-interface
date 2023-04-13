@@ -618,6 +618,21 @@ body.active-modal {
     min-width: 10%;
 }
 
+.add-label-btn{
+    background: #FFF;
+    border: 1px solid gray;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.add-label-btn:hover{
+    background: #e5e5e5;
+}
+
 .memberCard {
     display: flex;
     flex-direction: column;

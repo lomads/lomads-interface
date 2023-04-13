@@ -104,10 +104,13 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	const [offChainPendingTxn, setOffChainPendingTxn] = useState<Array<any>>();
 	const [offChainExecutedTxn, setOffChainExecutedTxn] = useState<Array<any>>();
 	const node = useRef<HTMLDivElement>()
+	const node2 = useRef<HTMLDivElement>()
 	const [editMode, setEditMode] = useState<any>();
+	const [editTag, setEditTag] = useState<any>();
 	const [lowBalanceError, setLowBalanceError] = useState<any>(null);
 
-	useOnClickOutside(node, () => editMode ? setEditMode(null) : undefined)
+	useOnClickOutside(node, () => editMode ? setEditMode(null) : undefined);
+	useOnClickOutside(node2, () => editTag ? setEditTag(null) : undefined);
 	useState<Array<any>>();
 	//const [recurringTxnQueue, setRecurringTxnQueue] = useState<Array<any>>();
 
@@ -899,12 +902,12 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 									}
 									{
 										pendingTxn.map((ptx, index) =>
-											<PendingTxn chainId={+_get(DAO, 'chainId', 5)} editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} executeFirst={executeFirst} isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
+											<PendingTxn chainId={+_get(DAO, 'chainId', 5)} editMode={editMode} editTag={editTag} onSetEditTag={setEditTag} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} executeFirst={executeFirst} isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
 										)
 									}
 									{
 										executedTxn.map((ptx, index) =>
-											<CompleteTxn chainId={+_get(DAO, 'chainId', 5)} editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} isAdmin={amIAdmin} owner={owner} transaction={ptx} tokens={props.tokens} />
+											<CompleteTxn chainId={+_get(DAO, 'chainId', 5)} editMode={editMode} editTag={editTag} onSetEditTag={setEditTag} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} isAdmin={amIAdmin} owner={owner} transaction={ptx} tokens={props.tokens} />
 										)
 									}
 								</div>

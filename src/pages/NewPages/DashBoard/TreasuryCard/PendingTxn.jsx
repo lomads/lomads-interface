@@ -15,6 +15,8 @@ import { AiOutlineClose, AiOutlineCheck } from "react-icons/ai";
 import CloseBtn from '../../../../assets/svg/close-btn.svg';
 import CheckBtn from '../../../../assets/svg/check-btn.svg';
 import { SupportedChainId } from "constants/chains";
+import Dropdown from "muiComponents/Dropdown";
+import Avatar from "muiComponents/Avatar";
 import {useSafeTokens} from "hooks/useSafeTokens";
 import { CHAIN_INFO } from "constants/chainInfo";
 
@@ -28,7 +30,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
     const { provider, account } = useWeb3React();
     const { DAO } = useAppSelector(store => store.dashboard);
     const [reasonText, setReasonText] = useState({});
-    //const [editMode, setEditMode] = useState(null);
+    // const [editTag, setEditTag] = useState(false);
     const dispatch = useAppDispatch()
     const { safeTokens: tokens } = useSafeTokens()
     //const threshold = useAppSelector((state) => state.flow.safeThreshold);
@@ -117,6 +119,19 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
         }
     }
 
+    const _handleSelectTag = (safeTxHash, recipient, tagText) => {
+        if (tagText && tagText !== '') {
+            axiosHttp.patch('transaction/tag', { safeAddress, tag: tagText, safeTxHash, recipient })
+                .then(res => { 
+                    onLoadLabels(res.data);
+                    // setEditTag(false);
+                    if (editTag && editTag === `${safeTxHash}-${recipient}`) {
+                        onSetEditTag(null);
+                    }
+                })
+        }
+    }
+
     const handleEnableEditMode = (text, reason) => {
         if (isAdmin) {
             onSetEditMode(text);
@@ -126,6 +141,12 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                     [text] : reason
                 }
             })
+        }
+    }
+
+    const handleEnableEditTag = (text) => {
+        if (isAdmin) {
+            onSetEditTag(text);
         }
     }
 
@@ -149,8 +170,6 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
         if(labels && labels.length > 0) {
             mulTag = _get(_find(labels, l => l.recipient && l.safeTxHash && (_get(l, "recipient", "").toLowerCase() === mulRecipient.toLowerCase()) && (l.safeTxHash.toLowerCase() === transaction.safeTxHash.toLowerCase())), "tag", null)
         }
-
-        console.log("multag : ",mulTag);
         const isOwnerModificaitonTransaction =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => (_get(vd, 'dataDecoded.method', '') === "addOwnerWithThreshold") || _get(vd, 'dataDecoded.method', '') === "removeOwner" || _get(vd, 'dataDecoded.method', '') === "changeThreshold" )
 
         return (
@@ -164,7 +183,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                     </div>
                     <div className="transactionName">
                         {
-                             mulReason && (!editMode || (editMode && editMode !== `${transaction.safeTxHash}-${mulRecipient}`))
+                            mulReason && (!editMode || (editMode && editMode !== `${transaction.safeTxHash}-${mulRecipient}`))
                                 ?
                                 <div className="dashboardText" onClick={() => handleEnableEditMode(`${transaction.safeTxHash}-${mulRecipient}`, mulReason)}>{mulReason}</div>
                                 :
@@ -198,17 +217,38 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                     </div>
                     <div className="transactionAddress">
                         <div className="dashboardText">
-                            {`to ${beautifyHexToken(mulRecipient)}`}
+                            {handleRenderAvatar(mulRecipient)}
                         </div>
                     </div>
                     <div className="transactionAddress">
                             {
-                                mulTag &&
-                                <div className="dashboardText" style={{background:`${mulTag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px'}}>
-                                    <span style={{color:mulTag.color,fontWeight:'700',fontSize:'10px'}}>{mulTag.value}</span>
-                                </div>
+                                mulTag
+                                ?
+                                <>
+                                {
+                                    (!editTag || (editTag && editTag !== `${transaction.safeTxHash}-${mulRecipient}`))
+                                    ?
+                                    <div onClick={() => handleEnableEditTag(`${transaction.safeTxHash}-${mulRecipient}`)} className="dashboardText" style={{background:`${mulTag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer'}}>
+                                        <span style={{color:mulTag.color,fontWeight:'700',fontSize:'10px'}}>{mulTag.value}</span>
+                                    </div>
+                                    :
+                                    <Dropdown onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, mulRecipient,value)}/>
+                                }
+                                </>
+                                :
+                                <>
+                                    {
+                                        (!editTag || (editTag && editTag !== `${transaction.safeTxHash}-${mulRecipient}`))
+                                        ?
+                                        <div className="add-label-btn" onClick={() => handleEnableEditTag(`${transaction.safeTxHash}-${mulRecipient}`)}>
+                                            <span style={{color:'#111111',fontWeight:'700',fontSize:'10px'}}>Add Label +</span>
+                                        </div>
+                                        :
+                                        <Dropdown onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, mulRecipient,value)}/>
+                                    }
+                                </>
                             }
-                        </div>
+                    </div>
                     <div id="voteArea">
                         {
                         threshold && index == 0 && <div className="dashboardTextBold">
@@ -303,6 +343,18 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
         )
     }
 
+    const handleRenderAvatar = (reciever) => {
+        const user = _find(_get(DAO,'members',[]),item => _get(item, 'member.wallet', '') === reciever);
+        if(user){
+            return(
+                <Avatar name={user.member.name} wallet={user.member.wallet}/>
+            )
+        }
+        else{
+            return `to ${beautifyHexToken(reciever)}`
+        }
+    }
+
     return (
         <>
             {_get(transaction, 'dataDecoded.method', null) !== "multiSend" || (_get(transaction, 'dataDecoded.method', null) === "multiSend" && isAllowanceTransaction && _get(transaction, 'dataDecoded.parameters[0].name', null) === "transactions") ?
@@ -350,17 +402,67 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                         </div>
                         <div className="transactionAddress">
                             <div className="dashboardText">
-                                {`to ${beautifyHexToken(recipient)}`}
+                                {handleRenderAvatar(recipient)}
                             </div>
                         </div>
                         <div className="transactionAddress">
                             {
-                                tag &&
-                                <div className="dashboardText" style={{background:`${tag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px'}}>
-                                    <span style={{color:tag.color,fontWeight:'700',fontSize:'10px'}}>{tag.value}</span>
-                                </div>
+                                tag
+                                ?
+                                <>
+                                    {
+                                        (!editTag || (editTag && editTag !== `${transaction.safeTxHash}-${recipient}`))
+                                        ?
+                                        <div onClick={() => handleEnableEditTag(`${transaction.safeTxHash}-${recipient}`)} className="dashboardText" style={{background:`${tag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer'}}>
+                                            <span style={{color:tag.color,fontWeight:'700',fontSize:'10px'}}>{tag.value}</span>
+                                        </div>
+                                        :
+                                        <Dropdown onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, recipient,value)}/>
+                                    }
+                                </>
+                                :
+                                <>
+                                    {
+                                        (!editTag || (editTag && editTag !== `${transaction.safeTxHash}-${recipient}`))
+                                        ?
+                                        <div className="add-label-btn" onClick={() => handleEnableEditTag(`${transaction.safeTxHash}-${recipient}`)}>
+                                            <span style={{color:'#111111',fontWeight:'700',fontSize:'10px'}}>Add Label +</span>
+                                        </div>
+                                        :
+                                        <Dropdown onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, recipient,value)}/>
+                                    }
+                                </>
                             }
                         </div>
+                        {/* <div className="transactionAddress">
+                            {
+                                tag
+                                ?
+                                <>
+                                {
+                                    editTag
+                                    ?
+                                    <Dropdown onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, recipient,value)}/>
+                                    :
+                                    <div onClick={() => setEditTag(true)} className="dashboardText" style={{background:`${tag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer'}}>
+                                        <span style={{color:tag.color,fontWeight:'700',fontSize:'10px'}}>{tag.value}</span>
+                                    </div>
+                                }
+                                </>
+                                :
+                                <>
+                                    {
+                                        editTag
+                                        ?
+                                        <Dropdown onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, recipient,value)}/>
+                                        :
+                                        <div className="add-label-btn" onClick={() => setEditTag(true)}>
+                                            <span style={{color:'#111111',fontWeight:'700',fontSize:'10px'}}>Add Label +</span>
+                                        </div>
+                                    }
+                                </>
+                            }
+                        </div> */}
                         <div id="voteArea">
                         {
                             threshold && <div className="dashboardTextBold">

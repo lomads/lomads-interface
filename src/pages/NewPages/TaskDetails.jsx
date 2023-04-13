@@ -66,6 +66,7 @@ import { CgClose } from 'react-icons/cg'
 import useRole from "hooks/useRole";
 import EditTask from "./DashBoard/Task/EditTask";
 import EditDraftTask from "./DashBoard/Task/EditDraftTask";
+import Avatar from "muiComponents/Avatar";
 
 const TaskDetails = () => {
     const dispatch = useAppDispatch();
@@ -274,7 +275,7 @@ const TaskDetails = () => {
     const assignedUser = useMemo(() => {
         let user = _find(_get(Task, 'members', []), m => m.status === 'approved' || m.status === 'submission_accepted')
         if (user)
-            return user.member.name
+            return user.member
     }, [Task]);
 
     const handleOpenApplicantsSlider = () => {
@@ -1017,7 +1018,7 @@ const TaskDetails = () => {
                                                                     :
                                                                     // else display the name of the user who has been assigned
                                                                     <>
-                                                                        <h1>{assignedUser} is assigned</h1>
+                                                                        <h1>{assignedUser.name} is assigned</h1>
                                                                     </>
                                                             }
                                                         </>
@@ -1115,16 +1116,21 @@ const TaskDetails = () => {
                                 {
                                     Task.reviewer &&
                                     <div>
-                                        <span>Reviewer</span>
-                                        <img src={memberIcon} alt="member-icon" />
-                                        <p>{Task.reviewer.name}</p>
+                                        <span style={{marginRight:'10px'}}>Reviewer</span>
+                                        <Avatar name={Task.reviewer.name} wallet={Task.reviewer.wallet}/>
+                                        {/* <img src={memberIcon} alt="member-icon" />
+                                        <p>{Task.reviewer.name}</p> */}
                                     </div>
                                 }
                                 {!(Task.isSingleContributor === false && Task.contributionType === 'open') &&
                                     <div>
-                                        <span>Assigned</span>
-                                        <img src={memberIcon} alt="member-icon" />
-                                        <p>{assignedUser ? assignedUser : 'Not yet assigned'}</p>
+                                        <span style={{marginRight:'10px'}}>Assigned</span>
+                                        {
+                                            assignedUser?
+                                            <Avatar name={assignedUser.name} wallet={assignedUser.wallet}/>
+                                            :
+                                            <p>Not yet assigned</p>
+                                        }
                                     </div>}
                                 {
                                     Task.taskStatus !== 'open' && Task.contributionType === 'open' && Task.isSingleContributor
