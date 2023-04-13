@@ -13,13 +13,16 @@ import { updateSafeTransaction } from "state/dashboard/reducer";
 import { SupportedChainId } from "constants/chains";
 import useSafeTokens from "hooks/useSafeTokens";
 import { legacy_createStore } from "@reduxjs/toolkit";
+import Dropdown from "muiComponents/Dropdown";
 
-const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress, onLoadLabels, editMode, onSetEditMode }: any) => {
+import Avatar from "muiComponents/Avatar";
+
+const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress, onLoadLabels, editMode, onSetEditMode,editTag,onSetEditTag }: any) => {
 	const { chainId } = useWeb3React();
     const threshold = useAppSelector((state) => state.flow.safeThreshold);
     const { DAO } = useAppSelector(store => store.dashboard);
     const [reasonText, setReasonText] = useState({});
-    //const [editMode, setEditMode] = useState(null);
+    // const [editTag, setEditTag] = useState(false);
     const {safeTokens} = useSafeTokens(safeAddress)
     const dispatch = useAppDispatch()
 
@@ -100,6 +103,19 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
         }
     }
 
+    const _handleSelectTag = (safeTxHash:string, recipient:string, tagText:any) => {
+        if (tagText && tagText !== '') {
+            axiosHttp.patch('transaction/tag', { safeAddress, tag: tagText, safeTxHash, recipient })
+                .then(res => { 
+                    onLoadLabels(res.data);
+                    // setEditTag(false);
+                    if (editTag && editTag === `${safeTxHash}-${recipient}`) {
+                        onSetEditTag(null)
+                    }
+                })
+        }
+    }
+
     const handleEnableEditMode = (text: any, reason: string) => {
         if (isAdmin || owner) {
             onSetEditMode(text);
@@ -109,6 +125,24 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
                     [text] : reason
                 }
             })
+        }
+    }
+
+    const handleEnableEditTag = (text:string) => {
+        if (isAdmin) {
+            onSetEditTag(text);
+        }
+    }
+
+    const handleRenderAvatar = (reciever:any) => {
+        const user = _find(_get(DAO,'members',[]),item => _get(item, 'member.wallet', '') === reciever);
+        if(user){
+            return(
+                <Avatar name={user.member.name} wallet={user.member.wallet}/>
+            )
+        }
+        else{
+            return `to ${beautifyHexToken(reciever)}`
         }
     }
 
@@ -191,17 +225,42 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
                     </div>
                 <div className="transactionAddress">
                     <div className="dashboardText">
-                        {`to ${beautifyHexToken(mulRecipient)}`}
+                    {handleRenderAvatar(mulRecipient)}
                     </div>
                 </div>
                 <div className="transactionAddress">
                             {
-                                mulTag &&
-                                <div className="dashboardText" style={{background:`${mulTag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px'}}>
-                                    <span style={{color:mulTag.color,fontWeight:'700',fontSize:'10px'}}>{mulTag.value}</span>
-                                </div>
+                                mulTag
+                                ?
+                                <>
+                                {
+                                    (!editTag || (editTag && editTag !== `${txHash}-${mulRecipient}`))
+                                    ?
+                                    <div onClick={() => handleEnableEditTag(`${txHash}-${mulRecipient}`)} className="dashboardText" style={{background:`${mulTag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer'}}>
+                                        <span style={{color:mulTag.color,fontWeight:'700',fontSize:'10px'}}>{mulTag.value}</span>
+                                    </div>
+                                    :
+                                    <Dropdown onChangeOption={(value:any) => _handleSelectTag(_get(transaction, 'safeTxHash', _get(transaction, 'txHash', undefined)), mulRecipient,value)}/>
+                                   
+                                }
+                                </>
+                                :
+                                <>
+                                {
+                                    (!editTag || (editTag && editTag !== `${txHash}-${mulRecipient}`))
+                                    ?
+                                    
+                                    <div className="add-label-btn" onClick={() => handleEnableEditTag(`${txHash}-${mulRecipient}`)}>
+                                        <span style={{color:'#111111',fontWeight:'700',fontSize:'10px'}}>Add Label +</span>
+                                    </div>
+                                    :
+                                    <Dropdown onChangeOption={(value:any) => _handleSelectTag(_get(transaction, 'safeTxHash', _get(transaction, 'txHash', undefined)), mulRecipient,value)}/>
+                                    
+                                }
+                            </>
+                                
                             }
-                        </div>
+                </div>
                 <div id="voteArea">
                     {/* {threshold && index == 0 && <div className="dashboardTextBold">
                         {_get(transaction, 'confirmations', null) ? `${_get(transaction, 'confirmations', []).length}/${threshold} sign` : ''}
@@ -264,15 +323,38 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
                         </div>
                     <div className="transactionAddress">
                         <div className="dashboardText">
-                            {`to ${beautifyHexToken(recipient)}`}
+                        {handleRenderAvatar(recipient)}
                         </div>
                     </div>
                     <div className="transactionAddress">
                             {
-                                tag &&
-                                <div className="dashboardText" style={{background:`${tag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px'}}>
-                                    <span style={{color:tag.color,fontWeight:'700',fontSize:'10px'}}>{tag.value}</span>
-                                </div>
+                                tag
+                                ?
+                                <>
+                                {
+                                    (!editTag || (editTag && editTag !== `${txHash}-${recipient}`))
+                                    ?
+                                    <div onClick={() => handleEnableEditTag(`${txHash}-${recipient}`)} className="dashboardText" style={{background:`${tag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer'}}>
+                                        <span style={{color:tag.color,fontWeight:'700',fontSize:'10px'}}>{tag.value}</span>
+                                    </div>
+                                    :
+                                    <Dropdown onChangeOption={(value:any) => _handleSelectTag(_get(transaction, 'safeTxHash', _get(transaction, 'txHash', undefined)), recipient,value)}/>
+                                    
+                                }
+                                </>
+                                :
+                                <>
+                                    {
+                                        (!editTag || (editTag && editTag !== `${txHash}-${recipient}`))
+                                        ?
+                                        <div className="add-label-btn" onClick={() => handleEnableEditTag(`${txHash}-${recipient}`)}>
+                                            <span style={{color:'#111111',fontWeight:'700',fontSize:'10px'}}>Add Label +</span>
+                                        </div>
+                                        :
+                                        <Dropdown onChangeOption={(value:any) => _handleSelectTag(_get(transaction, 'safeTxHash', _get(transaction, 'txHash', undefined)), recipient,value)}/>
+                                        
+                                    }
+                                </>
                             }
                         </div>
                     <div id="voteArea">

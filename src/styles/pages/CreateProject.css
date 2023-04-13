@@ -558,7 +558,7 @@
     width: 60%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
 }
 
 .createProject-container .createProject-body .project-members .member-list .member-li .member-address p {
