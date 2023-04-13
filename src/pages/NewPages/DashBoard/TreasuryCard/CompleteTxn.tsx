@@ -23,7 +23,7 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
     const {safeTokens} = useSafeTokens(safeAddress)
     const dispatch = useAppDispatch()
 
-    const { isCredit, amount, tokenSymbol, symbol, recipient, date, reason, txHash, isAllowanceTransaction, isOwnerModificaitonTransaction } = useMemo(() => {
+    const { isCredit, amount, tokenSymbol, symbol, recipient,tag, date, reason, txHash, isAllowanceTransaction, isOwnerModificaitonTransaction } = useMemo(() => {
         let isCredit = _get(transaction, 'txType', '') === 'ETHEREUM_TRANSACTION'
         let decimal = 18;
         if(_get(transaction, 'transfers[0].tokenInfo.decimals', null))
@@ -72,10 +72,14 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
         if(labels && labels.length > 0) {
             reason = _get(_find(labels, l => l.recipient.toLowerCase() === recipient.toLowerCase() && l.safeTxHash === _get(transaction, 'safeTxHash', _get(transaction, 'txHash', _get(transaction, 'transactionHash', '')))), "label", null)
         }
+        let tag = null
+        if(labels && labels.length > 0) {
+            tag = _get(_find(labels, l => l.recipient.toLowerCase() === recipient.toLowerCase() && l.safeTxHash === _get(transaction, 'safeTxHash', _get(transaction, 'txHash', _get(transaction, 'transactionHash', '')))), "tag", null)
+        }
         const txHash = _get(transaction, 'safeTxHash', _get(transaction, 'txHash', _get(transaction, 'transactionHash', '')));
         let date = _get(transaction, 'executionDate', null) ? moment.utc(_get(transaction, 'executionDate', null)).local().format('MM/DD hh:mm') : moment.utc(_get(transaction, 'submissionDate', null)).local().format('MM/DD hh:mm')
         console.log('reason', reason)
-        return { isCredit, amount, tokenSymbol, symbol, recipient, date, reason, txHash, isAllowanceTransaction, isOwnerModificaitonTransaction }
+        return { isCredit, amount, tokenSymbol, symbol, recipient, date, reason,tag, txHash, isAllowanceTransaction, isOwnerModificaitonTransaction }
     }, [transaction, safeTokens, tokens, labels])
 
     const _handleReasonKeyDown = (safeTxHash: string, recipient: string, reasonText: string) => {
@@ -137,6 +141,10 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
         if(labels && labels.length > 0) {
             mulReason = _get(_find(labels, l => l.recipient.toLowerCase() === mulRecipient.toLowerCase() && _get(l, 'safeTxHash', _get(l, 'txHash', '')) === txHash), "label", null)
         }
+        let mulTag = null;
+        if(labels && labels.length > 0) {
+            mulTag = _get(_find(labels, l => l.recipient.toLowerCase() === mulRecipient.toLowerCase() && _get(l, 'safeTxHash', _get(l, 'txHash', '')) === txHash), "tag", null)
+        }
 
 
         return (
@@ -186,6 +194,14 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
                         {`to ${beautifyHexToken(mulRecipient)}`}
                     </div>
                 </div>
+                <div className="transactionAddress">
+                            {
+                                mulTag &&
+                                <div className="dashboardText" style={{background:`${mulTag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px'}}>
+                                    <span style={{color:mulTag.color,fontWeight:'700',fontSize:'10px'}}>{mulTag.value}</span>
+                                </div>
+                            }
+                        </div>
                 <div id="voteArea">
                     {/* {threshold && index == 0 && <div className="dashboardTextBold">
                         {_get(transaction, 'confirmations', null) ? `${_get(transaction, 'confirmations', []).length}/${threshold} sign` : ''}
@@ -251,6 +267,14 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
                             {`to ${beautifyHexToken(recipient)}`}
                         </div>
                     </div>
+                    <div className="transactionAddress">
+                            {
+                                tag &&
+                                <div className="dashboardText" style={{background:`${tag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px'}}>
+                                    <span style={{color:tag.color,fontWeight:'700',fontSize:'10px'}}>{tag.value}</span>
+                                </div>
+                            }
+                        </div>
                     <div id="voteArea">
                         {/* {threshold && <div className="dashboardTextBold">
                             {_get(transaction, 'confirmations', null) ? `${_get(transaction, 'confirmations', []).length}/${threshold} sign` : ''}

@@ -38,6 +38,7 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
   const dispatch = useAppDispatch()
   const [safeTokens, setSafeTokens] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedTag, setSelectedTag] = useState(null);
 
   const capitalizeFirstLetter = (string) => {
 		return string.charAt(0).toUpperCase() + string.slice(1);
@@ -202,7 +203,8 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
 							safeTxHash: safeTxHash,
 							recipient: r.member.wallet,
 							label: "Sweat conversion",
-              sweatConversion: true
+              sweatConversion: true,
+              tag:selectedTag
 						})
 					})
 					axiosHttp.post(`transaction/label`, payload)
@@ -299,7 +301,7 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
           <div id="cm-info" style={{ paddingBottom : 120 }}
           >
             All SWEAT counter will be reset to 0.
-			<Dropdown />
+			    <Dropdown onChangeOption={(value) => setSelectedTag(value)}/>
           </div>
           {/* //! FOOTER */}
           <Box position="fixed" width={400} backgroundColor='#FFF' bottom={0} pb={3} pt={2} display="flex" flexDirection="row">

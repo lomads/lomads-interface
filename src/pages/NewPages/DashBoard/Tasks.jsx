@@ -379,7 +379,7 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
                         })
                     }
                     {
-                        !showCreateTask && 
+                        !showCreateTask || myTasks.length < 3 && 
                         <div
                             className='create-new-task'
                             onClick={() => {toggleShowCreateTask() }}

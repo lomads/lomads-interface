@@ -188,7 +188,7 @@ const MyProject = ({ isHelpIconOpen }) => {
                             })
                         }
                         {
-                            !showCreateProject &&
+                            !showCreateProject || myProjects.length < 2 &&
                             <div
                                 className='create-new-project'
                                 onClick={() => {

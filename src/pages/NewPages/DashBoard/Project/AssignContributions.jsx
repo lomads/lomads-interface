@@ -53,6 +53,8 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
 
     const [isSplit, setIsSplit] = useState(false);
 
+    const [selectedTag, setSelectedTag] = useState(null);
+
     useEffect(() => {
         if (Project) {
             // let arr = [];
@@ -198,7 +200,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
         return new Promise(async (resolve, reject) => {
             try {
                 if (!chainId) return;
-                const txnResponse = await createSafeTransaction({ tokenAddress: _get(compensation, 'currency', null), send, confirm: isSafeOwner, createLabel: true })
+                const txnResponse = await createSafeTransaction({ tokenAddress: _get(compensation, 'currency', null), send, confirm: isSafeOwner, createLabel: true,tag:selectedTag })
                 if(txnResponse) {
                     resolve(txnResponse.safeTxHash)
                 } else {
@@ -286,7 +288,8 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
 						safeAddress: _get(DAO, 'safe.address', null),
 						safeTxHash: res.data.safeTxHash,
 						recipient: r.recipient,
-						label: _get(r, 'reason', null)
+						label: _get(r, 'reason', null),
+                        tag:selectedTag
 					})
 				})
 				await axiosHttp.post(`transaction/label`, payload)
@@ -376,7 +379,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                                         />
                                         </div>
                                         <div style={{width:'192px'}}>
-                                            <Dropdown />
+                                            <Dropdown onChangeOption={(value) => setSelectedTag(value)}/>
                                         </div>
                                    </div>
 
