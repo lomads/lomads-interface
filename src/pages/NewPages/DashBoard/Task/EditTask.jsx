@@ -36,6 +36,8 @@ import {
     NumberDecrementStepper,
     NumberIncrementStepper,
 } from "@chakra-ui/react";
+import { useSafeTokens } from 'hooks/useSafeTokens';
+import { CHAIN_INFO } from 'constants/chainInfo';
 
 const EditTask = ({ close, task, daoURL }) => {
     const dispatch = useAppDispatch();
@@ -62,14 +64,14 @@ const EditTask = ({ close, task, daoURL }) => {
     const [reviewer, setReviewer] = useState(task.reviewer ? task.reviewer._id : null);
     const [currency, setCurrency] = useState({ currency: task.compensation.currency });
     const [amount, setAmount] = useState(task.compensation.amount);
-    const [safeTokens, setSafeTokens] = useState([]);
     const [showSuccess, setShowSuccess] = useState(false);
     const [isLoading, setLoading] = useState(false);
+    const { safeTokens } = useSafeTokens();
 
-    const getTokens = async (safeAddress) => {
-        const tokens = await getSafeTokens(chainId, safeAddress)
-        setSafeTokens(tokens)
-    };
+    // const getTokens = async (safeAddress) => {
+    //     const tokens = await getSafeTokens(chainId, safeAddress)
+    //     setSafeTokens(tokens)
+    // };
 
     const getrolename = (roleId) => {
 
@@ -90,10 +92,10 @@ const EditTask = ({ close, task, daoURL }) => {
         }
     }, [account, chainId, user])
 
-    useEffect(() => {
-        getTokens(_get(DAO, 'safe.address'));
-        return () => { };
-    }, [DAO]);
+    // useEffect(() => {
+    //     getTokens(_get(DAO, 'safe.address'));
+    //     return () => { };
+    // }, [DAO]);
 
     useEffect(() => { setReviewer(task.reviewer ? task?.reviewer?._id : null) }, [task])
 
@@ -205,7 +207,7 @@ const EditTask = ({ close, task, daoURL }) => {
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
             symbol = _get(symbol, 'token.symbol', null)
             if (!symbol)
-                symbol = currency.currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
+                symbol = currency.currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[chainId]?.nativeCurrency?.symbol : 'SWEAT'
 
             let members = _get(task, 'members', [])
 
@@ -630,8 +632,8 @@ const EditTask = ({ close, task, daoURL }) => {
                                                         return (
                                                             (
                                                                 <>
-                                                                    <option value={result.tokenAddress ? result.tokenAddress : chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS} key={index}>
-                                                                        {_get(result, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}
+                                                                    <option value={result.tokenAddress} key={index}>
+                                                                        {_get(result, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol)}
                                                                     </option>
                                                                 </>
                                                             )

@@ -18,6 +18,7 @@ const useSafeTransaction = (safeAddress: string) => {
 
     const { provider, chainId, account } = useWeb3React();
     const { safeTokens, tokenBalance } = useSafeTokens()
+    console.log("safeTokens", safeTokens)
     //const currentNonce = useAppSelector((state) => state.flow.currentNonce);
     const [createSafeTxnLoading, setCreateSafeTxnLoading] = useState(false);
     const [updateOwnerLoading, setUpdateOwnerLoading] = useState(false);
@@ -73,6 +74,7 @@ const useSafeTransaction = (safeAddress: string) => {
         let signature = null;
         try {
             const safeToken = _find(safeTokens, t => _get(t, 'tokenAddress', null) === tokenAddress)
+            console.log("safeToken", safeToken)
             let total = send.reduce((pv: any, cv: any) => pv + (+cv.amount), 0);
             if (total == 0) throw 'Cannot send 0'
             console.log(tokenBalance(tokenAddress), total)
@@ -142,7 +144,10 @@ const useSafeTransaction = (safeAddress: string) => {
         catch (e) {
             setCreateSafeTxnLoading(false)
             console.log(e)
-            throw e;
+            if(typeof e === 'string')
+                throw e
+            else
+                throw _get(e, 'message', 'Something went wrong')
         }
     }
 

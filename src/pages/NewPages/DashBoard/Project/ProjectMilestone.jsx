@@ -36,6 +36,9 @@ import { resetEditProjectMilestoneLoader } from 'state/dashboard/reducer';
 import { editProjectMilestone } from "state/dashboard/actions";
 
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
+import { CHAIN_INFO } from 'constants/chainInfo';
+
+import { useSafeTokens } from 'hooks/useSafeTokens';
 
 const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation, list, editMilestones }) => {
     const dispatch = useAppDispatch();
@@ -48,7 +51,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
 
     const [milestones, setMilestones] = useState(list.length > 0 ? list : [{ name: '', amount: '0', deadline: '', deliverables: '', complete: false }]);
 
-    const [safeTokens, setSafeTokens] = useState([]);
+   const { safeTokens } = useSafeTokens();
 
     const [amount, setAmount] = useState(_get(Project, 'compensation.amount', ''));
     const [currency, setCurrency] = useState(_get(Project, 'compensation.currency', ''));
@@ -61,16 +64,16 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
         }
     }, [editProjectMilestoneLoading]);
 
-    useEffect(() => {
-        getTokens(_get(DAO, 'safe.address'));
-        return () => { };
-    }, [DAO]);
+    // useEffect(() => {
+    //     getTokens(_get(DAO, 'safe.address'));
+    //     return () => { };
+    // }, [DAO]);
 
-    const getTokens = async (safeAddress) => {
-        const tokens = await getSafeTokens(chainId, safeAddress)
-        console.log("Tokens : ", tokens);
-        setSafeTokens(tokens)
-    };
+    // const getTokens = async (safeAddress) => {
+    //     const tokens = await getSafeTokens(chainId, safeAddress)
+    //     console.log("Tokens : ", tokens);
+    //     setSafeTokens(tokens)
+    // };
 
     useEffect(() => {
         var date = new Date();
@@ -201,7 +204,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
             symbol = _get(symbol, 'token.symbol', null)
             if (!symbol)
-                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
+                symbol = currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[chainId]?.nativeCurrency?.symbol : 'SWEAT'
             let e = document.getElementById('currency-amt');
             e.innerHTML = `Compensation amount cannot be 0 ${symbol}`;
             e.scrollIntoView({ behavior: 'smooth', block: "end", inline: "nearest" });
@@ -248,7 +251,7 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency)
             symbol = _get(symbol, 'token.symbol', null)
             if (!symbol)
-                symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
+                symbol = currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[chainId]?.nativeCurrency?.symbol : 'SWEAT'
 
             if (editMilestones) {
                 dispatch(editProjectMilestone({ projectId: _get(Project, '_id', ''), daoUrl: _get(DAO, 'url', ''), payload: { milestones, compensation: { currency, amount, symbol } } }));
@@ -284,9 +287,9 @@ const ProjectMilestone = ({ toggleShowMilestone, getMilestones, getCompensation,
                                         safeTokens.map((result, index) => {
                                             return (
                                                 (
-                                                    <option value={result.tokenAddress ? result.tokenAddress : chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS} key={index}>
+                                                    <option value={result.tokenAddress ? result.tokenAddress : process.env.REACT_APP_NATIVE_TOKEN_ADDRESS} key={index}>
                                                         {chainId === SupportedChainId.POLYGON ? <PolygonIcon /> : ''}
-                                                        {_get(result, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}
+                                                        {_get(result, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol)}
                                                     </option>
                                                 )
                                             );

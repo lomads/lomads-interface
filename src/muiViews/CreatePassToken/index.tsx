@@ -214,10 +214,7 @@ export default () => {
         }
     }, [chainId])
 
-    const { deploy, deployLoading } = useContractDeployer(
-        chainId === SupportedChainId.GOERLI ? require('abis/SBTDeployer.json') :
-        chainId === SupportedChainId.POLYGON ? require('abisPolygon/SBTDeployer.json') : ''
-    )
+    const { deploy, deployLoading } = useContractDeployer(require('abis/SBTDeployer.json'))
     
 
     const handleContactChange = (key: string) => {

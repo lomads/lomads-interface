@@ -31,6 +31,7 @@ import { nanoid } from "@reduxjs/toolkit";
 import moment from "moment";
 import useRole from "hooks/useRole";
 import useSafeTransaction from "hooks/useSafeTransaction";
+import { useSafeTokens } from "hooks/useSafeTokens";
 
 const SideModal = (props: IsideModal) => {
 	const dispatch = useAppDispatch();
@@ -44,7 +45,8 @@ const SideModal = (props: IsideModal) => {
 	});
 	const [error, setError] = useState<any>(null)
 	const [isLoading, setisLoading] = useState<boolean>(false);
-	const [safeTokens, setSafeTokens] = useState<Array<any>>([]);
+	//const [safeTokens, setSafeTokens] = useState<Array<any>>([]);
+	const { safeTokens } = useSafeTokens()
 	const totalMembers = useAppSelector((state) => state.flow.totalMembers);
 	const selectToken = (_tokenAddress: string) => {
 		setSelectedToken(_tokenAddress);
@@ -182,25 +184,28 @@ const SideModal = (props: IsideModal) => {
 			}
 		} catch (e) {
 			console.log(e)
-			setError(e)
+			if(typeof e === 'string')
+				setError(e)
+			else
+				setError(_get(e, 'message', 'Something went wrong'))
 		}
 	};
 
-	const getTokens = async (safeAddress: string) => {
-		chainId &&
-			await axios
-				.get(
-					`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`
-				)
-				.then((tokens: any) => {
-					setSafeTokens(tokens.data);
-				});
-	};
+	// const getTokens = async (safeAddress: string) => {
+	// 	chainId &&
+	// 		await axios
+	// 			.get(
+	// 				`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`
+	// 			)
+	// 			.then((tokens: any) => {
+	// 				setSafeTokens(tokens.data);
+	// 			});
+	// };
 
-	useEffect(() => {
-		getTokens(props.safeAddress);
-		return () => { };
-	}, [props.safeAddress]);
+	// useEffect(() => {
+	// 	getTokens(props.safeAddress);
+	// 	return () => { };
+	// }, [props.safeAddress]);
 
 	useEffect(() => {
 		if (DAO)

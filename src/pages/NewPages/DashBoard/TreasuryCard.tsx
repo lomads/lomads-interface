@@ -5,7 +5,6 @@ import { useAppDispatch, useAppSelector } from "state/hooks";
 import SafeButton from "UIpack/SafeButton";
 import { useWeb3React } from "@web3-react/core";
 import { EthSignSignature } from "@gnosis.pm/safe-core-sdk";
-import { switchChain } from "utils/switchChain";
 import { SafeTransactionData } from "@gnosis.pm/safe-core-sdk-types/dist/src/types";
 import copyIcon from "../../../assets/svg/copyIcon.svg";
 import {
@@ -50,6 +49,9 @@ import RecurringTxnTreasury from "./TreasuryCard/RecurringTxnTreasury";
 import useGnosisTxnTransform from "hooks/useGnosisTxnTransform";
 import Button from "muiComponents/Button";
 import CsvDownloadButton from 'react-json-to-csv'
+import { toast } from "react-hot-toast";
+import SwitchChain from "components/SwitchChain";
+import { CHAIN_INFO } from "constants/chainInfo";
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
 const HEADERS = [
@@ -156,9 +158,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				if(!tkn.tokenAddress){
 					return {
 						...t,
-						tokenAddress: chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS,
+						tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
 						token: {
-							symbol: chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR',
+							symbol:CHAIN_INFO[chainId]?.nativeCurrency?.symbol,
 							decimal: 18
 						}
 					}
@@ -378,6 +380,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	}
 
 	const handleConfirmTransaction = async (_safeTxHashs: string, txn: any) => {
+		if(currentChainId !== _get(DAO, 'chainId', '')) {
+			return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')} />)
+		}
 		if (txn.offChain && _get(txn, 'token.symbol') === 'SWEAT') {
 			setConfirmTxLoading(_safeTxHashs);
 			axiosHttp.patch(`transaction/off-chain/${_safeTxHashs}/approve`,
@@ -399,9 +404,6 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				.catch(e => console.log(e))
 				.finally(() => setConfirmTxLoading(null))
 		} else if (txn.offChain && _get(txn, 'token.symbol') !== 'SWEAT') {
-			if(currentChainId !== _get(DAO, 'chainId', '')) {
-				return await switchChain(connector, _get(DAO, 'chainId', ''))
-			}
 			try {
 				await createOnChainTxn(txn, 'confirm')
 				loadPendingTxn();
@@ -410,9 +412,6 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				console.log(e)
 			}
 		} else {
-			if(currentChainId !== _get(DAO, 'chainId', '')) {
-				return await switchChain(connector, _get(DAO, 'chainId', ''))
-			}
 			try {
 				setConfirmTxLoading(_safeTxHashs);
 				// const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
@@ -459,6 +458,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	};
 
 	const handleRejectTransaction = async (_n: number, txn: any = null) => {
+		if(currentChainId !== _get(DAO, 'chainId', '')) {
+			return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
+		}
 		let _nonce: any = _n;
 		if (txn.offChain && _get(txn, 'token.symbol') === 'SWEAT') {
 			setRejectTxLoading(_nonce);
@@ -495,7 +497,6 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 					console.log(response)
 					_nonce = _get(response, 'nonce', null);
 				}
-				console.log("_nonce", _nonce)
 				const transactionObject = await safeSDK.createRejectionTransaction(_nonce);
 				const safeTxHash = await safeSDK.getTransactionHash(transactionObject);
 				const signature = await safeSDK.signTransactionHash(safeTxHash);
@@ -563,6 +564,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	};
 
 	const handleExecuteTransactions = async (txn: any, reject: boolean | undefined, syncOwners = false, amount = null, isAllowanceTransaction = false) => {
+		if(currentChainId !== _get(DAO, 'chainId', '')) {
+			return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
+		}
 		console.log(txn)
 		let _txs = txn;
 		if (txn.offChain && _get(txn, 'token.symbol') === 'SWEAT') {
@@ -583,14 +587,11 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				.catch(e => console.log(e))
 				.finally(() => setExecuteTxLoading(null))
 		} else {
-			if(currentChainId !== _get(DAO, 'chainId', '')) {
-				return await switchChain(connector, _get(DAO, 'chainId', ''))
-			}
 			const st = await getSafeTokens();
 			let safeToken = _find(st, t => toChecksumAddress(t.tokenAddress) === toChecksumAddress(_get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', ''))))
 			console.log("safeTokensafeToken",st, safeToken, _get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', '')))
 			if (!safeToken)
-				safeToken = _find(st || [], (st: any) => _get(st, 'tokenAddress', '') === (chainId === SupportedChainId.GOERLI ? process.env.REACT_APP_GOERLI_TOKEN_ADDRESS : process.env.REACT_APP_MATIC_TOKEN_ADDRESS))
+				safeToken = _find(st || [], (st: any) => _get(st, 'tokenAddress', '') === (process.env.REACT_APP_NATIVE_TOKEN_ADDRESS))
 			if (!reject && amount && !isAllowanceTransaction) {
 				const balance = _get(safeToken, 'balance', 0) / 10 ** _get(safeToken, 'token.decimal', _get(safeToken, 'token.decimals', 18))
 				if (+amount > +balance) {
@@ -689,11 +690,10 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
 	const tokenDecimal = useCallback((addr: any) => {
 		if (safeTokens) {
-			if (!addr || addr === SupportedChainId.POLYGON || addr === SupportedChainId.GOERLI || addr === 'SWEAT')
+			if (!addr || addr === 'SWEAT')
 				return 18
 			const tkn = _find(safeTokens, (stkn: any) => stkn.tokenAddress === addr)
 			if (tkn) {
-				console.log("tokenDecimal", tkn)
 				return _get(tkn, 'token.decimals', 18)
 			}
 			return 18
@@ -746,13 +746,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 							>
 								Treasury
 								<span onClick={() => {
-									window.open(
-										chainId === SupportedChainId.GOERLI ?
-											`https://goerli.etherscan.io/address/${_get(DAO, 'safe.address')}` :
-											`https://polygonscan.com/address/${_get(DAO, 'safe.address')}`
-									)
+									window.open(`${CHAIN_INFO[chainId].explorer}address/${_get(DAO, 'safe.address')}`)
 								}}>
-									<img style={{ width: 24, height: 24, objectFit: 'contain', marginLeft: 8 }} src={chainId === SupportedChainId.GOERLI ? GOERLI_LOGO : POLYGON_LOGO} />
+									<img style={{ width: 24, height: 24, objectFit: 'contain', marginLeft: 8 }} src={CHAIN_INFO[chainId]?.logoUrl} />
 								</span>
 							</div>
 							<div className="treasuryDivider"></div>
@@ -791,7 +787,12 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 							})
 						}
 					</div> */}
-					{owner && tab === 1 && <SafeButton onClick={props.toggleModal} height={40} width={150} titleColor="#B12F15" title="SEND TOKEN" bgColor={!hasValidToken ? "#f0f2f6" : "#FFFFFF"} opacity={!hasValidToken ? "0.4" : "1"} disabled={!hasValidToken} fontweight={400} fontsize={16} />}
+					{owner && tab === 1 && <SafeButton onClick={() => {
+						if(currentChainId !== _get(DAO, 'chainId', '')) {
+							return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')} />)
+						}
+						props.toggleModal()
+					}} height={40} width={150} titleColor="#B12F15" title="SEND TOKEN" bgColor={!hasValidToken ? "#f0f2f6" : "#FFFFFF"} opacity={!hasValidToken ? "0.4" : "1"} disabled={!hasValidToken} fontweight={400} fontsize={16} />}
 					{/* <Button onClick={() => transform([...(pendingTxn as []), ...(executedTxn as [])])} size="small" variant="contained">DOWNLOAD</Button> */}
 					{owner && tab === 1 && <CsvDownloadButton
 						className="downloadBtn"
@@ -832,8 +833,8 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 									return (
 										<>
 											<div className="tokenDiv">
-												<span>{`${(_get(token, 'balance', 0) / 10 ** tokenDecimal(token.tokenAddress)).toFixed(4)}`}</span>
-												<h1>{`${_get(token, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}`}</h1>
+												<span>{`${(_get(token, 'balance', 0) / 10 ** _get(token, 'token.decimal', _get(token, 'token.decimals', 18))).toFixed(4)}`}</span>
+												<h1>{`${_get(token, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol)}`}</h1>
 											</div>
 										</>
 									)
@@ -856,7 +857,13 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 						<div className="dashboardText">per month</div> */}
 					</div>
 					<div className="treasuryTokens-right">
-						<button className="recurring-btn" onClick={props.toggleShowCreateRecurring}>
+						<button className="recurring-btn" onClick={() => {
+							if(currentChainId !== _get(DAO, 'chainId', '')) {
+								toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
+							} else {
+								props.toggleShowCreateRecurring()
+							}
+						}}>
 							<img src={plus} alt="asset" /> NEW RECURRING PAYMENT
 						</button>
 					</div>

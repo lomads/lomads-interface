@@ -37,6 +37,8 @@ import {
 import axios from "axios";
 import { isValidUrl } from 'utils';
 import { Editor } from '@tinymce/tinymce-react';
+import { CHAIN_INFO } from 'constants/chainInfo';
+import { useSafeTokens } from 'hooks/useSafeTokens';
 
 const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
 
@@ -64,7 +66,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
     const [reviewer, setReviewer] = useState(null);
     const [currency, setCurrency] = useState(null);
     const [amount, setAmount] = useState(0);
-    const [safeTokens, setSafeTokens] = useState([]);
+    const { safeTokens } = useSafeTokens()
     const [showSuccess, setShowSuccess] = useState(false);
 
     const getrolename = (roleId) => {
@@ -102,10 +104,10 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
     };
 
 
-    const getTokens = async (safeAddress) => {
-        const tokens = await getSafeTokens(chainId, safeAddress)
-        setSafeTokens(tokens)
-    };
+    // const getTokens = async (safeAddress) => {
+    //     const tokens = await getSafeTokens(chainId, safeAddress)
+    //     setSafeTokens(tokens)
+    // };
 
     useEffect(() => {
         var date = new Date();
@@ -128,10 +130,10 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
         }
     }, [account, chainId, user])
 
-    useEffect(() => {
-        getTokens(_get(DAO, 'safe.address'));
-        return () => { };
-    }, [DAO]);
+    // useEffect(() => {
+    //     getTokens(_get(DAO, 'safe.address'));
+    //     return () => { };
+    // }, [DAO]);
 
     useEffect(() => { setReviewer(user._id) }, [user])
 
@@ -245,7 +247,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
             symbol = _get(symbol, 'token.symbol', null)
             if (!symbol)
-                symbol = currency.currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency.currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
+                symbol = currency.currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[chainId]?.nativeCurrency?.symbol : 'SWEAT'
             console.log("task role:", symbol);
             let task = {};
             task.daoId = DAO?._id;
@@ -291,7 +293,7 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
         let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
         symbol = _get(symbol, 'token.symbol', 'SWEAT')
         if (!symbol)
-            symbol = currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
+            symbol = currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[chainId]?.nativeCurrency?.symbol : 'SWEAT'
         let task = {};
         task.daoId = DAO?._id;
         task.name = name;
@@ -649,8 +651,8 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                                         return (
                                                             (
                                                                 <>
-                                                                    <option value={result.tokenAddress ? result.tokenAddress : chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS} key={index}>
-                                                                        {_get(result, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}
+                                                                    <option value={result.tokenAddress} key={index}>
+                                                                        {_get(result, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol)}
                                                                     </option>
                                                                 </>
                                                             )

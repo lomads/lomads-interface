@@ -137,6 +137,7 @@ const LoginPage = (props: any) => {
 			if (chainAllowed && !account) {
 				await connector.activate()
 			} else if (!chainAllowed) {
+				await connector.activate()
 				switchChain(connector, +preferredChain)
 					.then(async () => {
 						if (!account)

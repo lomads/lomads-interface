@@ -7,7 +7,9 @@ import MultiCall from "@indexed-finance/multicall";
 import axiosHttp from 'api'
 import { USDC } from 'constants/tokens';
 import { USDC_GOERLI, USDC_POLYGON } from 'constants/tokens'
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useAppSelector } from 'state/hooks';
+import { INFURA_NETWORK_URLS } from 'constants/infura';
 
 export type SBTParams = {
     name: string,
@@ -19,12 +21,15 @@ export type SBTParams = {
 
 const useMintSBT = (contractAddress: string | undefined, version: string | undefined = "0") => {
   console.log("useMintSBT", contractAddress, version)
-    const { account, chainId, provider } = useWeb3React();
+    const { account, chainId: currentChainId, provider } = useWeb3React();
+    const { DAO } = useAppSelector(store => store.dashboard)
+    const [chainId, setChainId] = useState(null)
+    useEffect(() => {
+      if(DAO)
+        setChainId(_get(DAO, 'chainId'))
+    }, [DAO])
     const mintContract = useContract(contractAddress, 
-        version === "1" ? chainId === SupportedChainId.GOERLI ? require('abis/SBT.json') :
-        chainId === SupportedChainId.POLYGON ? require('abisPolygon/SBT.json') : '' : 
-        chainId === SupportedChainId.GOERLI ? require('abis/SBTv0.json') :
-        chainId === SupportedChainId.POLYGON ? require('abisPolygon/SBTv0.json') : ''
+        version === "1" ?  require('abis/SBT.json') : require('abis/SBTv0.json')
     , true);
 
     const weth = (price: string, token: string): any => {
@@ -46,7 +51,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
   }
 
     const getStats = useCallback(async () => {
-        if(account) {
+        if(account && chainId) {
           const calls: any = [
             {
               target: contractAddress,
@@ -86,19 +91,17 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
             ]),
             
           ]
+          const provider = new ethers.providers.JsonRpcProvider(INFURA_NETWORK_URLS[chainId])
           const multicall = new MultiCall(provider);
           const [, res] = await multicall.multiCall(
-              version === "1" ? chainId === SupportedChainId.GOERLI ? require('abis/SBT.json') :
-              chainId === SupportedChainId.POLYGON ? require('abisPolygon/SBT.json') : '' : 
-              chainId === SupportedChainId.GOERLI ? require('abis/SBTv0.json') :
-              chainId === SupportedChainId.POLYGON ? require('abisPolygon/SBTv0.json') : '',
+              version === "1" ? require('abis/SBT.json') : require('abis/SBTv0.json'),
               calls
           );
           console.log("useMintSBT-calls", res)
           return res
         }
         return [null, null, null, null]
-    }, [version, contractAddress, provider, account])
+    }, [version, contractAddress, chainId, account])
 
     const payByCrypto = async (tokenContract: any) => {
       if(window.ethereum) {

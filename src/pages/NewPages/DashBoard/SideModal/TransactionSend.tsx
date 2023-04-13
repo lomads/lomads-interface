@@ -189,7 +189,7 @@ const TransactionSend = (props: IselectTransactionSend) => {
 						/>
 					</div>
 				</div>
-				{props.error && <div style={{ fontSize: 14, color: 'red', textAlign: 'center' }}>{props.error}</div>}
+				{props.error && typeof props.error === 'string' && <div style={{ fontSize: 14, color: 'red', textAlign: 'center' }}>{props.error}</div>}
 				<div id="transactionSendDivider2"></div>
 				<Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: '500px',  position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
 					<Box display="flex" mt={4} justifyContent="center" flexDirection="row">

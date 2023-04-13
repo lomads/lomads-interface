@@ -20,44 +20,51 @@ import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains';
 import { SupportedChainId, SUPPORTED_CHAIN_IDS, CHAIN_IDS_TO_NAMES } from 'constants/chains'
 import { useAppSelector } from "state/hooks";
 import { useWeb3React } from "@web3-react/core";
+import {useSafeTokens} from "hooks/useSafeTokens";
 
 import starXP from 'assets/svg/starXP.svg';
 
 
 const CompensateMembersModal = ({ toggleModal, toggleCompensate }) => {
+  const { chainId: currentChainId } = useWeb3React();
   const [showCompensateMembersDescriptionModals, setShowCompensateMembersDescriptionModals] = useState(false)
-  const [safeTokens, setSafeTokens] = useState([]);
+  const [chainId, setChainId] = useState(null)
   const { user, DAO, DAOList, DAOLoading } = useAppSelector((state) => state.dashboard);
-  const { chainId } = useWeb3React();
   const [sweatValue, setSweatValue] = useState(null);
   const [currency, setCurrency] = useState(null);
+  const { safeTokens } = useSafeTokens()
 
   useEffect(() => {
-    if (chainId, DAO) {
-      axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${_get(DAO, 'safe.address', '')}/balances/usd/`, { withCredentials: false })
-        .then((tokens) => {
-          setSafeTokens(tokens.data.map(t => {
-            let tkn = t
-            console.log(tkn)
-            if (!tkn.tokenAddress) {
-              return {
-                ...t,
-                tokenAddress: chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS,
-                token: {
-                  symbol: chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'
-                }
-              }
-            }
-            return t
-          }));
-        });
-    }
-  }, [chainId, DAO]);
+    if(DAO)
+      setChainId(_get(DAO, 'chainId'))
+  }, [DAO])
+
+  // useEffect(() => {
+  //   if (chainId, DAO) {
+  //     axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${_get(DAO, 'safe.address', '')}/balances/usd/`, { withCredentials: false })
+  //       .then((tokens) => {
+  //         setSafeTokens(tokens.data.map(t => {
+  //           let tkn = t
+  //           console.log(tkn)
+  //           if (!tkn.tokenAddress) {
+  //             return {
+  //               ...t,
+  //               tokenAddress: chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS,
+  //               token: {
+  //                 symbol: chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'
+  //               }
+  //             }
+  //           }
+  //           return t
+  //         }));
+  //       });
+  //   }
+  // }, [chainId, DAO]);
 
   useEffect(() => {
     if (safeTokens && safeTokens.length > 0) {
       if (!safeTokens[0].tokenAddress) {
-        setCurrency(chainId === SupportedChainId.GOERLI ? process.env.REACT_APP_GOERLI_TOKEN_ADDRESS : process.env.REACT_APP_MATIC_TOKEN_ADDRESS)
+        setCurrency(process.env.REACT_APP_NATIVE_TOKEN_ADDRESS)
       } else {
         setCurrency(safeTokens[0].tokenAddress)
       }

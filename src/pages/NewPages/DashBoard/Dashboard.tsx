@@ -111,12 +111,13 @@ const Dashboard = () => {
 	const { daoURL } = useParams();
 	const location = useLocation()
 	const from = location?.state?.from;
-	const { user, DAO, DAOList, DAOLoading } = useAppSelector((state) => state.dashboard);
+	const { user, DAO, DAOList, DAOLoading } = useAppSelector((state:any) => state.dashboard);
 	const [update, setUpdate] = useState(0);
 	const treasuryRef = useRef<any>();
 	const anchorRef = useRef<any>();
 	const questionMarkRef = useRef<any>();
-	const { provider, account, chainId, connector } = useWeb3React();
+	const { provider, account, chainId: currentChainId, connector } = useWeb3React();
+	const [chainId, setChainId] = useState(null)
 	const safeAddress = useAppSelector((state) => state.flow.safeAddress);
 	const totalMembers = useAppSelector((state) => state.flow.totalMembers);
 	const [pendingTransactions, setPendingTransactions] =
@@ -185,6 +186,11 @@ const Dashboard = () => {
 				// dispatch(storeGithubIssues({ payload: { daoId: _get(DAO, '_id', null), issueList: newArray } }))
 			})
 	}
+
+	useEffect(() => {
+		if(DAO)
+			setChainId(DAO?.chainId)
+	}, [DAO])
 
 	useEffect(() => {
 		if(myRole)
@@ -258,15 +264,15 @@ const Dashboard = () => {
 
 	const handleSwitchChain = async (nextChain: number) => {
 		console.log("nextChain", nextChain)
-		if (chainId !== nextChain) {
-			sessionStorage.setItem('___lmds_chain_switch', "1");
-			switchChain(connector, nextChain)
-				.then(res => {
-					window.location.href = '/'
-				})
-				.catch(e => {
-					sessionStorage.clear();
-				})
+		if (currentChainId !== nextChain) {
+			//sessionStorage.setItem('___lmds_chain_switch', "1");
+			await switchChain(connector, nextChain)
+				// .then(res => {
+				// 	//window.location.href = '/'
+				// })
+				// .catch(e => {
+				// 	sessionStorage.clear();
+				// })
 		}
 	}
 
@@ -291,7 +297,7 @@ const Dashboard = () => {
 	}, [chainId, account])
 
 	useEffect(() => {
-		if (chainId && account) {
+		if (account) {
 			if (!DAOList)
 				dispatch(loadDao({ chainId }))
 			else {
@@ -310,7 +316,7 @@ const Dashboard = () => {
 				}
 			}
 		}
-	}, [chainId, account, DAOList, daoURL])
+	}, [account, DAOList, daoURL])
 
 	const validateMetaData = () => {
 		if (_get(DAO, 'sbt.contactDetail', null)) {
@@ -321,6 +327,7 @@ const Dashboard = () => {
 				const myMetadata = _find(_get(DAO, 'sbt.metadata', []), m => {
 					return _find(m.attributes, a => a.value === account)
 				})
+				console.log("ATTRRS..", myMetadata.attributes)
 				if (myMetadata && myMetadata.attributes) {
 					for (let index = 0; index < myMetadata.attributes.length; index++) {
 						const attribute = myMetadata.attributes[index];
@@ -332,6 +339,7 @@ const Dashboard = () => {
 					}
 				}
 				if (shouldUpdate) {
+					console.log("balanceOf::::", )
 					navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
 					break;
 				}
@@ -345,7 +353,7 @@ const Dashboard = () => {
 			if (chainId && DAO && DAO.sbt && DAO.sbt && account) {
 				getStats().then(res => {
 					const balanceOf = res[0];
-					console.log("balanceOf", balanceOf)
+					console.log("balanceOf::::", balanceOf)
 					if (chainId === DAO.chainId) {
 						if (DAO?.sbt?.whitelisted) {
 							if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
@@ -530,7 +538,7 @@ const Dashboard = () => {
 			const myTokens = _get(user, 'earnings', []).filter((e: any) => e.daoId === _get(DAO, '_id'))
 			for (let index = 0; index < myTokens.length; index++) {
 				const myToken = myTokens[index];
-				const safeTkn = _find(safeTokens, (st: any) => (st.tokenAddress ? st.tokenAddress : chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS) === myToken.currency)
+				const safeTkn = _find(safeTokens, (st: any) => (st.tokenAddress ? st.tokenAddress : process.env.REACT_APP_NATIVE_TOKEN_ADDRESS) === myToken.currency)
 				if (safeTkn) {
 					console.log("safeTkn", safeTkn, myToken)
 					usdVal = usdVal + (+_get(safeTkn, 'fiatConversion', 0) * _get(myToken, 'value', 0))
@@ -702,7 +710,7 @@ const Dashboard = () => {
 									</div>
 								}
 							</div>
-							<select name="chain" id="chain" value={chainId} onChange={e => handleSwitchChain(+e.target.value)} className="chain" style={{ width: 150 }}>
+							<select name="chain" id="chain" value={currentChainId} onChange={e => handleSwitchChain(+e.target.value)} className="chain" style={{ width: 150 }}>
 								{
 									SUPPORTED_CHAIN_IDS.map(chain => <option value={+chain}>{CHAIN_IDS_TO_NAMES[chain]}</option>)
 								}

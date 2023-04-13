@@ -16,6 +16,7 @@ import CloseBtn from '../../../../assets/svg/close-btn.svg';
 import CheckBtn from '../../../../assets/svg/check-btn.svg';
 import { SupportedChainId } from "constants/chains";
 import {useSafeTokens} from "hooks/useSafeTokens";
+import { CHAIN_INFO } from "constants/chainInfo";
 
 const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
       <div style={{ flex : 1}} ref={ref} {...rest}>
@@ -129,7 +130,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
 
         const isLast = _get(transaction, 'dataDecoded.parameters[0].valueDecoded', []).length - 1 === index;
         const muldecimal = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.decimals', _get(transaction, 'token.decimals', 18))
-        const token = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
+        const token = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', _get(transaction, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol))
         //let trans = _find(_get(DAO, 'safe.transactions', []), t => t.safeTxHash === transaction.safeTxHash)
 
         if(_get(item, 'dataDecoded.method', '') === 'removeOwner')
@@ -291,7 +292,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
                         <div className="coinText">
                             <img src={sendTokenOutline} alt="" />
                             <div className="dashboardTextBold">
-                                {isOwnerModificaitonTransaction ? `-` : `${amount / 10 ** decimal} ${tokenSymbol ? tokenSymbol : _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))}`}
+                                {isOwnerModificaitonTransaction ? `-` : `${amount / 10 ** decimal} ${tokenSymbol ? tokenSymbol : _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol))}`}
                             </div>
                         </div>
                         <div className="transactionName">

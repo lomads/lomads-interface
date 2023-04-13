@@ -145,7 +145,7 @@ const useGnosisAllowance = (safeAddress: string | null) => {
                 tokenAddress, 
                 toChecksumAddress(to), 
                 `${BigInt(amount * 10 ** _get(safeToken, 'token.decimals', 18))}`, 
-                chainId === SupportedChainId.GOERLI ? process.env.REACT_APP_GOERLI_TOKEN_ADDRESS : process.env.REACT_APP_MATIC_TOKEN_ADDRESS, 
+                process.env.REACT_APP_NATIVE_TOKEN_ADDRESS, 
                 '0', 
                 delegate, 
                 "0x"

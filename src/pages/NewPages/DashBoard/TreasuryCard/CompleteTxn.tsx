@@ -13,6 +13,7 @@ import { updateSafeTransaction } from "state/dashboard/reducer";
 import { SupportedChainId } from "constants/chains";
 import {useSafeTokens} from "hooks/useSafeTokens";
 import { legacy_createStore } from "@reduxjs/toolkit";
+import { CHAIN_INFO } from "constants/chainInfo";
 
 const CompleteTxn = ({ chainId, labels, transaction, tokens, owner, isAdmin, safeAddress, onLoadLabels, editMode, onSetEditMode }: any) => {
 	//const { chainId } = useWeb3React();
@@ -29,11 +30,11 @@ const CompleteTxn = ({ chainId, labels, transaction, tokens, owner, isAdmin, saf
         if(_get(transaction, 'transfers[0].tokenInfo.decimals', null))
             decimal = _get(transaction, 'transfers[0].tokenInfo.decimals', 18)
         let amount = (+(_get(transaction, 'transfers[0].value', _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'value' || p.name === '_value'), 'value', _get(transaction, 'value', 0)))) / 10 ** decimal)
-        let symbol = chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR';
+        let symbol = CHAIN_INFO[chainId]?.nativeCurrency?.symbol;
         if(_get(transaction, 'transfers[0].tokenAddress', null))
             symbol = _get(transaction, 'transfers[0].tokenInfo.symbol', '')
         else
-            symbol = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
+            symbol = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol))
         let recipient = _get(transaction, 'transfers[0].to', _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'to' || p.name === '_to'), 'value', _get(transaction, 'to', '')))
         let tokenSymbol = undefined;
         const setAllowance =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => _get(vd, 'dataDecoded.method', '') === "setAllowance")
@@ -112,11 +113,11 @@ const CompleteTxn = ({ chainId, labels, transaction, tokens, owner, isAdmin, saf
         const mulAmount = _get(item, 'dataDecoded.parameters[1].value',  _get(item, 'value', 0))
         let mulRecipient = _get(item, 'dataDecoded.parameters[0].value', _get(item, 'to', 0))
         const isLast = _get(transaction, 'dataDecoded.parameters[0].valueDecoded', []).length - 1 === index;
-        let token = chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR';
+        let token = CHAIN_INFO[chainId]?.nativeCurrency?.symbol;
         if(_get(transaction, 'transfers[0].tokenAddress', null))
             token = _get(transaction, 'transfers[0].tokenInfo.symbol', '')
         else
-            token = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
+            token = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', _get(transaction, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol))
 
         let muldecimal = 18;
         if(_get(transaction, 'transfers[0].tokenAddress', null))

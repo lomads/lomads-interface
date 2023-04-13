@@ -23,9 +23,12 @@ import { off } from "process";
 import {useSafeTokens} from "hooks/useSafeTokens";
 import useSafeTransaction from "hooks/useSafeTransaction";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
+import SwitchChain from "components/SwitchChain";
+import { toast } from "react-hot-toast";
 
 const SafeModal = ({ toggleS }) => {
-	const { provider, account, chainId } = useWeb3React();
+	const { provider, account, chainId: currentChainId } = useWeb3React();
+	const [chainId, setChainId] = useState(null);
 	const [safeName, setSafeName] = useState(null)
 	const { DAO } = useAppSelector(store => store.dashboard)
 	const [copy, setCopy] = useState(false);
@@ -36,7 +39,21 @@ const SafeModal = ({ toggleS }) => {
 	const [currentThreshold, setCurrentThreshold] = useState(1);
 	const [members, setMembers] = useState([])
 
+	useEffect(() => {
+        if(DAO) 
+            setChainId(_get(DAO, 'chainId', null))
+    }, [DAO])
+
 	const { updateOwnersWithThreshold, updateOwnerLoading } = useSafeTransaction(_get(DAO, 'safe.address', ''))
+
+	const handleUpdateOwnersWithThreshold = async (obj) => {
+		if(currentChainId !== _get(DAO, 'chainId', '')) {
+            return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
+        }
+		 await updateOwnersWithThreshold(obj)
+		 toggleS()
+		 return;
+	}
 
 	const getSafeThreshold = async safeAddress => {
 		const safeSDK = await ImportSafe(provider, safeAddress);
@@ -143,9 +160,9 @@ const SafeModal = ({ toggleS }) => {
 				</div>
 				<div className="button-section">
 					<Button onClick={() => setShowConfirmation(false)} className="chakra-button btn-cancel">CANCEL</Button>
-					<SimpleLoadButton height={40} title="CONFIRM" width={200} bgColor={updateOwnerLoading ? 'grey' : "#C94B32"} condition={updateOwnerLoading} disabled={newOwnerCount == 0 || updateOwnerLoading} onClick={async () => {
-						await updateOwnersWithThreshold({ newOwners: newOwners.map(o => o.wallet), removeOwners: removeOwners.map(o => o.wallet), threshold: thresholdValue, ownerCount: newOwnerCount, thresholdChanged: currentThreshold !== thresholdValue })
-						toggleS();
+					<SimpleLoadButton height={50} title="CONFIRM" width={200} bgColor={updateOwnerLoading ? 'grey' : "#C94B32"} condition={updateOwnerLoading} disabled={newOwnerCount == 0 || updateOwnerLoading} onClick={async () => {
+						handleUpdateOwnersWithThreshold({ newOwners: newOwners.map(o => o.wallet), removeOwners: removeOwners.map(o => o.wallet), threshold: thresholdValue, ownerCount: newOwnerCount, thresholdChanged: currentThreshold !== thresholdValue })
+						//toggleS();
 					}} className="chakra-button btn-save">CONFIRM</SimpleLoadButton>
 				</div>
 			</div>
@@ -342,11 +359,11 @@ const SafeModal = ({ toggleS }) => {
 												onClick={async () => {
 													// add name condition
 													if (currentThreshold !== thresholdValue) {
-														await updateOwnersWithThreshold({ ownerCount: newOwnerCount, threshold: thresholdValue, thresholdChanged: currentThreshold !== thresholdValue })
-														toggleS();
+														handleUpdateOwnersWithThreshold({ ownerCount: newOwnerCount, threshold: thresholdValue, thresholdChanged: currentThreshold !== thresholdValue })
+														//toggleS();
 													}
 													else {
-														toggleS();
+														//toggleS();
 													}
 												}}
 											sx={{ ml: 1 }} fullWidth variant='contained'>Save</Button>

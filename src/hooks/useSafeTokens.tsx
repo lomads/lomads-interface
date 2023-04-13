@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import {  get as _get } from 'lodash'
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import {  get as _get, find as _find } from 'lodash'
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import axios from "axios";
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains';
@@ -19,6 +19,16 @@ export const SafeTokensProvider = ({ children }: any) => {
     const { DAO } = useAppSelector(store => store?.dashboard)
     const [safeTokens, setSafeTokens] = useState<any>(null);
 
+    const tokenBalance = useCallback((token: any) => {
+        if(safeTokens && safeTokens.length > 0) {
+            let selToken = _find(safeTokens, t => _get(t, 'tokenAddress', null) === token)
+			if (safeTokens.length > 0 && !selToken)
+			    selToken = safeTokens[0];
+            return _get(selToken, 'balance', 0) / 10 ** _get(selToken, 'token.decimals', 18)
+        }
+        return 0
+    }, [safeTokens])
+
     const setTokens = async () => {
         setSafeTokens(null)
         axios.get(`${GNOSIS_SAFE_BASE_URLS[DAO?.chainId]}/api/v1/safes/${DAO?.safe?.address}/balances/usd/`, {withCredentials: false })
@@ -28,10 +38,11 @@ export const SafeTokensProvider = ({ children }: any) => {
                     if(!tkn.tokenAddress){
                         return {
                             ...t,
-                            tokenAddress: DAO?.chainId === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
+                            tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
                             token: {
                                 symbol: CHAIN_INFO[DAO?.chainId].nativeCurrency.symbol,
-                                decimal:  CHAIN_INFO[DAO?.chainId].nativeCurrency.decimals
+                                decimal:  CHAIN_INFO[DAO?.chainId].nativeCurrency.decimals,
+                                decimals:  CHAIN_INFO[DAO?.chainId].nativeCurrency.decimals,
                             }
                         }
                     }
@@ -54,7 +65,8 @@ export const SafeTokensProvider = ({ children }: any) => {
     }, [DAO?.url])
 
     const contextProvider = {
-        safeTokens
+        safeTokens,
+        tokenBalance
     };
     return <SafeTokensContext.Provider value={contextProvider}>{children}</SafeTokensContext.Provider>;
 }
