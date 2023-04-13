@@ -217,6 +217,7 @@ const useStyles = makeStyles((theme: any) => ({
 		borderRadius: '5px',
 		maxHeight: 'fit-content',
 		padding: '26px 22px 30px 22px',
+		width: 541,
 		gap: '10px'
 	},
 	inputTitle: {
