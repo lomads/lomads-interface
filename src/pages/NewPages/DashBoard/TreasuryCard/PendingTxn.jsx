@@ -24,6 +24,8 @@ const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
   ))
 
 const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, executeFirst = '', threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions, confirmTxLoading, rejectTxLoading, executeTxLoading, isAdmin, onLoadLabels }) => {
+    console.log("labels:",labels);
+    console.log("transactions : ",transaction);
     const { provider, account, chainId } = useWeb3React();
     const { DAO } = useAppSelector(store => store.dashboard);
     const [reasonText, setReasonText] = useState({});
@@ -32,7 +34,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
     const {safeTokens} = useSafeTokens(safeAddress)
     //const threshold = useAppSelector((state) => state.flow.safeThreshold);
 
-    const { amount, tokenSymbol, recipient, reason, decimal, isAllowanceTransaction, isOwnerModificaitonTransaction } = useMemo(() => {
+    const { amount, tokenSymbol, recipient, reason,tag, decimal, isAllowanceTransaction, isOwnerModificaitonTransaction } = useMemo(() => {
         const tokendata = _find(tokens, t => t.tokenAddress === _get(transaction, 'to', ''))
         const decimal = _get(tokendata, 'token.decimals', _get(transaction, 'token.decimals', 18))
         let amount = _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'value' || p.name === '_value'), 'value', _get(transaction, 'value', 0))
@@ -73,12 +75,17 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
         if(labels && labels.length > 0) {
             reason = _get(_find(labels, l => l.recipient.toLowerCase() === recipient.toLowerCase() && l.safeTxHash === transaction.safeTxHash), "label", null)
         }
+
+        let tag = null
+        if(labels && labels.length > 0) {
+            tag = _get(_find(labels, l => l.recipient.toLowerCase() === recipient.toLowerCase() && l.safeTxHash === transaction.safeTxHash), "tag", null)
+        }
         // if (trans) {
         //     console.log('transaction', recipient, trans)
         //     reason = _get(_find(trans.data, u => u.recipient.toLowerCase() === recipient.toLowerCase()), 'reason', null)
         // }
         console.log('reason', reason)
-        return { amount, tokenSymbol, recipient, reason, decimal, isAllowanceTransaction, isOwnerModificaitonTransaction }
+        return { amount, tokenSymbol, recipient, reason,tag, decimal, isAllowanceTransaction, isOwnerModificaitonTransaction }
     }, [transaction, labels, tokens])
 
     const { confirmReached, hasMyConfirmVote, rejectReached, hasMyRejectVote } = useMemo(() => {
@@ -139,6 +146,12 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
         if(labels && labels.length > 0) {
             mulReason = _get(_find(labels, l => l.recipient && l.safeTxHash && (_get(l, "recipient", "").toLowerCase() === mulRecipient.toLowerCase()) && (l.safeTxHash.toLowerCase() === transaction.safeTxHash.toLowerCase())), "label", null)
         }
+        let mulTag = null;
+        if(labels && labels.length > 0) {
+            mulTag = _get(_find(labels, l => l.recipient && l.safeTxHash && (_get(l, "recipient", "").toLowerCase() === mulRecipient.toLowerCase()) && (l.safeTxHash.toLowerCase() === transaction.safeTxHash.toLowerCase())), "tag", null)
+        }
+
+        console.log("multag : ",mulTag);
         const isOwnerModificaitonTransaction =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => (_get(vd, 'dataDecoded.method', '') === "addOwnerWithThreshold") || _get(vd, 'dataDecoded.method', '') === "removeOwner" || _get(vd, 'dataDecoded.method', '') === "changeThreshold" )
 
         return (
@@ -189,6 +202,14 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
                             {`to ${beautifyHexToken(mulRecipient)}`}
                         </div>
                     </div>
+                    <div className="transactionAddress">
+                            {
+                                mulTag &&
+                                <div className="dashboardText" style={{background:`${mulTag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px'}}>
+                                    <span style={{color:mulTag.color,fontWeight:'700',fontSize:'10px'}}>{mulTag.value}</span>
+                                </div>
+                            }
+                        </div>
                     <div id="voteArea">
                         {
                         threshold && index == 0 && <div className="dashboardTextBold">
@@ -296,8 +317,10 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
                         </div>
                         <div className="transactionName">
                             {
-                                reason && (!editMode || (editMode && editMode !== `${transaction.safeTxHash}-${recipient}`)) ?
-                                <div className="dashboardText" onClick={() => handleEnableEditMode(`${transaction.safeTxHash}-${recipient}`, reason)}>{reason}</div> :
+                                reason && (!editMode || (editMode && editMode !== `${transaction.safeTxHash}-${recipient}`)) 
+                                ?
+                                <div className="dashboardText" onClick={() => handleEnableEditMode(`${transaction.safeTxHash}-${recipient}`, reason)}>{reason}</div> 
+                                :
                                  <>
                                         {
                                             isAdmin || owner
@@ -330,6 +353,14 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
                             <div className="dashboardText">
                                 {`to ${beautifyHexToken(recipient)}`}
                             </div>
+                        </div>
+                        <div className="transactionAddress">
+                            {
+                                tag &&
+                                <div className="dashboardText" style={{background:`${tag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px'}}>
+                                    <span style={{color:tag.color,fontWeight:'700',fontSize:'10px'}}>{tag.value}</span>
+                                </div>
+                            }
                         </div>
                         <div id="voteArea">
                         {

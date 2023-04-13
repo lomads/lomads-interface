@@ -102,8 +102,7 @@ const TransactionSend = (props: IselectTransactionSend) => {
 							return (
 								<div id="assignAmount">
 									<div id="recipientAvatarAndName" className="sendToken">
-										<Avatar name={result.name} wallet={result.recipient
-}/>
+										<Avatar name={result.name} wallet={result.recipient}/>
 										{/* <img src={daoMember2} alt={result.recipient} />
 										<p className="nameText">
 											{result.name.length < 1
