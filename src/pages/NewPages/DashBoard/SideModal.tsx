@@ -170,10 +170,6 @@ const SideModal = (props: IsideModal) => {
 		if (selectedToken === 'SWEAT') {
 			return createOffChainTxn()
 		}
-		if(chainId !== _get(DAO, 'chainId', '')) {
-			return await switchChain(connector, _get(DAO, 'chainId', ''))
-		}
-
 		try {
 			const txnResponse = await createSafeTransaction({ tokenAddress: selectedToken, send: setRecipient.current });
 			if (txnResponse?.safeTxHash) {

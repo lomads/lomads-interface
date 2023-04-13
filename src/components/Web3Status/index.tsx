@@ -160,13 +160,13 @@ function Web3StatusInner() {
 		return (
 			<Web3StatusError
 				onClick={() => {
-					switchChain(connector, SupportedChainId.GOERLI)
-						.then(async () => {
-							//navigate(navigateTo())
-						})
-						.catch((err) => {
-							console.log("Error occurred while switching");
-						});
+					// switchChain(connector, SupportedChainId.GOERLI)
+					// 	.then(async () => {
+					// 		//navigate(navigateTo())
+					// 	})
+					// 	.catch((err) => {
+					// 		console.log("Error occurred while switching");
+					// 	});
 				}}
 			>
 				<NetworkIcon />
