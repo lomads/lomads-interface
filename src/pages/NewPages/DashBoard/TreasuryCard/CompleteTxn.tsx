@@ -17,7 +17,7 @@ import Dropdown from "muiComponents/Dropdown";
 import Avatar from "muiComponents/Avatar";
 import { CHAIN_INFO } from "constants/chainInfo";
 
-const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress, onLoadLabels, editMode, onSetEditMode, editTag,onSetEditTag }: any) => {
+const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress, onLoadLabels, editMode, onSetEditMode, editTag, onSetEditTag }: any) => {
 	//const { chainId } = useWeb3React();
     const threshold = useAppSelector((state) => state.flow.safeThreshold);
     const { DAO } = useAppSelector(store => store.dashboard);

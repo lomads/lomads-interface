@@ -26,7 +26,7 @@ const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
       </div>
   ))
 
-const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst = '', threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions, confirmTxLoading, rejectTxLoading, executeTxLoading, isAdmin, onLoadLabels, chainId }) => {
+const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst = '', threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions, confirmTxLoading, rejectTxLoading, executeTxLoading, isAdmin, onLoadLabels, chainId, editTag, onSetEditTag }) => {
     const { provider, account } = useWeb3React();
     const { DAO } = useAppSelector(store => store.dashboard);
     const [reasonText, setReasonText] = useState({});

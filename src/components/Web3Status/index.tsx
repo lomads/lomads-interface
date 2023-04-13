@@ -200,7 +200,7 @@ function Web3StatusInner() {
 					!hasPendingTransactions && (
 						// <StatusIcon connectionType={connectionType} />
 						// <img src={dogIcon} alt="dog-icon" />
-						<Avatar name={user.name} wallet={account}/>
+						<Avatar name={user?.name} wallet={account}/>
 					)
 				}
 				{/* {

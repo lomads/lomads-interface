@@ -1018,7 +1018,7 @@ const TaskDetails = () => {
                                                                     :
                                                                     // else display the name of the user who has been assigned
                                                                     <>
-                                                                        <h1>{assignedUser.name} is assigned</h1>
+                                                                        <h1>{assignedUser?.name} is assigned</h1>
                                                                     </>
                                                             }
                                                         </>
@@ -1127,7 +1127,7 @@ const TaskDetails = () => {
                                         <span style={{marginRight:'10px'}}>Assigned</span>
                                         {
                                             assignedUser?
-                                            <Avatar name={assignedUser.name} wallet={assignedUser.wallet}/>
+                                            <Avatar name={assignedUser?.name} wallet={assignedUser.wallet}/>
                                             :
                                             <p>Not yet assigned</p>
                                         }
