@@ -45,8 +45,8 @@ const useSafeTokens = (safeAddress: string | null) => {
                             ...t,
                             tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
                             token: {
-                                symbol: CHAIN_INFO[chainId].nativeCurrency.symbol,
-                                decimal:  CHAIN_INFO[chainId].nativeCurrency.decimals
+                                symbol: CHAIN_INFO[chainId]?.nativeCurrency?.symbol,
+                                decimal:  CHAIN_INFO[chainId]?.nativeCurrency?.decimals
                             }
                         }
                     }

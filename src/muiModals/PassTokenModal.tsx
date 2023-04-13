@@ -351,7 +351,7 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
                                     checked={state?.contact.indexOf('email') > -1}
                                     onChange={() => handleContactChange('email')}
                                     label="Email"/>
-                                    <Typography variant="body2" className={classes.socialText}>Get certain member details could be useful for the smooth functioning of your organisation</Typography>
+                                    <Typography variant="body2" className={classes.socialText}>Please select if you intend to use services such as Notion, Google Workspace and Github</Typography>
                                 </Box>
                                 <Box my={3} mx={1}>
                                     <Switch

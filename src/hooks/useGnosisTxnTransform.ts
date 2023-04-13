@@ -19,7 +19,7 @@ export default (safeAddress: string | null) => {
 
     const getNativeToken = useCallback(() => {
         if(chainId)
-            return CHAIN_INFO[chainId].nativeCurrency
+            return CHAIN_INFO[chainId]?.nativeCurrency
         return { name: '', symbol: '', decimals: 18 }
     }, [chainId])
 

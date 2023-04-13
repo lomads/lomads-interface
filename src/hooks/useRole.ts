@@ -35,6 +35,9 @@ const role3: Array<string> = [
 
 const role2: Array<string> = [
     ...role3, 
+    //'settings',
+    //'settings.roles_permissions',
+    //'settings.integration',
     'project.edit', 
     'project.share', 
     'project.view.all', 
@@ -55,7 +58,7 @@ const role2: Array<string> = [
     'task.create', 
     'task.create.sweat'
 ]
-const role1: Array<string> = [...role2, 'settings', 'members.delete', 'task.edit', 'task.share', 'task.delete', 'task.close'];
+const role1: Array<string> = [...role2, 'settings', 'settings.*', 'members.delete', 'task.edit', 'task.share', 'task.delete', 'task.close'];
 
 const permissions: any = { "role1": role1, "role2": role2, "role3" : role3, "role4": role4, "": [] }
 
