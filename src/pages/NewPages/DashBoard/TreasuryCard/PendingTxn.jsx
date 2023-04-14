@@ -178,7 +178,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                     <div className="coinText">
                         <img src={sendTokenOutline} alt="" />
                         <div className="dashboardTextBold">
-                            { isOwnerModificaitonTransaction ? `-` : `${mulAmount / 10 ** muldecimal} ${token}`}
+                            { isOwnerModificaitonTransaction ? `-` : `${(mulAmount / 10 ** muldecimal).toFixed(3)} ${token}`}
                         </div>
                     </div>
                     <div className="transactionName">
@@ -363,7 +363,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                         <div className="coinText">
                             <img src={sendTokenOutline} alt="" />
                             <div className="dashboardTextBold">
-                                {isOwnerModificaitonTransaction ? `-` : `${amount / 10 ** decimal} ${tokenSymbol ? tokenSymbol : _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol))}`}
+                                {isOwnerModificaitonTransaction ? `-` : `${(amount / 10 ** decimal).toFixed(3)} ${tokenSymbol ? tokenSymbol : _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol))}`}
                             </div>
                         </div>
                         <div className="transactionName">
