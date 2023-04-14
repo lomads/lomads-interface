@@ -384,9 +384,6 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	}
 
 	const handleConfirmTransaction = async (_safeTxHashs: string, txn: any) => {
-		if(currentChainId !== _get(DAO, 'chainId', '')) {
-			return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')} />)
-		}
 		if (txn.offChain && _get(txn, 'token.symbol') === 'SWEAT') {
 			setConfirmTxLoading(_safeTxHashs);
 			axiosHttp.patch(`transaction/off-chain/${_safeTxHashs}/approve`,
@@ -408,6 +405,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				.catch(e => console.log(e))
 				.finally(() => setConfirmTxLoading(null))
 		} else if (txn.offChain && _get(txn, 'token.symbol') !== 'SWEAT') {
+			if(currentChainId !== _get(DAO, 'chainId', '')) {
+				return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')} />)
+			}
 			try {
 				await createOnChainTxn(txn, 'confirm')
 				loadPendingTxn();
@@ -416,6 +416,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				console.log(e)
 			}
 		} else {
+			if(currentChainId !== _get(DAO, 'chainId', '')) {
+				return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')} />)
+			}
 			try {
 				setConfirmTxLoading(_safeTxHashs);
 				const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
@@ -462,9 +465,6 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	};
 
 	const handleRejectTransaction = async (_n: number, txn: any = null) => {
-		if(currentChainId !== _get(DAO, 'chainId', '')) {
-			return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
-		}
 		let _nonce: any = _n;
 		if (txn.offChain && _get(txn, 'token.symbol') === 'SWEAT') {
 			setRejectTxLoading(_nonce);
@@ -493,6 +493,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				.catch(e => console.log(e))
 				.finally(() => setRejectTxLoading(null))
 		} else {
+			if(currentChainId !== _get(DAO, 'chainId', '')) {
+				return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')} />)
+			}
 			try {
 				setRejectTxLoading(_nonce);
 				const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
@@ -568,9 +571,6 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	};
 
 	const handleExecuteTransactions = async (txn: any, reject: boolean | undefined, syncOwners = false, amount = null, isAllowanceTransaction = false) => {
-		if(currentChainId !== _get(DAO, 'chainId', '')) {
-			return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
-		}
 		console.log(txn)
 		let _txs = txn;
 		if (txn.offChain && _get(txn, 'token.symbol') === 'SWEAT') {
@@ -591,6 +591,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				.catch(e => console.log(e))
 				.finally(() => setExecuteTxLoading(null))
 		} else {
+			if(currentChainId !== _get(DAO, 'chainId', '')) {
+				return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
+			}
 			const st = await getSafeTokens();
 			let safeToken = _find(st, t => toChecksumAddress(t.tokenAddress) === toChecksumAddress(_get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', ''))))
 			console.log("safeTokensafeToken",st, safeToken, _get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', '')))
