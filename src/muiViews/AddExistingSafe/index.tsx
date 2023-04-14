@@ -130,9 +130,6 @@ const useStyles = makeStyles((theme: any) => ({
 		textAlign: 'center',
 		marginBottom: 9,
 	},
-	findSafe: {
-		margin: 10
-	},
 	inputArea: {
 		display: 'flex',
 		justifyContent: 'space-around',
@@ -278,11 +275,19 @@ const useStyles = makeStyles((theme: any) => ({
 		margin: 10
 	},
 	safeContainer: {
+		marginBottom: 30,
+		display: "flex",
+		flexDirection: "column",
+		height: 550,
+		overflowY: "scroll"
+	},
+	addSafe: {
+		position: 'fixed',
+		bottom: 3,
 		display: 'flex',
-		flexDirection: 'column',
+		flexDirection: 'row',
 		justifyContent: 'center',
-		alignItems: 'center',
-		height: 576
+		alignItems: 'center'
 	}
 }));
 
@@ -404,15 +409,9 @@ export default () => {
 	}, [safeAddress]);
 
 	const handleClickDelayed = useCallback(_.debounce(handleClick, 1000), [handleClick, safeAddress])
-	const handleDownClick = () => {
-		axios.get(`${GNOSIS_SAFE_BASE_URLS[selectedChainId]}/api/v1/owners/0xbd062EB9720c78f00c68770F3dE62118e66be404/safes/`)
-			.then((response: any) => {
-				// response
-			});
-	}
 
-	const getSafes = () => {
-		axios.get(`${GNOSIS_SAFE_BASE_URLS[selectedChainId]}/api/v1/owners/0xbd062EB9720c78f00c68770F3dE62118e66be404/safes/`)
+	const getSafes = (chainId: number = selectedChainId) => {
+		axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/owners/0xbd062EB9720c78f00c68770F3dE62118e66be404/safes/`)
 			.then((response: any) => {
 				setSafeList(response.data.safes)
 			});
@@ -539,7 +538,7 @@ export default () => {
 							setSelectedValue={(value) => {
 								setSelectedChainId(value)
 								if (safeList.length) {
-									getSafes()
+									getSafes(value)
 								}
 							}}
 						/>
@@ -547,9 +546,6 @@ export default () => {
 					{safeList.length ?
 						<Box className={classes.StartSafe}>
 							<Box className={classes.bottomLine} />
-							<Box sx={{
-								overflow: 'scroll'
-							}}>
 								<Box className={classes.safeContainer}>
 									{safeList.map((item: any, index: any) => (
 										<Box key={index} className={classes.List}>
@@ -579,8 +575,7 @@ export default () => {
 										</Box>
 									))}
 								</Box>
-							</Box>
-							<Box className={classes.findSafe}>
+							<Box className={classes.addSafe}>
 								<Button
 									style={{
 										color: '#FFF',
@@ -594,15 +589,15 @@ export default () => {
 								</Button>
 							</Box>
 						</Box>
-						: <Box className={classes.findSafe}>
+						: <Box style={{margin: 25}}>
 							<Button
-								style={{
+								sx={{
 									color: '#FFF',
 									fontWeight: 400,
 									minWidth: 'max-content'
 								}}
 								variant='contained'
-								onClick={getSafes}
+								onClick={() => getSafes()}
 							>FIND MY SAFE
 							</Button>
 						</Box>
