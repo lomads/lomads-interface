@@ -7,6 +7,7 @@ import {
 	TransactionDataType,
 } from "types/DashBoardType";
 import { InviteGangType } from "types/UItype";
+import { switchChain } from "utils/switchChain";
 import SelectRecipient from "./SideModal/SelectRecipient";
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import TransactionSend from "./SideModal/TransactionSend";
@@ -24,17 +25,19 @@ import axios from "axios";
 import { getDao } from "state/dashboard/actions";
 import { updateTotalMembers } from "state/flow/reducer";
 import axiosHttp from '../../../api'
-import { SupportedChainId } from "constants/chains";
+import { CHAIN_IDS_TO_NAMES, SupportedChainId } from "constants/chains";
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
 import { nanoid } from "@reduxjs/toolkit";
 import moment from "moment";
 import useRole from "hooks/useRole";
 import useSafeTransaction from "hooks/useSafeTransaction";
+import { useSafeTokens } from "hooks/useSafeTokens";
 
 const SideModal = (props: IsideModal) => {
 	const dispatch = useAppDispatch();
-	const { provider, account, chainId } = useWeb3React();
+	const { provider, account, chainId, connector } = useWeb3React();
 	const [selectedToken, setSelectedToken] = useState<string>("");
+	const [selectedTag, setSelectedTag] = useState<any>(null);
 	const [addNewRecipient, setAddNewRecipient] = useState<boolean>(false);
 	const [modalNavigation, setModalNavigation] = useState({
 		showRecipient: false,
@@ -43,10 +46,17 @@ const SideModal = (props: IsideModal) => {
 	});
 	const [error, setError] = useState<any>(null)
 	const [isLoading, setisLoading] = useState<boolean>(false);
-	const [safeTokens, setSafeTokens] = useState<Array<any>>([]);
+	//const [safeTokens, setSafeTokens] = useState<Array<any>>([]);
+	const { safeTokens } = useSafeTokens()
 	const totalMembers = useAppSelector((state) => state.flow.totalMembers);
+
 	const selectToken = (_tokenAddress: string) => {
 		setSelectedToken(_tokenAddress);
+	};
+
+	const selectTag = (_tag: any) => {
+		setSelectedTag(_tag);
+		console.log("selected tag : ",_tag);
 	};
 
 	const selectedRecipients = useRef<InviteGangType[]>([]);
@@ -148,7 +158,8 @@ const SideModal = (props: IsideModal) => {
 						safeAddress: _get(DAO, 'safe.address', null),
 						safeTxHash: res.data.safeTxHash,
 						recipient: r.recipient,
-						label: _get(r, 'reason', null)
+						label: _get(r, 'reason', null),
+						tag:selectedTag
 					})
 				})
 				axiosHttp.post(`transaction/label`, payload)
@@ -163,13 +174,14 @@ const SideModal = (props: IsideModal) => {
 	}
 
 	const createTransaction = async () => {
+		console.log("selected tag : ",selectedTag);
 		setError(null)
 		if (selectedToken === 'SWEAT') {
 			return createOffChainTxn()
 		}
 		try {
 
-			const txnResponse = await createSafeTransaction({ tokenAddress: selectedToken, send: setRecipient.current });
+			const txnResponse = await createSafeTransaction({ tokenAddress: selectedToken, send: setRecipient.current,tag:selectedTag });
 			if (txnResponse?.safeTxHash) {
 				dispatch(getDao(DAO.url))
 				await props.getPendingTransactions();
@@ -178,25 +190,28 @@ const SideModal = (props: IsideModal) => {
 			}
 		} catch (e) {
 			console.log(e)
-			setError(e)
+			if(typeof e === 'string')
+				setError(e)
+			else
+				setError(_get(e, 'message', 'Something went wrong'))
 		}
 	};
 
-	const getTokens = async (safeAddress: string) => {
-		chainId &&
-			await axios
-				.get(
-					`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`
-				)
-				.then((tokens: any) => {
-					setSafeTokens(tokens.data);
-				});
-	};
+	// const getTokens = async (safeAddress: string) => {
+	// 	chainId &&
+	// 		await axios
+	// 			.get(
+	// 				`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`
+	// 			)
+	// 			.then((tokens: any) => {
+	// 				setSafeTokens(tokens.data);
+	// 			});
+	// };
 
-	useEffect(() => {
-		getTokens(props.safeAddress);
-		return () => { };
-	}, [props.safeAddress]);
+	// useEffect(() => {
+	// 	getTokens(props.safeAddress);
+	// 	return () => { };
+	// }, [props.safeAddress]);
 
 	useEffect(() => {
 		if (DAO)
@@ -261,6 +276,7 @@ const SideModal = (props: IsideModal) => {
 								setRecipient={setRecipient}
 								tokens={props.tokens}
 								selectToken={selectToken}
+								selectTag={selectTag}
 								selectedToken={selectedToken}
 								toggleAddNewRecipient={toggleAddNewRecipient}
 								addNewRecipient={addNewRecipient}

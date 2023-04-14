@@ -3,7 +3,7 @@ import '../../styles/pages/AllTasks.css';
 import { find as _find, get as _get, debounce as _debounce } from 'lodash';
 import { orderBy as _orderBy } from 'lodash';
 import moment from 'moment';
-import { useAppSelector } from "state/hooks";
+import { useAppDispatch, useAppSelector } from "state/hooks";
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useWeb3React } from "@web3-react/core";
 import useTerminology from 'hooks/useTerminology';
@@ -23,12 +23,15 @@ import TaskCard from './DashBoard/Task/TaskCard';
 import useRole from '../../hooks/useRole';
 
 import CreateTask from "./DashBoard/Task/CreateTask";
+import useTasks from 'hooks/useTasks';
+import { getDao, getProject } from 'state/dashboard/actions';
 
 const AllProjectTasks = () => {
     const navigate = useNavigate();
-    const { projectId } = useParams();
+    const dispatch = useAppDispatch()
+    const { daoURL, projectId } = useParams();
     const location = useLocation();
-    const { DAO, user } = useAppSelector((state) => state.dashboard);
+    const { DAO, user, Project } = useAppSelector((state) => state.dashboard);
     const { account } = useWeb3React();
     const daoName = _get(DAO, 'name', '').split(" ");
     const { transformTask } = useTerminology(_get(DAO, 'terminologies', null))
@@ -40,9 +43,22 @@ const AllProjectTasks = () => {
     const [initialCheck, setInitialCheck] = useState(false);
     const [currentTasks, setCurrentTasks] = useState([]);
 
+    const  { parsedTasks } = useTasks(_get(Project, 'tasks', []))
+
     const { myRole, can } = useRole(DAO, account)
 
     const [showCreateTask, setShowCreateTask] = useState(false);
+
+
+    useEffect(() => {
+        if (daoURL && (!DAO || (DAO && DAO?.url !== daoURL)))
+            dispatch(getDao(daoURL));
+    }, [daoURL, DAO])
+
+    useEffect(() => {
+        if (projectId && (!Project || (Project && Project._id !== projectId)))
+            dispatch(getProject(projectId));
+    }, [projectId])
 
     const amIEligible = (Task) => {
         if (DAO && Task && Task.contributionType === 'open') {
@@ -89,7 +105,7 @@ const AllProjectTasks = () => {
 
     const taskSubmissionCount = (task) => {
         if (task) {
-            let submissions = _get(task, 'members', []).filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+            let submissions = _get(task, 'members', [])?.filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
             if (submissions)
                 return submissions.length
             return 0
@@ -128,18 +144,18 @@ const AllProjectTasks = () => {
 
     useEffect(() => {
         if (tab === 1) {
-            setCurrentTasks(myTasks);
+            setCurrentTasks(parsedTasks["myTask"]);
         }
         else if (tab === 2) {
-            setCurrentTasks(manageTasks);
+            setCurrentTasks(parsedTasks["manage"]);
         }
         else if (tab === 3) {
-            setCurrentTasks(draftTasks);
+            setCurrentTasks(parsedTasks["drafts"]);
         }
         else {
-            setCurrentTasks(otherTasks);
+            setCurrentTasks(parsedTasks["allTasks"]);
         }
-    }, [tab, myTasks, manageTasks, draftTasks, otherTasks]);
+    }, [tab, parsedTasks]);
 
     // const amIApproved = useMemo(() => {
     //     if (task) {
@@ -150,6 +166,8 @@ const AllProjectTasks = () => {
     //     }
     //     return false;
     // }, [account, task]);
+
+    console.log("current task  : ",currentTasks);
 
     return (
         <div className='allTasks-container'>
@@ -558,30 +576,40 @@ const AllProjectTasks = () => {
 
                 {/* Draft tasks */}
                 {
-                    tab === 3 && currentTasks && currentTasks.map((item, index) => {
-                        return (
-                            <div key={index}>
-                                <TaskCard
-                                    task={item}
-                                    daoUrl={DAO?.url}
-                                />
-                            </div>
-                        )
-                    })
+                    tab === 3 &&
+                    <div className='allTask-container'>
+                        {
+                            currentTasks && currentTasks.map((item, index) => {
+                                return (
+                                    <div key={index}>
+                                        <TaskCard
+                                            task={item}
+                                            daoUrl={DAO?.url}
+                                        />
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
                 }
 
                 {/* other tasks */}
                 {
-                    tab === 4 && currentTasks && currentTasks.map((item, index) => {
-                        return (
-                            <div key={index}>
-                                <TaskCard
-                                    task={item}
-                                    daoUrl={DAO?.url}
-                                />
-                            </div>
-                        )
-                    })
+                    tab === 4 &&
+                    <div className='allTask-container'>
+                        {
+                            currentTasks && currentTasks.map((item, index) => {
+                                return (
+                                    <div key={index}>
+                                        <TaskCard
+                                            task={item}
+                                            daoUrl={DAO?.url}
+                                        />
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
                 }
 
 

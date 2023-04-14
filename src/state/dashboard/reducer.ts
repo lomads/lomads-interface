@@ -5,6 +5,7 @@ import {
 	loadDao,
 	updateDao,
 	addDaoMember,
+	createDaoOption,
 	addDaoMemberList,
 	updateDaoMember,
 	manageDaoMember,
@@ -17,6 +18,7 @@ import {
 	deleteProjectMember,
 	editProjectMembers,
 	archiveProject,
+	updateViewProject,
 	deleteProject,
 	updateProjectLink,
 	editProjectLinks,
@@ -59,6 +61,7 @@ export interface DashboardState {
 	DAOList: Array<DAOType> | null;
 	updateDaoLoading: boolean | null;
 	addMemberLoading: boolean | null;
+	createOptionLoading: boolean | null;
 	addMemberListLoading: boolean | null;
 	updateMemberLoading: boolean | null;
 	manageMemberLoading: boolean | null;
@@ -74,6 +77,7 @@ export interface DashboardState {
 	deleteProjectMemberLoading: boolean | null;
 	editProjectMemberLoading: boolean | null;
 	archiveProjectLoading: boolean | null;
+	updateViewProjectLoading: boolean | null;
 	deleteProjectLoading: boolean | null;
 	addProjectLinksLoading: boolean | null;
 	editProjectLinksLoading: boolean | null;
@@ -100,6 +104,7 @@ export interface DashboardState {
 	editProjectKraLoading: boolean | null;
 	updateMilestoneLoading: boolean | null;
 	editProjectMilestoneLoading: boolean | null;
+	safeTokens: any;
 }
 
 const initialState: DashboardState = {
@@ -109,6 +114,7 @@ const initialState: DashboardState = {
 	DAOList: null,
 	updateDaoLoading: null,
 	addMemberLoading: null,
+	createOptionLoading: null,
 	addMemberListLoading: null,
 	updateMemberLoading: null,
 	manageMemberLoading: null,
@@ -124,6 +130,7 @@ const initialState: DashboardState = {
 	deleteProjectMemberLoading: null,
 	editProjectMemberLoading: null,
 	archiveProjectLoading: null,
+	updateViewProjectLoading:null,
 	deleteProjectLoading: null,
 	addProjectLinksLoading: null,
 	editProjectLinksLoading: null,
@@ -150,12 +157,16 @@ const initialState: DashboardState = {
 	editProjectKraLoading: null,
 	updateMilestoneLoading: null,
 	editProjectMilestoneLoading: null,
+	safeTokens: null
 };
 
 const dashboardSlice = createSlice({
 	name: "dashboard",
 	initialState,
 	reducers: {
+		setSafeTokens(state, action) {
+			state.safeTokens = action.payload
+		},
 		setUser(state, action) {
 			state.user = action.payload
 		},
@@ -167,6 +178,9 @@ const dashboardSlice = createSlice({
 		},
 		resetAddMemberLoader(state) {
 			state.addMemberLoading = null
+		},
+		resetCreateOptionLoader(state) {
+			state.createOptionLoading = null
 		},
 		resetAddMemberListLoader(state) {
 			state.addMemberListLoading = null
@@ -206,6 +220,9 @@ const dashboardSlice = createSlice({
 		},
 		resetArchiveProjectLoader(state) {
 			state.archiveProjectLoading = null
+		},
+		resetUpdateViewProjectLoader(state) {
+			state.updateViewProjectLoading = null
 		},
 		resetDeleteProjectLoader(state) {
 			state.deleteProjectLoading = null
@@ -362,6 +379,14 @@ const dashboardSlice = createSlice({
 		[`${addDaoMember.pending}`]: (state) => {
 			state.addMemberLoading = true
 		},
+		// create dao options
+		[`${createDaoOption.fulfilled}`]: (state, action) => {
+			state.createOptionLoading = false
+			state.DAO = action.payload
+		},
+		[`${createDaoOption.pending}`]: (state) => {
+			state.createOptionLoading = true
+		},
 
 		// add dao members list
 		[`${addDaoMemberList.fulfilled}`]: (state, action) => {
@@ -490,6 +515,15 @@ const dashboardSlice = createSlice({
 		},
 		[`${archiveProject.pending}`]: (state) => {
 			state.archiveProjectLoading = true;
+		},
+		// update view Project
+		[`${updateViewProject.fulfilled}`]: (state, action) => {
+			state.updateViewProjectLoading = false;
+			state.Project = action.payload.project;
+			state.DAO = action.payload.dao;
+		},
+		[`${updateViewProject.pending}`]: (state) => {
+			state.updateViewProjectLoading = true;
 		},
 		// Delete project
 		[`${deleteProject.fulfilled}`]: (state, action) => {
@@ -721,6 +755,7 @@ const dashboardSlice = createSlice({
 });
 
 export const {
+	setSafeTokens,
 	setDAOList,
 	resetProject,
 	setDAO,
@@ -741,6 +776,7 @@ export const {
 	resetDeleteProjectMemberLoader,
 	resetEditProjectMemberLoader,
 	resetArchiveProjectLoader,
+	resetUpdateViewProjectLoader,
 	resetDeleteProjectLoader,
 	resetAddProjectLinksLoader,
 	resetEditProjectLinksLoader,
@@ -766,5 +802,6 @@ export const {
 	resetEditProjectMilestoneLoader,
 	resetDeleteDaoLinkLoader,
 	resetSyncTrelloDataLoader,
+	resetCreateOptionLoader,
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

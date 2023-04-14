@@ -29,6 +29,7 @@ import axiosHttp from '../../api';
 import useEns from 'hooks/useEns'
 import dogIcon from '../../assets/svg/dogIcon.svg';
 import { MdKeyboardArrowDown } from 'react-icons/md';
+import Avatar from 'muiComponents/Avatar';
 
 const Web3StatusGeneric = styled(ButtonSecondary)`
   ${({ theme }) => theme.flexRowNoWrap}
@@ -106,6 +107,7 @@ function Sock() {
 
 function Web3StatusInner() {
 	const { account, connector, chainId, ENSName } = useWeb3React();
+	const { DAO, user, Project } = useAppSelector((state) => state.dashboard);
 	const connectionType = getConnection(connector).type;
 	const { getENSAddress, getENSName } = useEns()
 	const [ens, setEns] = useState<string|null|undefined>(null)
@@ -160,13 +162,13 @@ function Web3StatusInner() {
 		return (
 			<Web3StatusError
 				onClick={() => {
-					switchChain(connector, SupportedChainId.GOERLI)
-						.then(async () => {
-							//navigate(navigateTo())
-						})
-						.catch((err) => {
-							console.log("Error occurred while switching");
-						});
+					// switchChain(connector, SupportedChainId.GOERLI)
+					// 	.then(async () => {
+					// 		//navigate(navigateTo())
+					// 	})
+					// 	.catch((err) => {
+					// 		console.log("Error occurred while switching");
+					// 	});
 				}}
 			>
 				<NetworkIcon />
@@ -193,13 +195,15 @@ function Web3StatusInner() {
 				onClick={toggleWalletModal}
 				pending={hasPendingTransactions}
 			>
+				<div style={{display:'flex',alignItems:'center'}}>
 				{
 					!hasPendingTransactions && (
 						// <StatusIcon connectionType={connectionType} />
-						<img src={dogIcon} alt="dog-icon" />
+						// <img src={dogIcon} alt="dog-icon" />
+						<Avatar name={user?.name} wallet={account}/>
 					)
 				}
-				{
+				{/* {
 					hasPendingTransactions
 						?
 						<RowBetween>
@@ -216,7 +220,7 @@ function Web3StatusInner() {
 							}
 							<Text>{ ens ? ens : (ENSName || shortenAddress(account))}</Text>
 						</>
-				}
+				} */}
 				<div style={{ height: '100%', width: '25%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderLeft: '1px solid #F0F0F0', marginLeft: '10px' }}>
 					<span>
 						<MdKeyboardArrowDown
@@ -224,6 +228,7 @@ function Web3StatusInner() {
 							color="#76808D"
 						/>
 					</span>
+				</div>
 				</div>
 			</Web3StatusConnected>
 		);

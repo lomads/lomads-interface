@@ -56,7 +56,7 @@ import ApplyTask from "./DashBoard/Task/ApplyTask";
 import assign from '../../assets/svg/assign.svg'
 import submitted from '../../assets/svg/submitted.svg'
 import applied from '../../assets/svg/applied.svg'
-import open from '../../assets/svg/open.svg'
+import openSvg from '../../assets/svg/open.svg'
 import memberIcon from '../../assets/svg/memberIcon.svg';
 import SubmitTask from "./DashBoard/Task/SubmitTask";
 import ApplicantList from "./DashBoard/Task/ApplicantList";
@@ -66,6 +66,7 @@ import { CgClose } from 'react-icons/cg'
 import useRole from "hooks/useRole";
 import EditTask from "./DashBoard/Task/EditTask";
 import EditDraftTask from "./DashBoard/Task/EditDraftTask";
+import Avatar from "muiComponents/Avatar";
 
 const TaskDetails = () => {
     const dispatch = useAppDispatch();
@@ -263,7 +264,7 @@ const TaskDetails = () => {
 
     const submissionCount = useMemo(() => {
         if (Task) {
-            let submissions = _get(Task, 'members', []).filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+            let submissions = _get(Task, 'members', [])?.filter(m => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
             if (submissions)
                 return submissions.length
             return 0
@@ -274,7 +275,7 @@ const TaskDetails = () => {
     const assignedUser = useMemo(() => {
         let user = _find(_get(Task, 'members', []), m => m.status === 'approved' || m.status === 'submission_accepted')
         if (user)
-            return user.member.name
+            return user.member
     }, [Task]);
 
     const handleOpenApplicantsSlider = () => {
@@ -448,6 +449,11 @@ const TaskDetails = () => {
 
                                                 {/* Task status */}
                                                 {/* If task was manually assigned---check if current user is approved applicant or other user*/}
+                                                { Task.draftedAt ? 
+                                                <div style={{ border: '1px solid #C94B32', borderRadius: 16, padding: '4px 16px' }}>
+                                                    <span style={{ color: '#C94B32' }}>Draft</span>
+                                                </div> :
+                                                <>
                                                 {
                                                     (Task.contributionType === 'assign' || Task.contributionType === 'open') && Task.taskStatus === 'submitted'
                                                         ?
@@ -542,7 +548,7 @@ const TaskDetails = () => {
                                                                                 </div>
                                                                                 :
                                                                                 <div>
-                                                                                    <img src={open} style={{ marginRight: '5px' }} />
+                                                                                    <img src={openSvg} style={{ marginRight: '5px' }} />
                                                                                     <span style={{ color: '#4BA1DB' }}>Open</span>
                                                                                 </div>
                                                                         }
@@ -609,7 +615,7 @@ const TaskDetails = () => {
                                                                                 </div>
                                                                                 :
                                                                                 <div>
-                                                                                    <img src={open} style={{ marginRight: '5px' }} />
+                                                                                    <img src={openSvg} style={{ marginRight: '5px' }} />
                                                                                     <span style={{ color: '#4BA1DB' }}>Open</span>
                                                                                 </div>
                                                                         }
@@ -658,8 +664,7 @@ const TaskDetails = () => {
                                                         :
                                                         null
                                                 }
-
-
+                                                </> }
                                                 {/* edit and menu button visible only to the creator */}
                                                 {
                                                     // account.toLowerCase() === Task?.creator.toLowerCase()
@@ -812,6 +817,24 @@ const TaskDetails = () => {
                                                     <span>Deadline</span>
                                                     <img src={calendarIcon} alt="calendarIcon" />
                                                     <span>{moment(Task.deadline).format('L')}</span>
+                                                </div>
+                                            }
+                                            { Task?.contributionType === 'open' && !Task?.isSingleContributor && _get(Task, 'members', []).filter(t => t.status === 'submission_accepted').length > 0 &&
+                                                <div style={{ 
+                                                    fontStyle: 'normal',
+                                                    marginLeft: 8,
+                                                    fontWeight: 400,
+                                                    fontSize: '16px',
+                                                    lineHeight: '18px',
+                                                    display: 'flex',
+                                                    alignItems: 'flex-end',
+                                                    letterSpacing: '-0.011em',
+                                                    color: '#76808D',
+                                                    flex: 'none',
+                                                    order: 0,
+                                                    flexGrow: 0,
+                                                 }}>
+                                                    <span style={{ fontWeight: 'bold', marginRight: 3 }}>{ _get(Task, 'members', []).filter(t => t.status === 'submission_accepted').length }</span> Submission(s) Approved
                                                 </div>
                                             }
                                         </div>
@@ -995,7 +1018,7 @@ const TaskDetails = () => {
                                                                     :
                                                                     // else display the name of the user who has been assigned
                                                                     <>
-                                                                        <h1>{assignedUser} is assigned</h1>
+                                                                        <h1>{assignedUser?.name} is assigned</h1>
                                                                     </>
                                                             }
                                                         </>
@@ -1093,16 +1116,21 @@ const TaskDetails = () => {
                                 {
                                     Task.reviewer &&
                                     <div>
-                                        <span>Reviewer</span>
-                                        <img src={memberIcon} alt="member-icon" />
-                                        <p>{Task.reviewer.name}</p>
+                                        <span style={{marginRight:'10px'}}>Reviewer</span>
+                                        <Avatar name={Task.reviewer.name} wallet={Task.reviewer.wallet}/>
+                                        {/* <img src={memberIcon} alt="member-icon" />
+                                        <p>{Task.reviewer.name}</p> */}
                                     </div>
                                 }
                                 {!(Task.isSingleContributor === false && Task.contributionType === 'open') &&
                                     <div>
-                                        <span>Assigned</span>
-                                        <img src={memberIcon} alt="member-icon" />
-                                        <p>{assignedUser ? assignedUser : 'Not yet assigned'}</p>
+                                        <span style={{marginRight:'10px'}}>Assigned</span>
+                                        {
+                                            assignedUser?
+                                            <Avatar name={assignedUser?.name} wallet={assignedUser.wallet}/>
+                                            :
+                                            <p>Not yet assigned</p>
+                                        }
                                     </div>}
                                 {
                                     Task.taskStatus !== 'open' && Task.contributionType === 'open' && Task.isSingleContributor

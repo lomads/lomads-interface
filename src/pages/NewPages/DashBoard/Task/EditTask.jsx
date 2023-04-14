@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { find as _find, get as _get, debounce as _debounce } from 'lodash';
+import { find as _find, get as _get, debounce as _debounce, isEqual as _isEqual } from 'lodash';
 import './CreateTask.css';
 import { CgClose } from 'react-icons/cg'
 import createProjectSvg from '../../../../assets/svg/createProject.svg';
@@ -36,6 +36,8 @@ import {
     NumberDecrementStepper,
     NumberIncrementStepper,
 } from "@chakra-ui/react";
+import { useSafeTokens } from 'hooks/useSafeTokens';
+import { CHAIN_INFO } from 'constants/chainInfo';
 
 const EditTask = ({ close, task, daoURL }) => {
     const dispatch = useAppDispatch();
@@ -52,7 +54,7 @@ const EditTask = ({ close, task, daoURL }) => {
     const [isFilterRoles, setIsFilterRoles] = useState(task.isFilterRoles);
     const [select, setSelect] = useState(false);
     const [validRoles, setValidRoles] = useState(task.validRoles);
-    const [selectedUser, setSelectedUser] = useState(_find(_get(task, 'members', []), m => m?.status === 'approved')?.member);
+    const [selectedUser, setSelectedUser] = useState(null);
     const [name, setName] = useState(task.name);
     const [description, setDescription] = useState(task.description);
     const [dchannel, setDChannel] = useState(task.discussionChannel);
@@ -62,14 +64,14 @@ const EditTask = ({ close, task, daoURL }) => {
     const [reviewer, setReviewer] = useState(task.reviewer ? task.reviewer._id : null);
     const [currency, setCurrency] = useState({ currency: task.compensation.currency });
     const [amount, setAmount] = useState(task.compensation.amount);
-    const [safeTokens, setSafeTokens] = useState([]);
     const [showSuccess, setShowSuccess] = useState(false);
     const [isLoading, setLoading] = useState(false);
+    const { safeTokens } = useSafeTokens();
 
-    const getTokens = async (safeAddress) => {
-        const tokens = await getSafeTokens(chainId, safeAddress)
-        setSafeTokens(tokens)
-    };
+    // const getTokens = async (safeAddress) => {
+    //     const tokens = await getSafeTokens(chainId, safeAddress)
+    //     setSafeTokens(tokens)
+    // };
 
     const getrolename = (roleId) => {
 
@@ -90,10 +92,12 @@ const EditTask = ({ close, task, daoURL }) => {
         }
     }, [account, chainId, user])
 
-    useEffect(() => {
-        getTokens(_get(DAO, 'safe.address'));
-        return () => { };
-    }, [DAO]);
+    // useEffect(() => {
+    //     getTokens(_get(DAO, 'safe.address'));
+    //     return () => { };
+    // }, [DAO]);
+
+    useEffect(() => { setReviewer(task.reviewer ? task?.reviewer?._id : null) }, [task])
 
     useEffect(() => {
         var date = new Date();
@@ -203,7 +207,20 @@ const EditTask = ({ close, task, daoURL }) => {
             let symbol = _find(safeTokens, tkn => tkn.tokenAddress === currency.currency)
             symbol = _get(symbol, 'token.symbol', null)
             if (!symbol)
-                symbol = currency.currency === process.env.REACT_APP_MATIC_TOKEN_ADDRESS || currency === process.env.REACT_APP_GOERLI_TOKEN_ADDRESS ? chainId === SupportedChainId.GOERLI ? 'GOR' : 'MATIC' : 'SWEAT'
+                symbol = currency.currency === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS ? CHAIN_INFO[chainId]?.nativeCurrency?.symbol : 'SWEAT'
+
+            let members = _get(task, 'members', [])
+
+            if(
+                (task.contributionType !== contributionType) || 
+                (task.isSingleContributor !== isSingleContributor) ||
+                (task.isFilterRoles !== isFilterRoles) ||
+                !_isEqual(task.validRoles, validRoles)
+            ) {
+                members = []
+            }
+
+            members = contributionType === 'assign' && selectedUser ? [{ member: selectedUser._id, status: 'approved' }] : members;
 
             let taskOb = {};
             taskOb.name = name;
@@ -217,7 +234,7 @@ const EditTask = ({ close, task, daoURL }) => {
             taskOb.isSingleContributor = isSingleContributor;
             taskOb.isFilterRoles = isFilterRoles;
             taskOb.validRoles = isFilterRoles ? validRoles : [];
-            taskOb.members = selectedUser ? [{ member: selectedUser._id, status: 'approved' }] : [];
+            taskOb.members = members
             taskOb.reviewer = reviewer;
             console.log("task ob : ", taskOb)
             dispatch(editTask({ payload: taskOb, daoUrl: daoURL, taskId: task._id }))
@@ -229,12 +246,34 @@ const EditTask = ({ close, task, daoURL }) => {
     }, [DAO, selectedUser, reviewer])
 
     const eligibleReviewers = useMemo(() => {
-        return _get(DAO, 'members', []).filter(m => _get(selectedUser, "_id", "").toLowerCase() !== m.member._id.toLowerCase() && m.member._id !== user._id)
+        return _get(DAO, 'members', []).filter(m => _get(selectedUser, "_id", "")?.toLowerCase() !== m?.member?._id?.toLowerCase() && (m?.role === 'role1' || m?.role === 'role2'))
     }, [DAO, reviewer, selectedUser])
 
     const eligibleProjects = useMemo(() => {
-        return _get(DAO, 'projects', []).filter(p => _find(p.members, m => m._id === user._id) && p._id !== task.project?._id)
+        return _get(DAO, 'projects', []).filter(p => _find(p?.members, m => m?._id === user?._id) && p?._id !== task?.project?._id)
     }, [DAO, reviewer, selectedUser])
+
+    const getroleColor = (roleId) => {
+
+        if (roleId == "role1" || roleId == "role2" || roleId == "role3" || roleId == "role4") {
+            if (roleId === 'role1')
+                return { pill: 'rgba(146, 225, 168, 0.3)', circle: 'rgba(146, 225, 168, 1)' };
+            else if (roleId === 'role2')
+                return { pill: 'rgba(137,179,229,0.3)', circle: 'rgba(137,179,229,1)' };
+            else if (roleId === 'role3')
+                return { pill: 'rgba(234,100,71,0.3)', circle: 'rgba(234,100,71,1)' };
+            else if (roleId === 'role4')
+                return { pill: 'rgba(146, 225, 168, 0.3)', circle: 'rgba(146, 225, 168, 1)' };
+        }
+        for (let index = 0; index < Object.keys(_get(DAO, 'discord', {})).length; index++) {
+            const element = Object.keys(_get(DAO, 'discord', {}))[index];
+            const rolename_discord = _find(DAO.discord[element].roles, r => r.id === roleId)
+            if (rolename_discord) {
+                return { pill: `${_get(rolename_discord, 'roleColor', '#99aab5')}50`, circle: _get(rolename_discord, 'roleColor', '#99aab5') }
+            }
+        }
+        return { pill: '#99aab550', circle: '#99aab5' };
+    };
 
     return (
         <div className="createTaskOverlay">
@@ -394,6 +433,28 @@ const EditTask = ({ close, task, daoURL }) => {
                                         <div className='hr-line'></div>
 
                                         <div className='createTask-inputRow'>
+                                            <span>Reviewer</span>
+                                            <select
+                                                name="reviewer"
+                                                id="reviewer"
+                                                className="tokenDropdown"
+                                                value={reviewer}
+                                                style={{ width: '100%' }}
+                                                onChange={(e) => { setReviewer(e.target.value); document.getElementById('error-reviewer').innerHTML = '' }}
+                                            >
+                                                <option value={null}>Select member</option>
+                                                {
+                                                    eligibleReviewers.map((item, index) => {
+                                                        return (
+                                                            <option value={`${item.member._id}`}>{item.member.name}</option>
+                                                        )
+                                                    })
+                                                }
+                                            </select>
+                                            <span className='error-msg' id="error-reviewer"></span>
+                                        </div>
+
+                                        <div className='createTask-inputRow'>
                                             <span>Contribution</span>
                                             <div className='createTask-buttonRow'>
                                                 <button
@@ -484,7 +545,7 @@ const EditTask = ({ close, task, daoURL }) => {
                                         }
 
                                         {
-                                            isFilterRoles &&
+                                            isFilterRoles && validRoles &&
                                             <>
                                                 <div className='selected-roles'>
                                                     <div className='roles-left'>
@@ -495,11 +556,11 @@ const EditTask = ({ close, task, daoURL }) => {
                                                                     <div className='roles-li'>
                                                                         <div
                                                                             className='roles-pill'
-                                                                            style={{ background: '#99aab550' }}
+                                                                            style={{ background: getroleColor(item).pill }}
                                                                         >
                                                                             <div
                                                                                 className='roles-circle'
-                                                                                style={{ background: '#99aab5' }}
+                                                                                style={{ background: getroleColor(item).circle }}
                                                                             ></div>
                                                                             <span>{item == "role1" || item == "role2" || item == "role3" || item == "role4" ? transformRole(item).label : getrolename(item)}</span>
                                                                         </div>
@@ -571,8 +632,8 @@ const EditTask = ({ close, task, daoURL }) => {
                                                         return (
                                                             (
                                                                 <>
-                                                                    <option value={result.tokenAddress ? result.tokenAddress : chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS} key={index}>
-                                                                        {_get(result, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}
+                                                                    <option value={result.tokenAddress} key={index}>
+                                                                        {_get(result, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol)}
                                                                     </option>
                                                                 </>
                                                             )
@@ -606,27 +667,6 @@ const EditTask = ({ close, task, daoURL }) => {
                                                 </NumberInput>
                                             </div>
                                             <span className='error-msg' id="error-compensation"></span>
-                                        </div>
-
-                                        <div className='createTask-inputRow'>
-                                            <span>Reviewer</span>
-                                            <select
-                                                name="reviewer"
-                                                id="reviewer"
-                                                className="tokenDropdown"
-                                                style={{ width: '100%' }}
-                                                onChange={(e) => { setReviewer(e.target.value); document.getElementById('error-reviewer').innerHTML = '' }}
-                                            >
-                                                <option value={null}>Select member</option>
-                                                {
-                                                    eligibleReviewers.map((item, index) => {
-                                                        return (
-                                                            <option value={`${item.member._id}`}>{item.member.name}</option>
-                                                        )
-                                                    })
-                                                }
-                                            </select>
-                                            <span className='error-msg' id="error-reviewer"></span>
                                         </div>
 
                                     </div>

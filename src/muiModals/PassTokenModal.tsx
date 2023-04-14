@@ -24,6 +24,8 @@ import { useNavigate } from 'react-router-dom';
 import { USDC } from 'constants/tokens';
 import { CHAIN_INFO } from 'constants/chainInfo';
 import { setDAO } from 'state/dashboard/reducer';
+import SwitchChain from 'components/SwitchChain';
+import { toast } from 'react-hot-toast';
 
 const LOCK_SVG = `<svg width="13" height="15" viewBox="0 0 13 15" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g clip-path="url(#clip0_2971_2676)">
@@ -101,14 +103,15 @@ const LOCK_SVG = `<svg width="13" height="15" viewBox="0 0 13 15" fill="none" xm
 
 
 export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
-    const { account, provider, chainId } = useWeb3React();
+    const { account, provider, chainId: currentChainId } = useWeb3React();
     const navigate = useNavigate();
     const classes = useStyles()
+    const [chainId, setChainId] = useState<any>(null);
     const [networkError, setNetworkError] = useState<any>(null)
     const {  DAO } = useAppSelector(store => store.dashboard)
     const [contract, setContract] = useState<any>(null);
     const [updateContractLoading, setUpdateContractLoading] = useState<boolean | null>(null)
-    const { updateContract, getStats } = useMintSBT(_get(contract, 'address', ''))
+    const { updateContract, getStats, withdraw } = useMintSBT(_get(contract, 'address', ''), _get(contract, 'version', ''))
     const [tokens, setTokens] = useState<any>([])
     const [state, setState] = useState<any>({
         whitelisted: false,
@@ -124,6 +127,11 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
             value: 0
         }
     })
+
+    useEffect(() => {
+        if(DAO) 
+            setChainId(_get(DAO, 'chainId', null))
+    }, [DAO])
 
     useEffect(() => {
         getStats().then(res => console.log("MINT_PRICE", res[5]))
@@ -179,12 +187,17 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
         //         args: [ethers.utils.parseEther(state?.price?.value)],
         //     })  
         // }
+
+        if(currentChainId !== _get(DAO, 'chainId', '')) {
+            return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
+        }
+
         try {
             setUpdateContractLoading(true)
-            if((state?.price?.token !== prevState?.price?.token) || (state?.price?.value !== prevState?.price?.value)) {
+            if(contract?.version === "1" && (state?.price?.token !== prevState?.price?.token) || (state?.price?.value !== prevState?.price?.value)) {
                 await updateContract(state?.price?.value, state?.price?.token)
             }
-            await axiosHttp.patch(`contract/${contract?.address}`, {
+            return await axiosHttp.patch(`contract/${contract?.address}`, {
                  daoId: DAO?._id,
                  mintPrice: state?.price?.value,
                  whitelisted: state?.whitelisted,
@@ -199,8 +212,9 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
         } catch (e) {
             setUpdateContractLoading(false)
             console.log(e)
-            setNetworkError(e)
+            return setNetworkError(e)
         }
+
     }
 
     const handleContactChange = (key: string) => {
@@ -241,7 +255,12 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
                             textAlign: 'center',
                             width: '300px'
                         }}>The organisation doesn't have a token yet</Typography>
-                        <Button sx={{ mt:3 }} onClick={() => navigate(`/${DAO?.url}/create-pass-token`)} variant='contained' size="small">Configure Pass Token</Button>
+                        <Button sx={{ mt:3 }} onClick={() => {
+                            if(currentChainId !== _get(DAO, 'chainId', '')) {
+                                return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
+                            }
+                            return navigate(`/${DAO?.url}/create-pass-token`)
+                        }} variant='contained' size="small">Configure Pass Token</Button>
                     </Box> :
                     <Box margin="0 auto" width={380}>
                         <Box className={classes.paperDetails}>
@@ -259,9 +278,9 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
                                     <img style={{ width: 20, borderRadius: 10, marginLeft: 8, height: 20 }} src={_get(CHAIN_INFO, chainId).logoUrl} />
                                 </Box> }
                             </Box>
-                            <Box display="flex" flexDirection="row" alignItems="center">
+                            {/* <Box display="flex" flexDirection="row" alignItems="center">
                                { contract?.tokenSupply && <Typography className={classes.tokenSupply}>{ `X ${ contract?.tokenSupply }` }</Typography> }
-                            </Box>
+                            </Box> */}
                         </Box>
                         <Box my={3} mx={1}>
                             <Typography
@@ -284,6 +303,7 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
                                 checked={state?.whitelisted} label="WHITELISTED"/>
                             </Box>
                         </Box>
+                        { contract?.version === "1" &&
                         <Box my={4} mx={1}>
                             <Typography
                                 style={{
@@ -317,7 +337,10 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
                                     }
                                 </Box>
                             </Box>
-                        </Box>
+                        </Box> }
+                        {/* <Box>
+                            <Button onClick={async () => await withdraw()} size="small" variant="contained">Withdraw</Button>
+                        </Box> */}
                         <Box style={{ height: 4, width: 200, alignSelf: 'center', margin: '60px auto', backgroundColor: palette.primary.main }}></Box>
                         <Box className={classes.paperDetailsSocial}>
                             <Box>
@@ -328,7 +351,7 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
                                     checked={state?.contact.indexOf('email') > -1}
                                     onChange={() => handleContactChange('email')}
                                     label="Email"/>
-                                    <Typography variant="body2" className={classes.socialText}>Get certain member details could be useful for the smooth functioning of your organisation</Typography>
+                                    <Typography variant="body2" className={classes.socialText}>Please select if you intend to use services such as Notion, Google Workspace and Github</Typography>
                                 </Box>
                                 <Box my={3} mx={1}>
                                     <Switch

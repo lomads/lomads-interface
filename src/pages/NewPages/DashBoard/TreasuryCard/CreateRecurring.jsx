@@ -33,7 +33,7 @@ import { beautifyHexToken, getSafeTokens } from '../../../../utils'
 
 import useRole from '../../../../hooks/useRole'
 import { ReactComponent as PolygonIcon } from 'assets/svg/polygon.svg';
-import useSafeTokens from 'hooks/useSafeTokens'
+import {useSafeTokens} from 'hooks/useSafeTokens'
 
 import axios from "axios";
 import { isValidUrl } from 'utils';
@@ -42,6 +42,7 @@ import moment from 'moment';
 import { createRecurringPayment } from 'state/dashboard/actions';
 import SimpleLoadButton from 'UIpack/SimpleLoadButton';
 import { setRecurringPayments } from 'state/dashboard/reducer';
+import { CHAIN_INFO } from 'constants/chainInfo';
 
 const format = (val) => (val || '0') + ` occurance`
 const parse = (val) => (val || '0').replace(/^\occurance/, '')
@@ -53,7 +54,7 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
     const { chainId, provider, account } = useWeb3React();
     const { myRole, can } = useRole(DAO, account);
     const { gnosisAllowanceLoading, setAllowance, getSpendingAllowance, createAllowanceTransaction } = useGnosisAllowance(_get(DAO, 'safe.address', null));
-    const { safeTokens } = useSafeTokens(_get(DAO, 'safe.address', null))
+    const { safeTokens } = useSafeTokens()
     const [showSuccess, setShowSuccess] = useState(false);
     const [error, setError] = useState(null)
     const [selectedUser, setSelectedUser] = useState(null);
@@ -100,8 +101,8 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
     useEffect(() => {
         if (chainId) {
             setCompensation({
-                symbol: chainId === SupportedChainId.GOERLI ? 'GOR' : chainId === SupportedChainId.POLYGON ? "MATIC" : null,
-                currency: chainId === SupportedChainId.GOERLI ? process.env.REACT_APP_GOERLI_TOKEN_ADDRESS : chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : null,
+                symbol: CHAIN_INFO[chainId]?.nativeCurrency?.symbol,
+                currency: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
                 amount: null
             })
         }
@@ -381,8 +382,8 @@ const CreateRecurring = ({ transaction, toggleShowCreateRecurring, onRecurringPa
                                                     return (
                                                         (
                                                             <option value={_get(result, 'tokenAddress', '')} key={index}>
-                                                                {chainId === SupportedChainId.POLYGON ? <PolygonIcon /> : chainId === SupportedChainId.GOERLI ? <img src={require('assets/images/goerli.png')} /> : <StarIcon />}
-                                                                {_get(result, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : chainId === SupportedChainId.GOERLI ? 'GOR' : '')}
+                                                                {CHAIN_INFO[chainId]?.logoUrl ? <img style={{ width: 24, height: 24, objectFit: 'contain', marginLeft: 8 }} src={CHAIN_INFO[chainId]?.logoUrl} /> : <StarIcon />}
+                                                                {_get(result, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol)}
                                                             </option>
                                                         )
                                                     );

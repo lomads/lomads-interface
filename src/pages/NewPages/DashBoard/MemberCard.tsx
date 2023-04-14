@@ -13,6 +13,9 @@ import SimpleInputField from "UIpack/SimpleInputField";
 import useRole from "hooks/useRole";
 import useTerminology from 'hooks/useTerminology';
 
+import {BsArrowRight} from 'react-icons/bs'
+import Avatar from "muiComponents/Avatar";
+
 const MemberCard = (props: any) => {
 	const dispatch = useAppDispatch();
 	const { provider, account } = useWeb3React();
@@ -67,14 +70,10 @@ const MemberCard = (props: any) => {
 			<>
 				<div className="NameAndAvatar">
 					<div className="memberRow">
-						<div className="avatarAndName">
-							<img src={daoMember2} alt="avatar" />
-							<div className="dashboardText">{props.name}</div>
+						<div className="avatarAndName" style={{width:'250px'}}>
+							<Avatar name={props.name} wallet={props.address}/>
 						</div>
-						<div id="memberAddressText">
-							{props.address.slice(0, 6) + "..." + props.address.slice(-4)}
-						</div>
-						<div style={{ marginLeft: 12 }} className="memberdivider">
+						<div className="memberdivider">
 							<hr />
 						</div>
 						<div className="dashboardText">{moment.utc(props.joined).local().format('MM/DD/YYYY')}</div>
@@ -172,10 +171,10 @@ const MemberCard = (props: any) => {
 					<div className="membersList">
 						<div className="NameAndAvatar">
 							<div className="memberRow">
-								<div className="avatarAndName" style={{ width: '30%' }}>
+								<div className="avatarAndName" style={{ width: '325px' }}>
 									<div className="dashboardText">Name</div>
 								</div>
-								<div className="dashboardText" style={{ marginLeft: '40px' }}>Joined</div>
+								<div className="dashboardText">Joined</div>
 							</div>
 						</div>
 						{_sortBy(_uniqBy(membersArray, (m: any) => m.member.wallet.toLowerCase()), (m: any) => _get(m, 'member.name', '').toLowerCase(), 'asc').map((result: any, index: any) => {
@@ -192,6 +191,15 @@ const MemberCard = (props: any) => {
 							);
 						})}
 					</div>
+					{
+						_sortBy(_uniqBy(membersArray, (m: any) => m.member.wallet.toLowerCase()), (m: any) => _get(m, 'member.name', '').toLowerCase(), 'asc').length < 2 &&
+						<div style={{padding:'0 22px 26px 22px',width:'100%'}}>
+							<div className="invite-gang-box" onClick={() => props.toggleShowMember()}>
+								<span>INVITE YOUR GANG</span>
+								<BsArrowRight color='rgba(118, 128, 141, 0.5)' size={20}/>
+							</div>
+						</div>
+					}
 				</div>
 			</div>
 		</>

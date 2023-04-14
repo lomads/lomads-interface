@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { SafeTransactionDataPartial, MetaTransactionData } from "@gnosis.pm/safe-core-sdk-types";
 import { SafeTransactionOptionalProps } from "@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/types";
-import useSafeTokens from "./useSafeTokens";
+import {useSafeTokens} from "hooks/useSafeTokens";
 import { get as _get, find as _find } from 'lodash';
 import { tokenCallSafe } from "connection/DaoTokenCall";
 import { ImportSafe, safeService } from "connection/SafeCall";
@@ -17,7 +17,8 @@ const { toChecksumAddress } = require('ethereum-checksum-address')
 const useSafeTransaction = (safeAddress: string) => {
 
     const { provider, chainId, account } = useWeb3React();
-    const { safeTokens, tokenBalance } = useSafeTokens(safeAddress)
+    const { safeTokens, tokenBalance } = useSafeTokens()
+    console.log("safeTokens", safeTokens)
     //const currentNonce = useAppSelector((state) => state.flow.currentNonce);
     const [createSafeTxnLoading, setCreateSafeTxnLoading] = useState(false);
     const [updateOwnerLoading, setUpdateOwnerLoading] = useState(false);
@@ -68,11 +69,12 @@ const useSafeTransaction = (safeAddress: string) => {
         return safeTransactionData;
     }
 
-    const createSafeTransaction = async ({ tokenAddress, send, confirm = true, createLabel = true }: any) => {
+    const createSafeTransaction = async ({ tokenAddress, send,tag, confirm = true, createLabel = true }: any) => {
         if (!safeAddress) return null;
         let signature = null;
         try {
             const safeToken = _find(safeTokens, t => _get(t, 'tokenAddress', null) === tokenAddress)
+            console.log("safeToken", safeToken)
             let total = send.reduce((pv: any, cv: any) => pv + (+cv.amount), 0);
             if (total == 0) throw 'Cannot send 0'
             console.log(tokenBalance(tokenAddress), total)
@@ -111,7 +113,7 @@ const useSafeTransaction = (safeAddress: string) => {
                         if (createLabel) {
                             let payload: any[] = [];
                             send.map((r: any) => {
-                                payload.push({ safeAddress, safeTxHash, recipient: r.recipient, label: _get(r, 'reason', null) })
+                                payload.push({ safeAddress, safeTxHash, recipient: r.recipient, label: _get(r, 'reason', null),tag })
                             })
                             await axiosHttp.post(`transaction/label`, payload)
                         }
@@ -125,7 +127,7 @@ const useSafeTransaction = (safeAddress: string) => {
                 if (createLabel) {
                     let payload: any[] = [];
                     send.map((r: any) => {
-                        payload.push({ safeAddress, safeTxHash, recipient: r.recipient, label: _get(r, 'reason', null) })
+                        payload.push({ safeAddress, safeTxHash, recipient: r.recipient, label: _get(r, 'reason', null),tag })
                     })
                     await axiosHttp.post(`transaction/label`, payload)
                 }
@@ -142,7 +144,10 @@ const useSafeTransaction = (safeAddress: string) => {
         catch (e) {
             setCreateSafeTxnLoading(false)
             console.log(e)
-            throw e;
+            if(typeof e === 'string')
+                throw e
+            else
+                throw _get(e, 'message', 'Something went wrong')
         }
     }
 

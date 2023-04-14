@@ -39,6 +39,7 @@ import moment from 'moment';
 import ProjectResource from './DashBoard/Project/ProjectResource';
 import useTerminology from 'hooks/useTerminology';
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
+import Avatar from 'muiComponents/Avatar';
 
 const CreateProject = () => {
 
@@ -91,6 +92,7 @@ const CreateProject = () => {
         if (createProjectLoading === false) {
             dispatch(resetCreateProjectLoader());
             setSuccess(true);
+            localStorage.setItem("create_first_project",true);
             setTimeout(() => {
                 navigate(-1);
             }, 2000);
@@ -619,11 +621,12 @@ const CreateProject = () => {
                                                                             return (
                                                                                 <div className="member-li" key={index} onClick={() => handleAddMember(item.member)}>
                                                                                     <div className="member-img-name">
-                                                                                        <img src={memberIcon} alt="member-icon" />
-                                                                                        <p>{item.member.name}</p>
+                                                                                        <Avatar name={item.member.name} wallet={item.member.wallet}/>
+                                                                                        {/* <img src={memberIcon} alt="member-icon" />
+                                                                                        <p>{item.member.name}</p> */}
                                                                                     </div>
                                                                                     <div className="member-address">
-                                                                                        <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p>
+                                                                                        {/* <p>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</p> */}
 
                                                                                         <div className='checkbox' onClick={() => handleAddMember(item.member)}>
                                                                                             {

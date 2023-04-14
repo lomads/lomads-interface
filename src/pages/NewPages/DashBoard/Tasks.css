@@ -68,6 +68,7 @@
 
 .tasks-container .tasks-body {
     width: 100%;
+    min-height: 169px;
     padding: 26px 22px 0 22px;
     background: #FFF;
     border-radius: 5px;
@@ -79,7 +80,7 @@
 
 .tasks-container .tasks-body .all-tasks {
     width: 320px;
-    height: 100px;
+    height: 120px;
     background: linear-gradient(180deg, #FBF4F2 0%, #EEF1F5 100%);
     border-radius: 5px;
     display: flex;
@@ -98,6 +99,26 @@
     line-height: 18px;
     text-transform: uppercase;
     color: #B12F15;
+}
+
+.tasks-container .tasks-body .create-new-task {
+    width: 320px;
+    height: 120px;
+    background: #FFFFFF;
+    border: 1px dashed rgba(118, 128, 141, 0.5);
+    border-radius: 5px;
+    margin-right: 25px;
+    margin-bottom: 26px;
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tasks-container .tasks-body .create-new-task span{
+    color: rgba(118, 128, 141, 0.5);
+    margin-right: 10px;
 }
 
 .tasks-container .tasks-body::-webkit-scrollbar {
@@ -126,7 +147,7 @@
 
 .tasks-card {
     width: 320px;
-    height: 110px;
+    height: 120px;
     padding: 26px 22px;
     background: #FFFFFF;
     box-shadow: 3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1);

@@ -3,6 +3,7 @@ import { get as _get, find as _find, uniqBy as _uniqBy } from 'lodash';
 import './ApplicantList.css';
 import { CgClose } from 'react-icons/cg';
 import { IoIosArrowBack } from 'react-icons/io'
+import Button from 'muiComponents/Button';
 
 import bigMember from '../../../../assets/svg/bigMember.svg';
 
@@ -100,8 +101,8 @@ const ApplicantList = ({ task, close }) => {
                         applicant.status === 'pending'
                             ?
                             <>
-                                <button disabled={rejectTaskMemberLoading} onClick={() => handleRejectMember(applicant)}>REJECT</button>
-                                <button onClick={() => handleAssignTask(applicant)}>ASSIGN</button>
+                                <Button disabled={rejectTaskMemberLoading||assignTaskLoading} loading={rejectTaskMemberLoading} onClick={() => handleRejectMember(applicant)}>REJECT</Button>
+                                <Button disabled={rejectTaskMemberLoading||assignTaskLoading} loading={assignTaskLoading} onClick={() => handleAssignTask(applicant)}>ASSIGN</Button>
                             </>
                             :
                             null

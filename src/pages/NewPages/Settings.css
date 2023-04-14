@@ -158,7 +158,7 @@
     height: 130px;
     width: 947px;
     background-color: #FFF;
-    border-radius: 5px;
+    border-radius: 20px;
     padding: 26px 22px 30px;
     display: flex;
     flex-direction: column;
@@ -171,7 +171,7 @@
     height: 130px;
     width: 300px;
     background-color: #FFF;
-    border-radius: 5px;
+    border-radius: 20px;
     /* padding: 26px 22px 30px; */
     display: flex;
     flex-direction: column;
@@ -526,12 +526,12 @@
 
     /* Note */
     font-family: 'Inter', sans-serif;
-    font-style: italic;
+    /* font-style: italic; */
     font-weight: 400;
     font-size: 14px;
     line-height: 18px;
     /* identical to box height, or 129% */
-    text-align: center;
+    /* text-align: center; */
     letter-spacing: -0.011em;
     margin-top: 35px;
     /* Grey */

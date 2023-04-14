@@ -90,6 +90,7 @@ import WorkspaceInfo from "./DashBoard/Project/WorkspaceInfo";
 import ProjectMembers from "./DashBoard/Project/ProjectMembers";
 import ProjectResource from "./DashBoard/Project/ProjectResource";
 import useMintSBT from "hooks/useMintSBT";
+import Avatar from "muiComponents/Avatar";
 
 const ProjectDetails = () => {
     const dispatch = useAppDispatch();
@@ -148,7 +149,7 @@ const ProjectDetails = () => {
     const [openKRA, setOpenKRA] = useState(false);
     const [openWorkspaceInfo, setOpenWorkspaceInfo] = useState(false);
     const { decryptMessage } = useEncryptDecrypt()
-    const { getStats } = useMintSBT(DAO?.sbt?.address)
+    const { getStats } = useMintSBT(DAO?.sbt?.address, DAO?.sbt?.version)
 
     useEffect(() => {
         if (daoURL && (!DAO || (DAO && DAO.url !== daoURL)))
@@ -1141,10 +1142,11 @@ const ProjectDetails = () => {
                                                 <div className="members-row" key={index}>
                                                     <div className="members-row-name">
                                                         <div>
-                                                            <img src={memberIcon} alt="memberIcon" />
-                                                            <p>{item.name}</p>
+                                                            <Avatar name={item.name} wallet={item.wallet}/>
+                                                            {/* <img src={memberIcon} alt="memberIcon" />
+                                                            <p>{item.name}</p> */}
                                                         </div>
-                                                        <span>{item.wallet.slice(0, 6) + "..." + item.wallet.slice(-4)}</span>
+                                                        {/* <span>{item.wallet.slice(0, 6) + "..." + item.wallet.slice(-4)}</span> */}
                                                     </div>
                                                     <div className="members-row-date">
                                                         <p>{moment.utc(item.joined).local().format('MM/DD/YYYY')} </p>

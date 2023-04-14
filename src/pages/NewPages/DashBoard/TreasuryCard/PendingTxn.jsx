@@ -15,7 +15,10 @@ import { AiOutlineClose, AiOutlineCheck } from "react-icons/ai";
 import CloseBtn from '../../../../assets/svg/close-btn.svg';
 import CheckBtn from '../../../../assets/svg/check-btn.svg';
 import { SupportedChainId } from "constants/chains";
-import useSafeTokens from "hooks/useSafeTokens";
+import Dropdown from "muiComponents/Dropdown";
+import Avatar from "muiComponents/Avatar";
+import {useSafeTokens} from "hooks/useSafeTokens";
+import { CHAIN_INFO } from "constants/chainInfo";
 
 const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
       <div style={{ flex : 1}} ref={ref} {...rest}>
@@ -23,16 +26,16 @@ const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
       </div>
   ))
 
-const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, executeFirst = '', threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions, confirmTxLoading, rejectTxLoading, executeTxLoading, isAdmin, onLoadLabels }) => {
-    const { provider, account, chainId } = useWeb3React();
+const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst = '', threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions, confirmTxLoading, rejectTxLoading, executeTxLoading, isAdmin, onLoadLabels, chainId, editTag, onSetEditTag }) => {
+    const { provider, account } = useWeb3React();
     const { DAO } = useAppSelector(store => store.dashboard);
     const [reasonText, setReasonText] = useState({});
-    //const [editMode, setEditMode] = useState(null);
+    // const [editTag, setEditTag] = useState(false);
     const dispatch = useAppDispatch()
-    const {safeTokens} = useSafeTokens(safeAddress)
+    const { safeTokens: tokens } = useSafeTokens()
     //const threshold = useAppSelector((state) => state.flow.safeThreshold);
 
-    const { amount, tokenSymbol, recipient, reason, decimal, isAllowanceTransaction, isOwnerModificaitonTransaction } = useMemo(() => {
+    const { amount, tokenSymbol, recipient, reason,tag, decimal, isAllowanceTransaction, isOwnerModificaitonTransaction } = useMemo(() => {
         const tokendata = _find(tokens, t => t.tokenAddress === _get(transaction, 'to', ''))
         const decimal = _get(tokendata, 'token.decimals', _get(transaction, 'token.decimals', 18))
         let amount = _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'value' || p.name === '_value'), 'value', _get(transaction, 'value', 0))
@@ -73,12 +76,17 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
         if(labels && labels.length > 0) {
             reason = _get(_find(labels, l => l.recipient.toLowerCase() === recipient.toLowerCase() && l.safeTxHash === transaction.safeTxHash), "label", null)
         }
+
+        let tag = null
+        if(labels && labels.length > 0) {
+            tag = _get(_find(labels, l => l.recipient.toLowerCase() === recipient.toLowerCase() && l.safeTxHash === transaction.safeTxHash), "tag", null)
+        }
         // if (trans) {
         //     console.log('transaction', recipient, trans)
         //     reason = _get(_find(trans.data, u => u.recipient.toLowerCase() === recipient.toLowerCase()), 'reason', null)
         // }
         console.log('reason', reason)
-        return { amount, tokenSymbol, recipient, reason, decimal, isAllowanceTransaction, isOwnerModificaitonTransaction }
+        return { amount, tokenSymbol, recipient, reason,tag, decimal, isAllowanceTransaction, isOwnerModificaitonTransaction }
     }, [transaction, labels, tokens])
 
     const { confirmReached, hasMyConfirmVote, rejectReached, hasMyRejectVote } = useMemo(() => {
@@ -111,6 +119,19 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
         }
     }
 
+    const _handleSelectTag = (safeTxHash, recipient, tagText) => {
+        if (tagText && tagText !== '') {
+            axiosHttp.patch('transaction/tag', { safeAddress, tag: tagText, safeTxHash, recipient })
+                .then(res => { 
+                    onLoadLabels(res.data);
+                    // setEditTag(false);
+                    if (editTag && editTag === `${safeTxHash}-${recipient}`) {
+                        onSetEditTag(null);
+                    }
+                })
+        }
+    }
+
     const handleEnableEditMode = (text, reason) => {
         if (isAdmin) {
             onSetEditMode(text);
@@ -123,13 +144,19 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
         }
     }
 
+    const handleEnableEditTag = (text) => {
+        if (isAdmin) {
+            onSetEditTag(text);
+        }
+    }
+
     const renderItem = (item, index) => {
         const mulAmount = _get(item, 'dataDecoded.parameters[1].value', _get(item, 'value', 0))
         let mulRecipient = _get(item, 'dataDecoded.parameters[0].value', _get(item, 'to', 0))
 
         const isLast = _get(transaction, 'dataDecoded.parameters[0].valueDecoded', []).length - 1 === index;
         const muldecimal = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.decimals', _get(transaction, 'token.decimals', 18))
-        const token = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
+        const token = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', _get(transaction, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol))
         //let trans = _find(_get(DAO, 'safe.transactions', []), t => t.safeTxHash === transaction.safeTxHash)
 
         if(_get(item, 'dataDecoded.method', '') === 'removeOwner')
@@ -139,6 +166,10 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
         if(labels && labels.length > 0) {
             mulReason = _get(_find(labels, l => l.recipient && l.safeTxHash && (_get(l, "recipient", "").toLowerCase() === mulRecipient.toLowerCase()) && (l.safeTxHash.toLowerCase() === transaction.safeTxHash.toLowerCase())), "label", null)
         }
+        let mulTag = null;
+        if(labels && labels.length > 0) {
+            mulTag = _get(_find(labels, l => l.recipient && l.safeTxHash && (_get(l, "recipient", "").toLowerCase() === mulRecipient.toLowerCase()) && (l.safeTxHash.toLowerCase() === transaction.safeTxHash.toLowerCase())), "tag", null)
+        }
         const isOwnerModificaitonTransaction =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => (_get(vd, 'dataDecoded.method', '') === "addOwnerWithThreshold") || _get(vd, 'dataDecoded.method', '') === "removeOwner" || _get(vd, 'dataDecoded.method', '') === "changeThreshold" )
 
         return (
@@ -147,12 +178,12 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
                     <div className="coinText">
                         <img src={sendTokenOutline} alt="" />
                         <div className="dashboardTextBold">
-                            { isOwnerModificaitonTransaction ? `-` : `${parseFloat(mulAmount / 10 ** muldecimal).toFixed(3)} ${token}`}
+                            { isOwnerModificaitonTransaction ? `-` : `${mulAmount / 10 ** muldecimal} ${token}`}
                         </div>
                     </div>
                     <div className="transactionName">
                         {
-                             mulReason && (!editMode || (editMode && editMode !== `${transaction.safeTxHash}-${mulRecipient}`))
+                            mulReason && (!editMode || (editMode && editMode !== `${transaction.safeTxHash}-${mulRecipient}`))
                                 ?
                                 <div className="dashboardText" onClick={() => handleEnableEditMode(`${transaction.safeTxHash}-${mulRecipient}`, mulReason)}>{mulReason}</div>
                                 :
@@ -186,8 +217,37 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
                     </div>
                     <div className="transactionAddress">
                         <div className="dashboardText">
-                            {`to ${beautifyHexToken(mulRecipient)}`}
+                            {handleRenderAvatar(mulRecipient)}
                         </div>
+                    </div>
+                    <div className="transactionAddress">
+                            {
+                                mulTag
+                                ?
+                                <>
+                                {
+                                    (!editTag || (editTag && editTag !== `${transaction.safeTxHash}-${mulRecipient}`))
+                                    ?
+                                    <div onClick={() => handleEnableEditTag(`${transaction.safeTxHash}-${mulRecipient}`)} className="dashboardText" style={{background:`${mulTag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer'}}>
+                                        <span style={{color:mulTag.color,fontWeight:'700',fontSize:'10px'}}>{mulTag.value}</span>
+                                    </div>
+                                    :
+                                    <Dropdown onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, mulRecipient,value)}/>
+                                }
+                                </>
+                                :
+                                <>
+                                    {
+                                        (!editTag || (editTag && editTag !== `${transaction.safeTxHash}-${mulRecipient}`))
+                                        ?
+                                        <div className="add-label-btn" onClick={() => handleEnableEditTag(`${transaction.safeTxHash}-${mulRecipient}`)}>
+                                            <span style={{color:'#111111',fontWeight:'700',fontSize:'10px'}}>Add Label +</span>
+                                        </div>
+                                        :
+                                        <Dropdown onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, mulRecipient,value)}/>
+                                    }
+                                </>
+                            }
                     </div>
                     <div id="voteArea">
                         {
@@ -283,6 +343,18 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
         )
     }
 
+    const handleRenderAvatar = (reciever) => {
+        const user = _find(_get(DAO,'members',[]),item => _get(item, 'member.wallet', '') === reciever);
+        if(user){
+            return(
+                <Avatar name={user.member.name} wallet={user.member.wallet}/>
+            )
+        }
+        else{
+            return `to ${beautifyHexToken(reciever)}`
+        }
+    }
+
     return (
         <>
             {_get(transaction, 'dataDecoded.method', null) !== "multiSend" || (_get(transaction, 'dataDecoded.method', null) === "multiSend" && isAllowanceTransaction && _get(transaction, 'dataDecoded.parameters[0].name', null) === "transactions") ?
@@ -291,13 +363,15 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
                         <div className="coinText">
                             <img src={sendTokenOutline} alt="" />
                             <div className="dashboardTextBold">
-                                {isOwnerModificaitonTransaction ? `-` : `${(amount / 10 ** decimal).toFixed(3)} ${tokenSymbol ? tokenSymbol : _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))}`}
+                                {isOwnerModificaitonTransaction ? `-` : `${amount / 10 ** decimal} ${tokenSymbol ? tokenSymbol : _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol))}`}
                             </div>
                         </div>
                         <div className="transactionName">
                             {
-                                reason && (!editMode || (editMode && editMode !== `${transaction.safeTxHash}-${recipient}`)) ?
-                                <div className="dashboardText" onClick={() => handleEnableEditMode(`${transaction.safeTxHash}-${recipient}`, reason)}>{reason}</div> :
+                                reason && (!editMode || (editMode && editMode !== `${transaction.safeTxHash}-${recipient}`)) 
+                                ?
+                                <div className="dashboardText" onClick={() => handleEnableEditMode(`${transaction.safeTxHash}-${recipient}`, reason)}>{reason}</div> 
+                                :
                                  <>
                                         {
                                             isAdmin || owner
@@ -328,9 +402,67 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, tokens, exec
                         </div>
                         <div className="transactionAddress">
                             <div className="dashboardText">
-                                {`to ${beautifyHexToken(recipient)}`}
+                                {handleRenderAvatar(recipient)}
                             </div>
                         </div>
+                        <div className="transactionAddress">
+                            {
+                                tag
+                                ?
+                                <>
+                                    {
+                                        (!editTag || (editTag && editTag !== `${transaction.safeTxHash}-${recipient}`))
+                                        ?
+                                        <div onClick={() => handleEnableEditTag(`${transaction.safeTxHash}-${recipient}`)} className="dashboardText" style={{background:`${tag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer'}}>
+                                            <span style={{color:tag.color,fontWeight:'700',fontSize:'10px'}}>{tag.value}</span>
+                                        </div>
+                                        :
+                                        <Dropdown onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, recipient,value)}/>
+                                    }
+                                </>
+                                :
+                                <>
+                                    {
+                                        (!editTag || (editTag && editTag !== `${transaction.safeTxHash}-${recipient}`))
+                                        ?
+                                        <div className="add-label-btn" onClick={() => handleEnableEditTag(`${transaction.safeTxHash}-${recipient}`)}>
+                                            <span style={{color:'#111111',fontWeight:'700',fontSize:'10px'}}>Add Label +</span>
+                                        </div>
+                                        :
+                                        <Dropdown onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, recipient,value)}/>
+                                    }
+                                </>
+                            }
+                        </div>
+                        {/* <div className="transactionAddress">
+                            {
+                                tag
+                                ?
+                                <>
+                                {
+                                    editTag
+                                    ?
+                                    <Dropdown onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, recipient,value)}/>
+                                    :
+                                    <div onClick={() => setEditTag(true)} className="dashboardText" style={{background:`${tag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer'}}>
+                                        <span style={{color:tag.color,fontWeight:'700',fontSize:'10px'}}>{tag.value}</span>
+                                    </div>
+                                }
+                                </>
+                                :
+                                <>
+                                    {
+                                        editTag
+                                        ?
+                                        <Dropdown onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, recipient,value)}/>
+                                        :
+                                        <div className="add-label-btn" onClick={() => setEditTag(true)}>
+                                            <span style={{color:'#111111',fontWeight:'700',fontSize:'10px'}}>Add Label +</span>
+                                        </div>
+                                    }
+                                </>
+                            }
+                        </div> */}
                         <div id="voteArea">
                         {
                             threshold && <div className="dashboardTextBold">

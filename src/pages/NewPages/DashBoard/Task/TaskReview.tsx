@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { get as _get, find as _find, uniqBy as _uniqBy, findIndex as _findIndex } from 'lodash';
+import { get as _get, find as _find, uniqBy as _uniqBy, findIndex as _findIndex, debounce as _debounce } from 'lodash';
 import './TaskReview.css';
 import { CgClose } from 'react-icons/cg';
 import { IoIosArrowBack } from 'react-icons/io'
 import userPlaceholder from 'assets/svg/user-placeholder.svg';
 import clipboard from 'assets/svg/clipboard.svg';
 import editIcon from 'assets/svg/editButton.svg';
+import Button from 'muiComponents/Button';
 import compensationIcon from 'assets/svg/compensation.svg';
 import polygonIcon from 'assets/svg/polygon.svg';
 import starIcon from 'assets/svg/star.svg';
@@ -40,6 +41,10 @@ import axios from 'axios';
 import { beautifyHexToken } from '../../../../utils';
 import { SupportedChainId } from 'constants/chains';
 import useSafeTransaction from 'hooks/useSafeTransaction';
+import { toast } from 'react-hot-toast';
+import SwitchChain from 'components/SwitchChain';
+import { useSafeTokens } from 'hooks/useSafeTokens';
+import Dropdown from 'muiComponents/Dropdown';
 
 const TaskReview = ({ task, close }: any) => {
     console.log("task review : ", task);
@@ -48,26 +53,34 @@ const TaskReview = ({ task, close }: any) => {
     const [newCompensation, setNewCompensation] = useState<number>(0)
     const [showModifyCompensation, setShowModifyCompensation] = useState<boolean>(false)
     const [showRejectSubmission, setShowRejectSubmission] = useState<boolean>(false)
-    const { provider, account, chainId, connector } = useWeb3React();
+    const { provider, account, chainId: currentChainId, connector } = useWeb3React();
     const [activeSubmission, setActiveSubmission] = useState<any>(null)
     const [approveLoading, setApproveLoading] = useState<any>(false)
     const { isSafeOwner } = useRole(DAO, account);
     const currentNonce = useAppSelector((state) => state.flow.currentNonce);
-    const [safeTokens, setSafeTokens] = useState([]);
+    //const [safeTokens, setSafeTokens] = useState([]);
+    const { safeTokens } = useSafeTokens()
     const [reopen, setReopen] = useState(false);
     const [rejectionNote, setRejectionNote] = useState('');
     const [selectedUser, setSelectedUser] = useState<any>(null);
     const [rejectUser, setRejectUser] = useState<any>(null);
     const [error, setError] = useState<any>(null);
+    const [chainId, setChainId] = useState(null)
+    const [selectedTag, setSelectedTag] = useState<any>(null);
 
     const { createSafeTransaction } = useSafeTransaction(_get(DAO, 'safe.address', ''))
 
     useEffect(() => {
-        if (chainId) {
-            getSafeTokens(chainId, _get(DAO, 'safe.address', null))
-                .then(tokens => setSafeTokens(tokens))
-        }
-    }, [chainId, DAO])
+        if(DAO)
+            setChainId(_get(DAO, 'chainId'))
+    }, [DAO])
+
+    // useEffect(() => {
+    //     if (chainId) {
+    //         getSafeTokens(chainId, _get(DAO, 'safe.address', null))
+    //             .then(tokens => setSafeTokens(tokens))
+    //     }
+    // }, [chainId, DAO])
 
     const taskSubmissions = useMemo(() => {
         console.log("59 task : ", task)
@@ -128,7 +141,7 @@ const TaskReview = ({ task, close }: any) => {
             try {
                 if (!chainId) return;
                 const send = [{ recipient: activeSubmission.member.wallet, amount: newCompensation }]
-                const txnResponse = await createSafeTransaction({ tokenAddress: _get(task, 'compensation.currency', null), send, confirm: isSafeOwner, createLabel: false })
+                const txnResponse = await createSafeTransaction({ tokenAddress: _get(task, 'compensation.currency', null), send, confirm: isSafeOwner, createLabel: false,tag:selectedTag })
                 if(txnResponse) {
                     resolve(txnResponse.safeTxHash)
                 }
@@ -143,7 +156,7 @@ const TaskReview = ({ task, close }: any) => {
     const tokenDecimal = useMemo(() => {
         if (task) {
             const tokenAddr = _get(task, 'compensation.currency', 'SWEAT');
-            if (tokenAddr === SupportedChainId.POLYGON || tokenAddr === SupportedChainId.GOERLI || tokenAddr === 'SWEAT')
+            if (tokenAddr === 'SWEAT')
                 return 18
             const tkn = _find(safeTokens, (stkn: any) => stkn.tokenAddress === tokenAddr)
             if (tkn) {
@@ -155,6 +168,9 @@ const TaskReview = ({ task, close }: any) => {
     }, [safeTokens, task])
 
     const handleApproveTask = async () => {
+        if(currentChainId !== _get(DAO, 'chainId', '')) {
+            return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
+        }
         try {
             setApproveLoading(true);
             setError(null)
@@ -196,7 +212,7 @@ const TaskReview = ({ task, close }: any) => {
                 recipient: _get(activeSubmission, 'member._id', null)
             }
     
-            axiosHttp.post(`task/${task._id}/approve?daoUrl=${DAO.url}`, payload)
+            return axiosHttp.post(`task/${task._id}/approve?daoUrl=${DAO.url}`, payload)
                 .then(async res => {
                     let m = _get(activeSubmission, 'member.name', '') === '' ? _get(activeSubmission, 'member.wallet', '') : _get(activeSubmission, 'member.name', '')
                     await axiosHttp.post(`transaction/label`, {
@@ -213,9 +229,11 @@ const TaskReview = ({ task, close }: any) => {
         } catch (e) {
             setApproveLoading(false);
             console.log(e)
-            setError(e)
+            return setError(e)
         }
     }
+
+    const handleApproveTaskAsync = _debounce(handleApproveTask, 500)
 
     const handleRejectTask = () => {
         dispatch(rejectTask({
@@ -301,6 +319,9 @@ const TaskReview = ({ task, close }: any) => {
                         <span>Note</span>
                         <div className='note'>{submission.submission.note}</div>
                     </div>
+                    
+                </div>
+                <div style={{width:'100%',display:'flex',flexDirection:'column'}}>
                     <div className='detail-container'>
                         {task && _get(task, 'submissionLink', []).length == 0 ?
                             <>
@@ -322,25 +343,30 @@ const TaskReview = ({ task, close }: any) => {
                             </>
                         }
                     </div>
-                </div>
-                <div className='task-review-compensation'>
-                    <div className='task-review-compensation-main'>
-                        <div className='container'>
-                            <div>Compensation</div>
-                            <img src={starIcon} />
-                            <div className='amount'>{_get(task, 'compensation.amount', 0)}</div>
-                            {(newCompensation - _get(task, 'compensation.amount', 0)) !== 0 && <div className='extra'>{`${(newCompensation - _get(task, 'compensation.amount', 0)) > 0 ? '+' : ''} ${(newCompensation - _get(task, 'compensation.amount', 0))}`}</div>}
-                            <div>{_get(task, 'compensation.symbol', "SWEAT")}</div>
+                    <div className='task-review-compensation'>
+                        <div className='task-review-compensation-main'>
+                            <div style={{width:'100%',display:'flex'}}>
+                                <div className='container'>
+                                    <div>Compensation</div>
+                                    <img src={starIcon} />
+                                    <div className='amount'>{_get(task, 'compensation.amount', 0)}</div>
+                                    {(newCompensation - _get(task, 'compensation.amount', 0)) !== 0 && <div className='extra'>{`${(newCompensation - _get(task, 'compensation.amount', 0)) > 0 ? '+' : ''} ${(newCompensation - _get(task, 'compensation.amount', 0))}`}</div>}
+                                    <div>{_get(task, 'compensation.symbol', "SWEAT")}</div>
+                                </div>
+                                <button onClick={() => { setError(null); setShowModifyCompensation(true) }}>
+                                    <img src={editIcon} alt="edit-icon" />
+                                </button>
+                            </div>
+                            <div style={{width:'100%'}}>
+                                <Dropdown onChangeOption={(value:any) => setSelectedTag(value)}/>
+                            </div>
                         </div>
-                        <button onClick={() => { setError(null); setShowModifyCompensation(true) }}>
-                            <img src={editIcon} alt="edit-icon" />
-                        </button>
                     </div>
-                </div>
-                { error && (typeof error === 'string') && <div style={{ color: 'red', marginBottom: 16, textAlign: 'center' }}>{ error }</div> }
-                <div className='task-review-foot'>
-                    <button onClick={() => { setRejectUser(submission.member._id); setShowRejectSubmission(true) }}>REJECT</button>
-                    <button disabled={approveLoading} style={{ backgroundColor: approveLoading ? 'grey' : '#C94B32' }} onClick={() => handleApproveTask()}>APPROVE</button>
+                    { error && (typeof error === 'string') && <div style={{ color: 'red', marginBottom: 16, textAlign: 'center' }}>{ error }</div> }
+                    <div className='task-review-foot'>
+                        <Button disabled={approveLoading || rejectTaskLoading} loading={rejectTaskLoading} onClick={() => { setRejectUser(submission.member._id); setShowRejectSubmission(true) }}>REJECT</Button>
+                        <Button disabled={approveLoading || rejectTaskLoading} loading={approveLoading} style={{ backgroundColor: approveLoading ? 'grey' : '#C94B32' }} onClick={() => handleApproveTaskAsync()}>APPROVE</Button>
+                    </div>
                 </div>
             </div>
         )

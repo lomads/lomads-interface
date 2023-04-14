@@ -105,8 +105,32 @@ export default ({ isHelpIconOpen }) => {
         }
     }
 
-    if(myNotifications.length == 0)
-        return null
+    if(myNotifications.length == 0){
+        return (
+            <div className='notifications no-content'>
+                <div className='my_notifications'>
+                    <div className='list-container' style={{justifyContent:'center'}}>
+                        <div className='no-action-list'>
+                            <span>NO ACTION NOTIFICATION YET</span>
+                        </div>
+                    </div>
+                </div>
+                <div className='timeline_notifications'>
+                    <div className='list-container'>
+                        <div className='notification-item'>
+                            <div className='notification-item__container'>
+                                <div className='left-section'>
+                                    <img className='icon'></img>
+                                    <div className='title'>{_get(DAO,'name','')} is created!</div>
+                                </div>
+                                <div className='date'>10/03</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    } 
 
     return (
         <div className="notifications">

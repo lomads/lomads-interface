@@ -181,7 +181,7 @@ export default ({ children }: any) => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
 
   const { DAOList, DAO } = useAppSelector((state) => state.dashboard);
 

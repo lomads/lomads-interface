@@ -89,7 +89,7 @@ export const CHAIN_INFO: ChainInfoMap = {
     infoLink: 'https://info.uniswap.org/#/',
     label: 'Görli',
     logoUrl: ethereumLogoUrl,
-    nativeCurrency: { name: 'Görli Ether', symbol: 'görETH', decimals: 18 },
+    nativeCurrency: { name: 'Görli Ether', symbol: 'GOR', decimals: 18 },
   },
   [SupportedChainId.OPTIMISM]: {
     networkType: NetworkType.L2,

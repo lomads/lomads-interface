@@ -2,12 +2,29 @@ import { useEffect, useState, useMemo } from "react";
 import { get as _get, groupBy as _groupBy } from 'lodash'
 import { useNavigate } from "react-router-dom";
 
-import { BsDiscord } from 'react-icons/bs';
+import { BsDiscord,BsTrello } from 'react-icons/bs';
+import { FaTrello } from 'react-icons/fa';
 
 import { ProgressBar, Step } from "react-step-progress-bar";
 
+import { useAppSelector, useAppDispatch } from "state/hooks";
+
+import { updateViewProject } from "state/dashboard/actions";
+import { resetUpdateViewProjectLoader } from 'state/dashboard/reducer';
+
 const ProjectCard = ({ project, daoUrl, tab }) => {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+
+    const { DAO,updateViewProjectLoading,user } = useAppSelector((state) => state.dashboard);
+
+    // runs after updating viewer
+    // useEffect(() => {
+    //     if (updateViewProjectLoading === false) {
+    //         dispatch(resetUpdateViewProjectLoader());
+    //         navigate(`/${daoUrl}/project/${project._id}`, { state: { project } })
+    //     }
+    // }, [updateViewProjectLoading]);
 
     const notifications = useMemo(() => {
         let count = [];
@@ -21,10 +38,16 @@ const ProjectCard = ({ project, daoUrl, tab }) => {
         }
         console.log(count)
         return count
-    }, [project])
+    }, [project]);
+
+    const handleCardClick = () => {
+        console.log("clicked... : ",project.name);
+        dispatch(updateViewProject({ projectId:project._id, daoUrl:_get(DAO,'url','') }));
+        navigate(`/${daoUrl}/project/${project._id}`, { state: { project } })
+    }
 
     return (
-        <div className='myproject-card' onClick={() => navigate(`/${daoUrl}/project/${project._id}`, { state: { project } })}>
+        <div className='myproject-card' onClick={handleCardClick}>
             {
                 project.links.length > 0 && tab === 1
                     ?
@@ -41,7 +64,19 @@ const ProjectCard = ({ project, daoUrl, tab }) => {
                         }
                     </div>
                     :
-                    null
+                    <>
+                    {
+                        project.provider === 'Trello' && !project.viewers.includes(_get(user,'_id',''))
+                        ?
+                        <div className='myproject-card-icons'>
+                            <div className='icon-container'>
+                                <FaTrello color='#FFF' size={20} />
+                            </div>
+                        </div> 
+                        :
+                        null
+                    }
+                    </>
             }
             <div className="container">
                 <div className="project-name">

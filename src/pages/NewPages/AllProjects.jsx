@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import '../../styles/pages/AllTasks.css';
 import { find as _find, get as _get, debounce as _debounce, groupBy as _groupBy, orderBy as _orderBy } from 'lodash';
 import { useAppDispatch, useAppSelector } from "state/hooks";
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useWeb3React } from "@web3-react/core";
 import useTerminology from 'hooks/useTerminology';
 import { IoIosArrowBack } from 'react-icons/io';
@@ -13,12 +13,14 @@ import ProjectCard from './DashBoard/Project/ProjectCard';
 
 import moment from 'moment';
 import { resetProject } from 'state/dashboard/reducer';
+import { getCurrentUser, getDao } from 'state/dashboard/actions';
 
 const AllProjects = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useAppDispatch()
-    const { DAO, user } = useAppSelector((state) => state.dashboard);
+    const { daoURL } = useParams()
+    const { DAO, user, DAOLoading } = useAppSelector((state) => state.dashboard);
     const { account } = useWeb3React();
     const daoName = _get(DAO, 'name', '').split(" ");
     const { transformWorkspace } = useTerminology(_get(DAO, 'terminologies', null))
@@ -28,6 +30,17 @@ const AllProjects = () => {
     const [otherProjects, setOtherProjects] = useState([]);
 
     const [currentProjects, setCurrentProjects] = useState([]);
+
+    useEffect(() => {
+        if ((!DAO || (DAO && DAO.url !== daoURL)) && !DAOLoading)
+            dispatch(getDao(daoURL))
+    }, [daoURL, DAO, DAOLoading])
+
+    useEffect(() => {
+        if(!user) {
+            dispatch(getCurrentUser({}))
+        }
+    }, [user])
 
     const notificationCount = (project) => {
         let count = [];

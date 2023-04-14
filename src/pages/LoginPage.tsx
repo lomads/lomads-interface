@@ -62,9 +62,6 @@ const LoginPage = (props: any) => {
 	const { chainId, connector, account, provider } = useWeb3React();
 	const [preferredChain, setPreferredChain] = useState<number>(SupportedChainId?.GOERLI);
 
-
-	console.log('chainId', chainId, connector, account)
-
 	const chainAllowed = chainId && isChainAllowed(connector, chainId) && chainId === +preferredChain;
 	console.log("chainAllowed", chainAllowed, chainId);
 
@@ -128,6 +125,12 @@ const LoginPage = (props: any) => {
 			generateToken()
 	}, [selectedWallet, account, chainAllowed]);
 
+	useEffect(() => {
+		if(connector) {
+
+		}
+	}, [connector])
+
 	const nextLogin = useCallback(async (connector: Connector) => {
 		localStorage.removeItem('__lmds_web3_token')
 		const connectionType = getConnection(connector).type;
@@ -137,6 +140,7 @@ const LoginPage = (props: any) => {
 			if (chainAllowed && !account) {
 				await connector.activate()
 			} else if (!chainAllowed) {
+				await connector.activate()
 				switchChain(connector, +preferredChain)
 					.then(async () => {
 						if (!account)

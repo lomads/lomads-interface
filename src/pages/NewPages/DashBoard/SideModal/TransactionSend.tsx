@@ -19,6 +19,7 @@ import AddRecipient from "./AddRecipient";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import { ImportSafe } from "connection/SafeCall";
 import { SupportedChainId } from "constants/chains";
+import {useSafeTokens} from "hooks/useSafeTokens";
 import { useWeb3React } from "@web3-react/core";
 import { useAppSelector } from "state/hooks";
 import {
@@ -31,11 +32,14 @@ import {
 	NumberDecrementStepper,
 	NumberIncrementStepper,
 } from "@chakra-ui/react";
+import Avatar from "muiComponents/Avatar";
+import Dropdown from "muiComponents/Dropdown";
 
 
 const TransactionSend = (props: IselectTransactionSend) => {
 	console.log("error : ", props.error)
 	const { DAO } = useAppSelector((state) => state?.dashboard);
+	const { safeTokens } = useSafeTokens()
 	const { chainId } = useWeb3React();
 	const managePreviousNavigation = () => {
 		const length = props.setRecipient.current.length;
@@ -76,12 +80,12 @@ const TransactionSend = (props: IselectTransactionSend) => {
 							}}
 							defaultValue={props.selectedToken}
 						>
-							{props.tokens.map((result: any, index: any) => {
+							{safeTokens.map((result: any, index: any) => {
 								return (
 									(
 										<>
-											<option value={result?.tokenAddress ? result.tokenAddress : chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS} key={index}>
-												{_get(result, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}
+											<option value={result?.tokenAddress} key={index}>
+												{_get(result, 'token.symbol')}
 											</option>
 										</>
 									)
@@ -96,54 +100,19 @@ const TransactionSend = (props: IselectTransactionSend) => {
 				<div id="recipientListandButtons">
 					<div id="recipientList">
 						{showInput.map((result: IsetRecipientType, index: number) => {
+							console.log("result : ",result);
 							return (
 								<div id="assignAmount">
 									<div id="recipientAvatarAndName" className="sendToken">
-										<img src={daoMember2} alt={result.recipient} />
+										<Avatar name={result.name} wallet={result.recipient}/>
+										{/* <img src={daoMember2} alt={result.recipient} />
 										<p className="nameText">
 											{result.name.length < 1
 												? result.recipient.slice(0, 6) +
 												"..." +
 												result.recipient.slice(-4)
 												: result.name}
-										</p>
-									</div>
-									<div id="amountInputFields">
-										<div>
-											{/* <NumberInputStepper
-												height={50}
-												width={106}
-												placeholder="Amount"
-												type="number"
-				
-												onchange={(e) => {
-													console.log(e.target.value)
-													props.setRecipient.current[index].amount =
-														e.target.value;
-												}}
-											/> */}
-											<NumberInput onChange={(e) => {
-												props.setRecipient.current[index].amount = `${+e}`;
-											}} style={{ width: (54 + 50), height: 50, borderRadius: '10px 10px 10px 10px', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)' }} step={1} min={0}>
-												<NumberInputField className='input' style={{ padding: 0, textAlign: "center", height: 50, width: 54, backgroundColor: '#F5F5F5', borderRadius: '10px 0px 0px 10px', borderWidth: 0 }} />
-												<NumberInputStepper style={{ width: 50, backgroundColor: 'transparent', borderRadius: '10px 10px 10px 10px' }}>
-													<NumberIncrementStepper color="#C94B32" />
-													<NumberDecrementStepper color="#C94B32" style={{ borderTopWidth: 0 }} />
-												</NumberInputStepper>
-											</NumberInput>
-										</div>
-										<div>
-											<SimpleInputField
-												height={50}
-												width={195}
-												placeholder="Reason for transaction"
-												type="text"
-												onchange={(e) => {
-													props.setRecipient.current[index].reason =
-														e.target.value;
-												}}
-											/>
-										</div>
+										</p> */}
 										<div>
 											<IconButton
 												Icon={
@@ -164,6 +133,38 @@ const TransactionSend = (props: IselectTransactionSend) => {
 												}}
 											/>
 										</div>
+									</div>
+									<div id="amountInputFields">
+										<div>
+											<NumberInput onChange={(e) => {
+												props.setRecipient.current[index].amount = `${+e}`;
+											}} style={{ width: (54 + 50), height: 40, borderRadius: '10px 10px 10px 10px', boxShadow: 'inset -1px 0px 4px rgba(27, 43, 65, 0.1)' }} step={1} min={0}>
+												<NumberInputField className='input' style={{ padding: 0, textAlign: "center", height: 40, width: 54, backgroundColor: '#F5F5F5', borderRadius: '10px 0px 0px 10px', borderWidth: 0 }} />
+												<NumberInputStepper style={{ width: 50, backgroundColor: 'transparent', borderRadius: '10px 10px 10px 10px' }}>
+													<NumberIncrementStepper color="#C94B32" />
+													<NumberDecrementStepper color="#C94B32" style={{ borderTopWidth: 0 }} />
+												</NumberInputStepper>
+											</NumberInput>
+										</div>
+										<div>
+											<SimpleInputField
+												height={40}
+												width={195}
+												padding={'0 10px'}
+												placeholder="Reason for transaction"
+												type="text"
+												onchange={(e) => {
+													props.setRecipient.current[index].reason =
+														e.target.value;
+												}}
+											/>
+										</div>
+										<div style={{width:'192px'}}>
+											<Dropdown 
+												onChangeOption={(value:any) => props.selectTag(value)}
+											/>
+										</div>
+										
 									</div>
 								</div>
 							);
@@ -187,7 +188,7 @@ const TransactionSend = (props: IselectTransactionSend) => {
 						/>
 					</div>
 				</div>
-				{props.error && <div style={{ fontSize: 14, color: 'red', textAlign: 'center' }}>{props.error}</div>}
+				{props.error && typeof props.error === 'string' && <div style={{ fontSize: 14, color: 'red', textAlign: 'center' }}>{props.error}</div>}
 				<div id="transactionSendDivider2"></div>
 				<Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: '500px',  position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
 					<Box display="flex" mt={4} justifyContent="center" flexDirection="row">
