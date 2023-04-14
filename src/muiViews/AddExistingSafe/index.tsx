@@ -411,7 +411,7 @@ export default () => {
 	const handleClickDelayed = useCallback(_.debounce(handleClick, 1000), [handleClick, safeAddress])
 
 	const getSafes = (chainId: number = selectedChainId) => {
-		axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/owners/0xbd062EB9720c78f00c68770F3dE62118e66be404/safes/`)
+		axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/owners/${safeAddress}/safes/`)
 			.then((response: any) => {
 				setSafeList(response.data.safes)
 			});

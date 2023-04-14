@@ -128,7 +128,7 @@ const useStyles = makeStyles((theme: any) => ({
 		fontSize: 14,
 		letterSpacing: '-0.011em',
 		color: '#76808D',
-		marginLeft: 26,
+		paddingLeft: 26,
 		textAlign: 'center',
 	},
 	cardButton: {
@@ -845,7 +845,14 @@ export default () => {
 				<Box className={classes.bottomLine} />
 				<Box className={classes.InviteGang}>
 					<Box className={classes.centerInputCard}>
-						<Box style={{ width: '100%', marginBottom: 8, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+						<Box style={{
+								 width: '100%',
+								 marginBottom: 8, 
+								 display: 'flex',
+								 flexDirection: 'row',
+								 alignItems: 'center',
+								 justifyContent: 'space-between'
+							  }}>
 							<Box className={classes.inputTitle}>Add Owner :</Box>
 						</Box>
 						<Box className={classes.inputArea}>
@@ -1019,7 +1026,7 @@ export default () => {
 						</Typography>
 					</Box>
 					<Box className={classes.selectionArea}>
-						<Box>
+						<Box style={{width: 109, padding: 5 }}>
 							<MuiSelect
 								selected={thresholdValue}
 								options={Myvalue.current.map((item, index)=> ({label: index+1, value: index+1}))}
