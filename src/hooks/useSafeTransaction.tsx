@@ -69,7 +69,7 @@ const useSafeTransaction = (safeAddress: string) => {
         return safeTransactionData;
     }
 
-    const createSafeTransaction = async ({ tokenAddress, send,tag, confirm = true, createLabel = true }: any) => {
+    const createSafeTransaction = async ({ tokenAddress, send, confirm = true, createLabel = true }: any) => {
         if (!safeAddress) return null;
         let signature = null;
         try {
@@ -113,7 +113,7 @@ const useSafeTransaction = (safeAddress: string) => {
                         if (createLabel) {
                             let payload: any[] = [];
                             send.map((r: any) => {
-                                payload.push({ safeAddress, safeTxHash, recipient: r.recipient, label: _get(r, 'reason', null),tag })
+                                payload.push({ safeAddress, safeTxHash, recipient: r.recipient, label: _get(r, 'reason', null),tag:_get(r, 'tag', null) })
                             })
                             await axiosHttp.post(`transaction/label`, payload)
                         }
@@ -127,7 +127,7 @@ const useSafeTransaction = (safeAddress: string) => {
                 if (createLabel) {
                     let payload: any[] = [];
                     send.map((r: any) => {
-                        payload.push({ safeAddress, safeTxHash, recipient: r.recipient, label: _get(r, 'reason', null),tag })
+                        payload.push({ safeAddress, safeTxHash, recipient: r.recipient, label: _get(r, 'reason', null),tag:_get(r, 'tag', null) })
                     })
                     await axiosHttp.post(`transaction/label`, payload)
                 }

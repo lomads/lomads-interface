@@ -65,7 +65,6 @@ export interface IselectTransactionSend {
   setRecipient: React.MutableRefObject<IsetRecipientType[]>;
   tokens: any;
   selectToken: (_tokenAddress: string) => void;
-  selectTag: (_tag: string) => void;
   selectedToken: string;
   toggleAddNewRecipient: () => void;
   addNewRecipient: boolean;
@@ -83,6 +82,7 @@ export interface IsetRecipientType {
   recipient: string;
   name: string;
   reason: string;
+  tag:any;
 }
 export interface ItreasuryCardType {
   innerRef: any,
