@@ -15,9 +15,10 @@ import { AiOutlineClose, AiOutlineCheck } from "react-icons/ai";
 import CloseBtn from '../../../../assets/svg/close-btn.svg';
 import CheckBtn from '../../../../assets/svg/check-btn.svg';
 import { SupportedChainId } from "constants/chains";
-import useSafeTokens from "hooks/useSafeTokens";
 import Dropdown from "muiComponents/Dropdown";
 import Avatar from "muiComponents/Avatar";
+import {useSafeTokens} from "hooks/useSafeTokens";
+import { CHAIN_INFO } from "constants/chainInfo";
 
 const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
       <div style={{ flex : 1}} ref={ref} {...rest}>
@@ -25,15 +26,13 @@ const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
       </div>
   ))
 
-const PendingTxn = ({editMode, onSetEditMode,editTag,onSetEditTag,  safeAddress, labels, tokens, executeFirst = '', threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions, confirmTxLoading, rejectTxLoading, executeTxLoading, isAdmin, onLoadLabels }) => {
-    console.log("labels:",labels);
-    console.log("transactions : ",transaction);
-    const { provider, account, chainId } = useWeb3React();
+const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst = '', threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions, confirmTxLoading, rejectTxLoading, executeTxLoading, isAdmin, onLoadLabels, chainId, editTag, onSetEditTag }) => {
+    const { provider, account } = useWeb3React();
     const { DAO } = useAppSelector(store => store.dashboard);
     const [reasonText, setReasonText] = useState({});
     // const [editTag, setEditTag] = useState(false);
     const dispatch = useAppDispatch()
-    const {safeTokens} = useSafeTokens(safeAddress)
+    const { safeTokens: tokens } = useSafeTokens()
     //const threshold = useAppSelector((state) => state.flow.safeThreshold);
 
     const { amount, tokenSymbol, recipient, reason,tag, decimal, isAllowanceTransaction, isOwnerModificaitonTransaction } = useMemo(() => {
@@ -157,7 +156,7 @@ const PendingTxn = ({editMode, onSetEditMode,editTag,onSetEditTag,  safeAddress,
 
         const isLast = _get(transaction, 'dataDecoded.parameters[0].valueDecoded', []).length - 1 === index;
         const muldecimal = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.decimals', _get(transaction, 'token.decimals', 18))
-        const token = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
+        const token = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', _get(transaction, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol))
         //let trans = _find(_get(DAO, 'safe.transactions', []), t => t.safeTxHash === transaction.safeTxHash)
 
         if(_get(item, 'dataDecoded.method', '') === 'removeOwner')
@@ -364,7 +363,7 @@ const PendingTxn = ({editMode, onSetEditMode,editTag,onSetEditTag,  safeAddress,
                         <div className="coinText">
                             <img src={sendTokenOutline} alt="" />
                             <div className="dashboardTextBold">
-                                {isOwnerModificaitonTransaction ? `-` : `${amount / 10 ** decimal} ${tokenSymbol ? tokenSymbol : _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))}`}
+                                {isOwnerModificaitonTransaction ? `-` : `${amount / 10 ** decimal} ${tokenSymbol ? tokenSymbol : _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol))}`}
                             </div>
                         </div>
                         <div className="transactionName">

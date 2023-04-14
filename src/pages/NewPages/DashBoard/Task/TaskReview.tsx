@@ -41,6 +41,9 @@ import axios from 'axios';
 import { beautifyHexToken } from '../../../../utils';
 import { SupportedChainId } from 'constants/chains';
 import useSafeTransaction from 'hooks/useSafeTransaction';
+import { toast } from 'react-hot-toast';
+import SwitchChain from 'components/SwitchChain';
+import { useSafeTokens } from 'hooks/useSafeTokens';
 import Dropdown from 'muiComponents/Dropdown';
 
 const TaskReview = ({ task, close }: any) => {
@@ -50,27 +53,34 @@ const TaskReview = ({ task, close }: any) => {
     const [newCompensation, setNewCompensation] = useState<number>(0)
     const [showModifyCompensation, setShowModifyCompensation] = useState<boolean>(false)
     const [showRejectSubmission, setShowRejectSubmission] = useState<boolean>(false)
-    const { provider, account, chainId, connector } = useWeb3React();
+    const { provider, account, chainId: currentChainId, connector } = useWeb3React();
     const [activeSubmission, setActiveSubmission] = useState<any>(null)
     const [approveLoading, setApproveLoading] = useState<any>(false)
     const { isSafeOwner } = useRole(DAO, account);
     const currentNonce = useAppSelector((state) => state.flow.currentNonce);
-    const [safeTokens, setSafeTokens] = useState([]);
+    //const [safeTokens, setSafeTokens] = useState([]);
+    const { safeTokens } = useSafeTokens()
     const [reopen, setReopen] = useState(false);
     const [rejectionNote, setRejectionNote] = useState('');
     const [selectedUser, setSelectedUser] = useState<any>(null);
     const [rejectUser, setRejectUser] = useState<any>(null);
     const [error, setError] = useState<any>(null);
+    const [chainId, setChainId] = useState(null)
     const [selectedTag, setSelectedTag] = useState<any>(null);
 
     const { createSafeTransaction } = useSafeTransaction(_get(DAO, 'safe.address', ''))
 
     useEffect(() => {
-        if (chainId) {
-            getSafeTokens(chainId, _get(DAO, 'safe.address', null))
-                .then(tokens => setSafeTokens(tokens))
-        }
-    }, [chainId, DAO])
+        if(DAO)
+            setChainId(_get(DAO, 'chainId'))
+    }, [DAO])
+
+    // useEffect(() => {
+    //     if (chainId) {
+    //         getSafeTokens(chainId, _get(DAO, 'safe.address', null))
+    //             .then(tokens => setSafeTokens(tokens))
+    //     }
+    // }, [chainId, DAO])
 
     const taskSubmissions = useMemo(() => {
         console.log("59 task : ", task)
@@ -146,7 +156,7 @@ const TaskReview = ({ task, close }: any) => {
     const tokenDecimal = useMemo(() => {
         if (task) {
             const tokenAddr = _get(task, 'compensation.currency', 'SWEAT');
-            if (tokenAddr === SupportedChainId.POLYGON || tokenAddr === SupportedChainId.GOERLI || tokenAddr === 'SWEAT')
+            if (tokenAddr === 'SWEAT')
                 return 18
             const tkn = _find(safeTokens, (stkn: any) => stkn.tokenAddress === tokenAddr)
             if (tkn) {
@@ -158,6 +168,9 @@ const TaskReview = ({ task, close }: any) => {
     }, [safeTokens, task])
 
     const handleApproveTask = async () => {
+        if(currentChainId !== _get(DAO, 'chainId', '')) {
+            return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
+        }
         try {
             setApproveLoading(true);
             setError(null)
@@ -199,7 +212,7 @@ const TaskReview = ({ task, close }: any) => {
                 recipient: _get(activeSubmission, 'member._id', null)
             }
     
-            axiosHttp.post(`task/${task._id}/approve?daoUrl=${DAO.url}`, payload)
+            return axiosHttp.post(`task/${task._id}/approve?daoUrl=${DAO.url}`, payload)
                 .then(async res => {
                     let m = _get(activeSubmission, 'member.name', '') === '' ? _get(activeSubmission, 'member.wallet', '') : _get(activeSubmission, 'member.name', '')
                     await axiosHttp.post(`transaction/label`, {
@@ -216,7 +229,7 @@ const TaskReview = ({ task, close }: any) => {
         } catch (e) {
             setApproveLoading(false);
             console.log(e)
-            setError(e)
+            return setError(e)
         }
     }
 

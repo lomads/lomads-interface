@@ -11,19 +11,20 @@ import moment from "moment";
 import axiosHttp from '../../../../api';
 import { updateSafeTransaction } from "state/dashboard/reducer";
 import { SupportedChainId } from "constants/chains";
-import useSafeTokens from "hooks/useSafeTokens";
+import {useSafeTokens} from "hooks/useSafeTokens";
 import { legacy_createStore } from "@reduxjs/toolkit";
 import Dropdown from "muiComponents/Dropdown";
-
 import Avatar from "muiComponents/Avatar";
+import { CHAIN_INFO } from "constants/chainInfo";
 
-const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress, onLoadLabels, editMode, onSetEditMode,editTag,onSetEditTag }: any) => {
-	const { chainId } = useWeb3React();
+const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress, onLoadLabels, editMode, onSetEditMode, editTag, onSetEditTag }: any) => {
+	//const { chainId } = useWeb3React();
     const threshold = useAppSelector((state) => state.flow.safeThreshold);
     const { DAO } = useAppSelector(store => store.dashboard);
     const [reasonText, setReasonText] = useState({});
-    // const [editTag, setEditTag] = useState(false);
-    const {safeTokens} = useSafeTokens(safeAddress)
+    //const [editMode, setEditMode] = useState(null);
+    const {safeTokens} = useSafeTokens()
+    //const [editTag, setEditTag] = useState(false);
     const dispatch = useAppDispatch()
 
     const { isCredit, amount, tokenSymbol, symbol, recipient,tag, date, reason, txHash, isAllowanceTransaction, isOwnerModificaitonTransaction } = useMemo(() => {
@@ -32,11 +33,11 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
         if(_get(transaction, 'transfers[0].tokenInfo.decimals', null))
             decimal = _get(transaction, 'transfers[0].tokenInfo.decimals', 18)
         let amount = (+(_get(transaction, 'transfers[0].value', _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'value' || p.name === '_value'), 'value', _get(transaction, 'value', 0)))) / 10 ** decimal)
-        let symbol = chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR';
+        let symbol = CHAIN_INFO[chainId]?.nativeCurrency?.symbol;
         if(_get(transaction, 'transfers[0].tokenAddress', null))
             symbol = _get(transaction, 'transfers[0].tokenInfo.symbol', '')
         else
-            symbol = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
+            symbol = _get(_find(safeTokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol))
         let recipient = _get(transaction, 'transfers[0].to', _get(_find(_get(transaction, 'dataDecoded.parameters', []), p => p.name === 'to' || p.name === '_to'), 'value', _get(transaction, 'to', '')))
         let tokenSymbol = undefined;
         const setAllowance =  _find(_get(transaction, 'dataDecoded.parameters[0].valueDecoded', []), vd => _get(vd, 'dataDecoded.method', '') === "setAllowance")
@@ -83,7 +84,7 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
         let date = _get(transaction, 'executionDate', null) ? moment.utc(_get(transaction, 'executionDate', null)).local().format('MM/DD hh:mm') : moment.utc(_get(transaction, 'submissionDate', null)).local().format('MM/DD hh:mm')
         console.log('reason', reason)
         return { isCredit, amount, tokenSymbol, symbol, recipient, date, reason,tag, txHash, isAllowanceTransaction, isOwnerModificaitonTransaction }
-    }, [transaction, safeTokens, tokens, labels])
+    }, [transaction, safeTokens, safeTokens, labels])
 
     const _handleReasonKeyDown = (safeTxHash: string, recipient: string, reasonText: string) => {
         if (reasonText && reasonText !== '') {
@@ -150,17 +151,17 @@ const CompleteTxn = ({ labels, transaction, tokens, owner, isAdmin, safeAddress,
         const mulAmount = _get(item, 'dataDecoded.parameters[1].value',  _get(item, 'value', 0))
         let mulRecipient = _get(item, 'dataDecoded.parameters[0].value', _get(item, 'to', 0))
         const isLast = _get(transaction, 'dataDecoded.parameters[0].valueDecoded', []).length - 1 === index;
-        let token = chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR';
+        let token = CHAIN_INFO[chainId]?.nativeCurrency?.symbol;
         if(_get(transaction, 'transfers[0].tokenAddress', null))
             token = _get(transaction, 'transfers[0].tokenInfo.symbol', '')
         else
-            token = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', _get(transaction, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'))
+            token = _get(_find(safeTokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.symbol', _get(transaction, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol))
 
         let muldecimal = 18;
         if(_get(transaction, 'transfers[0].tokenAddress', null))
             muldecimal = _get(transaction, 'transfers[0].tokenInfo.decimals', 18)
         else
-            muldecimal = _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.decimals', _get(transaction, 'token.decimals', 18))
+            muldecimal = _get(_find(safeTokens, t => t.tokenAddress === _get(transaction, 'dataDecoded.parameters[0].valueDecoded', [])[index].to), 'token.decimals', _get(transaction, 'token.decimals', 18))
 
         console.log("muldecimal", muldecimal)
 

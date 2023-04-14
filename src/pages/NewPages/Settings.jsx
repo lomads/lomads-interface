@@ -68,11 +68,13 @@ import RolesAndPermissionModal from "muiModals/RolesAndPermissionModal";
 import TrelloOrganizationsModal from "muiModals/TrelloOrganizationsModal";
 
 import { LeapFrog } from "@uiball/loaders";
+import useRole from "hooks/useRole";
+import { useWeb3React } from "@web3-react/core";
 
 const Settings = () => {
 	const navigate = useNavigate();
 	const { daoURL,openState } = useParams();
-
+	const { account } = useWeb3React() 
 	const dispatch = useAppDispatch();
 
 	//! CONST DECLARATION
@@ -87,6 +89,7 @@ const Settings = () => {
 	const [repoInfo, setRepoInfo] = useState('');
 
 	const { DAO, updateDaoLoading, updateDaoLinksLoading } = useAppSelector((state) => state.dashboard);
+	const { myRole, displayRole, permissions, can, isSafeOwner } = useRole(DAO, account);
 
 	console.log("DAO data : ", DAO);
 
@@ -210,6 +213,7 @@ const Settings = () => {
 							<h1>{name}</h1>
 							<h2>Settings</h2>
 						</div>
+						{
 						<div className="settings-organisation"
 							onClick={() => {
 								setOpenOrganisationDetails(true);
@@ -226,7 +230,7 @@ const Settings = () => {
 								</Link>
 							</div>
 						</div>
-
+						}
 						<div className="settings-organisation-flexbox">
 							<div className="settings-organisation-child"
 								onClick={() => {
@@ -248,7 +252,7 @@ const Settings = () => {
 									</Link>
 								</div>
 							</div>
-							<div
+							{ <div
 								onClick={() => {
 									setOpenSafe(true)
 								}}
@@ -267,7 +271,7 @@ const Settings = () => {
 										<ChevronRight />
 									</Link>
 								</div>
-							</div>
+							</div> }
 
 							<div className="settings-organisation-child"
 								onClick={() => {

@@ -27,6 +27,9 @@ import { tokenCallSafe } from "connection/DaoTokenCall";
 import { ImportSafe, safeService } from "connection/SafeCall";
 import axiosHttp from 'api'
 import { getDao } from "state/dashboard/actions";
+import {useSafeTokens} from "hooks/useSafeTokens";
+import SwitchChain from "components/SwitchChain";
+import { toast } from "react-hot-toast";
 import Avatar from "muiComponents/Avatar";
 import Dropdown from "muiComponents/Dropdown";
 
@@ -34,36 +37,42 @@ import Dropdown from "muiComponents/Dropdown";
 const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleModal, toggleCompensate }) => {
   const [showCompensateMembersDoneModal , setShowCompensateMembersDoneModal] = useState(false)
   const { user, DAO, DAOList, DAOLoading } = useAppSelector((state) => state.dashboard);
-  const { chainId, account, provider } = useWeb3React();
+  const { chainId: currentChainId, account, provider } = useWeb3React();
+  const [chainId, setChainId] = useState(null)
   const dispatch = useAppDispatch()
-  const [safeTokens, setSafeTokens] = useState([]);
   const [loading, setLoading] = useState(false);
+  const { safeTokens } = useSafeTokens()
+
+  useEffect(() => {
+    if(DAO)
+      setChainId(_get(DAO, 'chainId'))
+  }, [DAO])
   const [selectedTag, setSelectedTag] = useState(null);
 
   const capitalizeFirstLetter = (string) => {
 		return string.charAt(0).toUpperCase() + string.slice(1);
 	}
 
-  useEffect(() => {
-    if(chainId, DAO) {
-      axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${_get(DAO, 'safe.address', '')}/balances/usd/`, {withCredentials: false })
-      .then((tokens) => {
-        setSafeTokens(tokens.data.map(t => {
-          let tkn = t
-          if(!tkn.tokenAddress){
-            return {
-              ...t,
-              tokenAddress: chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS,
-              token: {
-                symbol: chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'
-              }
-            }
-          }
-            return t
-        }));
-      });
-    }
-	}, [chainId, DAO]);
+  // useEffect(() => {
+  //   if(chainId, DAO) {
+  //     axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${_get(DAO, 'safe.address', '')}/balances/usd/`, {withCredentials: false })
+  //     .then((tokens) => {
+  //       setSafeTokens(tokens.data.map(t => {
+  //         let tkn = t
+  //         if(!tkn.tokenAddress){
+  //           return {
+  //             ...t,
+  //             tokenAddress: chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS,
+  //             token: {
+  //               symbol: chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR'
+  //             }
+  //           }
+  //         }
+  //           return t
+  //       }));
+  //     });
+  //   }
+	// }, [chainId, DAO]);
 
   const sweatMembers = useMemo(() => {
     if(DAO) {
@@ -129,6 +138,9 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
 
 
   const createTransaction = async () => {
+    if(currentChainId !== _get(DAO, 'chainId', '')) {
+      return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
+    }
 		try {
       if(!sweatMembers || sweatMembers.length == 0) throw "No entries"
 			//setError(null)

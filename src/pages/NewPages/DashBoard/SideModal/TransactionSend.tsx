@@ -19,6 +19,7 @@ import AddRecipient from "./AddRecipient";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import { ImportSafe } from "connection/SafeCall";
 import { SupportedChainId } from "constants/chains";
+import {useSafeTokens} from "hooks/useSafeTokens";
 import { useWeb3React } from "@web3-react/core";
 import { useAppSelector } from "state/hooks";
 import {
@@ -38,6 +39,7 @@ import Dropdown from "muiComponents/Dropdown";
 const TransactionSend = (props: IselectTransactionSend) => {
 	console.log("error : ", props.error)
 	const { DAO } = useAppSelector((state) => state?.dashboard);
+	const { safeTokens } = useSafeTokens()
 	const { chainId } = useWeb3React();
 	const managePreviousNavigation = () => {
 		const length = props.setRecipient.current.length;
@@ -78,12 +80,12 @@ const TransactionSend = (props: IselectTransactionSend) => {
 							}}
 							defaultValue={props.selectedToken}
 						>
-							{props.tokens.map((result: any, index: any) => {
+							{safeTokens.map((result: any, index: any) => {
 								return (
 									(
 										<>
-											<option value={result?.tokenAddress ? result.tokenAddress : chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS} key={index}>
-												{_get(result, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')}
+											<option value={result?.tokenAddress} key={index}>
+												{_get(result, 'token.symbol')}
 											</option>
 										</>
 									)
@@ -186,7 +188,7 @@ const TransactionSend = (props: IselectTransactionSend) => {
 						/>
 					</div>
 				</div>
-				{props.error && <div style={{ fontSize: 14, color: 'red', textAlign: 'center' }}>{props.error}</div>}
+				{props.error && typeof props.error === 'string' && <div style={{ fontSize: 14, color: 'red', textAlign: 'center' }}>{props.error}</div>}
 				<div id="transactionSendDivider2"></div>
 				<Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: '500px',  position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
 					<Box display="flex" mt={4} justifyContent="center" flexDirection="row">

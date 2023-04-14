@@ -162,13 +162,13 @@ function Web3StatusInner() {
 		return (
 			<Web3StatusError
 				onClick={() => {
-					switchChain(connector, SupportedChainId.GOERLI)
-						.then(async () => {
-							//navigate(navigateTo())
-						})
-						.catch((err) => {
-							console.log("Error occurred while switching");
-						});
+					// switchChain(connector, SupportedChainId.GOERLI)
+					// 	.then(async () => {
+					// 		//navigate(navigateTo())
+					// 	})
+					// 	.catch((err) => {
+					// 		console.log("Error occurred while switching");
+					// 	});
 				}}
 			>
 				<NetworkIcon />
@@ -200,7 +200,7 @@ function Web3StatusInner() {
 					!hasPendingTransactions && (
 						// <StatusIcon connectionType={connectionType} />
 						// <img src={dogIcon} alt="dog-icon" />
-						<Avatar name={user.name} wallet={account}/>
+						<Avatar name={user?.name} wallet={account}/>
 					)
 				}
 				{/* {

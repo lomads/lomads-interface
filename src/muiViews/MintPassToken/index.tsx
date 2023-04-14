@@ -52,6 +52,7 @@ import { useTokenContract } from 'hooks/useContract'
 import mime from 'mime'
 import moment from 'moment'
 import useTransak from 'hooks/useTransak'
+import SwitchChain from 'components/SwitchChain'
 const { NFTStorage, File } = require("nft.storage")
 const client = new NFTStorage({ token: process.env.REACT_APP_NFT_STORAGE })
 
@@ -74,7 +75,8 @@ const useStyles = makeStyles((theme: any) => ({
 
 
 export default () => {
-    const { account, provider, chainId } = useWeb3React();
+    const { account, provider, chainId: currentChainId } = useWeb3React();
+    const [chainId, setChainId] = useState(null);
     const navigate = useNavigate()
     const { daoURL } = useParams()
     const classes = useStyles()
@@ -89,7 +91,7 @@ export default () => {
     const [contract, setContract] = useState<any>(null)
     const [showDrawer, setShowDrawer] = useState<boolean>(false)
     const [errors, setErrors] = useState<any>({})
-    const [balance, setBalance] = useState<any>(0)
+    const [balance, setBalance] = useState<any>(null)
     const [metadata, setMetadata] = useState<any>(null)
     const [payment, setPayment] = useState<any>(null)
     const [discountCheckLoading, setDiscountCheckLoading] = useState<boolean|null>(null)
@@ -110,6 +112,11 @@ export default () => {
     const tokenContract = useTokenContract(contract?.mintPriceToken || undefined)
 
     useEffect(() => {
+        if(DAO)
+            setChainId(DAO?.chainId)
+    }, [DAO])
+
+    useEffect(() => {
         if(account && contract) {
             axiosHttp.get(`mint-payment/${contract?.address}`)
             .then(res => setPayment(res.data))
@@ -118,9 +125,9 @@ export default () => {
 
     useEffect(() => {
         console.log("balance..getStats", balance)
-        if(account)
-            getStats().then(res => setBalance(parseInt(res[0]._hex, 16)))
-    }, [account])
+        if(account && chainId)
+            getStats().then(res => { console.log("balanceof::::", res); setBalance(parseInt(res[0]._hex, 16)) })
+    }, [account, chainId])
 
     useEffect(() => {
         if(!DAO) {
@@ -305,10 +312,19 @@ export default () => {
             return setErrors(err)
         const msg = await encryptMessage(JSON.stringify({ email: _get(state, 'email', ''), discord: _get(state, 'discord', ''), telegram: _get(state, 'telegram', ''), github: _get(state, 'github', '') }))
         const {  _id, createdAt, updatedAt, archivedAt, ...remaining } = metadata;
+        let attrb = remaining?.attributes;
+        const entities = ['Email', 'Discord', 'Telegram', 'Github'];
+        for (let index = 0; index < entities.length; index++) {
+            const entity = entities[index];
+            const exists = _find(attrb, a => a.trait_type === entity)
+            if(!exists)
+                attrb.push({ trait_type: entity, value: null })
+        }
+
         let metadataJSON = {
             ...remaining,
             name: state?.name,
-            attributes: remaining?.attributes.map((attr: any) => {
+            attributes: attrb.map((attr: any) => {
                 if(['Email', 'Discord', 'Telegram', 'Github', 'Personal Details'].indexOf(attr.trait_type) > -1){
                     if(attr?.trait_type === 'Email') {
                          return {
@@ -568,6 +584,10 @@ export default () => {
         }
     }
 
+    if(!chainId || balance === null) {
+        return <FullScreenLoader/>
+    }
+
 
     return (
         <Container>
@@ -678,7 +698,12 @@ export default () => {
                                         <Button loading={discountCheckLoading} disabled={ !state?.referralCode || state?.referralCode === "" || discountCheckLoading} onClick={() => handleApplyDiscount()} style={{ marginLeft: 16, marginTop: 22 }} size="small" variant="outlined">Apply</Button>
                                     </Box> } */}
                                     { balance == 0 &&
-                                        <Button loading={mintLoading} onClick={() => setShowDrawer(true)} style={{ margin: '32px 0 16px 0' }} variant="contained" fullWidth>MINT YOUR SBT</Button>
+                                        <Button loading={mintLoading} onClick={() => { 
+                                            if(currentChainId !== _get(DAO, 'chainId', '')) {
+                                                return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')} />)
+                                            }
+                                            return setShowDrawer(true) 
+                                        }} style={{ margin: '32px 0 16px 0' }} variant="contained" fullWidth>MINT YOUR SBT</Button>
                                     }
                                   {networkError && <Typography my={2} textAlign="center" color="error" variant="body2">{ networkError }</Typography> }
                                 </Box> : 
@@ -708,7 +733,10 @@ export default () => {
                                     }
                                     { balance === 1 && metadata &&
                                         <Button onClick={() => { 
-                                            updateMetadata()
+                                            if(currentChainId !== _get(DAO, 'chainId', '')) {
+                                                return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')} />)
+                                            }
+                                            return updateMetadata()
                                         }} style={{ margin: '32px 0 16px 0' }} variant="contained" fullWidth>UPDATE</Button>
                                     }
                                 </Box>
@@ -717,7 +745,10 @@ export default () => {
                                 <Box mx={2} mt={0.5} px={3} py={2} style={{ borderRadius: 5, width: '100%', backgroundColor: '#FFF'  }}>
                                      { balance === 1 && metadata ?
                                         <Button onClick={() => { 
-                                            updateMetadata()
+                                            if(currentChainId !== _get(DAO, 'chainId', '')) {
+                                                return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')} />)
+                                            }
+                                           return updateMetadata()
                                         }} style={{ margin: '32px 0 16px 0' }} variant="contained" fullWidth>UPDATE</Button> : 
                                         <Button onClick={() => setShowDrawer(true)} style={{ margin: '32px 0 16px 0' }} variant="contained" fullWidth>{"MINT YOUR SBT" }</Button>
                                     }

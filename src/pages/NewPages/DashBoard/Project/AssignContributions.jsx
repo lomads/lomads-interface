@@ -25,7 +25,9 @@ import { getDao, updateMilestone } from "state/dashboard/actions";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 
 import { resetUpdateMilestoneLoader } from 'state/dashboard/reducer';
-import useSafeTokens from 'hooks/useSafeTokens';
+import {useSafeTokens} from 'hooks/useSafeTokens';
+import SwitchChain from 'components/SwitchChain';
+import { toast } from 'react-hot-toast';
 import Dropdown from 'muiComponents/Dropdown';
 import Avatar from 'muiComponents/Avatar';
 
@@ -34,7 +36,9 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
     console.log("selectedMilestone : ", selectedMilestone);
     const dispatch = useAppDispatch();
     const { DAO, Project, updateMilestoneLoading } = useAppSelector((state) => state.dashboard);
-    const { chainId, account } = useWeb3React();
+    const { chainId: currentChainId, account } = useWeb3React();
+
+    const [chainId, setChainId] = useState(null)
 
     const [compensation, setCompensation] = useState(_get(data, 'compensation', null));
     const [error, setError] = useState(null);
@@ -45,7 +49,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
     const safeAddress = useAppSelector((state) => state.flow.safeAddress);
 
     const { isSafeOwner } = useRole(DAO, account);
-    const { safeTokens } = useSafeTokens(_get(DAO, 'safe.address', ''))
+    const { safeTokens } = useSafeTokens()
 
     const [temp, setTemp] = useState([]);
 
@@ -54,6 +58,11 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
     const [isSplit, setIsSplit] = useState(false);
 
     const [selectedTag, setSelectedTag] = useState(null);
+
+    useEffect(() => {
+        if(DAO)
+            setChainId(_get(DAO, 'chainId'))
+    }, [DAO])
 
     useEffect(() => {
         if (Project) {
@@ -186,7 +195,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
     const tokenDecimal = useMemo(() => {
         if(safeTokens && safeTokens.length > 0) {
             const tokenAddr = _get(compensation, 'currency', 'SWEAT');
-            if (tokenAddr === SupportedChainId.POLYGON || tokenAddr === SupportedChainId.GOERLI || tokenAddr === 'SWEAT')
+            if (tokenAddr === 'SWEAT')
                 return 18
             const tkn = _find(safeTokens, (stkn) => stkn.tokenAddress === tokenAddr)
             if (tkn) {
@@ -217,10 +226,13 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
 
     const createTxn = async (send) => {
         setError(null);
-        setisLoading(true);
         try {
             let onChainSafeTxHash = undefined;
             if (isSafeOwner && _get(compensation, 'amount', 'SWEAT') !== 'SWEAT') {
+                if(currentChainId !== _get(DAO, 'chainId', '')) {
+                    return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
+                }
+                setisLoading(true);
                 onChainSafeTxHash = await createOnChainTxn(send);
                     const newArray = _get(data, 'milestones', []).map((item, i) => {
                         if (i === _get(selectedMilestone, 'pos', '')) {
@@ -233,7 +245,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                 setisLoading(false);
                 return;
             }
-
+            setisLoading(true);
             const offChainPayload = {
                 daoId: _get(DAO, '_id', undefined),
                 safe: _get(DAO, 'safe.address', undefined),

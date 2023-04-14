@@ -39,8 +39,10 @@ root.render(
                     <MoralisProvider serverUrl={serverUrl} appId={appId}>
                       <MuiThemeProvider theme={muiTheme}>
                         <App />
+                        <Toaster containerStyle={{
+                          zIndex: 1000000
+                        }} position="bottom-right" />
                       </MuiThemeProvider>
-                      <Toaster position="bottom-right" />
                     </MoralisProvider>
                   </ChakraProvider>
                 </BrowserRouter>

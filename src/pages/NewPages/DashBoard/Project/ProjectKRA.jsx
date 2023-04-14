@@ -3,7 +3,7 @@ import { find as _find, get as _get, debounce as _debounce } from 'lodash';
 import './ProjectKRA.css';
 import { CgClose } from 'react-icons/cg'
 import createTaskSvg from '../../../../assets/svg/kra.svg';
-
+import Button from 'muiComponents/Button';
 import SimpleInputField from "UIpack/SimpleInputField";
 import { nanoid } from '@reduxjs/toolkit';
 
@@ -177,7 +177,14 @@ const ProjectKRA = ({ toggleShowKRA, getResults, list, freq, editKRA }) => {
                             })
                         }
                     </div>
-                    <div className='kra-footer'>
+                    <div style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: '500px',  position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
+                        <div style={{ width: 350,  margin: '0 auto', display: 'flex', flexDirection: 'row', alignSelf: 'center', }}>
+                            <Button size="small" sx={{mr:1}} variant="outlined" fullWidth onClick={() => toggleShowKRA()}>CANCEL</Button>
+                            <Button loading={editProjectKraLoading} disabled={editProjectKraLoading} size="small" fullWidth variant="contained"
+                                onClick={handleSubmit}>{editKRA ? "SAVE" : "ADD"}</Button>
+                        </div>
+					</div>
+                    {/* <div className='kra-footer'>
                         <button onClick={() => toggleShowKRA()}>
                             CANCEL
                         </button>
@@ -202,7 +209,7 @@ const ProjectKRA = ({ toggleShowKRA, getResults, list, freq, editKRA }) => {
                                 </button>
                         }
 
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>

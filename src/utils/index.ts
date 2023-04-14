@@ -4,6 +4,7 @@ import { Contract } from '@ethersproject/contracts'
 import { JsonRpcProvider, JsonRpcSigner } from '@ethersproject/providers'
 import { FeeAmount } from '@uniswap/v3-sdk'
 import axios from 'axios'
+import { CHAIN_INFO } from 'constants/chainInfo'
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
 import { SupportedChainId } from "constants/chains";
 import { get as _get } from 'lodash'
@@ -83,10 +84,10 @@ export async function getSafeTokens(chainId: number, safeAddress: string): Promi
         tkns = tkns.map((tkn: any) => {
           return {
             ...tkn,
-            tokenAddress: tkn.tokenAddress ? tkn.tokenAddress : chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS,
+            tokenAddress: tkn.tokenAddress ? tkn.tokenAddress : process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
             token: {
               ...(tkn.token ? { ...tkn.token } : {
-                symbol: _get(tkn, 'token.symbol', chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR')
+                symbol: _get(tkn, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol)
               })
             }
           }

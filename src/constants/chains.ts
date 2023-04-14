@@ -16,12 +16,12 @@
 }
 
 export const CHAIN_IDS_TO_NAMES = {
-  [`${SupportedChainId.MAINNET}`]: 'mainnet',
+  [`${SupportedChainId.MAINNET}`]: 'Ethereum',
   [`${SupportedChainId.ROPSTEN}`]: 'ropsten',
   [`${SupportedChainId.RINKEBY}`]: 'rinkeby',
-  [`${SupportedChainId.GOERLI}`]: 'goerli',
+  [`${SupportedChainId.GOERLI}`]: 'Goerli',
   [`${SupportedChainId.KOVAN}`]: 'kovan',
-  [`${SupportedChainId.POLYGON}`]: 'polygon',
+  [`${SupportedChainId.POLYGON}`]: 'Polygon',
   [`${SupportedChainId.POLYGON_MUMBAI}`]: 'polygon mumbai',
   [`${SupportedChainId.ARBITRUM_ONE}`]: 'arbitrum',
   [`${SupportedChainId.ARBITRUM_RINKEBY}`]: 'arbitrum_rinkeby',
@@ -37,7 +37,7 @@ export const ALL_SUPPORTED_CHAIN_IDS: SupportedChainId[] = Object.values(Support
 ) as SupportedChainId[]
 
 export const SUPPORTED_CHAIN_IDS: SupportedChainId[] = [
-  // SupportedChainId.MAINNET,
+  SupportedChainId.MAINNET,
   SupportedChainId.POLYGON,
   SupportedChainId.GOERLI,
 ]
@@ -87,13 +87,15 @@ export const L2_CHAIN_IDS = [
 export type SupportedL2ChainId = typeof L2_CHAIN_IDS[number]
 
 export const GNOSIS_SAFE_BASE_URLS:any = {
+  [SupportedChainId.MAINNET]: 'https://safe-transaction-mainnet.safe.global',
   [SupportedChainId.GOERLI]: 'https://safe-transaction.goerli.gnosis.io',
   [SupportedChainId.POLYGON]: 'https://safe-transaction-polygon.safe.global'
 }
 
 export const GNOSIS_SAFE_ALLOWANCE_MODULE_CONTRACT :any = {
   [SupportedChainId.GOERLI]: '0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134',
-  [SupportedChainId.POLYGON]: '0x1Fb403834C911eB98d56E74F5182b0d64C3b3b4D'
+  [SupportedChainId.POLYGON]: '0x1Fb403834C911eB98d56E74F5182b0d64C3b3b4D',
+  [SupportedChainId.MAINNET]: '0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134'
 }
 
 export const CHAIN_GAS_STATION :any = {
@@ -105,6 +107,10 @@ export const CHAIN_GAS_STATION :any = {
 }
 
 export const SUPPORTED_ASSETS = {
+  [`${SupportedChainId.MAINNET}`]: {
+    id: "ethereum",
+    symbol: "ETH",
+  },
   [`${SupportedChainId.GOERLI}`]: {
     id: "ethereum",
     symbol: "ETH",

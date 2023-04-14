@@ -107,11 +107,11 @@ const ProjectEdit = ({ toggleShowEdit, toggleDeletePrompt, toggleClosePrompt, to
                         </div>
                     </div>
 
-                    <div className='ProjectEdit-footer'>
+                    {/* <div className='ProjectEdit-footer'>
                         <button onClick={() => toggleShowEdit()}>
                             SAVE
                         </button>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>

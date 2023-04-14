@@ -1,21 +1,25 @@
-import { useEffect, useState, useCallback } from "react"
-import { get as _get, find as _find } from 'lodash'
-import axios from "axios";
-import { GNOSIS_SAFE_BASE_URLS, SupportedChainId } from 'constants/chains';
-import { useWeb3React } from "@web3-react/core";
-import { usePrevious } from "./usePrevious";
-import axiosHttp from '../api'
-import { setSafeTokens } from "state/dashboard/reducer";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import {  get as _get, find as _find } from 'lodash'
 import { useAppDispatch, useAppSelector } from "state/hooks";
+import axios from "axios";
+import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains';
+import { CHAIN_INFO } from "constants/chainInfo";
+import axiosHttp from '../api'
 
-const useSafeTokens = (safeAddress: string | null) => {
+export const SafeTokensContext = createContext<any>({
+    safeTokens: null
+})
 
-    const { chainId } = useWeb3React();
-    const dispatch = useAppDispatch();
-    //const [safeTokens, setSafeTokens] = useState([]);
-    const { safeTokens } = useAppSelector(store => store.dashboard)
+export function useSafeTokens(): any {
+    return useContext(SafeTokensContext);
+}
 
-    const tokenBalance = (token: any) => {
+export const SafeTokensProvider = ({ children }: any) => {
+    const dispatch = useAppDispatch()
+    const { DAO } = useAppSelector(store => store?.dashboard)
+    const [safeTokens, setSafeTokens] = useState<any>(null);
+
+    const tokenBalance = useCallback((token: any) => {
         if(safeTokens && safeTokens.length > 0) {
             let selToken = _find(safeTokens, t => _get(t, 'tokenAddress', null) === token)
 			if (safeTokens.length > 0 && !selToken)
@@ -23,24 +27,22 @@ const useSafeTokens = (safeAddress: string | null) => {
             return _get(selToken, 'balance', 0) / 10 ** _get(selToken, 'token.decimals', 18)
         }
         return 0
-    }
+    }, [safeTokens])
 
-    const prevSafeAddress = usePrevious(safeAddress)
-
-    useEffect(() => {
-        if(chainId && safeAddress !== null && (prevSafeAddress !== safeAddress) && !safeTokens){
-            console.log('calling safe tokens..', prevSafeAddress, safeAddress)
-            axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`, {withCredentials: false })
+    const setTokens = async () => {
+        setSafeTokens(null)
+        axios.get(`${GNOSIS_SAFE_BASE_URLS[DAO?.chainId]}/api/v1/safes/${DAO?.safe?.address}/balances/usd/`, {withCredentials: false })
             .then((res: any) => {
                 let tokens = res.data.map((t: any) => {
                     let tkn = t
                     if(!tkn.tokenAddress){
                         return {
                             ...t,
-                            tokenAddress: chainId === SupportedChainId.POLYGON ? process.env.REACT_APP_MATIC_TOKEN_ADDRESS : process.env.REACT_APP_GOERLI_TOKEN_ADDRESS,
+                            tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
                             token: {
-                                symbol: chainId === SupportedChainId.POLYGON ? 'MATIC' : 'GOR',
-                                decimal: 18
+                                symbol: CHAIN_INFO[DAO?.chainId].nativeCurrency.symbol,
+                                decimal:  CHAIN_INFO[DAO?.chainId].nativeCurrency.decimals,
+                                decimals:  CHAIN_INFO[DAO?.chainId].nativeCurrency.decimals,
                             }
                         }
                     }
@@ -50,15 +52,21 @@ const useSafeTokens = (safeAddress: string | null) => {
                     let total = tokens.reduce((a:any, b:any) => {
                         return a + parseFloat(_get(b, 'fiatBalance', 0))
                     }, 0);
-                    axiosHttp.post(`/safe/${safeAddress}/sync`, { tokens, balance: total })
+                    axiosHttp.post(`/safe/${DAO?.safe?.address}/sync`, { tokens, balance: total })
                 }
-                dispatch(setSafeTokens(tokens))
+                setSafeTokens(tokens)
             })
+    }
+
+    useEffect(() => {
+        if(DAO?.url) {
+            setTokens()
         }
-    }, [chainId, safeAddress, prevSafeAddress, safeTokens])
+    }, [DAO?.url])
 
-    return { safeTokens, tokenBalance }
-
+    const contextProvider = {
+        safeTokens,
+        tokenBalance
+    };
+    return <SafeTokensContext.Provider value={contextProvider}>{children}</SafeTokensContext.Provider>;
 }
-
-export default useSafeTokens

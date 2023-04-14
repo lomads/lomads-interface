@@ -132,16 +132,12 @@ export function DAOTokenContract(_tokenAddress: string) {
 export function useSBTDeployerContract(){
   const { chainId } = useWeb3React()
   let path = require('../abis/SBTDeployerv0.json')
-  if(chainId === SupportedChainId.POLYGON)
-    path = require('../abisPolygon/SBTDeployerv0.json')
   return useContract(SBT_DEPLOYER_ADDRESSES, path, true);
 }
 
 export function useSBTContract(contractAddr : String) {
   const { chainId } = useWeb3React()
   let path = require('../abis/SBTv0.json')
-  if(chainId === SupportedChainId.POLYGON)
-    path = require('../abisPolygon/SBTv0.json')
   return useContract(contractAddr, path, true);
 }
 
