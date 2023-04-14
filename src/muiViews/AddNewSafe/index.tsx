@@ -425,7 +425,7 @@ export default () => {
 	const createDAOLoading = useAppSelector((state) => state.flow.createDAOLoading);
 	const { DAOList } = useAppSelector((state) => state.dashboard);
 	const flow = useAppSelector((state) => state.flow);
-	let Myvalue = useRef<Array<InviteGangType>>([]);
+	let Myvalue = useRef<Array<InviteGangType>>([...invitedMembers]);
 	const [polygonGasEstimate, setPolygonGasEstimate] = useState<any>(null)
 
 	//let thresholdValue = useRef<string>("");
