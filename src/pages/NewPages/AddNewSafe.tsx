@@ -471,7 +471,7 @@ const AddNewSafe = () => {
 	return (
 		<>
 			<div className="StartSafe">
-				<div className="headerText">3/3 DAO Treasury</div>
+				<div className="headerText">3/3 Multi-sig Wallet</div>
 				<div className="buttonArea">
 					<div>
 						<SafeButton
