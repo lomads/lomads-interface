@@ -56,6 +56,7 @@ const SelectRecipient = (props: IselectRecipientType) => {
 					name: "",
 					recipient: "",
 					reason: "",
+					tag:{},
 				};
 				obj["name"] = _get(result, 'name', '');
 				obj["recipient"] = result.address;

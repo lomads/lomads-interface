@@ -13,7 +13,7 @@ interface Option {
     color: string;
 }
 
-export default ({ loading, children, className,onChangeOption, ...props }: any) => {
+export default ({ loading, children, className,onChangeOption,defaultMenuIsOpen, ...props }: any) => {
     const dispatch = useAppDispatch();
     const { DAO, createOptionLoading } = useAppSelector((state) => state.dashboard);
     const [isLoading, setIsLoading] = useState(false);
@@ -55,14 +55,17 @@ export default ({ loading, children, className,onChangeOption, ...props }: any) 
       };
 
     return (
-        <CreatableSelect
-            isDisabled={isLoading}
-            isLoading={isLoading}
-            onChange={(newValue) => handleChange(newValue!)}
-            onCreateOption={handleCreate}
-            options={_get(DAO,'options',[])}
-            styles={customStyles}
-            value={value}
-        />
+       <div>
+            <CreatableSelect
+                defaultMenuIsOpen={defaultMenuIsOpen}
+                isDisabled={isLoading}
+                isLoading={isLoading}
+                onChange={(newValue) => handleChange(newValue!)}
+                onCreateOption={handleCreate}
+                options={_get(DAO,'options',[])}
+                styles={customStyles}
+                value={value}
+            />
+       </div>
     )
 }

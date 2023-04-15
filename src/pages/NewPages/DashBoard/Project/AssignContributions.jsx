@@ -209,7 +209,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
         return new Promise(async (resolve, reject) => {
             try {
                 if (!chainId) return;
-                const txnResponse = await createSafeTransaction({ tokenAddress: _get(compensation, 'currency', null), send, confirm: isSafeOwner, createLabel: true,tag:selectedTag })
+                const txnResponse = await createSafeTransaction({ tokenAddress: _get(compensation, 'currency', null), send, confirm: isSafeOwner, createLabel: true })
                 if(txnResponse) {
                     resolve(txnResponse.safeTxHash)
                 } else {
@@ -301,7 +301,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
 						safeTxHash: res.data.safeTxHash,
 						recipient: r.recipient,
 						label: _get(r, 'reason', null),
-                        tag:selectedTag
+                        tag:_get(r, 'tag', null),
 					})
 				})
 				await axiosHttp.post(`transaction/label`, payload)

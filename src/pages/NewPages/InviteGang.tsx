@@ -26,6 +26,7 @@ import { SupportedChainId } from "constants/chains";
 import { DEFAULT_ROLES } from "constants/terminology";
 import useEns from 'hooks/useEns';
 import useTerminology from "hooks/useTerminology";
+import Avatar from "muiComponents/Avatar";
 
 const InviteGang = () => {
 	const dispatch = useAppDispatch();
@@ -337,16 +338,17 @@ const InviteGang = () => {
 								return (
 									<div key={index} className="owner">
 										<div className="avatarPlusName">
-											<img src={daoMember2} alt={result.address} />
-											<p className="nameText">{result.name}</p>
+											<Avatar name={result.name} wallet={result.address}/>
+											{/* <img src={daoMember2} alt={result.address} />
+											<p className="nameText">{result.name}</p> */}
 										</div>
 										<div className="avatarAddress">
-											<p className="text">
+											{/* <p className="text">
 												{result.address &&
 													result.address.slice(0, 6) +
 													"..." +
 													result.address.slice(-4)}
-											</p>
+											</p> */}
 										</div>
 										<div className="avatarRole">
 											<p className="text">

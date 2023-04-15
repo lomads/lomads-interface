@@ -6,7 +6,7 @@ import { getConnection } from "connection/utils";
 import { darken } from "polished";
 import React, { useEffect, useMemo, useState } from "react";
 import { Activity } from "react-feather";
-import { useAppSelector } from "state/hooks";
+import { useAppSelector, useAppDispatch } from 'state/hooks';
 import styled, { css } from "styled-components/macro";
 import { isChainAllowed, switchChain } from "utils/switchChain";
 import { SupportedChainId } from 'constants/chains'
@@ -30,6 +30,8 @@ import useEns from 'hooks/useEns'
 import dogIcon from '../../assets/svg/dogIcon.svg';
 import { MdKeyboardArrowDown } from 'react-icons/md';
 import Avatar from 'muiComponents/Avatar';
+
+import { getCurrentUser } from "state/dashboard/actions";
 
 const Web3StatusGeneric = styled(ButtonSecondary)`
   ${({ theme }) => theme.flexRowNoWrap}
@@ -111,6 +113,14 @@ function Web3StatusInner() {
 	const connectionType = getConnection(connector).type;
 	const { getENSAddress, getENSName } = useEns()
 	const [ens, setEns] = useState<string|null|undefined>(null)
+
+	const dispatch = useAppDispatch();
+
+	useEffect(() => {
+		if(!user){
+			dispatch(getCurrentUser({}))
+		}
+	},[user]);
 
 	useEffect(() => {
 		if(account) {
@@ -195,7 +205,7 @@ function Web3StatusInner() {
 				onClick={toggleWalletModal}
 				pending={hasPendingTransactions}
 			>
-				<div style={{display:'flex',alignItems:'center'}}>
+				<div style={{width:'100%',height:'100%',display:'flex',alignItems:'center'}}>
 				{
 					!hasPendingTransactions && (
 						// <StatusIcon connectionType={connectionType} />
