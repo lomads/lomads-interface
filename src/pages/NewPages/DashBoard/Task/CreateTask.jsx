@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { find as _find, get as _get, debounce as _debounce } from 'lodash';
+import { find as _find, get as _get, debounce as _debounce, orderBy as _orderBy } from 'lodash';
 import './CreateTask.css';
 import { CgClose } from 'react-icons/cg'
 import createProjectSvg from '../../../../assets/svg/createProject.svg';
@@ -479,9 +479,9 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
                                             >
                                                 <option value={null}>Select member</option>
                                                 {
-                                                    eligibleReviewers.map((item, index) => {
+                                                    _orderBy(eligibleReviewers, er => er.member.name).map((item, index) => {
                                                         return (
-                                                            <option value={`${item.member._id}`}>{item.member.name}</option>
+                                                            <option value={`${item.member._id}`}>{item.member.name} ({ beautifyHexToken(item?.member?.wallet) })</option>
                                                         )
                                                     })
                                                 }
