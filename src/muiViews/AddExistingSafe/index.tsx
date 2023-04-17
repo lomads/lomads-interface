@@ -27,6 +27,7 @@ import { makeStyles } from '@mui/styles';
 import { CHAIN_INFO } from 'constants/chainInfo';
 import downArrow from '../../assets/svg/downArrow.svg'
 import { beautifyHexToken } from "utils"
+import { INFURA_NETWORK_URLS } from "constants/infura";
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
@@ -80,7 +81,7 @@ const useStyles = makeStyles((theme: any) => ({
 	ListContent: {
 		display: 'flex',
 		flexDirection: 'row',
-		alignItems: 'center',
+		alignItems: 'flex-start',
 		background: '#FFFFFF',
 	},
 	StartSafe: {
@@ -321,50 +322,52 @@ export default () => {
 	const getSafeDetails = (item: string) => {
 		if (!expand || selectedSafeAddress !== item) {
 			setExpand(true)
-			UseExistingSafe()
+			UseExistingSafe(item)
 			return
 		}
 		setExpand(false)
 	}
 	const UseExistingSafe = useCallback(async (value: string = selectedSafeAddress) => {
 		if (isLoading) return;
-		if (chainId) {
+		if (selectedChainId) {
 			owners.current = [];
 			setisLoading(true);
-			ImportSafe(provider, value)
-				.then(async safeSDK => {
-					dispatch(updateHolder(safeSDK.getAddress() as string));
-					const safeowners: string[] = await safeSDK.getOwners();
+	        // const jsonRpcProvider = new ethers.providers.JsonRpcProvider(_.get(INFURA_NETWORK_URLS,`${selectedChainId}`))
+			// ImportSafe(jsonRpcProvider, value)
+			// 	.then(async safeSDK => {
+			// 		console.log("safeSDK", safeSDK)
+					dispatch(updateHolder(value as string));
+					const safeowners: string[] = await axios.get(`${GNOSIS_SAFE_BASE_URLS[selectedChainId]}/api/v1/safes/${value}`).then(res => res?.data?.owners)
 					safeowners.map((ownerAddress: string, index: number) => {
 						let obj: InviteGangType = { name: "", address: "" };
 						obj["address"] = ownerAddress;
 						if (!_.find(owners.current, (w: any) => w.address.toLowerCase() === obj.address.toLowerCase()))
 							owners.current.push(obj);
 					});
-					const bal = await safeSDK.getBalance();
-					setBalance(bal.toString());
-					await getTokens(safeAddress);
+					// const bal = await safeSDK.getBalance();
+					// setBalance(bal.toString());
+					await getTokens(value);
 					setisLoading(false);
-				})
-				.catch(e => {
-					setisLoading(false);
-					console.log(e)
-					if (e.message === "SafeProxy contract is not deployed on the current network") {
-						if (chainId) {
-							const chain = chainId || 137;
-							setErrors({ issafeAddress: `This safe is not on ${CHAIN_IDS_TO_NAMES[chain]}` });
-						}
-					}
-				})
+				// })
+				// .catch(e => {
+				// 	setisLoading(false);
+				// 	console.log(e)
+				// 	if (e.message === "SafeProxy contract is not deployed on the current network") {
+				// 		if (selectedChainId) {
+				// 			const chain = selectedChainId || 137;
+				// 			setErrors({ issafeAddress: `This safe is not on ${CHAIN_IDS_TO_NAMES[chain]}` });
+				// 		}
+				// 	}
+				// })
 		}
-	}, [chainId, safeAddress]);
+	}, [selectedChainId, selectedSafeAddress]);
 
 
 	const getTokens = async (safeAddress: string) => {
-		chainId &&
+		selectedChainId &&
 			axios
 				.get(
-					`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${safeAddress}/balances/usd/`
+					`${GNOSIS_SAFE_BASE_URLS[selectedChainId]}/api/v1/safes/${safeAddress}/balances/usd/`
 				)
 				.then((tokens: any) => {
 					setTokens(tokens.data);
@@ -377,8 +380,8 @@ export default () => {
 	};
 
 	useEffect(() => {
-		isAddressValid(safeAddress);
-	}, [safeAddress]);
+		isAddressValid(selectedSafeAddress);
+	}, [selectedSafeAddress]);
 
 	useEffect(() => {
 		if (createDAOLoading == false) {
@@ -398,18 +401,18 @@ export default () => {
 	const handleClick = useCallback(() => {
 		console.log("clicked")
 		let terrors: any = {};
-		if (!isAddressValid(safeAddress)) {
+		if (!isAddressValid(selectedSafeAddress)) {
 			terrors.issafeAddress = " * Safe Address is not valid.";
 		}
 		if (_.isEmpty(terrors)) {
-			UseExistingSafe();
+			UseExistingSafe(selectedSafeAddress);
 		}
 		else {
 			setErrors(terrors);
 		}
-	}, [safeAddress]);
+	}, [selectedSafeAddress]);
 
-	const handleClickDelayed = useCallback(_.debounce(handleClick, 1000), [handleClick, safeAddress])
+	const handleClickDelayed = useCallback(_.debounce(handleClick, 1000), [handleClick, selectedSafeAddress])
 
 	const getSafes = (chainId: number = selectedChainId) => {
 		axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/owners/${account}/safes/`)
@@ -561,7 +564,7 @@ export default () => {
 											>
 												<Box className={classes.ListContent}>
 													<Box className={classes.ChainLogo}>
-														<img src={CHAIN_INFO[selectedChainId].logoUrl} alt="seek-logo" />
+														<img style={{ width: 18, height: 18 }} src={CHAIN_INFO[selectedChainId].logoUrl} alt="seek-logo" />
 													</Box>
 													<Box>
 														<Typography className={classes.safeName}>Safe Name</Typography>
