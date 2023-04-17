@@ -88,7 +88,8 @@ const useSafeTransaction = (safeAddress: string) => {
                     safeTransactionData = await createNativeSingleTxn(send, safeToken)
                 else
                     safeTransactionData = await createNativeMultiTxn(send, safeToken)
-            } else {
+            } 
+            else {
                 safeTransactionData = await createMultiTxn(send, safeToken)
             }
 

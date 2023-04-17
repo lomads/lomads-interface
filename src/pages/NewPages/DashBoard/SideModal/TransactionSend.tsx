@@ -41,6 +41,7 @@ const TransactionSend = (props: IselectTransactionSend) => {
 	const { DAO } = useAppSelector((state) => state?.dashboard);
 	const { safeTokens } = useSafeTokens()
 	const { chainId } = useWeb3React();
+	
 	const managePreviousNavigation = () => {
 		const length = props.setRecipient.current.length;
 		props.setRecipient.current.splice(0, length);

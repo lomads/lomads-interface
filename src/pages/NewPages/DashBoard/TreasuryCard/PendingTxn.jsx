@@ -36,6 +36,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
     const { safeTokens: tokens } = useSafeTokens()
 
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const [tempMulRecipient,setTempMulRecipient] = useState(null);
     //const threshold = useAppSelector((state) => state.flow.safeThreshold);
 
     const { amount, tokenSymbol, recipient, reason,tag, decimal, isAllowanceTransaction, isOwnerModificaitonTransaction } = useMemo(() => {
@@ -147,9 +148,10 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popover' : undefined;
 
-    const handleEnableEditTag = (event) => {
+    const handleEnableEditTag = (event,mulRecipient) => {
         if (isAdmin) {
             setAnchorEl(event.currentTarget);
+            setTempMulRecipient(mulRecipient);
         }
     }
 
@@ -192,7 +194,12 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                         {
                             mulReason && (!editMode || (editMode && editMode !== `${transaction.safeTxHash}-${mulRecipient}`))
                                 ?
-                                <div className="dashboardText" onClick={() => handleEnableEditMode(`${transaction.safeTxHash}-${mulRecipient}`, mulReason)}>{mulReason}</div>
+                                <div 
+                                    className="dashboardText" 
+                                    onClick={() => handleEnableEditMode(`${transaction.safeTxHash}-${mulRecipient}`, mulReason)}
+                                    >
+                                    {mulReason}
+                                </div>
                                 :
                                 <>
                                     {
@@ -234,7 +241,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                                 <>
                                     <div 
                                         aria-describedby={id}
-                                        onClick={(e) => handleEnableEditTag(e)} 
+                                        onClick={(e) => handleEnableEditTag(e,mulRecipient)} 
                                         className="dashboardText" style={{background:`${mulTag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer',position:'relative'}}
                                     >
                                         <span style={{color:mulTag.color,fontWeight:'700',fontSize:'10px'}}>{mulTag.value}</span>
@@ -250,7 +257,10 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                                           }}
                                     >
                                         <div className="dropdown-popover-container">
-                                            <Dropdown defaultMenuIsOpen={true} onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, mulRecipient,value)}/>
+                                            <Dropdown 
+                                                defaultMenuIsOpen={true} 
+                                                onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, tempMulRecipient,value)}
+                                            />
                                         </div>
                                     </Popover>
                                 </>
@@ -258,7 +268,8 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                                 <>
                                     <div 
                                         aria-describedby={id}
-                                        onClick={(e) => handleEnableEditTag(e)} 
+                                        className="add-label-btn" 
+                                        onClick={(e) => handleEnableEditTag(e,mulRecipient)} 
                                     >
                                         <span style={{color:'#111111',fontWeight:'700',fontSize:'10px'}}>Add Label +</span>
                                     </div>
@@ -273,7 +284,10 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                                           }}
                                     >
                                         <div className="dropdown-popover-container">
-                                            <Dropdown defaultMenuIsOpen={true} onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, mulRecipient,value)}/>
+                                            <Dropdown 
+                                                defaultMenuIsOpen={true} 
+                                                onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, tempMulRecipient,value)}
+                                            />
                                         </div>
                                     </Popover>
                                 </>
@@ -442,7 +456,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                                 <>
                                     <div 
                                             aria-describedby={id}
-                                            onClick={(e) => handleEnableEditTag(e)} 
+                                            onClick={(e) => handleEnableEditTag(e,recipient)} 
                                             className="dashboardText" 
                                             style={{background:`${tag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer'}}
                                         >
@@ -459,7 +473,10 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                                               }}
                                         >
                                             <div className="dropdown-popover-container">
-                                                <Dropdown defaultMenuIsOpen={true} onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, recipient,value)}/>
+                                                <Dropdown 
+                                                    defaultMenuIsOpen={true} 
+                                                    onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, recipient,value)}
+                                                />
                                             </div>
                                         </Popover>
                                 </>
@@ -468,7 +485,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                                     <div 
                                             aria-describedby={id}
                                             className="add-label-btn" 
-                                            onClick={(e) => handleEnableEditTag(e)}
+                                            onClick={(e) => handleEnableEditTag(e,recipient)}
                                         >
                                             <span style={{color:'#111111',fontWeight:'700',fontSize:'10px'}}>Add Label +</span>
                                         </div>
@@ -483,7 +500,10 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                                               }}
                                         >
                                             <div className="dropdown-popover-container">
-                                                <Dropdown defaultMenuIsOpen={true} onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, recipient,value)}/>
+                                                <Dropdown 
+                                                    defaultMenuIsOpen={true} 
+                                                    onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, recipient,value)}
+                                                />
                                             </div>
                                         </Popover>
                                 </>

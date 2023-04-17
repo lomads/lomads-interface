@@ -174,7 +174,8 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                     amount: ((item.percent * allotedAmt) / 100).toFixed(5),
                     name: item.name,
                     recipient: item.wallet,
-                    reason: `${item.name} | ${_get(data, 'name', '')} | ${selectedMilestone.name}`
+                    reason: `${item.name} | ${_get(data, 'name', '')} | ${selectedMilestone.name}`,
+                    tag:selectedTag
                 })
             }
         }

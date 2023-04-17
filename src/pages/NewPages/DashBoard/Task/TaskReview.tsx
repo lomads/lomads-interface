@@ -219,7 +219,8 @@ const TaskReview = ({ task, close }: any) => {
                         safeAddress: _get(DAO, 'safe.address', null),
                         safeTxHash: onChainSafeTxHash ? onChainSafeTxHash : offChainPayload.safeTxHash,
                         recipient: _get(activeSubmission, 'member.wallet', null),
-                        label: `${m} | ${_get(task, 'name', '')}`
+                        label: `${m} | ${_get(task, 'name', '')}`,
+                        tag:selectedTag
                     })
                     dispatch(setDAO(res.data.dao))
                     dispatch(setTask(res.data.task))
@@ -358,7 +359,11 @@ const TaskReview = ({ task, close }: any) => {
                                 </button>
                             </div>
                             <div style={{width:'100%'}}>
-                                <Dropdown onChangeOption={(value:any) => setSelectedTag(value)}/>
+                                <Dropdown 
+                                    defaultMenuIsOpen={false} 
+                                    onChangeOption={(value:any) => setSelectedTag(value)}
+                                    menuPlacement={'top'}
+                                />
                             </div>
                         </div>
                     </div>
@@ -380,6 +385,7 @@ const TaskReview = ({ task, close }: any) => {
                 setActiveSubmission(prevSubmission)
         }
     }
+
     const handleNext = () => {
         if (activeSubmission) {
             const currIndex = _findIndex(taskSubmissions, (t: any) => t._id === activeSubmission._id)

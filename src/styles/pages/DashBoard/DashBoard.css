@@ -562,7 +562,7 @@ body.active-modal {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 30px;
+    /* gap: 30px; */
     width: 100%;
     height: 50px;
     overflow-y: visible;
@@ -607,6 +607,7 @@ body.active-modal {
 .transactionName {
     flex-grow: 1;
     min-width: 30%;
+    padding-left: 50px;
 }
 
 .transactionName input::placeholder {
@@ -775,7 +776,11 @@ body.active-modal {
     justify-content: flex-start;
     align-items: center;
     width: 15%;
-    gap: 30px;
+    /* gap: 30px; */
+}
+
+.coinText img{
+    margin-right: 30px;
 }
 
 .sidebarModal,
@@ -1287,7 +1292,7 @@ body.active-modal {
 
 .dropdown-popover-container{
     width: 250px;
-    height: 300px;
+    height: 450px;
     padding: 5px;
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
@@ -1298,7 +1303,10 @@ body.active-modal {
   }
 
 #voteArea {
-    width: 250px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
 
 #voteArea .vote-view {

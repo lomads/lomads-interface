@@ -29,6 +29,7 @@ const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress
     const dispatch = useAppDispatch()
 
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const [tempMulRecipient,setTempMulRecipient] = useState(null);
 
     const { isCredit, amount, tokenSymbol, symbol, recipient,tag, date, reason, txHash, isAllowanceTransaction, isOwnerModificaitonTransaction } = useMemo(() => {
         let isCredit = _get(transaction, 'txType', '') === 'ETHEREUM_TRANSACTION'
@@ -107,7 +108,7 @@ const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress
         }
     }
 
-    const _handleSelectTag = (safeTxHash:string, recipient:string, tagText:any) => {
+    const _handleSelectTag = (safeTxHash:string, recipient:any, tagText:any) => {
         if (tagText && tagText !== '') {
             axiosHttp.patch('transaction/tag', { safeAddress, tag: tagText, safeTxHash, recipient })
                 .then(res => { 
@@ -132,9 +133,10 @@ const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popover' : undefined;
 
-    const handleEnableEditTag = (event:any) => {
+    const handleEnableEditTag = (event:any,mulRecipient:any) => {
         if (isAdmin) {
             setAnchorEl(event.currentTarget);
+            setTempMulRecipient(mulRecipient);
         }
     }
 
@@ -243,7 +245,7 @@ const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress
                         <>
                             <div 
                                 aria-describedby={id}
-                                onClick={(e) => handleEnableEditTag(e)} 
+                                onClick={(e) => handleEnableEditTag(e,mulRecipient)} 
                                 className="dashboardText" style={{background:`${mulTag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer'}}>
                                 <span style={{color:mulTag.color,fontWeight:'700',fontSize:'10px'}}>{mulTag.value}</span>
                             </div>
@@ -258,7 +260,10 @@ const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress
                                   }}
                             >
                                 <div className="dropdown-popover-container">
-                                    <Dropdown defaultMenuIsOpen={true} onChangeOption={(value:any) => _handleSelectTag(_get(transaction, 'safeTxHash', _get(transaction, 'txHash', undefined)), mulRecipient,value)}/>
+                                    <Dropdown 
+                                        defaultMenuIsOpen={true} 
+                                        onChangeOption={(value:any) => _handleSelectTag(_get(transaction, 'safeTxHash', _get(transaction, 'txHash', undefined)), tempMulRecipient, value)}
+                                    />
                                 </div>
                             </Popover>
                             
@@ -266,8 +271,9 @@ const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress
                         :
                         <>
                             <div 
+                                className="add-label-btn" 
                                 aria-describedby={id}
-                                onClick={(e) => handleEnableEditTag(e)} 
+                                onClick={(e) => handleEnableEditTag(e,mulRecipient)} 
                             >
                                 <span style={{color:'#111111',fontWeight:'700',fontSize:'10px'}}>Add Label +</span>
                             </div>
@@ -282,7 +288,10 @@ const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress
                                   }}
                             >
                                 <div className="dropdown-popover-container">
-                                    <Dropdown defaultMenuIsOpen={true} onChangeOption={(value:any) => _handleSelectTag(_get(transaction, 'safeTxHash', _get(transaction, 'txHash', undefined)), mulRecipient,value)}/>
+                                    <Dropdown 
+                                        defaultMenuIsOpen={true} 
+                                        onChangeOption={(value:any) => _handleSelectTag(_get(transaction, 'safeTxHash', _get(transaction, 'txHash', undefined)), tempMulRecipient, value)}
+                                    />
                                 </div>
                             </Popover>
                         </>
@@ -360,7 +369,7 @@ const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress
                                 <>
                                     <div 
                                         aria-describedby={id}
-                                        onClick={(e) => handleEnableEditTag(e)} 
+                                        onClick={(e) => handleEnableEditTag(e,recipient)} 
                                         className="dashboardText" style={{background:`${tag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer'}}>
                                         <span style={{color:tag.color,fontWeight:'700',fontSize:'10px'}}>{tag.value}</span>
                                     </div>
@@ -375,7 +384,10 @@ const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress
                                         }}
                                     >
                                         <div className="dropdown-popover-container">
-                                            <Dropdown defaultMenuIsOpen={true} onChangeOption={(value:any) => _handleSelectTag(_get(transaction, 'safeTxHash', _get(transaction, 'txHash', undefined)), recipient,value)}/>
+                                            <Dropdown 
+                                                defaultMenuIsOpen={true} 
+                                                onChangeOption={(value:any) => _handleSelectTag(_get(transaction, 'safeTxHash', _get(transaction, 'txHash', undefined)), recipient,value)}
+                                            />
                                         </div>
                                     </Popover>
                                 </>
@@ -384,7 +396,7 @@ const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress
                                     <div 
                                         className="add-label-btn" 
                                         aria-describedby={id}
-                                        onClick={(e) => handleEnableEditTag(e)} 
+                                        onClick={(e) => handleEnableEditTag(e,recipient)} 
                                     >
                                         <span style={{color:'#111111',fontWeight:'700',fontSize:'10px'}}>Add Label +</span>
                                     </div>
@@ -399,7 +411,10 @@ const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress
                                         }}
                                     >
                                         <div className="dropdown-popover-container">
-                                            <Dropdown defaultMenuIsOpen={true} onChangeOption={(value:any) => _handleSelectTag(_get(transaction, 'safeTxHash', _get(transaction, 'txHash', undefined)), recipient,value)}/>
+                                            <Dropdown 
+                                                defaultMenuIsOpen={true} 
+                                                onChangeOption={(value:any) => _handleSelectTag(_get(transaction, 'safeTxHash', _get(transaction, 'txHash', undefined)), recipient,value)}
+                                            />
                                         </div>
                                     </Popover>
                                 </>
