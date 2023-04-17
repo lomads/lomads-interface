@@ -841,10 +841,10 @@ export default () => {
 	}
 
 	const setDebounceOwnerName = (event: any) => {
-		console.log('....debounce....owner ..name....')
-		if(ownerName.length <= 12) {
+		console.log('....debounce....owner ..name....', event)
+		if (ownerName.length <= 12) {
 			setOwnerName(event.target.value);
-		} 
+		}
 	}
 
 	const setOwnerSafeAddress = (event: any) => {
@@ -852,8 +852,8 @@ export default () => {
 		setErrors({ ownerAddress: "" });
 		setOwnerAddress(event.target.value);
 	}
- 	const updateOwnerSafeAddress = useCallback(_.debounce(setOwnerSafeAddress, 1000), [setOwnerSafeAddress])
-	const  updateOwnerName = useCallback(_.debounce(setDebounceOwnerName, 1000), [setDebounceOwnerName])
+	const setOwnerSafeAddressAsync = useCallback(_.debounce(setOwnerSafeAddress, 500), [setOwnerSafeAddress])
+	const setOwnerNameAsyn = useCallback(_.debounce(setDebounceOwnerName, 500), [setDebounceOwnerName])
 
 	const InviteMembersBlock = () => {
 		return (
@@ -862,13 +862,13 @@ export default () => {
 				<Box className={classes.InviteGang}>
 					<Box className={classes.centerInputCard}>
 						<Box style={{
-								 width: '100%',
-								 marginBottom: 8, 
-								 display: 'flex',
-								 flexDirection: 'row',
-								 alignItems: 'center',
-								 justifyContent: 'space-between'
-							  }}>
+							width: '100%',
+							marginBottom: 8,
+							display: 'flex',
+							flexDirection: 'row',
+							alignItems: 'center',
+							justifyContent: 'space-between'
+						}}>
 							<Box className={classes.inputTitle}>Add Owner :</Box>
 						</Box>
 						<Box className={classes.inputArea}>
@@ -879,10 +879,8 @@ export default () => {
 										width: 144
 									}}
 									placeholder="Name"
-									value={ownerName}
-									onChange={(event: any) => {
-										ownerName.length <= 12 && setOwnerName(event.target.value);
-									}}
+									defaultValue={ownerName}
+									onChange={setOwnerNameAsyn}
 								/>
 							</Box>
 							<Box sx={{ marginRight: '10px' }}>
@@ -892,12 +890,8 @@ export default () => {
 										width: 251
 									}}
 									placeholder="ENS Domain and Wallet Address"
-									value={ownerAddress}
-									onChange={(event: any) => {
-										console.log('....event address....')
-										setErrors({ ownerAddress: "" });
-										setOwnerAddress(event.target.value);
-									}}
+									defaultValue={ownerAddress}
+									onChange={setOwnerSafeAddressAsync}
 									error={!!errors.ownerAddress}
 									helperText={errors.ownerAddress}
 								/>
@@ -1043,10 +1037,10 @@ export default () => {
 						</Typography>
 					</Box>
 					<Box className={classes.selectionArea}>
-						<Box style={{width: 109, padding: 5 }}>
+						<Box style={{ width: 109, padding: 5 }}>
 							<MuiSelect
 								selected={thresholdValue}
-								options={Myvalue.current.map((item, index)=> ({label: index+1, value: index+1}))}
+								options={Myvalue.current.map((item, index) => ({ label: index + 1, value: index + 1 }))}
 								setSelectedValue={(value) => {
 									setThresholdValue(+value)
 								}}
