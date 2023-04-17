@@ -30,7 +30,7 @@ export default ({ loading, children, className,onChangeOption,defaultMenuIsOpen,
     const createOption = (label: string) => ({
         label,
         value: label,
-        color:'#FF69B4'
+        color:"#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);})
     });
 
     const handleCreate = (inputValue: string) => {
