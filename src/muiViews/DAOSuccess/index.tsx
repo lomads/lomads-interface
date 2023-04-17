@@ -113,7 +113,7 @@ export default () => {
 						<img src={lomadslogodark} alt="logo" />
 					</Box>
 					<Box className={classes.congrats}>Well done!</Box>
-					<Box className={classes.header}>Your DAO is live</Box>
+					<Box className={classes.header}>Your Organisation is live</Box>
 					<Box className={classes.redirectText} onClick={handleClick}>
 						you will be redirected to the dashboard in a few seconds
 					</Box>
