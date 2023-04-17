@@ -4,6 +4,7 @@ import _ from "lodash";
 import TextInput from '../../muiComponents/TextInput'
 import { InviteGangType } from "types/UItype";
 import IconButton from "../../muiComponents/IconButton";
+import Button from "muiComponents/Button";
 import createProjectSvg from '../../assets/svg/createProject.svg';
 import memberIcon from '../../assets/svg/memberIcon.svg';
 import binRed from '../../assets/svg/bin-red.svg';
@@ -34,7 +35,7 @@ import { ethers } from "ethers";
 import { CHAIN_INFO } from 'constants/chainInfo';
 import { createDAO } from '../../state/flow/actions';
 import { loadDao } from '../../state/dashboard/actions';
-import { Box, Button, Typography, Container, Grid } from "@mui/material"
+import { Box, Typography, Container, Grid } from "@mui/material"
 import { makeStyles } from '@mui/styles';
 import MuiSelect from '../../muiComponents/Select'
 import axios from "axios";
@@ -599,7 +600,7 @@ export default () => {
 
 		const ethAdapter = new EthersAdapter({
 			ethers,
-			signer: safeOwner as any,
+			signerOrProvider: safeOwner as any,
 		});
 		const safeFactory = await SafeFactory.create({
 			ethAdapter,
@@ -839,6 +840,21 @@ export default () => {
 		}
 	}
 
+	const setDebounceOwnerName = (event: any) => {
+		console.log('....debounce....owner ..name....')
+		if(ownerName.length <= 12) {
+			setOwnerName(event.target.value);
+		} 
+	}
+
+	const setOwnerSafeAddress = (event: any) => {
+		console.log('.owner ...safe..address....')
+		setErrors({ ownerAddress: "" });
+		setOwnerAddress(event.target.value);
+	}
+ 	const updateOwnerSafeAddress = useCallback(_.debounce(setOwnerSafeAddress, 1000), [setOwnerSafeAddress])
+	const  updateOwnerName = useCallback(_.debounce(setDebounceOwnerName, 1000), [setDebounceOwnerName])
+
 	const InviteMembersBlock = () => {
 		return (
 			<>
@@ -878,6 +894,7 @@ export default () => {
 									placeholder="ENS Domain and Wallet Address"
 									value={ownerAddress}
 									onChange={(event: any) => {
+										console.log('....event address....')
 										setErrors({ ownerAddress: "" });
 										setOwnerAddress(event.target.value);
 									}}
@@ -1054,6 +1071,7 @@ export default () => {
 				<Button
 					variant='contained'
 					onClick={deployNewSafeDelayed}
+					loading={isLoading}
 					sx={{
 						bgColor: isLoading ? 'grey' : "#C94B32",
 						height: 50,

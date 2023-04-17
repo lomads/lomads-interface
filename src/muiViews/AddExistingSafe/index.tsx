@@ -16,7 +16,8 @@ import {
 } from "state/flow/reducer";
 import { ethers } from "ethers";
 import TextInput from '../../muiComponents/TextInput'
-import { Box, Button, Typography, Container, Grid, IconButton } from "@mui/material"
+import Button from "muiComponents/Button";
+import { Box, Typography, Container, Grid, IconButton } from "@mui/material"
 import MuiSelect from '../../muiComponents/Select'
 import axios from "axios";
 import { InviteGangType } from "types/UItype";
@@ -411,7 +412,7 @@ export default () => {
 	const handleClickDelayed = useCallback(_.debounce(handleClick, 1000), [handleClick, safeAddress])
 
 	const getSafes = (chainId: number = selectedChainId) => {
-		axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/owners/${safeAddress}/safes/`)
+		axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/owners/${account}/safes/`)
 			.then((response: any) => {
 				setSafeList(response.data.safes)
 			});
@@ -591,6 +592,7 @@ export default () => {
 						</Box>
 						: <Box style={{margin: 25}}>
 							<Button
+							   loading={isLoading}
 								sx={{
 									color: '#FFF',
 									fontWeight: 400,
