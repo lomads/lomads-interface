@@ -69,6 +69,7 @@ export default ({ loading, children, className,onChangeOption,defaultMenuIsOpen,
             options={_get(DAO,'options',[])}
             styles={customStyles}
             value={value}
+            placeholder={"Add Label"}
         />
     )
 }
