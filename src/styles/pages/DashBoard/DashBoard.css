@@ -579,8 +579,7 @@ body.active-modal {
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
-    gap: 10px;
-    min-width: 10%;
+    width: 10%;
     height: 100%;
     overflow-y: visible;
 }
@@ -605,9 +604,8 @@ body.active-modal {
 }
 
 .transactionName {
-    flex-grow: 1;
-    min-width: 30%;
-    padding-left: 50px;
+    width: 30%;
+    padding-right: 10px;
 }
 
 .transactionName input::placeholder {
@@ -616,7 +614,7 @@ body.active-modal {
 }
 
 .transactionAddress {
-    min-width: 10%;
+    width: 12.5%;
 }
 
 .add-label-btn{
@@ -775,12 +773,11 @@ body.active-modal {
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    width: 15%;
-    /* gap: 30px; */
+    width: 10%;
 }
 
 .coinText img{
-    margin-right: 30px;
+    margin-right: 10px;
 }
 
 .sidebarModal,
@@ -1292,10 +1289,11 @@ body.active-modal {
 
 .dropdown-popover-container{
     width: 250px;
-    height: 450px;
+    height: 350px;
     padding: 5px;
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
+    background-color: 'transparent';
 }
 
 .dropdown-popover-container::-webkit-scrollbar {
@@ -1303,7 +1301,8 @@ body.active-modal {
   }
 
 #voteArea {
-    width: 100%;
+    width: 25%;
+    padding: 0 20px;
     display: flex;
     align-items: center;
     justify-content: flex-end;

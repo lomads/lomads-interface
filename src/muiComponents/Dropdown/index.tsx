@@ -52,21 +52,23 @@ export default ({ loading, children, className,onChangeOption,defaultMenuIsOpen,
           border:'none',
           height:'40px',
         }),
+        menuList: (base:any, state:any) => ({
+            ...base,
+            height:'280px'
+        })
       };
 
     return (
-       <div>
-            <CreatableSelect
-                defaultMenuIsOpen={defaultMenuIsOpen}
-                menuPlacement={menuPlacement}
-                isDisabled={isLoading}
-                isLoading={isLoading}
-                onChange={(newValue) => handleChange(newValue!)}
-                onCreateOption={handleCreate}
-                options={_get(DAO,'options',[])}
-                styles={customStyles}
-                value={value}
-            />
-       </div>
+        <CreatableSelect
+            defaultMenuIsOpen={defaultMenuIsOpen}
+            menuPlacement={menuPlacement}
+            isDisabled={isLoading}
+            isLoading={isLoading}
+            onChange={(newValue) => handleChange(newValue!)}
+            onCreateOption={handleCreate}
+            options={_get(DAO,'options',[])}
+            styles={customStyles}
+            value={value}
+        />
     )
 }

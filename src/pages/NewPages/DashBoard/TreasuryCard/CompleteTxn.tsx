@@ -195,7 +195,7 @@ const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress
             <div className="transactionRow">
                 <div className="coinText">
                     <img src={isCredit ? receiveToken : sendToken} alt="" />
-                    <div className="dashboardTextBold">
+                    <div className="dashboardTextBold" style={{fontSize:'12px'}}>
                         {ownerModification ? `-` : `${(mulAmount / 10 ** muldecimal).toFixed(3)} ${token}`}
                     </div>
                 </div>
@@ -258,6 +258,8 @@ const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress
                                     vertical: 'bottom',
                                     horizontal: 'left',
                                   }}
+                                  elevation={0}
+                                  style={{backgroundColor:'transparent'}}
                             >
                                 <div className="dropdown-popover-container">
                                     <Dropdown 
@@ -286,6 +288,8 @@ const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress
                                     vertical: 'bottom',
                                     horizontal: 'left',
                                   }}
+                                  elevation={0}
+                                  style={{backgroundColor:'transparent'}}
                             >
                                 <div className="dropdown-popover-container">
                                     <Dropdown 
@@ -321,7 +325,7 @@ const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress
                 <div className="transactionRow">
                     <div className="coinText">
                         <img src={isCredit ? receiveToken : sendToken} alt="" />
-                        <div className="dashboardTextBold">
+                        <div className="dashboardTextBold" style={{fontSize:'12px'}}>
                             {isOwnerModificaitonTransaction ? `-` : `${parseFloat(`${amount}`).toFixed(3)} ${tokenSymbol ? tokenSymbol : symbol}`}
                         </div>
                     </div>
@@ -382,6 +386,8 @@ const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress
                                             vertical: 'bottom',
                                             horizontal: 'left',
                                         }}
+                                        elevation={0}
+                                        style={{backgroundColor:'transparent'}}
                                     >
                                         <div className="dropdown-popover-container">
                                             <Dropdown 
@@ -409,6 +415,8 @@ const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress
                                             vertical: 'bottom',
                                             horizontal: 'left',
                                         }}
+                                        elevation={0}
+                                        style={{backgroundColor:'transparent'}}
                                     >
                                         <div className="dropdown-popover-container">
                                             <Dropdown 
