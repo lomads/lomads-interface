@@ -600,7 +600,7 @@ export default () => {
 
 		const ethAdapter = new EthersAdapter({
 			ethers,
-			signerOrProvider: safeOwner as any,
+			signer: safeOwner as any,
 		});
 		const safeFactory = await SafeFactory.create({
 			ethAdapter,
