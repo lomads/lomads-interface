@@ -15,8 +15,6 @@ import uploadIconOrange from '../../assets/svg/ico-upload-orange.svg';
 import { Container, Grid, Button, Typography, Box } from "@mui/material"
 import { makeStyles } from '@mui/styles';
 
-const { debounce } = require('throttle-debounce');
-
 const useStyles = makeStyles((theme: any) => ({
 	root: {
 		minHeight: "100vh",
@@ -52,15 +50,14 @@ const useStyles = makeStyles((theme: any) => ({
 		color: '#76808d',
 		marginLeft: 13,
 	},
-	title: {
-		fontFamily: 'Inter, sans-serif',
+	headerText: {
+		fontFamily: 'Insignia',
 		fontStyle: 'normal',
-		fontWeight: 500,
-		fontSize: '30px !important',
-		display: 'flex',
-		alignItems: 'center',
+		fontWeight: 400,
+		fontSize: 35,
+		paddingBottom: 35,
 		textAlign: 'center',
-		color: theme.palette.primary.main
+		color: '#C94B32'
 	},
 	inputFieldTitle: {
 		fontFamily: 'Inter, sans-serif',
@@ -96,10 +93,9 @@ const useStyles = makeStyles((theme: any) => ({
 		background: '#FFFFFF',
 		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
 		borderRadius: 5,
-		minWidth: 394,
-		minHeight: 'fit-content',
-		padding: 20,
-		marginTop: 35,
+		width: 394,
+		padding: 22,
+		minHeight: 'fit-content'
 	},
 	imagePickerWrapperText: {
 		fontStyle: 'normal',
@@ -230,7 +226,7 @@ export default () => {
 	const handleNavigate = () => {
 		daoName.length >= 1 && navigate("/newsafe");
 	};
-	
+
 	const handleDaoName = (event: any) => {
 		refSafeName.current = event.target.value.replace(/[^a-z0-9 ]/gi, "");
 		dispatch(updateDaoName(refSafeName.current.toString()));
@@ -275,18 +271,20 @@ export default () => {
 					flexDirection="column"
 					alignItems="center"
 					justifyContent="center">
-					<Typography sx={{ mt: 2 }} className={classes.title}>
+					<Box className={classes.headerText}>
 						1/2 Name of your Organisation
-					</Typography>
+					</Box>
 					<Box className={classes.centerCard}>
 						<Box>
 							<Box>
 								<Box className={classes.inputFieldTitle}>Name Your Organisation</Box>
 								<TextInput
-									className={classes.inputFieldTitle}
-									height={50}
-									fullWidth
+									sx={{
+										width: 350,
+										height: 50
+									}}
 									placeholder="Epic Organisation"
+									fullWidth
 									value={daoName}
 									onChange={(event: any) => {
 										checkAvailabilityAsync(event)
@@ -302,8 +300,10 @@ export default () => {
 									{urlCheckLoading && <LeapFrog size={20} color="#C94B32" />}
 								</Box>
 								<TextInput
-									className={classes.inputFieldTitle}
-									height={50}
+									sx={{
+										width: 350,
+										height: 50
+									}}
 									fullWidth
 									disabled
 									value={daoAddress}
@@ -351,7 +351,7 @@ export default () => {
 														{uploadLoading ?
 															<LeapFrog size={24} color="#C94B32" /> :
 															<>
-																<img src={uploadIconOrange} alt="upload-icon" className={classes.uploadIcon}/>
+																<img src={uploadIconOrange} alt="upload-icon" className={classes.uploadIcon} />
 																<Typography sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
 																	<span className={classes.chooseText}>Choose or </span>
 																	<span className={classes.chooseText}> drag an image</span>

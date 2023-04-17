@@ -396,6 +396,7 @@ export default () => {
 	}, [createDAOLoading])
 
 	const handleClick = useCallback(() => {
+		console.log("clicked")
 		let terrors: any = {};
 		if (!isAddressValid(safeAddress)) {
 			terrors.issafeAddress = " * Safe Address is not valid.";
