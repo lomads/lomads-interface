@@ -852,8 +852,8 @@ export default () => {
 		setErrors({ ownerAddress: "" });
 		setOwnerAddress(event.target.value);
 	}
-	const setOwnerSafeAddressAsync = useCallback(_.debounce(setOwnerSafeAddress, 500), [setOwnerSafeAddress])
-	const setOwnerNameAsyn = useCallback(_.debounce(setDebounceOwnerName, 500), [setDebounceOwnerName])
+	const setOwnerSafeAddressAsync = useCallback(_.debounce(setOwnerSafeAddress, 1000), [setOwnerSafeAddress])
+	const setOwnerNameAsyn = useCallback(_.debounce(setDebounceOwnerName, 1000), [setDebounceOwnerName])
 
 	const InviteMembersBlock = () => {
 		return (
