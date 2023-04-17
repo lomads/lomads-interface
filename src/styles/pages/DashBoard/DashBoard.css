@@ -555,6 +555,11 @@ body.active-modal {
     justify-content: center;
     align-items: center;
     color: #FFFFFF;
+    /* margin-right: 8px; */
+}
+
+.iconButtons:last-child{
+    margin-left: 8px;
 }
 
 .transactionRow {
@@ -605,7 +610,8 @@ body.active-modal {
 
 .transactionName {
     width: 30%;
-    padding-right: 10px;
+    padding: 0 20px;
+    /* background-color: red; */
 }
 
 .transactionName input::placeholder {
