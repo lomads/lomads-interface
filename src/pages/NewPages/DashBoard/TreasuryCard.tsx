@@ -21,6 +21,7 @@ import {
 } from "@gnosis.pm/safe-service-client";
 import coin from "../../../assets/svg/coin.svg";
 import plus from "../../../assets/svg/plusBtn.svg";
+import exportBtn from 'assets/svg/exportBtn.png'
 import recurring_payment from "../../../assets/svg/recurring_payment.svg";
 import { useParams } from "react-router-dom";
 import { ItreasuryCardType } from "types/DashBoardType";
@@ -53,6 +54,7 @@ import { toast } from "react-hot-toast";
 import SwitchChain from "components/SwitchChain";
 import { CHAIN_INFO } from "constants/chainInfo";
 const { toChecksumAddress } = require('ethereum-checksum-address')
+
 
 const HEADERS = [
 	{ key: "nonce", name: "nonce" },
@@ -104,13 +106,10 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	const [offChainPendingTxn, setOffChainPendingTxn] = useState<Array<any>>();
 	const [offChainExecutedTxn, setOffChainExecutedTxn] = useState<Array<any>>();
 	const node = useRef<HTMLDivElement>()
-	const node2 = useRef<HTMLDivElement>()
 	const [editMode, setEditMode] = useState<any>();
-	const [editTag, setEditTag] = useState<any>();
 	const [lowBalanceError, setLowBalanceError] = useState<any>(null);
 
 	useOnClickOutside(node, () => editMode ? setEditMode(null) : undefined);
-	useOnClickOutside(node2, () => editTag ? setEditTag(null) : undefined);
 	useState<Array<any>>();
 	//const [recurringTxnQueue, setRecurringTxnQueue] = useState<Array<any>>();
 
@@ -809,7 +808,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 						}}
 						filename={`${_get(DAO,'safe.address', 'export')}.csv`}
 						disabled={!hasValidToken}
-						data={exportableData} >EXPORT</CsvDownloadButton> }
+						data={exportableData}>
+							<img src={exportBtn}/>
+						</CsvDownloadButton> }
 				</div>
 			</div>
 
@@ -905,12 +906,12 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 									}
 									{
 										pendingTxn.map((ptx, index) =>
-											<PendingTxn chainId={+_get(DAO, 'chainId', 5)} editMode={editMode} editTag={editTag} onSetEditTag={setEditTag} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} executeFirst={executeFirst} isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
+											<PendingTxn chainId={+_get(DAO, 'chainId', 5)} editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} executeFirst={executeFirst} isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
 										)
 									}
 									{
 										executedTxn.map((ptx, index) =>
-											<CompleteTxn chainId={+_get(DAO, 'chainId', 5)} editMode={editMode} editTag={editTag} onSetEditTag={setEditTag} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} isAdmin={amIAdmin} owner={owner} transaction={ptx} tokens={props.tokens} />
+											<CompleteTxn chainId={+_get(DAO, 'chainId', 5)} editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} isAdmin={amIAdmin} owner={owner} transaction={ptx} tokens={props.tokens} />
 										)
 									}
 								</div>

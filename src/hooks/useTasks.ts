@@ -1,5 +1,5 @@
 import react, { useEffect, useMemo } from 'react'
-import { filter as _filter, get as _get, find as _find, orderBy as _orderBy, uniqBy as _uniqBy} from 'lodash'
+import { filter as _filter, get as _get, find as _find, orderBy as _orderBy, uniqBy as _uniqBy, sortBy as _sortBy} from 'lodash'
 import { useAppDispatch, useAppSelector } from 'state/hooks';
 import { useWeb3React } from '@web3-react/core';
 import moment from 'moment';
@@ -45,14 +45,47 @@ export default (rawTasks: Array<any>) => {
         }
         return false;
     };
+
+    const taskApplicationCount = (task:any) => {
+        if (task) {
+            if (task.taskStatus === 'open' && task.isSingleContributor) {
+                let applications = _get(task, 'members', []).filter((m:any) => (m.status !== 'rejected' && m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+                if (applications)
+                    return applications.length
+            }
+        }
+        return 0;
+    };
+
+    const taskSubmissionCount = (task: any) => {
+        if (task) {
+            if ((task.contributionType === 'open' && !task.isSingleContributor) || task.contributionType === 'assign') {
+                let submissions = _get(task, 'members', [])?.filter((m:any) => m.submission && (m.status !== 'submission_accepted' && m.status !== 'submission_rejected'))
+                if (submissions)
+                    return submissions.length
+            }
+            return 0
+        }
+        return 0;
+    };
     
     const parsedTasks = useMemo(() => {
         if(account && user) {
             let tasks = _filter(rawTasks, rt => !rt.deletedAt && !rt.archivedAt && !rt.draftedAt);
             let manage = _filter(tasks, tsk => tsk.reviewer === user._id)
-            let manageN = _orderBy(_filter(manage, (m:any) => moment(m.deadline).isSameOrAfter(moment())), t => moment(t.deadline).unix(), 'asc')
-            let manageO = _orderBy(_filter(manage, (m:any) => moment(m.deadline).isBefore(moment())), t => moment(t.deadline).unix(), 'desc')
-            manage = [...manageN, ...manageO]
+            manage = manage.map(t => {
+                let tsk = { ...t, notification: 0 };
+                if (((t.contributionType === 'open' && !t.isSingleContributor) || t.contributionType === 'assign') && taskSubmissionCount(t) > 0) {
+                    tsk['notification'] = 1
+                } else {
+                    if (taskApplicationCount(t) > 0) {
+                        tsk['notification'] = 1
+                    }
+                }
+                return tsk
+            })
+            manage = _orderBy(manage, ['notification', mt => moment(mt.updatedAt).unix()], ['desc', 'desc'])
+     
             let myTask = _orderBy(_filter(tasks, tsk => {
                 return tsk.reviewer !== user._id && 
                 canApply(tsk) && 
@@ -61,11 +94,9 @@ export default (rawTasks: Array<any>) => {
                     tsk.contributionType === 'open' && !tsk.isSingleContributor || 
                     _find(tsk.members, m => m.member.wallet.toLowerCase() === account.toLowerCase())
                 )
-            }), (mt: any) => moment(mt.deadline).unix(), 'desc');
+            }), (mt: any) => moment(mt.updatedAt).unix(), 'desc');
             let drafts = rawTasks.filter(task => !task.deletedAt && !task.archivedAt && task.draftedAt !== null && (task.creator === user._id || task.provider === 'Github' || task.provider === 'Trello'))
-            let allTaskN = _orderBy(_filter([...manage, ...tasks], (m:any) => moment(m.deadline).isSameOrAfter(moment())), t => moment(t.deadline).unix(), 'asc')
-            let allTaskO = _orderBy(_filter([...manage, ...tasks], (m:any) => moment(m.deadline).isBefore(moment())), t => moment(t.deadline).unix(), 'desc')
-            let allTasks = _uniqBy([...allTaskN, ...allTaskO], t => t._id)
+            let allTasks = _uniqBy([...manage, ...tasks], t => t._id)
             return { tasks, manage, myTask, drafts, allTasks  }
         }
         return { tasks: [], manage: [], myTask: [], drafts: [], allTasks: [] }

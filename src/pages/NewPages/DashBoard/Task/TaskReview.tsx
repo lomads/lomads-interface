@@ -140,8 +140,8 @@ const TaskReview = ({ task, close }: any) => {
         return new Promise(async (resolve, reject) => {
             try {
                 if (!chainId) return;
-                const send = [{ recipient: activeSubmission.member.wallet, amount: newCompensation }]
-                const txnResponse = await createSafeTransaction({ tokenAddress: _get(task, 'compensation.currency', null), send, confirm: isSafeOwner, createLabel: false,tag:selectedTag })
+                const send = [{ recipient: activeSubmission.member.wallet, amount: newCompensation,tag:selectedTag }]
+                const txnResponse = await createSafeTransaction({ tokenAddress: _get(task, 'compensation.currency', null), send, confirm: isSafeOwner, createLabel: false })
                 if(txnResponse) {
                     resolve(txnResponse.safeTxHash)
                 }
