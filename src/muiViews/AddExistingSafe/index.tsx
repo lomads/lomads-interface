@@ -578,6 +578,7 @@ export default () => {
 								</Box>
 							<Box className={classes.addSafe}>
 								<Button
+									loading={isLoading}
 									style={{
 										color: '#FFF',
 										fontWeight: 400,
