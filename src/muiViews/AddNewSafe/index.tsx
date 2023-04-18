@@ -508,6 +508,7 @@ export default () => {
 		}
 		if (_.isEmpty(terrors)) {
 			setshowContinue(false);
+			//window.scrollTo(0, document.body.scrollHeight);
 		} else {
 			setErrors(terrors);
 		}
@@ -853,14 +854,12 @@ export default () => {
 	}
 
 	const setDebounceOwnerName = (event: any) => {
-		console.log('....debounce....owner ..name....', event)
 		if (ownerName.length <= 12) {
 			setOwnerName(event.target.value);
 		}
 	}
 
 	const setOwnerSafeAddress = (event: any) => {
-		console.log('.owner ...safe..address....')
 		setErrors({ ownerAddress: "" });
 		setOwnerAddress(event.target.value);
 	}
@@ -1147,6 +1146,7 @@ export default () => {
 							onChange={(e: any) => {
 								dispatch(updatesafeName(e.target.value));
 							}}
+							error={!!errors.safeName}
 							helperText={errors.safeName}
 						/>
 					</Box>

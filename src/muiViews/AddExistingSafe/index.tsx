@@ -5,6 +5,7 @@ import { useWeb3React } from "@web3-react/core";
 import { updateHolder } from "state/proposal/reducer";
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import { ImportSafe } from "connection/SafeCall";
+import { createDAO } from '../../state/flow/actions';
 import coin from "../../assets/svg/coin.svg";
 import {
 	updateSafeAddress,
@@ -214,9 +215,8 @@ const useStyles = makeStyles((theme: any) => ({
 		fontStyle: 'normal',
 		fontWeight: 400,
 		fontSize: 16,
-		textAlign: 'center',
+		textAlign: 'right',
 		color: '#76808D',
-		marginLeft: 100
 	},
 	balance: {
 		display: 'flex',
@@ -242,6 +242,7 @@ const useStyles = makeStyles((theme: any) => ({
 		fontStyle: 'normal',
 		fontWeight: '400',
 		fontSize: 16,
+		marginLeft: 8,
 		textAlign: 'center',
 		color: '#188C7C',
 	},
@@ -284,7 +285,7 @@ const useStyles = makeStyles((theme: any) => ({
 		justifyContent: 'space-between',
 		alignItems: 'flex-end',
 		marginTop: 10,
-		width: '100%',
+		width: 325
 	},
 	userDetail: {
 		display: 'flex',
@@ -400,6 +401,37 @@ export default () => {
 		}
 	}, [selectedChainId, selectedSafeAddress]);
 
+	const handleAddSafe = useCallback(() => {
+		const totalAddresses = [...invitedMembers, ...owners.current];
+		const value = totalAddresses.reduce((final: any, current: any) => {
+			let object = final.find((item: any) => item.address === current.address);
+			if (object) {
+				return final;
+			}
+			return final.concat([current]);
+		}, []);
+		dispatch(updateTotalMembers(value));
+		const payload: any = {
+			chainId,
+			contractAddress: '',
+			name: flow.daoName,
+			url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
+			image: flow.daoImage,
+			members: value.map((m: any) => {
+				if (m.address.toLowerCase() === account?.toLowerCase()) {
+					return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : 'role2' }
+				}
+				return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4' }
+			}),
+			safe: {
+				name: safeName,
+				address: selectedSafeAddress,
+				chainId: selectedChainId,
+				owners: owners.current.map(o => o.address),
+			}
+		}
+		dispatch(createDAO(payload))
+	}, [selectedChainId, selectedSafeAddress]);
 
 	const getTokens = async (safeAddress: string) => {
 		selectedChainId &&
@@ -444,7 +476,7 @@ export default () => {
 			terrors.issafeAddress = " * Safe Address is not valid.";
 		}
 		if (_.isEmpty(terrors)) {
-			UseExistingSafe(selectedSafeAddress);
+			handleAddSafe()
 		}
 		else {
 			setErrors(terrors);
@@ -458,6 +490,7 @@ export default () => {
 			.then((response: any) => {
 				setSafeList(response.data.safes)
 			});
+		//window.scrollTo(0, document.body.scrollHeight);
 	}
 
 	const SafeDetails = ({ index }: any) => {
@@ -513,11 +546,20 @@ export default () => {
 								<>
 									<Box className={classes.safeOwner} key={index}>
 										<Box className={classes.userDetail}>
-											<img src={safeUserIcon} alt="safe-owner-icon" />
+											<Box sx={{marginTop: 1.5}}>
+												<img src={safeUserIcon} alt="safe-owner-icon" />
+											</Box>
 											<TextInput
 												placeholder="Name"
 												type="text"
-												sx={{ width: 80 }}
+												sx={{
+													marginTop: 1,
+													width: 141,
+													'& .MuiInputBase-input': {
+														height: 30,
+														padding: '2px'
+													}
+												}}
 												onChange={(e: any) => {
 													owners.current[index].name = e.target.value;
 												}}
