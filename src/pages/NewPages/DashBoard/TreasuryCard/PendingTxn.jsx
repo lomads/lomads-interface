@@ -20,19 +20,23 @@ import Avatar from "muiComponents/Avatar";
 import {useSafeTokens} from "hooks/useSafeTokens";
 import { CHAIN_INFO } from "constants/chainInfo";
 
+import {Popover} from '@mui/material';
+
 const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
       <div style={{ flex : 1}} ref={ref} {...rest}>
         {children}
       </div>
   ))
 
-const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst = '', threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions, confirmTxLoading, rejectTxLoading, executeTxLoading, isAdmin, onLoadLabels, chainId, editTag, onSetEditTag }) => {
+const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst = '', threshold, transaction, owner, confirmTransaction, rejectTransaction, executeTransactions, confirmTxLoading, rejectTxLoading, executeTxLoading, isAdmin, onLoadLabels, chainId,}) => {
     const { provider, account } = useWeb3React();
     const { DAO } = useAppSelector(store => store.dashboard);
     const [reasonText, setReasonText] = useState({});
-    // const [editTag, setEditTag] = useState(false);
     const dispatch = useAppDispatch()
     const { safeTokens: tokens } = useSafeTokens()
+
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [tempMulRecipient,setTempMulRecipient] = useState(null);
     //const threshold = useAppSelector((state) => state.flow.safeThreshold);
 
     const { amount, tokenSymbol, recipient, reason,tag, decimal, isAllowanceTransaction, isOwnerModificaitonTransaction } = useMemo(() => {
@@ -124,10 +128,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
             axiosHttp.patch('transaction/tag', { safeAddress, tag: tagText, safeTxHash, recipient })
                 .then(res => { 
                     onLoadLabels(res.data);
-                    // setEditTag(false);
-                    if (editTag && editTag === `${safeTxHash}-${recipient}`) {
-                        onSetEditTag(null);
-                    }
+                    setAnchorEl(null);
                 })
         }
     }
@@ -144,11 +145,19 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
         }
     }
 
-    const handleEnableEditTag = (text) => {
+    const open = Boolean(anchorEl);
+    const id = open ? 'simple-popover' : undefined;
+
+    const handleEnableEditTag = (event,mulRecipient) => {
         if (isAdmin) {
-            onSetEditTag(text);
+            setAnchorEl(event.currentTarget);
+            setTempMulRecipient(mulRecipient);
         }
     }
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
 
     const renderItem = (item, index) => {
         const mulAmount = _get(item, 'dataDecoded.parameters[1].value', _get(item, 'value', 0))
@@ -178,14 +187,19 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                     <div className="coinText">
                         <img src={sendTokenOutline} alt="" />
                         <div className="dashboardTextBold">
-                            { isOwnerModificaitonTransaction ? `-` : `${mulAmount / 10 ** muldecimal} ${token}`}
+                            { isOwnerModificaitonTransaction ? `-` : `${(mulAmount / 10 ** muldecimal).toFixed(3)} ${token}`}
                         </div>
                     </div>
                     <div className="transactionName">
                         {
                             mulReason && (!editMode || (editMode && editMode !== `${transaction.safeTxHash}-${mulRecipient}`))
                                 ?
-                                <div className="dashboardText" onClick={() => handleEnableEditMode(`${transaction.safeTxHash}-${mulRecipient}`, mulReason)}>{mulReason}</div>
+                                <div 
+                                    className="dashboardText" 
+                                    onClick={() => handleEnableEditMode(`${transaction.safeTxHash}-${mulRecipient}`, mulReason)}
+                                    >
+                                    {mulReason}
+                                </div>
                                 :
                                 <>
                                     {
@@ -225,27 +239,61 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                                 mulTag
                                 ?
                                 <>
-                                {
-                                    (!editTag || (editTag && editTag !== `${transaction.safeTxHash}-${mulRecipient}`))
-                                    ?
-                                    <div onClick={() => handleEnableEditTag(`${transaction.safeTxHash}-${mulRecipient}`)} className="dashboardText" style={{background:`${mulTag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer'}}>
+                                    <div 
+                                        aria-describedby={id}
+                                        onClick={(e) => handleEnableEditTag(e,mulRecipient)} 
+                                        className="dashboardText" style={{background:`${mulTag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer',position:'relative'}}
+                                    >
                                         <span style={{color:mulTag.color,fontWeight:'700',fontSize:'10px'}}>{mulTag.value}</span>
                                     </div>
-                                    :
-                                    <Dropdown onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, mulRecipient,value)}/>
-                                }
+                                    <Popover
+                                        id={id}
+                                        open={open}
+                                        anchorEl={anchorEl}
+                                        onClose={handleClose}
+                                        anchorOrigin={{
+                                            vertical: 'bottom',
+                                            horizontal: 'left',
+                                          }}
+                                          elevation={0}
+                                          style={{backgroundColor:'transparent'}}
+                                    >
+                                        <div className="dropdown-popover-container">
+                                            <Dropdown 
+                                                defaultMenuIsOpen={true} 
+                                                onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, tempMulRecipient,value)}
+                                            />
+                                        </div>
+                                    </Popover>
                                 </>
                                 :
                                 <>
-                                    {
-                                        (!editTag || (editTag && editTag !== `${transaction.safeTxHash}-${mulRecipient}`))
-                                        ?
-                                        <div className="add-label-btn" onClick={() => handleEnableEditTag(`${transaction.safeTxHash}-${mulRecipient}`)}>
-                                            <span style={{color:'#111111',fontWeight:'700',fontSize:'10px'}}>Add Label +</span>
+                                    <div 
+                                        aria-describedby={id}
+                                        className="add-label-btn" 
+                                        onClick={(e) => handleEnableEditTag(e,mulRecipient)} 
+                                    >
+                                        <span style={{color:'#111111',fontWeight:'700',fontSize:'10px'}}>Add Label +</span>
+                                    </div>
+                                    <Popover
+                                        id={id}
+                                        open={open}
+                                        anchorEl={anchorEl}
+                                        onClose={handleClose}
+                                        anchorOrigin={{
+                                            vertical: 'bottom',
+                                            horizontal: 'left',
+                                          }}
+                                          elevation={0}
+                                          style={{backgroundColor:'transparent'}}
+                                    >
+                                        <div className="dropdown-popover-container">
+                                            <Dropdown 
+                                                defaultMenuIsOpen={true} 
+                                                onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, tempMulRecipient,value)}
+                                            />
                                         </div>
-                                        :
-                                        <Dropdown onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, mulRecipient,value)}/>
-                                    }
+                                    </Popover>
                                 </>
                             }
                     </div>
@@ -351,7 +399,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
             )
         }
         else{
-            return `to ${beautifyHexToken(reciever)}`
+            return <Avatar wallet={reciever}/>
         }
     }
 
@@ -363,7 +411,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                         <div className="coinText">
                             <img src={sendTokenOutline} alt="" />
                             <div className="dashboardTextBold">
-                                {isOwnerModificaitonTransaction ? `-` : `${amount / 10 ** decimal} ${tokenSymbol ? tokenSymbol : _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol))}`}
+                                {isOwnerModificaitonTransaction ? `-` : `${(amount / 10 ** decimal).toFixed(3)} ${tokenSymbol ? tokenSymbol : _get(_find(tokens, t => t.tokenAddress === _get(transaction, 'to', '')), 'token.symbol', _get(transaction, 'token.symbol', CHAIN_INFO[chainId]?.nativeCurrency?.symbol))}`}
                             </div>
                         </div>
                         <div className="transactionName">
@@ -410,59 +458,65 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                                 tag
                                 ?
                                 <>
-                                    {
-                                        (!editTag || (editTag && editTag !== `${transaction.safeTxHash}-${recipient}`))
-                                        ?
-                                        <div onClick={() => handleEnableEditTag(`${transaction.safeTxHash}-${recipient}`)} className="dashboardText" style={{background:`${tag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer'}}>
+                                    <div 
+                                            aria-describedby={id}
+                                            onClick={(e) => handleEnableEditTag(e,recipient)} 
+                                            className="dashboardText" 
+                                            style={{background:`${tag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer'}}
+                                        >
                                             <span style={{color:tag.color,fontWeight:'700',fontSize:'10px'}}>{tag.value}</span>
                                         </div>
-                                        :
-                                        <Dropdown onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, recipient,value)}/>
-                                    }
+                                        <Popover
+                                            id={id}
+                                            open={open}
+                                            anchorEl={anchorEl}
+                                            onClose={handleClose}
+                                            anchorOrigin={{
+                                                vertical: 'bottom',
+                                                horizontal: 'left',
+                                              }}
+                                            elevation={0}
+                                            style={{backgroundColor:'transparent'}}
+                                        >
+                                            <div className="dropdown-popover-container">
+                                                <Dropdown 
+                                                    defaultMenuIsOpen={true} 
+                                                    onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, recipient,value)}
+                                                />
+                                            </div>
+                                        </Popover>
                                 </>
                                 :
                                 <>
-                                    {
-                                        (!editTag || (editTag && editTag !== `${transaction.safeTxHash}-${recipient}`))
-                                        ?
-                                        <div className="add-label-btn" onClick={() => handleEnableEditTag(`${transaction.safeTxHash}-${recipient}`)}>
+                                    <div 
+                                            aria-describedby={id}
+                                            className="add-label-btn" 
+                                            onClick={(e) => handleEnableEditTag(e,recipient)}
+                                        >
                                             <span style={{color:'#111111',fontWeight:'700',fontSize:'10px'}}>Add Label +</span>
                                         </div>
-                                        :
-                                        <Dropdown onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, recipient,value)}/>
-                                    }
+                                        <Popover
+                                            id={id}
+                                            open={open}
+                                            anchorEl={anchorEl}
+                                            onClose={handleClose}
+                                            anchorOrigin={{
+                                                vertical: 'bottom',
+                                                horizontal: 'left',
+                                            }}
+                                            elevation={0}
+                                            style={{backgroundColor:'transparent'}}
+                                        >
+                                            <div className="dropdown-popover-container">
+                                                <Dropdown 
+                                                    defaultMenuIsOpen={true} 
+                                                    onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, recipient,value)}
+                                                />
+                                            </div>
+                                        </Popover>
                                 </>
                             }
                         </div>
-                        {/* <div className="transactionAddress">
-                            {
-                                tag
-                                ?
-                                <>
-                                {
-                                    editTag
-                                    ?
-                                    <Dropdown onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, recipient,value)}/>
-                                    :
-                                    <div onClick={() => setEditTag(true)} className="dashboardText" style={{background:`${tag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer'}}>
-                                        <span style={{color:tag.color,fontWeight:'700',fontSize:'10px'}}>{tag.value}</span>
-                                    </div>
-                                }
-                                </>
-                                :
-                                <>
-                                    {
-                                        editTag
-                                        ?
-                                        <Dropdown onChangeOption={(value) => _handleSelectTag(transaction.safeTxHash, recipient,value)}/>
-                                        :
-                                        <div className="add-label-btn" onClick={() => setEditTag(true)}>
-                                            <span style={{color:'#111111',fontWeight:'700',fontSize:'10px'}}>Add Label +</span>
-                                        </div>
-                                    }
-                                </>
-                            }
-                        </div> */}
                         <div id="voteArea">
                         {
                             threshold && <div className="dashboardTextBold">

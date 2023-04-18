@@ -39,7 +39,7 @@ const DAOsuccess = () => {
 		<>
 			<div className="DAOsuccess">
 				<div className="itemsGroup">
-					<div className="logo">
+					<div className="logo-success">
 						<img src={lomadslogodark} alt="logo" />
 					</div>
 					<div className="congrats">Well done!</div>

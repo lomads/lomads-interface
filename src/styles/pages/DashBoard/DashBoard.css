@@ -273,13 +273,13 @@ body.active-modal {
 }
 
 .headerDetails .downloadBtn {
-    padding: 0px 10px 0px 10px;
+    /* padding: 0px 10px 0px 10px; */
     box-shadow: 3px 5px 4px rgb(27 43 65 / 5%), -3px -3px 8px rgb(201 75 50 / 10%);
     border-radius: 5px;
     border-width: 0px;
     border-color: #FFFFFF;
     height: 40px;
-    width: 150px;
+    /* width: 150px; */
     font-size: 16px;
     font-weight: 400;
     color: rgb(177, 47, 21);
@@ -555,6 +555,11 @@ body.active-modal {
     justify-content: center;
     align-items: center;
     color: #FFFFFF;
+    /* margin-right: 8px; */
+}
+
+.iconButtons:last-child{
+    margin-left: 8px;
 }
 
 .transactionRow {
@@ -562,7 +567,7 @@ body.active-modal {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 30px;
+    /* gap: 30px; */
     width: 100%;
     height: 50px;
     overflow-y: visible;
@@ -579,8 +584,7 @@ body.active-modal {
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
-    gap: 10px;
-    min-width: 10%;
+    width: 10%;
     height: 100%;
     overflow-y: visible;
 }
@@ -605,8 +609,9 @@ body.active-modal {
 }
 
 .transactionName {
-    flex-grow: 1;
-    min-width: 30%;
+    width: 35%;
+    padding: 0 30px;
+    /* background-color: #f5f5f5; */
 }
 
 .transactionName input::placeholder {
@@ -615,7 +620,7 @@ body.active-modal {
 }
 
 .transactionAddress {
-    min-width: 10%;
+    width: 12.5%;
 }
 
 .add-label-btn{
@@ -774,8 +779,11 @@ body.active-modal {
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    width: 15%;
-    gap: 30px;
+    width: 10%;
+}
+
+.coinText img{
+    margin-right: 30px;
 }
 
 .sidebarModal,
@@ -1285,12 +1293,29 @@ body.active-modal {
     overflow-y: scroll;
 }
 
+.dropdown-popover-container{
+    width: 250px;
+    height: 350px;
+    padding: 5px;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+    background-color: 'transparent';
+}
+
+.dropdown-popover-container::-webkit-scrollbar {
+    display: none !important;
+  }
+
 #voteArea {
-    min-width: 10%;
+    width: 20%;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
 
 #voteArea .vote-view {
-    width: 120px;
+    width: 105px;
     color: #76808D;
     font-size: 14px;
     font-weight: 700;

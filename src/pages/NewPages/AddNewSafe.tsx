@@ -32,6 +32,7 @@ import { createDAO } from '../../state/flow/actions';
 import { loadDao } from '../../state/dashboard/actions';
 import { CHAIN_GAS_STATION, SupportedChainId } from "constants/chains";
 import axios from "axios";
+import Avatar from "muiComponents/Avatar";
 
 const AddNewSafe = () => {
 	const dispatch = useAppDispatch();
@@ -303,18 +304,20 @@ const AddNewSafe = () => {
 					<div className="inputFieldTitle">Select Owners</div>
 					<div className="ownerArea">
 						{invitedMembers.map((result: any, index: any) => {
+							console.log("result : ",result)
 							return (
 								<>
 									<div key={index} className="owner">
 										<div className="avatarName">
-											<img src={daoMember2} alt={result.address} />
-											<p className="nameText">{result.name}</p>
+											<Avatar name={result.name} wallet={result.address}/>
+											{/* <img src={daoMember2} alt={result.address} />
+											<p className="nameText">{result.name}</p> */}
 										</div>
-										<p className="text">
+										{/* <p className="text">
 											{result.address.slice(0, 6) +
 												"..." +
 												result.address.slice(-4)}
-										</p>
+										</p> */}
 										{result.address !== account ? (
 											<>
 												<Checkbox
@@ -375,14 +378,13 @@ const AddNewSafe = () => {
 								<>
 									<div key={index} className="owner">
 										<div className="avatarName">
-											<img src={daoMember2} alt={result.address} />
-											<p className="nameText">{result.name}</p>
+										<Avatar name={result.name} wallet={result.address}/>
 										</div>
-										<p className="text">
+										{/* <p className="text">
 											{result.address.slice(0, 6) +
 												"..." +
 												result.address.slice(-4)}
-										</p>
+										</p> */}
 									</div>
 								</>
 							);
@@ -471,7 +473,7 @@ const AddNewSafe = () => {
 	return (
 		<>
 			<div className="StartSafe">
-				<div className="headerText">3/3 DAO Treasury</div>
+				<div className="headerText">3/3 Multi-sig Wallet</div>
 				<div className="buttonArea">
 					<div>
 						<SafeButton

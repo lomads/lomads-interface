@@ -1,12 +1,12 @@
-import LoginPage from "../pages/LoginPage";
+//import LoginPage from "../pages/LoginPage";
 import Header from "components/Header";
-import DAOsuccess from "../pages/NewPages/DAOsuccess";
-import DAONoAccess from "../pages/NewPages/DAONoAccess";
-import NameDAO from "../pages/NewPages/NameDAO";
-import StartSafe from "../pages/NewPages/StartSafe";
-import InviteGang from "../pages/NewPages/InviteGang";
-import AddExistingSafe from "../pages/NewPages/AddExistingSafe";
-import AddNewSafe from "../pages/NewPages/AddNewSafe";
+// import DAOsuccess from "../pages/NewPages/DAOsuccess";
+// import DAONoAccess from "../pages/NewPages/DAONoAccess";
+// import NameDAO from "../pages/NewPages/NameDAO";
+// import StartSafe from "../pages/NewPages/StartSafe";
+// import InviteGang from "../pages/NewPages/InviteGang";
+// import AddExistingSafe from "../pages/NewPages/AddExistingSafe";
+// import AddNewSafe from "../pages/NewPages/AddNewSafe";
 import Dashboard from "../pages/NewPages/DashBoard/Dashboard";
 import Settings from "../pages/NewPages/Settings";
 import SettingsOlder from "../pages/NewPages/SettingsOlder";
@@ -34,6 +34,14 @@ import BaseLayout from "muiLayouts/BaseLayout";
 
 import CreatePassToken from "muiViews/CreatePassToken";
 import MintPassToken from "muiViews/MintPassToken";
+import LoginPage from "muiViews/LoginPage";
+import createDaoOrg from "muiViews/CreateDaoOrg"
+//import StartSafe from "muiViews/StartSafe";
+//import InviteGang from "muiViews/InviteGang";
+import AddExistingSafe from "muiViews/AddExistingSafe";
+import AddNewSafe from "muiViews/AddNewSafe";
+import DAOsuccess from "muiViews/DAOSuccess";
+import DAONoAccess from "muiViews/DAONoAccess";
 
 export default [
     {
@@ -46,20 +54,20 @@ export default [
     },
     {
         path: '/createorg',
-        component: NameDAO
+        component: createDaoOrg
     },
     {
         path: '/createdao',
-        component: NameDAO
+        component: createDaoOrg
     },
-    {
-        path: '/invitegang',
-        component: InviteGang
-    },
-    {
-        path: '/startsafe',
-        component: StartSafe
-    },
+    // {
+    //     path: '/invitegang',
+    //     component: InviteGang
+    // },
+    // {
+    //     path: '/startsafe',
+    //     component: StartSafe
+    // },
     {
         path: '/addsafe',
         component: AddExistingSafe

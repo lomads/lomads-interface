@@ -21,6 +21,7 @@ import {
 } from "@gnosis.pm/safe-service-client";
 import coin from "../../../assets/svg/coin.svg";
 import plus from "../../../assets/svg/plusBtn.svg";
+import exportBtn from 'assets/svg/exportBtn.png'
 import recurring_payment from "../../../assets/svg/recurring_payment.svg";
 import { useParams } from "react-router-dom";
 import { ItreasuryCardType } from "types/DashBoardType";
@@ -53,6 +54,7 @@ import { toast } from "react-hot-toast";
 import SwitchChain from "components/SwitchChain";
 import { CHAIN_INFO } from "constants/chainInfo";
 const { toChecksumAddress } = require('ethereum-checksum-address')
+
 
 const HEADERS = [
 	{ key: "nonce", name: "nonce" },
@@ -104,13 +106,10 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	const [offChainPendingTxn, setOffChainPendingTxn] = useState<Array<any>>();
 	const [offChainExecutedTxn, setOffChainExecutedTxn] = useState<Array<any>>();
 	const node = useRef<HTMLDivElement>()
-	const node2 = useRef<HTMLDivElement>()
 	const [editMode, setEditMode] = useState<any>();
-	const [editTag, setEditTag] = useState<any>();
 	const [lowBalanceError, setLowBalanceError] = useState<any>(null);
 
 	useOnClickOutside(node, () => editMode ? setEditMode(null) : undefined);
-	useOnClickOutside(node2, () => editTag ? setEditTag(null) : undefined);
 	useState<Array<any>>();
 	//const [recurringTxnQueue, setRecurringTxnQueue] = useState<Array<any>>();
 
@@ -385,9 +384,6 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	}
 
 	const handleConfirmTransaction = async (_safeTxHashs: string, txn: any) => {
-		if(currentChainId !== _get(DAO, 'chainId', '')) {
-			return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')} />)
-		}
 		if (txn.offChain && _get(txn, 'token.symbol') === 'SWEAT') {
 			setConfirmTxLoading(_safeTxHashs);
 			axiosHttp.patch(`transaction/off-chain/${_safeTxHashs}/approve`,
@@ -409,6 +405,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				.catch(e => console.log(e))
 				.finally(() => setConfirmTxLoading(null))
 		} else if (txn.offChain && _get(txn, 'token.symbol') !== 'SWEAT') {
+			if(currentChainId !== _get(DAO, 'chainId', '')) {
+				return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')} />)
+			}
 			try {
 				await createOnChainTxn(txn, 'confirm')
 				loadPendingTxn();
@@ -417,6 +416,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				console.log(e)
 			}
 		} else {
+			if(currentChainId !== _get(DAO, 'chainId', '')) {
+				return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')} />)
+			}
 			try {
 				setConfirmTxLoading(_safeTxHashs);
 				const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
@@ -463,9 +465,6 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	};
 
 	const handleRejectTransaction = async (_n: number, txn: any = null) => {
-		if(currentChainId !== _get(DAO, 'chainId', '')) {
-			return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
-		}
 		let _nonce: any = _n;
 		if (txn.offChain && _get(txn, 'token.symbol') === 'SWEAT') {
 			setRejectTxLoading(_nonce);
@@ -494,6 +493,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				.catch(e => console.log(e))
 				.finally(() => setRejectTxLoading(null))
 		} else {
+			if(currentChainId !== _get(DAO, 'chainId', '')) {
+				return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')} />)
+			}
 			try {
 				setRejectTxLoading(_nonce);
 				const safeSDK = await ImportSafe(provider, _get(DAO, 'safe.address', ''));
@@ -569,9 +571,6 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 	};
 
 	const handleExecuteTransactions = async (txn: any, reject: boolean | undefined, syncOwners = false, amount = null, isAllowanceTransaction = false) => {
-		if(currentChainId !== _get(DAO, 'chainId', '')) {
-			return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
-		}
 		console.log(txn)
 		let _txs = txn;
 		if (txn.offChain && _get(txn, 'token.symbol') === 'SWEAT') {
@@ -592,6 +591,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				.catch(e => console.log(e))
 				.finally(() => setExecuteTxLoading(null))
 		} else {
+			if(currentChainId !== _get(DAO, 'chainId', '')) {
+				return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
+			}
 			const st = await getSafeTokens();
 			let safeToken = _find(st, t => toChecksumAddress(t.tokenAddress) === toChecksumAddress(_get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', ''))))
 			console.log("safeTokensafeToken",st, safeToken, _get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', '')))
@@ -806,7 +808,9 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 						}}
 						filename={`${_get(DAO,'safe.address', 'export')}.csv`}
 						disabled={!hasValidToken}
-						data={exportableData} >EXPORT</CsvDownloadButton> }
+						data={exportableData}>
+							<img src={exportBtn}/>
+						</CsvDownloadButton> }
 				</div>
 			</div>
 
@@ -902,12 +906,12 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 									}
 									{
 										pendingTxn.map((ptx, index) =>
-											<PendingTxn chainId={+_get(DAO, 'chainId', 5)} editMode={editMode} editTag={editTag} onSetEditTag={setEditTag} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} executeFirst={executeFirst} isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
+											<PendingTxn chainId={+_get(DAO, 'chainId', 5)} editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} executeFirst={executeFirst} isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
 										)
 									}
 									{
 										executedTxn.map((ptx, index) =>
-											<CompleteTxn chainId={+_get(DAO, 'chainId', 5)} editMode={editMode} editTag={editTag} onSetEditTag={setEditTag} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} isAdmin={amIAdmin} owner={owner} transaction={ptx} tokens={props.tokens} />
+											<CompleteTxn chainId={+_get(DAO, 'chainId', 5)} editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} isAdmin={amIAdmin} owner={owner} transaction={ptx} tokens={props.tokens} />
 										)
 									}
 								</div>

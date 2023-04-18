@@ -13,7 +13,7 @@ interface Option {
     color: string;
 }
 
-export default ({ loading, children, className,onChangeOption, ...props }: any) => {
+export default ({ loading, children, className,onChangeOption,defaultMenuIsOpen,menuPlacement, ...props }: any) => {
     const dispatch = useAppDispatch();
     const { DAO, createOptionLoading } = useAppSelector((state) => state.dashboard);
     const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +30,7 @@ export default ({ loading, children, className,onChangeOption, ...props }: any) 
     const createOption = (label: string) => ({
         label,
         value: label,
-        color:'#FF69B4'
+        color:"#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);})
     });
 
     const handleCreate = (inputValue: string) => {
@@ -52,10 +52,16 @@ export default ({ loading, children, className,onChangeOption, ...props }: any) 
           border:'none',
           height:'40px',
         }),
+        menuList: (base:any, state:any) => ({
+            ...base,
+            height:'280px'
+        })
       };
 
     return (
         <CreatableSelect
+            defaultMenuIsOpen={defaultMenuIsOpen}
+            menuPlacement={menuPlacement}
             isDisabled={isLoading}
             isLoading={isLoading}
             onChange={(newValue) => handleChange(newValue!)}
@@ -63,6 +69,7 @@ export default ({ loading, children, className,onChangeOption, ...props }: any) 
             options={_get(DAO,'options',[])}
             styles={customStyles}
             value={value}
+            placeholder={"Add Label"}
         />
     )
 }

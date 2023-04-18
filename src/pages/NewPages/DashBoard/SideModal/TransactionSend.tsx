@@ -41,6 +41,7 @@ const TransactionSend = (props: IselectTransactionSend) => {
 	const { DAO } = useAppSelector((state) => state?.dashboard);
 	const { safeTokens } = useSafeTokens()
 	const { chainId } = useWeb3React();
+	
 	const managePreviousNavigation = () => {
 		const length = props.setRecipient.current.length;
 		props.setRecipient.current.splice(0, length);
@@ -161,7 +162,7 @@ const TransactionSend = (props: IselectTransactionSend) => {
 										</div>
 										<div style={{width:'192px'}}>
 											<Dropdown 
-												onChangeOption={(value:any) => props.selectTag(value)}
+												onChangeOption={(value:any) => props.setRecipient.current[index].tag = value}
 											/>
 										</div>
 										
