@@ -62,8 +62,19 @@ const useStyles = makeStyles((theme: any) => ({
 		fontWeight: 700,
 		fontSize: 16,
 		letterSpacing: '-0.011em',
-		color: '#76808D',
-		margin: '15px 0px 15px 0px'
+		color: '#1B2B41',
+		opacity: 0.5
+	},
+	safeNameTitle: {
+		fontFamily: 'Inter, sans-serif',
+		fontStyle: 'normal',
+		fontWeight: 700,
+		fontSize: 16,
+		letterSpacing: '-0.011em',
+		color: '#1B2B41',
+		opacity: 0.5,
+		marginBottom: 6.71,
+		marginTop: 15
 	},
 	centerCard: {
 		display: 'flex',
@@ -76,7 +87,7 @@ const useStyles = makeStyles((theme: any) => ({
 		maxHeight: 'fit-content',
 		padding: 20,
 		margin: 35,
-		width: 551
+		width: 385
 	},
 	thresholdText: {
 		fontFamily: 'Inter, sans-serif',
@@ -173,6 +184,7 @@ const useStyles = makeStyles((theme: any) => ({
 		fontWeight: 400,
 		fontSize: 35,
 		paddingBottom: 30,
+		marginTop: 110,
 		textAlign: 'center',
 		color: '#C94B32'
 	},
@@ -279,8 +291,8 @@ const useStyles = makeStyles((theme: any) => ({
 		backgroundColor: 'rgba(118, 128, 141, 0.09)',
 		boxShadow: 'inset 1px 0px 4px rgba(27, 43, 65, 0.1)',
 		borderRadius: '0px 0px 5px 5px',
-		width: '500px',
-		maxHeight: '500px',
+		width: 497,
+		maxHeight: 500,
 		overflow: 'hidden',
 		overflowY: 'auto'
 	},
@@ -600,7 +612,7 @@ export default () => {
 
 		const ethAdapter = new EthersAdapter({
 			ethers,
-			signer: safeOwner as any,
+			signerOrProvider: safeOwner as any,
 		});
 		const safeFactory = await SafeFactory.create({
 			ethAdapter,
@@ -1037,7 +1049,7 @@ export default () => {
 						</Typography>
 					</Box>
 					<Box className={classes.selectionArea}>
-						<Box style={{ width: 109, padding: 5 }}>
+						<Box style={{ width: 109}}>
 							<MuiSelect
 								selected={thresholdValue}
 								options={Myvalue.current.map((item, index) => ({ label: index + 1, value: index + 1 }))}
@@ -1118,7 +1130,7 @@ export default () => {
 					</Box>
 					<Box className={classes.bottomLine} />
 					<Box className={classes.centerCard}>
-						<Typography className={classes.inputFieldTitle}>Select Chain</Typography>
+						<Box className={classes.inputFieldTitle}>Select Chain</Box>
 						<MuiSelect
 							selected={selectedChainId}
 							options={SUPPORTED_CHAIN_IDS.map(item => ({ label: CHAIN_INFO[item].label, value: item }))}
@@ -1127,12 +1139,9 @@ export default () => {
 								setSelectedChainId(value)
 							}}
 						/>
-						<Typography className={classes.inputFieldTitle}>Safe Name</Typography>
+						<Box className={classes.safeNameTitle}>Safe Name</Box>
 						<TextInput
-							sx={{
-								height: 50,
-								width: 507
-							}}
+							fullWidth
 							placeholder="Pied Piper"
 							value={safeName}
 							onChange={(e: any) => {
