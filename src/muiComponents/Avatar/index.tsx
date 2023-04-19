@@ -9,7 +9,7 @@ export default ({name,wallet,...props }: any) => {
     return (
         <Box style={{display:'flex',width:'100%'}}>
             <Avatar
-                size={35}
+                size={32}
                 name={wallet}
                 variant="bauhaus"
                 colors={["#E67C40", "#EDCD27", "#8ECC3E", "#2AB87C", "#188C8C"]}

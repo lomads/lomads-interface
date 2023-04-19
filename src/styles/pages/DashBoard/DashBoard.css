@@ -325,7 +325,7 @@ body.active-modal {
     font-family: 'Inter', sans-serif;
     font-weight: 400;
     font-size: 14px;
-    line-height: 16px;
+    line-height: 18px;
     display: flex;
     align-items: center;
     color: #76808D;
@@ -403,7 +403,7 @@ body.active-modal {
 .dashboardTextBold {
     font-family: 'Inter', sans-serif;
     font-style: normal;
-    font-weight: 800;
+    font-weight: 700;
     font-size: 14px;
     line-height: 16px;
     display: flex;
@@ -621,6 +621,18 @@ body.active-modal {
 
 .transactionAddress {
     width: 12.5%;
+}
+
+.tag-pill {
+    /* padding:6px 10px; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    cursor: pointer;
+    height: 24px;
+    max-width:100px;
+    text-overflow: ellipsis;
 }
 
 .add-label-btn{

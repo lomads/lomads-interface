@@ -242,7 +242,8 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                                     <div 
                                         aria-describedby={id}
                                         onClick={(e) => handleEnableEditTag(e,mulRecipient)} 
-                                        className="dashboardText" style={{background:`${mulTag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer',position:'relative'}}
+                                        className="tag-pill"
+                                        style={{background:`${mulTag.color}20`}}
                                     >
                                         <span style={{color:mulTag.color,fontWeight:'700',fontSize:'10px'}}>{mulTag.value}</span>
                                     </div>
@@ -459,13 +460,13 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                                 ?
                                 <>
                                     <div 
-                                            aria-describedby={id}
-                                            onClick={(e) => handleEnableEditTag(e,recipient)} 
-                                            className="dashboardText" 
-                                            style={{background:`${tag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer'}}
-                                        >
-                                            <span style={{color:tag.color,fontWeight:'700',fontSize:'10px'}}>{tag.value}</span>
-                                        </div>
+                                        aria-describedby={id}
+                                        onClick={(e) => handleEnableEditTag(e,recipient)} 
+                                        className="tag-pill" 
+                                        style={{background:`${tag.color}20`}}
+                                    >
+                                        <span style={{color:tag.color,fontWeight:'700',fontSize:'10px'}}>{tag.value}</span>
+                                    </div>
                                         <Popover
                                             id={id}
                                             open={open}
