@@ -456,7 +456,7 @@ const AddNewSafe = () => {
 				</div>
 				<div className="createButton">
 					<SimpleLoadButton
-						title="CREATE SAFE"
+						title="CREATE"
 						bgColor={isLoading ? 'grey' : "#C94B32"}
 						height={50}
 						width={250}
