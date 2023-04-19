@@ -41,14 +41,17 @@ import { makeStyles } from '@mui/styles';
 import MuiSelect from '../../muiComponents/Select'
 import SwitchChain from 'components/SwitchChain';
 import axios from "axios";
+import { margin } from "polished";
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
-		minHeight: '100vh',
+		minHeight: "100vh",
+		maxHeight: 'fit-content',
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'center',
-		justifyContent: 'center'
+		justifyContent: 'center',
+		overflow: 'hidden !important'
 	},
 	text: {
 		fontFamily: 'Inter, sans-serif',
@@ -97,7 +100,7 @@ const useStyles = makeStyles((theme: any) => ({
 		fontWeight: 400,
 		fontSize: 16,
 		letterSpacing: '-0.011em',
-		color: '#76808D'
+		color: '#76808D',
 	},
 	StartSafe: {
 		display: 'flex',
@@ -183,10 +186,10 @@ const useStyles = makeStyles((theme: any) => ({
 	headerText: {
 		fontFamily: 'Insignia',
 		fontStyle: 'normal',
-		fontWeight: 400,
-		fontSize: 35,
-		paddingBottom: 30,
-		marginTop: 110,
+		fontWeight: '400',
+		fontSize: '35px',
+		lineHeight: '35px',
+		paddingBottom: '30px',
 		textAlign: 'center',
 		color: '#C94B32'
 	},
@@ -506,7 +509,7 @@ export default () => {
 	const handleSafeName = () => {
 		let terrors: any = {};
 		if (!safeName) {
-			terrors.safeName = " * safe Name is required";
+			terrors.safeName = " * Multi-sig Wallet Name is required";
 		}
 		if (_.isEmpty(terrors)) {
 			setshowContinue(false);
@@ -1055,7 +1058,7 @@ export default () => {
 				<Box className={classes.bottomLine} />
 				<Box className={classes.centerCard}>
 					<Box>
-						<Typography className={classes.thresholdText}>
+						<Typography className={classes.thresholdText} sx={{ my: 1 }}>
 							Any transaction requires the confirmation of
 						</Typography>
 					</Box>
@@ -1069,7 +1072,7 @@ export default () => {
 								}}
 							/>
 						</Box>
-						<Box className={classes.thresholdCount}>
+						<Box sx={{ mx: 1 }} className={classes.thresholdCount}>
 							of {Myvalue.current.length} owner(s)
 						</Box>
 					</Box>
@@ -1096,7 +1099,7 @@ export default () => {
 						fontsize: 20,
 						boxShadow: '3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)'
 					}}>
-					CREATE SAFE
+					CREATE
 				</Button>
 			</>
 		);
@@ -1106,7 +1109,7 @@ export default () => {
 		<Container>
 			<Grid className={classes.root}>
 				<Box className={classes.StartSafe}>
-					<Box className={classes.headerText}>2/2 Organisation Treasury</Box>
+					<Box className={classes.headerText}>2/2 Organisation Multi-sig Wallet</Box>
 					<Box className={classes.buttonArea}>
 						<Box>
 							<Button
@@ -1119,7 +1122,7 @@ export default () => {
 									boxShadow: '3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)'
 								}}
 								variant='contained'>
-								CREATE NEW SAFE
+								CREATE
 							</Button>
 						</Box>
 						<Box className={classes.centerText}>or</Box>
@@ -1135,7 +1138,7 @@ export default () => {
 								}}
 								onClick={() => navigate('/addsafe')}
 								variant='contained'>
-								ADD EXISTING SAFE
+								ADD EXISTING
 							</Button>
 						</Box>
 					</Box>
@@ -1150,7 +1153,7 @@ export default () => {
 								setSelectedChainId(value)
 							}}
 						/>
-						<Box className={classes.safeNameTitle}>Safe Name</Box>
+						<Box className={classes.safeNameTitle}>Multi-sig Wallet Name</Box>
 						<TextInput
 							fullWidth
 							placeholder="Pied Piper"

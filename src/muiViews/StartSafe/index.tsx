@@ -505,7 +505,7 @@ const StartSafe = () => {
 			<Container>
 				<Grid container className={classes.root}>
 				<Box className={classes.StartSafe}>
-					<Box className={classes.headerText}>2/2 Organisation Treasury</Box>
+					<Box className={classes.headerText}>2/2 Organisation Multi-sig Wallet</Box>
 					<Box className={classes.buttonArea}>
 						<Box>
 							<Button
@@ -521,7 +521,7 @@ const StartSafe = () => {
 								size="medium"
 								onClick={createNewSafe}
 								>
-								CREATE NEW SAFE
+								CREATE
 							</Button>
 						</Box>
 						<Box className={classes.centerText}>or</Box>
@@ -538,7 +538,7 @@ const StartSafe = () => {
 								variant='contained'
 								size="medium"
 								>
-								ADD EXISTING SAFE
+								ADD EXISTING
 						</Button>
 						</Box>
 					</Box>

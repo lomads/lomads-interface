@@ -32,11 +32,13 @@ import { beautifyHexToken } from "utils"
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
-		minHeight: '100vh',
+		minHeight: "100vh",
+		maxHeight: 'fit-content',
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'center',
-		justifyContent: 'center'
+		justifyContent: 'center',
+		overflow: 'hidden !important'
 	},
 	text: {
 		fontFamily: 'Inter, sans-serif',
@@ -99,7 +101,7 @@ const useStyles = makeStyles((theme: any) => ({
 		alignItems: 'center',
 		justifyContent: 'center',
 		height: 'fit-content',
-		padding: '20vh 0vh 10vh 0vh'
+		padding: '14vh 0vh 10vh 0vh'
 	},
 	centerFlexContainer: {
 		display: 'flex',
@@ -131,10 +133,10 @@ const useStyles = makeStyles((theme: any) => ({
 	headerText: {
 		fontFamily: 'Insignia',
 		fontStyle: 'normal',
-		fontWeight: 400,
-		fontSize: 35,
-		marginTop: 110,
-		paddingBottom: 30,
+		fontWeight: '400',
+		fontSize: '35px',
+		lineHeight: '35px',
+		paddingBottom: '30px',
 		textAlign: 'center',
 		color: '#C94B32'
 	},
@@ -319,8 +321,8 @@ const useStyles = makeStyles((theme: any) => ({
 		marginBottom: 30,
 		display: "flex",
 		flexDirection: "column",
-		height: 550,
-		overflowY: "scroll"
+		// height: 550,
+		// overflowY: "scroll"
 	},
 	addSafe: {
 		position: 'fixed',
@@ -584,7 +586,7 @@ export default () => {
 		<Container>
 			<Grid className={classes.root}>
 				<Box className={classes.StartSafe}>
-					<Box className={classes.headerText}>2/2 Organisation Treasury</Box>
+					<Box className={classes.headerText}>2/2 Organisation Multi-sig Wallet</Box>
 					<Box className={classes.buttonArea}>
 						<Box>
 							<Button
@@ -598,7 +600,7 @@ export default () => {
 								}}
 								onClick={() => navigate('/newsafe')}
 								variant='contained'>
-								CREATE NEW SAFE
+								CREATE
 							</Button>
 						</Box>
 						<Box className={classes.centerText}>or</Box>
@@ -613,7 +615,7 @@ export default () => {
 									boxShadow: '3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)'
 								}}
 								variant='contained'>
-								ADD EXISTING SAFE
+								ADD EXISTING
 							</Button>
 						</Box>
 					</Box>
@@ -652,7 +654,7 @@ export default () => {
 													<img width={18} height={18} src={CHAIN_INFO[selectedChainId].logoUrl} alt="seek-logo" />
 												</Box>
 												<Box>
-													<Typography className={classes.safeName}>Safe Name</Typography>
+													<Typography className={classes.safeName}>Multi-sig Wallet Name</Typography>
 													<Typography>{beautifyHexToken(item)}</Typography>
 												</Box>
 											</Box>
