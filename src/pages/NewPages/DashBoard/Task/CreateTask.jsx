@@ -156,7 +156,6 @@ const CreateTask = ({ toggleShowCreateTask, selectedProject }) => {
             setReviewer(null);
             setCurrency(null);
             setAmount(0);
-            localStorage.setItem("create_first_task",true);
             setTimeout(() => {
                 setShowSuccess(false);
                 toggleShowCreateTask();

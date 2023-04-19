@@ -35,8 +35,6 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
     const [initialCheck, setInitialCheck] = useState(false);
     const { myRole, can } = useRole(DAO, account)
 
-    const showCreateTask = localStorage.getItem("create_first_task");
-
     useEffect(() => {
         console.log("projectId", projectId)
         if (projectId && (!Project || (Project && Project._id !== projectId)))
@@ -378,16 +376,6 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
                             }
                         })
                     }
-                    {
-                        !showCreateTask || myTasks.length < 3 && 
-                        <div
-                            className='create-new-task'
-                            onClick={() => {toggleShowCreateTask() }}
-                        >
-                            <span>CREATE YOUR FIRST TASK</span>
-                            <BsArrowRight color='rgba(118, 128, 141, 0.5)' size={20}/>
-                        </div>
-                    }
                 </div>
                 :
                 null
@@ -423,16 +411,18 @@ const Tasks = ({ toggleShowCreateTask, onlyProjects, isHelpIconOpen }) => {
                             }
                         })
                     }
+                         
                     {
-                        !showCreateTask && 
-                        <div
-                            className='create-new-task'
-                            onClick={() => { toggleShowCreateTask() }}
-                        >
-                            <span>CREATE YOUR FIRST TASK</span>
-                            <BsArrowRight color='rgba(118, 128, 141, 0.5)' size={20}/>
-                        </div>
+                        _get(DAO,'dummyTaskFlag',false) && <div
+                        className='create-new-task'
+                        onClick={() => { toggleShowCreateTask() }}
+                    >
+                        <span>CREATE YOUR FIRST TASK</span>
+                        <BsArrowRight color='rgba(118, 128, 141, 0.5)' size={20}/>
+                    </div>
+
                     }
+                    
                 </div>
                 :
                 null

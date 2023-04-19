@@ -245,7 +245,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                                         className="tag-pill"
                                         style={{background:`${mulTag.color}20`}}
                                     >
-                                        <span style={{color:mulTag.color,fontWeight:'700',fontSize:'10px'}}>{mulTag.value}</span>
+                                        <span style={{color:mulTag.color,fontWeight:'700',fontSize:'10px'}}>{mulTag.value.length > 15 ? mulTag.value.substring(0,15) + '...' : mulTag.value}</span>
                                     </div>
                                     <Popover
                                         id={id}
@@ -465,7 +465,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                                         className="tag-pill" 
                                         style={{background:`${tag.color}20`}}
                                     >
-                                        <span style={{color:tag.color,fontWeight:'700',fontSize:'10px'}}>{tag.value}</span>
+                                        <span style={{color:tag.color,fontWeight:'700',fontSize:'10px'}}>{tag.value.length > 15 ? tag.value.substring(0,15) + '...' : tag.value}</span>
                                     </div>
                                         <Popover
                                             id={id}

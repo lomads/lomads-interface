@@ -113,8 +113,7 @@ const SafeModal = ({ toggleS }) => {
 								newOwners.map(owner => {
 									return (
 										<div className="safe-modal owner-item">
-											<img src={bitMemberIcon} />
-											<div>{owner.name}</div>
+											<Avatar name={owner.name} wallet={owner.wallet}/>
 										</div>
 									)
 								})
@@ -130,8 +129,7 @@ const SafeModal = ({ toggleS }) => {
 								removeOwners.map(owner => {
 									return (
 										<div className="safe-modal owner-item">
-											<img src={bitMemberIcon} />
-											<div>{owner.name}</div>
+											<Avatar name={owner.name} wallet={owner.wallet}/>
 										</div>
 									)
 								})

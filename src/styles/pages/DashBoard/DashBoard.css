@@ -624,15 +624,13 @@ body.active-modal {
 }
 
 .tag-pill {
-    /* padding:6px 10px; */
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 20px;
     cursor: pointer;
     height: 24px;
-    max-width:100px;
-    text-overflow: ellipsis;
+    max-width:120px;
 }
 
 .add-label-btn{
@@ -644,6 +642,9 @@ body.active-modal {
     border-radius: 20px;
     padding: 6px 10px;
     cursor: pointer;
+    width: 120px;
+    height: 24px;
+
 }
 
 .add-label-btn:hover{

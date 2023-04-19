@@ -181,6 +181,7 @@ export default () => {
 
     const [state, setState] = useState<any>({
         logo: null,
+        treasury:null,
         symbol: null,
         supply: 0,
         whitelisted: false,
@@ -231,6 +232,10 @@ export default () => {
         setErrors(err)
         if(!state?.symbol || state?.symbol === '')
             err['symbol'] = "Enter valid symbol"
+        if(!state?.treasury || state?.treasury === '')
+            err['treasury'] = "Enter valid treasury"
+        if(!state?.logo || state?.logo === '')
+            err['logo'] = "Please upload image"
         // if(!state?.supply || state?.supply === '')
         //     err['supply'] = "Enter valid supply"
         if(Object.keys(err).length > 0)
@@ -314,26 +319,36 @@ export default () => {
                 {
                     editMode ? 
                     <Paper className={classes.paper}>
-                        <TextInput value={state?.symbol}
+                        <TextInput 
+                            value={state?.symbol}
                             error={errors['symbol']}
                             helperText={errors['symbol']}
                             onChange={(e: any) => {
-                                setErrors({})
+                                setErrors({});
                                 setState((prev: any) => { return { ...prev, symbol: e.target.value } } ) 
                             }}
-                        sx={{ my: 1 }} placeholder="LMDS" fullWidth label="Symbol of the Pass Token" />
-                        <Box mt={4}>
+                            sx={{ my: 1 }} placeholder="LMDS" fullWidth label="Symbol of the Pass Token" 
+                        />
+                        <Box mt={4} mb={2}>
                             <FormControl fullWidth>
                                 <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
-                                    <FormLabel>Pass Token Icon</FormLabel>
-                                    <Chip sx={{ mr: 1 }} className={classes.chip} size="small" label="Optional" />
+                                    <FormLabel sx={{color : errors['logo']?'#e53935':null }}>Pass Token Icon</FormLabel>
+                                    {/* <Chip sx={{ mr: 1 }} className={classes.chip} size="small" label="Optional" /> */}
                                 </Box>
                                 <Typography variant="subtitle2" className={classes.description}>Suggested dimensions and format : 800x800, .svg or .png</Typography>
                             </FormControl>
                             <Box>
-                                <Dropzone value={state?.logo} onUpload={(url: string) => {
-                                    setState((prev: any) => { return { ...prev, logo: url } } )
-                                }}/>
+                                <Dropzone 
+                                    value={state?.logo} 
+                                    onUpload={(url: string) => {
+                                        setErrors({});
+                                        setState((prev: any) => { return { ...prev, logo: url } } )
+                                    }}
+                                />
+                                {
+                                    errors['logo'] &&
+                                    <Typography mt={-2} sx={{color:'#e53935',fontSize:'11px',marginLeft:'14px'}}>{errors['logo']}</Typography>
+                                }
                             </Box>
                         </Box>
                         {/* <TextInput value={state?.supply} type="number"
@@ -345,14 +360,19 @@ export default () => {
                         }}
                         placeholder="Number of existing tokens" sx={{ my: 1 }} fullWidth label="Supply" labelChip={<Chip sx={{ m:1 }} className={classes.chip} label="Optional" size="small" />} /> */}
                         
-                        <TextInput value={state?.treasury}
-                        error={errors['treasury']}
-                        helperText={errors['treasury']}
-                        onChange={(e: any) => {
-                            setErrors({})
-                            setState((prev: any) => { return { ...prev, treasury: e.target.value } } ) 
-                        }}
-                        placeholder="Treasury address" sx={{ my: 1 }} fullWidth label="Treasury" />
+                        <TextInput 
+                            value={state?.treasury}
+                            error={errors['treasury']}
+                            helperText={errors['treasury']}
+                            onChange={(e: any) => {
+                                setErrors({});
+                                setState((prev: any) => { return { ...prev, treasury: e.target.value } } ) 
+                            }}
+                            placeholder="Treasury address" 
+                            sx={{ my: 1 }} 
+                            fullWidth 
+                            label="Treasury" 
+                        />
 
                         <Box my={3} display="flex" flexDirection="row" justifyContent="space-between" mx={1}>
                             <Switch onChange={(e: any) => { setState((prev: any) => { return {

@@ -41,6 +41,7 @@ import { makeStyles } from '@mui/styles';
 import MuiSelect from '../../muiComponents/Select'
 import SwitchChain from 'components/SwitchChain';
 import axios from "axios";
+import Avatar from "muiComponents/Avatar";
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
@@ -940,18 +941,18 @@ export default () => {
 									return (
 										<Box key={index} className={classes.owner}>
 											<Box className={classes.avatarPlusName}>
-												<img src={daoMember2} alt={result.address} />
-												<Typography variant="body1" className={classes.nameText}>{result.name}</Typography>
+												<Avatar name={result.name} wallet={result.address}/>
+												{/* <img src={daoMember2} alt={result.address} />
+												<Typography variant="body1" className={classes.nameText}>{result.name}</Typography> */}
 											</Box>
-											<Box className={classes.avatarAddress}>
+											{/* <Box className={classes.avatarAddress}>
 												<Typography className={classes.text}>
 													{result.address &&
 														result.address.slice(0, 6) +
 														"..." +
 														result.address.slice(-4)}
 												</Typography>
-											</Box>
-
+											</Box> */}
 											<Box className={classes.avatarBtn}>
 												{result.address !== account && (
 													<IconButton
