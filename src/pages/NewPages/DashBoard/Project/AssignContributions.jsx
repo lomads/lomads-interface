@@ -438,7 +438,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                                 { error && <div style={{ color: 'red', textAlign: 'center', margin: '0 0 8px 0' }}>{ error }</div> }
                                 <div style={{ display: 'flex', flexDirection: 'row', background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: '500px',  position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
                                     <Button sx={{mr:1}} size="small" variant="outlined" fullWidth onClick={() => toggleShowAssign()}>CANCEL</Button>
-                                    <Button fullWidth size="small" variant="contained" loading={false} 
+                                    <Button fullWidth size="small" variant="contained" loading={isLoading} 
                                         onClick={handleSubmit}>SAVE</Button>
                                 </div>
                                 {/* <div className='milestone-footer'>

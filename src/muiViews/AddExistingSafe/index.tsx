@@ -29,6 +29,7 @@ import { CHAIN_INFO } from 'constants/chainInfo';
 import safeUserIcon from '../../assets/svg/safeUserIcon.svg'
 import downArrow from '../../assets/svg/downArrow.svg'
 import { beautifyHexToken } from "utils"
+import Avatar from "boring-avatars";
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
@@ -549,7 +550,13 @@ export default () => {
 									<Box className={classes.safeOwner} key={index}>
 										<Box className={classes.userDetail}>
 											<Box sx={{marginTop: 1.5}}>
-												<img src={safeUserIcon} alt="safe-owner-icon" />
+											<Avatar
+												size={32}
+												name={result.address}
+												variant="bauhaus"
+												colors={["#E67C40", "#EDCD27", "#8ECC3E", "#2AB87C", "#188C8C"]}
+											/>
+												{/* <img src={safeUserIcon} alt="safe-owner-icon" /> */}
 											</Box>
 											<TextInput
 												placeholder="Name"

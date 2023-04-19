@@ -114,6 +114,7 @@ const Dashboard = () => {
 	const location = useLocation()
 	const from = location?.state?.from;
 	const { user, DAO, DAOList, DAOLoading } = useAppSelector((state:any) => state.dashboard);
+	console.log("DAO : ",DAO);
 	const [update, setUpdate] = useState(0);
 	const treasuryRef = useRef<any>();
 	const anchorRef = useRef<any>();

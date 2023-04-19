@@ -124,7 +124,7 @@ const Settings = () => {
 
 	//! TOGGLE FUNCTIONS
 	let toggleOrganisationDetailsModal = () => {
-		setOpenOrganisationDetails(!openOrganisationDetails);
+		setOpenOrganisationDetails(false);
 	};
 	let toggleRP = () => {
 		setOpenRolesPermissions(!openRolesPermissions);
