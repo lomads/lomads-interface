@@ -12,12 +12,11 @@ import React, { useEffect, useState } from "react";
 import IconButton from "muiComponents/IconButton";
 import useContractDeployer, { SBTParams } from "hooks/useContractDeployer"
 import { useWeb3React } from "@web3-react/core"
-import { SupportedChainId } from "constants/chains"
+import { SUPPORTED_CHAIN_IDS, SupportedChainId } from "constants/chains"
 import axiosHttp from 'api'
 import CurrencyInput from "muiComponents/CurrencyInput"
 import { useNavigate, useParams } from "react-router-dom"
 import XlsxUpload from "muiComponents/XlsxUpload"
-import toast from 'react-hot-toast';
 import { USDC } from 'constants/tokens';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -25,9 +24,16 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Select from "muiComponents/Select";
 import { beautifyHexToken } from "utils"
 import { useAppDispatch, useAppSelector } from "state/hooks"
 import { getDao, loadDao } from "state/dashboard/actions"
+import { CHAIN_INFO } from "constants/chainInfo"
+import SwitchChain from 'components/SwitchChain';
+import { toast } from 'react-hot-toast';
+import {
+    SBT_DEPLOYER_ADDRESSES
+  } from 'constants/addresses'
 
 ///   0xD123b939B5022608241b08c41ece044059bE00f5
 
@@ -163,16 +169,17 @@ export default () => {
             dispatch(getDao(daoURL))
     }, [DAO])
 
-    useEffect(() => {
-        if(DAO?.safe) {
-            setState((prev: any) => { return { ...prev,
-                 treasury: DAO?.safe?.address
-             }})
-        }
-    }, [DAO?.safe])
+    // useEffect(() => {
+    //     if(DAO?.safe) {
+    //         setState((prev: any) => { return { ...prev,
+    //              treasury: DAO?.safe?.address
+    //          }})
+    //     }
+    // }, [DAO?.safe])
 
 
     const [state, setState] = useState<any>({
+        selectedChainId: null,
         logo: null,
         symbol: null,
         supply: 0,
@@ -191,23 +198,28 @@ export default () => {
     })
 
     useEffect(() => {
-        if(chainId) {
+        if(chainId)
+            setState((prev: any) => { return { ...prev, selectedChainId: chainId } })
+    }, [chainId])
+
+    useEffect(() => {
+        if(state?.selectedChainId) {
             setTokens([
                 {
-                    label: 'ETH',
-                    value: "0x0000000000000000000000000000000000000000",
-                    decimals: 18
+                    label: CHAIN_INFO[state?.selectedChainId]?.nativeCurrency?.symbol,
+                    value: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
+                    decimals: CHAIN_INFO[state?.selectedChainId]?.nativeCurrency?.decimals
                 },
                 {
-                    label: _get(USDC, `[${chainId}].symbol`),
-                    value: _get(USDC, `[${chainId}].address`),
-                    decimals: _get(USDC, `[${chainId}].decimals`),
+                    label: _get(USDC, `[${state?.selectedChainId}].symbol`),
+                    value: _get(USDC, `[${state?.selectedChainId}].address`),
+                    decimals: _get(USDC, `[${state?.selectedChainId}].decimals`),
                 }
             ])
         }
-    }, [chainId])
+    }, [state?.selectedChainId])
 
-    const { deploy, deployLoading } = useContractDeployer(require('abis/SBTDeployer.json'))
+    const { deploy, deployLoading } = useContractDeployer(SBT_DEPLOYER_ADDRESSES[state?.selectedChainId])
     
 
     const handleContactChange = (key: string) => {
@@ -224,8 +236,8 @@ export default () => {
         setErrors(err)
         if(!state?.symbol || state?.symbol === '')
             err['symbol'] = "Enter valid symbol"
-        // if(!state?.supply || state?.supply === '')
-        //     err['supply'] = "Enter valid supply"
+        if(!state?.selectedChainId || state?.selectedChainId === '')
+            err['chain'] = "Select valid chain"
         if(Object.keys(err).length > 0)
             return setErrors(err)
         console.log(state)
@@ -233,47 +245,53 @@ export default () => {
     }
 
     const deployContract = async () => {
-        try {
-            setDeployContractLoading(true)
-            const params: SBTParams = {
-                name: `${state?.symbol} SBT`,
-                symbol: state?.symbol,
-                mintPrice: `${state?.price?.value}`,
-                mintToken: state?.price?.token,
-                treasury: state?.treasury,
-                whitelisted: state?.whitelisted ? 1 : 0
-            }
-
-            const contractAddr = await deploy(params)
-
-            if(contractAddr) {
-                const contractJSON = {
+        if(chainId !== state?.selectedChainId) {
+            toast.custom(t => <SwitchChain t={t} nextChainId={state?.selectedChainId}/>)
+        } else {
+            try {
+                setDeployContractLoading(true)
+                const params: SBTParams = {
+                    chainId: state?.selectedChainId,
                     name: `${state?.symbol} SBT`,
-                    token: state.symbol,
-                    image: state?.logo,
-                    tokenSupply: state?.supply,
-                    address: contractAddr,
-                    version: 1,
-                    treasury: state?.treasury,
+                    symbol: state?.symbol,
                     mintPrice: `${state?.price?.value}`,
-                    mintPriceToken: `${state?.price?.token}`,
-                    whitelisted: state?.whitelisted,
-                    contactDetail: state?.contact,
-                    metadata: [],
-                    membersList: state?.whitelisted ? _get(DAO, 'members', []).map((m:any) => { return { name: m.member.name, address: m.member.wallet }}) : [],
-                    daoId: _get(DAO, '_id', null)
+                    mintToken: state?.price?.token,
+                    treasury: state?.treasury,
+                    whitelisted: state?.whitelisted ? 1 : 0,
                 }
-                axiosHttp.post('contract', contractJSON)
-                .then(res => {
-                    setTimeout(() => { window.location.href = `/${_get(DAO, 'url', '')}` }, 500)
-                })
-                .finally(() =>  setDeployContractLoading(false))
+    
+                const contractAddr = await deploy(params)
+    
+                if(contractAddr) {
+                    const contractJSON = {
+                        chainId: state?.selectedChainId,
+                        name: `${state?.symbol} SBT`,
+                        token: state.symbol,
+                        image: state?.logo,
+                        tokenSupply: state?.supply,
+                        address: contractAddr,
+                        version: 1,
+                        treasury: state?.treasury,
+                        mintPrice: `${state?.price?.value}`,
+                        mintPriceToken: `${state?.price?.token}`,
+                        whitelisted: state?.whitelisted,
+                        contactDetail: state?.contact,
+                        metadata: [],
+                        membersList: state?.whitelisted ? _get(DAO, 'members', []).map((m:any) => { return { name: m.member.name, address: m.member.wallet }}) : [],
+                        daoId: _get(DAO, '_id', null)
+                    }
+                    axiosHttp.post('contract', contractJSON)
+                    .then(res => {
+                        setTimeout(() => { window.location.href = `/${_get(DAO, 'url', '')}` }, 500)
+                    })
+                    .finally(() =>  setDeployContractLoading(false))
+                }
             }
-        }
-        catch(e) {
-            setNetworkError(e)
-            setTimeout(() => setNetworkError(null), 3000)
-            setDeployContractLoading(false)
+            catch(e) {
+                setNetworkError(e)
+                setTimeout(() => setNetworkError(null), 3000)
+                setDeployContractLoading(false)
+            }
         }
     }
 
@@ -307,6 +325,18 @@ export default () => {
                 {
                     editMode ? 
                     <Paper className={classes.paper}>
+                        <Box mb={4}>
+                            <FormLabel style={{ marginBottom: 8 }}>Chain</FormLabel>
+                            <Box mt={2}>
+                                <Select
+                                    selected={state?.selectedChainId}
+                                    options={ SUPPORTED_CHAIN_IDS.map((item : any) => ({ label: CHAIN_INFO[item].label, value: item }))}
+                                    setSelectedValue={(value) => {
+                                        setState((prev: any) => { return {...prev, selectedChainId: +value }})
+                                    }}
+                                />
+                            </Box>
+						</Box>
                         <TextInput value={state?.symbol}
                             error={errors['symbol']}
                             helperText={errors['symbol']}

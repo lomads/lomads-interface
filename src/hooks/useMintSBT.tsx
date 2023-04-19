@@ -10,6 +10,7 @@ import { USDC_GOERLI, USDC_POLYGON } from 'constants/tokens'
 import { useCallback, useEffect, useState } from 'react';
 import { useAppSelector } from 'state/hooks';
 import { INFURA_NETWORK_URLS } from 'constants/infura';
+import { CHAIN_INFO } from 'constants/chainInfo';
 
 export type SBTParams = {
     name: string,
@@ -35,16 +36,16 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
     const weth = (price: string, token: string): any => {
       if(!chainId) return;
       const tokens = [
-          {
-              label: 'ETH',
-              value: "0x0000000000000000000000000000000000000000",
-              decimals: 18
-          },
-          {
-              label: _get(USDC, `[${chainId}].symbol`),
-              value: _get(USDC, `[${chainId}].address`),
-              decimals: _get(USDC, `[${chainId}].decimals`),
-          }
+        {
+          label: CHAIN_INFO[chainId]?.nativeCurrency?.symbol,
+          value: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
+          decimals: CHAIN_INFO[chainId]?.nativeCurrency?.decimals
+        },
+        {
+            label: _get(USDC, `[${chainId}].symbol`),
+            value: _get(USDC, `[${chainId}].address`),
+            decimals: _get(USDC, `[${chainId}].decimals`),
+        }
       ]
       const payToken = _find(tokens, (t:any) => t.value === token)
       return ethers.utils.parseUnits(price, payToken?.decimals)
