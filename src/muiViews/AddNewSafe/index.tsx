@@ -16,6 +16,7 @@ import useEns from 'hooks/useEns';
 import useTerminology from "hooks/useTerminology";
 import { useAppSelector } from "state/hooks";
 import { useAppDispatch } from "state/hooks";
+import { toast } from 'react-hot-toast';
 import {
 	updateOwners,
 	updateSafeAddress,
@@ -38,6 +39,7 @@ import { loadDao } from '../../state/dashboard/actions';
 import { Box, Typography, Container, Grid } from "@mui/material"
 import { makeStyles } from '@mui/styles';
 import MuiSelect from '../../muiComponents/Select'
+import SwitchChain from 'components/SwitchChain';
 import axios from "axios";
 
 const useStyles = makeStyles((theme: any) => ({
@@ -607,77 +609,87 @@ export default () => {
 	}
 
 	const deployNewSafe = async () => {
-		setisLoading(true);
-		dispatch(updateOwners(Myvalue.current));
-		const safeOwner = provider?.getSigner(0);
-
-		const ethAdapter = new EthersAdapter({
-			ethers,
-			signerOrProvider: safeOwner as any,
-		});
-		const safeFactory = await SafeFactory.create({
-			ethAdapter,
-		});
-		const owners: any = Myvalue.current.map((result) => {
-			return result.address;
-		});
-		console.log(owners);
-		const threshold: number = thresholdValue;
-		console.log(threshold);
-		const safeAccountConfig: SafeAccountConfig = {
-			owners,
-			threshold,
-		};
-
-		let currentSafes: Array<string> = []
-		if (chainId === SupportedChainId.POLYGON)
-			currentSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
-
-		console.log("currentSafes", currentSafes)
-
-		await safeFactory
-			.deploySafe({ safeAccountConfig })
-			.then(async (tx) => {
-				dispatch(updateSafeAddress(tx.getAddress() as string));
-				const totalAddresses = [...invitedMembers, ...Myvalue.current];
-				const value = totalAddresses.reduce((final: any, current: any) => {
-					let object = final.find(
-						(item: any) => item.address === current.address
-					);
-					if (object) {
-						return final;
-					}
-					return final.concat([current]);
-				}, []);
-				dispatch(updateTotalMembers(value));
-				//setisLoading(false);
-				const payload: any = {
-					contractAddress: '',
-					chainId,
-					name: flow.daoName,
-					url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
-					image: null,
-					members: value.map((m: any) => {
-						return {
-							...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: owners.map((a: any) => a.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4'
+		if(selectedChainId !== chainId) {
+            toast.custom(t => <SwitchChain t={t} nextChainId={selectedChainId}/>)
+        } else {
+			try {
+				setisLoading(true);
+				dispatch(updateOwners(Myvalue.current));
+				const safeOwner = provider?.getSigner(0);
+		
+				const ethAdapter = new EthersAdapter({
+					ethers,
+					signer: safeOwner as any,
+				});
+				console.log(await ethAdapter.getChainId())
+				const safeFactory = await SafeFactory.create({
+					ethAdapter,
+				});
+				const owners: any = Myvalue.current.map((result) => {
+					return result.address;
+				});
+				console.log(owners);
+				const threshold: number = thresholdValue;
+				console.log(threshold);
+				const safeAccountConfig: SafeAccountConfig = {
+					owners,
+					threshold,
+				};
+		
+				let currentSafes: Array<string> = []
+				if (chainId === SupportedChainId.POLYGON)
+					currentSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
+		
+				console.log("currentSafes", currentSafes)
+		
+				await safeFactory
+					.deploySafe({ safeAccountConfig })
+					.then(async (tx) => {
+						dispatch(updateSafeAddress(tx.getAddress() as string));
+						const totalAddresses = [...invitedMembers, ...Myvalue.current];
+						const value = totalAddresses.reduce((final: any, current: any) => {
+							let object = final.find(
+								(item: any) => item.address === current.address
+							);
+							if (object) {
+								return final;
+							}
+							return final.concat([current]);
+						}, []);
+						dispatch(updateTotalMembers(value));
+						//setisLoading(false);
+						const payload: any = {
+							contractAddress: '',
+							chainId,
+							name: flow.daoName,
+							url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
+							image: null,
+							members: value.map((m: any) => {
+								return {
+									...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: owners.map((a: any) => a.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4'
+								}
+							}),
+							safe: {
+								name: safeName,
+								address: tx.getAddress(),
+								owners: owners,
+							}
 						}
-					}),
-					safe: {
-						name: safeName,
-						address: tx.getAddress(),
-						owners: owners,
-					}
-				}
-				dispatch(createDAO(payload))
-			})
-			.catch(async (err) => {
-				console.log("An error occured while creating safe", err);
-				if (chainId === SupportedChainId.POLYGON) {
-					checkNewSafe(currentSafes, owners)
-				} else {
-					setisLoading(false);
-				}
-			});
+						dispatch(createDAO(payload))
+					})
+					.catch(async (err) => {
+						console.log("An error occured while creating safe", err);
+						if (chainId === SupportedChainId.POLYGON) {
+							checkNewSafe(currentSafes, owners)
+						} else {
+							setisLoading(false);
+						}
+					});
+			} catch (e) {
+				setisLoading(false);
+				console.log(e)
+			}
+		}
 	};
 
 	const deployNewSafeDelayed = useCallback(_.debounce(deployNewSafe, 1000), [deployNewSafe])
