@@ -168,14 +168,15 @@ const TaskReview = ({ task, close }: any) => {
     }, [safeTokens, task])
 
     const handleApproveTask = async () => {
-        if(currentChainId !== _get(DAO, 'chainId', '')) {
-            return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
-        }
         try {
             setApproveLoading(true);
             setError(null)
             let onChainSafeTxHash: any = undefined;
             if (isSafeOwner && _get(task, 'compensation.currency', 'SWEAT') !== 'SWEAT') {
+                if(currentChainId !== _get(DAO, 'chainId', '')) {
+                    setApproveLoading(false);
+                    return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
+                }
                 onChainSafeTxHash = await createOnChainTxn();
             }
     

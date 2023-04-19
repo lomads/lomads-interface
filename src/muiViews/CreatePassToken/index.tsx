@@ -166,18 +166,11 @@ export default () => {
     useEffect(() => {
         if(DAO?.safe) {
             setState((prev: any) => { return { ...prev,
-                 treasury: account //DAO?.safe?.address
+                 treasury: DAO?.safe?.address
              }})
         }
     }, [DAO?.safe])
-    
-    useEffect(() => {
-        axiosHttp.get('contract')
-        .then(res => {
-            if(res.data.length > 0)
-                navigate('/')
-        })
-    }, [])
+
 
     const [state, setState] = useState<any>({
         logo: null,

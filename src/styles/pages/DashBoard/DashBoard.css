@@ -964,7 +964,7 @@ body.active-modal {
     max-height: 70vh; */
     width: 100%;
     padding-bottom: 150px;
-    gap: 35px;
+    gap: 12px;
     /* overflow-y: auto; */
 }
 
@@ -985,6 +985,8 @@ body.active-modal {
     width: 75%;
     justify-content: space-between;
     margin: 0vh 0vh 0vh 0vh;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #F5F5F5;
 }
 
 #assignAmount {

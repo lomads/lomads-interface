@@ -116,7 +116,7 @@ const AddNewSafe = () => {
 	const handleSafeName = () => {
 		let terrors: any = {};
 		if (!safeName) {
-			terrors.safeName = " * safe Name is required";
+			terrors.safeName = " * Multi-sig Wallet Name is required";
 		}
 		if (_.isEmpty(terrors)) {
 			setshowContinue(false);
@@ -456,7 +456,7 @@ const AddNewSafe = () => {
 				</div>
 				<div className="createButton">
 					<SimpleLoadButton
-						title="CREATE SAFE"
+						title="CREATE"
 						bgColor={isLoading ? 'grey' : "#C94B32"}
 						height={50}
 						width={250}
@@ -477,7 +477,7 @@ const AddNewSafe = () => {
 				<div className="buttonArea">
 					<div>
 						<SafeButton
-							title="CREATE NEW SAFE"
+							title="CREATE"
 							titleColor="#C94B32"
 							bgColor="#FFFFFF"
 							height={58}
@@ -490,7 +490,7 @@ const AddNewSafe = () => {
 					<div className="centerText">or</div>
 					<div>
 						<SafeButton
-							title="ADD EXISTING SAFE"
+							title="ADD EXISTING"
 							titleColor="rgba(201, 75, 50, 0.6)"
 							bgColor="#FFFFFF"
 							height={58}
@@ -508,7 +508,7 @@ const AddNewSafe = () => {
 				</div>
 				<div className="centerCard">
 					<div>
-						<div className="inputFieldTitle">Safe Name</div>
+						<div className="inputFieldTitle">Multi-sig Wallet Name</div>
 						<SimpleInputField
 							className="inputField"
 							height={50}
