@@ -1,9 +1,8 @@
 // import { Checkbox } from "@chakra-ui/react";
 import Checkbox from "muiComponents/Checkbox";
-import { get as _get } from 'lodash'
+import { get as _get, find as _find } from 'lodash'
 import React, { useState, useEffect } from "react";
 import { Box, Typography } from "@mui/material";
-import Button from "muiComponents/Button";
 import SimpleButton from "UIpack/SimpleButton";
 import daoMember2 from "../../../../assets/svg/daoMember2.svg";
 import SafeButton from "UIpack/SafeButton";
@@ -12,12 +11,14 @@ import { InviteGangType } from "types/UItype";
 import { IselectRecipientType, IsetRecipientType } from "types/DashBoardType";
 import AddRecipient from "./AddRecipient";
 import Avatar from "muiComponents/Avatar";
+import Button from "muiComponents/Button";
 
 const SelectRecipient = (props: IselectRecipientType) => {
 	{ console.log(props.totalMembers) }
 	const [selectedRecipientCount, setSelectedRecipientCount] =
 		useState<number>(0);
-	const handleCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
+
+	const handleCheck = (event: any) => {
 		const checked = event.target.checked;
 		if (checked) {
 			let index = props.totalMembers.findIndex(
@@ -79,7 +80,7 @@ const SelectRecipient = (props: IselectRecipientType) => {
 				<div id="SelectRecipientsHeader">
 					<div className="dashboardTextBold">Select recipients</div>
 					<div>
-						<SafeButton
+						{/* <SafeButton
 							bgColor="#FFFFFF"
 							disabled={false}
 							title="ADD NEW RECIPIENT"
@@ -89,10 +90,31 @@ const SelectRecipient = (props: IselectRecipientType) => {
 							height={40}
 							width={209}
 							onClick={props.toggleAddNewRecipient}
-						/>
+						/> */}
+						<Button size="small" onClick={props.toggleAddNewRecipient} variant="contained" color="secondary">ADD NEW RECIPIENT</Button>
 					</div>
 				</div>
 				<div className="SelectNewRecipientPageList">
+				{
+					newMembers && newMembers.map((result: any, index: any) => {
+						return (
+							<div className="selectRecipient">
+								<Avatar name={result.name} wallet={result.address}/>
+								<Checkbox
+									size="lg"
+									colorScheme="orange"
+									name="owner"
+									defaultChecked={_find(props.selectedRecipients, (s:any) => s?.address === result.address) !== null}
+									disabled={false}
+									value={result.address}
+									onChange={(event:any) => {
+										handleCheck(event);
+									}}
+								/>
+							</div>
+						);
+					})
+				}
 				{
 					props.totalMembers && props.totalMembers.map((result: any, index: any) => {
 						return (
@@ -107,34 +129,6 @@ const SelectRecipient = (props: IselectRecipientType) => {
 										"..." +
 										result.address.slice(-4)}
 								</p> */}
-								<Checkbox
-									size="lg"
-									colorScheme="orange"
-									name="owner"
-									defaultChecked={false}
-									disabled={false}
-									value={result.address}
-									onChange={(event:any) => {
-										handleCheck(event);
-									}}
-								/>
-							</div>
-						);
-					})
-				}
-				{
-					newMembers && newMembers.map((result: any, index: any) => {
-						return (
-							<div className="selectRecipient">
-								<div className="avatarName">
-									<img src={daoMember2} alt={result.address} />
-									<p className="nameText">{result.name}</p>
-								</div>
-								<p className="addressText">
-									{result.address.slice(0, 6) +
-										"..." +
-										result.address.slice(-4)}
-								</p>
 								<Checkbox
 									size="lg"
 									colorScheme="orange"
@@ -189,8 +183,11 @@ const SelectRecipient = (props: IselectRecipientType) => {
 					isTransactionSendPage={false}
 					onAddRecipient={(recipient:any) => {
 						setNewMembers((prev:any) => {
-							return [...prev, recipient]
+							return [recipient, ...prev]
 						})
+						setTimeout(() => {
+							props.selectedRecipients.current.push(recipient);
+						}, 500)
 					}}
 				/>
 			)}
