@@ -898,7 +898,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 									</div>
 									{
 										recurringTreasuryData.map((rtx :any) => 
-											<RecurringTxnTreasury chainId={+_get(DAO, 'chainId', 5)} onExecute={async (data: any) => {
+											<RecurringTxnTreasury chainId={+chainId} onExecute={async (data: any) => {
 												await loadTxnLabel()
 												dispatch(setRecurringPayments(data))
 											}} transaction={rtx}/>
@@ -906,12 +906,12 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 									}
 									{
 										pendingTxn.map((ptx, index) =>
-											<PendingTxn chainId={+_get(DAO, 'chainId', 5)} editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} executeFirst={executeFirst} isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
+											<PendingTxn chainId={+chainId} editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} executeFirst={executeFirst} isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
 										)
 									}
 									{
 										executedTxn.map((ptx, index) =>
-											<CompleteTxn chainId={+_get(DAO, 'chainId', 5)} editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} isAdmin={amIAdmin} owner={owner} transaction={ptx} tokens={props.tokens} />
+											<CompleteTxn chainId={+chainId} editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} isAdmin={amIAdmin} owner={owner} transaction={ptx} tokens={props.tokens} />
 										)
 									}
 								</div>

@@ -61,7 +61,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
 
     useEffect(() => {
         if(DAO)
-            setChainId(_get(DAO, 'chainId'))
+            setChainId(_get(DAO, 'safe.chainId', _get(DAO, 'chainId')))
     }, [DAO])
 
     useEffect(() => {
@@ -230,8 +230,8 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
         try {
             let onChainSafeTxHash = undefined;
             if (isSafeOwner && _get(compensation, 'amount', 'SWEAT') !== 'SWEAT') {
-                if(currentChainId !== _get(DAO, 'chainId', '')) {
-                    return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
+                if(currentChainId !== chainId) {
+                    return toast.custom(t => <SwitchChain t={t} nextChainId={chainId}/>)
                 }
                 setisLoading(true);
                 onChainSafeTxHash = await createOnChainTxn(send);

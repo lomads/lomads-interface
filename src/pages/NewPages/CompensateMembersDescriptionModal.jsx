@@ -138,8 +138,8 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
 
 
   const createTransaction = async () => {
-    if(currentChainId !== _get(DAO, 'chainId', '')) {
-      return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
+    if(currentChainId !== _get(DAO, 'safe.chainId', _get(DAO, 'chainId'))) {
+      return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'safe.chainId', _get(DAO, 'chainId'))}/>)
     }
 		try {
       if(!sweatMembers || sweatMembers.length == 0) throw "No entries"

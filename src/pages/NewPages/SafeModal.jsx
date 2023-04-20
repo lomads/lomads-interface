@@ -42,14 +42,14 @@ const SafeModal = ({ toggleS }) => {
 
 	useEffect(() => {
         if(DAO) 
-            setChainId(_get(DAO, 'chainId', null))
+            setChainId(_get(DAO, 'safe.chainId', _get(DAO, 'chainId')))
     }, [DAO])
 
 	const { updateOwnersWithThreshold, updateOwnerLoading } = useSafeTransaction(_get(DAO, 'safe.address', ''))
 
 	const handleUpdateOwnersWithThreshold = async (obj) => {
-		if(currentChainId !== _get(DAO, 'chainId', '')) {
-            return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
+		if(currentChainId !== chainId) {
+            return toast.custom(t => <SwitchChain t={t} nextChainId={chainId}/>)
         }
 		 await updateOwnersWithThreshold(obj)
 		 toggleS()
