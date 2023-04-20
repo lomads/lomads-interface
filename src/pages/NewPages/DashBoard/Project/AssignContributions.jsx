@@ -20,12 +20,12 @@ import moment from "moment";
 import axiosHttp from '../../../../api';
 import Button from 'muiComponents/Button'
 
-import { getDao, updateMilestone } from "state/dashboard/actions";
+import { getDao, updateMilestone, generateInvoice } from "state/dashboard/actions";
 
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 
 import { resetUpdateMilestoneLoader } from 'state/dashboard/reducer';
-import {useSafeTokens} from 'hooks/useSafeTokens';
+import { useSafeTokens } from 'hooks/useSafeTokens';
 import SwitchChain from 'components/SwitchChain';
 import { toast } from 'react-hot-toast';
 import Dropdown from 'muiComponents/Dropdown';
@@ -60,7 +60,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
     const [selectedTag, setSelectedTag] = useState(null);
 
     useEffect(() => {
-        if(DAO)
+        if (DAO)
             setChainId(_get(DAO, 'chainId'))
     }, [DAO])
 
@@ -71,7 +71,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
             //     const item = Project?.members[i];
             //     arr.push({ name: item.name, wallet: item.wallet, percent: 0 });
             // }
-            console.log("sada",_get(Project, 'members', []),  _uniqBy(_get(Project, 'members', []), m => m.id))
+            console.log("sada", _get(Project, 'members', []), _uniqBy(_get(Project, 'members', []), m => m.id))
             setTemp(_uniqBy(_get(Project, 'members', []), m => m._id).map(m => { console.log('asdas', m); return { ...m, percent: 0 } }));
         }
     }, [Project]);
@@ -175,7 +175,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                     name: item.name,
                     recipient: item.wallet,
                     reason: `${item.name} | ${_get(data, 'name', '')} | ${selectedMilestone.name}`,
-                    tag:selectedTag
+                    tag: selectedTag
                 })
             }
         }
@@ -194,7 +194,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
     }
 
     const tokenDecimal = useMemo(() => {
-        if(safeTokens && safeTokens.length > 0) {
+        if (safeTokens && safeTokens.length > 0) {
             const tokenAddr = _get(compensation, 'currency', 'SWEAT');
             if (tokenAddr === 'SWEAT')
                 return 18
@@ -202,7 +202,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
             if (tkn) {
                 return _get(tkn, 'token.decimals', 18)
             }
-        } 
+        }
         return 18
     }, [safeTokens])
 
@@ -211,7 +211,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
             try {
                 if (!chainId) return;
                 const txnResponse = await createSafeTransaction({ tokenAddress: _get(compensation, 'currency', null), send, confirm: isSafeOwner, createLabel: true })
-                if(txnResponse) {
+                if (txnResponse) {
                     resolve(txnResponse.safeTxHash)
                 } else {
                     setisLoading(false);
@@ -230,18 +230,47 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
         try {
             let onChainSafeTxHash = undefined;
             if (isSafeOwner && _get(compensation, 'amount', 'SWEAT') !== 'SWEAT') {
-                if(currentChainId !== _get(DAO, 'chainId', '')) {
-                    return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
+                if (currentChainId !== _get(DAO, 'chainId', '')) {
+                    return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')} />)
                 }
                 setisLoading(true);
                 onChainSafeTxHash = await createOnChainTxn(send);
-                    const newArray = _get(data, 'milestones', []).map((item, i) => {
-                        if (i === _get(selectedMilestone, 'pos', '')) {
-                            return { ...item, complete: true };
-                        } else {
-                            return item;
-                        }
-                    });
+                const invoiceArrayPayload = send.map((item, index) => ({
+                    generalInfo: {
+                        paymentToken: _get(compensation, 'currency', 'SWEAT'),
+                        chain: currentChainId,
+                        transactionId: onChainSafeTxHash
+                    },
+                    buyerInfo: {
+                        name: _get(DAO, 'name', undefined),
+                        address: '',
+                        email: '',
+                        id:  _get(DAO, '_id', undefined)
+                    },
+                    paymentInfo: {
+                        recipientWalletAddress: item.recipient,
+                        title: item.reason,
+                        labels: '',
+                        price: item.amount,
+                        tax: '',
+                        total: '',
+                    },
+                    sellerInfo: {
+                        name:  item.name,
+                        email: temp[index].email,
+                        id: temp[index]._id
+                    }
+                }));
+                console.log(invoiceArrayPayload, '......invoiceArrayPayload.....')
+                // dispatch(generateInvoice({ projectId: data._id, daoUrl: daoURL, payload: invoicePayload }));
+
+                const newArray = _get(data, 'milestones', []).map((item, i) => {
+                    if (i === _get(selectedMilestone, 'pos', '')) {
+                        return { ...item, complete: true };
+                    } else {
+                        return item;
+                    }
+                });
                 dispatch(updateMilestone({ projectId: data._id, daoUrl: daoURL, payload: { milestones: newArray } }));
                 setisLoading(false);
                 return;
@@ -263,8 +292,8 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                     owner: account,
                     submissionDate: moment().utc().toDate()
                 }] : [],
-                
-                dataDecoded: ( send.length == 1 ? {
+
+                dataDecoded: (send.length == 1 ? {
                     method: 'transfer',
                     parameters: [
                         { name: 'to', type: "address", value: send[0].recipient },
@@ -294,28 +323,28 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                 })
             }
             await axiosHttp.post('transaction/off-chain', offChainPayload)
-            .then(async res => {
-                let payload = [];
-				send.map(r => {
-					payload.push({
-						safeAddress: _get(DAO, 'safe.address', null),
-						safeTxHash: res.data.safeTxHash,
-						recipient: r.recipient,
-						label: _get(r, 'reason', null),
+                .then(async res => {
+                    let payload = [];
+                    send.map(r => {
+                        payload.push({
+                            safeAddress: _get(DAO, 'safe.address', null),
+                            safeTxHash: res.data.safeTxHash,
+                            recipient: r.recipient,
+                            label: _get(r, 'reason', null),
                         tag:_get(r, 'tag', null),
-					})
-				})
-				await axiosHttp.post(`transaction/label`, payload)
-                setisLoading(false);
-                const newArray = _get(data, 'milestones', []).map((item, i) => {
-                    if (i === _get(selectedMilestone, 'pos', '')) {
-                        return { ...item, complete: true };
-                    } else {
-                        return item;
-                    }
-                });
+                        })
+                    })
+                    await axiosHttp.post(`transaction/label`, payload)
+                    setisLoading(false);
+                    const newArray = _get(data, 'milestones', []).map((item, i) => {
+                        if (i === _get(selectedMilestone, 'pos', '')) {
+                            return { ...item, complete: true };
+                        } else {
+                            return item;
+                        }
+                    });
                 dispatch(updateMilestone({ projectId: data._id, daoUrl: daoURL, payload: { milestones: newArray } }));
-            })
+                })
         } catch (e) {
             console.log(e)
             setError(e)
@@ -376,32 +405,32 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                                     <h1>Assign Contributions</h1>
                                     <span>Mark the milestone as completed and reward the contributors</span>
 
-                                   <div style={{display:'flex'}}>
-                                        <div style={{marginRight:'16px'}}>
-                                        <SafeButton
-                                            height={40}
-                                            width={140}
-                                            titleColor="#C94B32"
-                                            title="SPLIT EQUALLY"
-                                            bgColor="#FFFFFF"
-                                            opacity="1"
-                                            disabled={false}
-                                            fontweight={400}
-                                            fontsize={16}
-                                            onClick={() => handleSplitEqually()}
-                                        />
+                                    <div style={{ display: 'flex' }}>
+                                        <div style={{ marginRight: '16px' }}>
+                                            <SafeButton
+                                                height={40}
+                                                width={140}
+                                                titleColor="#C94B32"
+                                                title="SPLIT EQUALLY"
+                                                bgColor="#FFFFFF"
+                                                opacity="1"
+                                                disabled={false}
+                                                fontweight={400}
+                                                fontsize={16}
+                                                onClick={() => handleSplitEqually()}
+                                            />
                                         </div>
-                                        <div style={{width:'192px'}}>
-                                            <Dropdown onChangeOption={(value) => setSelectedTag(value)}/>
+                                        <div style={{ width: '192px' }}>
+                                            <Dropdown onChangeOption={(value) => setSelectedTag(value)} />
                                         </div>
-                                   </div>
+                                    </div>
 
                                     <div className='members-section'>
                                         {
                                             temp && temp.map((item, index) => (
                                                 <div className='member-row' key={item.wallet}>
                                                     <div>
-                                                        <Avatar name={item.name} wallet={item.wallet}/>
+                                                        <Avatar name={item.name} wallet={item.wallet} />
                                                     </div>
                                                     <div>
                                                         <div
@@ -435,10 +464,10 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
 
                                     </div>
                                 </div>
-                                { error && <div style={{ color: 'red', textAlign: 'center', margin: '0 0 8px 0' }}>{ error }</div> }
-                                <div style={{ display: 'flex', flexDirection: 'row', background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: '500px',  position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
-                                    <Button sx={{mr:1}} size="small" variant="outlined" fullWidth onClick={() => toggleShowAssign()}>CANCEL</Button>
-                                    <Button fullWidth size="small" variant="contained" loading={false} 
+                                {error && <div style={{ color: 'red', textAlign: 'center', margin: '0 0 8px 0' }}>{error}</div>}
+                                <div style={{ display: 'flex', flexDirection: 'row', background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: '500px', position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px', padding: "30px 0 20px" }}>
+                                    <Button sx={{ mr: 1 }} size="small" variant="outlined" fullWidth onClick={() => toggleShowAssign()}>CANCEL</Button>
+                                    <Button fullWidth size="small" variant="contained" loading={false}
                                         onClick={handleSubmit}>SAVE</Button>
                                 </div>
                                 {/* <div className='milestone-footer'>

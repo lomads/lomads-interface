@@ -22,7 +22,7 @@ import IconButton from "UIpack/IconButton";
 import { SafeTransactionOptionalProps } from "@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/types";
 import ethers from "ethers";
 import axios from "axios";
-import { getDao } from "state/dashboard/actions";
+import { getDao, generateInvoice } from "state/dashboard/actions";
 import { updateTotalMembers } from "state/flow/reducer";
 import axiosHttp from '../../../api'
 import { CHAIN_IDS_TO_NAMES, SupportedChainId } from "constants/chains";
@@ -118,7 +118,7 @@ const SideModal = (props: IsideModal) => {
 					}]
 				}
 			}
-		} 
+		}
 		else {
 			payload = {
 				daoId: _get(DAO, '_id', undefined),
@@ -154,7 +154,7 @@ const SideModal = (props: IsideModal) => {
 						safeTxHash: res.data.safeTxHash,
 						recipient: r.recipient,
 						label: _get(r, 'reason', null),
-						tag:_get(r, 'tag', null)
+						tag: _get(r, 'tag', null)
 					})
 				})
 				axiosHttp.post(`transaction/label`, payload)
@@ -174,17 +174,44 @@ const SideModal = (props: IsideModal) => {
 			return createOffChainTxn()
 		}
 		try {
-
-			const txnResponse = await createSafeTransaction({ tokenAddress: selectedToken, send: setRecipient.current});
+			const txnResponse = await createSafeTransaction({ tokenAddress: selectedToken, send: setRecipient.current });
 			if (txnResponse?.safeTxHash) {
 				dispatch(getDao(DAO.url))
 				await props.getPendingTransactions();
 				showNavigation(false, true, false);
 				setisLoading(false);
+				const invoiceArrayPayload = setRecipient.current.map((item) => ({
+					generalInfo: {
+						paymentToken: selectedToken,
+						chain: chainId,
+						transactionId: ""
+					},
+					buyerInfo: {
+						name: _get(DAO, 'name', undefined),
+						address: '',
+						email: '',
+						id: _get(DAO, '_id', undefined)
+					},
+					paymentInfo: {
+						recipientWalletAddress: item.recipient,
+						title: item.reason,
+						labels: '',
+						price: item.amount,
+						tax: '',
+						total: '',
+					},
+					sellerInfo: {
+						name: item.name,
+						email: "",
+						id: ""
+					}
+				}));
+				console.log(invoiceArrayPayload, '......invoiceArrayPayload.....')
+				// dispatch(generateInvoice({ projectId: data._id, daoUrl: daoURL, payload: invoicePayload }));
 			}
 		} catch (e) {
 			console.log(e)
-			if(typeof e === 'string')
+			if (typeof e === 'string')
 				setError(e)
 			else
 				setError(_get(e, 'message', 'Something went wrong'))
