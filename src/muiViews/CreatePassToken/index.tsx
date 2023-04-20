@@ -199,9 +199,9 @@ export default () => {
     })
 
     useEffect(() => {
-        if(chainId)
-            setState((prev: any) => { return { ...prev, selectedChainId: chainId } })
-    }, [chainId])
+        if(DAO)
+            setState((prev: any) => { return { ...prev, selectedChainId: +(_get(DAO, 'safe.chainId', _get(DAO, 'chainId', chainId))) } })
+    }, [DAO])
 
     useEffect(() => {
         if(state?.selectedChainId) {

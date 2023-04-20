@@ -32,14 +32,15 @@ export default function MuiSelect({
   return (
     <FormControl sx={{ width: '100%', ...selectStyle}}>
       <Select
-        value={activeOption?.toString()}
+        // @ts-ignore
+        value={activeOption}
         onChange={handleChange}
         displayEmpty
         inputProps={{ 'aria-label': 'Without label', id: 'mui-dropdown' }}
       >
         {options.map((option, index) => (
           <MenuItem
-            value={option?.value.toString()}
+            value={option?.value}
             key={index}
           >
             {option.label}
