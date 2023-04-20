@@ -31,8 +31,7 @@ import { useAppSelector, useAppDispatch } from "state/hooks";
 import { useWeb3React } from "@web3-react/core";
 import axiosHttp from 'api'
 import { setDAO, setTask } from "state/dashboard/reducer";
-
-import { approveTask, rejectTask } from 'state/dashboard/actions'
+import { approveTask, rejectTask, generateInvoice } from 'state/dashboard/actions'
 import { resetAssignTaskLoader, resetRejectTaskMemberLoader, resetRejectTaskLoader } from 'state/dashboard/reducer';
 import { id } from 'ethers/lib/utils';
 import moment from 'moment';
@@ -174,9 +173,39 @@ const TaskReview = ({ task, close }: any) => {
         try {
             setApproveLoading(true);
             setError(null)
+            console.log(task, '...task...')
             let onChainSafeTxHash: any = undefined;
+        
             if (isSafeOwner && _get(task, 'compensation.currency', 'SWEAT') !== 'SWEAT') {
                 onChainSafeTxHash = await createOnChainTxn();
+                const invoiceArrayPayload = [{
+                    generalInfo: {
+                        paymentToken: _get(task, 'compensation.currency', 'SWEAT'),
+                        chain: currentChainId,
+                        transactionId: onChainSafeTxHash
+                    },
+                    buyerInfo: {
+                        name: _get(DAO, 'name', undefined),
+                        address: null,
+                        email: null,
+                        id: _get(DAO, '_id', undefined)
+                    },
+                    paymentInfo: {
+                        recipientWalletAddress: taskSubmissions[0].member.wallet,
+                        title: taskSubmissions[0].submission.note,
+                        labels: taskSubmissions[0].member.name,
+                        price: task,
+                        tax: null,
+                        total: null,
+                    },
+                    sellerInfo: {
+                        name: taskSubmissions[0].member.name,
+                        email: null,
+                        id: taskSubmissions[0].member._id
+                    }
+                }];
+                console.log(invoiceArrayPayload, '......invoiceArrayPayload.....')
+                // dispatch(generateInvoice({ projectId: data._id, daoUrl: daoURL, payload: invoicePayload }));
             }
     
             const offChainPayload = {
@@ -300,7 +329,6 @@ const TaskReview = ({ task, close }: any) => {
     }
 
     const renderSingleSubmission = (submission: any) => {
-        console.log("submission : ", submission);
         if (!submission) return null;
         return (
             <div className='task-review-card'>

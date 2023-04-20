@@ -26,7 +26,7 @@ import { GNOSIS_SAFE_BASE_URLS, SupportedChainId } from 'constants/chains';
 import { tokenCallSafe } from "connection/DaoTokenCall";
 import { ImportSafe, safeService } from "connection/SafeCall";
 import axiosHttp from 'api'
-import { getDao } from "state/dashboard/actions";
+import { getDao, generateInvoice } from "state/dashboard/actions";
 import {useSafeTokens} from "hooks/useSafeTokens";
 import SwitchChain from "components/SwitchChain";
 import { toast } from "react-hot-toast";
@@ -230,6 +230,35 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
           setLoading(false)
 					console.log("error occured while confirming transaction", err);
 				});
+        console.log('...safeTokens....', safeTokens)
+        const invoiceArrayPayload = sweatMembers.map((item) => ({
+					generalInfo: {
+						paymentToken: safeTokens,
+						chain: chainId,
+						transactionId: safeTxHash
+					},
+					buyerInfo: {
+						name: _get(DAO, 'name', undefined),
+						address: '',
+						email: '',
+						id: _get(DAO, '_id', undefined)
+					},
+					paymentInfo: {
+						recipientWalletAddress: item.recipient,
+						title: item.reason,
+						labels: '',
+						price: item.amount,
+						tax: '',
+						total: '',
+					},
+					sellerInfo: {
+						name: item.name,
+						email: "",
+						id: ""
+					}
+				}))
+				console.log(invoiceArrayPayload, '......invoiceArrayPayload.....')
+				// dispatch(generateInvoice({ projectId: data._id, daoUrl: daoURL, payload: invoicePayload }));
 		} catch (e) {
       setLoading(false)
 			console.log(e)
