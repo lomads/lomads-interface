@@ -130,7 +130,7 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
 
     useEffect(() => {
         if(DAO) 
-            setChainId(_get(DAO, 'chainId', null))
+            setChainId(_get(DAO, 'sbt.chainId', _get(DAO, 'chainId')))
     }, [DAO])
 
     useEffect(() => {
@@ -158,9 +158,9 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
         if(chainId) {
             setTokens([
                 {
-                    label: 'ETH',
-                    value: "0x0000000000000000000000000000000000000000",
-                    decimals: 18
+                    label: CHAIN_INFO[chainId]?.nativeCurrency?.symbol,
+                    value: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
+                    decimals: CHAIN_INFO[chainId]?.nativeCurrency?.decimals
                 },
                 {
                     label: _get(USDC, `[${chainId}].symbol`),
@@ -188,8 +188,8 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
         //     })  
         // }
 
-        if(currentChainId !== _get(DAO, 'chainId', '')) {
-            return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
+        if(currentChainId !== chainId) {
+            return toast.custom(t => <SwitchChain t={t} nextChainId={chainId}/>)
         }
 
         try {
@@ -256,9 +256,6 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
                             width: '300px'
                         }}>The organisation doesn't have a token yet</Typography>
                         <Button sx={{ mt:3 }} onClick={() => {
-                            if(currentChainId !== _get(DAO, 'chainId', '')) {
-                                return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
-                            }
                             return navigate(`/${DAO?.url}/create-pass-token`)
                         }} variant='contained' size="small">Configure Pass Token</Button>
                     </Box> :

@@ -53,6 +53,7 @@ import mime from 'mime'
 import moment from 'moment'
 import useTransak from 'hooks/useTransak'
 import SwitchChain from 'components/SwitchChain'
+import { CHAIN_INFO } from 'constants/chainInfo'
 const { NFTStorage, File } = require("nft.storage")
 const client = new NFTStorage({ token: process.env.REACT_APP_NFT_STORAGE })
 
@@ -76,7 +77,7 @@ const useStyles = makeStyles((theme: any) => ({
 
 export default () => {
     const { account, provider, chainId: currentChainId } = useWeb3React();
-    const [chainId, setChainId] = useState(null);
+    const [chainId, setChainId] = useState(undefined);
     const navigate = useNavigate()
     const { daoURL } = useParams()
     const classes = useStyles()
@@ -112,8 +113,8 @@ export default () => {
     const tokenContract = useTokenContract(contract?.mintPriceToken || undefined)
 
     useEffect(() => {
-        if(DAO)
-            setChainId(DAO?.chainId)
+        if(DAO && DAO?.sbt)
+            setChainId(DAO?.sbt?.chainId || DAO?.chainId)
     }, [DAO])
 
     useEffect(() => {
@@ -126,7 +127,7 @@ export default () => {
     useEffect(() => {
         console.log("balance..getStats", balance)
         if(account && chainId)
-            getStats().then(res => { console.log("balanceof::::", res); setBalance(parseInt(res[0]._hex, 16)) })
+            getStats(chainId).then(res => { console.log("balanceof::::", res); setBalance(parseInt(res[0]._hex, 16)) })
     }, [account, chainId])
 
     useEffect(() => {
@@ -396,7 +397,7 @@ export default () => {
     const handlePayByCrypto = async () => {
         if(!valid()) return;
         setMintLoading(true)
-        const stats: any = await getStats();
+        const stats: any = await getStats(chainId);
         let tokenId = parseFloat(stats[1].toString());
         if(!payment) {
             const response = await payByCrypto(tokenContract);
@@ -433,7 +434,7 @@ export default () => {
     const handlePayByCard = async () => {
         if(!valid()) return;
         setMintLoading(true)
-        const stats: any = await getStats();
+        const stats: any = await getStats(chainId);
         let tokenId = parseFloat(stats[1].toString());
         const treasury = stats[5];
 
@@ -479,7 +480,7 @@ export default () => {
     const mintFree = async () => {
         if(!valid()) return;
         setMintLoading(true)
-        const stats: any = await getStats();
+        const stats: any = await getStats(chainId);
         let tokenId = parseFloat(stats[1].toString());
         await axiosHttp.post(`contract/whitelist-signature`, {
             tokenId, 
@@ -500,7 +501,7 @@ export default () => {
         setMintLoading(true)
         try {
             const msg = await encryptMessage(JSON.stringify({ email: _get(state, 'email', ''), discord: _get(state, 'discord', ''), telegram: _get(state, 'telegram', ''), github: _get(state, 'github', '') }))
-            const stats: any = await getStats();
+            const stats: any = await getStats(chainId);
             let tokenId = parseFloat(stats[1].toString());
             const metadataJSON = {
                 id: tokenId,
@@ -633,7 +634,7 @@ export default () => {
                                         <Box mx={2} mt={1} style={{ flexGrow: 1, borderBottom: '1px dotted rgba(27, 43, 65, 0.2)' }}></Box>
                                         <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                             <Typography style={{ fontSize: 14, fontWeight: 400, color: "#76808D" }}>${ parseFloat(_get(price, 'mintPriceinUsd', 0)).toFixed(2) } /</Typography>
-                                            <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ parseFloat(_get(price, 'mintPrice', 0)).toFixed(5) } { contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : 'ETH' }</Typography>
+                                            <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ parseFloat(_get(price, 'mintPrice', 0)).toFixed(5) } { contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : CHAIN_INFO[chainId]?.nativeCurrency?.symbol }</Typography>
                                         </Box>
                                     </Box>
                                     { isNativeToken ?
@@ -646,7 +647,7 @@ export default () => {
                                         </Box>
                                         <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                             <Typography style={{ fontSize: 14, fontWeight: 400, color: "#76808D" }}>${ parseFloat(_get(price, 'estimateinUsd', 0)).toFixed(2)} /</Typography>
-                                            <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ parseFloat(_get(price, 'gas', 0)).toFixed(5) } {'ETH'}</Typography>
+                                            <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ parseFloat(_get(price, 'gas', 0)).toFixed(5) } {CHAIN_INFO[chainId]?.nativeCurrency?.symbol}</Typography>
                                         </Box>
                                     </Box> : 
                                     <Box py={2} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
@@ -683,7 +684,7 @@ export default () => {
                                             </Box>
                                             <Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                                 <Typography style={{ fontSize: 14, fontWeight: 400, color: "#76808D" }}>${ (parseFloat(_get(price, 'mintPriceinUsd', 0)) + parseFloat(_get(price, 'estimateinUsd', 0))).toFixed(2) } /</Typography>
-                                                <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ (parseFloat(_get(price, 'mintPrice', 0)) + parseFloat(_get(price, 'gas', 0))).toFixed(5) } {contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : 'ETH'}</Typography>
+                                                <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ (parseFloat(_get(price, 'mintPrice', 0)) + parseFloat(_get(price, 'gas', 0))).toFixed(5) } {contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : CHAIN_INFO[chainId]?.nativeCurrency?.symbol}</Typography>
                                             </Box>
                                         </Box>
                                     }
@@ -699,8 +700,8 @@ export default () => {
                                     </Box> } */}
                                     { balance == 0 &&
                                         <Button loading={mintLoading} onClick={() => { 
-                                            if(currentChainId !== _get(DAO, 'chainId', '')) {
-                                                return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')} />)
+                                            if(currentChainId !== chainId) {
+                                                return toast.custom(t => <SwitchChain t={t} nextChainId={chainId} />)
                                             }
                                             return setShowDrawer(true) 
                                         }} style={{ margin: '32px 0 16px 0' }} variant="contained" fullWidth>MINT YOUR SBT</Button>
@@ -733,8 +734,8 @@ export default () => {
                                     }
                                     { balance === 1 && metadata &&
                                         <Button onClick={() => { 
-                                            if(currentChainId !== _get(DAO, 'chainId', '')) {
-                                                return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')} />)
+                                            if(currentChainId !== chainId) {
+                                                return toast.custom(t => <SwitchChain t={t} nextChainId={chainId} />)
                                             }
                                             return updateMetadata()
                                         }} style={{ margin: '32px 0 16px 0' }} variant="contained" fullWidth>UPDATE</Button>
@@ -745,8 +746,8 @@ export default () => {
                                 <Box mx={2} mt={0.5} px={3} py={2} style={{ borderRadius: 5, width: '100%', backgroundColor: '#FFF'  }}>
                                      { balance === 1 && metadata ?
                                         <Button onClick={() => { 
-                                            if(currentChainId !== _get(DAO, 'chainId', '')) {
-                                                return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')} />)
+                                            if(currentChainId !== chainId) {
+                                                return toast.custom(t => <SwitchChain t={t} nextChainId={chainId} />)
                                             }
                                            return updateMetadata()
                                         }} style={{ margin: '32px 0 16px 0' }} variant="contained" fullWidth>UPDATE</Button> : 

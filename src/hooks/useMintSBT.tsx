@@ -11,6 +11,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useAppSelector } from 'state/hooks';
 import { INFURA_NETWORK_URLS } from 'constants/infura';
 import { CHAIN_INFO } from 'constants/chainInfo';
+import { getRpcUrls } from 'utils/switchChain';
 
 export type SBTParams = {
     name: string,
@@ -22,12 +23,12 @@ export type SBTParams = {
 
 const useMintSBT = (contractAddress: string | undefined, version: string | undefined = "0") => {
   console.log("useMintSBT", contractAddress, version)
-    const { account, chainId: currentChainId, provider } = useWeb3React();
+    const { account, provider: currentProvider, chainId: currentChainId, provider } = useWeb3React();
     const { DAO } = useAppSelector(store => store.dashboard)
     const [chainId, setChainId] = useState(null)
     useEffect(() => {
       if(DAO)
-        setChainId(_get(DAO, 'chainId'))
+        setChainId(_get(DAO, 'sbt.chainId', _get(DAO, 'chainId')))
     }, [DAO])
     const mintContract = useContract(contractAddress, 
         version === "1" ?  require('abis/SBT.json') : require('abis/SBTv0.json')
@@ -51,8 +52,9 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
       return ethers.utils.parseUnits(price, payToken?.decimals)
   }
 
-    const getStats = useCallback(async () => {
+    const getStats = useCallback(async (overrideChainId: number | undefined = undefined) => {
         if(account && chainId) {
+          let currChainId: number | null = overrideChainId ? overrideChainId : chainId;
           const calls: any = [
             {
               target: contractAddress,
@@ -92,13 +94,14 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
             ]),
             
           ]
-          const provider = new ethers.providers.JsonRpcProvider(INFURA_NETWORK_URLS[chainId])
+          const rpcUrl = getRpcUrls(currChainId)
+          let provider = new ethers.providers.JsonRpcProvider(rpcUrl[0])
           const multicall = new MultiCall(provider);
           const [, res] = await multicall.multiCall(
               version === "1" ? require('abis/SBT.json') : require('abis/SBTv0.json'),
               calls
           );
-          console.log("useMintSBT-calls", res)
+          console.log("currChainId", res)
           return res
         }
         return [null, null, null, null]

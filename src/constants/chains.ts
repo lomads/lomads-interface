@@ -112,7 +112,7 @@ export const SUPPORTED_ASSETS = {
     symbol: "ETH",
   },
   [`${SupportedChainId.GOERLI}`]: {
-    id: "ethereum",
+    id: "goerli-eth",
     symbol: "ETH",
   },
   [`${SupportedChainId.POLYGON}`]: {

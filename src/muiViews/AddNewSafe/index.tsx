@@ -549,6 +549,7 @@ export default () => {
 				}
 			}),
 			safe: {
+				chainId: selectedChainId,
 				name: safeName,
 				address: addr,
 				owners: owners,
@@ -613,8 +614,9 @@ export default () => {
 	}
 
 	const deployNewSafe = async () => {
-		if(selectedChainId !== chainId) {
-            toast.custom(t => <SwitchChain t={t} nextChainId={selectedChainId}/>)
+		if(!chainId) return;
+		if(+selectedChainId !== +chainId) {
+            toast.custom(t => <SwitchChain t={t} nextChainId={+selectedChainId}/>)
         } else {
 			try {
 				setisLoading(true);

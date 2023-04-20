@@ -31,7 +31,7 @@ export const SafeTokensProvider = ({ children }: any) => {
 
     const setTokens = async () => {
         setSafeTokens(null)
-        axios.get(`${GNOSIS_SAFE_BASE_URLS[DAO?.chainId]}/api/v1/safes/${DAO?.safe?.address}/balances/usd/`, {withCredentials: false })
+        axios.get(`${GNOSIS_SAFE_BASE_URLS[_get(DAO, 'safe.chainId', _get(DAO, 'chainId'))]}/api/v1/safes/${DAO?.safe?.address}/balances/usd/`, {withCredentials: false })
             .then((res: any) => {
                 let tokens = res.data.map((t: any) => {
                     let tkn = t
@@ -40,9 +40,9 @@ export const SafeTokensProvider = ({ children }: any) => {
                             ...t,
                             tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
                             token: {
-                                symbol: CHAIN_INFO[DAO?.chainId].nativeCurrency.symbol,
-                                decimal:  CHAIN_INFO[DAO?.chainId].nativeCurrency.decimals,
-                                decimals:  CHAIN_INFO[DAO?.chainId].nativeCurrency.decimals,
+                                symbol: CHAIN_INFO[_get(DAO, 'safe.chainId', _get(DAO, 'chainId'))].nativeCurrency.symbol,
+                                decimal:  CHAIN_INFO[_get(DAO, 'safe.chainId', _get(DAO, 'chainId'))].nativeCurrency.decimals,
+                                decimals:  CHAIN_INFO[_get(DAO, 'safe.chainId', _get(DAO, 'chainId'))].nativeCurrency.decimals,
                             }
                         }
                     }
