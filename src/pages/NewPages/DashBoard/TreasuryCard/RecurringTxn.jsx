@@ -22,6 +22,7 @@ import { useAppDispatch, useAppSelector } from 'state/hooks';
 import axiosHttp from 'api'
 import { setRecurringPayments } from 'state/dashboard/reducer';
 import { useWeb3React } from '@web3-react/core';
+import Avatar from 'muiComponents/Avatar';
 const { toChecksumAddress } = require('ethereum-checksum-address')
 
 
@@ -105,10 +106,11 @@ const handleDeleteRecurringPayment = async tx => {
     <Tr className='recurringtxn-row' onMouseEnter={() => setShowEdit(true)} onMouseLeave={() => setShowEdit(false)} >
         <Td className='recurringtxn-row-item'>
             <div className="receiver">
-                <img className="img" src={Bigmember} alt="" />
+                {/* <img className="img" src={Bigmember} alt="" />
                 <div className="name">
                     { _get(transaction, 'receiver.name', '') === '' ? beautifyHexToken(_get(transaction, 'receiver.wallet', '')) :  _get(transaction, 'receiver.name', '')}
-                </div>
+                </div> */}
+                <Avatar name={_get(transaction, 'receiver.name', '')} wallet={_get(transaction, 'receiver.wallet', '')} />
             </div>
         </Td>
         <Td className='recurringtxn-row-item'>

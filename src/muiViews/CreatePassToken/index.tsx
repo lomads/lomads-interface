@@ -200,7 +200,7 @@ export default () => {
 
     useEffect(() => {
         if(DAO)
-            setState((prev: any) => { return { ...prev, selectedChainId: +(_get(DAO, 'safe.chainId', _get(DAO, 'chainId', chainId))) } })
+            setState((prev: any) => { return { ...prev, selectedChainId: +(_get(DAO, 'safe.chainId', _get(DAO, 'chainId', chainId))) !== SupportedChainId.MAINNET ? +(_get(DAO, 'safe.chainId', _get(DAO, 'chainId', chainId))) : SupportedChainId.POLYGON } })
     }, [DAO])
 
     useEffect(() => {
@@ -337,7 +337,7 @@ export default () => {
                             <Box mt={2}>
                                 <Select
                                     selected={state?.selectedChainId}
-                                    options={ SUPPORTED_CHAIN_IDS.map((item : any) => ({ label: CHAIN_INFO[item].label, value: item }))}
+                                    options={ SUPPORTED_CHAIN_IDS.filter(i => i !== SupportedChainId.MAINNET).map((item : any) => ({ label: CHAIN_INFO[item].label, value: item }))}
                                     setSelectedValue={(value) => {
                                         setState((prev: any) => { return {...prev, selectedChainId: +value }})
                                     }}
