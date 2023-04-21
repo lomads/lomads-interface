@@ -12,12 +12,11 @@ import React, { useEffect, useState } from "react";
 import IconButton from "muiComponents/IconButton";
 import useContractDeployer, { SBTParams } from "hooks/useContractDeployer"
 import { useWeb3React } from "@web3-react/core"
-import { SupportedChainId } from "constants/chains"
+import { SUPPORTED_CHAIN_IDS, SupportedChainId } from "constants/chains"
 import axiosHttp from 'api'
 import CurrencyInput from "muiComponents/CurrencyInput"
 import { useNavigate, useParams } from "react-router-dom"
 import XlsxUpload from "muiComponents/XlsxUpload"
-import toast from 'react-hot-toast';
 import { USDC } from 'constants/tokens';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -25,9 +24,16 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Select from "muiComponents/Select";
 import { beautifyHexToken } from "utils"
 import { useAppDispatch, useAppSelector } from "state/hooks"
 import { getDao, loadDao } from "state/dashboard/actions"
+import { CHAIN_INFO } from "constants/chainInfo"
+import SwitchChain from 'components/SwitchChain';
+import { toast } from 'react-hot-toast';
+import {
+    SBT_DEPLOYER_ADDRESSES
+  } from 'constants/addresses'
 
 ///   0xD123b939B5022608241b08c41ece044059bE00f5
 
@@ -163,24 +169,19 @@ export default () => {
             dispatch(getDao(daoURL))
     }, [DAO])
 
-    useEffect(() => {
-        if(DAO?.safe) {
-            setState((prev: any) => { return { ...prev,
-                 treasury: account //DAO?.safe?.address
-             }})
-        }
-    }, [DAO?.safe])
-    
-    useEffect(() => {
-        axiosHttp.get('contract')
-        .then(res => {
-            if(res.data.length > 0)
-                navigate('/')
-        })
-    }, [])
+    // useEffect(() => {
+    //     if(DAO?.safe) {
+    //         setState((prev: any) => { return { ...prev,
+    //              treasury: DAO?.safe?.address
+    //          }})
+    //     }
+    // }, [DAO?.safe])
+
 
     const [state, setState] = useState<any>({
+        selectedChainId: null,
         logo: null,
+        treasury:null,
         symbol: null,
         supply: 0,
         whitelisted: false,
@@ -198,23 +199,28 @@ export default () => {
     })
 
     useEffect(() => {
-        if(chainId) {
+        if(DAO)
+            setState((prev: any) => { return { ...prev, selectedChainId: +(_get(DAO, 'safe.chainId', _get(DAO, 'chainId', chainId))) } })
+    }, [DAO])
+
+    useEffect(() => {
+        if(state?.selectedChainId) {
             setTokens([
                 {
-                    label: 'ETH',
-                    value: "0x0000000000000000000000000000000000000000",
-                    decimals: 18
+                    label: CHAIN_INFO[state?.selectedChainId]?.nativeCurrency?.symbol,
+                    value: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
+                    decimals: CHAIN_INFO[state?.selectedChainId]?.nativeCurrency?.decimals
                 },
                 {
-                    label: _get(USDC, `[${chainId}].symbol`),
-                    value: _get(USDC, `[${chainId}].address`),
-                    decimals: _get(USDC, `[${chainId}].decimals`),
+                    label: _get(USDC, `[${state?.selectedChainId}].symbol`),
+                    value: _get(USDC, `[${state?.selectedChainId}].address`),
+                    decimals: _get(USDC, `[${state?.selectedChainId}].decimals`),
                 }
             ])
         }
-    }, [chainId])
+    }, [state?.selectedChainId])
 
-    const { deploy, deployLoading } = useContractDeployer(require('abis/SBTDeployer.json'))
+    const { deploy, deployLoading } = useContractDeployer(SBT_DEPLOYER_ADDRESSES[state?.selectedChainId])
     
 
     const handleContactChange = (key: string) => {
@@ -231,6 +237,12 @@ export default () => {
         setErrors(err)
         if(!state?.symbol || state?.symbol === '')
             err['symbol'] = "Enter valid symbol"
+        if(!state?.selectedChainId || state?.selectedChainId === '')
+            err['chain'] = "Select valid chain"
+        if(!state?.treasury || state?.treasury === '')
+            err['treasury'] = "Enter valid treasury"
+        if(!state?.logo || state?.logo === '')
+            err['logo'] = "Please upload image"
         // if(!state?.supply || state?.supply === '')
         //     err['supply'] = "Enter valid supply"
         if(Object.keys(err).length > 0)
@@ -240,47 +252,53 @@ export default () => {
     }
 
     const deployContract = async () => {
-        try {
-            setDeployContractLoading(true)
-            const params: SBTParams = {
-                name: `${state?.symbol} SBT`,
-                symbol: state?.symbol,
-                mintPrice: `${state?.price?.value}`,
-                mintToken: state?.price?.token,
-                treasury: state?.treasury,
-                whitelisted: state?.whitelisted ? 1 : 0
-            }
-
-            const contractAddr = await deploy(params)
-
-            if(contractAddr) {
-                const contractJSON = {
+        if(chainId !== state?.selectedChainId) {
+            toast.custom(t => <SwitchChain t={t} nextChainId={state?.selectedChainId}/>)
+        } else {
+            try {
+                setDeployContractLoading(true)
+                const params: SBTParams = {
+                    chainId: state?.selectedChainId,
                     name: `${state?.symbol} SBT`,
-                    token: state.symbol,
-                    image: state?.logo,
-                    tokenSupply: state?.supply,
-                    address: contractAddr,
-                    version: 1,
-                    treasury: state?.treasury,
+                    symbol: state?.symbol,
                     mintPrice: `${state?.price?.value}`,
-                    mintPriceToken: `${state?.price?.token}`,
-                    whitelisted: state?.whitelisted,
-                    contactDetail: state?.contact,
-                    metadata: [],
-                    membersList: state?.whitelisted ? _get(DAO, 'members', []).map((m:any) => { return { name: m.member.name, address: m.member.wallet }}) : [],
-                    daoId: _get(DAO, '_id', null)
+                    mintToken: state?.price?.token,
+                    treasury: state?.treasury,
+                    whitelisted: state?.whitelisted ? 1 : 0,
                 }
-                axiosHttp.post('contract', contractJSON)
-                .then(res => {
-                    setTimeout(() => { window.location.href = `/${_get(DAO, 'url', '')}` }, 500)
-                })
-                .finally(() =>  setDeployContractLoading(false))
+    
+                const contractAddr = await deploy(params)
+    
+                if(contractAddr) {
+                    const contractJSON = {
+                        chainId: state?.selectedChainId,
+                        name: `${state?.symbol} SBT`,
+                        token: state.symbol,
+                        image: state?.logo,
+                        tokenSupply: state?.supply,
+                        address: contractAddr,
+                        version: 1,
+                        treasury: state?.treasury,
+                        mintPrice: `${state?.price?.value}`,
+                        mintPriceToken: `${state?.price?.token}`,
+                        whitelisted: state?.whitelisted,
+                        contactDetail: state?.contact,
+                        metadata: [],
+                        membersList: state?.whitelisted ? _get(DAO, 'members', []).map((m:any) => { return { name: m.member.name, address: m.member.wallet }}) : [],
+                        daoId: _get(DAO, '_id', null)
+                    }
+                    axiosHttp.post('contract', contractJSON)
+                    .then(res => {
+                        setTimeout(() => { window.location.href = `/${_get(DAO, 'url', '')}` }, 500)
+                    })
+                    .finally(() =>  setDeployContractLoading(false))
+                }
             }
-        }
-        catch(e) {
-            setNetworkError(e)
-            setTimeout(() => setNetworkError(null), 3000)
-            setDeployContractLoading(false)
+            catch(e) {
+                setNetworkError(e)
+                setTimeout(() => setNetworkError(null), 3000)
+                setDeployContractLoading(false)
+            }
         }
     }
 
@@ -314,26 +332,48 @@ export default () => {
                 {
                     editMode ? 
                     <Paper className={classes.paper}>
-                        <TextInput value={state?.symbol}
+                        <Box mb={4}>
+                            <FormLabel style={{ marginBottom: 8 }}>Chain</FormLabel>
+                            <Box mt={2}>
+                                <Select
+                                    selected={state?.selectedChainId}
+                                    options={ SUPPORTED_CHAIN_IDS.map((item : any) => ({ label: CHAIN_INFO[item].label, value: item }))}
+                                    setSelectedValue={(value) => {
+                                        setState((prev: any) => { return {...prev, selectedChainId: +value }})
+                                    }}
+                                />
+                            </Box>
+						</Box>
+                        <TextInput 
+                            value={state?.symbol}
                             error={errors['symbol']}
                             helperText={errors['symbol']}
                             onChange={(e: any) => {
-                                setErrors({})
+                                setErrors({});
                                 setState((prev: any) => { return { ...prev, symbol: e.target.value } } ) 
                             }}
-                        sx={{ my: 1 }} placeholder="LMDS" fullWidth label="Symbol of the Pass Token" />
-                        <Box mt={4}>
+                            sx={{ my: 1 }} placeholder="LMDS" fullWidth label="Symbol of the Pass Token" 
+                        />
+                        <Box mt={4} mb={2}>
                             <FormControl fullWidth>
                                 <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
-                                    <FormLabel>Pass Token Icon</FormLabel>
-                                    <Chip sx={{ mr: 1 }} className={classes.chip} size="small" label="Optional" />
+                                    <FormLabel sx={{color : errors['logo']?'#e53935':null }}>Pass Token Icon</FormLabel>
+                                    {/* <Chip sx={{ mr: 1 }} className={classes.chip} size="small" label="Optional" /> */}
                                 </Box>
                                 <Typography variant="subtitle2" className={classes.description}>Suggested dimensions and format : 800x800, .svg or .png</Typography>
                             </FormControl>
                             <Box>
-                                <Dropzone value={state?.logo} onUpload={(url: string) => {
-                                    setState((prev: any) => { return { ...prev, logo: url } } )
-                                }}/>
+                                <Dropzone 
+                                    value={state?.logo} 
+                                    onUpload={(url: string) => {
+                                        setErrors({});
+                                        setState((prev: any) => { return { ...prev, logo: url } } )
+                                    }}
+                                />
+                                {
+                                    errors['logo'] &&
+                                    <Typography mt={-2} sx={{color:'#e53935',fontSize:'11px',marginLeft:'14px'}}>{errors['logo']}</Typography>
+                                }
                             </Box>
                         </Box>
                         {/* <TextInput value={state?.supply} type="number"
@@ -345,14 +385,19 @@ export default () => {
                         }}
                         placeholder="Number of existing tokens" sx={{ my: 1 }} fullWidth label="Supply" labelChip={<Chip sx={{ m:1 }} className={classes.chip} label="Optional" size="small" />} /> */}
                         
-                        <TextInput value={state?.treasury}
-                        error={errors['treasury']}
-                        helperText={errors['treasury']}
-                        onChange={(e: any) => {
-                            setErrors({})
-                            setState((prev: any) => { return { ...prev, treasury: e.target.value } } ) 
-                        }}
-                        placeholder="Treasury address" sx={{ my: 1 }} fullWidth label="Treasury" />
+                        <TextInput 
+                            value={state?.treasury}
+                            error={errors['treasury']}
+                            helperText={errors['treasury']}
+                            onChange={(e: any) => {
+                                setErrors({});
+                                setState((prev: any) => { return { ...prev, treasury: e.target.value } } ) 
+                            }}
+                            placeholder="Treasury address" 
+                            sx={{ my: 1 }} 
+                            fullWidth 
+                            label="Treasury" 
+                        />
 
                         <Box my={3} display="flex" flexDirection="row" justifyContent="space-between" mx={1}>
                             <Switch onChange={(e: any) => { setState((prev: any) => { return {
@@ -385,7 +430,14 @@ export default () => {
                             </Box>
                         }
                         <Box my={3} mx={1}>
-                            <Switch onChange={(e: any) => { setState((prev: any) => { return { ...prev, priced: !prev.priced } } ) }} checked={state?.priced} label="Priced"/>
+                            <Switch onChange={(e: any) => { setState((prev: any) => { return { 
+                                ...prev, 
+                                priced: !prev.priced,
+                                price: prev.priced ? {
+                                    token: "0x0000000000000000000000000000000000000000",
+                                    value: 0
+                                } : prev.price
+                            } } ) }} checked={state?.priced} label="Priced"/>
                         </Box>
                         {
                             state['priced'] ?

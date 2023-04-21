@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
@@ -18,6 +18,11 @@ export default function MuiSelect({
     }: propTypes) {
   const [activeOption, setActiveOption] = useState<number | string | undefined | null>(selected);
 
+  useEffect(() => {
+    if(selected)
+      setActiveOption(selected)
+  }, [selected])
+
   const handleChange = (event: SelectChangeEvent) => {
     if(!!event.target.value){
       setActiveOption(event.target.value);
@@ -27,14 +32,15 @@ export default function MuiSelect({
   return (
     <FormControl sx={{ width: '100%', ...selectStyle}}>
       <Select
-        value={activeOption?.toString()}
+        // @ts-ignore
+        value={activeOption}
         onChange={handleChange}
         displayEmpty
         inputProps={{ 'aria-label': 'Without label', id: 'mui-dropdown' }}
       >
         {options.map((option, index) => (
           <MenuItem
-            value={option.value}
+            value={option?.value}
             key={index}
           >
             {option.label}

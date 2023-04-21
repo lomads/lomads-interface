@@ -5,6 +5,7 @@ export interface InputFieldType {
   height?: number | string;
   width?: number | string;
   padding?: number | string;
+  margin?: number | string;
   name?: string;
   onKeyDown?: any;
   autoFocus?:boolean | undefined;

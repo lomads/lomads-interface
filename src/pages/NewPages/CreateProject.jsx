@@ -92,7 +92,6 @@ const CreateProject = () => {
         if (createProjectLoading === false) {
             dispatch(resetCreateProjectLoader());
             setSuccess(true);
-            localStorage.setItem("create_first_project",true);
             setTimeout(() => {
                 navigate(-1);
             }, 2000);

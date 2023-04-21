@@ -16,7 +16,7 @@ import { useDispatch } from "react-redux";
 import axiosHttp from 'api'
 import { updateDao, updateDaoLinks, storeGithubIssues, deleteDaoLink } from 'state/dashboard/actions';
 import AddDiscordLink from 'components/AddDiscordLink';
-import { setDAO, resetStoreGithubIssuesLoader, resetDeleteDaoLinkLoader } from "state/dashboard/reducer";
+import { setDAO, resetStoreGithubIssuesLoader, resetDeleteDaoLinkLoader,resetUpdateDAOLoader,resetUpdateDaoLinksLoader } from "state/dashboard/reducer";
 import AddGithubLink from "components/AddGithubLink";
 
 import TextInput from "muiComponents/TextInput";
@@ -64,9 +64,17 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 
 	useEffect(() => {
 		if (deleteDaoLinkLoading === false) {
-			dispatch(resetDeleteDaoLinkLoader);
+			dispatch(resetDeleteDaoLinkLoader());
 		}
 	}, [deleteDaoLinkLoading])
+
+	useEffect(() => {
+		if (updateDaoLoading === false && updateDaoLinksLoading === false) {
+			dispatch(resetUpdateDAOLoader());
+			dispatch(resetUpdateDaoLinksLoader());
+			toggleOrganisationDetailsModal();
+		}
+	}, [updateDaoLoading,updateDaoLinksLoading])
 
 	const addLink = useCallback(() => {
 		if (!linkTitle || !link || (linkTitle && linkTitle === '') || (link && link === ''))
@@ -82,9 +90,9 @@ const OrganisationDetails = ({ toggleOrganisationDetailsModal, githubLogin }) =>
 	}, [link, linkTitle]);
 
 	const saveChanges = () => {
+		console.log("save...",daoLinks)
 		dispatch(updateDao({ url: DAO?.url, payload: { name, description, image } }))
-		// dispatch(updateDaoLinks({ url: DAO?.url, payload: { links: daoLinks } }))
-		toggleOrganisationDetailsModal();
+		dispatch(updateDaoLinks({ url: DAO?.url, payload: { links: daoLinks } }))
 	}
 
 	const addNewLink = (e) => {

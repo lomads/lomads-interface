@@ -182,7 +182,7 @@ const AddExistingSafe = () => {
 				<div className="buttonArea">
 					<div>
 						<SafeButton
-							title="CREATE NEW SAFE"
+							title="CREATE"
 							titleColor="rgba(201, 75, 50, 0.6)"
 							bgColor="#FFFFFF"
 							height={58}
@@ -197,7 +197,7 @@ const AddExistingSafe = () => {
 					<div className="centerText">or</div>
 					<div>
 						<SafeButton
-							title="ADD EXISTING SAFE"
+							title="ADD EXISTING"
 							titleColor="#C94B32"
 							bgColor="#FFFFFF"
 							height={58}
@@ -365,7 +365,7 @@ const AddExistingSafe = () => {
 							<div className="inputArea">
 								<div>
 									<div>
-										<div className="inputFieldTitle">Safe Name</div>
+										<div className="inputFieldTitle">Multi-sig Wallet name</div>
 									</div>
 									<SimpleInputField
 										className="inputField"

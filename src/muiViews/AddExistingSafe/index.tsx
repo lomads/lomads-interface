@@ -5,6 +5,7 @@ import { useWeb3React } from "@web3-react/core";
 import { updateHolder } from "state/proposal/reducer";
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import { ImportSafe } from "connection/SafeCall";
+import { createDAO } from '../../state/flow/actions';
 import coin from "../../assets/svg/coin.svg";
 import {
 	updateSafeAddress,
@@ -22,12 +23,13 @@ import MuiSelect from '../../muiComponents/Select'
 import axios from "axios";
 import { InviteGangType } from "types/UItype";
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains'
-import { CHAIN_IDS_TO_NAMES, SUPPORTED_CHAIN_IDS, SupportedChainId } from 'constants/chains'
+import { SUPPORTED_CHAIN_IDS, SupportedChainId } from 'constants/chains'
 import { makeStyles } from '@mui/styles';
 import { CHAIN_INFO } from 'constants/chainInfo';
+import safeUserIcon from '../../assets/svg/safeUserIcon.svg'
 import downArrow from '../../assets/svg/downArrow.svg'
 import { beautifyHexToken } from "utils"
-import { INFURA_NETWORK_URLS } from "constants/infura";
+import Avatar from "boring-avatars";
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
@@ -54,7 +56,8 @@ const useStyles = makeStyles((theme: any) => ({
 		fontWeight: 700,
 		fontSize: 16,
 		letterSpacing: '-0.011em',
-		color: '#76808D',
+		color: '#1B2B41',
+		opacity: 0.5
 	},
 	List: {
 		display: 'flex',
@@ -66,7 +69,7 @@ const useStyles = makeStyles((theme: any) => ({
 		maxHeight: 'fit-content',
 		margin: 8
 	},
-	ListItem: {
+	ListItemParent: {
 		display: 'flex',
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -76,6 +79,15 @@ const useStyles = makeStyles((theme: any) => ({
 		width: 360,
 		padding: 10,
 		height: 64,
+		gap: 5,
+		cursor: 'pointer'
+	},
+	ListItemContent: {
+		display: 'flex',
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'flex-start',
+		gap: 5,
 		cursor: 'pointer'
 	},
 	ListContent: {
@@ -85,6 +97,14 @@ const useStyles = makeStyles((theme: any) => ({
 		background: '#FFFFFF',
 	},
 	StartSafe: {
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center',
+		height: 'fit-content',
+		padding: '14vh 0vh 10vh 0vh'
+	},
+	centerFlexContainer: {
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'center',
@@ -114,9 +134,10 @@ const useStyles = makeStyles((theme: any) => ({
 	headerText: {
 		fontFamily: 'Insignia',
 		fontStyle: 'normal',
-		fontWeight: 400,
-		fontSize: 35,
-		paddingBottom: 30,
+		fontWeight: '400',
+		fontSize: '35px',
+		lineHeight: '35px',
+		paddingBottom: '30px',
 		textAlign: 'center',
 		color: '#C94B32'
 	},
@@ -138,7 +159,41 @@ const useStyles = makeStyles((theme: any) => ({
 		alignItems: 'center',
 		width: '100%'
 	},
-	safeData: {
+	// safeData: {
+	// 	display: 'flex',
+	// 	flexDirection: 'column',
+	// 	alignItems: 'flex-start',
+	// 	justifyContent: 'space-between',
+	// 	background: '#FFFFFF',
+	// 	border: '1px solid #f1f4f4',
+	// 	borderRadius: 5,
+	// 	maxHeight: 'fit-content',
+	// 	width: 385,
+	// 	padding: 20,
+	// 	marginTop: 2
+	// },
+	centerCard: {
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'flex-start',
+		justifyItems: 'flex-start',
+		background: '#FFFFFF',
+		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
+		borderRadius: 5,
+		maxHeight: 'fit-content',
+		padding: 20,
+		margin: 35,
+		width: 385
+	},
+	safeName: {
+		fontFamily: 'Inter, sans-serif',
+		fontStyle: 'normal',
+		fontWeight: 600,
+		fontSize: 16,
+		textAlign: 'left',
+		color: '#76808D',
+	},
+	safeOwners: {
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'flex-start',
@@ -147,29 +202,10 @@ const useStyles = makeStyles((theme: any) => ({
 		border: '1px solid #f1f4f4',
 		borderRadius: 5,
 		maxHeight: 'fit-content',
-		width: 385,
 		padding: 20,
-		marginTop: 2
-	},
-	safeName: {
-		fontFamily: 'Inter, sans-serif',
-		fontStyle: 'normal',
-		fontWeight: 600,
-		fontSize: 16,
-		textAlign: 'center',
-		color: '#76808D',
-	},
-	safeOwners: {
-		display: 'flex',
-		flexDirection: 'column',
-		alignItems: 'flex-start',
-		justifyContent: 'flex-start',
-		background: '#FFFFFF',
-		border: '1px solid #f1f4f4',
-		borderRadius: 5,
-		maxHeight: 'fit-content',
-		padding: 20,
-		marginTop: 2
+		marginTop: 2,
+		width: 360,
+		textAlign: 'left'
 	},
 	ownerList: {
 		display: 'flex',
@@ -182,9 +218,8 @@ const useStyles = makeStyles((theme: any) => ({
 		fontStyle: 'normal',
 		fontWeight: 400,
 		fontSize: 16,
-		textAlign: 'center',
+		textAlign: 'right',
 		color: '#76808D',
-		marginLeft: '2vh'
 	},
 	balance: {
 		display: 'flex',
@@ -210,6 +245,7 @@ const useStyles = makeStyles((theme: any) => ({
 		fontStyle: 'normal',
 		fontWeight: '400',
 		fontSize: 16,
+		marginLeft: 8,
 		textAlign: 'center',
 		color: '#188C7C',
 	},
@@ -249,9 +285,18 @@ const useStyles = makeStyles((theme: any) => ({
 	safeOwner: {
 		display: 'flex',
 		flexDirection: 'row',
-		justifyContent: 'flex-start',
-		alignItems: 'center',
+		justifyContent: 'space-between',
+		alignItems: 'flex-end',
 		marginTop: 10,
+		width: 325
+	},
+	userDetail: {
+		display: 'flex',
+		flexDirection: 'row',
+		alignItems: 'flex-start',
+		justifyContent: 'flex-start',
+		background: '#FFFFFF',
+		gap: 5,
 	},
 	bottomLine: {
 		margin: 20,
@@ -261,9 +306,6 @@ const useStyles = makeStyles((theme: any) => ({
 		border: '2px solid #C94B32',
 		position: 'relative',
 		borderRadius: 50
-	},
-	downArrow: {
-		maxWidth: 'fit-content'
 	},
 	ChainLogo: {
 		display: 'flex',
@@ -280,12 +322,12 @@ const useStyles = makeStyles((theme: any) => ({
 		marginBottom: 30,
 		display: "flex",
 		flexDirection: "column",
-		height: 550,
-		overflowY: "scroll"
+		// height: 550,
+		// overflowY: "scroll"
 	},
 	addSafe: {
 		position: 'fixed',
-		bottom: 3,
+		bottom: 13,
 		display: 'flex',
 		flexDirection: 'row',
 		justifyContent: 'center',
@@ -332,36 +374,67 @@ export default () => {
 		if (selectedChainId) {
 			owners.current = [];
 			setisLoading(true);
-	        // const jsonRpcProvider = new ethers.providers.JsonRpcProvider(_.get(INFURA_NETWORK_URLS,`${selectedChainId}`))
+			// const jsonRpcProvider = new ethers.providers.JsonRpcProvider(_.get(INFURA_NETWORK_URLS,`${selectedChainId}`))
 			// ImportSafe(jsonRpcProvider, value)
 			// 	.then(async safeSDK => {
 			// 		console.log("safeSDK", safeSDK)
-					dispatch(updateHolder(value as string));
-					const safeowners: string[] = await axios.get(`${GNOSIS_SAFE_BASE_URLS[selectedChainId]}/api/v1/safes/${value}`).then(res => res?.data?.owners)
-					safeowners.map((ownerAddress: string, index: number) => {
-						let obj: InviteGangType = { name: "", address: "" };
-						obj["address"] = ownerAddress;
-						if (!_.find(owners.current, (w: any) => w.address.toLowerCase() === obj.address.toLowerCase()))
-							owners.current.push(obj);
-					});
-					// const bal = await safeSDK.getBalance();
-					// setBalance(bal.toString());
-					await getTokens(value);
-					setisLoading(false);
-				// })
-				// .catch(e => {
-				// 	setisLoading(false);
-				// 	console.log(e)
-				// 	if (e.message === "SafeProxy contract is not deployed on the current network") {
-				// 		if (selectedChainId) {
-				// 			const chain = selectedChainId || 137;
-				// 			setErrors({ issafeAddress: `This safe is not on ${CHAIN_IDS_TO_NAMES[chain]}` });
-				// 		}
-				// 	}
-				// })
+			dispatch(updateHolder(value as string));
+			const safeowners: string[] = await axios.get(`${GNOSIS_SAFE_BASE_URLS[selectedChainId]}/api/v1/safes/${value}`).then(res => res?.data?.owners)
+			safeowners.map((ownerAddress: string, index: number) => {
+				let obj: InviteGangType = { name: "", address: "" };
+				obj["address"] = ownerAddress;
+				if (!_.find(owners.current, (w: any) => w.address.toLowerCase() === obj.address.toLowerCase()))
+					owners.current.push(obj);
+			});
+			// const bal = await safeSDK.getBalance();
+			// setBalance(bal.toString());
+			await getTokens(value);
+			setisLoading(false);
+			// })
+			// .catch(e => {
+			// 	setisLoading(false);
+			// 	console.log(e)
+			// 	if (e.message === "SafeProxy contract is not deployed on the current network") {
+			// 		if (selectedChainId) {
+			// 			const chain = selectedChainId || 137;
+			// 			setErrors({ issafeAddress: `This safe is not on ${CHAIN_IDS_TO_NAMES[chain]}` });
+			// 		}
+			// 	}
+			// })
 		}
 	}, [selectedChainId, selectedSafeAddress]);
 
+	const handleAddSafe = useCallback(() => {
+		const totalAddresses = [...invitedMembers, ...owners.current];
+		const value = totalAddresses.reduce((final: any, current: any) => {
+			let object = final.find((item: any) => item.address === current.address);
+			if (object) {
+				return final;
+			}
+			return final.concat([current]);
+		}, []);
+		dispatch(updateTotalMembers(value));
+		const payload: any = {
+			chainId,
+			contractAddress: '',
+			name: flow.daoName,
+			url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
+			image: flow.daoImage,
+			members: value.map((m: any) => {
+				if (m.address.toLowerCase() === account?.toLowerCase()) {
+					return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : 'role2' }
+				}
+				return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4' }
+			}),
+			safe: {
+				name: safeName,
+				address: selectedSafeAddress,
+				chainId: selectedChainId,
+				owners: owners.current.map(o => o.address),
+			}
+		}
+		dispatch(createDAO(payload))
+	}, [selectedChainId, selectedSafeAddress]);
 
 	const getTokens = async (safeAddress: string) => {
 		selectedChainId &&
@@ -384,6 +457,7 @@ export default () => {
 	}, [selectedSafeAddress]);
 
 	useEffect(() => {
+		console.log(createDAOLoading, '....createDAOLoading....')
 		if (createDAOLoading == false) {
 			dispatch(updateSafeAddress(''))
 			dispatch(updatesafeName(''))
@@ -405,7 +479,7 @@ export default () => {
 			terrors.issafeAddress = " * Safe Address is not valid.";
 		}
 		if (_.isEmpty(terrors)) {
-			UseExistingSafe(selectedSafeAddress);
+			handleAddSafe()
 		}
 		else {
 			setErrors(terrors);
@@ -419,10 +493,11 @@ export default () => {
 			.then((response: any) => {
 				setSafeList(response.data.safes)
 			});
+		//window.scrollTo(0, document.body.scrollHeight);
 	}
 
-	const SafeDetails = () => {
-		return <Box className={classes.StartSafe}>
+	const SafeDetails = ({ index }: any) => {
+		return <Box className={classes.centerFlexContainer} key={index}>
 			<Box className={classes.safeOwners}>
 				<Box className={classes.balance}>
 					<img src={coin} alt="coin" />
@@ -473,14 +548,33 @@ export default () => {
 							return (
 								<>
 									<Box className={classes.safeOwner} key={index}>
-										<TextInput
-											placeholder="Name"
-											type="text"
-											onChange={(e: any) => {
-												owners.current[index].name = e.target.value;
-											}}
-										/>
-										<Box className="address">
+										<Box className={classes.userDetail}>
+											<Box sx={{marginTop: 1.5}}>
+											<Avatar
+												size={32}
+												name={result.address}
+												variant="bauhaus"
+												colors={["#E67C40", "#EDCD27", "#8ECC3E", "#2AB87C", "#188C8C"]}
+											/>
+												{/* <img src={safeUserIcon} alt="safe-owner-icon" /> */}
+											</Box>
+											<TextInput
+												placeholder="Name"
+												type="text"
+												sx={{
+													marginTop: 1,
+													width: 141,
+													'& .MuiInputBase-input': {
+														height: 30,
+														padding: '2px'
+													}
+												}}
+												onChange={(e: any) => {
+													owners.current[index].name = e.target.value;
+												}}
+											/>
+										</Box>
+										<Box className={classes.address}>
 											{result.address.slice(0, 6) +
 												"..." +
 												result.address.slice(-4)}
@@ -499,7 +593,7 @@ export default () => {
 		<Container>
 			<Grid className={classes.root}>
 				<Box className={classes.StartSafe}>
-					<Box className={classes.headerText}>2/2 Organisation Treasury</Box>
+					<Box className={classes.headerText}>2/2 Organisation Multi-sig Wallet</Box>
 					<Box className={classes.buttonArea}>
 						<Box>
 							<Button
@@ -513,7 +607,7 @@ export default () => {
 								}}
 								onClick={() => navigate('/newsafe')}
 								variant='contained'>
-								CREATE NEW SAFE
+								CREATE
 							</Button>
 						</Box>
 						<Box className={classes.centerText}>or</Box>
@@ -528,13 +622,13 @@ export default () => {
 									boxShadow: '3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)'
 								}}
 								variant='contained'>
-								ADD EXISTING SAFE
+								ADD EXISTING
 							</Button>
 						</Box>
 					</Box>
 					<Box className={classes.bottomLine} />
-					<Box className={classes.safeData}>
-						<Typography className={classes.inputFieldTitle}>Select Chain</Typography>
+					<Box className={classes.centerCard}>
+						<Box className={classes.inputFieldTitle}>Select Chain</Box>
 						<MuiSelect
 							selected={selectedChainId}
 							options={SUPPORTED_CHAIN_IDS.map(item => ({ label: CHAIN_INFO[item].label, value: item }))}
@@ -548,37 +642,37 @@ export default () => {
 						/>
 					</Box>
 					{safeList.length ?
-						<Box className={classes.StartSafe}>
+						<Box className={classes.centerFlexContainer}>
 							<Box className={classes.bottomLine} />
-								<Box className={classes.safeContainer}>
-									{safeList.map((item: any, index: any) => (
-										<Box key={index} className={classes.List}>
-											<Box
-												className={classes.ListItem}
-												sx={{
-													border: selectedSafeAddress == item
-														? '1px solid #C94B32'
-														: ''
-												}}
-												onClick={() => setSelectedSafeAddress(item)}
-											>
-												<Box className={classes.ListContent}>
-													<Box className={classes.ChainLogo}>
-														<img style={{ width: 18, height: 18 }} src={CHAIN_INFO[selectedChainId].logoUrl} alt="seek-logo" />
-													</Box>
-													<Box>
-														<Typography className={classes.safeName}>Safe Name</Typography>
-														<Typography>{beautifyHexToken(item)}</Typography>
-													</Box>
+							<Box className={classes.safeContainer}>
+								{safeList.map((item: any, index: any) => (
+									<Box key={index} className={classes.List}>
+										<Box
+											className={classes.ListItemParent}
+											sx={{
+												border: selectedSafeAddress == item
+													? '1px solid #C94B32'
+													: ''
+											}}
+											onClick={() => { setSelectedSafeAddress(item); getSafeDetails(item); }}
+										>
+											<Box className={classes.ListItemContent}>
+												<Box className={classes.ChainLogo}>
+													<img width={18} height={18} src={CHAIN_INFO[selectedChainId].logoUrl} alt="seek-logo" />
 												</Box>
-												<IconButton className={classes.downArrow} onClick={() => getSafeDetails(item)}>
-													<img src={downArrow} alt="down-arrow" />
-												</IconButton>
+												<Box>
+													<Typography className={classes.safeName}>Multi-sig Wallet</Typography>
+													<Typography>{beautifyHexToken(item)}</Typography>
+												</Box>
 											</Box>
-											{expand && selectedSafeAddress === item ? <SafeDetails /> : ''}
+											<IconButton>
+												<img src={downArrow} alt="down-arrow" />
+											</IconButton>
 										</Box>
-									))}
-								</Box>
+										{expand && selectedSafeAddress === item ? <SafeDetails index={index} /> : ''}
+									</Box>
+								))}
+							</Box>
 							<Box className={classes.addSafe}>
 								<Button
 									loading={isLoading}
@@ -594,9 +688,9 @@ export default () => {
 								</Button>
 							</Box>
 						</Box>
-						: <Box style={{margin: 25}}>
+						: <Box style={{ margin: 25 }}>
 							<Button
-							   loading={isLoading}
+								loading={isLoading}
 								sx={{
 									color: '#FFF',
 									fontWeight: 400,

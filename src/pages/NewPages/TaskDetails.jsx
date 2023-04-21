@@ -671,7 +671,7 @@ const TaskDetails = () => {
                                                     amICreator || can(myRole, 'task.edit') || can(myRole, 'task.delete') || can(myRole, 'task.close')
                                                         ?
                                                         <>
-                                                            {(amICreator || can(myRole, 'task.edit')) &&
+                                                            {(amICreator || can(myRole, 'task.edit')) && (Task.isDummy === false) &&
                                                                 <button style={{ marginRight: '25px' }} onClick={() => { Task.draftedAt ? setOpenEditDraftedTask(true) : setOpenEditTask(true) }}>
                                                                     <img src={editToken} alt="hk-logo" />
                                                                 </button>
@@ -708,7 +708,7 @@ const TaskDetails = () => {
                                                         :
                                                         null
                                                 }
-                                                {(amICreator || can(myRole, 'task.share')) &&
+                                                {(amICreator || can(myRole, 'task.share')) && (Task.isDummy === false) &&
                                                 <>
                                                 <button onClick={handleClick} style={{ 
                                                     marginLeft: '12px',
@@ -940,7 +940,7 @@ const TaskDetails = () => {
                                                                                                         <>
 
                                                                                                             <h1>This  {transformTask().label.toLowerCase()}<br />fits your role.</h1>
-                                                                                                            {moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt ? null : <button onClick={() => setOpenApply(true)}>APPLY</button>}
+                                                                                                            {moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt && !Task.isDummy ? null : <button onClick={() => setOpenApply(true)}>APPLY</button>}
                                                                                                         </>
                                                                                                         :
                                                                                                         // mulitple contributor
@@ -967,7 +967,7 @@ const TaskDetails = () => {
                                                                                             <>
 
                                                                                                 <h1>This {transformTask().label.toLowerCase()} needs a<br />contributor.</h1>
-                                                                                                {moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt ? null : <button onClick={() => setOpenApply(true)}>APPLY</button>}
+                                                                                                {moment(Task.deadline).isBefore(moment(), "day") && !Task.draftedAt && !Task.isDummy ? null : <button onClick={() => setOpenApply(true)}>APPLY</button>}
 
                                                                                             </>
                                                                                             :

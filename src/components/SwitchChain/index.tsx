@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { get as _get } from 'lodash'
 import { Box, Fade, Typography, IconButton } from "@mui/material";
 import Button from "muiComponents/Button";
@@ -12,10 +12,11 @@ import { CHAIN_INFO } from "constants/chainInfo";
 
 export default ({ t, nextChainId }: any) => {
     const { connector, chainId } = useWeb3React()
-    const handleSwitch = async () => {
+    const handleSwitch = useCallback(async () => {
         toast.dismiss(t.id)
-        await switchChain(connector, nextChainId)
-    }
+        await switchChain(connector, +nextChainId)
+    }, [connector])
+
     return (
         <Fade in={t?.visible}>
             <Box style={{ 

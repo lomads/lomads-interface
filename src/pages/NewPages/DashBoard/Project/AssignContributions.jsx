@@ -61,7 +61,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
 
     useEffect(() => {
         if(DAO)
-            setChainId(_get(DAO, 'chainId'))
+            setChainId(_get(DAO, 'safe.chainId', _get(DAO, 'chainId')))
     }, [DAO])
 
     useEffect(() => {
@@ -230,8 +230,8 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
         try {
             let onChainSafeTxHash = undefined;
             if (isSafeOwner && _get(compensation, 'amount', 'SWEAT') !== 'SWEAT') {
-                if(currentChainId !== _get(DAO, 'chainId', '')) {
-                    return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
+                if(currentChainId !== chainId) {
+                    return toast.custom(t => <SwitchChain t={t} nextChainId={chainId}/>)
                 }
                 setisLoading(true);
                 onChainSafeTxHash = await createOnChainTxn(send);
@@ -438,7 +438,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                                 { error && <div style={{ color: 'red', textAlign: 'center', margin: '0 0 8px 0' }}>{ error }</div> }
                                 <div style={{ display: 'flex', flexDirection: 'row', background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: '500px',  position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
                                     <Button sx={{mr:1}} size="small" variant="outlined" fullWidth onClick={() => toggleShowAssign()}>CANCEL</Button>
-                                    <Button fullWidth size="small" variant="contained" loading={false} 
+                                    <Button fullWidth size="small" variant="contained" loading={isLoading} 
                                         onClick={handleSubmit}>SAVE</Button>
                                 </div>
                                 {/* <div className='milestone-footer'>

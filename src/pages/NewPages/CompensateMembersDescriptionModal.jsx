@@ -138,8 +138,8 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
 
 
   const createTransaction = async () => {
-    if(currentChainId !== _get(DAO, 'chainId', '')) {
-      return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
+    if(currentChainId !== _get(DAO, 'safe.chainId', _get(DAO, 'chainId'))) {
+      return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'safe.chainId', _get(DAO, 'chainId'))}/>)
     }
 		try {
       if(!sweatMembers || sweatMembers.length == 0) throw "No entries"
@@ -310,26 +310,32 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
 				</div>
 			</div>
         </div>
-          <div id="cm-info" style={{ paddingBottom : 120 }}
-          >
-            All SWEAT counter will be reset to 0.
-			    <Dropdown onChangeOption={(value) => setSelectedTag(value)}/>
-          </div>
-          {/* //! FOOTER */}
-          <Box position="fixed" width={400} backgroundColor='#FFF' bottom={0} pb={3} pt={2} display="flex" flexDirection="row">
-            <Button
-              variant="outlined"
-              fullWidth
-              sx={{ mr: 1 }}
-              onClick={() => {
-               // toggleModal();
-                toggleCompensate();
-              }}
-            >
-              Cancel
-            </Button>
-            <Button  disabled={loading || safeTokens.length == 0} fullWidth style={{ backgroundColor: loading ? 'grey' : '#C94B32' }} onClick={() => createTransaction()} id="button-save">SEND</Button>
-          </Box>
+          	{/* //! FOOTER */}
+			<Box position="fixed" width={400} backgroundColor='#FFF' bottom={0} pb={3} pt={2} display="flex" flexDirection="column">
+				<div id="cm-info">
+					<span>All SWEAT counter will be reset to 0.</span>
+					<Box sx={{marginTop:'16px'}}>
+						<Dropdown 
+							onChangeOption={(value) => setSelectedTag(value)}
+							menuPlacement={'top'}
+						/>
+					</Box>
+				</div>
+				<Box display={"flex"} flexDirection={"row"}>
+					<Button
+						variant="outlined"
+						fullWidth
+						sx={{ mr: 1 }}
+						onClick={() => {
+						// toggleModal();
+						toggleCompensate();
+						}}
+					>
+						Cancel
+					</Button>
+					<Button  disabled={loading || safeTokens.length == 0} fullWidth style={{ backgroundColor: loading ? 'grey' : '#C94B32' }} onClick={() => createTransaction()} id="button-save">SEND</Button>
+				</Box>
+			</Box>
         </div>
       </div>
       {showCompensateMembersDoneModal && (

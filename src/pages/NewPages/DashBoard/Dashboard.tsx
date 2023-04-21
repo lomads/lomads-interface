@@ -114,6 +114,7 @@ const Dashboard = () => {
 	const location = useLocation()
 	const from = location?.state?.from;
 	const { user, DAO, DAOList, DAOLoading } = useAppSelector((state:any) => state.dashboard);
+	console.log("DAO : ",DAO);
 	const [update, setUpdate] = useState(0);
 	const treasuryRef = useRef<any>();
 	const anchorRef = useRef<any>();
@@ -352,11 +353,12 @@ const Dashboard = () => {
 	}
 
 	useEffect(() => {
-			if (chainId && DAO && DAO.sbt && DAO.sbt && account) {
-				getStats().then(res => {
+			if (chainId && DAO && DAO.sbt && account) {
+				console.log("balanceOf::::", chainId ,DAO ,DAO?.sbt, account)
+				getStats(DAO.sbt.chainId || DAO?.chainId).then(res => {
 					const balanceOf = res[0];
 					console.log("balanceOf::::", balanceOf)
-					if (chainId === DAO.chainId) {
+					//if (chainId === DAO.chainId) {
 						if (DAO?.sbt?.whitelisted) {
 							if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
 								if (parseInt(balanceOf._hex, 16) === 0) {
@@ -386,9 +388,7 @@ const Dashboard = () => {
 								}
 							}
 						}
-					} else {
-						console.log('Switch chain to', DAO.chainId)
-					}
+					//}
 				})
 			}
 	}, [chainId, DAO, getStats, account]);
@@ -415,29 +415,17 @@ const Dashboard = () => {
 
 	useEffect(() => {
 		if (DAO && account && chainId) {
-			if (chainId === DAO.chainId) {
+			//if (chainId === DAO.chainId) {
 				if (!DAO.sbt) {
 					if (!_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase()))
 						navigate('/noaccess')
 				}
-			}
+			//}
 		}
 	}, [DAO, account, chainId]);
 
 	useEffect(() => {
-		if (DAO && account && chainId) {
-			if (chainId === DAO.chainId) {
-				if (!DAO.sbt) {
-					if (!_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase()))
-						navigate('/noaccess')
-				}
-			}
-		}
-	}, [DAO, account, chainId]);
-
-
-	useEffect(() => {
-		if (DAO && chainId && DAO.chainId === chainId){
+		if (DAO && chainId){
 			dispatch(updateSafeAddress(_get(DAO, 'safe.address', '')))
 		}
 	}, [DAO, chainId])
@@ -452,14 +440,17 @@ const Dashboard = () => {
 	};
 
 	const ownersCount = async (_safeAddress: string) => {
-		const safeSDK = await ImportSafe(provider, _safeAddress);
-		const owners = await safeSDK.getOwners();
-		//dispatch(syncSafeOwners({ daoUrl: DAO.url, payload: owners }))
-		const threshold = await safeSDK.getThreshold();
-		dispatch(updateSafeThreshold(threshold));
-		setOwnerCount(owners.length);
-		const dao = await axiosHttp.patch(`dao/${DAO.url}/sync-safe-owners`, owners)
-		//dispatch(setDAO(dao.data))
+		if(chainId) {
+			const safe = await axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${_safeAddress}`, {withCredentials: false }).then(res => res.data)
+			// const safeSDK = await ImportSafe(provider, _safeAddress);
+			const owners = safe?.owners
+			//dispatch(syncSafeOwners({ daoUrl: DAO.url, payload: owners }))
+			const threshold = safe?.threshold;
+			dispatch(updateSafeThreshold(threshold));
+			setOwnerCount(owners.length);
+			const dao = await axiosHttp.patch(`dao/${DAO.url}/sync-safe-owners`, owners)
+			//dispatch(setDAO(dao.data))
+		}
 	};
 
 	const getTokens = async (safeAddress: string) => {
@@ -478,7 +469,7 @@ const Dashboard = () => {
 	};
 
 	useEffect(() => {
-		if (chainId && DAO && DAO.chainId === chainId) {
+		if (chainId && DAO && (DAO?.safe?.chainId === chainId || DAO?.chainId === chainId)) {
 			if (DAO && _get(DAO, 'url') === daoURL)
 				prepare(_get(DAO, 'safe.address'))
 		}
