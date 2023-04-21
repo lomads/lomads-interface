@@ -865,7 +865,7 @@ export default () => {
                                     if(contract?.version === "0") {
                                         handleMint(undefined, undefined)
                                     } else {
-                                        if(contract?.mintPrice !== "0") {
+                                        if(contract?.mintPrice && contract?.mintPrice !== "0") {
                                             handlePayByCrypto() 
                                         } else {
                                             mintFree()
@@ -873,7 +873,7 @@ export default () => {
                                     }
                                 }} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">{ 
                                     contract?.version && contract?.version === "1" ? 
-                                    payment ? "MINT" : contract?.mintPrice === "0" ? "MINT" : "PAY BY CRYPTO" : "MINT" }</Button> : 
+                                    payment ? "MINT" : (!contract?.mintPrice || contract?.mintPrice === "0") ? "MINT" : "PAY BY CRYPTO" : "MINT" }</Button> : 
                                 <Button loading={mintLoading} disabled={mintLoading} onClick={() => handleUpdateMetadata()} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">UPDATE</Button>
                             }
 
