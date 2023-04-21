@@ -430,7 +430,14 @@ export default () => {
                             </Box>
                         }
                         <Box my={3} mx={1}>
-                            <Switch onChange={(e: any) => { setState((prev: any) => { return { ...prev, priced: !prev.priced } } ) }} checked={state?.priced} label="Priced"/>
+                            <Switch onChange={(e: any) => { setState((prev: any) => { return { 
+                                ...prev, 
+                                priced: !prev.priced,
+                                price: prev.priced ? {
+                                    token: "0x0000000000000000000000000000000000000000",
+                                    value: 0
+                                } : prev.price
+                            } } ) }} checked={state?.priced} label="Priced"/>
                         </Box>
                         {
                             state['priced'] ?

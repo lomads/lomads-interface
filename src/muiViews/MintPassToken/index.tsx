@@ -627,6 +627,8 @@ export default () => {
                                 <>
                                 { balance === 0 ?
                                 <Box mx={2} mt={0.5} px={3} py={2} style={{ borderRadius: 5, width: '100%', backgroundColor: '#FFF'  }}>
+                                    { _get(price, 'mintPrice', 0) > 0 &&
+                                    <>
                                     <Box py={2} style={{  display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                         <Typography style={{ fontSize: 16, fontWeight: 700 }}>
                                             Price
@@ -687,6 +689,8 @@ export default () => {
                                                 <Typography ml={2} style={{ fontSize: 16, fontWeight: 700, }}>{ (parseFloat(_get(price, 'mintPrice', 0)) + parseFloat(_get(price, 'gas', 0))).toFixed(5) } {contract?.mintPriceToken === USDC_GOERLI.address || contract?.mintPriceToken === USDC_POLYGON.address ? 'USDC' : CHAIN_INFO[chainId]?.nativeCurrency?.symbol}</Typography>
                                             </Box>
                                         </Box>
+                                    }
+                                    </>
                                     }
                                     {/* { balance == 0 &&
                                     <Box mt={2} display="flex" flexDirection="row" alignItems="center">
