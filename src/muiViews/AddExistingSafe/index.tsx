@@ -654,18 +654,18 @@ export default () => {
 													? '1px solid #C94B32'
 													: ''
 											}}
-											onClick={() => setSelectedSafeAddress(item)}
+											onClick={() => { setSelectedSafeAddress(item); getSafeDetails(item); }}
 										>
 											<Box className={classes.ListItemContent}>
 												<Box className={classes.ChainLogo}>
 													<img width={18} height={18} src={CHAIN_INFO[selectedChainId].logoUrl} alt="seek-logo" />
 												</Box>
 												<Box>
-													<Typography className={classes.safeName}>Multi-sig Wallet Name</Typography>
+													<Typography className={classes.safeName}>Multi-sig Wallet</Typography>
 													<Typography>{beautifyHexToken(item)}</Typography>
 												</Box>
 											</Box>
-											<IconButton onClick={() => getSafeDetails(item)}>
+											<IconButton>
 												<img src={downArrow} alt="down-arrow" />
 											</IconButton>
 										</Box>
