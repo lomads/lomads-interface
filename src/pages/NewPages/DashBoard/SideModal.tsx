@@ -174,31 +174,33 @@ const SideModal = (props: IsideModal) => {
 			return createOffChainTxn()
 		}
 		try {
+			console.log(setRecipient.current, '....setRecipient?.current?....')
 			const txnResponse = await createSafeTransaction({ tokenAddress: selectedToken, send: setRecipient.current });
 			if (txnResponse?.safeTxHash) {
 				dispatch(getDao(DAO.url))
 				await props.getPendingTransactions();
 				showNavigation(false, true, false);
 				setisLoading(false);
-				const invoiceArrayPayload = setRecipient.current.map((item) => ({
+				const invoiceArrayPayload = setRecipient?.current?.map((item) => ({
+					flag: 'SEND_TOKENS',
 					generalInfo: {
 						paymentToken: selectedToken,
 						chain: chainId,
-						transactionId: ""
+						transactionId: txnResponse.safeTxHash
 					},
 					buyerInfo: {
 						name: _get(DAO, 'name', undefined),
-						address: '',
-						email: '',
+						address: null,
+						email: null,
 						id: _get(DAO, '_id', undefined)
 					},
 					paymentInfo: {
 						recipientWalletAddress: item.recipient,
 						title: item.reason,
-						labels: '',
+						labels: null,
 						price: item.amount,
-						tax: '',
-						total: '',
+						tax: null,
+						total: null,
 					},
 					sellerInfo: {
 						name: item.name,
