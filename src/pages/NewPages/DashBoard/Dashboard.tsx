@@ -561,12 +561,12 @@ const Dashboard = () => {
 	}
 	const incrementWalkThroughSteps = () => {
 		clearWalkThroughStyles()
-		if (currWalkThroughObj.step === 7) {
+		if (currWalkThroughObj?.step === 7) {
 			endWalkThrough()
 			return
 		}
 
-		let nextStep =  currWalkThroughObj.step + 1
+		let nextStep =  currWalkThroughObj?.step + 1
 		while(showWalkThrough 
 	   		 && !document.getElementById(Steps(myRole)[nextStep]?.id)
 	         &&  nextStep < 7 ){
@@ -601,7 +601,7 @@ const Dashboard = () => {
 	}
 
 	const getQuestionImage = (): string => {
-		return ((showWalkThrough && currWalkThroughObj.step === 7) || isHelpIconOpen)
+		return ((showWalkThrough && currWalkThroughObj?.step === 7) || isHelpIconOpen)
 					? questionMarkDark
 					: questionMarkLight
 	}
@@ -637,13 +637,13 @@ const Dashboard = () => {
 			?
 			<WalkThroughModal
 				incrementWalkThroughSteps={incrementWalkThroughSteps}
-				showConfirmation={showWalkThrough && currWalkThroughObj.step === 0}
+				showConfirmation={showWalkThrough && currWalkThroughObj?.step === 0}
 				endWalkThrough={endWalkThrough}
 				obj={currWalkThroughObj}
 			/> : null
 			}
 			<WalkThroughPopover
-				displayPopover={showWalkThrough && currWalkThroughObj.step > 0}
+				displayPopover={showWalkThrough && currWalkThroughObj?.step > 0}
 				obj={currWalkThroughObj}
 				incrementWalkThroughSteps={incrementWalkThroughSteps}
 				endWalkThrough={endWalkThrough}
