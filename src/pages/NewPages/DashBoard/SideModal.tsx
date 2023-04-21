@@ -186,7 +186,7 @@ const SideModal = (props: IsideModal) => {
 					generalInfo: {
 						paymentToken: selectedToken,
 						chain: chainId,
-						transactionId: txnResponse.safeTxHash
+						transactionId: txnResponse.safeTxHash,
 					},
 					buyerInfo: {
 						name: _get(DAO, 'name', undefined),
@@ -209,7 +209,7 @@ const SideModal = (props: IsideModal) => {
 					}
 				}));
 				console.log(invoiceArrayPayload, '......invoiceArrayPayload.....')
-				// dispatch(generateInvoice({ projectId: data._id, daoUrl: daoURL, payload: invoicePayload }));
+				dispatch(generateInvoice({ daoUrl: _get(DAO, 'url', undefined), payload: invoiceArrayPayload }));
 			}
 		} catch (e) {
 			console.log(e)
