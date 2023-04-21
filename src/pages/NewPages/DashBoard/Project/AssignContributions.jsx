@@ -236,6 +236,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                 setisLoading(true);
                 onChainSafeTxHash = await createOnChainTxn(send);
                 const invoiceArrayPayload = send.map((item, index) => ({
+                    flag: 'ADD_MILESTONE',
                     generalInfo: {
                         paymentToken: _get(compensation, 'currency', 'SWEAT'),
                         chain: currentChainId,
@@ -243,17 +244,17 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                     },
                     buyerInfo: {
                         name: _get(DAO, 'name', undefined),
-                        address: '',
-                        email: '',
+                        address: null,
+                        email: null,
                         id:  _get(DAO, '_id', undefined)
                     },
                     paymentInfo: {
                         recipientWalletAddress: item.recipient,
                         title: item.reason,
-                        labels: '',
+                        labels: null,
                         price: item.amount,
-                        tax: '',
-                        total: '',
+                        tax: null,
+                        total: null,
                     },
                     sellerInfo: {
                         name:  item.name,

@@ -230,8 +230,9 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
           setLoading(false)
 					console.log("error occured while confirming transaction", err);
 				});
-        console.log('...safeTokens....', safeTokens)
+
         const invoiceArrayPayload = sweatMembers.map((item) => ({
+          flag: 'CONVERT_SWEAT_POINTS',
 					generalInfo: {
 						paymentToken: safeTokens,
 						chain: chainId,
@@ -239,8 +240,8 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
 					},
 					buyerInfo: {
 						name: _get(DAO, 'name', undefined),
-						address: '',
-						email: '',
+						address: null,
+						email: null,
 						id: _get(DAO, '_id', undefined)
 					},
 					paymentInfo: {
@@ -254,7 +255,7 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
 					sellerInfo: {
 						name: item.name,
 						email: "",
-						id: ""
+						id: item._id
 					}
 				}))
 				console.log(invoiceArrayPayload, '......invoiceArrayPayload.....')

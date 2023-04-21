@@ -179,6 +179,7 @@ const TaskReview = ({ task, close }: any) => {
             if (isSafeOwner && _get(task, 'compensation.currency', 'SWEAT') !== 'SWEAT') {
                 onChainSafeTxHash = await createOnChainTxn();
                 const invoiceArrayPayload = [{
+                    flag: 'APPROVE_TASK',
                     generalInfo: {
                         paymentToken: _get(task, 'compensation.currency', 'SWEAT'),
                         chain: currentChainId,
