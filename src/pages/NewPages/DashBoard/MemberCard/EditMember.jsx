@@ -15,6 +15,7 @@ import { updateCurrentUser } from 'state/dashboard/actions';
 import useTerminology from 'hooks/useTerminology';
 import { get as _get, find as _find } from 'lodash';
 import useRole from 'hooks/useRole';
+import Avatar from "muiComponents/Avatar";
 
 const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
     const { transformRole } = useTerminology(_get(DAO, 'terminologies'))
@@ -119,12 +120,13 @@ const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
                                         null
                                 }
                                 <div>
-                                    <img src={memberIcon} alt="memberIcon" />
+                                    <Avatar name={item?.member?.name} hideDetails={item.member.wallet.toLowerCase() === account.toLowerCase()} wallet={item?.member?.wallet}/>
                                     {
                                         item.member.wallet.toLowerCase() === account.toLowerCase()
                                             ?
                                             <SimpleInputField
                                                 className="inputField"
+                                                margin={"8px 0 0 16px"}
                                                 id="nameInput"
                                                 height={50}
                                                 width={135}
@@ -134,11 +136,11 @@ const EditMember = ({ DAO, toggleShowEditMember, amIAdmin, account }) => {
                                                 onKeyDown={(e) => handleKeyDown(e)}
                                                 autofocus
                                             />
-                                            :
-                                            <p>{item.member.name}</p>
+                                            : null
+                                            // <p>{item.member.name}</p>
                                     }
                                 </div>
-                                <span>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</span>
+                                {/* <span>{item.member.wallet.slice(0, 6) + "..." + item.member.wallet.slice(-4)}</span> */}
                                 <select
                                     name="chain"
                                     id="chain"
