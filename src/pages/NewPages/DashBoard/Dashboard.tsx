@@ -330,7 +330,6 @@ const Dashboard = () => {
 				const myMetadata = _find(_get(DAO, 'sbt.metadata', []), m => {
 					return _find(m.attributes, a => a.value === account)
 				})
-				console.log("ATTRRS..", myMetadata.attributes)
 				if (myMetadata && myMetadata.attributes) {
 					for (let index = 0; index < myMetadata.attributes.length; index++) {
 						const attribute = myMetadata.attributes[index];
