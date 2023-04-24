@@ -120,7 +120,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                         })
                     }
                 })
-                dispatch(editInvoice({ daoUrl: _get(DAO, 'url', undefined), payload: { safeAddress, label: reasonText, safeTxHash, recipient } }));
+                dispatch(editInvoice({ daoUrl: _get(DAO, 'url', undefined), payload: { safeAddress, reasonText, safeTxHash, recipient } }));
         }
     }
 
@@ -409,7 +409,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
         <>
             {_get(transaction, 'dataDecoded.method', null) !== "multiSend" || (_get(transaction, 'dataDecoded.method', null) === "multiSend" && isAllowanceTransaction && _get(transaction, 'dataDecoded.parameters[0].name', null) === "transactions") ?
                 <>
-                    <div className="transactionRow" style={{border: '1px solid red'}}>
+                    <div className="transactionRow">
                         <div className="coinText">
                             <img src={sendTokenOutline} alt="" />
                             <div className="dashboardTextBold">

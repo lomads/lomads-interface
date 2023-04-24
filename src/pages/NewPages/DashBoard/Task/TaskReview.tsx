@@ -171,7 +171,8 @@ const TaskReview = ({ task, close }: any) => {
             setApproveLoading(true);
             setError(null)
             let onChainSafeTxHash: any = undefined;
-        
+            console.log(task, '...task..')
+            console.log(taskSubmissions, '...taskSubmissions..')
             if (isSafeOwner && _get(task, 'compensation.currency', 'SWEAT') !== 'SWEAT') {
                 if(currentChainId !== chainId) {
                     setApproveLoading(false);
@@ -195,7 +196,7 @@ const TaskReview = ({ task, close }: any) => {
                     paymentInfo: {
                         recipientWalletAddress: taskSubmissions[0].member.wallet,
                         title: taskSubmissions[0].submission.note,
-                        labels: taskSubmissions[0].member.name,
+                        labels: selectedTag,
                         price: _get(task, 'compensation.amount', 0),
                         tax: null,
                         total: null,
