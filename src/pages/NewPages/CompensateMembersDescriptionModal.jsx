@@ -248,14 +248,14 @@ const CompensateMembersDescriptionModal = ({ currency, sweatValue = 0, toggleMod
 					paymentInfo: {
 						recipientWalletAddress: item.recipient,
 						title: item.reason,
-						labels: '',
+						labels: null,
 						price: item.amount,
-						tax: '',
-						total: '',
+						tax: null,
+						total: null,
 					},
 					sellerInfo: {
 						name: item.name,
-						email: "",
+						email: null,
 					}
 				}))
 				dispatch(generateInvoice({ daoUrl: _get(DAO, 'url', undefined), payload: invoiceArrayPayload }));

@@ -170,7 +170,6 @@ const TaskReview = ({ task, close }: any) => {
         try {
             setApproveLoading(true);
             setError(null)
-            console.log(task, '...task...')
             let onChainSafeTxHash: any = undefined;
         
             if (isSafeOwner && _get(task, 'compensation.currency', 'SWEAT') !== 'SWEAT') {
@@ -197,14 +196,13 @@ const TaskReview = ({ task, close }: any) => {
                         recipientWalletAddress: taskSubmissions[0].member.wallet,
                         title: taskSubmissions[0].submission.note,
                         labels: taskSubmissions[0].member.name,
-                        price: task,
+                        price: _get(task, 'compensation.amount', 0),
                         tax: null,
                         total: null,
                     },
                     sellerInfo: {
                         name: taskSubmissions[0].member.name,
-                        email: null,
-                        id: taskSubmissions[0].member._id
+                        email: null
                     }
                 }];
                 dispatch(generateInvoice({ daoUrl: _get(DAO, 'url', undefined), payload: invoiceArrayPayload }));

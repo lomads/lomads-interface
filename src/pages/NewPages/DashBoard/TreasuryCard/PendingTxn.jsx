@@ -3,7 +3,6 @@ import { get as _get, find as _find, debounce as _debounce } from 'lodash'
 import { useWeb3React } from "@web3-react/core";
 import SimpleInputField from "UIpack/SimpleInputField";
 import sendTokenOutline from "../../../../assets/svg/sendTokenOutline.svg";
-import { beautifyHexToken } from '../../../../utils';
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import IconButton from "UIpack/IconButton";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
@@ -19,7 +18,7 @@ import Dropdown from "muiComponents/Dropdown";
 import Avatar from "muiComponents/Avatar";
 import {useSafeTokens} from "hooks/useSafeTokens";
 import { CHAIN_INFO } from "constants/chainInfo";
-
+import { editInvoice } from 'state/dashboard/actions'
 import {Popover} from '@mui/material';
 
 const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
@@ -105,6 +104,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
     }, [threshold, transaction])
 
     const _handleReasonKeyDown = (safeTxHash, recipient, reasonText) => {
+        console.log('....in handle text...')
         if (reasonText && reasonText !== '') {
             axiosHttp.patch('transaction/label', { safeAddress, label: reasonText, safeTxHash, recipient })
                 .then(res => { 
@@ -120,6 +120,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                         })
                     }
                 })
+                dispatch(editInvoice({ daoUrl: _get(DAO, 'url', undefined), payload: { safeAddress, label: reasonText, safeTxHash, recipient } }));
         }
     }
 
@@ -242,9 +243,10 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                                     <div 
                                         aria-describedby={id}
                                         onClick={(e) => handleEnableEditTag(e,mulRecipient)} 
-                                        className="dashboardText" style={{background:`${mulTag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer',position:'relative'}}
+                                        className="tag-pill"
+                                        style={{background:`${mulTag.color}20`}}
                                     >
-                                        <span style={{color:mulTag.color,fontWeight:'700',fontSize:'10px'}}>{mulTag.value}</span>
+                                        <span style={{color:mulTag.color,fontWeight:'700',fontSize:'10px'}}>{mulTag.value.length > 15 ? mulTag.value.substring(0,15) + '...' : mulTag.value}</span>
                                     </div>
                                     <Popover
                                         id={id}
@@ -407,7 +409,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
         <>
             {_get(transaction, 'dataDecoded.method', null) !== "multiSend" || (_get(transaction, 'dataDecoded.method', null) === "multiSend" && isAllowanceTransaction && _get(transaction, 'dataDecoded.parameters[0].name', null) === "transactions") ?
                 <>
-                    <div className="transactionRow">
+                    <div className="transactionRow" style={{border: '1px solid red'}}>
                         <div className="coinText">
                             <img src={sendTokenOutline} alt="" />
                             <div className="dashboardTextBold">
@@ -459,13 +461,13 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                                 ?
                                 <>
                                     <div 
-                                            aria-describedby={id}
-                                            onClick={(e) => handleEnableEditTag(e,recipient)} 
-                                            className="dashboardText" 
-                                            style={{background:`${tag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer'}}
-                                        >
-                                            <span style={{color:tag.color,fontWeight:'700',fontSize:'10px'}}>{tag.value}</span>
-                                        </div>
+                                        aria-describedby={id}
+                                        onClick={(e) => handleEnableEditTag(e,recipient)} 
+                                        className="tag-pill" 
+                                        style={{background:`${tag.color}20`}}
+                                    >
+                                        <span style={{color:tag.color,fontWeight:'700',fontSize:'10px'}}>{tag.value.length > 15 ? tag.value.substring(0,15) + '...' : tag.value}</span>
+                                    </div>
                                         <Popover
                                             id={id}
                                             open={open}
