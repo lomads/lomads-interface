@@ -119,7 +119,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                         })
                     }
                 })
-                dispatch(editInvoice({ daoUrl: _get(DAO, 'url', undefined), payload: { safeAddress, reasonText, safeTxHash, recipient } }));
+                dispatch(editInvoice({ daoUrl: _get(DAO, 'url', undefined), payload: { safeAddress, reasonText, safeTxHash, recipient, label: null } }));
         }
     }
 
@@ -130,6 +130,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                     onLoadLabels(res.data);
                     setAnchorEl(null);
                 })
+                dispatch(editInvoice({ daoUrl: _get(DAO, 'url', undefined), payload: { safeAddress, reasonText: null, safeTxHash, recipient, label: tagText.label } }));
         }
     }
 
