@@ -195,8 +195,8 @@ const TaskReview = ({ task, close }: any) => {
                     },
                     paymentInfo: {
                         recipientWalletAddress: taskSubmissions[0].member.wallet,
-                        title: taskSubmissions[0].submission.note,
-                        labels: selectedTag,
+                        title: taskSubmissions[0].member.name + ' | ' + _get(task, 'name', 0),
+                        labels: selectedTag.label,
                         price: _get(task, 'compensation.amount', 0),
                         tax: null,
                         total: null,
@@ -208,7 +208,7 @@ const TaskReview = ({ task, close }: any) => {
                 }];
                 dispatch(generateInvoice({ daoUrl: _get(DAO, 'url', undefined), payload: invoiceArrayPayload }));
             }
-    
+
             const offChainPayload = {
                 daoId: _get(DAO, '_id', undefined),
                 taskId: _get(task, '_id', undefined),
@@ -241,7 +241,7 @@ const TaskReview = ({ task, close }: any) => {
                 onChainSafeTxHash,
                 recipient: _get(activeSubmission, 'member._id', null)
             }
-    
+
             return axiosHttp.post(`task/${task._id}/approve?daoUrl=${DAO.url}`, payload)
                 .then(async res => {
                     let m = _get(activeSubmission, 'member.name', '') === '' ? _get(activeSubmission, 'member.wallet', '') : _get(activeSubmission, 'member.name', '')
@@ -349,7 +349,7 @@ const TaskReview = ({ task, close }: any) => {
                         <span>Note</span>
                         <div className='note'>{submission.submission.note}</div>
                     </div>
-                    
+
                 </div>
                 <div style={{width:'100%',display:'flex',flexDirection:'column'}}>
                     <div className='detail-container'>
@@ -388,8 +388,8 @@ const TaskReview = ({ task, close }: any) => {
                                 </button>
                             </div>
                             <div style={{width:'100%'}}>
-                                <Dropdown 
-                                    defaultMenuIsOpen={false} 
+                                <Dropdown
+                                    defaultMenuIsOpen={false}
                                     onChangeOption={(value:any) => setSelectedTag(value)}
                                     menuPlacement={'top'}
                                 />
