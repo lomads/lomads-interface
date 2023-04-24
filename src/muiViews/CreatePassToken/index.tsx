@@ -463,7 +463,7 @@ export default () => {
                             placeholder="Treasury address" 
                             sx={{ my: 1 }} 
                             fullWidth 
-                            label="Treasury" 
+                            label="Multi-sig Wallet" 
                         /> }
                         <Button sx={{ mt:2 }} onClick={() => handleSetPreview()} fullWidth size="small" variant='contained'>Next</Button>
                     </Paper> :
