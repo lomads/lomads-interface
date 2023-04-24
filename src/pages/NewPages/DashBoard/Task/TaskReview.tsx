@@ -71,7 +71,7 @@ const TaskReview = ({ task, close }: any) => {
 
     useEffect(() => {
         if(DAO)
-            setChainId(_get(DAO, 'chainId'))
+            setChainId(_get(DAO, 'safe.chainId', _get(DAO, 'chainId')))
     }, [DAO])
 
     // useEffect(() => {
@@ -167,9 +167,6 @@ const TaskReview = ({ task, close }: any) => {
     }, [safeTokens, task])
 
     const handleApproveTask = async () => {
-        if(currentChainId !== _get(DAO, 'chainId', '')) {
-            return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
-        }
         try {
             setApproveLoading(true);
             setError(null)
@@ -177,12 +174,17 @@ const TaskReview = ({ task, close }: any) => {
             let onChainSafeTxHash: any = undefined;
         
             if (isSafeOwner && _get(task, 'compensation.currency', 'SWEAT') !== 'SWEAT') {
+                if(currentChainId !== chainId) {
+                    setApproveLoading(false);
+                    return toast.custom(t => <SwitchChain t={t} nextChainId={chainId}/>)
+                }
                 onChainSafeTxHash = await createOnChainTxn();
                 const invoiceArrayPayload = [{
                     flag: 'APPROVE_TASK',
                     generalInfo: {
                         paymentToken: _get(task, 'compensation.currency', 'SWEAT'),
                         chain: currentChainId,
+                        safeAddress: _get(DAO, 'safe.address', undefined),
                         transactionId: onChainSafeTxHash
                     },
                     buyerInfo: {
@@ -205,8 +207,7 @@ const TaskReview = ({ task, close }: any) => {
                         id: taskSubmissions[0].member._id
                     }
                 }];
-                console.log(invoiceArrayPayload, '......invoiceArrayPayload.....')
-                // dispatch(generateInvoice({ projectId: data._id, daoUrl: daoURL, payload: invoicePayload }));
+                dispatch(generateInvoice({ daoUrl: _get(DAO, 'url', undefined), payload: invoiceArrayPayload }));
             }
     
             const offChainPayload = {

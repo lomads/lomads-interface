@@ -60,8 +60,8 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
     const [selectedTag, setSelectedTag] = useState(null);
 
     useEffect(() => {
-        if (DAO)
-            setChainId(_get(DAO, 'chainId'))
+        if(DAO)
+            setChainId(_get(DAO, 'safe.chainId', _get(DAO, 'chainId')))
     }, [DAO])
 
     useEffect(() => {
@@ -230,8 +230,8 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
         try {
             let onChainSafeTxHash = undefined;
             if (isSafeOwner && _get(compensation, 'amount', 'SWEAT') !== 'SWEAT') {
-                if (currentChainId !== _get(DAO, 'chainId', '')) {
-                    return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')} />)
+                if(currentChainId !== chainId) {
+                    return toast.custom(t => <SwitchChain t={t} nextChainId={chainId}/>)
                 }
                 setisLoading(true);
                 onChainSafeTxHash = await createOnChainTxn(send);
@@ -240,6 +240,7 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                     generalInfo: {
                         paymentToken: _get(compensation, 'currency', 'SWEAT'),
                         chain: currentChainId,
+                        safeAddress: _get(DAO, 'safe.address', undefined),
                         transactionId: onChainSafeTxHash
                     },
                     buyerInfo: {
@@ -259,11 +260,9 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
                     sellerInfo: {
                         name:  item.name,
                         email: temp[index].email,
-                        id: temp[index]._id
                     }
                 }));
-                console.log(invoiceArrayPayload, '......invoiceArrayPayload.....')
-                // dispatch(generateInvoice({ projectId: data._id, daoUrl: daoURL, payload: invoicePayload }));
+                dispatch(generateInvoice({ daoUrl: _get(DAO, 'url', undefined), payload: invoiceArrayPayload }));
 
                 const newArray = _get(data, 'milestones', []).map((item, i) => {
                     if (i === _get(selectedMilestone, 'pos', '')) {
@@ -465,10 +464,10 @@ const AssignContributions = ({ toggleShowAssign, data, selectedMilestone, daoURL
 
                                     </div>
                                 </div>
-                                {error && <div style={{ color: 'red', textAlign: 'center', margin: '0 0 8px 0' }}>{error}</div>}
-                                <div style={{ display: 'flex', flexDirection: 'row', background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: '500px', position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px', padding: "30px 0 20px" }}>
-                                    <Button sx={{ mr: 1 }} size="small" variant="outlined" fullWidth onClick={() => toggleShowAssign()}>CANCEL</Button>
-                                    <Button fullWidth size="small" variant="contained" loading={false}
+                                { error && <div style={{ color: 'red', textAlign: 'center', margin: '0 0 8px 0' }}>{ error }</div> }
+                                <div style={{ display: 'flex', flexDirection: 'row', background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: '500px',  position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
+                                    <Button sx={{mr:1}} size="small" variant="outlined" fullWidth onClick={() => toggleShowAssign()}>CANCEL</Button>
+                                    <Button fullWidth size="small" variant="contained" loading={isLoading} 
                                         onClick={handleSubmit}>SAVE</Button>
                                 </div>
                                 {/* <div className='milestone-footer'>

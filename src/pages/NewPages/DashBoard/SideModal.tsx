@@ -173,8 +173,8 @@ const SideModal = (props: IsideModal) => {
 		if (selectedToken === 'SWEAT') {
 			return createOffChainTxn()
 		}
+
 		try {
-			console.log(setRecipient.current, '....setRecipient?.current?....')
 			const txnResponse = await createSafeTransaction({ tokenAddress: selectedToken, send: setRecipient.current });
 			if (txnResponse?.safeTxHash) {
 				dispatch(getDao(DAO.url))
@@ -186,6 +186,7 @@ const SideModal = (props: IsideModal) => {
 					generalInfo: {
 						paymentToken: selectedToken,
 						chain: chainId,
+						safeAddress: _get(DAO, 'safe.address', undefined),
 						transactionId: txnResponse.safeTxHash,
 					},
 					buyerInfo: {
@@ -204,11 +205,9 @@ const SideModal = (props: IsideModal) => {
 					},
 					sellerInfo: {
 						name: item.name,
-						email: "",
-						id: ""
+						email: ""
 					}
 				}));
-				console.log(invoiceArrayPayload, '......invoiceArrayPayload.....')
 				dispatch(generateInvoice({ daoUrl: _get(DAO, 'url', undefined), payload: invoiceArrayPayload }));
 			}
 		} catch (e) {
