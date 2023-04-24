@@ -181,7 +181,7 @@ export default () => {
     const [state, setState] = useState<any>({
         selectedChainId: null,
         logo: null,
-        treasury:null,
+        treasury: "0x0000000000000000000000000000000000000000",
         symbol: null,
         supply: 0,
         whitelisted: false,
@@ -217,6 +217,13 @@ export default () => {
                     decimals: _get(USDC, `[${state?.selectedChainId}].decimals`),
                 }
             ])
+            setState((prev:any) => {
+                console.log("+DAO?.safe?.chainId", +DAO?.safe?.chainId, state?.selectedChainId)
+                return {
+                    ...prev,
+                    treasury: prev.priced ? state?.selectedChainId === +DAO?.safe?.chainId ? DAO?.safe?.address : '' : "0x0000000000000000000000000000000000000000",
+                }
+            })
         }
     }, [state?.selectedChainId])
 
@@ -339,7 +346,10 @@ export default () => {
                                     selected={state?.selectedChainId}
                                     options={ SUPPORTED_CHAIN_IDS.filter(i => i !== SupportedChainId.MAINNET).map((item : any) => ({ label: CHAIN_INFO[item].label, value: item }))}
                                     setSelectedValue={(value) => {
-                                        setState((prev: any) => { return {...prev, selectedChainId: +value }})
+                                        setState((prev: any) => { return {
+                                            ...prev, 
+                                            selectedChainId: +value
+                                        }})
                                     }}
                                 />
                             </Box>
@@ -384,20 +394,7 @@ export default () => {
                             setState((prev: any) => { return { ...prev, supply: e.target.value } } ) 
                         }}
                         placeholder="Number of existing tokens" sx={{ my: 1 }} fullWidth label="Supply" labelChip={<Chip sx={{ m:1 }} className={classes.chip} label="Optional" size="small" />} /> */}
-                        
-                        <TextInput 
-                            value={state?.treasury}
-                            error={errors['treasury']}
-                            helperText={errors['treasury']}
-                            onChange={(e: any) => {
-                                setErrors({});
-                                setState((prev: any) => { return { ...prev, treasury: e.target.value } } ) 
-                            }}
-                            placeholder="Treasury address" 
-                            sx={{ my: 1 }} 
-                            fullWidth 
-                            label="Treasury" 
-                        />
+                    
 
                         <Box my={3} display="flex" flexDirection="row" justifyContent="space-between" mx={1}>
                             <Switch onChange={(e: any) => { setState((prev: any) => { return {
@@ -433,6 +430,7 @@ export default () => {
                             <Switch onChange={(e: any) => { setState((prev: any) => { return { 
                                 ...prev, 
                                 priced: !prev.priced,
+                                treasury: !prev.priced ? prev.selectedChainId && prev.selectedChainId === DAO?.safe?.chainId ? DAO?.safe?.address : null : "0x0000000000000000000000000000000000000000",
                                 price: prev.priced ? {
                                     token: "0x0000000000000000000000000000000000000000",
                                     value: 0
@@ -455,6 +453,19 @@ export default () => {
                                     />
                             </Box> : null
                         }
+                        { state['priced'] && <TextInput 
+                            value={state?.treasury}
+                            error={errors['treasury']}
+                            helperText={errors['treasury']}
+                            onChange={(e: any) => {
+                                setErrors({});
+                                setState((prev: any) => { return { ...prev, treasury: e.target.value } } ) 
+                            }}
+                            placeholder="Treasury address" 
+                            sx={{ my: 1 }} 
+                            fullWidth 
+                            label="Treasury" 
+                        /> }
                         <Button sx={{ mt:2 }} onClick={() => handleSetPreview()} fullWidth size="small" variant='contained'>Next</Button>
                     </Paper> :
                     <Box display="flex" flexDirection="column" alignItems="center">
