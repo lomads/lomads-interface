@@ -104,7 +104,6 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
     }, [threshold, transaction])
 
     const _handleReasonKeyDown = (safeTxHash, recipient, reasonText) => {
-        console.log('....in handle text...')
         if (reasonText && reasonText !== '') {
             axiosHttp.patch('transaction/label', { safeAddress, label: reasonText, safeTxHash, recipient })
                 .then(res => { 
