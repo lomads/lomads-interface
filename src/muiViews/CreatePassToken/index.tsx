@@ -218,7 +218,6 @@ export default () => {
                 }
             ])
             setState((prev:any) => {
-                console.log("+DAO?.safe?.chainId", +DAO?.safe?.chainId, state?.selectedChainId)
                 return {
                     ...prev,
                     treasury: prev.priced ? state?.selectedChainId === +DAO?.safe?.chainId ? DAO?.safe?.address : '' : "0x0000000000000000000000000000000000000000",
