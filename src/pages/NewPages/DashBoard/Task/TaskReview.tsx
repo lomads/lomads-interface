@@ -197,7 +197,7 @@ const TaskReview = ({ task, close }: any) => {
                         recipientWalletAddress: taskSubmissions[0].member.wallet,
                         title: taskSubmissions[0].member.name + ' | ' + _get(task, 'name', 0),
                         labels: selectedTag.label,
-                        price: _get(task, 'compensation.amount', 0),
+                        price: _get(task, 'compensation.amount', 0) + _get(task, 'compensation.delta', 0),
                         tax: null,
                         total: null,
                     },

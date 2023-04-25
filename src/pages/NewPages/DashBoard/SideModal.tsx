@@ -198,7 +198,7 @@ const SideModal = (props: IsideModal) => {
 					paymentInfo: {
 						recipientWalletAddress: item.recipient,
 						title: item.reason,
-						labels: null,
+						labels: item.tag.label,
 						price: item.amount,
 						tax: null,
 						total: null,
