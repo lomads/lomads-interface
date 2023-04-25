@@ -325,7 +325,7 @@ body.active-modal {
     font-family: 'Inter', sans-serif;
     font-weight: 400;
     font-size: 14px;
-    line-height: 18px;
+    line-height: 16px;
     display: flex;
     align-items: center;
     color: #76808D;
@@ -403,7 +403,7 @@ body.active-modal {
 .dashboardTextBold {
     font-family: 'Inter', sans-serif;
     font-style: normal;
-    font-weight: 700;
+    font-weight: 800;
     font-size: 14px;
     line-height: 16px;
     display: flex;
@@ -623,16 +623,6 @@ body.active-modal {
     width: 12.5%;
 }
 
-.tag-pill {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 20px;
-    cursor: pointer;
-    height: 24px;
-    max-width:120px;
-}
-
 .add-label-btn{
     background: #FFF;
     border: 1px solid gray;
@@ -642,9 +632,6 @@ body.active-modal {
     border-radius: 20px;
     padding: 6px 10px;
     cursor: pointer;
-    width: 120px;
-    height: 24px;
-
 }
 
 .add-label-btn:hover{
@@ -964,7 +951,7 @@ body.active-modal {
     max-height: 70vh; */
     width: 100%;
     padding-bottom: 150px;
-    gap: 12px;
+    gap: 35px;
     /* overflow-y: auto; */
 }
 
@@ -985,8 +972,6 @@ body.active-modal {
     width: 75%;
     justify-content: space-between;
     margin: 0vh 0vh 0vh 0vh;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #F5F5F5;
 }
 
 #assignAmount {

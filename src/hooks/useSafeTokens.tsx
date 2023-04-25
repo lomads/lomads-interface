@@ -5,7 +5,6 @@ import axios from "axios";
 import { GNOSIS_SAFE_BASE_URLS } from 'constants/chains';
 import { CHAIN_INFO } from "constants/chainInfo";
 import axiosHttp from '../api'
-import { useWeb3React } from "@web3-react/core";
 
 export const SafeTokensContext = createContext<any>({
     safeTokens: null
@@ -16,16 +15,9 @@ export function useSafeTokens(): any {
 }
 
 export const SafeTokensProvider = ({ children }: any) => {
-    const { chainId: currentChainId } = useWeb3React()
-    const [chainId, setChainId] = useState(null)
     const dispatch = useAppDispatch()
     const { DAO } = useAppSelector(store => store?.dashboard)
     const [safeTokens, setSafeTokens] = useState<any>(null);
-
-    useEffect(() => {
-        if(DAO && DAO?.url) 
-            setChainId(_get(DAO, 'safe.chainId', _get(DAO, 'chainId')))
-    }, [DAO?.url])
 
     const tokenBalance = useCallback((token: any) => {
         if(safeTokens && safeTokens.length > 0) {
@@ -38,9 +30,8 @@ export const SafeTokensProvider = ({ children }: any) => {
     }, [safeTokens])
 
     const setTokens = async () => {
-        if(!chainId) return;
         setSafeTokens(null)
-        axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${DAO?.safe?.address}/balances/usd/`, {withCredentials: false })
+        axios.get(`${GNOSIS_SAFE_BASE_URLS[DAO?.chainId]}/api/v1/safes/${DAO?.safe?.address}/balances/usd/`, {withCredentials: false })
             .then((res: any) => {
                 let tokens = res.data.map((t: any) => {
                     let tkn = t
@@ -49,9 +40,9 @@ export const SafeTokensProvider = ({ children }: any) => {
                             ...t,
                             tokenAddress: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
                             token: {
-                                symbol: CHAIN_INFO[chainId].nativeCurrency.symbol,
-                                decimal:  CHAIN_INFO[chainId].nativeCurrency.decimals,
-                                decimals:  CHAIN_INFO[chainId].nativeCurrency.decimals,
+                                symbol: CHAIN_INFO[DAO?.chainId].nativeCurrency.symbol,
+                                decimal:  CHAIN_INFO[DAO?.chainId].nativeCurrency.decimals,
+                                decimals:  CHAIN_INFO[DAO?.chainId].nativeCurrency.decimals,
                             }
                         }
                     }
@@ -68,10 +59,10 @@ export const SafeTokensProvider = ({ children }: any) => {
     }
 
     useEffect(() => {
-        if(chainId) {
+        if(DAO?.url) {
             setTokens()
         }
-    }, [chainId, currentChainId])
+    }, [DAO?.url])
 
     const contextProvider = {
         safeTokens,

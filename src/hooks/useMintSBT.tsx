@@ -10,8 +10,6 @@ import { USDC_GOERLI, USDC_POLYGON } from 'constants/tokens'
 import { useCallback, useEffect, useState } from 'react';
 import { useAppSelector } from 'state/hooks';
 import { INFURA_NETWORK_URLS } from 'constants/infura';
-import { CHAIN_INFO } from 'constants/chainInfo';
-import { getRpcUrls } from 'utils/switchChain';
 
 export type SBTParams = {
     name: string,
@@ -23,12 +21,12 @@ export type SBTParams = {
 
 const useMintSBT = (contractAddress: string | undefined, version: string | undefined = "0") => {
   console.log("useMintSBT", contractAddress, version)
-    const { account, provider: currentProvider, chainId: currentChainId, provider } = useWeb3React();
+    const { account, chainId: currentChainId, provider } = useWeb3React();
     const { DAO } = useAppSelector(store => store.dashboard)
     const [chainId, setChainId] = useState(null)
     useEffect(() => {
       if(DAO)
-        setChainId(_get(DAO, 'sbt.chainId', _get(DAO, 'chainId')))
+        setChainId(_get(DAO, 'chainId'))
     }, [DAO])
     const mintContract = useContract(contractAddress, 
         version === "1" ?  require('abis/SBT.json') : require('abis/SBTv0.json')
@@ -37,24 +35,23 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
     const weth = (price: string, token: string): any => {
       if(!chainId) return;
       const tokens = [
-        {
-          label: CHAIN_INFO[chainId]?.nativeCurrency?.symbol,
-          value: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
-          decimals: CHAIN_INFO[chainId]?.nativeCurrency?.decimals
-        },
-        {
-            label: _get(USDC, `[${chainId}].symbol`),
-            value: _get(USDC, `[${chainId}].address`),
-            decimals: _get(USDC, `[${chainId}].decimals`),
-        }
+          {
+              label: 'ETH',
+              value: "0x0000000000000000000000000000000000000000",
+              decimals: 18
+          },
+          {
+              label: _get(USDC, `[${chainId}].symbol`),
+              value: _get(USDC, `[${chainId}].address`),
+              decimals: _get(USDC, `[${chainId}].decimals`),
+          }
       ]
       const payToken = _find(tokens, (t:any) => t.value === token)
       return ethers.utils.parseUnits(price, payToken?.decimals)
   }
 
-    const getStats = useCallback(async (overrideChainId: number | undefined = undefined) => {
+    const getStats = useCallback(async () => {
         if(account && chainId) {
-          let currChainId: number | null = overrideChainId ? overrideChainId : chainId;
           const calls: any = [
             {
               target: contractAddress,
@@ -94,14 +91,13 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
             ]),
             
           ]
-          const rpcUrl = getRpcUrls(currChainId)
-          let provider = new ethers.providers.JsonRpcProvider(rpcUrl[0])
+          const provider = new ethers.providers.JsonRpcProvider(INFURA_NETWORK_URLS[chainId])
           const multicall = new MultiCall(provider);
           const [, res] = await multicall.multiCall(
               version === "1" ? require('abis/SBT.json') : require('abis/SBTv0.json'),
               calls
           );
-          console.log("currChainId", res)
+          console.log("useMintSBT-calls", res)
           return res
         }
         return [null, null, null, null]

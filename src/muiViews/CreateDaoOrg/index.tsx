@@ -48,7 +48,6 @@ const useStyles = makeStyles((theme: any) => ({
 		fontSize: 14,
 		letterSpacing: '-0.011em',
 		color: '#76808d',
-		opacity: 0.5,
 		marginLeft: 13,
 	},
 	headerText: {
@@ -56,7 +55,6 @@ const useStyles = makeStyles((theme: any) => ({
 		fontStyle: 'normal',
 		fontWeight: 400,
 		fontSize: 35,
-		paddingTop: 159,
 		paddingBottom: 35,
 		textAlign: 'center',
 		color: '#C94B32'
@@ -68,7 +66,7 @@ const useStyles = makeStyles((theme: any) => ({
 		fontSize: 16,
 		letterSpacing: '-0.011em',
 		color: '#76808D',
-		margin: '20px 0px 10px 0px'
+		margin: '15px 0px 15px 0px'
 	},
 	createName: {
 		margin: '25px 0px 15px 0px'
@@ -96,7 +94,7 @@ const useStyles = makeStyles((theme: any) => ({
 		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
 		borderRadius: 5,
 		width: 394,
-		padding: '10px 22px 22px 22px',
+		padding: 22,
 		minHeight: 'fit-content'
 	},
 	imagePickerWrapperText: {
@@ -121,6 +119,7 @@ const useStyles = makeStyles((theme: any) => ({
 		justifyContent: 'center',
 		background: '#F5F5F5',
 		boxShadow: 'inset 1px 0px 4px rgba(27, 43, 65, 0.1)',
+		margin: '1rem 0',
 		cursor: 'pointer',
 		position: 'relative',
 	},
@@ -297,17 +296,13 @@ export default () => {
 							</Box>
 							<Box>
 								<Box style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-									<Box 
-										className={classes.inputFieldTitle}
-										style={{ marginRight: '16px' }}>
-												Organisation address
-									</Box>
+									<Box className={classes.inputFieldTitle} style={{ marginRight: '16px' }}>Organisation address</Box>
 									{urlCheckLoading && <LeapFrog size={20} color="#C94B32" />}
 								</Box>
 								<TextInput
 									sx={{
 										width: 350,
-										height: 50,
+										height: 50
 									}}
 									fullWidth
 									disabled

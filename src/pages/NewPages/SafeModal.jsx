@@ -25,7 +25,6 @@ import useSafeTransaction from "hooks/useSafeTransaction";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
 import SwitchChain from "components/SwitchChain";
 import { toast } from "react-hot-toast";
-import Avatar from "muiComponents/Avatar";
 
 const SafeModal = ({ toggleS }) => {
 	const { provider, account, chainId: currentChainId } = useWeb3React();
@@ -42,14 +41,14 @@ const SafeModal = ({ toggleS }) => {
 
 	useEffect(() => {
         if(DAO) 
-            setChainId(_get(DAO, 'safe.chainId', _get(DAO, 'chainId')))
+            setChainId(_get(DAO, 'chainId', null))
     }, [DAO])
 
 	const { updateOwnersWithThreshold, updateOwnerLoading } = useSafeTransaction(_get(DAO, 'safe.address', ''))
 
 	const handleUpdateOwnersWithThreshold = async (obj) => {
-		if(currentChainId !== chainId) {
-            return toast.custom(t => <SwitchChain t={t} nextChainId={chainId}/>)
+		if(currentChainId !== _get(DAO, 'chainId', '')) {
+            return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
         }
 		 await updateOwnersWithThreshold(obj)
 		 toggleS()
@@ -113,7 +112,8 @@ const SafeModal = ({ toggleS }) => {
 								newOwners.map(owner => {
 									return (
 										<div className="safe-modal owner-item">
-											<Avatar name={owner.name} wallet={owner.wallet}/>
+											<img src={bitMemberIcon} />
+											<div>{owner.name}</div>
 										</div>
 									)
 								})
@@ -129,7 +129,8 @@ const SafeModal = ({ toggleS }) => {
 								removeOwners.map(owner => {
 									return (
 										<div className="safe-modal owner-item">
-											<Avatar name={owner.name} wallet={owner.wallet}/>
+											<img src={bitMemberIcon} />
+											<div>{owner.name}</div>
 										</div>
 									)
 								})
@@ -182,13 +183,13 @@ const SafeModal = ({ toggleS }) => {
           </div> */}
 					{
 						members.map(member => {
-							
 							return (
 								<div className="list-item">
-									<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-										<Avatar name={member.name} wallet={member.wallet}/>
+									<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '30%' }}>
+										<img style={{ width: 30, height: 30 }} src={bitMemberIcon} />
+										<div className="name">{_get(member, 'name', '')}</div>
 									</div>
-									{/* <div className="wallet">{beautifyHexToken(_get(member, 'wallet', ''))}</div> */}
+									<div className="wallet">{beautifyHexToken(_get(member, 'wallet', ''))}</div>
 									<Checkbox onChange={status => {
 										setMembers(prev => prev.map(p => {
 											if (member._id === p._id)
@@ -300,9 +301,8 @@ const SafeModal = ({ toggleS }) => {
 													_get(DAO, 'safe.owners', []).map(owner => {
 														return (
 															<div className="safe-modal owner-item">
-																<Avatar name={owner.name} wallet={owner.wallet}/>
-																{/* <img src={bitMemberIcon} />
-																<div>{owner.name}</div> */}
+																<img src={bitMemberIcon} />
+																<div>{owner.name}</div>
 															</div>
 														)
 													})

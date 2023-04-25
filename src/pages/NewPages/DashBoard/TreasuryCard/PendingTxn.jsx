@@ -3,7 +3,6 @@ import { get as _get, find as _find, debounce as _debounce } from 'lodash'
 import { useWeb3React } from "@web3-react/core";
 import SimpleInputField from "UIpack/SimpleInputField";
 import sendTokenOutline from "../../../../assets/svg/sendTokenOutline.svg";
-import { beautifyHexToken } from '../../../../utils';
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import IconButton from "UIpack/IconButton";
 import SimpleLoadButton from "UIpack/SimpleLoadButton";
@@ -19,7 +18,7 @@ import Dropdown from "muiComponents/Dropdown";
 import Avatar from "muiComponents/Avatar";
 import {useSafeTokens} from "hooks/useSafeTokens";
 import { CHAIN_INFO } from "constants/chainInfo";
-
+import { editInvoice } from 'state/dashboard/actions'
 import {Popover} from '@mui/material';
 
 const ToolTopContainer = React.forwardRef(({ children, ...rest }, ref) => (
@@ -120,6 +119,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                         })
                     }
                 })
+                dispatch(editInvoice({ daoUrl: _get(DAO, 'url', undefined), payload: { safeAddress, reasonText, safeTxHash, recipient, label: null } }));
         }
     }
 
@@ -130,6 +130,7 @@ const PendingTxn = ({editMode, onSetEditMode,  safeAddress, labels, executeFirst
                     onLoadLabels(res.data);
                     setAnchorEl(null);
                 })
+                dispatch(editInvoice({ daoUrl: _get(DAO, 'url', undefined), payload: { safeAddress, reasonText: null, safeTxHash, recipient, label: tagText.label } }));
         }
     }
 

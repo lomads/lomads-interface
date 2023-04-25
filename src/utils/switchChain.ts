@@ -13,7 +13,7 @@ import { INFURA_NETWORK_URLS } from 'constants/infura'
 import { updateSelectedWallet } from 'state/user/reducer'
 
 
-export function getRpcUrls(chainId: SupportedChainId): [string] {
+function getRpcUrls(chainId: SupportedChainId): [string] {
   switch (chainId) {
     case SupportedChainId.MAINNET:
     case SupportedChainId.RINKEBY:
@@ -54,7 +54,6 @@ export function isChainAllowed(connector: Connector, chainId: number) {
 }
 
 export const switchChain = async (connector: Connector, chainId: number) => {
-  console.log(chainId, typeof chainId)
   if (!isChainAllowed(connector, chainId)) {
     throw new Error(`Chain ${chainId} not supported for connector (${typeof connector})`)
   } else if (connector === walletConnectConnection.connector || connector === networkConnection.connector) {

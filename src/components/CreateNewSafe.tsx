@@ -80,7 +80,7 @@ const CreateNewSafe = () => {
       terrors.owner = " * onwer name is required.";
     }
     if (!safeName) {
-      terrors.safename = " * Multi-sig Wallet Name is required.";
+      terrors.safename = " * Safe Name is required.";
     }
     if (Threshold <= 0 || Threshold > 3) {
       terrors.threshold =
@@ -140,7 +140,7 @@ const CreateNewSafe = () => {
         {/* safe name */}
         <div>
           <div>
-            <div className={"fieldDesc"}>Multi-sig Wallet Name</div>
+            <div className={"fieldDesc"}>Safe Name</div>
           </div>
           <SimpleInputField
             isInvalid={errors.safename}
@@ -295,8 +295,8 @@ const CreateNewSafe = () => {
       </div>
       {holder ? (
         <div>
-          <div className={"fieldDesc"}>{`Multi-sig Wallet Name: ${safeName}`}</div>
-          <div className={"fieldDesc"}>{`Multi-sig Wallet Address: ${holder}`}</div>
+          <div className={"fieldDesc"}>{`Safe Name: ${safeName}`}</div>
+          <div className={"fieldDesc"}>{`Safe Address: ${holder}`}</div>
           <div className={"fieldDesc"}>{`${owner1name}: ${owner1}`}</div>
           <div className={"fieldDesc"}>{`${owner2name}: ${owner2}`}</div>
           <div className={"fieldDesc"}>{`${owner3name}: ${owner3}`}</div>

@@ -188,16 +188,16 @@ const MyProject = ({ isHelpIconOpen }) => {
                             })
                         }
                         {
-                             _get(DAO,'dummyProjectFlag',false) && <div
-                             className='create-new-project'
-                             onClick={() => {
-                                 navigate("/createProject");
-                             }}
-                         >
-                             <span>CREATE A WORKSPACE</span>
-                             <BsArrowRight color='rgba(118, 128, 141, 0.5)' size={20}/>
-                         </div>
-                            
+                            !showCreateProject || myProjects.length < 2 &&
+                            <div
+                                className='create-new-project'
+                                onClick={() => {
+                                    navigate("/createProject");
+                                }}
+                            >
+                                <span>CREATE A WORKSPACE</span>
+                                <BsArrowRight color='rgba(118, 128, 141, 0.5)' size={20}/>
+                            </div>
                         }
                     </div>
                     :

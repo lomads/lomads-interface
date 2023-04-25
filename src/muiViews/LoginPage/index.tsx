@@ -187,7 +187,7 @@ export default () => {
                 <Box mb={0} mt={3}>
                     <img src={LOMADS_LOGO} />
                 </Box>
-                <Typography mt={16} variant="subtitle1">Hello there !</Typography>
+                <Typography my={2} variant="subtitle1">Hello there !</Typography>
                 <Typography mt={2} mb={4} color="primary" variant="h2">Connect Your Wallet</Typography>
                 <Button onClick={() => nextLogin(injectedConnection.connector)} className={classes.metamaskButton} variant='contained' color='secondary'>
                     <img src={METAMASK} />

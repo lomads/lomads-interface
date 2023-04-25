@@ -31,8 +31,7 @@ import { useAppSelector, useAppDispatch } from "state/hooks";
 import { useWeb3React } from "@web3-react/core";
 import axiosHttp from 'api'
 import { setDAO, setTask } from "state/dashboard/reducer";
-
-import { approveTask, rejectTask } from 'state/dashboard/actions'
+import { approveTask, rejectTask, generateInvoice } from 'state/dashboard/actions'
 import { resetAssignTaskLoader, resetRejectTaskMemberLoader, resetRejectTaskLoader } from 'state/dashboard/reducer';
 import { id } from 'ethers/lib/utils';
 import moment from 'moment';
@@ -172,14 +171,44 @@ const TaskReview = ({ task, close }: any) => {
             setApproveLoading(true);
             setError(null)
             let onChainSafeTxHash: any = undefined;
+            console.log(task, '...task..')
+            console.log(taskSubmissions, '...taskSubmissions..')
             if (isSafeOwner && _get(task, 'compensation.currency', 'SWEAT') !== 'SWEAT') {
                 if(currentChainId !== chainId) {
                     setApproveLoading(false);
                     return toast.custom(t => <SwitchChain t={t} nextChainId={chainId}/>)
                 }
                 onChainSafeTxHash = await createOnChainTxn();
+                const invoiceArrayPayload = [{
+                    flag: 'APPROVE_TASK',
+                    generalInfo: {
+                        paymentToken: _get(task, 'compensation.currency', 'SWEAT'),
+                        chain: currentChainId,
+                        safeAddress: _get(DAO, 'safe.address', undefined),
+                        transactionId: onChainSafeTxHash
+                    },
+                    buyerInfo: {
+                        name: _get(DAO, 'name', undefined),
+                        address: null,
+                        email: null,
+                        id: _get(DAO, '_id', undefined)
+                    },
+                    paymentInfo: {
+                        recipientWalletAddress: taskSubmissions[0].member.wallet,
+                        title: taskSubmissions[0].member.name + ' | ' + _get(task, 'name', 0),
+                        labels: selectedTag.label,
+                        price: _get(task, 'compensation.amount', 0) + _get(task, 'compensation.delta', 0),
+                        tax: null,
+                        total: null,
+                    },
+                    sellerInfo: {
+                        name: taskSubmissions[0].member.name,
+                        email: null
+                    }
+                }];
+                dispatch(generateInvoice({ daoUrl: _get(DAO, 'url', undefined), payload: invoiceArrayPayload }));
             }
-    
+
             const offChainPayload = {
                 daoId: _get(DAO, '_id', undefined),
                 taskId: _get(task, '_id', undefined),
@@ -212,7 +241,7 @@ const TaskReview = ({ task, close }: any) => {
                 onChainSafeTxHash,
                 recipient: _get(activeSubmission, 'member._id', null)
             }
-    
+
             return axiosHttp.post(`task/${task._id}/approve?daoUrl=${DAO.url}`, payload)
                 .then(async res => {
                     let m = _get(activeSubmission, 'member.name', '') === '' ? _get(activeSubmission, 'member.wallet', '') : _get(activeSubmission, 'member.name', '')
@@ -301,7 +330,6 @@ const TaskReview = ({ task, close }: any) => {
     }
 
     const renderSingleSubmission = (submission: any) => {
-        console.log("submission : ", submission);
         if (!submission) return null;
         return (
             <div className='task-review-card'>
@@ -321,7 +349,7 @@ const TaskReview = ({ task, close }: any) => {
                         <span>Note</span>
                         <div className='note'>{submission.submission.note}</div>
                     </div>
-                    
+
                 </div>
                 <div style={{width:'100%',display:'flex',flexDirection:'column'}}>
                     <div className='detail-container'>
@@ -360,8 +388,8 @@ const TaskReview = ({ task, close }: any) => {
                                 </button>
                             </div>
                             <div style={{width:'100%'}}>
-                                <Dropdown 
-                                    defaultMenuIsOpen={false} 
+                                <Dropdown
+                                    defaultMenuIsOpen={false}
                                     onChangeOption={(value:any) => setSelectedTag(value)}
                                     menuPlacement={'top'}
                                 />

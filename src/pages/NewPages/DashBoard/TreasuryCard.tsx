@@ -118,7 +118,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 
 	useEffect(() => {
 		if(DAO?.chainId) {
-			setChainId(_get(DAO, 'safe.chainId', _get(DAO, 'chainId')))
+			setChainId(DAO?.chainId)
 		}
 	}, [DAO])
 
@@ -405,8 +405,8 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				.catch(e => console.log(e))
 				.finally(() => setConfirmTxLoading(null))
 		} else if (txn.offChain && _get(txn, 'token.symbol') !== 'SWEAT') {
-			if(currentChainId !== chainId) {
-				return toast.custom(t => <SwitchChain t={t} nextChainId={chainId} />)
+			if(currentChainId !== _get(DAO, 'chainId', '')) {
+				return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')} />)
 			}
 			try {
 				await createOnChainTxn(txn, 'confirm')
@@ -416,8 +416,8 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				console.log(e)
 			}
 		} else {
-			if(currentChainId !== chainId) {
-				return toast.custom(t => <SwitchChain t={t} nextChainId={chainId} />)
+			if(currentChainId !== _get(DAO, 'chainId', '')) {
+				return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')} />)
 			}
 			try {
 				setConfirmTxLoading(_safeTxHashs);
@@ -493,8 +493,8 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				.catch(e => console.log(e))
 				.finally(() => setRejectTxLoading(null))
 		} else {
-			if(currentChainId !== chainId) {
-				return toast.custom(t => <SwitchChain t={t} nextChainId={chainId} />)
+			if(currentChainId !== _get(DAO, 'chainId', '')) {
+				return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')} />)
 			}
 			try {
 				setRejectTxLoading(_nonce);
@@ -591,8 +591,8 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 				.catch(e => console.log(e))
 				.finally(() => setExecuteTxLoading(null))
 		} else {
-			if(currentChainId !== chainId) {
-				return toast.custom(t => <SwitchChain t={t} nextChainId={chainId}/>)
+			if(currentChainId !== _get(DAO, 'chainId', '')) {
+				return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
 			}
 			const st = await getSafeTokens();
 			let safeToken = _find(st, t => toChecksumAddress(t.tokenAddress) === toChecksumAddress(_get(txn, 'dataDecoded.parameters[0].valueDecoded[0].to', _get(txn, 'to', ''))))
@@ -795,8 +795,8 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 						}
 					</div> */}
 					{owner && tab === 1 && <SafeButton onClick={() => {
-						if(currentChainId !== chainId) {
-							return toast.custom(t => <SwitchChain t={t} nextChainId={chainId} />)
+						if(currentChainId !== _get(DAO, 'chainId', '')) {
+							return toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')} />)
 						}
 						props.toggleModal()
 					}} height={40} width={150} titleColor="#B12F15" title="SEND TOKEN" bgColor={!hasValidToken ? "#f0f2f6" : "#FFFFFF"} opacity={!hasValidToken ? "0.4" : "1"} disabled={!hasValidToken} fontweight={400} fontsize={16} />}
@@ -867,8 +867,8 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 					</div>
 					<div className="treasuryTokens-right">
 						<button className="recurring-btn" onClick={() => {
-							if(currentChainId !== chainId) {
-								toast.custom(t => <SwitchChain t={t} nextChainId={chainId}/>)
+							if(currentChainId !== _get(DAO, 'chainId', '')) {
+								toast.custom(t => <SwitchChain t={t} nextChainId={_get(DAO, 'chainId', '')}/>)
 							} else {
 								props.toggleShowCreateRecurring()
 							}
@@ -898,7 +898,7 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 									</div>
 									{
 										recurringTreasuryData.map((rtx :any) => 
-											<RecurringTxnTreasury chainId={+chainId} onExecute={async (data: any) => {
+											<RecurringTxnTreasury chainId={+_get(DAO, 'chainId', 5)} onExecute={async (data: any) => {
 												await loadTxnLabel()
 												dispatch(setRecurringPayments(data))
 											}} transaction={rtx}/>
@@ -906,12 +906,12 @@ const TreasuryCard = (props: ItreasuryCardType) => {
 									}
 									{
 										pendingTxn.map((ptx, index) =>
-											<PendingTxn chainId={+chainId} editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} executeFirst={executeFirst} isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
+											<PendingTxn chainId={+_get(DAO, 'chainId', 5)} editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} executeFirst={executeFirst} isAdmin={amIAdmin} owner={owner} threshold={threshold} executeTransactions={handleExecuteTransactions} confirmTransaction={handleConfirmTransaction} rejectTransaction={handleRejectTransaction} tokens={props.tokens} transaction={ptx} confirmTxLoading={confirmTxLoading} rejectTxLoading={rejectTxLoading} executeTxLoading={executeTxLoading} />
 										)
 									}
 									{
 										executedTxn.map((ptx, index) =>
-											<CompleteTxn chainId={+chainId} editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} isAdmin={amIAdmin} owner={owner} transaction={ptx} tokens={props.tokens} />
+											<CompleteTxn chainId={+_get(DAO, 'chainId', 5)} editMode={editMode} onSetEditMode={setEditMode} onLoadLabels={(l: any) => setLabels(l)} safeAddress={_get(DAO, 'safe.address', '')} labels={labels} isAdmin={amIAdmin} owner={owner} transaction={ptx} tokens={props.tokens} />
 										)
 									}
 								</div>

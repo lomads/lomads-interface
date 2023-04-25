@@ -536,6 +536,30 @@ export const updateMilestone = createAsyncThunk(
 	}
 );
 
+export const generateInvoice = createAsyncThunk(
+	'dao/generateInvoice',
+	async (params: any, thunkApi) => {
+		return axiosHttp.post(`dao/${params.daoUrl}/add-invoice`, params.payload)
+			.then(res => res.data)
+			.catch(e => {
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
+	}
+);
+
+export const editInvoice = createAsyncThunk(
+	'dao/editInvoice',
+	async (params: any, thunkApi) => {
+		return axiosHttp.post(`dao/${params.daoUrl}/edit-invoice`, params.payload)
+			.then(res => res.data)
+			.catch(e => {
+				toast.error(e.response.data.message);
+				return thunkApi.rejectWithValue(e)
+			})
+	}
+);
+
 export const editProjectMilestone = createAsyncThunk(
 	'dao/editProjectMilestone',
 	async (params: any, thunkApi) => {

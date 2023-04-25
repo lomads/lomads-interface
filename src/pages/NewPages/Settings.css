@@ -522,12 +522,20 @@
 
 #cm-info {
     width: 400px;
+    height: 18px;
+
+    /* Note */
     font-family: 'Inter', sans-serif;
+    /* font-style: italic; */
     font-weight: 400;
     font-size: 14px;
     line-height: 18px;
+    /* identical to box height, or 129% */
+    /* text-align: center; */
+    letter-spacing: -0.011em;
+    margin-top: 35px;
+    /* Grey */
     color: #76808D;
-    margin-bottom: 16px;
 }
 
 #title-type {
@@ -670,7 +678,8 @@
     font-weight: 400;
     background: #C94B32;
     border-radius: 5px;
-    /* margin: 35px 0; */
+
+
 }
 
 .button-section {
@@ -706,13 +715,14 @@
 
 #xp-text {
     font-family: 'Inter', sans-serif;
-    width: 355px;
+    width: 400px;
+    height: 112px;
 
     /* corps */
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
-    line-height: 20px;
+    line-height: 16px;
     /* or 114% */
     text-align: center;
 
@@ -724,10 +734,6 @@
     /* flex: none;
     order: 2;
     flex-grow: 0; */
-}
-
-#xp-text span{
-    font-weight: 800;
 }
 
 #paragraph-type {

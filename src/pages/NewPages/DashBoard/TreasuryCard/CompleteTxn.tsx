@@ -195,7 +195,7 @@ const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress
             <div className="transactionRow">
                 <div className="coinText">
                     <img src={isCredit ? receiveToken : sendToken} alt="" />
-                    <div className="dashboardTextBold" >
+                    <div className="dashboardTextBold" style={{fontSize:'12px'}}>
                         {ownerModification ? `-` : `${(mulAmount / 10 ** muldecimal).toFixed(3)} ${token}`}
                     </div>
                 </div>
@@ -246,10 +246,8 @@ const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress
                             <div 
                                 aria-describedby={id}
                                 onClick={(e) => handleEnableEditTag(e,mulRecipient)} 
-                                className="tag-pill" 
-                                style={{background:`${mulTag.color}20`}}
-                            >
-                                <span style={{color:mulTag.color,fontWeight:'700',fontSize:'10px'}}>{mulTag.value.length > 15 ? mulTag.value.substring(0,15) + '...' : mulTag.value}</span>
+                                className="dashboardText" style={{background:`${mulTag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer'}}>
+                                <span style={{color:mulTag.color,fontWeight:'700',fontSize:'10px'}}>{mulTag.value}</span>
                             </div>
                             <Popover
                                 id={id}
@@ -327,7 +325,7 @@ const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress
                 <div className="transactionRow">
                     <div className="coinText">
                         <img src={isCredit ? receiveToken : sendToken} alt="" />
-                        <div className="dashboardTextBold">
+                        <div className="dashboardTextBold" style={{fontSize:'12px'}}>
                             {isOwnerModificaitonTransaction ? `-` : `${parseFloat(`${amount}`).toFixed(3)} ${tokenSymbol ? tokenSymbol : symbol}`}
                         </div>
                     </div>
@@ -376,10 +374,8 @@ const CompleteTxn = ({ chainId, labels, transaction, owner, isAdmin, safeAddress
                                     <div 
                                         aria-describedby={id}
                                         onClick={(e) => handleEnableEditTag(e,recipient)} 
-                                        className="tag-pill" 
-                                        style={{background:`${tag.color}20`}}
-                                    >
-                                        <span style={{color:tag.color,fontWeight:'700',fontSize:'10px'}}>{tag.value.length > 15 ? tag.value.substring(0,15) + '...' : tag.value}</span>
+                                        className="dashboardText" style={{background:`${tag.color}20`,padding:'6px 10px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'20px',cursor:'pointer'}}>
+                                        <span style={{color:tag.color,fontWeight:'700',fontSize:'10px'}}>{tag.value}</span>
                                     </div>
                                     <Popover
                                         id={id}

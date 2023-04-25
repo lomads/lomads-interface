@@ -4,8 +4,12 @@ import { useWeb3React } from "@web3-react/core";
 import { useContract } from "hooks/useContract";
 import { ethers } from "ethers";
 import { USDC } from 'constants/tokens';
+
+import {
+    SBT_DEPLOYER_ADDRESSES
+  } from 'constants/addresses'
 import { useState } from "react";
-import { CHAIN_INFO } from 'constants/chainInfo';
+import { SupportedChainId } from 'constants/chains';
 
 export type SBTParams = {
     name: string,
@@ -13,14 +17,13 @@ export type SBTParams = {
     mintToken: string,
     treasury: string,
     mintPrice: string,
-    whitelisted: number,
-    chainId: number
+    whitelisted: number
 }
 
 
-const useContractDeployer = (deployerAddress: any) => {
-    const { account, provider } = useWeb3React();
-    const deployerContract = useContract(deployerAddress, require('abis/SBTDeployer.json'), true)
+const useContractDeployer = (abi: any) => {
+    const { account, provider, chainId } = useWeb3React();
+    const deployerContract = useContract(SBT_DEPLOYER_ADDRESSES, abi, true)
     const [deployLoading, setDeployLoading] = useState(false)
 
     const waitFor = (milliseconds: number) => new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -51,12 +54,12 @@ const useContractDeployer = (deployerAddress: any) => {
         return deployerContract?.getContractByIndex(BigNumber.from(parseInt(id.toString())));
     }
 
-    const weth = (price: string, token: string, chainId: number): any => {
+    const weth = (price: string, token: string): any => {
         const tokens = [
             {
-                label: CHAIN_INFO[chainId]?.nativeCurrency?.symbol,
-                value: process.env.REACT_APP_NATIVE_TOKEN_ADDRESS,
-                decimals: CHAIN_INFO[chainId]?.nativeCurrency?.decimals
+                label: 'ETH',
+                value: "0x0000000000000000000000000000000000000000",
+                decimals: 18
             },
             {
                 label: _get(USDC, `[${chainId}].symbol`),
@@ -68,7 +71,7 @@ const useContractDeployer = (deployerAddress: any) => {
         return ethers.utils.parseUnits(price, payToken?.decimals)
     }
 
-    const deploy = async ({ name, symbol, mintToken, treasury, mintPrice, whitelisted, chainId }: SBTParams) => {
+    const deploy = async ({ name, symbol, mintToken, treasury, mintPrice, whitelisted }: SBTParams) => {
         setDeployLoading(true);
         try {
             if(chainId && account && deployerContract?.signer) {
@@ -76,7 +79,7 @@ const useContractDeployer = (deployerAddress: any) => {
                 const tx = await deployerContract?.deployNewSBT(
                     name, 
                     symbol, 
-                    weth(mintPrice, mintToken, chainId),
+                    weth(mintPrice, mintToken),
                     mintToken,
                     treasury,
                     whitelisted ? 1 : 0

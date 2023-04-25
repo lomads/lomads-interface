@@ -19,7 +19,7 @@ const StartSafe = () => {
 				<div className="buttonArea">
 					<div>
 						<SafeButton
-							title="CREATE"
+							title="CREATE NEW SAFE"
 							titleColor="#C94B32"
 							bgColor="#FFFFFF"
 							height={55}
@@ -33,7 +33,7 @@ const StartSafe = () => {
 					<div className="centerText">or</div>
 					<div>
 						<SafeButton
-							title="ADD EXISTING"
+							title="ADD EXISTING SAFE"
 							titleColor="#C94B32"
 							bgColor="#FFFFFF"
 							height={55}

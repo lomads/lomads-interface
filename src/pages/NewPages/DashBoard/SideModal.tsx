@@ -22,7 +22,7 @@ import IconButton from "UIpack/IconButton";
 import { SafeTransactionOptionalProps } from "@gnosis.pm/safe-core-sdk/dist/src/utils/transactions/types";
 import ethers from "ethers";
 import axios from "axios";
-import { getDao } from "state/dashboard/actions";
+import { getDao, generateInvoice } from "state/dashboard/actions";
 import { updateTotalMembers } from "state/flow/reducer";
 import axiosHttp from '../../../api'
 import { CHAIN_IDS_TO_NAMES, SupportedChainId } from "constants/chains";
@@ -118,7 +118,7 @@ const SideModal = (props: IsideModal) => {
 					}]
 				}
 			}
-		} 
+		}
 		else {
 			payload = {
 				daoId: _get(DAO, '_id', undefined),
@@ -154,7 +154,7 @@ const SideModal = (props: IsideModal) => {
 						safeTxHash: res.data.safeTxHash,
 						recipient: r.recipient,
 						label: _get(r, 'reason', null),
-						tag:_get(r, 'tag', null)
+						tag: _get(r, 'tag', null)
 					})
 				})
 				axiosHttp.post(`transaction/label`, payload)
@@ -173,18 +173,46 @@ const SideModal = (props: IsideModal) => {
 		if (selectedToken === 'SWEAT') {
 			return createOffChainTxn()
 		}
-		try {
 
-			const txnResponse = await createSafeTransaction({ tokenAddress: selectedToken, send: setRecipient.current});
+		try {
+			const txnResponse = await createSafeTransaction({ tokenAddress: selectedToken, send: setRecipient.current });
 			if (txnResponse?.safeTxHash) {
 				dispatch(getDao(DAO.url))
 				await props.getPendingTransactions();
 				showNavigation(false, true, false);
 				setisLoading(false);
+				const invoiceArrayPayload = setRecipient?.current?.map((item) => ({
+					flag: 'SEND_TOKENS',
+					generalInfo: {
+						paymentToken: selectedToken,
+						chain: chainId,
+						safeAddress: _get(DAO, 'safe.address', undefined),
+						transactionId: txnResponse.safeTxHash,
+					},
+					buyerInfo: {
+						name: _get(DAO, 'name', undefined),
+						address: null,
+						email: null,
+						id: _get(DAO, '_id', undefined)
+					},
+					paymentInfo: {
+						recipientWalletAddress: item.recipient,
+						title: item.reason,
+						labels: item.tag.label,
+						price: item.amount,
+						tax: null,
+						total: null,
+					},
+					sellerInfo: {
+						name: item.name,
+						email: ""
+					}
+				}));
+				dispatch(generateInvoice({ daoUrl: _get(DAO, 'url', undefined), payload: invoiceArrayPayload }));
 			}
 		} catch (e) {
 			console.log(e)
-			if(typeof e === 'string')
+			if (typeof e === 'string')
 				setError(e)
 			else
 				setError(_get(e, 'message', 'Something went wrong'))

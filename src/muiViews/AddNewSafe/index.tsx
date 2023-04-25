@@ -16,7 +16,6 @@ import useEns from 'hooks/useEns';
 import useTerminology from "hooks/useTerminology";
 import { useAppSelector } from "state/hooks";
 import { useAppDispatch } from "state/hooks";
-import { toast } from 'react-hot-toast';
 import {
 	updateOwners,
 	updateSafeAddress,
@@ -39,20 +38,15 @@ import { loadDao } from '../../state/dashboard/actions';
 import { Box, Typography, Container, Grid } from "@mui/material"
 import { makeStyles } from '@mui/styles';
 import MuiSelect from '../../muiComponents/Select'
-import SwitchChain from 'components/SwitchChain';
 import axios from "axios";
-import Avatar from "muiComponents/Avatar";
-import { margin } from "polished";
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {
-		minHeight: "100vh",
-		maxHeight: 'fit-content',
+		minHeight: '100vh',
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'center',
-		justifyContent: 'center',
-		overflow: 'hidden !important'
+		justifyContent: 'center'
 	},
 	text: {
 		fontFamily: 'Inter, sans-serif',
@@ -68,19 +62,8 @@ const useStyles = makeStyles((theme: any) => ({
 		fontWeight: 700,
 		fontSize: 16,
 		letterSpacing: '-0.011em',
-		color: '#1B2B41',
-		opacity: 0.5
-	},
-	safeNameTitle: {
-		fontFamily: 'Inter, sans-serif',
-		fontStyle: 'normal',
-		fontWeight: 700,
-		fontSize: 16,
-		letterSpacing: '-0.011em',
-		color: '#1B2B41',
-		opacity: 0.5,
-		marginBottom: 6.71,
-		marginTop: 15
+		color: '#76808D',
+		margin: '15px 0px 15px 0px'
 	},
 	centerCard: {
 		display: 'flex',
@@ -93,7 +76,7 @@ const useStyles = makeStyles((theme: any) => ({
 		maxHeight: 'fit-content',
 		padding: 20,
 		margin: 35,
-		width: 385
+		width: 551
 	},
 	thresholdText: {
 		fontFamily: 'Inter, sans-serif',
@@ -101,7 +84,7 @@ const useStyles = makeStyles((theme: any) => ({
 		fontWeight: 400,
 		fontSize: 16,
 		letterSpacing: '-0.011em',
-		color: '#76808D',
+		color: '#76808D'
 	},
 	StartSafe: {
 		display: 'flex',
@@ -187,10 +170,9 @@ const useStyles = makeStyles((theme: any) => ({
 	headerText: {
 		fontFamily: 'Insignia',
 		fontStyle: 'normal',
-		fontWeight: '400',
-		fontSize: '35px',
-		lineHeight: '35px',
-		paddingBottom: '30px',
+		fontWeight: 400,
+		fontSize: 35,
+		paddingBottom: 30,
 		textAlign: 'center',
 		color: '#C94B32'
 	},
@@ -297,8 +279,8 @@ const useStyles = makeStyles((theme: any) => ({
 		backgroundColor: 'rgba(118, 128, 141, 0.09)',
 		boxShadow: 'inset 1px 0px 4px rgba(27, 43, 65, 0.1)',
 		borderRadius: '0px 0px 5px 5px',
-		width: 497,
-		maxHeight: 500,
+		width: '500px',
+		maxHeight: '500px',
 		overflow: 'hidden',
 		overflowY: 'auto'
 	},
@@ -510,11 +492,10 @@ export default () => {
 	const handleSafeName = () => {
 		let terrors: any = {};
 		if (!safeName) {
-			terrors.safeName = " * Multi-sig Wallet Name is required";
+			terrors.safeName = " * safe Name is required";
 		}
 		if (_.isEmpty(terrors)) {
 			setshowContinue(false);
-			//window.scrollTo(0, document.body.scrollHeight);
 		} else {
 			setErrors(terrors);
 		}
@@ -549,7 +530,6 @@ export default () => {
 				}
 			}),
 			safe: {
-				chainId: selectedChainId,
 				name: safeName,
 				address: addr,
 				owners: owners,
@@ -614,88 +594,77 @@ export default () => {
 	}
 
 	const deployNewSafe = async () => {
-		if(!chainId) return;
-		if(+selectedChainId !== +chainId) {
-            toast.custom(t => <SwitchChain t={t} nextChainId={+selectedChainId}/>)
-        } else {
-			try {
-				setisLoading(true);
-				dispatch(updateOwners(Myvalue.current));
-				const safeOwner = provider?.getSigner(0);
-		
-				const ethAdapter = new EthersAdapter({
-					ethers,
-					signer: safeOwner as any,
-				});
-				console.log(await ethAdapter.getChainId())
-				const safeFactory = await SafeFactory.create({
-					ethAdapter,
-				});
-				const owners: any = Myvalue.current.map((result) => {
-					return result.address;
-				});
-				console.log(owners);
-				const threshold: number = thresholdValue;
-				console.log(threshold);
-				const safeAccountConfig: SafeAccountConfig = {
-					owners,
-					threshold,
-				};
-		
-				let currentSafes: Array<string> = []
-				if (chainId === SupportedChainId.POLYGON)
-					currentSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
-		
-				console.log("currentSafes", currentSafes)
-		
-				await safeFactory
-					.deploySafe({ safeAccountConfig })
-					.then(async (tx) => {
-						dispatch(updateSafeAddress(tx.getAddress() as string));
-						const totalAddresses = [...invitedMembers, ...Myvalue.current];
-						const value = totalAddresses.reduce((final: any, current: any) => {
-							let object = final.find(
-								(item: any) => item.address === current.address
-							);
-							if (object) {
-								return final;
-							}
-							return final.concat([current]);
-						}, []);
-						dispatch(updateTotalMembers(value));
-						//setisLoading(false);
-						const payload: any = {
-							contractAddress: '',
-							chainId,
-							name: flow.daoName,
-							url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
-							image: null,
-							members: value.map((m: any) => {
-								return {
-									...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: owners.map((a: any) => a.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4'
-								}
-							}),
-							safe: {
-								name: safeName,
-								address: tx.getAddress(),
-								owners: owners,
-							}
+		setisLoading(true);
+		dispatch(updateOwners(Myvalue.current));
+		const safeOwner = provider?.getSigner(0);
+
+		const ethAdapter = new EthersAdapter({
+			ethers,
+			signer: safeOwner as any,
+		});
+		const safeFactory = await SafeFactory.create({
+			ethAdapter,
+		});
+		const owners: any = Myvalue.current.map((result) => {
+			return result.address;
+		});
+		console.log(owners);
+		const threshold: number = thresholdValue;
+		console.log(threshold);
+		const safeAccountConfig: SafeAccountConfig = {
+			owners,
+			threshold,
+		};
+
+		let currentSafes: Array<string> = []
+		if (chainId === SupportedChainId.POLYGON)
+			currentSafes = await axios.get(`https://safe-transaction-polygon.safe.global/api/v1/owners/${account}/safes/`).then(res => res.data.safes);
+
+		console.log("currentSafes", currentSafes)
+
+		await safeFactory
+			.deploySafe({ safeAccountConfig })
+			.then(async (tx) => {
+				dispatch(updateSafeAddress(tx.getAddress() as string));
+				const totalAddresses = [...invitedMembers, ...Myvalue.current];
+				const value = totalAddresses.reduce((final: any, current: any) => {
+					let object = final.find(
+						(item: any) => item.address === current.address
+					);
+					if (object) {
+						return final;
+					}
+					return final.concat([current]);
+				}, []);
+				dispatch(updateTotalMembers(value));
+				//setisLoading(false);
+				const payload: any = {
+					contractAddress: '',
+					chainId,
+					name: flow.daoName,
+					url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
+					image: null,
+					members: value.map((m: any) => {
+						return {
+							...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: owners.map((a: any) => a.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4'
 						}
-						dispatch(createDAO(payload))
-					})
-					.catch(async (err) => {
-						console.log("An error occured while creating safe", err);
-						if (chainId === SupportedChainId.POLYGON) {
-							checkNewSafe(currentSafes, owners)
-						} else {
-							setisLoading(false);
-						}
-					});
-			} catch (e) {
-				setisLoading(false);
-				console.log(e)
-			}
-		}
+					}),
+					safe: {
+						name: safeName,
+						address: tx.getAddress(),
+						owners: owners,
+					}
+				}
+				dispatch(createDAO(payload))
+			})
+			.catch(async (err) => {
+				console.log("An error occured while creating safe", err);
+				if (chainId === SupportedChainId.POLYGON) {
+					checkNewSafe(currentSafes, owners)
+				} else {
+					setisLoading(false);
+				}
+			});
 	};
 
 	const deployNewSafeDelayed = useCallback(_.debounce(deployNewSafe, 1000), [deployNewSafe])
@@ -872,12 +841,14 @@ export default () => {
 	}
 
 	const setDebounceOwnerName = (event: any) => {
+		console.log('....debounce....owner ..name....', event)
 		if (ownerName.length <= 12) {
 			setOwnerName(event.target.value);
 		}
 	}
 
 	const setOwnerSafeAddress = (event: any) => {
+		console.log('.owner ...safe..address....')
 		setErrors({ ownerAddress: "" });
 		setOwnerAddress(event.target.value);
 	}
@@ -946,18 +917,18 @@ export default () => {
 									return (
 										<Box key={index} className={classes.owner}>
 											<Box className={classes.avatarPlusName}>
-												<Avatar name={result.name} wallet={result.address}/>
-												{/* <img src={daoMember2} alt={result.address} />
-												<Typography variant="body1" className={classes.nameText}>{result.name}</Typography> */}
+												<img src={daoMember2} alt={result.address} />
+												<Typography variant="body1" className={classes.nameText}>{result.name}</Typography>
 											</Box>
-											{/* <Box className={classes.avatarAddress}>
+											<Box className={classes.avatarAddress}>
 												<Typography className={classes.text}>
 													{result.address &&
 														result.address.slice(0, 6) +
 														"..." +
 														result.address.slice(-4)}
 												</Typography>
-											</Box> */}
+											</Box>
+
 											<Box className={classes.avatarBtn}>
 												{result.address !== account && (
 													<IconButton
@@ -1061,12 +1032,12 @@ export default () => {
 				<Box className={classes.bottomLine} />
 				<Box className={classes.centerCard}>
 					<Box>
-						<Typography className={classes.thresholdText} sx={{ my: 1 }}>
+						<Typography className={classes.thresholdText}>
 							Any transaction requires the confirmation of
 						</Typography>
 					</Box>
 					<Box className={classes.selectionArea}>
-						<Box style={{ width: 109}}>
+						<Box style={{ width: 109, padding: 5 }}>
 							<MuiSelect
 								selected={thresholdValue}
 								options={Myvalue.current.map((item, index) => ({ label: index + 1, value: index + 1 }))}
@@ -1075,7 +1046,7 @@ export default () => {
 								}}
 							/>
 						</Box>
-						<Box sx={{ mx: 1 }} className={classes.thresholdCount}>
+						<Box className={classes.thresholdCount}>
 							of {Myvalue.current.length} owner(s)
 						</Box>
 					</Box>
@@ -1102,7 +1073,7 @@ export default () => {
 						fontsize: 20,
 						boxShadow: '3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)'
 					}}>
-					CREATE
+					CREATE SAFE
 				</Button>
 			</>
 		);
@@ -1112,7 +1083,7 @@ export default () => {
 		<Container>
 			<Grid className={classes.root}>
 				<Box className={classes.StartSafe}>
-					<Box className={classes.headerText}>2/2 Organisation Multi-sig Wallet</Box>
+					<Box className={classes.headerText}>2/2 Organisation Treasury</Box>
 					<Box className={classes.buttonArea}>
 						<Box>
 							<Button
@@ -1125,7 +1096,7 @@ export default () => {
 									boxShadow: '3px 5px 20px rgba(27, 43, 65, 0.12), 0px 0px 20px rgba(201, 75, 50, 0.18)'
 								}}
 								variant='contained'>
-								CREATE
+								CREATE NEW SAFE
 							</Button>
 						</Box>
 						<Box className={classes.centerText}>or</Box>
@@ -1141,13 +1112,13 @@ export default () => {
 								}}
 								onClick={() => navigate('/addsafe')}
 								variant='contained'>
-								ADD EXISTING
+								ADD EXISTING SAFE
 							</Button>
 						</Box>
 					</Box>
 					<Box className={classes.bottomLine} />
 					<Box className={classes.centerCard}>
-						<Box className={classes.inputFieldTitle}>Select Chain</Box>
+						<Typography className={classes.inputFieldTitle}>Select Chain</Typography>
 						<MuiSelect
 							selected={selectedChainId}
 							options={SUPPORTED_CHAIN_IDS.map(item => ({ label: CHAIN_INFO[item].label, value: item }))}
@@ -1156,15 +1127,17 @@ export default () => {
 								setSelectedChainId(value)
 							}}
 						/>
-						<Box className={classes.safeNameTitle}>Multi-sig Wallet Name</Box>
+						<Typography className={classes.inputFieldTitle}>Safe Name</Typography>
 						<TextInput
-							fullWidth
+							sx={{
+								height: 50,
+								width: 507
+							}}
 							placeholder="Pied Piper"
 							value={safeName}
 							onChange={(e: any) => {
 								dispatch(updatesafeName(e.target.value));
 							}}
-							error={!!errors.safeName}
 							helperText={errors.safeName}
 						/>
 					</Box>

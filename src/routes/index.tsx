@@ -56,6 +56,10 @@ export default [
         path: '/createorg',
         component: createDaoOrg
     },
+    {
+        path: '/createdao',
+        component: createDaoOrg
+    },
     // {
     //     path: '/invitegang',
     //     component: InviteGang

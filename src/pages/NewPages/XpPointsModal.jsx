@@ -95,11 +95,12 @@ const XpPointsModal = ({ toggleXp }) => {
 
           {/* //! BODY */}
           <div id="xp-text" >
-            Get ahead of the game with SWEAT points during your organization's bootstrapping phase. <span>Track contributions</span> and <span>reward members</span> based on their SWEAT points, once your organization has the funds.
+            Get ahead of the game with SWEAT points during your organization's bootstrapping phase. Track contributions and reward members based on their SWEAT points, once your organization has the funds.
           </div>
           {isXpPointEnable && <Button size="small" onClick={() => setShowCompensateMembersModals(true)} id="button-save">{'Convert to tokens & Compensate members'}</Button>}
           <div
             style={{
+              marginTop: "10px",
               display: "flex",
               alignItems: "center",
             }}
