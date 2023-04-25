@@ -181,6 +181,7 @@ export default () => {
 
     const [state, setState] = useState<any>({
         logo: null,
+        treasury: "0x0000000000000000000000000000000000000000",
         symbol: null,
         supply: 0,
         whitelisted: false,
@@ -198,7 +199,12 @@ export default () => {
     })
 
     useEffect(() => {
-        if(chainId) {
+        if(DAO)
+            setState((prev: any) => { return { ...prev, selectedChainId: +(_get(DAO, 'safe.chainId', _get(DAO, 'chainId', chainId))) !== SupportedChainId.MAINNET ? +(_get(DAO, 'safe.chainId', _get(DAO, 'chainId', chainId))) : SupportedChainId.POLYGON } })
+    }, [DAO])
+
+    useEffect(() => {
+        if(state?.selectedChainId) {
             setTokens([
                 {
                     label: 'ETH',
@@ -211,6 +217,12 @@ export default () => {
                     decimals: _get(USDC, `[${chainId}].decimals`),
                 }
             ])
+            setState((prev:any) => {
+                return {
+                    ...prev,
+                    treasury: prev.priced ? state?.selectedChainId === +DAO?.safe?.chainId ? DAO?.safe?.address : '' : "0x0000000000000000000000000000000000000000",
+                }
+            })
         }
     }, [chainId])
 
@@ -314,7 +326,23 @@ export default () => {
                 {
                     editMode ? 
                     <Paper className={classes.paper}>
-                        <TextInput value={state?.symbol}
+                        <Box mb={4}>
+                            <FormLabel style={{ marginBottom: 8 }}>Chain</FormLabel>
+                            <Box mt={2}>
+                                <Select
+                                    selected={state?.selectedChainId}
+                                    options={ SUPPORTED_CHAIN_IDS.filter(i => i !== SupportedChainId.MAINNET).map((item : any) => ({ label: CHAIN_INFO[item].label, value: item }))}
+                                    setSelectedValue={(value) => {
+                                        setState((prev: any) => { return {
+                                            ...prev, 
+                                            selectedChainId: +value
+                                        }})
+                                    }}
+                                />
+                            </Box>
+						</Box>
+                        <TextInput 
+                            value={state?.symbol}
                             error={errors['symbol']}
                             helperText={errors['symbol']}
                             onChange={(e: any) => {
@@ -344,15 +372,7 @@ export default () => {
                             setState((prev: any) => { return { ...prev, supply: e.target.value } } ) 
                         }}
                         placeholder="Number of existing tokens" sx={{ my: 1 }} fullWidth label="Supply" labelChip={<Chip sx={{ m:1 }} className={classes.chip} label="Optional" size="small" />} /> */}
-                        
-                        <TextInput value={state?.treasury}
-                        error={errors['treasury']}
-                        helperText={errors['treasury']}
-                        onChange={(e: any) => {
-                            setErrors({})
-                            setState((prev: any) => { return { ...prev, treasury: e.target.value } } ) 
-                        }}
-                        placeholder="Treasury address" sx={{ my: 1 }} fullWidth label="Treasury" />
+                    
 
                         <Box my={3} display="flex" flexDirection="row" justifyContent="space-between" mx={1}>
                             <Switch onChange={(e: any) => { setState((prev: any) => { return {
@@ -385,7 +405,15 @@ export default () => {
                             </Box>
                         }
                         <Box my={3} mx={1}>
-                            <Switch onChange={(e: any) => { setState((prev: any) => { return { ...prev, priced: !prev.priced } } ) }} checked={state?.priced} label="Priced"/>
+                            <Switch onChange={(e: any) => { setState((prev: any) => { return { 
+                                ...prev, 
+                                priced: !prev.priced,
+                                treasury: !prev.priced ? prev.selectedChainId && prev.selectedChainId === DAO?.safe?.chainId ? DAO?.safe?.address : null : "0x0000000000000000000000000000000000000000",
+                                price: prev.priced ? {
+                                    token: "0x0000000000000000000000000000000000000000",
+                                    value: 0
+                                } : prev.price
+                            } } ) }} checked={state?.priced} label="Priced"/>
                         </Box>
                         {
                             state['priced'] ?
@@ -403,6 +431,19 @@ export default () => {
                                     />
                             </Box> : null
                         }
+                        { state['priced'] && <TextInput 
+                            value={state?.treasury}
+                            error={errors['treasury']}
+                            helperText={errors['treasury']}
+                            onChange={(e: any) => {
+                                setErrors({});
+                                setState((prev: any) => { return { ...prev, treasury: e.target.value } } ) 
+                            }}
+                            placeholder="Treasury address" 
+                            sx={{ my: 1 }} 
+                            fullWidth 
+                            label="Multi-sig Wallet" 
+                        /> }
                         <Button sx={{ mt:2 }} onClick={() => handleSetPreview()} fullWidth size="small" variant='contained'>Next</Button>
                     </Paper> :
                     <Box display="flex" flexDirection="column" alignItems="center">

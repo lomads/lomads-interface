@@ -154,7 +154,7 @@ const membersPermissions = [
     },
     {
         id: 2,
-        name: "Add/Remove (DAO level)",
+        name: "Add/Remove (Organisation level)",
         admin: "Yes",
         coreContributor: null,
         activeContributor: null,
@@ -276,7 +276,7 @@ export default ({ open, onClose }: { open: boolean, onClose: any }) => {
                 <Accordion expanded={panels.includes('panel2')} onChange={handleChange('panel2')}>
                     <AccordionSummary aria-controls="panel2d-content" id="panel2d-header">
                         <Box>
-                            <Typography>TREASURY</Typography>
+                            <Typography>MULTI-SIG WALLET</Typography>
                         </Box>
                     </AccordionSummary>
                     <AccordionDetails>

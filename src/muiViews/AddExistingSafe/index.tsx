@@ -284,8 +284,7 @@ const useStyles = makeStyles((theme: any) => ({
 		overflowY: "scroll"
 	},
 	addSafe: {
-		position: 'fixed',
-		bottom: 3,
+		bottom: 13,
 		display: 'flex',
 		flexDirection: 'row',
 		justifyContent: 'center',
@@ -590,7 +589,7 @@ export default () => {
 									}}
 									variant='contained'
 									onClick={handleClickDelayed}
-								>ADD SAFE
+								>ADD
 								</Button>
 							</Box>
 						</Box>

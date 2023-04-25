@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { get as _get, find as _find, uniqBy as _uniqBy } from 'lodash';
+import { get as _get, find as _find, uniqBy as _uniqBy, debounce as _debounce } from 'lodash';
 
 import { CgClose } from 'react-icons/cg';
 import createTaskSvg from '../../../../assets/svg/task.svg';
@@ -101,6 +101,8 @@ const ApplyTask = ({ task, close }) => {
         }
     }
 
+    const submitAsync = _debounce(handleSubmitApplication, 1500)
+
     return (
         <div className="taskApply-overlay">
             <div className="taskApply-container">
@@ -198,7 +200,7 @@ const ApplyTask = ({ task, close }) => {
                                         null
                                 }
 
-                                <button className='taskApply-sendBtn' onClick={handleSubmitApplication}>SEND</button>
+                                <button className='taskApply-sendBtn' onClick={submitAsync}>SEND</button>
 
                             </div>
                         </>

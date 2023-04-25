@@ -107,7 +107,6 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
       if(window.ethereum) {
         const stats = await getStats();
         const treasury = stats[5];
-        console.log(stats[2].toString())
         const mintToken = (stats[3] ? stats[3] : process.env.REACT_APP_MATIC_TOKEN_ADDRESS).toString()
         let mintPrice = stats[2]._hex
         if(mintToken === process.env.REACT_APP_NATIVE_TOKEN_ADDRESS) {

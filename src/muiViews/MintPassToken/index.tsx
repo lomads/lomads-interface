@@ -495,7 +495,7 @@ export default () => {
         })
     }
 
-    const handleMint = async (payment: string, signature: string) => {
+    const handleMint = async (payment: string | undefined, signature: string | undefined) => {
         if(!valid()) return;
         setMintLoading(true)
         try {
@@ -857,18 +857,22 @@ export default () => {
                             <Typography mt={2} variant='body1' style={{ textAlign: 'center' }}>Your contact details are encrypted using advanced public key encryption technology, ensuring that your personal information stays safe and secure.</Typography>
                             {   balance === 0 ?
                                 <Button loading={mintLoading} disabled={mintLoading} onClick={() => {
-                                    if(contract?.mintPrice !== "0") {
-                                        handlePayByCrypto() 
+                                    if(contract?.version === "0") {
+                                        handleMint(undefined, undefined)
                                     } else {
-                                        mintFree()
+                                        if(contract?.mintPrice && contract?.mintPrice !== "0") {
+                                            handlePayByCrypto() 
+                                        } else {
+                                            mintFree()
+                                        }
                                     }
                                 }} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">{ 
                                     contract?.version && contract?.version === "1" ? 
-                                    payment ? "MINT" : contract?.mintPrice === "0" ? "MINT" : "PAY BY CRYPTO" : "MINT" }</Button> : 
+                                    payment ? "MINT" : (!contract?.mintPrice || contract?.mintPrice === "0") ? "MINT" : "PAY BY CRYPTO" : "MINT" }</Button> : 
                                 <Button loading={mintLoading} disabled={mintLoading} onClick={() => handleUpdateMetadata()} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">UPDATE</Button>
                             }
 
-                            {   !payment && balance === 0 && contract && +contract?.mintPrice >= 27 &&
+                            {   contract.version !== "0" && !payment && balance === 0 && contract && +contract?.mintPrice >= 27 &&
                                 <Button loading={mintLoading} disabled={mintLoading} onClick={() => {
                                     if(valid()) {
                                         setShowDrawer(false)
