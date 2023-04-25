@@ -1,42 +1,13 @@
-import { useEffect, useState, createContext } from "react";
+import { useEffect, useState } from "react";
 import "./Settings.css";
 import { get as _get, find as _find } from "lodash";
 import settingIcon from "../../assets/svg/settingsXL.svg";
 import { CgClose } from "react-icons/cg";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import Table from "react-bootstrap/Table";
 import axiosHttp from '../../api';
-
-import {
-	Button,
-	Drawer,
-	DrawerBody,
-	DrawerCloseButton,
-	DrawerContent,
-	DrawerFooter,
-	DrawerOverlay,
-	FormLabel,
-	IconButton,
-	Image,
-	Input,
-	Switch,
-	TableContainer,
-	Tbody,
-	Td,
-	Text,
-	Tfoot,
-	Th,
-	Thead,
-	Tooltip,
-	Tr,
-} from "@chakra-ui/react";
-import copyIcon from "../../assets/svg/copyIcon.svg";
-import { isChainAllowed } from "utils/switchChain";
-import coin from "../../assets/svg/coin.svg";
 import Footer from "components/Footer";
 import { ChevronRight } from "react-feather";
-import { IoMdCloseCircle } from "react-icons/io";
-import { CgTrello } from 'react-icons/cg';
+import IntegrationGrey from "../../assets/svg/IntegrationGrey.svg";
 
 // ASSETS
 import OrganistionDetails from "../../assets/images/settings-page/1-ogranisation-details.svg";
@@ -45,29 +16,16 @@ import Safe from "../../assets/images/settings-page/3-safe.svg";
 import PassTokens from "../../assets/images/settings-page/4-pass-tokens.svg";
 import XpPoints from "../../assets/images/settings-page/5-xp-points.svg";
 import Terminology from "../../assets/images/settings-page/6-terminology.svg";
-import Discord from "../../assets/images/settings-page/7-discord.svg";
-
-import SideModal from "./DashBoard/SideModal";
 import OrganisationDetailsModal from "./OrganisationDetailsModal";
-import RolesPermissionsModal from "./RolesPermissionsModal";
 import SafeModal from "./SafeModal";
 import XpPointsModal from "./XpPointsModal";
 import PassTokenModal from "muiModals/PassTokenModal";
 import TerminologyModal from "./TerminologyModal";
-import DiscordModal from "./DiscordModal";
 import { useAppDispatch, useAppSelector } from "state/hooks";
-import CreateMorePassTokenModal from "./CreateMorePassTokenModal";
 import { getDao } from "state/dashboard/actions";
-import CompensateMembersModal from "./CompensateMembersModal";
-import CompensateMembersDescriptionModal from "./CompensateMembersDescriptionModal";
-import CompensateMembersDoneModal from "./CompensateMembersDoneModal";
-import DisableXpPointDailog from "./DisableXpPointDailog";
 import eventEmitter from "utils/eventEmmiter";
 import RolesAndPermissionModal from "muiModals/RolesAndPermissionModal";
-
-import TrelloOrganizationsModal from "muiModals/TrelloOrganizationsModal";
-
-import { LeapFrog } from "@uiball/loaders";
+import IntegrationsModal from "muiModals/IntegrationsModal";
 import useRole from "hooks/useRole";
 import { useWeb3React } from "@web3-react/core";
 
@@ -84,6 +42,7 @@ const Settings = () => {
 	const [openPassToken, setOpenPassToken] = useState(false);
 	const [openXpPoints, setOpenXpPoints] = useState(false);
 	const [openTerminology, setOpenTerminology] = useState(false);
+	const [openIntegrationModal, setOpenIntegrationModal] = useState(false)
 	const [openDiscord, setOpenDiscord] = useState(false);
 	const [openCreatePassToken, setOpenCreatePassToken] = useState(false);
 	const [repoInfo, setRepoInfo] = useState('');
@@ -358,22 +317,15 @@ const Settings = () => {
 								</div>
 							</div> */}
 							<div className="settings-organisation-child"
-								onClick={authorizeTrello}
+								onClick={() => setOpenIntegrationModal(true)}
 							>
 								<div style={{ padding: "20px" }}>
-									{
-										trelloLoading
-											?
-											<LeapFrog size={24} color="#76808D" />
-											:
-											<CgTrello size={35} color="#76808D" />
-									}
-
+									<img src={IntegrationGrey} width={35} height={32}/>
 									<Link
 										className="style-content"
 										style={{ color: "#C94B32" }}
 									>
-										Trello
+										Integrations
 										<ChevronRight />
 									</Link>
 								</div>
@@ -460,11 +412,18 @@ const Settings = () => {
 			{/* {openDiscord && (
 				<DiscordModal toggleDiscord={toggleDiscord} />
 			)} */}
-			<TrelloOrganizationsModal
+			{openIntegrationModal &&
+				<IntegrationsModal
+					open={openIntegrationModal}
+					onClose={() => setOpenIntegrationModal(false)}
+					organizationData={organizations}
+				/>
+		}	
+			{/* <TrelloOrganizationsModal
 				open={openTrelloModal}
 				onClose={() => setOpenTrelloModal(false)}
 				organizationData={organizations}
-			/>
+			/> */}
 		</>
 	);
 };
