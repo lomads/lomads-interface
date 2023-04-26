@@ -417,6 +417,7 @@ const Settings = () => {
 					open={openIntegrationModal}
 					onClose={() => setOpenIntegrationModal(false)}
 					organizationData={organizations}
+					authorizeTrello={authorizeTrello}
 				/>
 		}	
 			{/* <TrelloOrganizationsModal

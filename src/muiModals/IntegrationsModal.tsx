@@ -1,13 +1,16 @@
-import React from 'react';
-import { useState } from 'react'
+import React, { useState, useEffect } from 'react';
 import { get as _get } from 'lodash'
 import {
 	Drawer,
 	Box,
 	Typography,
 	Divider,
-	Button
+	Button,
+	Card,
+	CardContent,
+	Radio
 } from '@mui/material';
+import { Image } from "@chakra-ui/react";
 import IconButton from 'muiComponents/IconButton'
 import CloseSVG from 'assets/svg/close-new.svg'
 import Integrations from "assets/svg/Integrations.svg"
@@ -15,16 +18,38 @@ import GreyIconHelp from "assets/svg/GreyIconHelp.svg"
 import Integrationtrello from "assets/svg/Integrationtrello.svg"
 import Integrationgithub from "assets/svg/Integrationgithub.svg"
 import Integrationdiscord from "assets/svg/Integrationdiscord.svg"
+import checkmark from "assets/svg/completeCheckmark.svg";
+import downHandler from "assets/svg/downHandler.svg";
 import palette from 'muiTheme/palette';
+import { useAppSelector } from "state/hooks";
+import { LeapFrog } from "@uiball/loaders";
 import { makeStyles } from '@mui/styles';
+import { useDispatch } from "react-redux";
+import { syncTrelloData } from 'state/dashboard/actions';
+import { resetSyncTrelloDataLoader } from "state/dashboard/reducer";
+import axiosHttp from 'api';
 
 const useStyles = makeStyles((theme: any) => ({
-	integrationName: {
-		fontFamily: 'Inter, sans-serif',
-		fontStyle: 'normal',
-		fontWeight: 600,
-		fontSize: 16,
-		lineHeight: 22
+	card: {
+		height: '60px',
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		marginBottom: '20px',
+		boxShadow: '3px 5px 4px rgba(27, 43, 65, 0.05), -3px -3px 8px rgba(201, 75, 50, 0.1)',
+		borderRadius: '5px',
+		padding: '0 15px'
+	},
+	cardDisabled: {
+		background: 'rgba(24, 140, 124, 0.1)',
+		height: '60px',
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		marginBottom: '20px',
+		borderRadius: '5px',
+		boxShadow: 'none',
+		padding: '0 15px'
 	}
 }));
 
@@ -43,19 +68,94 @@ const integrationAccounts = [
 	}
 ];
 
-export default ({ open, onClose }: { open: boolean, onClose: any }) => {
+export default ({ open, onClose, authorizeTrello, organizationData }:
+	{ open: boolean, onClose: any, authorizeTrello: any, organizationData: any }) => {
 	const classes = useStyles();
+	const { DAO, user, syncTrelloDataLoading } = useAppSelector((state) => state.dashboard);
+	const [selectedValue, setSelectedValue] = useState('');
+	const [boardsLoading, setBoardsLoading] = useState(false)
+	const [expandTrello, setExpandTrello] = useState(false)
+	const [expandGitHub, setExpandGitHub] = useState(false)
+	const [expandDiscord, setExpandDiscord] = useState(false)
+	const dispatch = useDispatch()
 
-	const [panels, setPanels] = useState<any>([]);
+	useEffect(() => {
+		if (syncTrelloDataLoading === false) {
+			dispatch(resetSyncTrelloDataLoader());
+			setBoardsLoading(false);
+		}
+	}, [syncTrelloDataLoading]);
 
-	const handleChange = (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
-		if (panels.indexOf(panel) > -1) {
-			setPanels(panels.filter((i: string) => i !== panel));
+	const handleClick = (item: any) => {
+		if (item.name === "Trello") {
+			authorizeTrello()
+			console.log(organizationData, '...organisation data....')
+			setExpandTrello(true)
+		}
+	}
+
+	const getAllBoards = () => {
+		// check if webhook already exists
+		const trelloOb = _get(DAO, 'trello', null);
+		if (trelloOb) {
+			console.log("trello Ob exists...");
+			if (_get(DAO, `trello.${selectedValue}`, null)) {
+				console.log("org exists");
+				alert("This organisation has already been synced!");
+				return;
+			}
+			else {
+				console.log("org doesnt exists...call handleTrello");
+				handleTrello(selectedValue);
+			}
 		}
 		else {
-			setPanels([...panels, panel]);
+			console.log("trello ob doesnt exists...call handleTrello");
+			handleTrello(selectedValue);
 		}
-	};
+	}
+
+	const handleTrello = (selectedValue: any) => {
+		setBoardsLoading(true);
+		var trelloToken = localStorage.getItem("trello_token");
+		axiosHttp.get(`utility/get-trello-boards?orgId=${selectedValue}&accessToken=${trelloToken}`)
+			.then((boards: any) => {
+				if (boards.data.type === 'success') {
+					console.log("Boards : ", boards.data.data);
+					var trelloToken = localStorage.getItem("trello_token");
+					dispatch(syncTrelloData({
+						payload: {
+							user: { id: _get(user, '_id', null), address: _get(user, 'wallet', null) },
+							daoId: _get(DAO, '_id', null),
+							boardsArray: boards.data.data,
+							accessToken: trelloToken,
+							idModel: selectedValue
+						}
+					}));
+				}
+				else if (boards.data.type === 'error' && boards.data.message === 'No boards found') {
+					console.log("no boards...")
+					var trelloToken = localStorage.getItem("trello_token");
+					dispatch(syncTrelloData({
+						payload: {
+							user: { id: _get(user, '_id', null), address: _get(user, 'wallet', null) },
+							daoId: _get(DAO, '_id', null),
+							boardsArray: [],
+							accessToken: trelloToken,
+							idModel: selectedValue
+						}
+					}));
+				}
+				else {
+					setBoardsLoading(false);
+					console.log(boards.data.message);
+				}
+			})
+			.catch((e) => {
+				setBoardsLoading(false);
+				console.log("Error : ", e)
+			})
+	}
 
 	return (
 		<Drawer
@@ -96,14 +196,68 @@ export default ({ open, onClose }: { open: boolean, onClose: any }) => {
 									paddingLeft: 3,
 								}}>{item.name}</Typography>
 							</Box>
-							<Button variant='contained' sx={{
+							<Box sx={{
 								alignSelf: "flex-end",
 								right: 0,
-							}}>CONNECT</Button>
+								justifySelf: "center"
+							}}>
+								{(item.name === 'Trello' && !expandTrello)
+								|| (item.name === 'GitHub' && !expandGitHub)
+								|| (item.name === 'Discord' && !expandDiscord)
+								? <Button variant='contained'
+									onClick={() => handleClick(item)}
+								>CONNECT</Button>
+								: <Box sx={{marginRight: 5, cursor: 'pointer'}} onClick={()=> setExpandTrello(false)}><img src={downHandler} height={20} width={20} /></Box>}
+							</Box>
 						</Box>
 						<Divider sx={{ color: '#1B2B41', width: 440 }} variant="middle" />
 					</>
 				})}
+
+				{expandTrello ?
+					<>
+						<Typography style={{ color: '#76808D', fontSize: '16px', fontWeight: 700, margin: '30px 0' }}>Select your organisation Trello Workspace </Typography>
+						{organizationData.length && organizationData.map((item: any) => {
+							return (
+								<Card className={_get(DAO, `trello.${item.id}`, null) ? classes.cardDisabled : classes.card}>
+									<CardContent>
+										<Typography sx={{ fontSize: 14 }}>
+											{item.displayName}
+										</Typography>
+									</CardContent>
+									{
+										_get(DAO, `trello.${item.id}`, null)
+											?
+											<Image
+												src={checkmark}
+											/>
+											:
+											<Radio
+												checked={selectedValue === item.id}
+												onChange={(e) => setSelectedValue(e.target.value)}
+												value={item.id}
+												name="radio-buttons"
+												inputProps={{ 'aria-label': 'A' }}
+												disabled={_get(DAO, `trello.${item.id}`, null) ? true : false}
+											/>
+									}
+								</Card>
+							);
+						})}
+						<Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+							<Button color="error" variant="contained" onClick={getAllBoards}>
+								{
+									boardsLoading
+										?
+										<LeapFrog size={24} color="#FFF" />
+										:
+										'SYNC'
+								}
+							</Button>
+						</Box>
+					</>
+					: ''
+				}
 
 			</Box>
 		</Drawer>
