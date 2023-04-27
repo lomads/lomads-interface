@@ -200,7 +200,7 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 										fontWeight: 600,
 										fontSize: 16,
 									}}>{item.name}
-										<span className={classes.organizationCount}>{!!organizationData.length ? ` (${organizationData.length})` : ''}</span></Typography>
+										{(item.name === 'Trello') ? <span className={classes.organizationCount}>{!!organizationData.length ? ` (${organizationData.length})` : ''}</span> : null}</Typography>
 									{(item.name === 'Trello' && isTrelloConnected) ? <Box sx={{
 										color: '#188C7C',
 										fontSize: 12,
@@ -214,7 +214,7 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 								right: 0,
 								justifySelf: "center"
 							}}>
-								{(item.name === 'Trello' && !expandTrello && !isTrelloConnected)
+								{(item.name === 'Trello' && !isTrelloConnected)
 									|| (item.name === 'GitHub' && !expandGitHub)
 									|| (item.name === 'Discord' && !expandDiscord)
 									? <Button variant='contained'
@@ -235,7 +235,7 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 					</>
 				})}
 
-				{expandTrello ?
+				{expandTrello && isTrelloConnected ?
 					<>
 						{organizationData.length ? organizationData.map((item: any) => {
 							return (
@@ -263,7 +263,7 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 									}
 								</Card>
 							);
-						}): null}
+						}) : null}
 						<Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 							<Button color="error" variant="contained" onClick={getAllBoards}>
 								{
