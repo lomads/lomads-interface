@@ -178,6 +178,12 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 	}
 
 	const isIntegrationConnected = (item: any) => {
+		return (item.name === 'Trello' && isTrelloConnected)
+			|| (item.name === 'GitHub' && expandGitHub) // expandGitHub to be replace by isGitHUbConnected
+			|| (item.name === 'Discord' && expandDiscord)// expandDiscord to be replace by isDiscordConnected
+	}
+
+	const showIntegrationConnectButton = (item: any) => {
 		return (item.name === 'Trello' && !isTrelloConnected)
 			|| (item.name === 'GitHub' && !expandGitHub) // expandGitHub to be replace by isGitHUbConnected
 			|| (item.name === 'Discord' && !expandDiscord)// expandDiscord to be replace by isDiscordConnected
@@ -186,6 +192,68 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 	const getConnectionCount = (item: any) => {
 		if (item.name === 'Trello' && isTrelloConnected && !!organizationData.length) {
 			return ` (${organizationData.length})`
+		}
+		return null
+	}
+
+	const expandList = (item: any) => {
+		return (item.name === 'Trello' && expandTrello)
+			|| (item.name === 'GitHub' && expandGitHub) // expandGitHub to be replace by isGitHUbConnected
+			|| (item.name === 'Discord' && expandDiscord)
+	}
+
+
+	const IntegrationOrganizationList = (item: any) => {
+		if (item.name === 'Trello' && expandTrello && isTrelloConnected) {
+			return <>
+				{organizationData.length ? organizationData.map((item: any) => {
+					return (
+						<Card className={_get(DAO, `trello.${item.id}`, null) ? classes.cardDisabled : classes.card}>
+							<CardContent>
+								<Typography sx={{ fontSize: 14 }}>
+									{item.displayName}
+								</Typography>
+							</CardContent>
+							{
+								_get(DAO, `trello.${item.id}`, null)
+									?
+									<Image
+										src={checkmark}
+									/>
+									:
+									<Radio
+										checked={selectedValue === item.id}
+										onChange={(e) => setSelectedValue(e.target.value)}
+										value={item.id}
+										name="radio-buttons"
+										inputProps={{ 'aria-label': 'A' }}
+										disabled={_get(DAO, `trello.${item.id}`, null) ? true : false}
+									/>
+							}
+						</Card>
+					);
+				}) : null}
+				<Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+					<Button color="error" variant="contained" onClick={getAllBoards}>
+						{
+							boardsLoading
+								?
+								<LeapFrog size={24} color="#FFF" />
+								:
+								'SYNC'
+						}
+					</Button>
+				</Box>
+			</>
+		}
+
+		// add isGitHubConnected
+		if (item.name === 'GitHub' && expandGitHub) {
+
+		}
+		// add isDiscordConnected
+		if (item.name === 'Discord' && expandDiscord) {
+
 		}
 		return null
 	}
@@ -245,7 +313,7 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 								right: 0,
 								justifySelf: "center"
 							}}>
-								{isIntegrationConnected(item)
+								{showIntegrationConnectButton(item)
 									? <Button variant='contained'
 										onClick={() => handleClick(item)}
 									>
@@ -255,58 +323,16 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 												: 'CONNECT'
 										}</Button>
 									: <Box sx={{ marginRight: 5, cursor: 'pointer' }} onClick={() => handleExpand(item)}>{
-										expandTrello ? <img src={downHandler} height={20} width={20} />
+										expandList(item)
+											? <img src={downHandler} height={20} width={20} />
 											: <img src={rightArrow} height={15} width={15} />
 									}</Box>}
 							</Box>
 						</Box>
 						<Divider sx={{ color: '#1B2B41', width: 440 }} variant="middle" />
+						{IntegrationOrganizationList(item)}
 					</>
 				})}
-
-				{expandTrello && isTrelloConnected ?
-					<>
-						{organizationData.length ? organizationData.map((item: any) => {
-							return (
-								<Card className={_get(DAO, `trello.${item.id}`, null) ? classes.cardDisabled : classes.card}>
-									<CardContent>
-										<Typography sx={{ fontSize: 14 }}>
-											{item.displayName}
-										</Typography>
-									</CardContent>
-									{
-										_get(DAO, `trello.${item.id}`, null)
-											?
-											<Image
-												src={checkmark}
-											/>
-											:
-											<Radio
-												checked={selectedValue === item.id}
-												onChange={(e) => setSelectedValue(e.target.value)}
-												value={item.id}
-												name="radio-buttons"
-												inputProps={{ 'aria-label': 'A' }}
-												disabled={_get(DAO, `trello.${item.id}`, null) ? true : false}
-											/>
-									}
-								</Card>
-							);
-						}) : null}
-						<Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-							<Button color="error" variant="contained" onClick={getAllBoards}>
-								{
-									boardsLoading
-										?
-										<LeapFrog size={24} color="#FFF" />
-										:
-										'SYNC'
-								}
-							</Button>
-						</Box>
-					</>
-					: ''
-				}
 
 			</Box>
 		</Drawer>
