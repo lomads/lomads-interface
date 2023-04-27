@@ -97,6 +97,19 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 		}
 	}
 
+	const handleExpand = (item: any) => {
+		if (item.name === "Trello") {
+			setExpandTrello(!expandTrello)
+			return
+		}
+		if (item.name === "Discord") {
+			setExpandDiscord(!expandDiscord)
+			return
+		}
+
+		setExpandGitHub(!expandGitHub)
+
+	}
 	const getAllBoards = () => {
 		// check if webhook already exists
 		const trelloOb = _get(DAO, 'trello', null);
@@ -160,6 +173,23 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 			})
 	}
 
+	const isIntegrationLoader = (item: any) => {
+		return (item.name === 'Trello' && trelloLoading)
+	}
+
+	const isIntegrationConnected = (item: any) => {
+		return (item.name === 'Trello' && !isTrelloConnected)
+			|| (item.name === 'GitHub' && !expandGitHub) // expandGitHub to be replace by isGitHUbConnected
+			|| (item.name === 'Discord' && !expandDiscord)// expandDiscord to be replace by isDiscordConnected
+	}
+
+	const getConnectionCount = (item: any) => {
+		if (item.name === 'Trello' && isTrelloConnected && !!organizationData.length) {
+			return ` (${organizationData.length})`
+		}
+		return null
+	}
+
 	return (
 		<Drawer
 			PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
@@ -200,8 +230,9 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 										fontWeight: 600,
 										fontSize: 16,
 									}}>{item.name}
-										{(item.name === 'Trello') ? <span className={classes.organizationCount}>{!!organizationData.length ? ` (${organizationData.length})` : ''}</span> : null}</Typography>
-									{(item.name === 'Trello' && isTrelloConnected) ? <Box sx={{
+										<span className={classes.organizationCount}>{getConnectionCount(item)}</span>
+									</Typography>
+									{isIntegrationConnected(item) ? <Box sx={{
 										color: '#188C7C',
 										fontSize: 12,
 									}}>
@@ -214,18 +245,16 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 								right: 0,
 								justifySelf: "center"
 							}}>
-								{(item.name === 'Trello' && !isTrelloConnected)
-									|| (item.name === 'GitHub' && !expandGitHub)
-									|| (item.name === 'Discord' && !expandDiscord)
+								{isIntegrationConnected(item)
 									? <Button variant='contained'
 										onClick={() => handleClick(item)}
 									>
 										{
-											(item.name === 'Trello' && trelloLoading)
+											isIntegrationLoader(item)
 												? <LeapFrog size={24} color="#FFF" />
 												: 'CONNECT'
 										}</Button>
-									: <Box sx={{ marginRight: 5, cursor: 'pointer' }} onClick={() => setExpandTrello(!expandTrello)}>{
+									: <Box sx={{ marginRight: 5, cursor: 'pointer' }} onClick={() => handleExpand(item)}>{
 										expandTrello ? <img src={downHandler} height={20} width={20} />
 											: <img src={rightArrow} height={15} width={15} />
 									}</Box>}
