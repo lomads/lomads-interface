@@ -58,7 +58,7 @@ const Settings = () => {
 
 	const [organizations, setOrganizations] = useState([]);
 	const [trelloLoading, setTrelloLoading] = useState(false);
-	const [openTrelloModal, setOpenTrelloModal] = useState(false);
+	const [isTrelloConnected, setTrelloConnected] = useState(false);
 
 	useEffect(() => {
 		setName(_get(DAO, 'name', ''))
@@ -128,7 +128,7 @@ const Settings = () => {
 						if (organizations.data.type === 'success') {
 							setTrelloLoading(false);
 							setOrganizations(organizations.data.data);
-							setOpenTrelloModal(true);
+							setTrelloConnected(true)
 						}
 						else {
 							setTrelloLoading(false);
@@ -418,6 +418,8 @@ const Settings = () => {
 					onClose={() => setOpenIntegrationModal(false)}
 					organizationData={organizations}
 					authorizeTrello={authorizeTrello}
+					isTrelloConnected={isTrelloConnected}
+					trelloLoading={trelloLoading}
 				/>
 		}	
 			{/* <TrelloOrganizationsModal

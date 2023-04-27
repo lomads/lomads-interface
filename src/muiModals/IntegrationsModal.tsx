@@ -20,11 +20,11 @@ import Integrationgithub from "assets/svg/Integrationgithub.svg"
 import Integrationdiscord from "assets/svg/Integrationdiscord.svg"
 import checkmark from "assets/svg/completeCheckmark.svg";
 import downHandler from "assets/svg/downHandler.svg";
+import rightArrow from "assets/svg/rightArrow.svg"
 import palette from 'muiTheme/palette';
-import { useAppSelector } from "state/hooks";
+import { useAppSelector, useAppDispatch } from "state/hooks";
 import { LeapFrog } from "@uiball/loaders";
 import { makeStyles } from '@mui/styles';
-import { useDispatch } from "react-redux";
 import { syncTrelloData } from 'state/dashboard/actions';
 import { resetSyncTrelloDataLoader } from "state/dashboard/reducer";
 import axiosHttp from 'api';
@@ -50,6 +50,10 @@ const useStyles = makeStyles((theme: any) => ({
 		borderRadius: '5px',
 		boxShadow: 'none',
 		padding: '0 15px'
+	},
+	organizationCount: {
+		fontFamily: 'Inter, sans-serif',
+		opacity: 0.5
 	}
 }));
 
@@ -68,8 +72,8 @@ const integrationAccounts = [
 	}
 ];
 
-export default ({ open, onClose, authorizeTrello, organizationData }:
-	{ open: boolean, onClose: any, authorizeTrello: any, organizationData: any }) => {
+export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConnected, trelloLoading }:
+	{ open: boolean, onClose: any, authorizeTrello: any, organizationData: any, isTrelloConnected: any, trelloLoading: any }) => {
 	const classes = useStyles();
 	const { DAO, user, syncTrelloDataLoading } = useAppSelector((state) => state.dashboard);
 	const [selectedValue, setSelectedValue] = useState('');
@@ -77,7 +81,7 @@ export default ({ open, onClose, authorizeTrello, organizationData }:
 	const [expandTrello, setExpandTrello] = useState(false)
 	const [expandGitHub, setExpandGitHub] = useState(false)
 	const [expandDiscord, setExpandDiscord] = useState(false)
-	const dispatch = useDispatch()
+	const dispatch = useAppDispatch()
 
 	useEffect(() => {
 		if (syncTrelloDataLoading === false) {
@@ -89,7 +93,6 @@ export default ({ open, onClose, authorizeTrello, organizationData }:
 	const handleClick = (item: any) => {
 		if (item.name === "Trello") {
 			authorizeTrello()
-			console.log(organizationData, '...organisation data....')
 			setExpandTrello(true)
 		}
 	}
@@ -188,26 +191,44 @@ export default ({ open, onClose, authorizeTrello, organizationData }:
 						<Box key={index} display="flex" flexDirection="row" my={4} justifyContent="space-between" width={440}>
 							<Box display="flex" flexDirection="row">
 								<img src={item.icon} height={24} style={{ padding: 4 }} />
-								<Typography my={2} sx={{
-									fontFamily: 'Inter, sans-serif',
-									fontStyle: 'normal',
-									fontWeight: 600,
-									fontSize: 16,
+								<Box sx={{
 									paddingLeft: 3,
-								}}>{item.name}</Typography>
+								}}>
+									<Typography my={2} sx={{
+										fontFamily: 'Inter, sans-serif',
+										fontStyle: 'normal',
+										fontWeight: 600,
+										fontSize: 16,
+									}}>{item.name}
+										<span className={classes.organizationCount}>{!!organizationData.length ? ` (${organizationData.length})` : ''}</span></Typography>
+									{(item.name === 'Trello' && isTrelloConnected) ? <Box sx={{
+										color: '#188C7C',
+										fontSize: 12,
+									}}>
+										CONNECTED
+									</Box> : null}
+								</Box>
 							</Box>
 							<Box sx={{
 								alignSelf: "flex-end",
 								right: 0,
 								justifySelf: "center"
 							}}>
-								{(item.name === 'Trello' && !expandTrello)
-								|| (item.name === 'GitHub' && !expandGitHub)
-								|| (item.name === 'Discord' && !expandDiscord)
-								? <Button variant='contained'
-									onClick={() => handleClick(item)}
-								>CONNECT</Button>
-								: <Box sx={{marginRight: 5, cursor: 'pointer'}} onClick={()=> setExpandTrello(false)}><img src={downHandler} height={20} width={20} /></Box>}
+								{(item.name === 'Trello' && !expandTrello && !isTrelloConnected)
+									|| (item.name === 'GitHub' && !expandGitHub)
+									|| (item.name === 'Discord' && !expandDiscord)
+									? <Button variant='contained'
+										onClick={() => handleClick(item)}
+									>
+										{
+											trelloLoading
+												? <LeapFrog size={24} color="#FFF" />
+												: 'CONNECT'
+										}</Button>
+									: <Box sx={{ marginRight: 5, cursor: 'pointer' }} onClick={() => setExpandTrello(!expandTrello)}>{
+										expandTrello ? <img src={downHandler} height={20} width={20} />
+											: <img src={rightArrow} height={15} width={15} />
+									}</Box>}
 							</Box>
 						</Box>
 						<Divider sx={{ color: '#1B2B41', width: 440 }} variant="middle" />
@@ -216,8 +237,7 @@ export default ({ open, onClose, authorizeTrello, organizationData }:
 
 				{expandTrello ?
 					<>
-						<Typography style={{ color: '#76808D', fontSize: '16px', fontWeight: 700, margin: '30px 0' }}>Select your organisation Trello Workspace </Typography>
-						{organizationData.length && organizationData.map((item: any) => {
+						{organizationData.length ? organizationData.map((item: any) => {
 							return (
 								<Card className={_get(DAO, `trello.${item.id}`, null) ? classes.cardDisabled : classes.card}>
 									<CardContent>
@@ -243,7 +263,7 @@ export default ({ open, onClose, authorizeTrello, organizationData }:
 									}
 								</Card>
 							);
-						})}
+						}): null}
 						<Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 							<Button color="error" variant="contained" onClick={getAllBoards}>
 								{
