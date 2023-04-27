@@ -221,7 +221,7 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 										onClick={() => handleClick(item)}
 									>
 										{
-											trelloLoading
+											(item.name === 'Trello' && trelloLoading)
 												? <LeapFrog size={24} color="#FFF" />
 												: 'CONNECT'
 										}</Button>
