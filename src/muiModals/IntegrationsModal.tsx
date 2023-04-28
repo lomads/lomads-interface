@@ -25,9 +25,11 @@ import palette from 'muiTheme/palette';
 import { useAppSelector, useAppDispatch } from "state/hooks";
 import { LeapFrog } from "@uiball/loaders";
 import { makeStyles } from '@mui/styles';
-import { syncTrelloData } from 'state/dashboard/actions';
+import { syncTrelloData, storeGithubIssues } from 'state/dashboard/actions';
 import { resetSyncTrelloDataLoader } from "state/dashboard/reducer";
 import axiosHttp from 'api';
+import useGithubAuth from "hooks/useGithubAuth";
+import { usePrevious } from 'hooks/usePrevious';
 
 const useStyles = makeStyles((theme: any) => ({
 	card: {
@@ -75,13 +77,103 @@ const integrationAccounts = [
 export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConnected, trelloLoading }:
 	{ open: boolean, onClose: any, authorizeTrello: any, organizationData: any, isTrelloConnected: any, trelloLoading: any }) => {
 	const classes = useStyles();
+	/**** github code  */
+	const { onOpen, onResetAuth, authorization, isAuthenticating } = useGithubAuth();
+	const [hasClickedAuth, setHasClickedAuth] = useState(false)
+
+	const prevAuth = usePrevious(authorization)
+	/**** github code  */
 	const { DAO, user, syncTrelloDataLoading } = useAppSelector((state) => state.dashboard);
 	const [selectedValue, setSelectedValue] = useState('');
 	const [boardsLoading, setBoardsLoading] = useState(false)
 	const [expandTrello, setExpandTrello] = useState(false)
 	const [expandGitHub, setExpandGitHub] = useState(false)
 	const [expandDiscord, setExpandDiscord] = useState(false)
+	const [gitHubLoading, setGitHubLoading] = useState(false);
+	const [gitHubOrganizationList, setGitHubOrganizationList] = useState([])
 	const dispatch = useAppDispatch()
+
+	useEffect(() => {
+		console.log("auth : in useEffect", authorization);
+		if (((prevAuth == undefined && authorization) || (prevAuth && authorization && prevAuth !== authorization)) && hasClickedAuth) {
+			handleAddResource()
+		}
+	}, [prevAuth, authorization, hasClickedAuth])
+
+	const prevIsAuthenticating = usePrevious(isAuthenticating)
+
+	const handleAddResource = () => {
+		setHasClickedAuth(true)
+		try {
+			if (!authorization)
+				return onOpen()
+			setHasClickedAuth(false);
+			console.log("authorization", authorization)
+			onSuccess({ code: authorization })
+		}
+		catch (e) {
+			console.log(e)
+		}
+
+	}
+
+	const onSuccess = (response: any) => {
+		setGitHubLoading(true);
+		console.log(response.code, '...github response.code...')
+		axiosHttp.get(`utility/getGithubAccessToken?code=${response.code}`)
+			.then((res) => {
+				if (res.data) {
+					console.log("response : ", res.data);
+					// check if issues has been previously pulled --- inside DAO object
+					const githubOb = _get(DAO, 'github', null);
+					handleGithub(res.data.access_token);
+				}
+				else {
+					alert("No res : Something went wrong");
+					setGitHubLoading(false);
+				}
+				onResetAuth();
+			})
+			.catch((e) => {
+				onResetAuth()
+				console.log("error : ", e);
+				alert("Something went wrong");
+				setGitHubLoading(false);
+			})
+	}
+
+	const handleGithub = (token: any) => {
+		axiosHttp.post(`utility/user/repos`, { auth: token })
+			.then((result) => {
+				console.log(result, '...result...')
+				//setGitHubOrganizationList(result);
+			})
+
+		axiosHttp.get(`utility/get-issues?token=${token}&daoId=${_get(DAO, '_id', null)}`)
+			.then((result) => {
+				console.log("issues : ", result.data);
+				if (result.data.message === 'error') {
+					console.log("Not allowed");
+					//const e = document.getElementById('error-msg');
+					//e.innerHTML = 'Please check repository for ownership or typography error';
+					setGitHubLoading(false);
+					return;
+				}
+				else {
+					console.log("Allowed to pull and store issues")
+					// dispatch(storeGithubIssues({
+					// 	payload:
+					// 	{
+					// 		daoId: _get(DAO, '_id', null),
+					// 		issueList: result.data.data,
+					// 		token,
+					// 		repoInfo,
+					// 		linkOb: { title: linkTitle, link: link }
+					// 	}
+					// }));
+				}
+			})
+	}
 
 	useEffect(() => {
 		if (syncTrelloDataLoading === false) {
@@ -94,7 +186,12 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 		if (item.name === "Trello") {
 			authorizeTrello()
 			setExpandTrello(true)
+			return
 		}
+		if (item.name === "GitHub") {
+			handleAddResource()
+		}
+
 	}
 
 	const handleExpand = (item: any) => {
@@ -175,6 +272,7 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 
 	const isIntegrationLoader = (item: any) => {
 		return (item.name === 'Trello' && trelloLoading)
+			|| (item.name === 'GitHub' && gitHubLoading)
 	}
 
 	const isIntegrationConnected = (item: any) => {
