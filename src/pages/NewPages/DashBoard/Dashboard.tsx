@@ -201,6 +201,14 @@ const Dashboard = () => {
 	}, [myRole])
 
 	useEffect(() => {
+		if(DAO) {
+			if(!DAO?.safe) {
+				navigate(`/${daoURL}/newsafe`)
+			}
+		}
+	}, [DAO])
+
+	useEffect(() => {
 		// if (DAO && !DAO.githubIssues) {
 		// 	console.log("fetching...")
 		// 	// https://github.com/Lomads-Technologies/token-gating
@@ -325,8 +333,11 @@ const Dashboard = () => {
 		if (_get(DAO, 'sbt.contactDetail', null)) {
 			const contactdetails = _get(DAO, 'sbt.contactDetail', []);
 			for (let index = 0; index < contactdetails.length; index++) {
-				let shouldUpdate = true;
 				const contact = contactdetails[index];
+				if(['email', 'discord', 'github', 'telegram'].indexOf(contact) === -1){
+					continue;
+				}
+				let shouldUpdate = true;
 				const myMetadata = _find(_get(DAO, 'sbt.metadata', []), m => {
 					return _find(m.attributes, a => a.value === account)
 				})

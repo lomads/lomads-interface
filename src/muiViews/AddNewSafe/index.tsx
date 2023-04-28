@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import _ from "lodash";
 import TextInput from '../../muiComponents/TextInput'
 import { InviteGangType } from "types/UItype";
@@ -17,6 +17,7 @@ import useTerminology from "hooks/useTerminology";
 import { useAppSelector } from "state/hooks";
 import { useAppDispatch } from "state/hooks";
 import { toast } from 'react-hot-toast';
+import axiosHttp from 'api'
 import {
 	updateOwners,
 	updateSafeAddress,
@@ -35,7 +36,7 @@ import { SafeFactory, SafeAccountConfig } from "@gnosis.pm/safe-core-sdk";
 import { ethers } from "ethers";
 import { CHAIN_INFO } from 'constants/chainInfo';
 import { createDAO } from '../../state/flow/actions';
-import { loadDao } from '../../state/dashboard/actions';
+import { getDao, loadDao } from '../../state/dashboard/actions';
 import { Box, Typography, Container, Grid } from "@mui/material"
 import { makeStyles } from '@mui/styles';
 import MuiSelect from '../../muiComponents/Select'
@@ -430,6 +431,7 @@ export default () => {
 	const classes = useStyles()
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
+	const { daoURL } = useParams()
 	const { provider, account, chainId } = useWeb3React();
 	const invitedMembers = useAppSelector((state) => state.flow.invitedGang);
 	const [myowers, setMyOwers] = useState<InviteGangType[]>(invitedMembers);
@@ -664,24 +666,46 @@ export default () => {
 						}, []);
 						dispatch(updateTotalMembers(value));
 						//setisLoading(false);
-						const payload: any = {
-							contractAddress: '',
-							chainId,
-							name: flow.daoName,
-							url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
-							image: null,
-							members: value.map((m: any) => {
-								return {
-									...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: owners.map((a: any) => a.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4'
+
+						if(!daoURL) {
+							const payload: any = {
+								contractAddress: '',
+								chainId,
+								name: flow.daoName,
+								url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
+								image: null,
+								members: value.map((m: any) => {
+									return {
+										...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: owners.map((a: any) => a.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4'
+									}
+								}),
+								safe: {
+									name: safeName,
+									address: tx.getAddress(),
+									owners: owners,
+									chainId: selectedChainId
 								}
-							}),
-							safe: {
-								name: safeName,
-								address: tx.getAddress(),
-								owners: owners,
 							}
+							dispatch(createDAO(payload))
+						} else {
+							const params = {
+								members: value.map((m: any) => {
+									return {
+										...m, creator: m.address.toLowerCase() === account?.toLowerCase(), role: owners.map((a: any) => a.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4'
+									}
+								}),
+								safe: {
+									name: safeName,
+									address: tx.getAddress(),
+									owners: owners,
+									chainId: selectedChainId
+								}
+							}
+							axiosHttp.post(`dao/${daoURL}/attach-safe`, params)
+							.then(res => {
+								window.location.href = `/${daoURL}`
+							})
 						}
-						dispatch(createDAO(payload))
 					})
 					.catch(async (err) => {
 						console.log("An error occured while creating safe", err);
@@ -1112,7 +1136,7 @@ export default () => {
 		<Container>
 			<Grid className={classes.root}>
 				<Box className={classes.StartSafe}>
-					<Box className={classes.headerText}>2/2 Organisation Multi-sig Wallet</Box>
+					<Box className={classes.headerText}>{ daoURL ? '' : '2/2'} Organisation Multi-sig Wallet</Box>
 					<Box className={classes.buttonArea}>
 						<Box>
 							<Button
@@ -1139,7 +1163,10 @@ export default () => {
 									color: 'rgba(201, 75, 50, 0.6)',
 									width: 228
 								}}
-								onClick={() => navigate('/addsafe')}
+								onClick={() => {
+									daoURL ?  navigate(`/${daoURL}/addsafe`) :
+									navigate('/addsafe') 
+								}}
 								variant='contained'>
 								ADD EXISTING
 							</Button>

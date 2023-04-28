@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import _ from "lodash";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useWeb3React } from "@web3-react/core";
 import { updateHolder } from "state/proposal/reducer";
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import { ImportSafe } from "connection/SafeCall";
 import { createDAO } from '../../state/flow/actions';
 import coin from "../../assets/svg/coin.svg";
+import axiosHttp from 'api'
 import {
 	updateSafeAddress,
 	updatesafeName,
@@ -338,6 +339,7 @@ export default () => {
 	const classes = useStyles()
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
+	const { daoURL } = useParams()
 	const safeAddress = useAppSelector((state: any) => state.flow.safeAddress);
 	const safeName = useAppSelector((state: any) => state.flow.safeName);
 	const invitedMembers = useAppSelector((state: any) => state.flow.invitedGang);
@@ -413,26 +415,47 @@ export default () => {
 			return final.concat([current]);
 		}, []);
 		dispatch(updateTotalMembers(value));
-		const payload: any = {
-			chainId,
-			contractAddress: '',
-			name: flow.daoName,
-			url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
-			image: flow.daoImage,
-			members: value.map((m: any) => {
-				if (m.address.toLowerCase() === account?.toLowerCase()) {
-					return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : 'role2' }
+		if(!daoURL) {
+			const payload: any = {
+				chainId,
+				contractAddress: '',
+				name: flow.daoName,
+				url: flow.daoAddress.replace(`${process.env.REACT_APP_URL}/`, ''),
+				image: flow.daoImage,
+				members: value.map((m: any) => {
+					if (m.address.toLowerCase() === account?.toLowerCase()) {
+						return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : 'role2' }
+					}
+					return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4' }
+				}),
+				safe: {
+					name: safeName,
+					address: selectedSafeAddress,
+					chainId: selectedChainId,
+					owners: owners.current.map(o => o.address),
 				}
-				return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4' }
-			}),
-			safe: {
-				name: safeName,
-				address: selectedSafeAddress,
-				chainId: selectedChainId,
-				owners: owners.current.map(o => o.address),
 			}
+			dispatch(createDAO(payload))
+		} else {
+			const params = {
+				members: value.map((m: any) => {
+					if (m.address.toLowerCase() === account?.toLowerCase()) {
+						return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : 'role2' }
+					}
+					return { ...m, creator: m?.address.toLowerCase() === account?.toLowerCase(), role: owners.current.map(c => c.address.toLowerCase()).indexOf(m.address.toLowerCase()) > -1 ? 'role1' : m.role ? m.role : 'role4' }
+				}),
+				safe: {
+					name: safeName,
+					address: selectedSafeAddress,
+					chainId: selectedChainId,
+					owners: owners.current.map(o => o.address),
+				}
+			}
+			axiosHttp.post(`dao/${daoURL}/attach-safe`, params)
+			.then(res => {
+				window.location.href = `/${daoURL}`
+			})
 		}
-		dispatch(createDAO(payload))
 	}, [selectedChainId, selectedSafeAddress]);
 
 	const getTokens = async (safeAddress: string) => {
@@ -592,7 +615,7 @@ export default () => {
 		<Container>
 			<Grid className={classes.root}>
 				<Box className={classes.StartSafe}>
-					<Box className={classes.headerText}>2/2 Organisation Multi-sig Wallet</Box>
+					<Box className={classes.headerText}>{ daoURL ? '' : '2/2'} Organisation Multi-sig Wallet</Box>
 					<Box className={classes.buttonArea}>
 						<Box>
 							<Button
@@ -604,7 +627,10 @@ export default () => {
 									width: 228,
 									color: 'rgba(201, 75, 50, 0.6)'
 								}}
-								onClick={() => navigate('/newsafe')}
+								onClick={() => {
+									daoURL ?  navigate(`/${daoURL}/newsafe`) :
+									 navigate('/newsafe') 
+								}}
 								variant='contained'>
 								CREATE
 							</Button>
