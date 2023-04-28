@@ -507,7 +507,7 @@ export default () => {
                 id: tokenId,
                 description: `${contract?.token} SBT TOKEN`,
                 daoUrl: DAO?.url,
-                name: state?.name,
+                name: `${contract?.name}#${tokenId}`,
                 image: contract?.image,
                 attributes: [
                   {

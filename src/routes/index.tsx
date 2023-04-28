@@ -73,6 +73,14 @@ export default [
         component: AddNewSafe
     },
     {
+        path: '/:daoURL/addsafe',
+        component: AddExistingSafe
+    },
+    {
+        path: '/:daoURL/newsafe',
+        component: AddNewSafe
+    },
+    {
         path: '/success',
         component: DAOsuccess
     },
