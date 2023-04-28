@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { get as _get } from 'lodash'
+import React, { useState, useEffect, useCallback } from 'react';
+import { get as _get, find as _find, debounce as _debounce } from 'lodash'
 import {
 	Drawer,
 	Box,
@@ -13,7 +13,7 @@ import {
 import { Image } from "@chakra-ui/react";
 import IconButton from 'muiComponents/IconButton'
 import CloseSVG from 'assets/svg/close-new.svg'
-import Integrations from "assets/svg/Integrations.svg"
+// import Integrations from "assets/svg/Integrations.svg"
 import GreyIconHelp from "assets/svg/GreyIconHelp.svg"
 import Integrationtrello from "assets/svg/Integrationtrello.svg"
 import Integrationgithub from "assets/svg/Integrationgithub.svg"
@@ -28,6 +28,12 @@ import { makeStyles } from '@mui/styles';
 import { syncTrelloData } from 'state/dashboard/actions';
 import { resetSyncTrelloDataLoader } from "state/dashboard/reducer";
 import axiosHttp from 'api';
+import useDCAuth from 'hooks/useDCAuth';
+import { usePrevious } from 'hooks/usePrevious';
+import useInterval from "hooks/useInterval";
+import usePopupWindow from 'hooks/usePopupWindow';
+import axios from "axios";
+import { setDAO } from 'state/dashboard/reducer';
 
 const useStyles = makeStyles((theme: any) => ({
 	card: {
@@ -83,6 +89,17 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 	const [expandDiscord, setExpandDiscord] = useState(false)
 	const dispatch = useAppDispatch()
 
+	const { onOpen, onResetAuth, authorization, isAuthenticating } = useDCAuth("identify guilds");
+	const { onOpen: openAddBotPopup, windowInstance: activeAddBotPopup } = usePopupWindow()
+	const [hasClickedAuth, setHasClickedAuth] = useState(false);
+	const [isDiscordConnected, setIsDiscordConnected] = useState(false);
+	const [serverData, setServerData] = useState<any[]>([]);
+	const [selectedServerId, setSelectedServerId] = useState('');
+	const [server, setServer] = useState(null);
+	const [poll, setPoll] = useState<any>();
+	const [syncServerLoading, setSyncServerLoading] = useState<boolean>(false);
+	const [channels, setChannels] = useState<any[]>([]);
+
 	useEffect(() => {
 		if (syncTrelloDataLoading === false) {
 			dispatch(resetSyncTrelloDataLoader());
@@ -95,6 +112,130 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 			authorizeTrello()
 			setExpandTrello(true)
 		}
+		else if (item.name === 'Discord') {
+			handleConnectDiscord();
+		}
+	}
+
+	const getDiscordServers = useCallback(async () => {
+		console.log("getDiscordServers", authorization, typeof (authorization));
+		return axios.get('https://discord.com/api/users/@me/guilds', { headers: { Authorization: authorization! } })
+			.then(res => res.data)
+			.catch(e => {
+				if (e.response.status === 401) {
+					console.log(e)
+					setHasClickedAuth(true)
+					onResetAuth()
+					setTimeout(() => onOpen(), 1000)
+				}
+				return null;
+			})
+	}, [authorization, onOpen])
+
+	const prevAuth = usePrevious(authorization)
+	const prevActiveAddBotPopup = usePrevious(activeAddBotPopup)
+	const prevIsAuthenticating = usePrevious(isAuthenticating)
+
+	useEffect(() => {
+		if (((prevAuth == undefined && authorization) || (prevAuth && authorization && prevAuth !== authorization)) && hasClickedAuth) {
+			handleConnectDiscord();
+		}
+	}, [prevAuth, authorization, hasClickedAuth])
+
+	useInterval(async () => {
+		axiosHttp.get(`discord/guild/${poll}`)
+			.then(res => setChannels(res.data.channels))
+	}, poll ? 5000 : null)
+
+	useEffect(() => {
+		if (!!prevActiveAddBotPopup && !activeAddBotPopup) {
+			// onSelect(serverData.id)
+			if (poll)
+				setPoll(null)
+		}
+	}, [prevActiveAddBotPopup, activeAddBotPopup, poll])
+
+
+	useEffect(() => {
+		if (prevIsAuthenticating && !isAuthenticating)
+			setSyncServerLoading(false);
+	}, [prevIsAuthenticating, isAuthenticating])
+
+	useEffect(() => {
+		if (channels?.length > 0 && activeAddBotPopup) {
+			setPoll(null)
+			activeAddBotPopup.close()
+			onGuildBotAddedDelayed()
+		}
+	}, [channels, activeAddBotPopup])
+
+	const finish = () => {
+		setChannels([]);
+		setPoll(null);
+		setHasClickedAuth(false)
+		if (server) {
+			axiosHttp.post(`discord/guild/${selectedServerId}/sync-roles`, { daoId: _get(DAO, '_id') })
+				.then((daoData) => {
+					if (daoData.data) {
+						dispatch(setDAO(daoData.data))
+					}
+				})
+				.finally(() => {
+					setSyncServerLoading(false);
+
+					// onGuildCreateSuccess(result)
+					setServer(null);
+				})
+		}
+		else {
+			setSyncServerLoading(false);
+			// onGuildCreateSuccess(result)
+			setServer(null);
+		}
+	}
+
+	const onGuildBotAdded = async () => {
+		finish()
+	}
+
+	const onGuildBotAddedDelayed = useCallback(_debounce(onGuildBotAdded, 1000), [onGuildBotAdded, server])
+
+	const handleConnectDiscord = async () => {
+		if (!authorization)
+			return onOpen();
+		const dcServers = await getDiscordServers();
+		console.log("dc servers : ", dcServers);
+		if (dcServers && dcServers.length) {
+			setServerData(dcServers.filter((item: any) => item.owner));
+			setIsDiscordConnected(true);
+			setExpandDiscord(true);
+		}
+	}
+
+	const handleSyncServer = async () => {
+		setSyncServerLoading(true);
+		let validServer = _find(serverData, s => s.id.toString() === selectedServerId.toString());
+		const guildId = await axiosHttp.get(`project/discord-server-exists/${selectedServerId}`).then(res => res.data);
+		if (guildId) {
+			setServer(validServer)
+			const redirectUri = typeof window !== "undefined" && `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
+			setPoll(selectedServerId)
+			openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=${process.env.REACT_APP_DISCORD_APP_ID}&guild_id=${selectedServerId}&permissions=8&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
+
+		} else {
+			setServer(validServer)
+			// check if bot already added 
+			const discordGuild = await axiosHttp.get(`discord/guild/${validServer.id}`).then(res => res.data).catch(e => null);
+			console.log("discordGuild", discordGuild)
+			if (!discordGuild) {
+				const redirectUri = typeof window !== "undefined" && `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
+				setPoll(selectedServerId)
+				openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=${process.env.REACT_APP_DISCORD_APP_ID}&guild_id=${selectedServerId}&permissions=8&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
+			}
+			else {
+				onGuildBotAddedDelayed();
+			}
+		}
 	}
 
 	const handleExpand = (item: any) => {
@@ -106,10 +247,9 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 			setExpandDiscord(!expandDiscord)
 			return
 		}
-
 		setExpandGitHub(!expandGitHub)
-
 	}
+
 	const getAllBoards = () => {
 		// check if webhook already exists
 		const trelloOb = _get(DAO, 'trello', null);
@@ -180,18 +320,21 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 	const isIntegrationConnected = (item: any) => {
 		return (item.name === 'Trello' && isTrelloConnected)
 			|| (item.name === 'GitHub' && expandGitHub) // expandGitHub to be replace by isGitHUbConnected
-			|| (item.name === 'Discord' && expandDiscord)// expandDiscord to be replace by isDiscordConnected
+			|| (item.name === 'Discord' && isDiscordConnected)// expandDiscord to be replace by isDiscordConnected
 	}
 
 	const showIntegrationConnectButton = (item: any) => {
 		return (item.name === 'Trello' && !isTrelloConnected)
 			|| (item.name === 'GitHub' && !expandGitHub) // expandGitHub to be replace by isGitHUbConnected
-			|| (item.name === 'Discord' && !expandDiscord)// expandDiscord to be replace by isDiscordConnected
+			|| (item.name === 'Discord' && !isDiscordConnected)// expandDiscord to be replace by isDiscordConnected
 	}
 
 	const getConnectionCount = (item: any) => {
 		if (item.name === 'Trello' && isTrelloConnected && !!organizationData.length) {
 			return ` (${organizationData.length})`
+		}
+		if (item.name === 'Discord' && isDiscordConnected && !!serverData.length) {
+			return ` (${serverData.length})`
 		}
 		return null
 	}
@@ -201,7 +344,6 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 			|| (item.name === 'GitHub' && expandGitHub) // expandGitHub to be replace by isGitHUbConnected
 			|| (item.name === 'Discord' && expandDiscord)
 	}
-
 
 	const IntegrationOrganizationList = (item: any) => {
 		if (item.name === 'Trello' && expandTrello && isTrelloConnected) {
@@ -252,8 +394,53 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 
 		}
 		// add isDiscordConnected
-		if (item.name === 'Discord' && expandDiscord) {
-
+		if (item.name === 'Discord' && expandDiscord && isDiscordConnected) {
+			return <>
+				{
+					serverData.length
+						?
+						serverData.map((item: any) => {
+							return (
+								<Card className={_get(DAO, `discord.${item.id}`, null) ? classes.cardDisabled : classes.card}>
+									<CardContent>
+										<Typography sx={{ fontSize: 14 }}>
+											{item.name}
+										</Typography>
+									</CardContent>
+									{
+										_get(DAO, `discord.${item.id}`, null)
+											?
+											<Image
+												src={checkmark}
+											/>
+											:
+											<Radio
+												checked={selectedServerId === item.id}
+												onChange={(e) => setSelectedServerId(e.target.value)}
+												value={item.id}
+												name="radio-buttons"
+												inputProps={{ 'aria-label': 'A' }}
+												disabled={_get(DAO, `discord.${item.id}`, null) ? true : false}
+											/>
+									}
+								</Card>
+							)
+						})
+						:
+						null
+				}
+				<Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+					<Button color="error" variant="contained" onClick={handleSyncServer}>
+						{
+							syncServerLoading
+								?
+								<LeapFrog size={24} color="#FFF" />
+								:
+								'SYNC'
+						}
+					</Button>
+				</Box>
+			</>
 		}
 		return null
 	}
@@ -270,7 +457,7 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 					<img src={CloseSVG} />
 				</IconButton>
 				<Box display="flex" flexDirection="column" my={6} alignItems="center">
-					<img src={Integrations} />
+					{/* <img src={Integrations} /> */}
 					<Typography my={2} style={{ color: palette.primary.main, fontSize: '30px', fontWeight: 400 }}>Integrations</Typography>
 				</Box>
 
