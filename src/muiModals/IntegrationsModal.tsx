@@ -3,6 +3,7 @@ import { get as _get } from 'lodash'
 import {
 	Drawer,
 	Box,
+	Switch,
 	Typography,
 	Divider,
 	Button,
@@ -30,6 +31,7 @@ import { resetSyncTrelloDataLoader } from "state/dashboard/reducer";
 import axiosHttp from 'api';
 import useGithubAuth from "hooks/useGithubAuth";
 import { usePrevious } from 'hooks/usePrevious';
+import axios from 'axios';
 
 const useStyles = makeStyles((theme: any) => ({
 	card: {
@@ -87,29 +89,32 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 	const [selectedValue, setSelectedValue] = useState('');
 	const [boardsLoading, setBoardsLoading] = useState(false)
 	const [expandTrello, setExpandTrello] = useState(false)
-	const [expandGitHub, setExpandGitHub] = useState(false)
 	const [expandDiscord, setExpandDiscord] = useState(false)
-	const [gitHubLoading, setGitHubLoading] = useState(false);
+	const [expandGitHub, setExpandGitHub] = useState(false)
+	const [isGitHubConnected, setGitHubConnected] = useState(false)
+	const [gitHubLoading, setGitHubLoading] = useState(false)
+	const [gitHubAccessToken, setGitHubAccessToken] = useState(false)
+	const [selectedGitHubLink, setSelectedGitHubLink] = useState({ id: null, url: '', full_name: '', name: '' })
 	const [gitHubOrganizationList, setGitHubOrganizationList] = useState([])
 	const dispatch = useAppDispatch()
 
 	useEffect(() => {
 		console.log("auth : in useEffect", authorization);
 		if (((prevAuth == undefined && authorization) || (prevAuth && authorization && prevAuth !== authorization)) && hasClickedAuth) {
-			handleAddResource()
+			authorizeGitHub()
 		}
 	}, [prevAuth, authorization, hasClickedAuth])
 
-	const prevIsAuthenticating = usePrevious(isAuthenticating)
+	// const prevIsAuthenticating = usePrevious(isAuthenticating)
 
-	const handleAddResource = () => {
+	const authorizeGitHub = () => {
 		setHasClickedAuth(true)
 		try {
 			if (!authorization)
 				return onOpen()
 			setHasClickedAuth(false);
 			console.log("authorization", authorization)
-			onSuccess({ code: authorization })
+			generateGitHubAccessToken({ code: authorization })
 		}
 		catch (e) {
 			console.log(e)
@@ -117,20 +122,23 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 
 	}
 
-	const onSuccess = (response: any) => {
+	const generateGitHubAccessToken = (response: any) => {
 		setGitHubLoading(true);
 		console.log(response.code, '...github response.code...')
 		axiosHttp.get(`utility/getGithubAccessToken?code=${response.code}`)
 			.then((res) => {
 				if (res.data) {
 					console.log("response : ", res.data);
+					setGitHubConnected(true)
 					// check if issues has been previously pulled --- inside DAO object
-					const githubOb = _get(DAO, 'github', null);
-					handleGithub(res.data.access_token);
+					// const githubOb = _get(DAO, 'github', null);
+					setGitHubAccessToken(res.data.access_token);
+					getGitHubRepos(res.data.access_token);
 				}
 				else {
 					alert("No res : Something went wrong");
 					setGitHubLoading(false);
+					setGitHubConnected(false)
 				}
 				onResetAuth();
 			})
@@ -142,35 +150,51 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 			})
 	}
 
-	const handleGithub = (token: any) => {
-		axiosHttp.post(`utility/user/repos`, { auth: token })
-			.then((result) => {
-				console.log(result, '...result...')
-				//setGitHubOrganizationList(result);
+	const getGitHubRepos = (token: any) => {
+		const AuthStr = 'Bearer '.concat(token);
+		axios.get(`https://api.github.com/user`, { headers: { Authorization: AuthStr } })
+			.then(response => {
+				// If request is good...
+				console.log(response.data);
+				if (response.data) {
+					axios.get(response.data.repos_url, { headers: { Authorization: AuthStr } })
+						.then(res => {
+							// If request is good...
+							console.log(res.data, "....res.data github list");
+							if (res.data) {
+								setGitHubOrganizationList(res.data)
+								setGitHubLoading(false);
+							}
+						})
+				}
 			})
+			.catch((error) => {
+				console.log('error ' + error);
+				setGitHubLoading(false);
+			});
+	}
 
-		axiosHttp.get(`utility/get-issues?token=${token}&daoId=${_get(DAO, '_id', null)}`)
-			.then((result) => {
+	const getAllGithubIssues = () => {
+		axiosHttp.get(`utility/get-issues?token=${gitHubAccessToken}&repoInfo=${selectedGitHubLink.full_name}&daoId=${_get(DAO, '_id', null)}`)
+			.then((result: any) => {
 				console.log("issues : ", result.data);
 				if (result.data.message === 'error') {
 					console.log("Not allowed");
-					//const e = document.getElementById('error-msg');
-					//e.innerHTML = 'Please check repository for ownership or typography error';
 					setGitHubLoading(false);
 					return;
 				}
 				else {
 					console.log("Allowed to pull and store issues")
-					// dispatch(storeGithubIssues({
-					// 	payload:
-					// 	{
-					// 		daoId: _get(DAO, '_id', null),
-					// 		issueList: result.data.data,
-					// 		token,
-					// 		repoInfo,
-					// 		linkOb: { title: linkTitle, link: link }
-					// 	}
-					// }));
+					dispatch(storeGithubIssues({
+						payload:
+						{
+							daoId: _get(DAO, '_id', null),
+							issueList: result.data.data,
+							token: gitHubAccessToken,
+							repoInfo: selectedGitHubLink.full_name,
+							linkOb: { title: selectedGitHubLink.name, link: selectedGitHubLink.url }
+						}
+					}));
 				}
 			})
 	}
@@ -189,7 +213,7 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 			return
 		}
 		if (item.name === "GitHub") {
-			handleAddResource()
+			authorizeGitHub()
 		}
 
 	}
@@ -270,20 +294,20 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 			})
 	}
 
-	const isIntegrationLoader = (item: any) => {
+	const showButtonLoader = (item: any) => {
 		return (item.name === 'Trello' && trelloLoading)
 			|| (item.name === 'GitHub' && gitHubLoading)
 	}
 
-	const isIntegrationConnected = (item: any) => {
+	const showConnectedText = (item: any) => {
 		return (item.name === 'Trello' && isTrelloConnected)
-			|| (item.name === 'GitHub' && expandGitHub) // expandGitHub to be replace by isGitHUbConnected
+			|| (item.name === 'GitHub' && isGitHubConnected)
 			|| (item.name === 'Discord' && expandDiscord)// expandDiscord to be replace by isDiscordConnected
 	}
 
-	const showIntegrationConnectButton = (item: any) => {
+	const showConnectButton = (item: any) => {
 		return (item.name === 'Trello' && !isTrelloConnected)
-			|| (item.name === 'GitHub' && !expandGitHub) // expandGitHub to be replace by isGitHUbConnected
+			|| (item.name === 'GitHub' && !isGitHubConnected)
 			|| (item.name === 'Discord' && !expandDiscord)// expandDiscord to be replace by isDiscordConnected
 	}
 
@@ -291,15 +315,25 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 		if (item.name === 'Trello' && isTrelloConnected && !!organizationData.length) {
 			return ` (${organizationData.length})`
 		}
+		if (item.name === 'GitHub' && isGitHubConnected && !!gitHubOrganizationList.length) {
+			return ` (${gitHubOrganizationList.length})`
+		}
 		return null
 	}
 
 	const expandList = (item: any) => {
 		return (item.name === 'Trello' && expandTrello)
-			|| (item.name === 'GitHub' && expandGitHub) // expandGitHub to be replace by isGitHUbConnected
+			|| (item.name === 'GitHub' && expandGitHub)
 			|| (item.name === 'Discord' && expandDiscord)
 	}
 
+	const handleGitHubSwitch = (evt: any, item: any) => {
+		if (!!evt.target.checked) {
+			setSelectedGitHubLink(item)
+			return
+		}
+		setSelectedGitHubLink({ id: null, full_name: '', name: '', url: '' })
+	}
 
 	const IntegrationOrganizationList = (item: any) => {
 		if (item.name === 'Trello' && expandTrello && isTrelloConnected) {
@@ -345,9 +379,28 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 			</>
 		}
 
-		// add isGitHubConnected
-		if (item.name === 'GitHub' && expandGitHub) {
-
+		if (item.name === 'GitHub' && expandGitHub && isGitHubConnected && gitHubOrganizationList.length) {
+			return <>
+				{gitHubOrganizationList.length ? gitHubOrganizationList.map((item: any) => {
+					return (
+						<Card className={_get(DAO, `gitHub.${item.id}`, null) ? classes.cardDisabled : classes.card}>
+							<CardContent>
+								<Typography sx={{ fontSize: 14 }}>
+									{item.name}
+								</Typography>
+							</CardContent>
+							<Box ml={2} my={2}>
+								<Switch checked={selectedGitHubLink.id === item.id} onChange={(e) =>handleGitHubSwitch(e, item)} />
+							</Box>
+						</Card>
+					);
+				}) : null}
+				<Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+					<Button disabled={!selectedGitHubLink.id} color="error" variant="contained" onClick={getAllGithubIssues}>
+								PULL ISSUES
+					</Button>
+				</Box>
+			</>
 		}
 		// add isDiscordConnected
 		if (item.name === 'Discord' && expandDiscord) {
@@ -398,7 +451,7 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 									}}>{item.name}
 										<span className={classes.organizationCount}>{getConnectionCount(item)}</span>
 									</Typography>
-									{isIntegrationConnected(item) ? <Box sx={{
+									{showConnectedText(item) ? <Box sx={{
 										color: '#188C7C',
 										fontSize: 12,
 									}}>
@@ -411,12 +464,12 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 								right: 0,
 								justifySelf: "center"
 							}}>
-								{showIntegrationConnectButton(item)
+								{showConnectButton(item)
 									? <Button variant='contained'
 										onClick={() => handleClick(item)}
 									>
 										{
-											isIntegrationLoader(item)
+											showButtonLoader(item)
 												? <LeapFrog size={24} color="#FFF" />
 												: 'CONNECT'
 										}</Button>
@@ -428,7 +481,7 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 							</Box>
 						</Box>
 						<Divider sx={{ color: '#1B2B41', width: 440 }} variant="middle" />
-						{IntegrationOrganizationList(item)}
+						<Box sx={{ marginRight: 1 }}>{IntegrationOrganizationList(item)}</Box>
 					</>
 				})}
 
