@@ -45,7 +45,8 @@ const useStyles = makeStyles((theme: any) => ({
 		padding: '0 15px'
 	},
 	cardDisabled: {
-		background: 'rgba(24, 140, 124, 0.1)',
+		background: '#d4e5d2 !important',
+		opacity: 0.7,
 		height: '60px',
 		display: 'flex',
 		alignItems: 'center',
@@ -174,7 +175,8 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 			});
 	}
 
-	const getAllGithubIssues = () => {
+	const pullGithubIssues = () => {
+		setGitHubLoading(true);
 		axiosHttp.get(`utility/get-issues?token=${gitHubAccessToken}&repoInfo=${selectedGitHubLink.full_name}&daoId=${_get(DAO, '_id', null)}`)
 			.then((result: any) => {
 				console.log("issues : ", result.data);
@@ -195,6 +197,7 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 							linkOb: { title: selectedGitHubLink.name, link: selectedGitHubLink.url }
 						}
 					}));
+					setGitHubLoading(false);
 				}
 			})
 	}
@@ -312,15 +315,20 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 	}
 
 	const getConnectionCount = (item: any) => {
-		if (item.name === 'Trello' && isTrelloConnected && !!organizationData.length) {
-			return ` (${organizationData.length})`
+		if (item.name === 'Trello' && isTrelloConnected) {
+			return ` (${Object.keys(_get(DAO, `trello`, null)).length})`
 		}
-		if (item.name === 'GitHub' && isGitHubConnected && !!gitHubOrganizationList.length) {
-			return ` (${gitHubOrganizationList.length})`
+
+		if (item.name === 'GitHub' && isGitHubConnected) {
+			return ` (${Object.keys(_get(DAO, `github`, null)).length})`
 		}
+		
 		return null
 	}
 
+	const isGitHubItemConnected = (item: any) => {
+       return Object.keys(_get(DAO, `github`, null)).find(re => re === item.full_name)
+	}
 	const expandList = (item: any) => {
 		return (item.name === 'Trello' && expandTrello)
 			|| (item.name === 'GitHub' && expandGitHub)
@@ -383,21 +391,39 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 			return <>
 				{gitHubOrganizationList.length ? gitHubOrganizationList.map((item: any) => {
 					return (
-						<Card className={_get(DAO, `gitHub.${item.id}`, null) ? classes.cardDisabled : classes.card}>
+						<Card className={isGitHubItemConnected(item) ? classes.cardDisabled : classes.card}>
 							<CardContent>
 								<Typography sx={{ fontSize: 14 }}>
 									{item.name}
 								</Typography>
 							</CardContent>
-							<Box ml={2} my={2}>
-								<Switch checked={selectedGitHubLink.id === item.id} onChange={(e) =>handleGitHubSwitch(e, item)} />
-							</Box>
+							{
+								isGitHubItemConnected(item)
+									?
+									<Image
+										src={checkmark}
+									/>
+									:
+									<Radio
+										checked={selectedGitHubLink.id === item.id}
+										onChange={(e) => handleGitHubSwitch(e, item)}
+										value={item.id}
+										name="radio-buttons"
+										inputProps={{ 'aria-label': 'A' }}
+										disabled={isGitHubItemConnected(item) || gitHubLoading ? true : false}
+									/>
+							}
 						</Card>
 					);
 				}) : null}
 				<Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-					<Button disabled={!selectedGitHubLink.id} color="error" variant="contained" onClick={getAllGithubIssues}>
-								PULL ISSUES
+					<Button disabled={!selectedGitHubLink.id || Object.keys(_get(DAO, `github`, null)).length === gitHubOrganizationList.length} color="error" variant="contained" onClick={pullGithubIssues}>
+						{gitHubLoading
+							?
+							<LeapFrog size={24} color="#FFF" />
+							:
+							'PULL ISSUES'
+						}
 					</Button>
 				</Box>
 			</>
