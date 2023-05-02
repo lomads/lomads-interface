@@ -170,31 +170,45 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 	}, [channels, activeAddBotPopup])
 
 	const finish = () => {
+		console.log("server...", server)
+		console.log("selectedserver id : ", selectedServerId)
 		setChannels([]);
 		setPoll(null);
 		setHasClickedAuth(false)
-		if (server) {
-			axiosHttp.post(`discord/guild/${selectedServerId}/sync-roles`, { daoId: _get(DAO, '_id') })
-				.then((daoData) => {
-					if (daoData.data) {
-						dispatch(setDAO(daoData.data))
-					}
-				})
-				.finally(() => {
-					setSyncServerLoading(false);
-
-					// onGuildCreateSuccess(result)
-					setServer(null);
-				})
-		}
-		else {
-			setSyncServerLoading(false);
-			// onGuildCreateSuccess(result)
-			setServer(null);
-		}
+		axiosHttp.post(`discord/guild/${selectedServerId}/sync-roles`, { daoId: _get(DAO, '_id') })
+			.then((daoData) => {
+				if (daoData.data) {
+					console.log("180 dao object : ", daoData.data);
+					dispatch(setDAO(daoData.data))
+				}
+			})
+			.finally(() => {
+				setSyncServerLoading(false);
+				setServer(null);
+			})
+		// if (server) {
+		// 	console.log("server exists...")
+		// 	axiosHttp.post(`discord/guild/${selectedServerId}/sync-roles`, { daoId: _get(DAO, '_id') })
+		// 		.then((daoData) => {
+		// 			if (daoData.data) {
+		// 				console.log("180 dao object : ", daoData.data);
+		// 				dispatch(setDAO(daoData.data))
+		// 			}
+		// 		})
+		// 		.finally(() => {
+		// 			setSyncServerLoading(false);
+		// 			setServer(null);
+		// 		})
+		// }
+		// else {
+		// 	console.log("server does not exists...")
+		// 	setSyncServerLoading(false);
+		// 	setServer(null);
+		// }
 	}
 
 	const onGuildBotAdded = async () => {
+		console.log("calling finish()...")
 		finish()
 	}
 
@@ -215,14 +229,18 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 	const handleSyncServer = async () => {
 		setSyncServerLoading(true);
 		let validServer = _find(serverData, s => s.id.toString() === selectedServerId.toString());
+		console.log("valid server...", validServer);
 		const guildId = await axiosHttp.get(`project/discord-server-exists/${selectedServerId}`).then(res => res.data);
 		if (guildId) {
+			console.log("guildId exists...", guildId)
 			setServer(validServer)
 			const redirectUri = typeof window !== "undefined" && `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
 			setPoll(selectedServerId)
 			openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=${process.env.REACT_APP_DISCORD_APP_ID}&guild_id=${selectedServerId}&permissions=8&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
+		}
+		else {
 
-		} else {
+			console.log("guildId does not exists..");
 			setServer(validServer)
 			// check if bot already added 
 			const discordGuild = await axiosHttp.get(`discord/guild/${validServer.id}`).then(res => res.data).catch(e => null);
