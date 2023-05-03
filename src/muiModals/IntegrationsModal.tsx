@@ -125,19 +125,13 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 	}, [syncTrelloDataLoading]);
 
 	useEffect(() => {
-		console.log("auth : in useEffect", authorization);
 		if (((prevAuth == undefined && authorization) || (prevAuth && authorization && prevAuth !== authorization)) && hasClickedAuth) {
 			authorizeGitHub()
 		}
 	}, [prevAuth, authorization, hasClickedAuth])
 
 	useEffect(() => {
-		console.log(prevAuthDiscord, '...prevAuthDiscord...')
-		console.log(authorizationDiscord, '...authorizationDiscord...')
-		console.log(hasClickedAuthDiscord, '....hasClickedAuthDiscord...')
-
 		if (((prevAuthDiscord == undefined && authorizationDiscord) || (prevAuthDiscord && authorizationDiscord && prevAuthDiscord !== authorizationDiscord)) && hasClickedAuthDiscord) {
-			console.log('....handle discord connect...')
 			handleConnectDiscord();
 		}
 	}, [prevAuthDiscord, authorizationDiscord, hasClickedAuthDiscord])
