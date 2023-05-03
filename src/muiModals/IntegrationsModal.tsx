@@ -132,6 +132,10 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 	}, [prevAuth, authorization, hasClickedAuth])
 
 	useEffect(() => {
+		console.log(prevAuthDiscord, '...prevAuthDiscord...')
+		console.log(authorizationDiscord, '...authorizationDiscord...')
+		console.log(hasClickedAuthDiscord, '....hasClickedAuthDiscord...')
+
 		if (((prevAuthDiscord == undefined && authorizationDiscord) || (prevAuthDiscord && authorizationDiscord && prevAuthDiscord !== authorizationDiscord)) && hasClickedAuthDiscord) {
 			console.log('....handle discord connect...')
 			handleConnectDiscord();
@@ -264,7 +268,7 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 			.catch(e => {
 				if (e.response.status === 401) {
 					console.log(e)
-					setHasClickedAuthDiscord(true)
+					setHasClickedAuthDiscord(false)
 					onResetAuthDiscord()
 					setTimeout(() => onOpen(), 1000)
 				}
@@ -296,8 +300,11 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 	const onGuildBotAddedDelayed = useCallback(_debounce(onGuildBotAdded, 1000), [onGuildBotAdded, server])
 
 	const handleConnectDiscord = async () => {
-		if (!authorizationDiscord)
+		setHasClickedAuthDiscord(true)
+		if (!authorizationDiscord){
 			return onOpenDiscord();
+		}
+		setHasClickedAuthDiscord(false)
 		const dcServers = await getDiscordServers();
 		setIsDiscordConnected(true);
 		setExpandDiscord(true);
@@ -486,7 +493,7 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 		}
 		if(item === 'Discord') {
 			return !serverData.length
-			|| (_get(DAO, `Discord`, null) && Object.keys(_get(DAO, `discord`, null)).length === serverData.length)
+			|| (_get(DAO, `discord`, null) && Object.keys(_get(DAO, `discord`, null)).length === serverData.length)
 		}
 		return false
 	}
