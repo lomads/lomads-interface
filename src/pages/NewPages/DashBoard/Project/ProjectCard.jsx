@@ -3,7 +3,7 @@ import { get as _get, groupBy as _groupBy } from 'lodash'
 import { useNavigate } from "react-router-dom";
 
 import { BsDiscord,BsTrello } from 'react-icons/bs';
-import { FaTrello } from 'react-icons/fa';
+import { FaTrello, FaGithub } from 'react-icons/fa';
 
 import { ProgressBar, Step } from "react-step-progress-bar";
 
@@ -71,6 +71,17 @@ const ProjectCard = ({ project, daoUrl, tab }) => {
                         <div className='myproject-card-icons'>
                             <div className='icon-container'>
                                 <FaTrello color='#FFF' size={20} />
+                            </div>
+                        </div> 
+                        :
+                        null
+                    }
+                    {
+                        project.provider === 'Github' && !project.viewers.includes(_get(user,'_id',''))
+                        ?
+                        <div className='myproject-card-icons'>
+                            <div className='icon-container'>
+                                <FaGithub color='#FFF' size={20} />
                             </div>
                         </div> 
                         :
