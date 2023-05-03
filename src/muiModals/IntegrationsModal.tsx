@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { get as _get } from 'lodash'
+import React, { useState, useEffect, useCallback } from 'react';
+import { find as _find, get as _get, debounce as _debounce } from 'lodash';
 import {
 	Drawer,
 	Box,
@@ -31,6 +31,10 @@ import { resetSyncTrelloDataLoader } from "state/dashboard/reducer";
 import axiosHttp from 'api';
 import useGithubAuth from "hooks/useGithubAuth";
 import { usePrevious } from 'hooks/usePrevious';
+import useDCAuth from 'hooks/useDCAuth';
+import useInterval from "hooks/useInterval";
+import usePopupWindow from 'hooks/usePopupWindow';
+import { setDAO } from 'state/dashboard/reducer';
 import axios from 'axios';
 
 const useStyles = makeStyles((theme: any) => ({
@@ -80,12 +84,9 @@ const integrationAccounts = [
 export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConnected, trelloLoading }:
 	{ open: boolean, onClose: any, authorizeTrello: any, organizationData: any, isTrelloConnected: any, trelloLoading: any }) => {
 	const classes = useStyles();
-	/**** github code  */
 	const { onOpen, onResetAuth, authorization, isAuthenticating } = useGithubAuth();
 	const [hasClickedAuth, setHasClickedAuth] = useState(false)
-
 	const prevAuth = usePrevious(authorization)
-	/**** github code  */
 	const { DAO, user, syncTrelloDataLoading } = useAppSelector((state) => state.dashboard);
 	const [selectedValue, setSelectedValue] = useState('');
 	const [boardsLoading, setBoardsLoading] = useState(false)
@@ -97,7 +98,31 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 	const [gitHubAccessToken, setGitHubAccessToken] = useState(false)
 	const [selectedGitHubLink, setSelectedGitHubLink] = useState({ id: null, url: '', full_name: '', name: '' })
 	const [gitHubOrganizationList, setGitHubOrganizationList] = useState([])
+	const [isDiscordConnected, setIsDiscordConnected] = useState(false);
+	const [serverData, setServerData] = useState<any[]>([]);
+	const [selectedServerId, setSelectedServerId] = useState('');
+	const [server, setServer] = useState(null);
+	const [poll, setPoll] = useState<any>();
+	const [syncServerLoading, setSyncServerLoading] = useState<boolean>(false);
+	const [channels, setChannels] = useState<any[]>([]);
 	const dispatch = useAppDispatch()
+
+	const { onOpen: onOpenDiscord,
+			onResetAuth: onResetAuthDiscord,
+			authorization: authorizationDiscord,
+			isAuthenticating: isAuthenticatingDiscord } = useDCAuth("identify guilds");
+	const { onOpen: openAddBotPopup, windowInstance: activeAddBotPopup } = usePopupWindow()
+	const [hasClickedAuthDiscord, setHasClickedAuthDiscord] = useState(false)
+	const prevAuthDiscord = usePrevious(authorizationDiscord)
+	const prevActiveAddBotPopup = usePrevious(activeAddBotPopup)
+	const prevIsAuthenticatingDiscord = usePrevious(isAuthenticatingDiscord)
+
+	useEffect(() => {
+		if (syncTrelloDataLoading === false) {
+			dispatch(resetSyncTrelloDataLoader());
+			setBoardsLoading(false);
+		}
+	}, [syncTrelloDataLoading]);
 
 	useEffect(() => {
 		console.log("auth : in useEffect", authorization);
@@ -106,7 +131,38 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 		}
 	}, [prevAuth, authorization, hasClickedAuth])
 
-	// const prevIsAuthenticating = usePrevious(isAuthenticating)
+	useEffect(() => {
+		if (((prevAuthDiscord == undefined && authorizationDiscord) || (prevAuthDiscord && authorizationDiscord && prevAuthDiscord !== authorizationDiscord)) && hasClickedAuthDiscord) {
+			console.log('....handle discord connect...')
+			handleConnectDiscord();
+		}
+	}, [prevAuthDiscord, authorizationDiscord, hasClickedAuthDiscord])
+
+	useEffect(() => {
+		if (!!prevActiveAddBotPopup && !activeAddBotPopup) {
+			// onSelect(serverData.id)
+			if (poll)
+				setPoll(null)
+		}
+	}, [prevActiveAddBotPopup, activeAddBotPopup, poll])
+
+	useEffect(() => {
+		if (channels?.length > 0 && activeAddBotPopup) {
+			setPoll(null)
+			activeAddBotPopup.close()
+			onGuildBotAddedDelayed()
+		}
+	}, [channels, activeAddBotPopup])
+
+	useEffect(() => {
+		if (prevIsAuthenticatingDiscord && !isAuthenticatingDiscord)
+			setSyncServerLoading(false);
+	}, [prevIsAuthenticatingDiscord, isAuthenticatingDiscord])
+
+	useInterval(async () => {
+		axiosHttp.get(`discord/guild/${poll}`)
+			.then(res => setChannels(res.data.channels))
+	}, poll ? 5000 : null)
 
 	const authorizeGitHub = () => {
 		setHasClickedAuth(true)
@@ -114,7 +170,6 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 			if (!authorization)
 				return onOpen()
 			setHasClickedAuth(false);
-			console.log("authorization", authorization)
 			generateGitHubAccessToken({ code: authorization })
 		}
 		catch (e) {
@@ -131,6 +186,7 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 				if (res.data) {
 					console.log("response : ", res.data);
 					setGitHubConnected(true)
+					setExpandGitHub(true)
 					// check if issues has been previously pulled --- inside DAO object
 					// const githubOb = _get(DAO, 'github', null);
 					setGitHubAccessToken(res.data.access_token);
@@ -202,23 +258,94 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 			})
 	}
 
-	useEffect(() => {
-		if (syncTrelloDataLoading === false) {
-			dispatch(resetSyncTrelloDataLoader());
-			setBoardsLoading(false);
+	const getDiscordServers = useCallback(async () => {
+		return axios.get('https://discord.com/api/users/@me/guilds', { headers: { Authorization: authorizationDiscord! } })
+			.then(res => res.data)
+			.catch(e => {
+				if (e.response.status === 401) {
+					console.log(e)
+					setHasClickedAuthDiscord(true)
+					onResetAuthDiscord()
+					setTimeout(() => onOpen(), 1000)
+				}
+				return null;
+			})
+	}, [authorizationDiscord, onOpenDiscord])
+
+	const finish = () => {
+		setChannels([]);
+		setPoll(null);
+		setHasClickedAuthDiscord(false)
+		axiosHttp.post(`discord/guild/${selectedServerId}/sync-roles`, { daoId: _get(DAO, '_id') })
+			.then((daoData) => {
+				if (daoData.data) {
+					dispatch(setDAO(daoData.data))
+				}
+			})
+			.finally(() => {
+				setSyncServerLoading(false);
+				setServer(null);
+			})
+	}
+
+	const onGuildBotAdded = async () => {
+		console.log("calling finish()...")
+		finish()
+	}
+
+	const onGuildBotAddedDelayed = useCallback(_debounce(onGuildBotAdded, 1000), [onGuildBotAdded, server])
+
+	const handleConnectDiscord = async () => {
+		if (!authorizationDiscord)
+			return onOpenDiscord();
+		const dcServers = await getDiscordServers();
+		setIsDiscordConnected(true);
+		setExpandDiscord(true);
+		if (dcServers && dcServers.length) {
+			setServerData(dcServers.filter((item: any) => item.owner));
 		}
-	}, [syncTrelloDataLoading]);
+	}
 
 	const handleClick = (item: any) => {
 		if (item.name === "Trello") {
 			authorizeTrello()
 			setExpandTrello(true)
-			return
 		}
-		if (item.name === "GitHub") {
+		else if (item.name === "GitHub") {
 			authorizeGitHub()
 		}
+		else if (item.name === 'Discord') {
+			handleConnectDiscord();
+		}
+	}
 
+	const handleSyncServer = async () => {
+		setSyncServerLoading(true);
+		let validServer = _find(serverData, s => s.id.toString() === selectedServerId.toString());
+		console.log("valid server...", validServer);
+		const guildId = await axiosHttp.get(`project/discord-server-exists/${selectedServerId}`).then(res => res.data);
+		if (guildId) {
+			console.log("guildId exists...", guildId)
+			setServer(validServer)
+			const redirectUri = typeof window !== "undefined" && `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
+			setPoll(selectedServerId)
+			openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=${process.env.REACT_APP_DISCORD_APP_ID}&guild_id=${selectedServerId}&permissions=8&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
+		}
+		else {
+			console.log("guildId does not exists..");
+			setServer(validServer)
+			// check if bot already added 
+			const discordGuild = await axiosHttp.get(`discord/guild/${validServer.id}`).then(res => res.data).catch(e => null);
+			console.log("discordGuild", discordGuild)
+			if (!discordGuild) {
+				const redirectUri = typeof window !== "undefined" && `${window.location.href.split("/").slice(0, 3).join("/")}/dcauth`
+				setPoll(selectedServerId)
+				openAddBotPopup(`https://discord.com/api/oauth2/authorize?client_id=${process.env.REACT_APP_DISCORD_APP_ID}&guild_id=${selectedServerId}&permissions=8&scope=bot%20applications.commands&redirect_uri=${redirectUri}`)
+			}
+			else {
+				onGuildBotAddedDelayed();
+			}
+		}
 	}
 
 	const handleExpand = (item: any) => {
@@ -305,29 +432,33 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 	const showConnectedText = (item: any) => {
 		return (item.name === 'Trello' && isTrelloConnected)
 			|| (item.name === 'GitHub' && isGitHubConnected)
-			|| (item.name === 'Discord' && expandDiscord)// expandDiscord to be replace by isDiscordConnected
+			|| (item.name === 'Discord' && isDiscordConnected)
 	}
 
 	const showConnectButton = (item: any) => {
 		return (item.name === 'Trello' && !isTrelloConnected)
 			|| (item.name === 'GitHub' && !isGitHubConnected)
-			|| (item.name === 'Discord' && !expandDiscord)// expandDiscord to be replace by isDiscordConnected
+			|| (item.name === 'Discord' && !isDiscordConnected)
 	}
 
 	const getConnectionCount = (item: any) => {
-		if (item.name === 'Trello' && isTrelloConnected) {
+		if (item.name === 'Trello' && isTrelloConnected && _get(DAO, `trello`, null)) {
 			return ` (${Object.keys(_get(DAO, `trello`, null)).length})`
 		}
 
-		if (item.name === 'GitHub' && isGitHubConnected) {
+		if (item.name === 'GitHub' && isGitHubConnected && _get(DAO, `github`, null)) {
 			return ` (${Object.keys(_get(DAO, `github`, null)).length})`
+		}
+
+		if (item.name === 'Discord' && isDiscordConnected && _get(DAO, `discord`, null)) {
+			return ` (${Object.keys(_get(DAO, `discord`, null)).length})`
 		}
 		
 		return null
 	}
 
 	const isGitHubItemConnected = (item: any) => {
-       return Object.keys(_get(DAO, `github`, null)).find(re => re === item.full_name)
+       return !!Object.keys(_get(DAO, `github`, null)).find(re => re === item.full_name)
 	}
 	const expandList = (item: any) => {
 		return (item.name === 'Trello' && expandTrello)
@@ -343,6 +474,22 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 		setSelectedGitHubLink({ id: null, full_name: '', name: '', url: '' })
 	}
 
+	const disableSycPullIssues = (item: any) => {
+		if(item === 'Trello') {
+			return !organizationData.length 
+				|| (_get(DAO, `trello`, null) && Object.keys(_get(DAO, `trello`, null)).length === organizationData.length)
+		}
+		if(item === 'Github') {
+			return !selectedGitHubLink.id 
+				|| !gitHubOrganizationList.length
+				|| (_get(DAO, `github`, null) && Object.keys(_get(DAO, `github`, null)).length === gitHubOrganizationList.length)
+		}
+		if(item === 'Discord') {
+			return !serverData.length
+			|| (_get(DAO, `Discord`, null) && Object.keys(_get(DAO, `discord`, null)).length === serverData.length)
+		}
+		return false
+	}
 	const IntegrationOrganizationList = (item: any) => {
 		if (item.name === 'Trello' && expandTrello && isTrelloConnected) {
 			return <>
@@ -374,7 +521,7 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 					);
 				}) : null}
 				<Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-					<Button color="error" variant="contained" onClick={getAllBoards}>
+					<Button color="error" variant="contained" disabled={disableSycPullIssues('Trello')} onClick={getAllBoards}>
 						{
 							boardsLoading
 								?
@@ -410,14 +557,14 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 										value={item.id}
 										name="radio-buttons"
 										inputProps={{ 'aria-label': 'A' }}
-										disabled={isGitHubItemConnected(item) || gitHubLoading ? true : false}
+										disabled={isGitHubItemConnected(item) || !!gitHubLoading}
 									/>
 							}
 						</Card>
 					);
 				}) : null}
 				<Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-					<Button disabled={!selectedGitHubLink.id || Object.keys(_get(DAO, `github`, null)).length === gitHubOrganizationList.length} color="error" variant="contained" onClick={pullGithubIssues}>
+					<Button disabled={disableSycPullIssues('Github')} color="error" variant="contained" onClick={pullGithubIssues}>
 						{gitHubLoading
 							?
 							<LeapFrog size={24} color="#FFF" />
@@ -428,10 +575,56 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 				</Box>
 			</>
 		}
-		// add isDiscordConnected
-		if (item.name === 'Discord' && expandDiscord) {
-
+		
+		if (item.name === 'Discord' && expandDiscord && isDiscordConnected) {
+			return <>
+				{
+					serverData.length
+						?
+						serverData.map((item: any) => {
+							return (
+								<Card className={_get(DAO, `discord.${item.id}`, null) ? classes.cardDisabled : classes.card}>
+									<CardContent>
+										<Typography sx={{ fontSize: 14 }}>
+											{item.name}
+										</Typography>
+									</CardContent>
+									{
+										_get(DAO, `discord.${item.id}`, null)
+											?
+											<Image
+												src={checkmark}
+											/>
+											:
+											<Radio
+												checked={selectedServerId === item.id}
+												onChange={(e) => setSelectedServerId(e.target.value)}
+												value={item.id}
+												name="radio-buttons"
+												inputProps={{ 'aria-label': 'A' }}
+												disabled={_get(DAO, `discord.${item.id}`, null) ? true : false}
+											/>
+									}
+								</Card>
+							)
+						})
+						:
+						null
+				}
+				<Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+					<Button disabled={disableSycPullIssues('Discord')} color="error" variant="contained" onClick={handleSyncServer}>
+						{
+							syncServerLoading
+								?
+								<LeapFrog size={24} color="#FFF" />
+								:
+								'SYNC'
+						}
+					</Button>
+				</Box>
+			</>
 		}
+
 		return null
 	}
 
