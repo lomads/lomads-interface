@@ -14,7 +14,7 @@ import {
 import { Image } from "@chakra-ui/react";
 import IconButton from 'muiComponents/IconButton'
 import CloseSVG from 'assets/svg/close-new.svg'
-import Integrations from "assets/svg/integrations.svg"
+import Integrations from "assets/svg/Integrations.svg"
 import GreyIconHelp from "assets/svg/GreyIconHelp.svg"
 import Integrationtrello from "assets/svg/Integrationtrello.svg"
 import Integrationgithub from "assets/svg/Integrationgithub.svg"
@@ -459,7 +459,10 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 	}
 
 	const isGitHubItemConnected = (item: any) => {
-       return !!Object.keys(_get(DAO, `github`, null)).find(re => re === item.full_name)
+       if(_get(DAO, `github`, null)) {
+		 return !!Object.keys(_get(DAO, `github`, null)).find(re => re === item.full_name)
+	   }
+	   return null
 	}
 	const expandList = (item: any) => {
 		return (item.name === 'Trello' && expandTrello)
