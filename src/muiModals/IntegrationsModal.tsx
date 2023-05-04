@@ -16,7 +16,7 @@ import IconButton from 'muiComponents/IconButton'
 import CloseSVG from 'assets/svg/close-new.svg'
 import Integrations from "assets/svg/Integrations.svg"
 import GreyIconHelp from "assets/svg/GreyIconHelp.svg"
-import Integrationtrello from "assets/svg/Integrationtrello.svg"
+import Integrationtrello from "assets/svg/integrationtrello.svg"
 import Integrationgithub from "assets/svg/Integrationgithub.svg"
 import Integrationdiscord from "assets/svg/Integrationdiscord.svg"
 import checkmark from "assets/svg/completeCheckmark.svg";
