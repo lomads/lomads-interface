@@ -14,7 +14,7 @@ import {
 import { Image } from "@chakra-ui/react";
 import IconButton from 'muiComponents/IconButton'
 import CloseSVG from 'assets/svg/close-new.svg'
-import Integrations from "assets/svg/Integrations.svg"
+import Integrations from "assets/svg/integrations.svg"
 import GreyIconHelp from "assets/svg/GreyIconHelp.svg"
 import Integrationtrello from "assets/svg/Integrationtrello.svg"
 import Integrationgithub from "assets/svg/Integrationgithub.svg"
@@ -452,8 +452,8 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 	}
 
 	const isGitHubItemConnected = (item: any) => {
-       if(_get(DAO, `github`, null)) {
-		 return !!Object.keys(_get(DAO, `github`, null)).find(re => re === item.full_name)
+     if(_get(DAO, `github`, null)) {
+		   return !!Object.keys(_get(DAO, `github`, null)).find(re => re === item.full_name)
 	   }
 	   return null
 	}
@@ -637,7 +637,7 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 					<img src={CloseSVG} />
 				</IconButton>
 				<Box display="flex" flexDirection="column" my={6} alignItems="center">
-					<img src={Integrations} />
+					{/* <img src={Integrations} /> */}
 					<Typography my={2} style={{ color: palette.primary.main, fontSize: '30px', fontWeight: 400 }}>Integrations</Typography>
 				</Box>
 
