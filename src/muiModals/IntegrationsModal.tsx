@@ -452,10 +452,10 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 	}
 
 	const isGitHubItemConnected = (item: any) => {
-		if (_get(DAO, `github`, null)) {
-			return !!Object.keys(_get(DAO, `github`, null)).find(re => re === item.full_name)
-		}
-		return null
+       if(_get(DAO, `github`, null)) {
+		 return !!Object.keys(_get(DAO, `github`, null)).find(re => re === item.full_name)
+	   }
+	   return null
 	}
 	const expandList = (item: any) => {
 		return (item.name === 'Trello' && expandTrello)
