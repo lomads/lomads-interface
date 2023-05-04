@@ -14,7 +14,7 @@ import {
 import { Image } from "@chakra-ui/react";
 import IconButton from 'muiComponents/IconButton'
 import CloseSVG from 'assets/svg/close-new.svg'
-// import Integrations from "assets/svg/integrations.svg"
+import Integrations from "assets/svg/integrations.svg"
 import GreyIconHelp from "assets/svg/GreyIconHelp.svg"
 import Integrationtrello from "assets/svg/Integrationtrello.svg"
 import Integrationgithub from "assets/svg/Integrationgithub.svg"
@@ -207,20 +207,13 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 
 	const getGitHubRepos = (token: any) => {
 		const AuthStr = 'Bearer '.concat(token);
-		axios.get(`https://api.github.com/user`, { headers: { Authorization: AuthStr } })
-			.then(response => {
+		axios.get(`https://api.github.com/user/repos`, { headers: { Authorization: AuthStr } })
+			.then(res => {
 				// If request is good...
-				console.log(response.data);
-				if (response.data) {
-					axios.get(response.data.repos_url, { headers: { Authorization: AuthStr } })
-						.then(res => {
-							// If request is good...
-							console.log(res.data, "....res.data github list");
-							if (res.data) {
-								setGitHubOrganizationList(res.data)
-								setGitHubLoading(false);
-							}
-						})
+				console.log(res.data, "....res.data github list");
+				if (res.data) {
+					setGitHubOrganizationList(res.data)
+					setGitHubLoading(false);
 				}
 			})
 			.catch((error) => {
@@ -459,7 +452,10 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 	}
 
 	const isGitHubItemConnected = (item: any) => {
-		return !!Object.keys(_get(DAO, `github`, null)).find(re => re === item.full_name)
+     if(_get(DAO, `github`, null)) {
+		   return !!Object.keys(_get(DAO, `github`, null)).find(re => re === item.full_name)
+	   }
+	   return null
 	}
 	const expandList = (item: any) => {
 		return (item.name === 'Trello' && expandTrello)
