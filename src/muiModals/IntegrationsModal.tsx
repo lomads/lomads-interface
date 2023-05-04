@@ -14,7 +14,7 @@ import {
 import { Image } from "@chakra-ui/react";
 import IconButton from 'muiComponents/IconButton'
 import CloseSVG from 'assets/svg/close-new.svg'
-import Integrations from "assets/svg/integrations.svg"
+import Integrations from "assets/svg/Integrations.svg"
 import GreyIconHelp from "assets/svg/GreyIconHelp.svg"
 import Integrationtrello from "assets/svg/Integrationtrello.svg"
 import Integrationgithub from "assets/svg/Integrationgithub.svg"
@@ -108,9 +108,9 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 	const dispatch = useAppDispatch()
 
 	const { onOpen: onOpenDiscord,
-			onResetAuth: onResetAuthDiscord,
-			authorization: authorizationDiscord,
-			isAuthenticating: isAuthenticatingDiscord } = useDCAuth("identify guilds");
+		onResetAuth: onResetAuthDiscord,
+		authorization: authorizationDiscord,
+		isAuthenticating: isAuthenticatingDiscord } = useDCAuth("identify guilds");
 	const { onOpen: openAddBotPopup, windowInstance: activeAddBotPopup } = usePopupWindow()
 	const [hasClickedAuthDiscord, setHasClickedAuthDiscord] = useState(false)
 	const prevAuthDiscord = usePrevious(authorizationDiscord)
@@ -207,20 +207,13 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 
 	const getGitHubRepos = (token: any) => {
 		const AuthStr = 'Bearer '.concat(token);
-		axios.get(`https://api.github.com/user`, { headers: { Authorization: AuthStr } })
-			.then(response => {
+		axios.get(`https://api.github.com/user/repos`, { headers: { Authorization: AuthStr } })
+			.then(res => {
 				// If request is good...
-				console.log(response.data);
-				if (response.data) {
-					axios.get(response.data.repos_url, { headers: { Authorization: AuthStr } })
-						.then(res => {
-							// If request is good...
-							console.log(res.data, "....res.data github list");
-							if (res.data) {
-								setGitHubOrganizationList(res.data)
-								setGitHubLoading(false);
-							}
-						})
+				console.log(res.data, "....res.data github list");
+				if (res.data) {
+					setGitHubOrganizationList(res.data)
+					setGitHubLoading(false);
 				}
 			})
 			.catch((error) => {
@@ -295,7 +288,7 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 
 	const handleConnectDiscord = async () => {
 		setHasClickedAuthDiscord(true)
-		if (!authorizationDiscord){
+		if (!authorizationDiscord) {
 			return onOpenDiscord();
 		}
 		setHasClickedAuthDiscord(false)
@@ -454,15 +447,15 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 		if (item.name === 'Discord' && isDiscordConnected && _get(DAO, `discord`, null)) {
 			return ` (${Object.keys(_get(DAO, `discord`, null)).length})`
 		}
-		
+
 		return null
 	}
 
 	const isGitHubItemConnected = (item: any) => {
-       if(_get(DAO, `github`, null)) {
-		 return !!Object.keys(_get(DAO, `github`, null)).find(re => re === item.full_name)
-	   }
-	   return null
+		if (_get(DAO, `github`, null)) {
+			return !!Object.keys(_get(DAO, `github`, null)).find(re => re === item.full_name)
+		}
+		return null
 	}
 	const expandList = (item: any) => {
 		return (item.name === 'Trello' && expandTrello)
@@ -479,18 +472,18 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 	}
 
 	const disableSycPullIssues = (item: any) => {
-		if(item === 'Trello') {
-			return !organizationData.length 
+		if (item === 'Trello') {
+			return !organizationData.length
 				|| (_get(DAO, `trello`, null) && Object.keys(_get(DAO, `trello`, null)).length === organizationData.length)
 		}
-		if(item === 'Github') {
-			return !selectedGitHubLink.id 
+		if (item === 'Github') {
+			return !selectedGitHubLink.id
 				|| !gitHubOrganizationList.length
 				|| (_get(DAO, `github`, null) && Object.keys(_get(DAO, `github`, null)).length === gitHubOrganizationList.length)
 		}
-		if(item === 'Discord') {
+		if (item === 'Discord') {
 			return !serverData.length
-			|| (_get(DAO, `discord`, null) && Object.keys(_get(DAO, `discord`, null)).length === serverData.length)
+				|| (_get(DAO, `discord`, null) && Object.keys(_get(DAO, `discord`, null)).length === serverData.length)
 		}
 		return false
 	}
@@ -579,7 +572,7 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 				</Box>
 			</>
 		}
-		
+
 		if (item.name === 'Discord' && expandDiscord && isDiscordConnected) {
 			return <>
 				{
