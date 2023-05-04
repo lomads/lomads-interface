@@ -32,6 +32,8 @@ import starDashboard from "../../../assets/svg/star_dashboard.svg";
 import tokenDashboard from "../../../assets/svg/token_dashboard.svg";
 import questionMarkDark from "../../../assets/svg/question-mark-dark.svg";
 import questionMarkLight from "../../../assets/svg/question-mark-light.svg";
+import MOBILEDEVICE from "../../../assets/svg/mobile_device.svg";
+import LOMADLOGO from "../../../assets/svg/lomadsLogoRed.svg";
 import { useAppDispatch } from "state/hooks";
 import { getCurrentUser, getDao, loadDao, storeGithubIssues, updateDao, updateUserOnboardingCount } from "state/dashboard/actions";
 import { setDAO, setDAOList } from "state/dashboard/reducer";
@@ -58,7 +60,7 @@ import CreateRecurring from "./TreasuryCard/CreateRecurring";
 import axiosHttp from 'api'
 import useEns from "hooks/useEns";
 import useMintSBT from "hooks/useMintSBT";
-import { default as MuiButton, ButtonProps  } from '@mui/material/Button';
+import { default as MuiButton, ButtonProps } from '@mui/material/Button';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import Stack from '@mui/material/Stack';
@@ -66,17 +68,19 @@ import Button from "muiComponents/Button";
 import steps from "./WalkThrough/steps";
 import Dropdown from "muiComponents/Dropdown";
 import Avatar from "muiComponents/Avatar";
+import { Grid, Typography, Box, MenuItem, Menu, useMediaQuery } from "@mui/material"
+import { makeStyles } from '@mui/styles';
 
 const { toChecksumAddress } = require('ethereum-checksum-address')
 type WalkThroughObjType = {
-    step: number;
-    id: string;
-    title: string;
-    content: string;
-    buttonText: string;
-    imgPath: string;
-    placement: string;
-  }
+	step: number;
+	id: string;
+	title: string;
+	content: string;
+	buttonText: string;
+	imgPath: string;
+	placement: string;
+}
 
 const HideHelpIconButton = styled(Button)<ButtonProps>(({ theme }) => ({
 	color: '#ffffff',
@@ -87,7 +91,7 @@ const HideHelpIconButton = styled(Button)<ButtonProps>(({ theme }) => ({
 	radius: 5,
 	padding: 0,
 	fontFamily: "Inter, sans-serif",
-    fontSize: 16,
+	fontSize: 16,
 	'&:hover': {
 		backgroundColor: '#1B2B41',
 	},
@@ -101,9 +105,67 @@ const PlayWalkThroughButton = styled(Button)<ButtonProps>(({ theme }) => ({
 	radius: 5,
 	padding: 0,
 	fontFamily: "Inter, sans-serif",
-    fontSize: 16,
+	fontSize: 16,
 	'&:hover': {
 		backgroundColor: '#FFFFFF',
+	},
+}));
+
+const useStyles = makeStyles((theme: any) => ({
+	root: {
+		minHeight: '100vh',
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center',
+		overflow: 'hidden !important'
+	},
+	logo: {
+		width: 138,
+		height: 81
+	},
+	cheers: {
+		position: 'absolute',
+		bottom: 0,
+		left: 0,
+		right: 0,
+		display: 'flex',
+		alignItems: 'center',
+		justifyItems: 'center'
+	},
+	metamaskButton: {
+		height: '111px !important',
+		cursor: 'pointer',
+		alignContent: "inherit",
+		background: "#fff",
+		borderColor: "#c94b32",
+		borderRadius: '10px !important',
+		borderWidth: 0,
+		filter: "drop-shadow(3px 5px 4px rgba(27,43,65,.05)) drop-shadow(-3px -3px 8px rgba(201,75,50,.1)) !important",
+		margin: "10px",
+		padding: 40
+	},
+	select: {
+		background: '#FFF',
+		borderRadius: '10px !important',
+		boxShadow: 'none !important',
+		fontSize: '16px !important',
+		minWidth: 'inherit !importnt',
+		padding: '0px !important'
+	},
+	subtitle1: {
+		fontSize: '25px !important',
+		fontWeight: '400 !important',
+		lineHeight: '30px !important',
+		textAlign: 'center',
+		color: '#B12F15',
+		margin: '30px 0 !important'
+	},
+	subtitle2: {
+		fontSize: '38px !important',
+		lineHeight: '42px !important',
+		textTransform: 'uppercase',
+		color: '#1B2B41',
 	},
 }));
 
@@ -113,8 +175,10 @@ const Dashboard = () => {
 	const { daoURL } = useParams();
 	const location = useLocation()
 	const from = location?.state?.from;
-	const { user, DAO, DAOList, DAOLoading } = useAppSelector((state:any) => state.dashboard);
-	console.log("DAO : ",DAO);
+	const { user, DAO, DAOList, DAOLoading } = useAppSelector((state: any) => state.dashboard);
+	console.log("DAO : ", DAO);
+	const matches = useMediaQuery('(min-width:992px)');
+	const classes = useStyles()
 	const [update, setUpdate] = useState(0);
 	const treasuryRef = useRef<any>();
 	const anchorRef = useRef<any>();
@@ -191,18 +255,18 @@ const Dashboard = () => {
 	}
 
 	useEffect(() => {
-		if(DAO)
+		if (DAO)
 			setChainId(DAO?.chainId)
 	}, [DAO])
 
 	useEffect(() => {
-		if(myRole)
+		if (myRole)
 			setWalkThroughObj(steps(myRole)[0])
 	}, [myRole])
 
 	useEffect(() => {
-		if(DAO) {
-			if(!DAO?.safe) {
+		if (DAO) {
+			if (!DAO?.safe) {
 				navigate(`/${daoURL}/newsafe`)
 			}
 		}
@@ -218,7 +282,7 @@ const Dashboard = () => {
 	}, [DAO]);
 
 	useEffect(() => {
-		if(DAO && user && (!user?.onboardingViewCount || ( user?.onboardingViewCount && user?.onboardingViewCount.indexOf(_get(DAO, '_id', '')) === -1 && user?.onboardingViewCount.length < 2 )))
+		if (DAO && user && (!user?.onboardingViewCount || (user?.onboardingViewCount && user?.onboardingViewCount.indexOf(_get(DAO, '_id', '')) === -1 && user?.onboardingViewCount.length < 2)))
 			setShowWalkThrough(true)
 	}, [DAO, user])
 
@@ -278,12 +342,12 @@ const Dashboard = () => {
 		if (currentChainId !== nextChain) {
 			//sessionStorage.setItem('___lmds_chain_switch', "1");
 			await switchChain(connector, nextChain)
-				// .then(res => {
-				// 	//window.location.href = '/'
-				// })
-				// .catch(e => {
-				// 	sessionStorage.clear();
-				// })
+			// .then(res => {
+			// 	//window.location.href = '/'
+			// })
+			// .catch(e => {
+			// 	sessionStorage.clear();
+			// })
 		}
 	}
 
@@ -334,7 +398,7 @@ const Dashboard = () => {
 			const contactdetails = _get(DAO, 'sbt.contactDetail', []);
 			for (let index = 0; index < contactdetails.length; index++) {
 				const contact = contactdetails[index];
-				if(['email', 'discord', 'github', 'telegram'].indexOf(contact) === -1){
+				if (['email', 'discord', 'github', 'telegram'].indexOf(contact) === -1) {
 					continue;
 				}
 				let shouldUpdate = true;
@@ -352,7 +416,7 @@ const Dashboard = () => {
 					}
 				}
 				if (shouldUpdate) {
-					console.log("balanceOf::::", )
+					console.log("balanceOf::::",)
 					navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
 					break;
 				}
@@ -363,44 +427,44 @@ const Dashboard = () => {
 	}
 
 	useEffect(() => {
-			if (chainId && DAO && DAO.sbt && account) {
-				console.log("balanceOf::::", chainId ,DAO ,DAO?.sbt, account)
-				getStats(DAO.sbt.chainId || DAO?.chainId).then(res => {
-					const balanceOf = res[0];
-					console.log("balanceOf::::", balanceOf)
-					//if (chainId === DAO.chainId) {
-						if (DAO?.sbt?.whitelisted) {
-							if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
-								if (parseInt(balanceOf._hex, 16) === 0) {
-									navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
-								} else {
-									// check if data has been filled show mint page. with prefilled data. save data without minting again
-									validateMetaData()
-								}
-							} else {
-								navigate('/only-whitelisted')
-							}
-						} else if (!DAO?.sbt?.whitelisted) {
-							if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
-								if (parseInt(balanceOf._hex, 16) === 0) {
-									navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
-								} else {
-									// check if data has been filled show mint page. with prefilled data. save data without minting again
-									validateMetaData()
-								}
-							} else {
-								//add to DAO
-								if (parseInt(balanceOf._hex, 16) === 0) {
-									navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
-								} else {
-									// check if data has been filled show mint page. with prefilled data. save data without minting again
-									validateMetaData()
-								}
-							}
+		if (chainId && DAO && DAO.sbt && account) {
+			console.log("balanceOf::::", chainId, DAO, DAO?.sbt, account)
+			getStats(DAO.sbt.chainId || DAO?.chainId).then(res => {
+				const balanceOf = res[0];
+				console.log("balanceOf::::", balanceOf)
+				//if (chainId === DAO.chainId) {
+				if (DAO?.sbt?.whitelisted) {
+					if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
+						if (parseInt(balanceOf._hex, 16) === 0) {
+							navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
+						} else {
+							// check if data has been filled show mint page. with prefilled data. save data without minting again
+							validateMetaData()
 						}
-					//}
-				})
-			}
+					} else {
+						navigate('/only-whitelisted')
+					}
+				} else if (!DAO?.sbt?.whitelisted) {
+					if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
+						if (parseInt(balanceOf._hex, 16) === 0) {
+							navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
+						} else {
+							// check if data has been filled show mint page. with prefilled data. save data without minting again
+							validateMetaData()
+						}
+					} else {
+						//add to DAO
+						if (parseInt(balanceOf._hex, 16) === 0) {
+							navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
+						} else {
+							// check if data has been filled show mint page. with prefilled data. save data without minting again
+							validateMetaData()
+						}
+					}
+				}
+				//}
+			})
+		}
 	}, [chainId, DAO, getStats, account]);
 
 	useEffect(() => {
@@ -426,16 +490,16 @@ const Dashboard = () => {
 	useEffect(() => {
 		if (DAO && account && chainId) {
 			//if (chainId === DAO.chainId) {
-				if (!DAO.sbt) {
-					if (!_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase()))
-						navigate('/noaccess')
-				}
+			if (!DAO.sbt) {
+				if (!_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase()))
+					navigate('/noaccess')
+			}
 			//}
 		}
 	}, [DAO, account, chainId]);
 
 	useEffect(() => {
-		if (DAO && chainId){
+		if (DAO && chainId) {
 			dispatch(updateSafeAddress(_get(DAO, 'safe.address', '')))
 		}
 	}, [DAO, chainId])
@@ -450,8 +514,8 @@ const Dashboard = () => {
 	};
 
 	const ownersCount = async (_safeAddress: string) => {
-		if(chainId) {
-			const safe = await axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${_safeAddress}`, {withCredentials: false }).then(res => res.data)
+		if (chainId) {
+			const safe = await axios.get(`${GNOSIS_SAFE_BASE_URLS[chainId]}/api/v1/safes/${_safeAddress}`, { withCredentials: false }).then(res => res.data)
 			// const safeSDK = await ImportSafe(provider, _safeAddress);
 			const owners = safe?.owners
 			//dispatch(syncSafeOwners({ daoUrl: DAO.url, payload: owners }))
@@ -558,7 +622,7 @@ const Dashboard = () => {
 	}
 
 	const endWalkThrough = () => {
-		dispatch(updateUserOnboardingCount({ payload: { daoId: _get(DAO, '_id','') }}))
+		dispatch(updateUserOnboardingCount({ payload: { daoId: _get(DAO, '_id', '') } }))
 		setShowWalkThrough(false)
 		clearWalkThroughStyles()
 		setWalkThroughObj(Steps(myRole)[0])
@@ -576,10 +640,10 @@ const Dashboard = () => {
 			return
 		}
 
-		let nextStep =  currWalkThroughObj?.step + 1
-		while(showWalkThrough 
-	   		 && !document.getElementById(Steps(myRole)[nextStep]?.id)
-	         &&  nextStep < 7 ){
+		let nextStep = currWalkThroughObj?.step + 1
+		while (showWalkThrough
+			&& !document.getElementById(Steps(myRole)[nextStep]?.id)
+			&& nextStep < 7) {
 			nextStep++
 		}
 		const nextObj = Steps(myRole)[nextStep]
@@ -587,7 +651,7 @@ const Dashboard = () => {
 		setWalkThroughObj(nextObj)
 	}
 
-    const setWalkThroughStyles = (nextObj: WalkThroughObjType) => {
+	const setWalkThroughStyles = (nextObj: WalkThroughObjType) => {
 		anchorRef.current = document.getElementById(nextObj.id)
 		anchorRef.current.style.zIndex = 2500
 		anchorRef.current.scrollIntoView({
@@ -612,125 +676,126 @@ const Dashboard = () => {
 
 	const getQuestionImage = (): string => {
 		return ((showWalkThrough && currWalkThroughObj?.step === 7) || isHelpIconOpen)
-					? questionMarkDark
-					: questionMarkLight
+			? questionMarkDark
+			: questionMarkLight
 	}
 
 	useEffect(() => {
-        function handleClick(event: any) {
-			if(isHelpIconOpen && (event.target.matches('div.help-card')
-				|| event.target.matches('div.walkThroughOverlay') 
+		function handleClick(event: any) {
+			if (isHelpIconOpen && (event.target.matches('div.help-card')
+				|| event.target.matches('div.walkThroughOverlay')
 				|| event.target.matches('span.bold-text')
-				|| event.target.matches('span.help-card-content'))){
-					event.preventDefault()
-					setIsHelpIconOpen(false)
-				}
+				|| event.target.matches('span.help-card-content'))) {
+				event.preventDefault()
+				setIsHelpIconOpen(false)
+			}
 		}
-		document.addEventListener("click", handleClick); 
+		document.addEventListener("click", handleClick);
 		return () => document.removeEventListener("click", handleClick);
 	});
 
-	return (
-		<>
-			{!validDaoChain || !DAO || DAOLoading || (daoURL && (DAO && DAO.url !== daoURL)) ?
-				<div style={{ backgroundColor: '#FFF', height: '100vh', zIndex: 99999, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-					<div className="logo">
-						<img src={lomadsfulllogo} alt="" />
-					</div>
-					<div style={{ marginTop: 32 }}>
-						<LeapFrog size={50} color="#C94B32" />
-					</div>
-				</div> : null}
-			{(!checkLoading && validDaoChain && DAO && !DAOLoading && daoURL && DAO && DAO.url === daoURL) && (showWalkThrough || isHelpIconOpen)
-				&& <div className="walkThroughOverlay"></div>}
-			{(!checkLoading && validDaoChain && DAO && !DAOLoading && daoURL && DAO && DAO.url === daoURL)
-			?
-			<WalkThroughModal
-				incrementWalkThroughSteps={incrementWalkThroughSteps}
-				showConfirmation={showWalkThrough && currWalkThroughObj?.step === 0}
-				endWalkThrough={endWalkThrough}
-				obj={currWalkThroughObj}
-			/> : null
-			}
-			<WalkThroughPopover
-				displayPopover={showWalkThrough && currWalkThroughObj?.step > 0}
-				obj={currWalkThroughObj}
-				incrementWalkThroughSteps={incrementWalkThroughSteps}
-				endWalkThrough={endWalkThrough}
-				anchorEl={anchorRef.current}
-			/>
-			<div
-				className="dashBoardBody"
-				onMouseEnter={() => {
-					showSideBar(false);
-				}}
-			>
-				<div className="DAOdetails">
-					<div
-						className="copyArea"
-						onClick={() => {
-							setCopy(true);
-						}}
-						onMouseOut={() => {
-							setCopy(false);
-						}}
-					>
-						<div>
-							<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-								<div className="DAOname">
-									{_get(DAO, 'name', '')}
-								</div>
-								<Tooltip label={copy ? "copied" : "copy"}>
-									<div
-										className="copyLinkButton"
-										onClick={() => {
-											navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/${_get(DAO, 'url', '')}`);
-										}}
-									>
-										<img src={copyIcon} alt="copy" className="safeCopyImage" />
-									</div>
-								</Tooltip>
-
-							</div>
-							<div className="DAODescription">{_get(DAO, 'description', '')}</div>
+	if (matches) {
+		return (
+			<>
+				{!validDaoChain || !DAO || DAOLoading || (daoURL && (DAO && DAO.url !== daoURL)) ?
+					<div style={{ backgroundColor: '#FFF', height: '100vh', zIndex: 99999, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+						<div className="logo">
+							<img src={lomadsfulllogo} alt="" />
 						</div>
-					</div>
-
-					<div className="DAOsettings-container">
-						<div className="DAOsettings">
-							<div className="DAOadminPill">
-								<p>{displayRole}</p>
-							</div>
-							<div className="tokens">
-								<div className="token">
-									<img src={tokenDashboard} />
-									<div className="text">${tokenDollarBalance}</div>
-								</div>
-								{_get(DAO, 'sweatPoints', false) === true &&
-									<div className="token">
-										<img src={starDashboard} />
-										<div className="text">{swtBalance}</div>
-									</div>
-								}
-							</div>
-							<select name="chain" id="chain" value={currentChainId} onChange={e => handleSwitchChain(+e.target.value)} className="chain" style={{ width: 150 }}>
-								{
-									SUPPORTED_CHAIN_IDS.map(chain => <option value={+chain}>{CHAIN_IDS_TO_NAMES[chain]}</option>)
-								}
-							</select>
-
+						<div style={{ marginTop: 32 }}>
+							<LeapFrog size={50} color="#C94B32" />
 						</div>
-					</div>
-				</div>
-
-				<LinksArea 
-					links={_get(DAO, 'links', [])} 
-					isHelpIconOpen={isHelpIconOpen}
+					</div> : null}
+				{(!checkLoading && validDaoChain && DAO && !DAOLoading && daoURL && DAO && DAO.url === daoURL) && (showWalkThrough || isHelpIconOpen)
+					&& <div className="walkThroughOverlay"></div>}
+				{(!checkLoading && validDaoChain && DAO && !DAOLoading && daoURL && DAO && DAO.url === daoURL)
+					?
+					<WalkThroughModal
+						incrementWalkThroughSteps={incrementWalkThroughSteps}
+						showConfirmation={showWalkThrough && currWalkThroughObj?.step === 0}
+						endWalkThrough={endWalkThrough}
+						obj={currWalkThroughObj}
+					/> : null
+				}
+				<WalkThroughPopover
+					displayPopover={showWalkThrough && currWalkThroughObj?.step > 0}
+					obj={currWalkThroughObj}
+					incrementWalkThroughSteps={incrementWalkThroughSteps}
+					endWalkThrough={endWalkThrough}
+					anchorEl={anchorRef.current}
 				/>
+				<div
+					className="dashBoardBody"
+					onMouseEnter={() => {
+						showSideBar(false);
+					}}
+				>
+					<div className="DAOdetails">
+						<div
+							className="copyArea"
+							onClick={() => {
+								setCopy(true);
+							}}
+							onMouseOut={() => {
+								setCopy(false);
+							}}
+						>
+							<div>
+								<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+									<div className="DAOname">
+										{_get(DAO, 'name', '')}
+									</div>
+									<Tooltip label={copy ? "copied" : "copy"}>
+										<div
+											className="copyLinkButton"
+											onClick={() => {
+												navigator.clipboard.writeText(`${process.env.REACT_APP_URL}/${_get(DAO, 'url', '')}`);
+											}}
+										>
+											<img src={copyIcon} alt="copy" className="safeCopyImage" />
+										</div>
+									</Tooltip>
 
-				<Notifications isHelpIconOpen={isHelpIconOpen} />
+								</div>
+								<div className="DAODescription">{_get(DAO, 'description', '')}</div>
+							</div>
+						</div>
 
-				{/* {pendingTransactions !== undefined &&
+						<div className="DAOsettings-container">
+							<div className="DAOsettings">
+								<div className="DAOadminPill">
+									<p>{displayRole}</p>
+								</div>
+								<div className="tokens">
+									<div className="token">
+										<img src={tokenDashboard} />
+										<div className="text">${tokenDollarBalance}</div>
+									</div>
+									{_get(DAO, 'sweatPoints', false) === true &&
+										<div className="token">
+											<img src={starDashboard} />
+											<div className="text">{swtBalance}</div>
+										</div>
+									}
+								</div>
+								<select name="chain" id="chain" value={currentChainId} onChange={e => handleSwitchChain(+e.target.value)} className="chain" style={{ width: 150 }}>
+									{
+										SUPPORTED_CHAIN_IDS.map(chain => <option value={+chain}>{CHAIN_IDS_TO_NAMES[chain]}</option>)
+									}
+								</select>
+
+							</div>
+						</div>
+					</div>
+
+					<LinksArea
+						links={_get(DAO, 'links', [])}
+						isHelpIconOpen={isHelpIconOpen}
+					/>
+
+					<Notifications isHelpIconOpen={isHelpIconOpen} />
+
+					{/* {pendingTransactions !== undefined &&
 					pendingTransactions?.count >= 1 &&
 					showNotification && can(myRole, 'notification.view') && (
 						<NotificationArea
@@ -739,90 +804,109 @@ const Dashboard = () => {
 							showNotificationArea={showNotificationArea}
 						/>
 					)} */}
-				<MyProject isHelpIconOpen={isHelpIconOpen} />
-				<Tasks
-					toggleShowCreateTask={toggleShowCreateTask} 
-					onlyProjects={false} 
-					isHelpIconOpen={isHelpIconOpen} />
-				
-				{(can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') &&
-					<TreasuryCard
-						innerRef={treasuryRef}
-						onRecurringEdit={handleOnRecurringEdit}
-						safeAddress={safeAddress}
-						pendingTransactions={pendingTransactions}
-						executedTransactions={executedTransactions}
-						ownerCount={ownerCount}
+					<MyProject isHelpIconOpen={isHelpIconOpen} />
+					<Tasks
+						toggleShowCreateTask={toggleShowCreateTask}
+						onlyProjects={false}
+						isHelpIconOpen={isHelpIconOpen} />
+
+					{(can(myRole, 'transaction.view') || isSafeOwner) && DAO && daoURL === _get(DAO, 'url', '') &&
+						<TreasuryCard
+							innerRef={treasuryRef}
+							onRecurringEdit={handleOnRecurringEdit}
+							safeAddress={safeAddress}
+							pendingTransactions={pendingTransactions}
+							executedTransactions={executedTransactions}
+							ownerCount={ownerCount}
+							toggleModal={toggleModal}
+							fiatBalance={safeTokens}
+							account={account}
+							onChangePendingTransactions={(tx: any) => setPendingTransactions(tx)}
+							tokens={safeTokens}
+							toggleShowCreateRecurring={toggleShowCreateRecurring}
+							isHelpIconOpen={isHelpIconOpen}
+						/>}
+					{can(myRole, 'members.view') &&
+						<MemberCard
+							totalMembers={totalMembers}
+							toggleShowMember={toggleShowMember}
+							toggleShowEditMember={toggleShowEditMember}
+							isHelpIconOpen={isHelpIconOpen}
+						/>
+					}
+					<Footer theme="dark" />
+				</div>
+				{showModal && (
+					<SideModal
 						toggleModal={toggleModal}
-						fiatBalance={safeTokens}
-						account={account}
-						onChangePendingTransactions={(tx: any) => setPendingTransactions(tx)}
 						tokens={safeTokens}
-						toggleShowCreateRecurring={toggleShowCreateRecurring}
-						isHelpIconOpen={isHelpIconOpen}
-					/>}
-				{can(myRole, 'members.view') &&
-					<MemberCard
 						totalMembers={totalMembers}
+						safeAddress={safeAddress}
+						getPendingTransactions={() => { treasuryRef?.current?.reload() }}
+						showNotificationArea={showNotificationArea}
 						toggleShowMember={toggleShowMember}
-						toggleShowEditMember={toggleShowEditMember}
-						isHelpIconOpen={isHelpIconOpen}
 					/>
-				}
-				<Footer theme="dark" />
-			</div>
-			{showModal && (
-				<SideModal
-					toggleModal={toggleModal}
-					tokens={safeTokens}
-					totalMembers={totalMembers}
-					safeAddress={safeAddress}
-					getPendingTransactions={() => { treasuryRef?.current?.reload() }}
-					showNotificationArea={showNotificationArea}
-					toggleShowMember={toggleShowMember}
+				)}
+				<div className={`help-option ${isHelpIconOpen ? 'z-index-1000' : ''}`}
+					id="question-mark"
+					ref={questionMarkRef}
+					onClick={expandHelpOptions}>
+					{isHelpIconOpen
+						&&
+						<Stack spacing={2}>
+							<PlayWalkThroughButton
+								variant="contained"
+								className="play-walkthrough"
+								onClick={startWalkThroughAtStepOne}>
+								Play walk through
+							</PlayWalkThroughButton>
+							<HideHelpIconButton
+								startIcon={<CloseIcon />}
+								onClick={() => questionMarkRef.current.style.display = 'none'}
+								variant="contained">
+								Hide help icon
+							</HideHelpIconButton>
+						</Stack>
+					}
+					<img src={getQuestionImage()} />
+				</div>
+				<SideBar
+					name={_get(DAO, 'name', '')}
+					showSideBar={showSideBar}
+					showNavBar={showNavBar}
+					isHelpIconOpen={isHelpIconOpen}
 				/>
-			)}
-			<div className={`help-option ${isHelpIconOpen ? 'z-index-1000' : ''}`}
-				id="question-mark"
-				ref={questionMarkRef}
-				onClick={expandHelpOptions}>
-				{isHelpIconOpen
-					&&
-					<Stack spacing={2}>
-						<PlayWalkThroughButton
-							variant="contained"
-							className="play-walkthrough"
-							onClick={startWalkThroughAtStepOne}>
-							Play walk through
-            			</PlayWalkThroughButton>
-						<HideHelpIconButton
-							startIcon={<CloseIcon />}
-							onClick={()=> questionMarkRef.current.style.display = 'none'}
-							variant="contained">
-							Hide help icon
-						</HideHelpIconButton>
-					</Stack>
-				}
-				<img src={getQuestionImage()} />
-			</div>
-			<SideBar
-				name={_get(DAO, 'name', '')}
-				showSideBar={showSideBar}
-				showNavBar={showNavBar}
-				isHelpIconOpen={isHelpIconOpen}
-			/>
-			{showAddMember && <AddMember toggleShowMember={toggleShowMember} />}
-			{showEditMember && <EditMember toggleShowEditMember={toggleShowEditMember} DAO={DAO} amIAdmin={amIAdmin} account={account} />}
+				{showAddMember && <AddMember toggleShowMember={toggleShowMember} />}
+				{showEditMember && <EditMember toggleShowEditMember={toggleShowEditMember} DAO={DAO} amIAdmin={amIAdmin} account={account} />}
 
-			{/* create task side modal */}
-			{showCreateTask
-				&& <CreateTask toggleShowCreateTask={toggleShowCreateTask} selectedProject={null} />}
+				{/* create task side modal */}
+				{showCreateTask
+					&& <CreateTask toggleShowCreateTask={toggleShowCreateTask} selectedProject={null} />}
 
-			{/* Create recurring payment side modal */}
-			{showCreateRecurring && <CreateRecurring transaction={recurringTxn} onRecurringPaymentCreated={() => treasuryRef?.current?.reload()} toggleShowCreateRecurring={toggleShowCreateRecurring} />}
+				{/* Create recurring payment side modal */}
+				{showCreateRecurring && <CreateRecurring transaction={recurringTxn} onRecurringPaymentCreated={() => treasuryRef?.current?.reload()} toggleShowCreateRecurring={toggleShowCreateRecurring} />}
 
-		</>
-	);
+			</>
+		);
+	}
+	else {
+		return (
+			<Grid container className={classes.root}>
+				<Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
+					<Box position="absolute" top={0} left={0} sx={{ padding: '30px' }}>
+						<img src={LOMADLOGO} />
+					</Box>
+					<Box>
+						<img src={MOBILEDEVICE} />
+					</Box>
+					<Box sx={{ padding: '0 30px' }}>
+						<Typography className={classes.subtitle1}>Lomads app needs a PC<br />for now.</Typography>
+						<Typography className={classes.subtitle2} sx={{ fontWeight: '800' }}>CATCH YOU ON<br />THE <span style={{ fontWeight: '300', fontStyle: 'italic', color: '#C94B32' }}>BIG SCREEN</span></Typography>
+					</Box>
+				</Grid>
+			</Grid>
+		)
+	}
 };
 
 export default Dashboard;
