@@ -30,6 +30,7 @@ import useEns from 'hooks/useEns'
 import dogIcon from '../../assets/svg/dogIcon.svg';
 import { MdKeyboardArrowDown } from 'react-icons/md';
 import Avatar from 'muiComponents/Avatar';
+import { useMediaQuery } from "@mui/material"
 
 import { getCurrentUser } from "state/dashboard/actions";
 
@@ -112,18 +113,21 @@ function Web3StatusInner() {
 	const { DAO, user, Project } = useAppSelector((state) => state.dashboard);
 	const connectionType = getConnection(connector).type;
 	const { getENSAddress, getENSName } = useEns()
-	const [ens, setEns] = useState<string|null|undefined>(null)
+	const [ens, setEns] = useState<string | null | undefined>(null)
 
 	const dispatch = useAppDispatch();
 
-	useEffect(() => {
-		if(!user){
-			dispatch(getCurrentUser({}))
-		}
-	},[user]);
+
+	const matches = useMediaQuery('(min-width:992px)');
 
 	useEffect(() => {
-		if(account) {
+		if (!user) {
+			dispatch(getCurrentUser({}))
+		}
+	}, [user]);
+
+	useEffect(() => {
+		if (account) {
 			const getEns = async () => {
 				const name = await getENSName(account)
 				setEns(name)
@@ -168,6 +172,9 @@ function Web3StatusInner() {
 	if (!chainId) {
 		return null;
 	}
+	if (!matches) {
+		return null;
+	}
 	else if (!chainAllowed) {
 		return (
 			<Web3StatusError
@@ -205,15 +212,15 @@ function Web3StatusInner() {
 				onClick={toggleWalletModal}
 				pending={hasPendingTransactions}
 			>
-				<div style={{width:'100%',height:'100%',display:'flex',alignItems:'center'}}>
-				{
-					!hasPendingTransactions && (
-						// <StatusIcon connectionType={connectionType} />
-						// <img src={dogIcon} alt="dog-icon" />
-						<Avatar name={user?.name} wallet={account}/>
-					)
-				}
-				{/* {
+				<div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center' }}>
+					{
+						!hasPendingTransactions && (
+							// <StatusIcon connectionType={connectionType} />
+							// <img src={dogIcon} alt="dog-icon" />
+							<Avatar name={user?.name} wallet={account} />
+						)
+					}
+					{/* {
 					hasPendingTransactions
 						?
 						<RowBetween>
@@ -231,14 +238,14 @@ function Web3StatusInner() {
 							<Text>{ ens ? ens : (ENSName || shortenAddress(account))}</Text>
 						</>
 				} */}
-				<div style={{ height: '100%', width: '25%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderLeft: '1px solid #F0F0F0', marginLeft: '10px' }}>
-					<span>
-						<MdKeyboardArrowDown
-							size={20}
-							color="#76808D"
-						/>
-					</span>
-				</div>
+					<div style={{ height: '100%', width: '25%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderLeft: '1px solid #F0F0F0', marginLeft: '10px' }}>
+						<span>
+							<MdKeyboardArrowDown
+								size={20}
+								color="#76808D"
+							/>
+						</span>
+					</div>
 				</div>
 			</Web3StatusConnected>
 		);
