@@ -81,8 +81,23 @@ const integrationAccounts = [
 	}
 ];
 
-export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConnected, trelloLoading }:
-	{ open: boolean, onClose: any, authorizeTrello: any, organizationData: any, isTrelloConnected: any, trelloLoading: any }) => {
+export default ({ open,
+				onClose,
+				authorizeTrello,
+				organizationData,
+				isTrelloConnected,
+				trelloLoading,
+				setTrelloConnected,
+				getAllTrelloData
+			}:{ open: boolean,
+				onClose: any,
+				authorizeTrello: any,
+				organizationData: any,
+				isTrelloConnected: any,
+				trelloLoading: any,
+				setTrelloConnected: any,
+				getAllTrelloData: any
+	}) => {
 	const classes = useStyles();
 	const { onOpen, onResetAuth, authorization, isAuthenticating } = useGithubAuth();
 	const [hasClickedAuth, setHasClickedAuth] = useState(false)
@@ -93,9 +108,8 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 	const [expandTrello, setExpandTrello] = useState(false)
 	const [expandDiscord, setExpandDiscord] = useState(false)
 	const [expandGitHub, setExpandGitHub] = useState(false)
-	const [isGitHubConnected, setGitHubConnected] = useState(false)
+	const [isGitHubConnected, setIsGitHubConnected] = useState(false)
 	const [gitHubLoading, setGitHubLoading] = useState(false)
-	const [gitHubAccessToken, setGitHubAccessToken] = useState(false)
 	const [selectedGitHubLink, setSelectedGitHubLink] = useState({ id: null, url: '', full_name: '', name: '' })
 	const [gitHubOrganizationList, setGitHubOrganizationList] = useState([])
 	const [isDiscordConnected, setIsDiscordConnected] = useState(false);
@@ -157,6 +171,32 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 			setSyncServerLoading(false);
 	}, [prevIsAuthenticatingDiscord, isAuthenticatingDiscord])
 
+	useEffect(() => {
+      if(localStorage.getItem('github_access_token')) {
+		setIsGitHubConnected(true)
+	  }
+	  if(authorizationDiscord) {
+		setIsDiscordConnected(true)
+	  }
+	  if(localStorage.getItem('trello_token')) {
+		setTrelloConnected(true)
+	  }
+	}, [])
+
+	useEffect(() => {
+		const githubAccessToken = localStorage.getItem('github_access_token')
+		const trelloToken = localStorage.getItem('trello_token')
+		if(expandDiscord && !serverData.length && authorizationDiscord) {
+			getAllDiscords()
+		}
+		if(expandGitHub && !gitHubOrganizationList.length && githubAccessToken){
+			getGitHubRepos(githubAccessToken)
+		}
+		if(expandTrello && !organizationData.length && trelloToken) {
+			getAllTrelloData()
+		}
+	}, [expandDiscord, expandGitHub, expandTrello])
+
 	useInterval(async () => {
 		axiosHttp.get(`discord/guild/${poll}`)
 			.then(res => setChannels(res.data.channels))
@@ -178,22 +218,20 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 
 	const generateGitHubAccessToken = (response: any) => {
 		setGitHubLoading(true);
-		console.log(response.code, '...github response.code...')
 		axiosHttp.get(`utility/getGithubAccessToken?code=${response.code}`)
 			.then((res) => {
 				if (res.data) {
 					console.log("response : ", res.data);
-					setGitHubConnected(true)
+					setIsGitHubConnected(true)
 					setExpandGitHub(true)
 					// check if issues has been previously pulled --- inside DAO object
-					// const githubOb = _get(DAO, 'github', null);
-					setGitHubAccessToken(res.data.access_token);
+					localStorage.setItem('github_access_token', res.data.access_token)
 					getGitHubRepos(res.data.access_token);
 				}
 				else {
 					alert("No res : Something went wrong");
 					setGitHubLoading(false);
-					setGitHubConnected(false)
+					setIsGitHubConnected(false)
 				}
 				onResetAuth();
 			})
@@ -206,11 +244,10 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 	}
 
 	const getGitHubRepos = (token: any) => {
+		setGitHubLoading(true);
 		const AuthStr = 'Bearer '.concat(token);
 		axios.get(`https://api.github.com/user/repos`, { headers: { Authorization: AuthStr } })
 			.then(res => {
-				// If request is good...
-				console.log(res.data, "....res.data github list");
 				if (res.data) {
 					const filteredOwnerGithubList = res.data.filter((item: any) => item.permissions.admin)
 					setGitHubOrganizationList(filteredOwnerGithubList)
@@ -225,6 +262,7 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 
 	const pullGithubIssues = () => {
 		setGitHubLoading(true);
+		const gitHubAccessToken = localStorage.getItem('github_access_token');
 		axiosHttp.get(`utility/get-issues?token=${gitHubAccessToken}&repoInfo=${selectedGitHubLink.full_name}&daoId=${_get(DAO, '_id', null)}`)
 			.then((result: any) => {
 				console.log("issues : ", result.data);
@@ -251,6 +289,7 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 	}
 
 	const getDiscordServers = useCallback(async () => {
+		setSyncServerLoading(true);
 		return axios.get('https://discord.com/api/users/@me/guilds', { headers: { Authorization: authorizationDiscord! } })
 			.then(res => res.data)
 			.catch(e => {
@@ -287,20 +326,24 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 
 	const onGuildBotAddedDelayed = useCallback(_debounce(onGuildBotAdded, 1000), [onGuildBotAdded, server])
 
-	const handleConnectDiscord = async () => {
+	const handleConnectDiscord = () => {
 		setHasClickedAuthDiscord(true)
 		if (!authorizationDiscord) {
 			return onOpenDiscord();
 		}
 		setHasClickedAuthDiscord(false)
+		getAllDiscords()
+	}
+
+	const getAllDiscords = async () => {
 		const dcServers = await getDiscordServers();
 		setIsDiscordConnected(true);
 		setExpandDiscord(true);
 		if (dcServers && dcServers.length) {
 			setServerData(dcServers.filter((item: any) => item.owner));
 		}
+		setSyncServerLoading(false);
 	}
-
 	const handleClick = (item: any) => {
 		if (item.name === "Trello") {
 			authorizeTrello()
@@ -354,7 +397,6 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 		}
 
 		setExpandGitHub(!expandGitHub)
-
 	}
 	const getAllBoards = () => {
 		// check if webhook already exists
@@ -379,12 +421,11 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 
 	const handleTrello = (selectedValue: any) => {
 		setBoardsLoading(true);
-		var trelloToken = localStorage.getItem("trello_token");
+		const trelloToken = localStorage.getItem("trello_token");
 		axiosHttp.get(`utility/get-trello-boards?orgId=${selectedValue}&accessToken=${trelloToken}`)
 			.then((boards: any) => {
 				if (boards.data.type === 'success') {
 					console.log("Boards : ", boards.data.data);
-					var trelloToken = localStorage.getItem("trello_token");
 					dispatch(syncTrelloData({
 						payload: {
 							user: { id: _get(user, '_id', null), address: _get(user, 'wallet', null) },
@@ -397,7 +438,6 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 				}
 				else if (boards.data.type === 'error' && boards.data.message === 'No boards found') {
 					console.log("no boards...")
-					var trelloToken = localStorage.getItem("trello_token");
 					dispatch(syncTrelloData({
 						payload: {
 							user: { id: _get(user, '_id', null), address: _get(user, 'wallet', null) },
@@ -519,9 +559,9 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 					);
 				}) : null}
 				<Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-					<Button color="error" variant="contained" disabled={disableSycPullIssues('Trello')} onClick={getAllBoards}>
+					<Button color="error" variant="contained" disabled={disableSycPullIssues('Trello') && !trelloLoading} onClick={getAllBoards}>
 						{
-							boardsLoading
+							boardsLoading || trelloLoading
 								?
 								<LeapFrog size={24} color="#FFF" />
 								:

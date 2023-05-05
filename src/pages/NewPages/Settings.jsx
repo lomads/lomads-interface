@@ -109,7 +109,6 @@ const Settings = () => {
 	const daoName = name.split(" ");
 
 	const authorizeTrello = () => {
-		setTrelloLoading(true);
 		window.Trello.authorize({
 			type: 'popup',
 			persist: true,
@@ -122,7 +121,17 @@ const Settings = () => {
 			},
 			expiration: "never",
 			success: function () {
-				var trelloToken = localStorage.getItem("trello_token");
+				getAllTrelloData()
+			},
+			error: function (e) {
+				console.log("Error : ", e);
+				setTrelloLoading(false);
+			},
+		});
+	};
+	const getAllTrelloData = () => {
+		const trelloToken = localStorage.getItem("trello_token");
+		setTrelloLoading(true);
 				axiosHttp.get(`utility/get-trello-organizations?accessToken=${trelloToken}`)
 					.then((organizations) => {
 						if (organizations.data.type === 'success') {
@@ -134,15 +143,11 @@ const Settings = () => {
 							setTrelloLoading(false);
 							alert(organizations.data.message);
 						}
+					}).catch(function (evt) {
+						console.log("Error : ", evt);
+						setTrelloLoading(false);
 					})
-			},
-			error: function (e) {
-				console.log("Error : ", e);
-				setTrelloLoading(false);
-			},
-		});
-	};
-
+	}
 	return (
 		<>
 			<div className="settings-page">
@@ -419,6 +424,8 @@ const Settings = () => {
 					organizationData={organizations}
 					authorizeTrello={authorizeTrello}
 					isTrelloConnected={isTrelloConnected}
+					setTrelloConnected={(value) => setTrelloConnected(value)}
+					getAllTrelloData={getAllTrelloData}
 					trelloLoading={trelloLoading}
 				/>
 		}	
