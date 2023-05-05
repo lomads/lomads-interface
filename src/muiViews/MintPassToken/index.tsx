@@ -546,7 +546,7 @@ export default () => {
                 contract: contract?.address,
               };
                 //const ipfsURL: any =  await uploadNFT(metadataJSON, `${process.env.REACT_APP_NODE_BASE_URL}/v1/${contract?.address}/${tokenId}`)
-                if(contract?.version === '1') {
+                if(+contract?.version >= 1) {
                     const ipfsURL: string = await axiosHttp.post(`metadata/ipfs-metadata`, { metadata: metadataJSON, tokenURI: `${process.env.REACT_APP_NODE_BASE_URL}/v1/${contract?.address}/${tokenId}` }).then(res => res.data)
                     const token = await mint(ipfsURL, payment, signature, tokenContract);
                 } else {
@@ -862,7 +862,7 @@ export default () => {
                             <Typography mt={2} variant='body1' style={{ textAlign: 'center' }}>Your contact details are encrypted using advanced public key encryption technology, ensuring that your personal information stays safe and secure.</Typography>
                             {   balance === 0 ?
                                 <Button loading={mintLoading} disabled={mintLoading} onClick={() => {
-                                    if(contract?.version === "0") {
+                                    if(+contract?.version >= 1) {
                                         handleMint(undefined, undefined)
                                     } else {
                                         if(contract?.mintPrice && contract?.mintPrice !== "0") {
@@ -872,7 +872,7 @@ export default () => {
                                         }
                                     }
                                 }} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">{ 
-                                    contract?.version && contract?.version === "1" ? 
+                                    contract?.version && +contract?.version >= 1 ?
                                     payment ? "MINT" : (!contract?.mintPrice || contract?.mintPrice === "0") ? "MINT" : "PAY BY CRYPTO" : "MINT" }</Button> : 
                                 <Button loading={mintLoading} disabled={mintLoading} onClick={() => handleUpdateMetadata()} style={{ marginTop: 32 }} fullWidth variant="contained" color="primary">UPDATE</Button>
                             }

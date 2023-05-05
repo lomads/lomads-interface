@@ -31,7 +31,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
         setChainId(_get(DAO, 'sbt.chainId', _get(DAO, 'chainId')))
     }, [DAO])
     const mintContract = useContract(contractAddress, 
-        version === "1" ?  require('abis/SBT.json') : require('abis/SBTv0.json')
+      +version >= 1 ?  require('abis/SBT.json') : require('abis/SBTv0.json')
     , true);
 
     const weth = (price: string, token: string): any => {
@@ -61,7 +61,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
               function: "balanceOf",
               args: [account],
             },
-            ...( version === "1" ? [{
+            ...( +version >= 1 ? [{
               target: contractAddress,
               function: "MINTED",
               args: [],
@@ -98,7 +98,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
           let provider = new ethers.providers.JsonRpcProvider(rpcUrl[0])
           const multicall = new MultiCall(provider);
           const [, res] = await multicall.multiCall(
-              version === "1" ? require('abis/SBT.json') : require('abis/SBTv0.json'),
+             +version >= 1 ? require('abis/SBT.json') : require('abis/SBTv0.json'),
               calls
           );
           console.log("currChainId", res)
@@ -161,7 +161,7 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
 
           try {
             let tx = null;
-            if(version === "1") {
+            if(+version >= 1) {
               tx = await mintContract?.safeMint(
                 tokenURI,
                 tokenId,
