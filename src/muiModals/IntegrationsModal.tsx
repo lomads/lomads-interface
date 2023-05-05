@@ -14,7 +14,7 @@ import {
 import { Image } from "@chakra-ui/react";
 import IconButton from 'muiComponents/IconButton'
 import CloseSVG from 'assets/svg/close-new.svg'
-import Integrations from "assets/svg/integrations.svg"
+import Integrations from "assets/svg/Integrations.svg"
 import GreyIconHelp from "assets/svg/GreyIconHelp.svg"
 import Integrationtrello from "assets/svg/Integrationtrello.svg"
 import Integrationgithub from "assets/svg/Integrationgithub.svg"
@@ -212,7 +212,8 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 				// If request is good...
 				console.log(res.data, "....res.data github list");
 				if (res.data) {
-					setGitHubOrganizationList(res.data)
+					const filteredOwnerGithubList = res.data.filter((item: any) => item.permissions.admin)
+					setGitHubOrganizationList(filteredOwnerGithubList)
 					setGitHubLoading(false);
 				}
 			})
@@ -233,7 +234,7 @@ export default ({ open, onClose, authorizeTrello, organizationData, isTrelloConn
 					return;
 				}
 				else {
-					console.log("Allowed to pull and store issues")
+					console.log("Allowed to pull and store issues", result.data.data)
 					dispatch(storeGithubIssues({
 						payload:
 						{
