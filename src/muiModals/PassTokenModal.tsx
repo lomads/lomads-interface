@@ -194,7 +194,7 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
 
         try {
             setUpdateContractLoading(true)
-            if(contract?.version === "1" && (state?.price?.token !== prevState?.price?.token) || (state?.price?.value !== prevState?.price?.value)) {
+            if(+contract?.version >= 1 && (state?.price?.token !== prevState?.price?.token) || (state?.price?.value !== prevState?.price?.value)) {
                 await updateContract(state?.price?.value, state?.price?.token)
             }
             return await axiosHttp.patch(`contract/${contract?.address}`, {
@@ -300,7 +300,7 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
                                 checked={state?.whitelisted} label="WHITELISTED"/>
                             </Box>
                         </Box>
-                        { contract?.version === "1" &&
+                        { +contract?.version >= 1 &&
                         <Box my={4} mx={1}>
                             <Typography
                                 style={{

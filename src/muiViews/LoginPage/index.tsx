@@ -1,11 +1,13 @@
 /* eslint-disable */
 import React, { useEffect, useState, useCallback } from "react";
 import { KeyboardArrowDown } from '@mui/icons-material';
-import { Grid, Typography, Box, MenuItem, Menu, Button } from "@mui/material"
+import { Grid, Typography, Box, MenuItem, Menu, Button, useMediaQuery } from "@mui/material"
 import { get as _get, find as _find, throttle as _throttle, debounce as _debounce } from 'lodash';
 import { useLocation, useNavigate } from "react-router-dom";
 import LOMADS_LOGO from "../../assets/svg/lomadsfulllogo.svg";
+import LOMADLOGO from "../../assets/svg/lomadsLogoRed.svg";
 import METAMASK from "../../assets/svg/metamask2.svg";
+import MOBILEDEVICE from "../../assets/svg/mobile_device.svg";
 import { useWeb3React } from "@web3-react/core";
 import { Connector } from "@web3-react/types";
 import { updateSelectedWallet } from "state/user/reducer";
@@ -26,11 +28,11 @@ import { makeStyles } from '@mui/styles';
 const useStyles = makeStyles((theme: any) => ({
     root: {
         minHeight: '100vh',
-         display: 'flex',
-         flexDirection: 'column',
-         alignItems: 'center',
-         justifyContent: 'center',
-         overflow: 'hidden !important'
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden !important'
     },
     logo: {
         width: 138,
@@ -64,165 +66,203 @@ const useStyles = makeStyles((theme: any) => ({
         fontSize: '16px !important',
         minWidth: 'inherit !importnt',
         padding: '0px !important'
-    }
-  }));
+    },
+    subtitle1: {
+        fontSize: '25px !important',
+        fontWeight: '400 !important',
+        lineHeight: '30px !important',
+        textAlign: 'center',
+        color: '#B12F15',
+        margin: '30px 0 !important'
+    },
+    subtitle2: {
+        fontSize: '38px !important',
+        lineHeight: '42px !important',
+        textTransform: 'uppercase',
+        color: '#1B2B41',
+    },
+}));
 
 
 export default () => {
-	const dispatch = useAppDispatch();
-	const navigate = useNavigate();
-	const location = useLocation()
-	const from = location?.state?.from;
-	const selectedWallet = useAppSelector((state) => state.user.selectedWallet);
-	const [selectedChainId, setSelectedChainId] = useState<number>(SupportedChainId.GOERLI)
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const location = useLocation()
+    const from = location?.state?.from;
+    const selectedWallet = useAppSelector((state) => state.user.selectedWallet);
+    const [selectedChainId, setSelectedChainId] = useState<number>(SupportedChainId.GOERLI)
     const [checkLoading, setCheckLoading] = useState<boolean>(false)
-	const { chainId, connector, account, provider } = useWeb3React();
-	const [preferredChain, setPreferredChain] = useState<number>(SupportedChainId?.GOERLI);
+    const { chainId, connector, account, provider } = useWeb3React();
+    const [preferredChain, setPreferredChain] = useState<number>(SupportedChainId?.GOERLI);
     const classes = useStyles()
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
     const handleClose = () => setAnchorEl(null);
 
-	console.log('chainId', chainId, connector, account)
+    console.log('chainId', chainId, connector, account)
 
-	const chainAllowed = chainId && isChainAllowed(connector, chainId) && chainId === +preferredChain;
-	console.log("chainAllowed", chainAllowed, chainId);
+    const matches = useMediaQuery('(min-width:992px)');
 
-	useEffect(() => {
-		if (chainId) {
-			setPreferredChain(chainId ? SUPPORTED_CHAIN_IDS.indexOf(+chainId) > -1 ? +chainId : SupportedChainId?.GOERLI : SupportedChainId?.GOERLI)
-		}
-	}, [chainId])
+    const chainAllowed = chainId && isChainAllowed(connector, chainId) && chainId === +preferredChain;
+    console.log("chainAllowed", chainAllowed, chainId);
+
+    useEffect(() => {
+        if (chainId) {
+            setPreferredChain(chainId ? SUPPORTED_CHAIN_IDS.indexOf(+chainId) > -1 ? +chainId : SupportedChainId?.GOERLI : SupportedChainId?.GOERLI)
+        }
+    }, [chainId])
 
 
-	const navigateTo = async () => {
-		const activeDao = sessionStorage.getItem('__lmds_active_dao')
-	    if(activeDao)
-			return `/${activeDao}`
-		return "/"
-		// const activeDao = sessionStorage.getItem('__lmds_active_dao')
-		// if (activeDao)
-		// 	return `/${activeDao}`
-		// return "/"
-		// return axiosHttp.get('dao').then(res => {
-		//   if (res.data && res.data.length > 0) {
-		//     const activeDao = sessionStorage.getItem('__lmds_active_dao')
-		//     if (activeDao)
-		//         return `/${activeDao}`
-		//     else
-		//       return `/${_get(res.data, '[0].url')}`
-		//   } else {
-		//     sessionStorage.removeItem('__lmds_active_dao')
-		//     return "/namedao"
-		//   }
-		// })
-		//   .finally(() => setCheckLoading(false))
-	}
+    const navigateTo = async () => {
+        const activeDao = sessionStorage.getItem('__lmds_active_dao')
+        if (activeDao)
+            return `/${activeDao}`
+        return "/"
+        // const activeDao = sessionStorage.getItem('__lmds_active_dao')
+        // if (activeDao)
+        // 	return `/${activeDao}`
+        // return "/"
+        // return axiosHttp.get('dao').then(res => {
+        //   if (res.data && res.data.length > 0) {
+        //     const activeDao = sessionStorage.getItem('__lmds_active_dao')
+        //     if (activeDao)
+        //         return `/${activeDao}`
+        //     else
+        //       return `/${_get(res.data, '[0].url')}`
+        //   } else {
+        //     sessionStorage.removeItem('__lmds_active_dao')
+        //     return "/namedao"
+        //   }
+        // })
+        //   .finally(() => setCheckLoading(false))
+    }
 
-	const setLocalToken = (token: string) => {
-		return Promise.resolve().then(() => {
-			localStorage.setItem('__lmds_web3_token', token);
-		});
-	}
+    const setLocalToken = (token: string) => {
+        return Promise.resolve().then(() => {
+            localStorage.setItem('__lmds_web3_token', token);
+        });
+    }
 
-	const generateToken = useCallback(_throttle(async () => {
-		if (!localStorage.getItem('__lmds_web3_token')) {
-			if (provider && account) {
-				const signer = getSigner(provider, account)
-				const token = await Web3Token.sign(async (msg: string) => await signer.signMessage(msg), '365d');
-				await setLocalToken(token)
-				await axiosHttp.post(`auth/create-account`)
-					.then((res: any) => dispatch(setUser(res.data)))
-				const nTo = await navigateTo();
-				setTimeout(() => navigate(nTo, from ? { state: {
-					from
-				  } } : undefined), 100);
-			}
-		} else {
-			const nTo = await navigateTo();
-			navigate(nTo)
-		}
-	}, 2000), [account])
+    const generateToken = useCallback(_throttle(async () => {
+        if (!localStorage.getItem('__lmds_web3_token')) {
+            if (provider && account) {
+                const signer = getSigner(provider, account)
+                const token = await Web3Token.sign(async (msg: string) => await signer.signMessage(msg), '365d');
+                await setLocalToken(token)
+                await axiosHttp.post(`auth/create-account`)
+                    .then((res: any) => dispatch(setUser(res.data)))
+                const nTo = await navigateTo();
+                setTimeout(() => navigate(nTo, from ? {
+                    state: {
+                        from
+                    }
+                } : undefined), 100);
+            }
+        } else {
+            const nTo = await navigateTo();
+            navigate(nTo)
+        }
+    }, 2000), [account])
 
-	useEffect(() => {
-		if (selectedWallet && account && chainAllowed)
-			generateToken()
-	}, [selectedWallet, account, chainAllowed]);
+    useEffect(() => {
+        if (selectedWallet && account && chainAllowed)
+            generateToken()
+    }, [selectedWallet, account, chainAllowed]);
 
-	const nextLogin = useCallback(async (connector: Connector) => {
-		localStorage.removeItem('__lmds_web3_token')
-		const connectionType = getConnection(connector).type;
-		try {
-			dispatch(updateConnectionError({ connectionType, error: undefined }));
-			console.log("chainAllowed", chainAllowed)
-			if (chainAllowed && !account) {
-				await connector.activate()
-			} else if (!chainAllowed) {
-				switchChain(connector, +preferredChain)
-					.then(async () => {
-						if (!account)
-							await connector.activate()
-					})
-					.catch(e => { console.log(e) })
-			}
-			dispatch(updateSelectedWallet({ wallet: connectionType }));
-		} catch (error: any) {
-			console.debug(`web3-react connection error: ${error}`);
-			dispatch(updateConnectionError({ connectionType, error: error.message }));
-		}
-	}, [chainAllowed, preferredChain]);
+    const nextLogin = useCallback(async (connector: Connector) => {
+        localStorage.removeItem('__lmds_web3_token')
+        const connectionType = getConnection(connector).type;
+        try {
+            dispatch(updateConnectionError({ connectionType, error: undefined }));
+            console.log("chainAllowed", chainAllowed)
+            if (chainAllowed && !account) {
+                await connector.activate()
+            } else if (!chainAllowed) {
+                switchChain(connector, +preferredChain)
+                    .then(async () => {
+                        if (!account)
+                            await connector.activate()
+                    })
+                    .catch(e => { console.log(e) })
+            }
+            dispatch(updateSelectedWallet({ wallet: connectionType }));
+        } catch (error: any) {
+            console.debug(`web3-react connection error: ${error}`);
+            dispatch(updateConnectionError({ connectionType, error: error.message }));
+        }
+    }, [chainAllowed, preferredChain]);
 
-	useEffect(() => {
-		console.log('window.ethereum', window.ethereum)
-	}, [window.ethereum])
+    useEffect(() => {
+        console.log('window.ethereum', window.ethereum)
+    }, [window.ethereum])
 
-	return (
-        <>
-        <Grid container className={classes.root}>
-            <Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
-                <Box zIndex={0} position="absolute" bottom={0}>
-                    <img src={CHEERS} style={{ marginBottom: '-5px' }} />
-                </Box>
-                <Box mb={0} mt={3}>
-                    <img src={LOMADS_LOGO} />
-                </Box>
-                <Typography mt={16} variant="subtitle1">Hello there !</Typography>
-                <Typography mt={2} mb={4} color="primary" variant="h2">Connect Your Wallet</Typography>
-                <Button onClick={() => nextLogin(injectedConnection.connector)} className={classes.metamaskButton} variant='contained' color='secondary'>
-                    <img src={METAMASK} />
-                </Button>
-                <Box mt={4} display="flex" flexDirection="row" alignItems="center">
-                    <Typography variant='body1' fontWeight="bold" mr={2}>Select Blockchain:</Typography>
-                    <Button onClick={handleClick} aria-controls={open ? 'fade-menu' : undefined} aria-haspopup="true" aria-expanded={open ? 'true' : undefined} className={classes.select} variant="contained" color="secondary" disableElevation startIcon={<img style={{ width: 18, height: 18 }} src={CHAIN_INFO[preferredChain].logoUrl}/>} endIcon={<KeyboardArrowDown />}>
-                        { CHAIN_INFO[preferredChain].label }
-                    </Button>
-                    <Menu
-                        MenuListProps={{
-                        'aria-labelledby': 'fade-button',
-                        }}
-                        anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'right',
-                        }}
-                        transformOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                        }}
-                        anchorEl={anchorEl}
-                        open={open}
-                        onClose={handleClose}
-                    >
-                        {
-                            SUPPORTED_CHAIN_IDS.map((sc: any) => 
-                                <MenuItem style={{ textTransform: 'uppercase' }} onClick={() => { setPreferredChain(sc); handleClose() }}>
-                                    <img style={{ marginRight: '8px', width: 18, height: 18 }} src={CHAIN_INFO[sc].logoUrl} />{ CHAIN_INFO[sc].label }</MenuItem>)
-                        }
-                    </Menu>
-                </Box>
-                <Box height={200}></Box>
+    if (matches) {
+        return (
+            <>
+                <Grid container className={classes.root}>
+                    <Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
+                        <Box zIndex={0} position="absolute" bottom={0}>
+                            <img src={CHEERS} style={{ marginBottom: '-5px' }} />
+                        </Box>
+                        <Box mb={0} mt={3}>
+                            <img src={LOMADS_LOGO} />
+                        </Box>
+                        <Typography mt={16} variant="subtitle1">Hello there !</Typography>
+                        <Typography mt={2} mb={4} color="primary" variant="h2">Connect Your Wallet</Typography>
+                        <Button onClick={() => nextLogin(injectedConnection.connector)} className={classes.metamaskButton} variant='contained' color='secondary'>
+                            <img src={METAMASK} />
+                        </Button>
+                        <Box mt={4} display="flex" flexDirection="row" alignItems="center">
+                            <Typography variant='body1' fontWeight="bold" mr={2}>Select Blockchain:</Typography>
+                            <Button onClick={handleClick} aria-controls={open ? 'fade-menu' : undefined} aria-haspopup="true" aria-expanded={open ? 'true' : undefined} className={classes.select} variant="contained" color="secondary" disableElevation startIcon={<img style={{ width: 18, height: 18 }} src={CHAIN_INFO[preferredChain].logoUrl} />} endIcon={<KeyboardArrowDown />}>
+                                {CHAIN_INFO[preferredChain].label}
+                            </Button>
+                            <Menu
+                                MenuListProps={{
+                                    'aria-labelledby': 'fade-button',
+                                }}
+                                anchorOrigin={{
+                                    vertical: 'bottom',
+                                    horizontal: 'right',
+                                }}
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right',
+                                }}
+                                anchorEl={anchorEl}
+                                open={open}
+                                onClose={handleClose}
+                            >
+                                {
+                                    SUPPORTED_CHAIN_IDS.map((sc: any) =>
+                                        <MenuItem style={{ textTransform: 'uppercase' }} onClick={() => { setPreferredChain(sc); handleClose() }}>
+                                            <img style={{ marginRight: '8px', width: 18, height: 18 }} src={CHAIN_INFO[sc].logoUrl} />{CHAIN_INFO[sc].label}</MenuItem>)
+                                }
+                            </Menu>
+                        </Box>
+                        <Box height={200}></Box>
+                    </Grid>
+                </Grid>
+            </>
+        );
+    }
+    else {
+        return (
+            <Grid container className={classes.root}>
+                <Grid xs={12} item display="flex" flexDirection="column" alignItems="center">
+                    <Box position="absolute" top={0} left={0} sx={{ padding: '30px' }}>
+                        <img src={LOMADLOGO} />
+                    </Box>
+                    <Box>
+                        <img src={MOBILEDEVICE} />
+                    </Box>
+                    <Box sx={{ padding: '0 30px' }}>
+                        <Typography className={classes.subtitle1}>Lomads app needs a PC<br />for now.</Typography>
+                        <Typography className={classes.subtitle2} sx={{ fontWeight: '800' }}>CATCH YOU ON<br />THE <span style={{ fontWeight: '300', fontStyle: 'italic', color: '#C94B32' }}>BIG SCREEN</span></Typography>
+                    </Box>
+                </Grid>
             </Grid>
-        </Grid>
-    </>
-	);
+        )
+    }
 };
