@@ -109,6 +109,7 @@ const Settings = () => {
 	const daoName = name.split(" ");
 
 	const authorizeTrello = () => {
+		setTrelloLoading(true);
 		window.Trello.authorize({
 			type: 'popup',
 			persist: true,
