@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import _ from 'lodash';
 import lomadsfulllogo from "../../assets/svg/lomadsfulllogo.svg";
 import { useNavigate, useLocation } from "react-router-dom";

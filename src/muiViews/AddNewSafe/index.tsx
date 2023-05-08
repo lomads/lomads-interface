@@ -43,7 +43,6 @@ import MuiSelect from '../../muiComponents/Select'
 import SwitchChain from 'components/SwitchChain';
 import axios from "axios";
 import Avatar from "muiComponents/Avatar";
-import { margin } from "polished";
 
 const useStyles = makeStyles((theme: any) => ({
 	root: {

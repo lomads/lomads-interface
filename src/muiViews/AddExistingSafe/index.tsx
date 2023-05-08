@@ -4,7 +4,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useWeb3React } from "@web3-react/core";
 import { updateHolder } from "state/proposal/reducer";
 import { useAppDispatch, useAppSelector } from "state/hooks";
-import { ImportSafe } from "connection/SafeCall";
 import { createDAO } from '../../state/flow/actions';
 import coin from "../../assets/svg/coin.svg";
 import axiosHttp from 'api'

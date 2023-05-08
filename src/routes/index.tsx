@@ -1,18 +1,6 @@
-//import LoginPage from "../pages/LoginPage";
-import Header from "components/Header";
-// import DAOsuccess from "../pages/NewPages/DAOsuccess";
-// import DAONoAccess from "../pages/NewPages/DAONoAccess";
-// import NameDAO from "../pages/NewPages/NameDAO";
-// import StartSafe from "../pages/NewPages/StartSafe";
-// import InviteGang from "../pages/NewPages/InviteGang";
-// import AddExistingSafe from "../pages/NewPages/AddExistingSafe";
-// import AddNewSafe from "../pages/NewPages/AddNewSafe";
 import Dashboard from "../pages/NewPages/DashBoard/Dashboard";
 import Settings from "../pages/NewPages/Settings";
-import SettingsOlder from "../pages/NewPages/SettingsOlder";
 import DCAuth from '../pages/NewPages/DCAuth';
-//import CreatePassToken from "../pages/NewPages/CreatePassToken";
-//import MintPassToken from "../pages/NewPages/MintPassToken";
 import CreatePassSucess from "../pages/NewPages/CreatePassSucess";
 import CreateProject from "../pages/NewPages/CreateProject";
 import ProjectDetails from "../pages/NewPages/ProjectDetails";
@@ -36,8 +24,6 @@ import CreatePassToken from "muiViews/CreatePassToken";
 import MintPassToken from "muiViews/MintPassToken";
 import LoginPage from "muiViews/LoginPage";
 import createDaoOrg from "muiViews/CreateDaoOrg"
-//import StartSafe from "muiViews/StartSafe";
-//import InviteGang from "muiViews/InviteGang";
 import AddExistingSafe from "muiViews/AddExistingSafe";
 import AddNewSafe from "muiViews/AddNewSafe";
 import DAOsuccess from "muiViews/DAOSuccess";
@@ -56,14 +42,6 @@ export default [
         path: '/createorg',
         component: createDaoOrg
     },
-    // {
-    //     path: '/invitegang',
-    //     component: InviteGang
-    // },
-    // {
-    //     path: '/startsafe',
-    //     component: StartSafe
-    // },
     {
         path: '/addsafe',
         component: AddExistingSafe
