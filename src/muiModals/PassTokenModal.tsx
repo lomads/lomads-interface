@@ -239,7 +239,7 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
                     <IconButton sx={{ position: 'fixed', right: 32, top: 32 }} onClick={() => onClose()}>
                         <img src={CloseSVG} />
                     </IconButton>
-                    <Box display="flex" flexDirection="column" my={6} alignItems="center">
+                    <Box display="flex" flexDirection="column" my={6} alignItems="center" justifyContent="center">
                         <img src={MintSBTSvg} />
                         <Typography my={4} style={{ color: palette.primary.main, fontSize: '30px', fontWeight: 400 }}>Pass Tokens</Typography>
                     </Box>

@@ -43,7 +43,7 @@ const XpPointsModal = ({ toggleXp }) => {
 
   return (
     <>
-      <div className="sidebarModal">
+      <div className="sidebarModal" style={{border: '13px solid blue'}}>
         {showDisableDailog && <DisableXpPointDailog setShowDisableDailog={setShowDisableDailog} setIsXpPointEnable={(status) => {
           if (!status) {
             dispatch(toggleXPPoints({ payload: { status }, daoUrl: _get(DAO, 'url', '') }))
@@ -54,8 +54,9 @@ const XpPointsModal = ({ toggleXp }) => {
             toggleXp();
           }}
           className="overlay"
+          style={{border: '13px solid grey'}}
         ></div>
-        <div className="SideModal">
+        <div className="SideModal" style={{border: '13px solid purple'}}>
           <div className="closeButtonArea">
             <IconButton
               Icon={

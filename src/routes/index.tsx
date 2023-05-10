@@ -1,5 +1,5 @@
 import Dashboard from "../pages/NewPages/DashBoard/Dashboard";
-import Settings from "../pages/NewPages/Settings";
+//import Settings from "../pages/NewPages/Settings";
 import DCAuth from '../pages/NewPages/DCAuth';
 import CreatePassSucess from "../pages/NewPages/CreatePassSucess";
 import CreateProject from "../pages/NewPages/CreateProject";
@@ -28,6 +28,7 @@ import AddExistingSafe from "muiViews/AddExistingSafe";
 import AddNewSafe from "muiViews/AddNewSafe";
 import DAOsuccess from "muiViews/DAOSuccess";
 import DAONoAccess from "muiViews/DAONoAccess";
+import Settings from "muiViews/Settings";
 
 export default [
     {

@@ -34,3 +34,9 @@ export interface sidebarPropType {
   chainAllowed?: number | boolean | undefined;
   account?: string | undefined;
 }
+
+declare global {
+  interface Window {
+    Trello: any; // 👈️ turn off type checking
+  }
+}
