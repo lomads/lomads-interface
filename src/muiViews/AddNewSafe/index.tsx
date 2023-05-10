@@ -970,17 +970,7 @@ export default () => {
 										<Box key={index} className={classes.owner}>
 											<Box className={classes.avatarPlusName}>
 												<Avatar name={result.name} wallet={result.address}/>
-												{/* <img src={daoMember2} alt={result.address} />
-												<Typography variant="body1" className={classes.nameText}>{result.name}</Typography> */}
 											</Box>
-											{/* <Box className={classes.avatarAddress}>
-												<Typography className={classes.text}>
-													{result.address &&
-														result.address.slice(0, 6) +
-														"..." +
-														result.address.slice(-4)}
-												</Typography>
-											</Box> */}
 											<Box className={classes.avatarBtn}>
 												{result.address !== account && (
 													<IconButton
