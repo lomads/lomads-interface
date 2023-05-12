@@ -107,13 +107,13 @@ const useStyles = makeStyles((theme: any) => ({
 		borderRadius: 20,
 		padding: '26px 22px 30px',
 		color: '#C94B32',
-		marginBottom: 20
+		cursor: 'pointer'
 	},
 	styleContent: {
-		marginTop: '20px',
+		marginTop: 20,
 		display: 'flex',
 		alignItems: 'center',
-		justifyContent: 'space-between',
+		justifyContent: 'space-between'
 	},
 	settingsOrganisationChild: {
 		cursor: 'pointer',
@@ -328,7 +328,7 @@ const Settings = () => {
 											</Box>
 										</Grid>
 										<Grid
-											container
+											item
 											xs={6}
 											md={3.8}
 											margin={1}
@@ -337,7 +337,7 @@ const Settings = () => {
 											}}
 											className={classes.settingsOrganisationChild}>
 											<Box sx={{ padding: 2 }}>
-												<img src={Safe} style={{ height: "35px" }} />
+												<img src={Safe} style={{ height: 35 }} />
 												<Link
 													className={classes.styleContent}
 													style={{ color: "#C94B32" }}
@@ -359,7 +359,7 @@ const Settings = () => {
 											}}
 										>
 											<Box sx={{ padding: 2 }}>
-												<img src={PassTokens} style={{ height: "35px" }} />
+												<img src={PassTokens} style={{ height: 35 }} />
 												<Link
 													className={classes.styleContent}
 													style={{ color: "#C94B32" }}
@@ -383,7 +383,7 @@ const Settings = () => {
 											}}
 										>
 											<Box sx={{ padding: 2 }}>
-												<img src={XpPoints} style={{ height: "35px" }} />
+												<img src={XpPoints} style={{ height: 35 }} />
 												<Link
 													className={classes.styleContent}
 													style={{ color: "#C94B32" }}
@@ -405,7 +405,7 @@ const Settings = () => {
 											}}
 										>
 											<Box sx={{ padding: 2 }}>
-												<img src={Terminology} style={{ height: "35px" }} />
+												<img src={Terminology} style={{ height: 35 }} />
 												<Link
 													className={classes.styleContent}
 													style={{ color: "#C94B32" }}
