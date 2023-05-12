@@ -31,10 +31,6 @@ import { makeStyles } from '@mui/styles';
 import { Box, Grid } from "@mui/material";
 
 const useStyles = makeStyles((theme: any) => ({
-	root: {
-		float: 'right',
-		overflow: 'hidden !important',
-	},
 	settingsPage: {
 		width: '100%',
 		height: '100vh',
@@ -93,6 +89,10 @@ const useStyles = makeStyles((theme: any) => ({
 		width: '100%',
 		paddingTop: '4rem',
 		paddingLeft: '4rem',
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		flexDirection: 'column'
 	},
 	settingsHeader: {
 		width: '947px',
@@ -157,9 +157,6 @@ const useStyles = makeStyles((theme: any) => ({
 		fontSize: 30,
 		color: '#FFFFFF',
 		marginBottom: 40
-	},
-	FooterParent: {
-		bottom: 0
 	}
 }));
 
@@ -277,167 +274,173 @@ const Settings = () => {
 					</Box>
 					<img src={settingIcon} className={classes.settingIcon} />
 				</Box>
-				<Box className={classes.settingsCenter}>
-					<Box>
-						<Box className={classes.settingsHeader}>
-							<Box className={classes.settingsHeaderHOne}>{name}</Box>
-							<Box className={classes.settingsHeaderHTwo}>Settings</Box>
-						</Box>
-						<Grid container className={classes.root} spacing={1}>
-							<Grid
-								item
-								xs={9}
-								md={9.2}
-								margin={1}
-								className={classes.settingsOrganisation}
-								onClick={() => {
-									setOpenOrganisationDetails(true);
-								}}
-							>
-								<Box sx={{padding: 2}}>
-									<img src={OrganistionDetails} style={{ height: 35 }} />
-									<Link
-										className={classes.styleContent}
-										style={{ color: "#C94B32" }}
-										to={''}
+					<Box className={classes.settingsCenter}>
+						<Box>
+							<Box className={classes.settingsHeader}>
+								<Box className={classes.settingsHeaderHOne}>{name}</Box>
+								<Box className={classes.settingsHeaderHTwo}>Settings</Box>
+							</Box>
+							<Box sx={{ flexGrow: 1}}>
+								<Grid container spacing={1}>
+									<Grid
+										item
+										xs={6}
+										md={11.7}
+										margin={1}
+										className={classes.settingsOrganisation}
+										onClick={() => {
+											setOpenOrganisationDetails(true);
+										}}
 									>
-										Organisation Details
-										<ChevronRight />
-									</Link>
-								</Box>
-							</Grid>
-							<Grid container>
-								<Grid
-									item
-									xs={9} md={3}
-									margin={1}
-									className={classes.settingsOrganisationChild}
-									onClick={() => {
-										setOpenRolesPermissions(true);
-									}}
-								>
-									<Box sx={{padding: 2}}>
-										<img src={RolesPermissions} style={{ height: "35px" }} />
-										<Link
-											className={classes.styleContent}
-											style={{ color: "#C94B32" }}
-											to={''}
+										<Box sx={{ padding: '12px 0 12px 12px' }}>
+											<img src={OrganistionDetails} style={{ height: 35 }} />
+											<Link
+												className={classes.styleContent}
+												style={{ color: "#C94B32" }}
+												to={''}
+											>
+												Organisation Details
+												<ChevronRight />
+											</Link>
+										</Box>
+									</Grid>
+									<Grid container>
+										<Grid
+											item
+											xs={6}
+											md={3.8}
+											margin={1}
+											className={classes.settingsOrganisationChild}
+											onClick={() => {
+												setOpenRolesPermissions(true);
+											}}
 										>
-											Roles & Permissions
-											<ChevronRight />
-										</Link>
-									</Box>
-								</Grid>
-								<Grid
-									item
-									xs={9} md={3}
-									margin={1}
-									onClick={() => {
-										setOpenSafe(true)
-									}}
-									className={classes.settingsOrganisationChild}>
-									<Box sx={{padding: 2}}>
-										<img src={Safe} style={{ height: "35px" }} />
-										<Link
-											className={classes.styleContent}
-											style={{ color: "#C94B32" }}
-											to={''}
+											<Box sx={{ padding: 2 }}>
+												<img src={RolesPermissions} style={{ height: "35px" }} />
+												<Link
+													className={classes.styleContent}
+													style={{ color: "#C94B32" }}
+													to={''}
+												>
+													Roles & Permissions
+													<ChevronRight />
+												</Link>
+											</Box>
+										</Grid>
+										<Grid
+											container
+											xs={6}
+											md={3.8}
+											margin={1}
+											onClick={() => {
+												setOpenSafe(true)
+											}}
+											className={classes.settingsOrganisationChild}>
+											<Box sx={{ padding: 2 }}>
+												<img src={Safe} style={{ height: "35px" }} />
+												<Link
+													className={classes.styleContent}
+													style={{ color: "#C94B32" }}
+													to={''}
+												>
+													Safe
+													<ChevronRight />
+												</Link>
+											</Box>
+										</Grid>
+										<Grid
+											item
+											xs={6}
+											md={3.8}
+											margin={1}
+											className={classes.settingsOrganisationChild}
+											onClick={() => {
+												togglePassToken()
+											}}
 										>
-											Safe
-											<ChevronRight />
-										</Link>
-									</Box>
-								</Grid>
-								<Grid
-									item
-									xs={9} md={3}
-									margin={1}
-									className={classes.settingsOrganisationChild}
-									onClick={() => {
-										togglePassToken()
-									}}
-								>
-									<Box sx={{padding: 2}}>
-										<img src={PassTokens} style={{ height: "35px" }} />
-										<Link
-											className={classes.styleContent}
-											style={{ color: "#C94B32" }}
-											to={''}
+											<Box sx={{ padding: 2 }}>
+												<img src={PassTokens} style={{ height: "35px" }} />
+												<Link
+													className={classes.styleContent}
+													style={{ color: "#C94B32" }}
+													to={''}
+												>
+													Pass Tokens
+													<ChevronRight />
+												</Link>
+											</Box>
+										</Grid>
+									</Grid>
+									<Grid container>
+										<Grid
+											item
+											className={classes.settingsOrganisationChild}
+											xs={6}
+											md={3.8}
+											margin={1}
+											onClick={() => {
+												setOpenXpPoints(true);
+											}}
 										>
-											Pass Tokens
-											<ChevronRight />
-										</Link>
-									</Box>
-								</Grid>
-							</Grid>
-							<Grid container>
-								<Grid
-									item
-									className={classes.settingsOrganisationChild}
-									xs={9} md={3}
-									margin={1}
-									onClick={() => {
-										setOpenXpPoints(true);
-									}}
-								>
-									<Box sx={{padding: 2}}>
-										<img src={XpPoints} style={{ height: "35px" }} />
-										<Link
-											className={classes.styleContent}
-											style={{ color: "#C94B32" }}
-											to={''}
+											<Box sx={{ padding: 2 }}>
+												<img src={XpPoints} style={{ height: "35px" }} />
+												<Link
+													className={classes.styleContent}
+													style={{ color: "#C94B32" }}
+													to={''}
+												>
+													SWEAT points
+													<ChevronRight />
+												</Link>
+											</Box>
+										</Grid>
+										<Grid
+											item
+											className={classes.settingsOrganisationChild}
+											xs={6}
+											md={3.8}
+											margin={1}
+											onClick={() => {
+												setOpenTerminology(true);
+											}}
 										>
-											SWEAT points
-											<ChevronRight />
-										</Link>
-									</Box>
-								</Grid>
-								<Grid
-									item
-									className={classes.settingsOrganisationChild}
-									xs={9} md={3}
-									margin={1}
-									onClick={() => {
-										setOpenTerminology(true);
-									}}
-								>
-									<Box sx={{padding: 2}}>
-										<img src={Terminology} style={{ height: "35px" }} />
-										<Link
-											className={classes.styleContent}
-											style={{ color: "#C94B32" }}
-											to={''}
+											<Box sx={{ padding: 2 }}>
+												<img src={Terminology} style={{ height: "35px" }} />
+												<Link
+													className={classes.styleContent}
+													style={{ color: "#C94B32" }}
+													to={''}
+												>
+													Terminology
+													<ChevronRight />
+												</Link>
+											</Box>
+										</Grid>
+										<Grid
+											item
+											xs={6}
+											md={3.8}
+											margin={1}
+											className={classes.settingsOrganisationChild}
+											onClick={() => setOpenIntegrationModal(true)}
 										>
-											Terminology
-											<ChevronRight />
-										</Link>
-									</Box>
+											<Box sx={{ padding: 2 }}>
+												<img src={IntegrationGrey} width={35} height={32} />
+												<Link
+													className={classes.styleContent}
+													style={{ color: "#C94B32" }}
+													to={''}
+												>
+													Integrations
+													<ChevronRight />
+												</Link>
+											</Box>
+										</Grid>
+									</Grid>
 								</Grid>
-								<Grid
-									item
-									xs={9} md={3}
-									margin={1}
-									className={classes.settingsOrganisationChild}
-									onClick={() => setOpenIntegrationModal(true)}
-								>
-									<Box sx={{ padding: 2 }}>
-										<img src={IntegrationGrey} width={35} height={32} />
-										<Link
-											className={classes.styleContent}
-											style={{ color: "#C94B32" }}
-											to={''}
-										>
-											Integrations
-											<ChevronRight />
-										</Link>
-									</Box>
-								</Grid>
-							</Grid>
-						</Grid>
-					</Box>
-				   <Box className={classes.FooterParent}>
-					   <Footer theme="light" />
-				   </Box>
+							</Box>
+						</Box>
+					<Footer theme="light" />
 				</Box>
 				<Box className={classes.settingsRightBar}>
 					<Box

@@ -380,12 +380,13 @@ export default ({ open, onClose }: { open: boolean, onClose: any }) => {
 				<IconButton sx={{ position: 'fixed', right: 32, top: 32 }} onClick={() => onClose()}>
 					<img src={CloseSVG} />
 				</IconButton>
-				<Box className="MainComponent">
-					<Box
-						style={{
+				<Box>
+					<Box sx={{
 							display: "flex",
 							flexDirection: "column",
 							alignItems: "center",
+							marginTop: 11,
+							marginBottom: 5
 						}}
 					>
 						<Image
@@ -395,11 +396,7 @@ export default ({ open, onClose }: { open: boolean, onClose: any }) => {
 						/>
 						<Box id="title-type">Organisation Details</Box>
 					</Box>
-					<Box
-						style={{
-							padding: "0 50px 100px 50px",
-						}}
-					>
+					<Box sx={{ padding: "0 50px 100px 50px"}}>
 						<TextInput value={name}
 							onChange={(evt: any) => setName(evt.target.value)}
 							placeholder="Fashion Fusion" sx={{ my: 2 }} fullWidth label="Name" />
@@ -458,7 +455,7 @@ export default ({ open, onClose }: { open: boolean, onClose: any }) => {
 
 						<hr
 							style={{
-								height: "2px",
+								height: 2,
 								width: 208,
 								background: "#C94B32",
 								margin: "36px auto 35px",
@@ -470,7 +467,7 @@ export default ({ open, onClose }: { open: boolean, onClose: any }) => {
 							style={{
 								display: "flex",
 								flexDirection: "row",
-								marginTop: "9px",
+								marginTop: 9,
 								alignItems: 'center',
 								justifyContent: "space-between",
 							}}
@@ -529,11 +526,11 @@ export default ({ open, onClose }: { open: boolean, onClose: any }) => {
 						{daoLinks.length > 0 &&
 							<Box
 								style={{
-									marginTop: "9px",
+									marginTop: 9,
 									padding: "9px 20px 9px 20px",
 									backgroundColor: "rgba(118, 128, 141, 0.05)",
 									color: "#718096",
-									borderRadius: "5px",
+									borderRadius: 5,
 									justifyContent: 'space-between'
 								}}>
 								{daoLinks.map((item: any, index: any) => {
@@ -542,7 +539,7 @@ export default ({ open, onClose }: { open: boolean, onClose: any }) => {
 											style={{
 												display: "flex",
 												flexDirection: "row",
-												marginTop: "9px",
+												marginTop: 9,
 												color: "#718096",
 												justifyContent: 'space-between'
 											}}>

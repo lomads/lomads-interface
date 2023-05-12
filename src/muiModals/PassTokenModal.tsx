@@ -1,9 +1,9 @@
 import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 import { get as _get } from 'lodash'
-import { 
+import {
     Drawer, Box, Typography, Paper
- } from '@mui/material';
+} from '@mui/material';
 import IconButton from 'muiComponents/IconButton';
 import Button from 'muiComponents/Button';
 import Switch from "muiComponents/Switch";
@@ -43,7 +43,7 @@ const LOCK_SVG = `<svg width="13" height="15" viewBox="0 0 13 15" fill="none" xm
 `
 
 
- const useStyles = makeStyles((theme: any) => ({
+const useStyles = makeStyles((theme: any) => ({
     root: {
         paddingBottom: 60
     },
@@ -102,13 +102,13 @@ const LOCK_SVG = `<svg width="13" height="15" viewBox="0 0 13 15" fill="none" xm
 }));
 
 
-export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
+export default ({ open, onClose }: { open: boolean, onClose: any }) => {
     const { account, provider, chainId: currentChainId } = useWeb3React();
     const navigate = useNavigate();
     const classes = useStyles()
     const [chainId, setChainId] = useState<any>(null);
     const [networkError, setNetworkError] = useState<any>(null)
-    const {  DAO } = useAppSelector(store => store.dashboard)
+    const { DAO } = useAppSelector(store => store.dashboard)
     const [contract, setContract] = useState<any>(null);
     const [updateContractLoading, setUpdateContractLoading] = useState<boolean | null>(null)
     const { updateContract, getStats, withdraw } = useMintSBT(_get(contract, 'address', ''), _get(contract, 'version', ''))
@@ -129,7 +129,7 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
     })
 
     useEffect(() => {
-        if(DAO) 
+        if (DAO)
             setChainId(_get(DAO, 'sbt.chainId', _get(DAO, 'chainId')))
     }, [DAO])
 
@@ -138,16 +138,16 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
     }, [open])
 
     useEffect(() => {
-        if(contract) {
-            setState((prev:any) => {
+        if (contract) {
+            setState((prev: any) => {
                 return {
                     ...prev,
                     contact: contract?.contactDetail,
                     whitelisted: contract?.whitelisted,
                     priced: contract?.mintPrice && contract?.mintPrice !== "" && parseFloat(contract?.mintPrice) > 0 ? true : false,
                     price: {
-                        token : _get(contract,  'mintPriceToken', '0x0000000000000000000000000000000000000000'),
-                        value : contract?.mintPrice && contract?.mintPrice !== "" && parseFloat(contract?.mintPrice) > 0 ? parseFloat(contract?.mintPrice) : null
+                        token: _get(contract, 'mintPriceToken', '0x0000000000000000000000000000000000000000'),
+                        value: contract?.mintPrice && contract?.mintPrice !== "" && parseFloat(contract?.mintPrice) > 0 ? parseFloat(contract?.mintPrice) : null
                     }
                 }
             })
@@ -155,7 +155,7 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
     }, [contract])
 
     useEffect(() => {
-        if(chainId) {
+        if (chainId) {
             setTokens([
                 {
                     label: CHAIN_INFO[chainId]?.nativeCurrency?.symbol,
@@ -172,7 +172,7 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
     }, [chainId])
 
     useEffect(() => {
-        if(DAO?.sbt)
+        if (DAO?.sbt)
             setContract(DAO?.sbt)
     }, [DAO?.sbt])
 
@@ -188,27 +188,27 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
         //     })  
         // }
 
-        if(currentChainId !== chainId) {
-            return toast.custom(t => <SwitchChain t={t} nextChainId={chainId}/>)
+        if (currentChainId !== chainId) {
+            return toast.custom(t => <SwitchChain t={t} nextChainId={chainId} />)
         }
 
         try {
             setUpdateContractLoading(true)
-            if(+contract?.version >= 1 && (state?.price?.token !== prevState?.price?.token) || (state?.price?.value !== prevState?.price?.value)) {
+            if (+contract?.version >= 1 && (state?.price?.token !== prevState?.price?.token) || (state?.price?.value !== prevState?.price?.value)) {
                 await updateContract(state?.price?.value, state?.price?.token)
             }
             return await axiosHttp.patch(`contract/${contract?.address}`, {
-                 daoId: DAO?._id,
-                 mintPrice: state?.price?.value,
-                 whitelisted: state?.whitelisted,
-                 contactDetail: state?.contact
+                daoId: DAO?._id,
+                mintPrice: state?.price?.value,
+                whitelisted: state?.whitelisted,
+                contactDetail: state?.contact
             })
-            .then(res => { 
-                setDAO(res.data)
-                setContract(contract) 
-                onClose()
-            })
-            .finally(() => setUpdateContractLoading(false))
+                .then(res => {
+                    setDAO(res.data)
+                    setContract(contract)
+                    onClose()
+                })
+                .finally(() => setUpdateContractLoading(false))
         } catch (e) {
             setUpdateContractLoading(false)
             console.log(e)
@@ -228,165 +228,173 @@ export default ({ open, onClose }: { open: boolean , onClose: any} ) => {
 
     return (
         <Drawer
-                PaperProps={{ style: {  borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
-                sx={{ zIndex: 99999 }}
-                anchor={'right'}
-                open={open}
-                onClose={() => onClose()}>
-                {  DAO ?
-                    <>
-                <Box sx={{ width: 575, flex: 1, paddingBottom:'80px', borderRadius: '20px 0px 0px 20px' }}>
-                    <IconButton sx={{ position: 'fixed', right: 32, top: 32 }} onClick={() => onClose()}>
-                        <img src={CloseSVG} />
-                    </IconButton>
-                    <Box display="flex" flexDirection="column" my={6} alignItems="center" justifyContent="center">
-                        <img src={MintSBTSvg} />
-                        <Typography my={4} style={{ color: palette.primary.main, fontSize: '30px', fontWeight: 400 }}>Pass Tokens</Typography>
-                    </Box>
-                    { !contract ?
-                    <Box margin="0 auto" display="flex" flexDirection="column" alignItems="center" width={380}>
-                        <Typography style={{
-                            color: "#76808d",
-                            fontSize: '14px',
-                            fontStyle: 'italic',
-                            marginLeft: 'auto',
-                            marginRight: 'auto',
-                            marginTop: '20px',
-                            textAlign: 'center',
-                            width: '300px'
-                        }}>The organisation doesn't have a token yet</Typography>
-                        <Button sx={{ mt:3 }} onClick={() => {
-                            return navigate(`/${DAO?.url}/create-pass-token`)
-                        }} variant='contained' size="small">Configure Pass Token</Button>
-                    </Box> :
-                    <Box margin="0 auto" width={380}>
-                        <Box className={classes.paperDetails}>
-                            <Box display="flex" flexDirection="row" alignItems="center">
-                                { chainId &&
-                                <Box onClick={() => window.open(`${_get(CHAIN_INFO, chainId).explorer}address/${contract.address}`)} style={{ cursor: 'pointer' }}>
-                                    { contract?.image ?
-                                    <img style={{ width: 40, borderRadius: 10, height: 40, objectFit: 'cover' }} src={contract?.image} /> : 
-                                    <img style={{ width: 40, borderRadius: 10, height: 40 }} src={PT} />
-                                    }
-                                </Box> }
-                                <Typography className={classes.tokenName}>{ contract?.token }</Typography>
-                                { chainId &&
-                                <Box onClick={() => window.open(`${_get(CHAIN_INFO, chainId).explorer}address/${contract.address}`)} style={{ cursor: 'pointer' }}>
-                                    <img style={{ width: 20, borderRadius: 10, marginLeft: 8, height: 20 }} src={_get(CHAIN_INFO, chainId).logoUrl} />
-                                </Box> }
-                            </Box>
-                            {/* <Box display="flex" flexDirection="row" alignItems="center">
+            PaperProps={{ style: { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 } }}
+            sx={{ zIndex: 99999 }}
+            anchor={'right'}
+            open={open}
+            onClose={() => onClose()}>
+            {DAO ?
+                <>
+                    <Box sx={{ width: 575, flex: 1, paddingBottom: '80px', borderRadius: '20px 0px 0px 20px' }}>
+                        <IconButton sx={{ position: 'fixed', right: 32 }} onClick={() => onClose()}>
+                            <img src={CloseSVG} />
+                        </IconButton>
+                        <Box display="flex" flexDirection="column" sx={{ height: '100%', width: '100%' }} alignItems="center" justifyContent="center">
+                            <img src={MintSBTSvg} />
+                            <Typography my={3} style={{ color: palette.primary.main, fontSize: '30px', fontWeight: 400 }}>Pass Tokens</Typography>
+                            {!contract ?
+                                <Box margin="0 auto" display="flex" flexDirection="column" alignItems="center" width={380}>
+                                    <Typography style={{
+                                        color: "#76808d",
+                                        fontSize: 14,
+                                        fontStyle: 'italic',
+                                        marginLeft: 'auto',
+                                        marginRight: 'auto',
+                                        marginBottom: 35,
+                                        textAlign: 'center',
+                                        width: 300
+                                    }}>The organisation doesn't have a token yet</Typography>
+                                    <Button onClick={() => {
+                                        return navigate(`/${DAO?.url}/create-pass-token`)
+                                    }} variant='contained' size="small">Configure Pass Token</Button>
+                                </Box> :
+                                <Box margin="0 auto" width={380}>
+                                    <Box className={classes.paperDetails}>
+                                        <Box display="flex" flexDirection="row" alignItems="center">
+                                            {chainId &&
+                                                <Box onClick={() => window.open(`${_get(CHAIN_INFO, chainId).explorer}address/${contract.address}`)} style={{ cursor: 'pointer' }}>
+                                                    {contract?.image ?
+                                                        <img style={{ width: 40, borderRadius: 10, height: 40, objectFit: 'cover' }} src={contract?.image} /> :
+                                                        <img style={{ width: 40, borderRadius: 10, height: 40 }} src={PT} />
+                                                    }
+                                                </Box>}
+                                            <Typography className={classes.tokenName}>{contract?.token}</Typography>
+                                            {chainId &&
+                                                <Box onClick={() => window.open(`${_get(CHAIN_INFO, chainId).explorer}address/${contract.address}`)} style={{ cursor: 'pointer' }}>
+                                                    <img style={{ width: 20, borderRadius: 10, marginLeft: 8, height: 20 }} src={_get(CHAIN_INFO, chainId).logoUrl} />
+                                                </Box>}
+                                        </Box>
+                                        {/* <Box display="flex" flexDirection="row" alignItems="center">
                                { contract?.tokenSupply && <Typography className={classes.tokenSupply}>{ `X ${ contract?.tokenSupply }` }</Typography> }
                             </Box> */}
-                        </Box>
-                        <Box my={3} mx={1}>
-                            <Typography
-                                style={{
-                                    color: '#76808d',
-                                    fontSize: '16px',
-                                    fontWeight: 700,
-                                    marginBottom: '10px'
-                                }}
-                            >Membership policy:</Typography>
-                            <Box ml={1}>
-                                <Switch
-                                disabled
-                                checkedSVG={LOCK_SVG}
-                                onChange={(e: any) => { setState((prev: any) => { return {
-                                    ...prev, 
-                                    whitelisted: !prev.whitelisted,
-                                    whitelist: { members: [], discounts: [], inviteCodes: [] }
-                                } } ) }}
-                                checked={state?.whitelisted} label="WHITELISTED"/>
-                            </Box>
-                        </Box>
-                        { +contract?.version >= 1 &&
-                        <Box my={4} mx={1}>
-                            <Typography
-                                style={{
-                                    color: '#76808d',
-                                    fontSize: '16px',
-                                    fontWeight: 700,
-                                    marginBottom: '10px'
-                                }}
-                            >Price:</Typography>
-                            <Box ml={1} display="flex" flexDirection="row" justifyContent="space-between">
-                                <Switch
-                                onChange={(e: any) => { setState((prev: any) => { return {
-                                    ...prev, 
-                                    priced: !prev.priced,
-                                } } ) }}
-                                checked={state?.priced} label=""/>
-                                <Box width={300}>
-                                    { state?.priced &&
-                                    <CurrencyInput
-                                        value={_get(state, 'price.value', 0)} 
-                                        onChange={(value: any) => {
-                                            setState((prev: any)=> { return { ...prev, price : { ...prev.price, value: value } } })
-                                        }} 
-                                        options={tokens} 
-                                        disableSelect
-                                        dropDownvalue={_get(state, 'price.token')} 
-                                        onDropDownChange = {(value: string) => {
-                                            setState((prev: any)=> { return { ...prev, price : { ...prev.price, token: value } } })
-                                        }} 
-                                    />
-                                    }
-                                </Box>
-                            </Box>
-                        </Box> }
-                        {/* <Box>
+                                    </Box>
+                                    <Box my={3} mx={1}>
+                                        <Typography
+                                            style={{
+                                                color: '#76808d',
+                                                fontSize: '16px',
+                                                fontWeight: 700,
+                                                marginBottom: '10px'
+                                            }}
+                                        >Membership policy:</Typography>
+                                        <Box ml={1}>
+                                            <Switch
+                                                disabled
+                                                checkedSVG={LOCK_SVG}
+                                                onChange={(e: any) => {
+                                                    setState((prev: any) => {
+                                                        return {
+                                                            ...prev,
+                                                            whitelisted: !prev.whitelisted,
+                                                            whitelist: { members: [], discounts: [], inviteCodes: [] }
+                                                        }
+                                                    })
+                                                }}
+                                                checked={state?.whitelisted} label="WHITELISTED" />
+                                        </Box>
+                                    </Box>
+                                    {+contract?.version >= 1 &&
+                                        <Box my={4} mx={1}>
+                                            <Typography
+                                                style={{
+                                                    color: '#76808d',
+                                                    fontSize: '16px',
+                                                    fontWeight: 700,
+                                                    marginBottom: '10px'
+                                                }}
+                                            >Price:</Typography>
+                                            <Box ml={1} display="flex" flexDirection="row" justifyContent="space-between">
+                                                <Switch
+                                                    onChange={(e: any) => {
+                                                        setState((prev: any) => {
+                                                            return {
+                                                                ...prev,
+                                                                priced: !prev.priced,
+                                                            }
+                                                        })
+                                                    }}
+                                                    checked={state?.priced} label="" />
+                                                <Box width={300}>
+                                                    {state?.priced &&
+                                                        <CurrencyInput
+                                                            value={_get(state, 'price.value', 0)}
+                                                            onChange={(value: any) => {
+                                                                setState((prev: any) => { return { ...prev, price: { ...prev.price, value: value } } })
+                                                            }}
+                                                            options={tokens}
+                                                            disableSelect
+                                                            dropDownvalue={_get(state, 'price.token')}
+                                                            onDropDownChange={(value: string) => {
+                                                                setState((prev: any) => { return { ...prev, price: { ...prev.price, token: value } } })
+                                                            }}
+                                                        />
+                                                    }
+                                                </Box>
+                                            </Box>
+                                        </Box>}
+                                    {/* <Box>
                             <Button onClick={async () => await withdraw()} size="small" variant="contained">Withdraw</Button>
                         </Box> */}
-                        <Box style={{ height: 4, width: 200, alignSelf: 'center', margin: '60px auto', backgroundColor: palette.primary.main }}></Box>
-                        <Box className={classes.paperDetailsSocial}>
-                            <Box>
-                                <Typography variant="h6">Contact details</Typography>
-                                <Typography variant="body2" className={clsx(classes.socialText, { fontStyle: 'normal !important' })}>Get certain member details could be useful for the smooth functioning of your organisation</Typography>
-                                <Box my={3} mx={1}>
-                                    <Switch
-                                    checked={state?.contact.indexOf('email') > -1}
-                                    onChange={() => handleContactChange('email')}
-                                    label="Email"/>
-                                    <Typography variant="body2" className={classes.socialText}>Please select if you intend to use services such as Notion, Google Workspace and Github</Typography>
+                                    <Box style={{ height: 4, width: 200, alignSelf: 'center', margin: '60px auto', backgroundColor: palette.primary.main }}></Box>
+                                    <Box className={classes.paperDetailsSocial}>
+                                        <Box>
+                                            <Typography variant="h6">Contact details</Typography>
+                                            <Typography variant="body2" className={clsx(classes.socialText, { fontStyle: 'normal !important' })}>Get certain member details could be useful for the smooth functioning of your organisation</Typography>
+                                            <Box my={3} mx={1}>
+                                                <Switch
+                                                    checked={state?.contact.indexOf('email') > -1}
+                                                    onChange={() => handleContactChange('email')}
+                                                    label="Email" />
+                                                <Typography variant="body2" className={classes.socialText}>Please select if you intend to use services such as Notion, Google Workspace and Github</Typography>
+                                            </Box>
+                                            <Box my={3} mx={1}>
+                                                <Switch
+                                                    onChange={() => handleContactChange('discord')}
+                                                    checked={state?.contact.indexOf('discord') > -1}
+                                                    label="Discord user-id" />
+                                                <Typography variant="body2" className={classes.socialText}>Please select if you intend to use access-controlled channels in Discord.</Typography>
+                                            </Box>
+                                            <Box my={3} mx={1}>
+                                                <Switch
+                                                    onChange={() => handleContactChange('telegram')}
+                                                    checked={state?.contact.indexOf('telegram') > -1}
+                                                    label="Telegram user-id" />
+                                                <Typography variant="body2" className={classes.socialText}>Please select if you intend to use access-controlled Telegram groups.</Typography>
+                                            </Box>
+                                            <Box my={3} mx={1}>
+                                                <Switch
+                                                    onChange={() => handleContactChange('github')}
+                                                    checked={state?.contact.indexOf('github') > -1}
+                                                    label="Github user-id" />
+                                                <Typography variant="body2" className={classes.socialText}>Please select if you intend to use access-controlled github.</Typography>
+                                            </Box>
+                                        </Box>
+                                    </Box>
+                                    {networkError && <Typography style={{ textAlign: 'center', color: 'red' }}>{networkError}</Typography>}
                                 </Box>
-                                <Box my={3} mx={1}>
-                                    <Switch
-                                    onChange={() => handleContactChange('discord')}
-                                    checked={state?.contact.indexOf('discord') > -1}
-                                    label="Discord user-id"/>
-                                    <Typography variant="body2" className={classes.socialText}>Please select if you intend to use access-controlled channels in Discord.</Typography>
-                                </Box>
-                                <Box my={3} mx={1}>
-                                    <Switch
-                                    onChange={() => handleContactChange('telegram')}
-                                    checked={state?.contact.indexOf('telegram') > -1}
-                                    label="Telegram user-id"/>
-                                    <Typography variant="body2" className={classes.socialText}>Please select if you intend to use access-controlled Telegram groups.</Typography>
-                                </Box>
-                                <Box my={3} mx={1}>
-                                    <Switch
-                                    onChange={() => handleContactChange('github')}
-                                    checked={state?.contact.indexOf('github') > -1}
-                                    label="Github user-id"/>
-                                    <Typography variant="body2" className={classes.socialText}>Please select if you intend to use access-controlled github.</Typography>
+                            }
+                        </Box>
+                        {contract &&
+                            <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 575, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px', padding: "30px 0 20px" }}>
+                                <Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
+                                    <Button onClick={() => onClose()} sx={{ mr: 1 }} fullWidth variant='outlined' size="small">Cancel</Button>
+                                    <Button disabled={updateContractLoading} loading={updateContractLoading} onClick={() => saveChanges()} sx={{ ml: 1 }} fullWidth variant='contained' size="small">Save</Button>
                                 </Box>
                             </Box>
-                        </Box>
-                        { networkError && <Typography style={{ textAlign: 'center', color: 'red' }}>{ networkError }</Typography> }
+                        }
                     </Box>
-                    }
-                </Box>
-                { contract &&
-                <Box style={{ background: 'linear-gradient(0deg, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%)', width: 575, position: 'fixed', bottom: 0, borderRadius: '0px 0px 0px 20px' , padding: "30px 0 20px" }}>
-                    <Box display="flex" mt={4} width={380} style={{ margin: '0 auto' }} flexDirection="row">
-                        <Button onClick={() => onClose()} sx={{ mr:1 }} fullWidth variant='outlined' size="small">Cancel</Button>
-                        <Button disabled={updateContractLoading} loading={updateContractLoading} onClick={() => saveChanges()} sx={{ ml:1 }}  fullWidth variant='contained' size="small">Save</Button>
-                    </Box>
-                </Box>
-                }
-                </> : <Box sx={{ width: 575, flex: 1, paddingBottom:'80px', borderRadius: '20px 0px 0px 20px' }}></Box>
-                }
-            </Drawer>
+                </> : <Box sx={{ width: 575, flex: 1, paddingBottom: '80px', borderRadius: '20px 0px 0px 20px' }}></Box>
+            }
+        </Drawer>
     )
 }
