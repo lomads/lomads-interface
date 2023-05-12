@@ -28,10 +28,13 @@ import eventEmitter from "utils/eventEmmiter";
 import useRole from "hooks/useRole";
 import { useWeb3React } from "@web3-react/core";
 import { makeStyles } from '@mui/styles';
-import { Box, Button } from "@mui/material"
-import IconButton from "muiComponents/IconButton";
+import { Box, Grid } from "@mui/material";
 
 const useStyles = makeStyles((theme: any) => ({
+	root: {
+		float: 'right',
+		overflow: 'hidden !important',
+	},
 	settingsPage: {
 		width: '100%',
 		height: '100vh',
@@ -63,22 +66,22 @@ const useStyles = makeStyles((theme: any) => ({
 		justifyContent: 'center'
 	},
 	logoContainerImg: {
-    	transform: 'rotate(-45deg)',
-    	width: '141%',
-    	height: '141%',
-   		flexShrink: '0',
-    	maxWidth: '141%'
+		transform: 'rotate(-45deg)',
+		width: '141%',
+		height: '141%',
+		flexShrink: '0',
+		maxWidth: '141%'
 	},
 	logoContainerP: {
-    	fontFamily: 'var(--chakra-fonts-body)',
-    	fontStyle: 'normal',
-    	fontWeight: '600',
-    	fontSize: '35px',
-   		lineHeight: '25px',
-    	textAlign: 'center',
-    	transform: 'rotate(-45deg)',
-    	letterSpacing: '-0.011em',
-    	color: '#C94B32',
+		fontFamily: 'var(--chakra-fonts-body)',
+		fontStyle: 'normal',
+		fontWeight: '600',
+		fontSize: '35px',
+		lineHeight: '25px',
+		textAlign: 'center',
+		transform: 'rotate(-45deg)',
+		letterSpacing: '-0.011em',
+		color: '#C94B32',
 	},
 	settingIcon: {
 		position: 'absolute',
@@ -86,12 +89,8 @@ const useStyles = makeStyles((theme: any) => ({
 		left: 0,
 	},
 	settingsCenter: {
-		display: 'flex',
 		height: '100%',
 		width: '100%',
-		flexDirection: 'column',
-		alignItems: 'center',
-		justifyContent: 'space-between',
 		paddingTop: '4rem',
 		paddingLeft: '4rem',
 	},
@@ -99,17 +98,16 @@ const useStyles = makeStyles((theme: any) => ({
 		width: '947px',
 		display: 'flex',
 		flexDirection: 'column',
+		marginLeft: 34
 	},
 	settingsOrganisation: {
-		height: '130px',
-		width: '947px',
+		height: 130,
+		maxWidth: 947,
 		backgroundColor: '#FFF',
-		borderRadius: '20px',
+		borderRadius: 20,
 		padding: '26px 22px 30px',
-		display: 'flex',
-		flexDirection: 'column',
 		color: '#C94B32',
-		marginBottom: '20px',
+		marginBottom: 20
 	},
 	styleContent: {
 		marginTop: '20px',
@@ -117,22 +115,13 @@ const useStyles = makeStyles((theme: any) => ({
 		alignItems: 'center',
 		justifyContent: 'space-between',
 	},
-	settingsOrganisationFlexbox: {
-		width: '947px',
-		display: 'flex',
-		flexDirection: 'row',
-		justifyContent: 'space-between'
-	},
 	settingsOrganisationChild: {
 		cursor: 'pointer',
-		height: '130px',
-		width: '300px',
+		height: 130,
+		width: 300,
 		backgroundColor: '#FFF',
-		borderRadius: '20px',
-		display: 'flex',
-		flexDirection: 'column',
-		marginBottom: '20px',
-		color: '#C94B32',
+		borderRadius: 20,
+		color: '#C94B32'
 	},
 	settingsOrganisationChildDisabled: {
 		backgroundColor: '#fff',
@@ -168,6 +157,9 @@ const useStyles = makeStyles((theme: any) => ({
 		fontSize: 30,
 		color: '#FFFFFF',
 		marginBottom: 40
+	},
+	FooterParent: {
+		bottom: 0
 	}
 }));
 
@@ -269,10 +261,6 @@ const Settings = () => {
 	return (
 		<>
 			<Box className={classes.settingsPage}>
-				{/* <DisableXpPointDailog
-                    toggleShowLink={toggleCreatePassTokenModal}
-                    daoUrl={_get(DAO, 'url', '')}
-                /> */}
 				<Box className={classes.settingsLeftBar}>
 					<Box onClick={() => navigate(-1)} className={classes.logoContainer}>
 						{
@@ -295,14 +283,19 @@ const Settings = () => {
 							<Box className={classes.settingsHeaderHOne}>{name}</Box>
 							<Box className={classes.settingsHeaderHTwo}>Settings</Box>
 						</Box>
-						{
-							<Box className={classes.settingsOrganisation}
+						<Grid container className={classes.root} spacing={1}>
+							<Grid
+								item
+								xs={9}
+								md={9.2}
+								margin={1}
+								className={classes.settingsOrganisation}
 								onClick={() => {
 									setOpenOrganisationDetails(true);
 								}}
 							>
-								<Box>
-									<img src={OrganistionDetails} style={{ height: "35px" }} />
+								<Box sx={{padding: 2}}>
+									<img src={OrganistionDetails} style={{ height: 35 }} />
 									<Link
 										className={classes.styleContent}
 										style={{ color: "#C94B32" }}
@@ -312,184 +305,139 @@ const Settings = () => {
 										<ChevronRight />
 									</Link>
 								</Box>
-							</Box>
-						}
-						<Box className={classes.settingsOrganisationFlexbox}>
-							<Box className={classes.settingsOrganisationChild}
-								onClick={() => {
-									setOpenRolesPermissions(true);
-								}}
-							>
-								<Box
-									style={{
-										padding: "20px",
+							</Grid>
+							<Grid container>
+								<Grid
+									item
+									xs={9} md={3}
+									margin={1}
+									className={classes.settingsOrganisationChild}
+									onClick={() => {
+										setOpenRolesPermissions(true);
 									}}
 								>
-									<img src={RolesPermissions} style={{ height: "35px" }} />
-									<Link
-										className={classes.styleContent}
-										style={{ color: "#C94B32" }}
-										to={''}
-									>
-										Roles & Permissions
-										<ChevronRight />
-									</Link>
-								</Box>
-							</Box>
-							{<Box
-								onClick={() => {
-									setOpenSafe(true)
-								}}
-								className={classes.settingsOrganisationChild}>
-								<Box
-									style={{
-										padding: "20px",
+									<Box sx={{padding: 2}}>
+										<img src={RolesPermissions} style={{ height: "35px" }} />
+										<Link
+											className={classes.styleContent}
+											style={{ color: "#C94B32" }}
+											to={''}
+										>
+											Roles & Permissions
+											<ChevronRight />
+										</Link>
+									</Box>
+								</Grid>
+								<Grid
+									item
+									xs={9} md={3}
+									margin={1}
+									onClick={() => {
+										setOpenSafe(true)
+									}}
+									className={classes.settingsOrganisationChild}>
+									<Box sx={{padding: 2}}>
+										<img src={Safe} style={{ height: "35px" }} />
+										<Link
+											className={classes.styleContent}
+											style={{ color: "#C94B32" }}
+											to={''}
+										>
+											Safe
+											<ChevronRight />
+										</Link>
+									</Box>
+								</Grid>
+								<Grid
+									item
+									xs={9} md={3}
+									margin={1}
+									className={classes.settingsOrganisationChild}
+									onClick={() => {
+										togglePassToken()
 									}}
 								>
-									<img src={Safe} style={{ height: "35px" }} />
-									<Link
-										className={classes.styleContent}
-										style={{ color: "#C94B32" }}
-										to={''}
-									>
-										Safe
-										<ChevronRight />
-									</Link>
-								</Box>
-							</Box>}
-
-							<Box className={classes.settingsOrganisationChild}
-								onClick={() => {
-									togglePassToken()
-								}}
-							>
-								<Box
-									style={{
-										padding: "20px",
+									<Box sx={{padding: 2}}>
+										<img src={PassTokens} style={{ height: "35px" }} />
+										<Link
+											className={classes.styleContent}
+											style={{ color: "#C94B32" }}
+											to={''}
+										>
+											Pass Tokens
+											<ChevronRight />
+										</Link>
+									</Box>
+								</Grid>
+							</Grid>
+							<Grid container>
+								<Grid
+									item
+									className={classes.settingsOrganisationChild}
+									xs={9} md={3}
+									margin={1}
+									onClick={() => {
+										setOpenXpPoints(true);
 									}}
 								>
-									<img src={PassTokens} style={{ height: "35px" }} />
-									<Link
-										className={classes.styleContent}
-										style={{ color: "#C94B32" }}
-										to={''}
-									>
-										Pass Tokens
-										<ChevronRight />
-									</Link>
-								</Box>
-							</Box>
-						</Box>
-
-						<Box className={classes.settingsOrganisationFlexbox}>
-							<Box className={classes.settingsOrganisationChild}
-								onClick={() => {
-									setOpenXpPoints(true);
-								}}
-							>
-								<Box
-									style={{
-										padding: "20px",
+									<Box sx={{padding: 2}}>
+										<img src={XpPoints} style={{ height: "35px" }} />
+										<Link
+											className={classes.styleContent}
+											style={{ color: "#C94B32" }}
+											to={''}
+										>
+											SWEAT points
+											<ChevronRight />
+										</Link>
+									</Box>
+								</Grid>
+								<Grid
+									item
+									className={classes.settingsOrganisationChild}
+									xs={9} md={3}
+									margin={1}
+									onClick={() => {
+										setOpenTerminology(true);
 									}}
 								>
-									<img src={XpPoints} style={{ height: "35px" }} />
-									<Link
-										className={classes.styleContent}
-										style={{ color: "#C94B32" }}
-										to={''}
-									>
-										SWEAT points
-										<ChevronRight />
-									</Link>
-								</Box>
-							</Box>
-							<Box className={classes.settingsOrganisationChild}
-								onClick={() => {
-									setOpenTerminology(true);
-								}}
-							>
-								<Box
-									style={{
-										padding: "20px",
-									}}
+									<Box sx={{padding: 2}}>
+										<img src={Terminology} style={{ height: "35px" }} />
+										<Link
+											className={classes.styleContent}
+											style={{ color: "#C94B32" }}
+											to={''}
+										>
+											Terminology
+											<ChevronRight />
+										</Link>
+									</Box>
+								</Grid>
+								<Grid
+									item
+									xs={9} md={3}
+									margin={1}
+									className={classes.settingsOrganisationChild}
+									onClick={() => setOpenIntegrationModal(true)}
 								>
-									<img src={Terminology} style={{ height: "35px" }} />
-									<Link
-										className={classes.styleContent}
-										style={{ color: "#C94B32" }}
-										to={''}
-									>
-										Terminology
-										<ChevronRight />
-									</Link>
-								</Box>
-							</Box>
-
-							{/* <Box className={classes.settingsOrganisationChildDisabled}
-								onClick={() => {
-									setOpenDiscord(true);
-								}}
-							>
-								<Box
-									style={{
-										padding: "20px",
-									}}
-								>
-									<img src={Discord} style={{ height: "35px" }} />
-									<Link
-										className={classes.styleContent}
-										style={{ color: "#C94B32" }}
-									>
-										Discord
-										<ChevronRight />
-									</Link>
-								</Box>
-							</Box> */}
-							<Box className={classes.settingsOrganisationChild}
-								onClick={() => setOpenIntegrationModal(true)}
-							>
-								<Box style={{ padding: "20px" }}>
-									<img src={IntegrationGrey} width={35} height={32} />
-									<Link
-										className={classes.styleContent}
-										style={{ color: "#C94B32" }}
-										to={''}
-									>
-										Integrations
-										<ChevronRight />
-									</Link>
-								</Box>
-							</Box>
-						</Box>
-
-						{/* Trello */}
-						{/* <Box className={classes.settingsOrganisationFlexbox}>
-							<Box className={classes.settingsOrganisationChild}
-								onClick={authorizeTrello}
-							>
-								<Box style={{ padding: "20px" }}>
-									{
-										trelloLoading
-											?
-											<LeapFrog size={24} color="#76808D" />
-											:
-											<CgTrello size={35} color="#76808D" />
-									}
-
-									<Link
-										className={classes.styleContent}
-										style={{ color: "#C94B32" }}
-									>
-										Trello
-										<ChevronRight />
-									</Link>
-								</Box>
-							</Box> 
-						</Box>*/}
-
+									<Box sx={{ padding: 2 }}>
+										<img src={IntegrationGrey} width={35} height={32} />
+										<Link
+											className={classes.styleContent}
+											style={{ color: "#C94B32" }}
+											to={''}
+										>
+											Integrations
+											<ChevronRight />
+										</Link>
+									</Box>
+								</Grid>
+							</Grid>
+						</Grid>
 					</Box>
-
-					<Footer theme="light" />
+				   <Box className={classes.FooterParent}>
+					   <Footer theme="light" />
+				   </Box>
 				</Box>
 				<Box className={classes.settingsRightBar}>
 					<Box
@@ -499,8 +447,6 @@ const Settings = () => {
 					</Box>
 				</Box>
 			</Box>
-
-			{/* // !-------------  Organisation Details ------------ */}
 			{
 				<OrganisationDetailsModal
 					open={openOrganisationDetails}
@@ -536,7 +482,7 @@ const Settings = () => {
 			)} */}
 			{/* // !-------------  SWEAT Points ------------ */}
 			{
-				<XpPointsModal 
+				<XpPointsModal
 					open={openXpPoints}
 					onClose={() => setOpenXpPoints(false)}
 				/>

@@ -19,7 +19,7 @@ import axiosHttp from '../api';
 import { nanoid } from "@reduxjs/toolkit";
 import { SupportedChainId } from "constants/chains";
 
-export default ({ title, desc, link, roleName, accessControl, okButton, onGuildCreateSuccess, renderButton = undefined, onLinkError, ...props }) => {
+export default ({ title, desc, link, roleName, accessControl, okButton, onGuildCreateSuccess, renderButton, onLinkError, ...props }) => {
 
     const { provider, account, chainId } = useWeb3React();
     const signerFunction = useCallback((signableMessage) => getSigner(provider, account).signMessage(signableMessage), [provider, account]);
