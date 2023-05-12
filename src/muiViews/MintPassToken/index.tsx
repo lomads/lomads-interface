@@ -755,7 +755,12 @@ export default () => {
                                             }
                                            return updateMetadata()
                                         }} style={{ margin: '32px 0 16px 0' }} variant="contained" fullWidth>UPDATE</Button> : 
-                                        <Button onClick={() => setShowDrawer(true)} style={{ margin: '32px 0 16px 0' }} variant="contained" fullWidth>{"MINT YOUR SBT" }</Button>
+                                        <Button onClick={() => { 
+                                            if(currentChainId !== chainId) {
+                                                return toast.custom(t => <SwitchChain t={t} nextChainId={chainId} />)
+                                            }
+                                            return setShowDrawer(true) 
+                                        }} style={{ margin: '32px 0 16px 0' }} variant="contained" fullWidth>{"MINT YOUR SBT" }</Button>
                                     }
                                                                             
                                 </Box>
