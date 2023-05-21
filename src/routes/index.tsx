@@ -34,6 +34,7 @@ import BaseLayout from "muiLayouts/BaseLayout";
 
 import CreatePassToken from "muiViews/CreatePassToken";
 import MintPassToken from "muiViews/MintPassToken";
+import MintPassTokenV2 from "muiViews/MintPassToken/index.v2";
 import LoginPage from "muiViews/LoginPage";
 import createDaoOrg from "muiViews/CreateDaoOrg"
 //import StartSafe from "muiViews/StartSafe";
@@ -100,6 +101,11 @@ export default [
     {
         path: '/:daoURL/mint/:contractId',
         component: MintPassToken,
+        layout: BaseLayout
+    },
+    {
+        path: '/:daoURL/mint/v2/:contractId',
+        component: MintPassTokenV2,
         layout: BaseLayout
     },
     {

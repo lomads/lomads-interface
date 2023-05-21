@@ -6,14 +6,19 @@ import GroupEnjoy from "../../assets/svg/GroupEnjoy.svg";
 import { colors } from "assets/colors";
 import { Colorstype } from "types/UItype";
 import { useNavigate, useParams } from "react-router-dom";
+import { useAppSelector } from "state/hooks";
 
 
 const CreatePassSucess = () => {
   const navigate = useNavigate();
   const { contractAddr } = useParams();
+  const { DAO } = useAppSelector(store => store?.dashboard);
 
   const handleClick = () => {
-    navigate(`/:daoURL/mint/${contractAddr}`);
+    if(+DAO?.sbt?.version >= 2) 
+      navigate(`/${DAO.url}/mint/v2/${DAO.sbt.address}`);
+    else
+      navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
   };
   return (
     <>

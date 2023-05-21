@@ -60,6 +60,7 @@ import CreateRecurring from "./TreasuryCard/CreateRecurring";
 import axiosHttp from 'api'
 import useEns from "hooks/useEns";
 import useMintSBT from "hooks/useMintSBT";
+import useMintSBTV2 from "hooks/useMintSBT.v2";
 import { default as MuiButton, ButtonProps } from '@mui/material/Button';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
@@ -215,6 +216,7 @@ const Dashboard = () => {
 
 	//const { contractNamebalanceOf,  } = useSBTStats(provider, account ? account : '', update, DAO?.sbt ? DAO.sbt.address : '', chainId);
 	const { getStats } = useMintSBT(DAO?.sbt?.address, DAO?.sbt?.version)
+	const { balanceOf } = useMintSBTV2(DAO?.sbt?.address, DAO?.sbt?.version)
 
 	const token = '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';
 
@@ -394,6 +396,9 @@ const Dashboard = () => {
 	}, [account, DAOList, daoURL])
 
 	const validateMetaData = () => {
+		if(+DAO?.sbt?.version >=2){
+			return
+		}
 		if (_get(DAO, 'sbt.contactDetail', null)) {
 			const contactdetails = _get(DAO, 'sbt.contactDetail', []);
 			for (let index = 0; index < contactdetails.length; index++) {
@@ -417,7 +422,10 @@ const Dashboard = () => {
 				}
 				if (shouldUpdate) {
 					console.log("balanceOf::::",)
-					navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
+					if(+DAO.sbt.version >= 2) 
+						navigate(`/${DAO.url}/mint/v2/${DAO.sbt.address}`);
+					else
+						navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
 					break;
 				}
 			}
@@ -427,16 +435,27 @@ const Dashboard = () => {
 	}
 
 	useEffect(() => {
-		if (chainId && DAO && DAO.sbt && account) {
-			console.log("balanceOf::::", chainId, DAO, DAO?.sbt, account)
-			getStats(DAO.sbt.chainId || DAO?.chainId).then(res => {
-				const balanceOf = res[0];
-				console.log("balanceOf::::", balanceOf)
+		const check = async () => {
+			if (chainId && DAO && DAO.sbt && account) {
+				let balance = null;
+				console.log()
+				if(+DAO?.sbt?.version >= 2) {
+					let bal = await balanceOf()
+					balance =  parseInt(bal._hex, 16)
+					console.log("BALANCE", balance)
+				} else {
+					let res = await getStats(DAO.sbt.chainId || DAO?.chainId)
+					balance = res[0];
+					balance =  parseInt(res[0]._hex, 16)
+				}
 				//if (chainId === DAO.chainId) {
 				if (DAO?.sbt?.whitelisted) {
 					if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
-						if (parseInt(balanceOf._hex, 16) === 0) {
-							navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
+						if (balance === 0) {
+							if(+DAO.sbt.version >= 2) 
+								navigate(`/${DAO.url}/mint/v2/${DAO.sbt.address}`);
+							else
+								navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
 						} else {
 							// check if data has been filled show mint page. with prefilled data. save data without minting again
 							validateMetaData()
@@ -446,25 +465,31 @@ const Dashboard = () => {
 					}
 				} else if (!DAO?.sbt?.whitelisted) {
 					if (_find(DAO.members, member => member.member.wallet.toLowerCase() === account.toLowerCase())) {
-						if (parseInt(balanceOf._hex, 16) === 0) {
-							navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
+						if (balance === 0) {
+							if(+DAO.sbt.version >= 2) 
+								navigate(`/${DAO.url}/mint/v2/${DAO.sbt.address}`);
+							else
+								navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
 						} else {
 							// check if data has been filled show mint page. with prefilled data. save data without minting again
 							validateMetaData()
 						}
 					} else {
 						//add to DAO
-						if (parseInt(balanceOf._hex, 16) === 0) {
-							navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
+						if (balance === 0) {
+							if(+DAO.sbt.version >= 2) 
+								navigate(`/${DAO.url}/mint/v2/${DAO.sbt.address}`);
+							else
+								navigate(`/${DAO.url}/mint/${DAO.sbt.address}`);
 						} else {
 							// check if data has been filled show mint page. with prefilled data. save data without minting again
 							validateMetaData()
 						}
 					}
 				}
-				//}
-			})
+			}
 		}
+		check();
 	}, [chainId, DAO, getStats, account]);
 
 	useEffect(() => {

@@ -20,6 +20,7 @@ import OrganisationDetailsModal from "./OrganisationDetailsModal";
 import SafeModal from "./SafeModal";
 import XpPointsModal from "./XpPointsModal";
 import PassTokenModal from "muiModals/PassTokenModal";
+import PassTokenModalV2 from "muiModals/PassTokenModal.v2";
 import TerminologyModal from "./TerminologyModal";
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import { getDao } from "state/dashboard/actions";
@@ -388,10 +389,15 @@ const Settings = () => {
 				<SafeModal toggleS={toggleS} />
 			)}
 			{/* // !-------------  Pass Token ------------ */}
+			{ DAO && DAO?.sbt && +DAO?.sbt?.version >= 2 ?
+			<PassTokenModalV2
+				open={openPassToken}
+				onClose={() => setOpenPassToken(false)}
+			/> :
 			<PassTokenModal
 				open={openPassToken}
 				onClose={() => setOpenPassToken(false)}
-			/>
+			/> }
 			{/* {openCreatePassToken && (
 				<CreateMorePassTokenModal
 					navFromSetting={true}

@@ -7,7 +7,7 @@ import { nanoid } from '@reduxjs/toolkit';
 import uploadIcon from 'assets/svg/ico-upload.svg';
 import { Typography } from "@mui/material";
 
-export default ({ value, onUpload }) => {
+export default ({ disabled = false, value, info = true, onUpload }) => {
     const [url, setUrl] = useState(null)
     const [droppedfiles, setDroppedfiles] = useState([])
     const [uploadLoading, setUploadLoading] = useState(null)
@@ -15,11 +15,11 @@ export default ({ value, onUpload }) => {
     const { getRootProps, getInputProps } = useDropzone({ onDrop, multiple: false })
 
     useEffect(() => {
-        if(value)
-            setUrl(value)
+        setUrl(value)
     }, [value])
 
     const getSignedUploadUrl = (file, callback) => {
+        if(disabled) return;
         const filename = `SBT/${nanoid(32)}.${file.type.split('/')[1]}`
         return axiosHttp.post(`utility/upload-url`, { key: filename, mime: file.type }).then(res => callback(res.data))
     }
@@ -28,7 +28,7 @@ export default ({ value, onUpload }) => {
 
     const onUploadError = error => { setDroppedfiles([]); setUploadLoading(false) }
 
-    const onUploadStart = (file, next) => { setUploadLoading(true); return next(file); }
+    const onUploadStart = (file, next) => { if(disabled) return; setUploadLoading(true); return next(file); }
 
     const onFinish = finish => {
         setDroppedfiles([])
@@ -39,7 +39,7 @@ export default ({ value, onUpload }) => {
     }
 
     return (
-        <div {...getRootProps()}>
+        <div {...getRootProps()} disabled={disabled}>
             <ReactS3Uploader
                 droppedfiles={droppedfiles}
                 getSignedUrl={getSignedUploadUrl}
@@ -54,17 +54,17 @@ export default ({ value, onUpload }) => {
                 }}
                 contentDisposition="auto"
             />
-            <div style={{ display: 'flex',  borderRadius: 10, margin: '16px 0', height: 200, width: 200, backgroundColor: '#F5F5F5', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+            <div style={{ display: 'flex', borderRadius: 10, margin: '16px 0', height: 200, width: 200, backgroundColor: '#F5F5F5', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
                 {uploadLoading ?
                     <LeapFrog size={24} color="#C94B32" /> :
                     <>
-                        { !url ?
-                        <div style={{  display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                            <img style={{ marginBottom: 32 }} src={uploadIcon} alt="upload-icon" />
-                            <Typography style={{ textAlign: 'center', color: '#1B2D41', opacity: 0.6, fontSise: 16 }} variant='subtitle2'>Choose <br/> or drag an image</Typography>
-                            <Typography style={{ color: '#1B2D41', opacity: 0.2, fontSise: 14 }} variant='body2'>maximum size 2mb</Typography>
-                        </div> :
-                        <img src={url} style={{ objectFit: 'cover', height: 200, width: 200, borderRadius: 10,  }}></img> 
+                        {!url ?
+                            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                                <img style={{ marginBottom: 32 }} src={uploadIcon} alt="upload-icon" />
+                                <Typography style={{ textAlign: 'center', color: '#1B2D41', opacity: 0.6, fontSise: 16 }} variant='subtitle2'>Choose <br /> or drag an image</Typography>
+                                <Typography style={{ color: '#1B2D41', opacity: 0.2, fontSise: 14 }} variant='body2'>maximum size 2mb</Typography>
+                            </div> :
+                            <img src={url} style={{ objectFit: 'contain', height: 200, width: 200, borderRadius: 10, backgroundColor: "rgba(234, 100, 71, 0.1)" }}></img>
                         }
                     </>
                 }
