@@ -173,6 +173,7 @@ export const CHAIN_INFO: any = {
   // },
   [SupportedChainId.MAINNET]: {
     networkType: NetworkType.L1,
+    api: '',
     docs: 'https://docs.uniswap.org/',
     explorer: 'https://etherscan.io/',
     infoLink: 'https://info.uniswap.org/#/',
@@ -186,6 +187,7 @@ export const CHAIN_INFO: any = {
   },
   [SupportedChainId.GOERLI]: {
     networkType: NetworkType.L1,
+    apiEndpoint: "https://api.polygonscan.com",
     docs: 'https://docs.uniswap.org/',
     explorer: 'https://goerli.etherscan.io/',
     infoLink: 'https://info.uniswap.org/#/',
@@ -199,6 +201,7 @@ export const CHAIN_INFO: any = {
   },
   [SupportedChainId.POLYGON]: {
     networkType: NetworkType.L1,
+    apiEndpoint: "https://api.polygonscan.com",
     blockWaitMsBeforeWarning: ms`10m`,
     bridge: 'https://wallet.polygon.technology/bridge',
     docs: 'https://polygon.io/',

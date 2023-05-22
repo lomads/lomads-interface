@@ -134,20 +134,55 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
         }
     }
 
+    const waitFor = (milliseconds: number) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+    const retry = (promise: any, onRetry: Function, maxRetries: number) => {
+      const retryWithBackoff: any = async (retries: number) => {
+          try {
+              if (retries > 0) {
+                  const timeToWait = 2 ** retries * 1000;
+                  console.log(`waiting for ${timeToWait}ms...`);
+                  await waitFor(timeToWait);
+              }
+              return await promise();
+          } catch (e) {
+              if (retries < maxRetries) {
+                  onRetry();
+                  return retryWithBackoff(retries + 1);
+              } else {
+                  console.warn("Max retries reached. Bubbling the error up");
+                  throw e;
+              }
+          }
+      }
+      return retryWithBackoff(0);
+  }
+
+    const getTxnStatus = async () => { 
+      console.log("Checking balance...")
+      const res = await balanceOf();
+      if(parseInt(res._hex, 16) === 1)
+        return true
+      throw "Txn in progress.."
+    }
+
     const mint = async (tokenURI: string | null | undefined, payment: string | undefined, signature: string | undefined, tokenContract: any, gasless: boolean = false, dappApiKey: string | undefined) => {
         try {
           const currTokId = await getCurrentTokenId()
           let tokenId = parseFloat(currTokId.toString());
 
           try {
-            let tx = null;
+            let tx: any = null;
             if(+version >= 1) {
               if(gasless) {
                 tx = await safeMintGasless({ contract : contractAddress, apiKey: dappApiKey,  mintParams : {tokenURI, tokenId, payment, signature }} )
-                console.log(tx)
-                //@ts-expect-error
-                if(!tx?.transactionId) {
-                  //@ts-expect-error
+                if(tx?.transactionId) {
+                  await retry(
+                      () => getTxnStatus(),
+                      () => { console.log('retry called...') },
+                      10
+                  )
+                } else {
                   throw tx?.data?.error || "Error while minting"
                 }
               } else {
