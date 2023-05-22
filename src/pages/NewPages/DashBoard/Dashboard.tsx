@@ -71,6 +71,7 @@ import Dropdown from "muiComponents/Dropdown";
 import Avatar from "muiComponents/Avatar";
 import { Grid, Typography, Box, MenuItem, Menu, useMediaQuery } from "@mui/material"
 import { makeStyles } from '@mui/styles';
+import { addDaoMemberList } from "state/dashboard/actions";
 
 const { toChecksumAddress } = require('ethereum-checksum-address')
 type WalkThroughObjType = {
@@ -307,6 +308,22 @@ const Dashboard = () => {
 		if (account)
 			getENSName(account)
 	}, [account])
+
+	useEffect(() => {
+		if(DAO && DAO?.sbt) {
+			let mintMembers = DAO?.sbt?.metadata?.map((metadata: any) => {
+				return { 
+					name: _get(_find(metadata.attributes, attr => attr.trait_type === "Name"), "value", ""),
+					address: _get(_find(metadata.attributes, attr => attr.trait_type === "Wallet Address/ENS Domain"), "value", ""),
+					role: "role4"
+				}
+			})
+			mintMembers = mintMembers.filter((member: any) => member.address !== "").filter((member: any) => _find(DAO?.members, (m:any) => toChecksumAddress(m?.member?.wallet) !== toChecksumAddress(member?.address)))
+			if(mintMembers.length > 0){
+				dispatch(addDaoMemberList({ url: DAO?.url, payload: { list: mintMembers } }))
+			}
+		}
+	}, [DAO?.createdAt])
 
 	const [copy, setCopy] = useState<boolean>(false);
 	const toggleModal = () => {
