@@ -44,16 +44,20 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
       return ethers.utils.parseUnits(price, payToken?.decimals)
   }
 
-    const balanceOf = useCallback(async () => {
-      if(account && chainId && provider) {
-        return mintContract?.balanceOf(account)
+    const balanceOf = async () => {
+      if(mintContract?.signer){
+        if(account && chainId && provider) {
+          return mintContract?.balanceOf(account)
+        }
+        return null;
       }
-      return null;
-    }, [provider, account, chainId, contractAddress, version])
+    }
 
-    const getCurrentTokenId = useCallback(async () => {
-        return mintContract?.getCurrentTokenId()
-    }, [provider, account, chainId, contractAddress, version])
+    const getCurrentTokenId = async () => {
+        if(mintContract?.signer){
+          return mintContract?.getCurrentTokenId()
+        }
+    }
 
     const getTreasury = useCallback(async () => {
         return mintContract?.treasuryAddress()
@@ -140,6 +144,12 @@ const useMintSBT = (contractAddress: string | undefined, version: string | undef
             if(+version >= 1) {
               if(gasless) {
                 tx = await safeMintGasless({ contract : contractAddress, apiKey: dappApiKey,  mintParams : {tokenURI, tokenId, payment, signature }} )
+                console.log(tx)
+                //@ts-expect-error
+                if(!tx?.transactionId) {
+                  //@ts-expect-error
+                  throw tx?.data?.error || "Error while minting"
+                }
               } else {
                 tx = await mintContract?.safeMint(
                   tokenURI,

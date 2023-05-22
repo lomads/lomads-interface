@@ -148,7 +148,6 @@ export default () => {
     const { initTransak } = useTransak();
     const tokenContract = useTokenContract(contract?.mintPriceToken || undefined)
 
-    const [orgData, setOrgData] = useState<any>(null);
 
     useEffect(() => {
         if(!DAO) {
@@ -157,8 +156,8 @@ export default () => {
     }, [DAO])
 
     const isWhiteListed = useMemo(() => {
-        if(contract && contract.whitelisted && orgData && account) {
-            const currMember = _find(orgData.members, (m:any) => m?.member?.wallet.toLowerCase() === account.toLowerCase())
+        if(contract && contract.whitelisted && DAO && account) {
+            const currMember = _find(DAO.members, (m:any) => m?.member?.wallet.toLowerCase() === account.toLowerCase())
             if(!currMember)
                 return false
         }
@@ -201,21 +200,20 @@ export default () => {
     }, [account, contract])
 
     useEffect(() => {
-        if (account && contract) {
+        if (account && contract && DAO?.createdAt) {
             console.log("Account", account)
             balanceOf().then(res => 
             { 
+                console.log("BALBAL", parseInt(res._hex, 16))
                 setBalance(parseInt(res._hex, 16)) 
                 if(parseInt(res._hex, 16) === 1) {
                     setTimeout(() => { 
-                        if (contract?.redirectUrl) {
-                            window.open(contract?.redirectUrl.indexOf('http') > -1 ? contract?.redirectUrl : `https://${contract?.redirectUrl}`, '_blank');
-                        }
+                        window.location.href = `/${DAO?.url}`
                      }, 3000)
                 }
             })
         }
-    }, [account, contract])
+    }, [account, contract, DAO?.createdAt])
 
 
     const updateMetadata = async () => {
@@ -251,16 +249,8 @@ export default () => {
             setContractLoading(true)
             axiosHttp.get(`contract/${contractId}`)
                 .then(res => {
-                    console.log("contract data in min page : ", res.data);
                     setContract(res.data)
                     setPrice((prev: any) => { return { ...prev, mintPrice: _get(res.data, 'mintPrice', 0) } })
-                    axiosHttp.get(`contract/getContractDao/${res.data._id}`)
-                        .then((dao) => {
-                            if (dao) {
-                                console.log("dao data : ", dao.data);
-                                setOrgData(dao.data);
-                            }
-                        })
                 })
                 .catch(e => {
                     console.log(e)
@@ -766,8 +756,8 @@ export default () => {
             if(state.email) {
                 try {
                     await axiosHttp.post(`utility/send-alert`, { alertType: 'mint-success', to: [state?.email], data: {
-                        organizationName: orgData ? orgData?.name : '',
-                        organizationLogo: orgData ? orgData?.image : null,
+                        organizationName: _get(DAO, 'name', ''),
+                        organizationLogo: _get(DAO, 'image', ''),
                         sbtName: `${contract?.name}#${tokenId}`,
                         mintDate: moment().local().format('DD-MMM-YYYY'),
                         contractAddress:  beautifyHexToken(contract?.address),
@@ -786,16 +776,21 @@ export default () => {
             }
             setMetadata(metadataJSON)
             setBalance(1);
-            await axiosHttp.patch(`dao/${_get(DAO, 'url', '')}/update-user-discord`, {
-                discordId: state?.discord || null,
-                userId: _get(user, '_id', ''),
-                daoId: _get(DAO, '_id')
-            })
+            if(state?.discord) {
+                await axiosHttp.patch(`dao/${_get(DAO, 'url', '')}/update-user-discord`, {
+                    discordId: state?.discord || null,
+                    userId: _get(user, '_id', ''),
+                    daoId: _get(DAO, '_id')
+                })
+            }
             dispatch(updateCurrentUser({ name: state?.name }))
             dispatch(addDaoMember({ url: DAO?.url, payload: { name: '', address: account, role: myRole ? myRole : 'role4' } }))
             dispatch(getDao(DAO?.url));
             setMintLoading(false)
-            window.location.href = `/${DAO.url}`
+            setBalance(1);
+            setTimeout(() => {
+                window.location.href = `/${DAO?.url}`
+            }, 1000)
             return;
         } catch (e) {
             if (typeof e === 'string')
@@ -834,8 +829,8 @@ export default () => {
                 <Grid item sm={12} display="flex" flexDirection="column" alignItems="center" justifyContent="center">
                     <Box sx={{ mt:5 }} display="flex" alignItems="flex-start" justifyContent={"flex-start"} style={{ width: '100%', height: '100px' }}>
                         <Box>
-                            <Typography sx={{ marginLeft: "20px" }} className={classes.title}>{orgData ? orgData.name : ''}</Typography>
-                            <Typography sx={{ marginLeft: "20px", maxWidth: 800 }} className={classes.subtitle}>{orgData ? orgData.description : ''}</Typography>
+                            <Typography sx={{ marginLeft: "20px" }} className={classes.title}>{_get(DAO, 'name', '')}</Typography>
+                            <Typography sx={{ marginLeft: "20px", maxWidth: 800 }} className={classes.subtitle}>{_get(DAO, 'description', '')}</Typography>
                         </Box>
                     </Box>
                     <Box mt={0} style={{ width: '100%', minHeight: '568px', display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>

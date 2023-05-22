@@ -455,11 +455,10 @@ const Dashboard = () => {
 		const check = async () => {
 			if (chainId && DAO && DAO.sbt && account) {
 				let balance = null;
-				console.log()
 				if(+DAO?.sbt?.version >= 2) {
 					let bal = await balanceOf()
 					balance =  parseInt(bal._hex, 16)
-					console.log("BALANCE", balance)
+					console.log("BALANCE_checkinttt", balance)
 				} else {
 					let res = await getStats(DAO.sbt.chainId || DAO?.chainId)
 					balance = res[0];
@@ -506,8 +505,10 @@ const Dashboard = () => {
 				}
 			}
 		}
-		check();
-	}, [chainId, DAO, getStats, account]);
+		if (chainId && DAO && DAO.sbt && account) {
+			check();
+		}
+	}, [chainId, DAO, account]);
 
 	useEffect(() => {
 		if (account && chainId && (!user || (user && user.wallet.toLowerCase() !== account.toLowerCase()))) {
